@@ -1,0 +1,35 @@
+body {
+	width: 100%;
+	height: 100%;
+}
+
+.listOfRealtyObjects {
+	width: 50%;
+	float: left;
+	border-collapse: collapse;
+}
+
+.listOfRealtyObjectsHeader {
+	height: 30px;
+	text-align: center;
+	border-bottom: 1px solid grey;
+	border-top: 1px solid grey;
+	background-color: green;
+}
+
+.realtyObject {
+	height: 50px;
+	text-align: center;
+	border-bottom: 1px solid grey;
+	background-color: white;
+}
+
+.realtyObject:hover {
+	background-color: grey;
+}
+
+#map {
+	float: left;
+	width: 48.5%; 
+	height: 400px;
+}

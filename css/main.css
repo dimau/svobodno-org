@@ -438,7 +438,12 @@ td {
 /* ==|== primary styles =====================================================
    Author:
    ========================================================================== */
-.icon {
+
+.header {
+	height: 89px;
+}
+
+.iconBox {
 	background-image: url('brand.png');
 	width: 115px;
 	height: 89px;
@@ -446,10 +451,12 @@ td {
 	border: 1px solid black;
 }
 
-.nameOfService {
+.nameOfServiceBox {
 	float: left;
 	margin-left: 15px;
 	margin-right: 15px;
+	height: 91px;
+	text-align: center;
 }
 
 .loginBox {
@@ -459,13 +466,19 @@ td {
 }
 
 ul.login {
+	font-size: 0.8em;
 	list-style-type: none;
 	margin: 0px;
 	padding: 0px;
 }
 
+ul.login a {
+	float: right;
+}
+
 .nameLoginBox {
-	font-size: 1.5em;
+	font-size: 1.2em;
+	font-weight: bold;
 	padding-bottom: 3px;
 }
 
@@ -473,14 +486,39 @@ ul.login {
 	font-size: 30px;
 }
 
+#descriptionBox {
+	clear: both;
+	padding-top: 10px;
+}
 
+.descriptionBlock {
+	float: left;
+	width: 450px;
+	text-align: center;
+}
 
+.descriptionBlock ul {
+	text-align: left;
+}
 
+#choiceYourRoleBox {
+	clear: both;
+	text-align: center;
+	width: 900px;
+}
 
+.choiceYourRoleBoxHeader {
+	padding-bottom: 10px;
+}
 
+.choiceYourRoleButton {
+	float: left;
+	width: 450px;
+}
 
-
-
+.highlighted {
+	text-decoration: underline;
+}
 
 /* ==|== media queries ======================================================
    EXAMPLE Media Query for Responsive Design.

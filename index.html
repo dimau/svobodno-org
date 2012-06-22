@@ -36,13 +36,13 @@
 
     <!-- Add your site or application content here -->
 
-	<div id="header">
+	<div class="header">
 		
-		<div class="icon"></div>
+		<div class="iconBox"></div>
 		
-		<div class="nameOfService">
+		<div class="nameOfServiceBox">
 			<span class='slogan'>Найди свой дом с нами!</span><br>
-			Мы помогаем хорошим людям сдать / снять в аренду жилье в Екатеринбурге
+			Мы помогаем хорошим людям сдать в аренду и снять жилье в Екатеринбурге
 		</div>
 		
 		<div class="loginBox">
@@ -53,20 +53,43 @@
 					<li><input type="text" name="login"></li>
 					<li><label>Пароль:</label></li>
 					<li><input type="password" name="password"></li>
+					<li><a href="registration.html">Регистрация</a></li>
 				</ul>
 			</form>
 		</div>
 	</div>
 	
-	<div id="description">
-		
+	<div id="descriptionBox">
+		<div class="descriptionBlock">
+			<span class='descriptionBlockHeader'>Для собственников</span>
+			<ul>
+				<li><span class="highlighted">Бонусные выплаты</span> каждому собственнику - 20% от месячной стоимости аренды квартиры</li>
+				<li>Легко найти <span class="highlighted">порядочных нанимателей</span> - Вы получаете доступ к подробной информации о каждом претенденте</li>
+				<li>Найдите достойного <span class="highlighted">нанимателя с первого показа</span> - Вы сэкономите Ваше время и время потенциальный нанимателей - все стороны сделки располагают максимально подробной информацией друг о друге, а значит могут принимать взвешеные решения</li>
+			</ul>
+		</div>
+		<div class="descriptionBlock">
+			<span class='descriptionBlockHeader'>Для нанимателей</span>
+			<ul>
+				<li>Комиссия выплачивается <span class="highlighted">только по факту</span> - после подписания договора аренды</li>
+				<li>Невысокий размер комиссии - 40% от месячной стоимости аренды</li>
+				<li>Общение <span class="highlighted">напрямую с собственниками</span> - а значит быстрее и честнее</li>
+				<li>Максимально <span class="highlighted">подробная информация</span> по каждому объекту - экономьте Ваше время</li>
+			</ul>
+		</div>
 	</div>
 	
-	<div id="choiceYourRole">
-		
+	<div id="choiceYourRoleBox">
+		<span class="choiceYourRoleBoxHeader">Выберите Вашу роль:</span><br>
+		<div class="choiceYourRoleButton">
+			<input type="button" value="Я - собственник" name="ownerButton">
+		</div>
+		<div class="choiceYourRoleButton">
+			<input type="button" value="Я - наниматель" name="lodgerButton">
+		</div>
 	</div>
 	
-	<div id="footer">
+	<div class="footer">
 		
 	</div>
 
