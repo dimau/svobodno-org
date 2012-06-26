@@ -439,30 +439,71 @@ td {
    Author:
    ========================================================================== */
 
+body {
+	margin: auto;
+	font-family: 'Trebuchet MS', Tahoma, Verdana, Arial, sans-serif;
+}
+
 .header {
 	height: 89px;
+	position: relative;
+	width: 100%;
+	min-width: 703px;
 }
 
 .iconBox {
 	background-image: url('brand.png');
-	width: 115px;
-	height: 89px;
-	float: left;
-	border: 1px solid black;
+	width: 90px;
+	height: 90px;
+	/*float: left;*/
+	position: absolute;
+	left: 5px;
+	top: 0px;
 }
 
 .nameOfServiceBox {
+	position: absolute;
+	left: 0px;
+	right: 186px;
+	min-width: 370px;
 	float: left;
-	margin-left: 15px;
-	margin-right: 15px;
-	height: 91px;
+	padding-left: 90px;
+	padding-right: 15px;
+	height: 90px;
 	text-align: center;
+	
+	background: #33CEC3; /* Для старых браузров */
+    background: -moz-linear-gradient(top, #33CEC3, #009D91); /* Firefox 3.6+ */
+    /* Chrome 1-9, Safari 4-5 */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#33CEC3), color-stop(100%,#009D91));
+    /* Chrome 10+, Safari 5.1+ */
+    background: -webkit-linear-gradient(top, #33CEC3, #009D91);
+    background: -o-linear-gradient(top, #33CEC3, #009D91); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #33CEC3, #009D91); /* IE10 */
+    background: linear-gradient(top, #33CEC3, #009D91); /* CSS3 */ 
+	filter:progid: DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91'); /* для IE 6-7 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91')"; /* для IE8 */
 }
 
 .loginBox {
-	float: left;
+	float: right;
+	width: 170px;
 	border: 1px solid black;
 	padding: 7px;
+	
+	
+	background: #E2EEFD; /* Для старых браузров */
+   /* background: -moz-linear-gradient(top, #CDDDF3, #009D91); /* Firefox 3.6+ */
+    /* Chrome 1-9, Safari 4-5 */
+   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#BDDBF9), color-stop(100%,#F3F8FE));
+    /* Chrome 10+, Safari 5.1+ */
+   /* background: -webkit-linear-gradient(top, #33CEC3, #009D91);
+    background: -o-linear-gradient(top, #33CEC3, #009D91); /* Opera 11.10+ */
+   /* background: -ms-linear-gradient(top, #33CEC3, #009D91); /* IE10 */
+   /* background: linear-gradient(top, #33CEC3, #009D91); /* CSS3 */ 
+	/*filter:progid: DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91'); /* для IE 6-7 */
+	/*-ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91')"; /* для IE8 */
+
 }
 
 ul.login {
@@ -486,38 +527,13 @@ ul.login a {
 	font-size: 30px;
 }
 
-#descriptionBox {
+.footer {
+	background-image: url('stripe.gif');
+	background-repeat: repeat-x; 
+	width: 100%;
+	height: 250px;
 	clear: both;
-	padding-top: 10px;
-}
-
-.descriptionBlock {
-	float: left;
-	width: 450px;
-	text-align: center;
-}
-
-.descriptionBlock ul {
-	text-align: left;
-}
-
-#choiceYourRoleBox {
-	clear: both;
-	text-align: center;
-	width: 900px;
-}
-
-.choiceYourRoleBoxHeader {
-	padding-bottom: 10px;
-}
-
-.choiceYourRoleButton {
-	float: left;
-	width: 450px;
-}
-
-.highlighted {
-	text-decoration: underline;
+	margin-top: -250px;
 }
 
 /* ==|== media queries ======================================================

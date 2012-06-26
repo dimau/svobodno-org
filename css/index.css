@@ -1,0 +1,53 @@
+
+body {
+	
+}
+
+#descriptionBox {
+	clear: both;
+	padding-top: 10px;
+	width: 98%;
+	margin-left: 1%;
+	margin-right: 1%;
+	min-width: 703px;
+}
+
+.descriptionBlockHeader {
+	font-size: 1.2em;
+	margin-bottom: 8px;
+}
+
+.descriptionBlock1 {
+	float: left;
+	width: 49%;
+	text-align: center;
+	margin-right: 2%;
+}
+
+.descriptionBlock2 {
+	float: left;
+	width: 49%;
+	text-align: center;
+}
+
+.accordion {
+	text-align: left;
+}
+
+.accordionContentUnit {
+	font-size: 0.7em;
+}
+
+button {
+	margin-top: 30px;
+}
+
+/* ==|== media queries ======================================================
+   EXAMPLE Media Query for Responsive Design.
+   This example overrides the primary ('mobile first') styles
+   Modify as content requires.
+   ========================================================================== */
+
+@media only screen and (min-width: 35em) {
+    /* Style adjustments for viewports that meet the condition */
+}
