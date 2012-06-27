@@ -445,7 +445,7 @@ body {
 }
 
 .header {
-	height: 89px;
+	height: 90px;
 	position: relative;
 	width: 100%;
 	min-width: 703px;
@@ -525,6 +525,18 @@ ul.login a {
 
 .slogan {
 	font-size: 30px;
+}
+
+.enter {
+	float: right;
+	padding-top: 10px;
+	padding-right: 10px;
+}
+
+.headerOfPage {
+	font-size: 1.5em;
+	text-align: left;
+	margin-left: -5%;
 }
 
 .footer {

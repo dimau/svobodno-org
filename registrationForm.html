@@ -22,6 +22,7 @@
 
 		<!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
 
+		<link rel="stylesheet" href="css/jquery-ui-1.8.21.custom.css">
 		<link rel="stylesheet" href="css/main.css">
 		<link rel="stylesheet" href="css/registrationForm.css">
 
@@ -32,116 +33,6 @@
 		Create your own custom Modernizr build: www.modernizr.com/download/ -->
 		<script src="js/vendor/modernizr-2.5.3.min.js"></script>
 
-		<!-- Загружаем библиотеку для работы с картой от Яндекса -->
-		<script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
-		<!-- Как только будет загружен API и готов DOM, выполняем инициализацию -->
-		<script type="text/javascript">
-			ymaps.ready(init);
-
-			function init() {
-				// Создание экземпляра карты и его привязка к контейнеру с
-				// заданным id ("map")
-				var map = new ymaps.Map('map', {
-					// При инициализации карты, обязательно нужно указать
-					// ее центр и коэффициент масштабирования
-					center : [56.829748, 60.617435], // Екатеринбург
-					zoom : 10,
-					// Включим поведения по умолчанию (default) и,
-					// дополнительно, масштабирование колесом мыши.
-					// дополнительно включаем измеритель расстояний по клику левой кнопки мыши
-					behaviors : ['default', 'scrollZoom']
-				});
-
-				/***** Добавляем элементы управления на карту *****/
-				// Для добавления элемента управления на карту используется поле controls, ссылающееся на
-				// коллекцию элементов управления картой. Добавление элемента в коллекцию производится с помощью метода add().
-				// В метод add можно передать строковый идентификатор элемента управления и его параметры.
-				// Список типов карты
-				map.controls.add('typeSelector');
-				// Кнопка изменения масштаба - компактный вариант
-				// Расположим её ниже и левее левого верхнего угла
-				map.controls.add('smallZoomControl', {
-					left : 5,
-					top : 55
-				});
-				// Стандартный набор кнопок, кроме линейки
-				var myToolbar = new ymaps.control.MapTools(['drag', 'magnifier']);
-				map.controls.add(myToolbar);
-
-				/***** Настраиваем возможность указания адреса в форме регистрации *****/
-
-				// Создаем пустой массив маркеров - в него будет класть маркер, соответствующий адресу, введеному пользователем
-				searchObjectCollection = new ymaps.GeoObjectCollection();
-
-				// При вводе адреса в строку и нажатии энтера ставим метку на карте города
-				$('#addressForm').submit(function() {
-					// Записываем в переменную что конкретно ввел пользователь. Поле для ввода адреса располагается первым в форме!
-					var search_query = $('input:first').val();
-
-					// Получаем набор координат объектов, соответствующих строке пользователя на карте -
-					// Ограничиваем набор только первым объектом и поиск объекта ограничиваем только пригородом Екатеринбурга (параметр boundedBy [юго-западный угол, северов-восточный угол границы поиска])
-					var geoObjectsOfsearch_query = ymaps.geocode(search_query, {
-						results : 1,
-						boundedBy : [[55, 59], [58, 62]],
-						strictBounds : true
-					});
-
-					geoObjectsOfsearch_query.then(function(res) {
-						searchObjectCollection.removeAll();
-						searchObjectCollection = res.geoObjects;
-						map.geoObjects.add(searchObjectCollection);
-
-						// В центр карты поместим полученный объект
-						var point = res.geoObjects.get(0);
-						map.setCenter(point.geometry.getCoordinates(), 16);
-
-						// Указанный пользователем адрес в строке ввода сформулируем в соответствии с базой Яндекса
-						// Поле для ввода адреса располагается первым в форме!
-						document.getElementById('addressTextBox').value = point.properties.get('name');
-					},
-					// Обработка ошибки
-					function(error) {
-						alert("Возникла ошибка при работе с картой: " + error.message);
-					});
-
-					// Указанные координату не отправляются на сервер
-					return false;
-				});
-
-				// Если пользователь кликнит левой кнопкой по дому - то адресная строка заполнится автоматически
-				map.events.add('click', function(e) {
-					var coords = e.get('coordPosition');
-
-					// Отправим запрос на геокодирование, берем только 1 результат - это будетт название улицы и номер дома (так у них в Яндексе настроено).
-					ymaps.geocode(coords, {
-						results : 1
-					}).then(function(res) {
-						var names = [];
-
-						// Переберём все найденные результаты и
-						// запишем имена найденный объектов в массив names.
-						// Этот код остался от того момента, когда geocode был ограничен не одним результатом, а несколькими, возможно, для повышения эффективности его можно сократить
-						res.geoObjects.each(function(obj) {
-							names.push(obj.properties.get('name'));
-						});
-
-						// Если на карте уже есть метки - удаляем, записываем новую метку в точку, по координатам которой запрашивали обратное геокодирование
-						searchObjectCollection.removeAll();
-						searchObjectCollection = res.geoObjects;
-						map.geoObjects.add(searchObjectCollection);
-
-						// В центр карты поместим полученный объект
-						var point = res.geoObjects.get(0);
-						map.setCenter(point.geometry.getCoordinates(), 16);
-
-						// Укажем адрес данного объекта в строке ввода
-						// Поле для ввода адреса располагается первым в форме!
-						document.getElementById('addressTextBox').value = point.properties.get('name');
-					});
-				});
-
-			}
-		</script>
 	</head>
 	<body>
 		<!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
@@ -152,131 +43,341 @@
 
 		<div class="header">
 			<div class="nameOfServiceBox">
+				<div class="enter">
+					<a href="#">Вход</a>
+				</div>
 				<span class='slogan'>Найди свой дом с нами!</span>
 				<br>
 				Мы помогаем хорошим людям сдать в аренду и снять жилье в Екатеринбурге
 			</div>
 			<div class="iconBox"></div>
-			<div class="loginBox">
-				<form name="loginBox">
-					<ul class="login">
-						<li>
-							<span class='nameLoginBox'>Войти</span>
-						</li>
-						<li>
-							<label>Телефон или e-mail:</label>
-						</li>
-						<li>
-							<input type="text" name="login">
-						</li>
-						<li>
-							<label>Пароль:</label>
-						</li>
-						<li>
-							<input type="password" name="password">
-						</li>
-					</ul>
-				</form>
-			</div>
 		</div>
 
-		<div>Регистрация</div>
+		<div class="wrapperOfTabs">
+			<div class="headerOfPage">
+				Регистрация
+			</div>
+			<div id="tabs">
+				<ul>
+					<li>
+						<a href="#tabs-1">Личная информация</a>
+					</li>
+					<li>
+						<a href="#tabs-2">Условия поиска</a>
+					</li>
+					<li>
+						<a href="#tabs-3">Мои объявления</a>
+					</li>
+				</ul>
+				<div id="tabs-1">
+					<form name="personalInformation" class="personalInformation">
+						<div class="inputItem">
+							<div class="label">
+								Имя:
+							</div>
+							<input type="text" name="firstName" value="">
+						</div>
+						<div class="inputItem">
+							<div class="label">
+								Фамилия:
+							</div>
+							<input type="text" name="secondName" value="">
+						</div>
+						<div class="inputItem">
+							<div class="label">
+								Отчество:
+							</div>
+							<input type="text" name="thirdName" value="">
+						</div>
+						<div class="inputItem">
+							<div class="label">
+								Пол:
+							</div>
+							<select name="sex">
+								<option value="man">мужской</option>
+								<option value="woman">женский</option>
+							</select>
+						</div>
+						<div class="inputItem">
+							<div class="label">
+								Дата рождения:
+							</div>
+							<div id="selector" style="display: inline-block"></div>
+						</div>
+						<div class="inputItem">
+							<div class="label">
+								Ссылки на личные странички в социальных сетях:
+							</div>
+							<table>
+								<tbody>
+									<tr>
+										<td>
+										<select name="selectSocialNetwork1">
+											<option selected>В контакте</option><option>Одноклассники</option><option>Facebook</option><option>Twitter</option><option>Мой круг</option><option>Google+</option>
+										</select></td>
+										<td>
+										<input type="text" name="socialNetwork1" value="">
+										</td>
+									</tr>
+									<tr>
+										<td>
+										<select name="selectSocialNetwork2">
+											<option>В контакте</option><option selected>Одноклассники</option><option>Facebook</option><option>Twitter</option><option>Мой круг</option><option>Google+</option>
+										</select></td>
+										<td>
+										<input type="text" name="socialNetwork2" value="">
+										</td>
+									</tr>
+									<tr>
+										<td>
+										<select name="selectSocialNetwork3">
+											<option>В контакте</option><option>Одноклассники</option><option selected>Facebook</option><option>Twitter</option><option>Мой круг</option><option>Google+</option>
+										</select></td>
+										<td>
+										<input type="text" name="socialNetwork3" value="">
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="inputItem">
+							<div class="label">
+								Электронная почта:
+							</div>
+							<input type="text" name="email" value="">
+						</div>
+						<div class="inputItem">
+							<div class="label">
+								Контактный телефон:
+							</div>
+							<input type="text" name="phone" value="">
+						</div>
+						<div class="inputItem">
+							<div class="label">
+								Логин:
+							</div>
+							<input type="text" name="login" value="">
+						</div>
+						<div class="inputItem">
+							<div class="label"></div>
+							<input type="submit" value="Сохранить">
+						</div>
+					</form>
+				</div>
+				<div id="tabs-2">
+					А здесь параметры поиска
+				</div>
+				<div id="tabs-3">
+					<button id="newAdvertButton">
+						Новое объявление
+					</button>
+					<form name="advert0" class="advertDescriptionEdit">
+						<div class="advertDescriptionChapter">
+							<div class="advertDescriptionChapterHeader">
+								Описание объекта
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Тип объекта:
+								</div>
+								<select name="typeOfObject">
+									<option value="flat" selected>квартира</option>
+									<option value="room">комната</option>
+									<option value="house">дом, коттедж</option>
+									<option value="townhouse">таунхаус</option>
+									<option value="dacha">дача</option>
+									<option value="garage">гараж</option>
+								</select>
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Количество комнат:
+								</div>
+								<select name="amountOfRooms">
+									<option value="1" selected="">1</option>
+									<option value="2">2</option>
+									<option value="3">3</option>
+									<option value="4">4</option>
+									<option value="5">5</option>
+									<option value="6">6 и более</option>
+								</select>
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Общая площадь:
+								</div>
+								<input type="text" name="totalАrea" value="">
+								м²
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Жилая площадь:
+								</div>
+								<input type="text" name="livingSpace" value="">
+								м²
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Этаж:
+								</div>
+								<input type="text" name="floor" value="">
+								из
+								<input type="text" name="totalAmountFloor" value="">
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Подъезд:
+								</div>
+								<table>
+									<tbody>
+										<tr>
+											<td>
+											<input type="checkbox" name="concierge" value="">
+											В подъезде есть консьерж
+											<br>
+											</td>
+										</tr>
+										<tr>
+											<td>
+											<input type="checkbox" name="intercom" value="">
+											На входе в подъезд - домофон </td>
+											<td>
+											<input type="radio" name="intercomIsWorking" value="yes">
+											домофон работает
+											<br>
+											<input type="radio" name="intercomIsWorking" value="no">
+											домофон не работает </td>
+										</tr>
+									</tbody>
+								</table>
 
-		<form name="personalInformation" class="personalInformation">
-			<div class="inputItem">
-				<div class="label">
-					Имя:
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Фотографии (вид из окна, двор и дом, каждая из комнат, ванна, туалет, кухня)
+								</div>
+							</div>
+						</div>
+						
+						<div class="advertDescriptionChapter" id="addressChapter">
+							<div class="advertDescriptionChapterHeader">
+								Местоположение
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Город:
+								</div>
+								<span>
+									Екатеринбург
+								</span>
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Улица и номер дома:
+								</div>
+								<table>
+									<tbody>
+										<tr>
+											<td>
+												<form name="address" id="addressForm">
+													<input type="text" name="address" id="addressTextBox" size="30" value="улица и номер дома">
+													<input type="submit" value="Проверить адрес">
+												</form>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<!-- Карта Яндекса -->
+												<div id="map" style="width: 400px; height: 400px; margin-top: 8px;"></div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Номер квартиры:
+								</div>
+								<input type="text" name="apartment number" size="7" value="">
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Станция метро рядом:
+								</div>
+								<select name="subwayStation">
+									<option value="0" selected>Нет</option>
+									<option value="1">Проспект Космонавтов</option>
+									<option value="2">Уралмаш</option>
+									<option value="3">Машиностроителей</option>
+									<option value="4">Уральская</option>
+									<option value="5">Динамо</option>
+									<option value="6">Площадь 1905 г.</option>
+									<option value="7">Геологическая</option>
+									<option value="8">Чкаловская</option>
+									<option value="9">Ботаническая</option>
+								</select>
+								<input type="text" name="distanceToMetroStation" size="4" value=""> мин. ходьбы
+							</div>
+						</div>
+						
+						<div class="advertDescriptionChapter" id="costChapter">
+							<div class="advertDescriptionChapterHeader">
+								Стоимость, условия оплаты
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Месячная плата за аренду:
+								</div>
+								<input type="text" name="costOfRenting" size="7" value=""> руб.
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Коммунальные услуги:
+								</div>
+								<table>
+									<tbody>
+										<tr>
+											<td>
+											<input type="checkbox" name="paidInAddition" value="" checked> Оплачиваются дополнительно 
+											</td>
+											<td>
+												Летом <input type="text" name="costInSummer" size="7" value=""> руб. <br>
+												Зимой <input type="text" name="costInWinter" size="7" value=""> руб.
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Номер квартиры
+								</div>
+								<input type="text" name="apartment number" size="7" value="">
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Станция метро рядом
+								</div>
+								<select name="subwayStation">
+									<option value="0" selected>Нет</option>
+									<option value="1">Проспект Космонавтов</option>
+									<option value="2">Уралмаш</option>
+									<option value="3">Машиностроителей</option>
+									<option value="4">Уральская</option>
+									<option value="5">Динамо</option>
+									<option value="6">Площадь 1905 г.</option>
+									<option value="7">Геологическая</option>
+									<option value="8">Чкаловская</option>
+									<option value="9">Ботаническая</option>
+								</select>
+								<input type="text" name="distanceToMetroStation" size="4" value=""> мин. ходьбы
+							</div>
+						</div>
+					</form>
+					
 				</div>
-				<input type="text" name="firstName" value="">
 			</div>
-			<div class="inputItem">
-				<div class="label">
-					Фамилия:
-				</div>
-				<input type="text" name="secondName" value="">
-			</div>
-			<div class="inputItem">
-				<div class="label">
-					Отчество:
-				</div>
-				<input type="text" name="thirdName" value="">
-			</div>
-			<div class="inputItem">
-				<div class="label">
-					Пол:
-				</div>
-				<input type="text" name="sex" value="">
-			</div>
-			<div class="inputItem">
-				<div class="label">
-					Дата рождения:
-				</div>
-				<input type="text" name="birthDay" value="">
-			</div>
-			<div class="inputItem">
-				<div class="label">
-					Ссылки на личные странички в социальных сетях:
-				</div>
-				<table class="socialNetworkSelect">
-					<tbody>
-						<tr>
-							<td>
-							<select name="selectSocialNetwork1">
-								<option selected>В контакте</option><option>Одноклассники</option><option>Facebook</option><option>Twitter</option><option>Мой круг</option><option>Google+</option>
-							</select></td>
-							<td>
-							<input type="text" name="socialNetwork1" value="">
-							</td>
-						</tr>
-						<tr>
-							<td>
-							<select name="selectSocialNetwork2">
-								<option>В контакте</option><option selected>Одноклассники</option><option>Facebook</option><option>Twitter</option><option>Мой круг</option><option>Google+</option>
-							</select></td>
-							<td>
-							<input type="text" name="socialNetwork2" value="">
-							</td>
-						</tr>
-						<tr>
-							<td>
-							<select name="selectSocialNetwork3">
-								<option>В контакте</option><option>Одноклассники</option><option selected>Facebook</option><option>Twitter</option><option>Мой круг</option><option>Google+</option>
-							</select></td>
-							<td>
-							<input type="text" name="socialNetwork3" value="">
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="inputItem">
-				<div class="label">
-					Контактный телефон:
-				</div>
-				<input type="text" name="phone" value="">
-			</div>
-			<div class="inputItem">
-				<div class="label">
-					Логин:
-				</div>
-				<input type="text" name="login" value="">
-				<a>Сменить пароль</a>
-			</div>
-			<div class="inputItem">
-				<div class="label">
-				</div>
-				<input type="submit" value="Сохранить">
-			</div>
-			
-		</form>
-
-		<form name="address" id="addressForm">
-			<input type="text" name="address" id="addressTextBox" value="улица и номер дома">
-			<input type="submit" value="Проверить адрес">
-		</form>
-
-		<!-- Карта Яндекса -->
-		<div id="map" style="width: 300px; height: 400px;"></div>
+		</div>
 
 		<!-- Заполнитель низа -->
 		<div class="footer"></div>
@@ -285,9 +386,17 @@
 
 		<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-		<script>
-			window.jQuery || document.write('<script src="js/vendor/jquery-1.7.2.min.js"><\/script>')
-		</script>
+
+		<!-- jQuery UI с моей темой оформления -->
+		<script src="js/vendor/jquery-ui-1.8.21.custom.min.js"></script>
+
+		<!-- Загружаем библиотеку для работы с картой от Яндекса -->
+		<script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
+
+		<!-- Подгружаем яваскрипт для нормальной работы элемента - выбор даты без календаря-->
+		<script src="js/dateSelector/dom.js"></script>
+		<script src="js/dateSelector/eventer.js"></script>
+		<script src="js/dateSelector/dateselector.js"></script>
 
 		<!-- scripts concatenated and minified via build script -->
 		<script src="js/registrationForm.js"></script>
