@@ -539,13 +539,20 @@ ul.login a {
 	margin-left: -5%;
 }
 
-.footer {
+.footerImage {
 	background-image: url('stripe.gif');
 	background-repeat: repeat-x; 
 	width: 100%;
 	height: 250px;
 	clear: both;
 	margin-top: -250px;
+}
+
+.footer {
+	font-size: 13px;
+	color: #666666;
+	text-align: center;
+	padding: 7px;
 }
 
 /* ==|== media queries ======================================================

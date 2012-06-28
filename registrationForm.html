@@ -94,6 +94,7 @@
 								Пол:
 							</div>
 							<select name="sex">
+								<option value="0" selected></option>
 								<option value="man">мужской</option>
 								<option value="woman">женский</option>
 							</select>
@@ -113,7 +114,8 @@
 									<tr>
 										<td>
 										<select name="selectSocialNetwork1">
-											<option selected>В контакте</option><option>Одноклассники</option><option>Facebook</option><option>Twitter</option><option>Мой круг</option><option>Google+</option>
+											<option value="0" selected></option>
+											<option value="1">В контакте</option><option value="2">Одноклассники</option><option value="3">Facebook</option><option value="4">Twitter</option><option value="5">Мой круг</option><option value="6">Google+</option>
 										</select></td>
 										<td>
 										<input type="text" name="socialNetwork1" value="">
@@ -122,7 +124,8 @@
 									<tr>
 										<td>
 										<select name="selectSocialNetwork2">
-											<option>В контакте</option><option selected>Одноклассники</option><option>Facebook</option><option>Twitter</option><option>Мой круг</option><option>Google+</option>
+											<option value="0" selected></option>
+											<option value="1">В контакте</option><option value="2">Одноклассники</option><option value="3">Facebook</option><option value="4">Twitter</option><option value="5">Мой круг</option><option value="6">Google+</option>
 										</select></td>
 										<td>
 										<input type="text" name="socialNetwork2" value="">
@@ -131,7 +134,8 @@
 									<tr>
 										<td>
 										<select name="selectSocialNetwork3">
-											<option>В контакте</option><option>Одноклассники</option><option selected>Facebook</option><option>Twitter</option><option>Мой круг</option><option>Google+</option>
+											<option value="0" selected></option>
+											<option value="1">В контакте</option><option value="2">Одноклассники</option><option value="3">Facebook</option><option value="4">Twitter</option><option value="5">Мой круг</option><option value="6">Google+</option>
 										</select></td>
 										<td>
 										<input type="text" name="socialNetwork3" value="">
@@ -181,7 +185,8 @@
 									Тип объекта:
 								</div>
 								<select name="typeOfObject">
-									<option value="flat" selected>квартира</option>
+									<option value="0" selected></option>
+									<option value="flat">квартира</option>
 									<option value="room">комната</option>
 									<option value="house">дом, коттедж</option>
 									<option value="townhouse">таунхаус</option>
@@ -191,15 +196,76 @@
 							</div>
 							<div class="objectDescriptionItem">
 								<div class="objectDescriptionLabel">
-									Количество комнат:
+									С какого числа можно въезжать:
+								</div>
+								Выбор даты
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									На какой срок сдается:
+								</div>
+								<input type="text" name="termOfLease" value="">
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Количество комнат в квартире, доме:
 								</div>
 								<select name="amountOfRooms">
-									<option value="1" selected="">1</option>
+									<option value="0" selected></option>
+									<option value="1">1</option>
 									<option value="2">2</option>
 									<option value="3">3</option>
 									<option value="4">4</option>
 									<option value="5">5</option>
 									<option value="6">6 и более</option>
+								</select>
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Комнаты смежные:
+								</div>
+								<select name="adjacentRooms">
+									<option value="0" selected></option>
+									<option value="1">нет</option>
+									<option value="2">да</option>
+								</select>
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Санузел:
+								</div>
+								<select name="typeOfBathrooms">
+									<option value="0" selected></option>
+									<option value="1">раздельный</option>
+									<option value="2">совмещенный</option>
+									<option value="3">2</option>
+									<option value="4">3</option>
+								</select>
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Балкон/лоджия:
+								</div>
+								<select name="typeOfBalcony">
+									<option value="0" selected></option>
+									<option value="1">нет</option>
+									<option value="2">балкон</option>
+									<option value="3">лоджия</option>
+									<option value="4">балкон и лоджия</option>
+									<option value="5">балкон и эркер</option>
+									<option value="6">2 балкона и более</option>
+									<option value="7">2 лоджии и более</option>
+									<option value="8">2 эркера и более</option>
+								</select>
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Остекление балкона/лоджии:
+								</div>
+								<select name="glazed">
+									<option value="0" selected></option>
+									<option value="1">нет</option>
+									<option value="2">да</option>
 								</select>
 							</div>
 							<div class="objectDescriptionItem">
@@ -226,161 +292,597 @@
 							</div>
 							<div class="objectDescriptionItem">
 								<div class="objectDescriptionLabel">
-									Подъезд:
+									Консьерж:
 								</div>
-								<table>
-									<tbody>
-										<tr>
-											<td>
-											<input type="checkbox" name="concierge" value="">
-											В подъезде есть консьерж
-											<br>
-											</td>
-										</tr>
-										<tr>
-											<td>
-											<input type="checkbox" name="intercom" value="">
-											На входе в подъезд - домофон </td>
-											<td>
-											<input type="radio" name="intercomIsWorking" value="yes">
-											домофон работает
-											<br>
-											<input type="radio" name="intercomIsWorking" value="no">
-											домофон не работает </td>
-										</tr>
-									</tbody>
-								</table>
+								<select name="concierge">
+									<option value="0" selected></option>
+									<option value="1">есть</option>
+									<option value="2">нет</option>
+								</select>
+							</div>
+							<div class="objectDescriptionItem">
+								<div class="objectDescriptionLabel">
+									Домофон:
+								</div>
+								<select name="intercom">
+									<option value="0" selected></option>
+									<option value="1">есть и работает</option>
+									<option value="2">есть, но не работает</option>
+									<option value="3">нет</option>
+								</select>
+							</div>
 
+						<div class="objectDescriptionItem">
+							<div class="objectDescriptionLabel">
+								Парковка:
 							</div>
-							<div class="objectDescriptionItem">
-								<div class="objectDescriptionLabel">
-									Фотографии (вид из окна, двор и дом, каждая из комнат, ванна, туалет, кухня)
-								</div>
+							<select name="parking">
+								<option value="0" selected></option>
+								<option value="1">стихийная</option>
+								<option value="2">охраняемая</option>
+								<option value="3">неохраняемая</option>
+								<option value="4">подземная</option>
+								<option value="5">отсутствует</option>
+							</select>
+						</div>
+						<div class="objectDescriptionItem">
+							<div class="objectDescriptionLabel">
+								Фотографии (вид из окна, двор и дом, каждая из комнат, ванна, туалет, кухня)
 							</div>
 						</div>
-						
-						<div class="advertDescriptionChapter" id="addressChapter">
-							<div class="advertDescriptionChapterHeader">
-								Местоположение
-							</div>
-							<div class="objectDescriptionItem">
-								<div class="objectDescriptionLabel">
-									Город:
-								</div>
-								<span>
-									Екатеринбург
-								</span>
-							</div>
-							<div class="objectDescriptionItem">
-								<div class="objectDescriptionLabel">
-									Улица и номер дома:
-								</div>
-								<table>
-									<tbody>
-										<tr>
-											<td>
-												<form name="address" id="addressForm">
-													<input type="text" name="address" id="addressTextBox" size="30" value="улица и номер дома">
-													<input type="submit" value="Проверить адрес">
-												</form>
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<!-- Карта Яндекса -->
-												<div id="map" style="width: 400px; height: 400px; margin-top: 8px;"></div>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-							<div class="objectDescriptionItem">
-								<div class="objectDescriptionLabel">
-									Номер квартиры:
-								</div>
-								<input type="text" name="apartment number" size="7" value="">
-							</div>
-							<div class="objectDescriptionItem">
-								<div class="objectDescriptionLabel">
-									Станция метро рядом:
-								</div>
-								<select name="subwayStation">
-									<option value="0" selected>Нет</option>
-									<option value="1">Проспект Космонавтов</option>
-									<option value="2">Уралмаш</option>
-									<option value="3">Машиностроителей</option>
-									<option value="4">Уральская</option>
-									<option value="5">Динамо</option>
-									<option value="6">Площадь 1905 г.</option>
-									<option value="7">Геологическая</option>
-									<option value="8">Чкаловская</option>
-									<option value="9">Ботаническая</option>
-								</select>
-								<input type="text" name="distanceToMetroStation" size="4" value=""> мин. ходьбы
-							</div>
-						</div>
-						
-						<div class="advertDescriptionChapter" id="costChapter">
-							<div class="advertDescriptionChapterHeader">
-								Стоимость, условия оплаты
-							</div>
-							<div class="objectDescriptionItem">
-								<div class="objectDescriptionLabel">
-									Месячная плата за аренду:
-								</div>
-								<input type="text" name="costOfRenting" size="7" value=""> руб.
-							</div>
-							<div class="objectDescriptionItem">
-								<div class="objectDescriptionLabel">
-									Коммунальные услуги:
-								</div>
-								<table>
-									<tbody>
-										<tr>
-											<td>
-											<input type="checkbox" name="paidInAddition" value="" checked> Оплачиваются дополнительно 
-											</td>
-											<td>
-												Летом <input type="text" name="costInSummer" size="7" value=""> руб. <br>
-												Зимой <input type="text" name="costInWinter" size="7" value=""> руб.
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-							<div class="objectDescriptionItem">
-								<div class="objectDescriptionLabel">
-									Номер квартиры
-								</div>
-								<input type="text" name="apartment number" size="7" value="">
-							</div>
-							<div class="objectDescriptionItem">
-								<div class="objectDescriptionLabel">
-									Станция метро рядом
-								</div>
-								<select name="subwayStation">
-									<option value="0" selected>Нет</option>
-									<option value="1">Проспект Космонавтов</option>
-									<option value="2">Уралмаш</option>
-									<option value="3">Машиностроителей</option>
-									<option value="4">Уральская</option>
-									<option value="5">Динамо</option>
-									<option value="6">Площадь 1905 г.</option>
-									<option value="7">Геологическая</option>
-									<option value="8">Чкаловская</option>
-									<option value="9">Ботаническая</option>
-								</select>
-								<input type="text" name="distanceToMetroStation" size="4" value=""> мин. ходьбы
-							</div>
-						</div>
-					</form>
-					
 				</div>
+
+				<div class="advertDescriptionChapter" id="addressChapter">
+					<div class="advertDescriptionChapterHeader">
+						Местоположение
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Город:
+						</div>
+						<span> Екатеринбург </span>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Улица и номер дома:
+						</div>
+						<table>
+							<tbody>
+								<tr>
+									<td>
+									<form name="address" id="addressForm">
+										<input type="text" name="address" id="addressTextBox" size="30" value="">
+										<input type="submit" value="Проверить адрес">
+									</form></td>
+								</tr>
+								<tr>
+									<td><!-- Карта Яндекса --><div id="map" style="width: 400px; height: 400px; margin-top: 8px;"></div></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Номер квартиры:
+						</div>
+						<input type="text" name="apartment number" size="7" value="">
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Станция метро рядом:
+						</div>
+						<select name="subwayStation">
+							<option value="0" selected></option>
+							<option value="10">Нет</option>
+							<option value="1">Проспект Космонавтов</option>
+							<option value="2">Уралмаш</option>
+							<option value="3">Машиностроителей</option>
+							<option value="4">Уральская</option>
+							<option value="5">Динамо</option>
+							<option value="6">Площадь 1905 г.</option>
+							<option value="7">Геологическая</option>
+							<option value="8">Чкаловская</option>
+							<option value="9">Ботаническая</option>
+						</select>
+						<input type="text" name="distanceToMetroStation" size="4" value="">
+						мин. ходьбы
+					</div>
+				</div>
+
+				<div class="advertDescriptionChapter" id="costChapter">
+					<div class="advertDescriptionChapterHeader">
+						Стоимость, условия оплаты
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Плата за аренду:
+						</div>
+						<input type="text" name="costOfRenting" size="7" value="">
+						руб. в месяц
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Коммунальные услуги оплачиваются арендатором дополнительно:
+						</div>
+						<select name="utilities">
+							<option value="0" selected></option>
+							<option value="1">да</option>
+							<option value="2">нет</option>
+						</select>
+						Летом
+						<input type="text" name="costInSummer" size="7" value="">
+						руб. Зимой
+						<input type="text" name="costInWinter" size="7" value="">
+						руб.
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Электроэнергия оплачивается дополнительно:
+						</div>
+						<select name="electricPower">
+							<option value="0" selected></option>
+							<option value="1">да</option>
+							<option value="2">нет</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Залог за последний месяц проживания
+						</div>
+						<select name="bail">
+							<option value="0" selected></option>
+							<option value="1">есть</option>
+							<option value="2">нет</option>
+						</select>
+						<input type="text" name="bailCost" size="7" value="">
+						руб.
+					</div>
+				</div>
+
+				<div class="advertDescriptionChapter" id="currentStatus">
+					<div class="advertDescriptionChapterHeader">
+						Текущее состояние
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Ремонт:
+						</div>
+						<select name="repair">
+							<option value="0" selected></option>
+							<option value="1">не выполнялся (новый дом)</option>
+							<option value="2">больше года назад</option>
+							<option value="3">меньше 1 года назад</option>
+							<option value="4">сделан только что</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Отделка (жилых помещений):
+						</div>
+						<select name="furnish">
+							<option value="0" selected></option>
+							<option value="1">евростандарт</option>
+							<option value="2">косметическая (новые обои, побелка потолков)</option>
+							<option value="3">иное</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Окна:
+						</div>
+						<select name="windows">
+							<option value="0" selected></option>
+							<option value="1">деревянные</option>
+							<option value="2">стеклопакет</option>
+							<option value="3">иное</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Санузел, отделка:
+						</div>
+						<select name="wс">
+							<option value="0" selected></option>
+							<option value="1">кафель</option>
+							<option value="2">обои</option>
+							<option value="3">побелка</option>
+							<option value="4">иное</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Половое покрытие в комнатах:
+						</div>
+						<select name="flooring">
+							<option value="0" selected></option>
+							<option value="1">дерево</option>
+							<option value="2">паркет</option>
+							<option value="3">ламинат</option>
+							<option value="4">ковер</option>
+							<option value="5">бетон</option>
+							<option value="6">линолеум</option>
+							<option value="7">иное</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="advertDescriptionChapter" id="communication">
+					<div class="advertDescriptionChapterHeader">
+						Связь
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Интернет:
+						</div>
+						<select name="internet">
+							<option value="0" selected></option>
+							<option value="1">не проведен, нельзя провести</option>
+							<option value="2">не проведен, можно провести</option>
+							<option value="3">проведен, можно использовать</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Телефон:
+						</div>
+						<select name="telephoneLine">
+							<option value="0" selected></option>
+							<option value="1">не проведен, нельзя провести</option>
+							<option value="2">не проведен, можно провести</option>
+							<option value="3">проведен, можно использовать</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Кабельное ТВ:
+						</div>
+						<select name="cableTV">
+							<option value="0" selected></option>
+							<option value="1">не проведен, нельзя провести</option>
+							<option value="2">не проведен, можно провести</option>
+							<option value="3">проведен, можно использовать</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="advertDescriptionChapter" id="furniture">
+					<div class="advertDescriptionChapterHeader">
+						Мебель и бытовая техника
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Наличие мебели и бытовой техники:
+						</div>
+						<select name="furnitureYesNo">
+							<option value="0" selected></option>
+							<option value="1">Сдается с мебелью и бытовой техникой</option>
+							<option value="2">Сдается без мебели и бытовой техники</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							<input type="checkbox" name="sofa">
+							Диван:
+						</div>
+						количество
+						<input type="text" name="sofaAmount" size="3" value="">
+						состояние
+						<select name="sofaCurrentStatus">
+							<option value="0" selected></option>
+							<option value="1">новый</option>
+							<option value="2">старый</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							<input type="checkbox" name="chairBed">
+							Кресло-кровать:
+						</div>
+						количество
+						<input type="text" name="chairBedAmount" size="3" value="">
+						состояние
+						<select name="chairBedCurrentStatus">
+							<option value="0" selected></option>
+							<option value="1">новый</option>
+							<option value="2">старый</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							<input type="checkbox" name="chair">
+							Кресло:
+						</div>
+						количество
+						<input type="text" name="chairAmount" size="3" value="">
+						состояние
+						<select name="chairCurrentStatus">
+							<option value="0" selected></option>
+							<option value="1">новый</option>
+							<option value="2">старый</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							<input type="checkbox" name="stool">
+							Стул:
+						</div>
+						количество
+						<input type="text" name="stoolAmount" size="3" value="">
+						состояние
+						<select name="stoolCurrentStatus">
+							<option value="0" selected></option>
+							<option value="1">новый</option>
+							<option value="2">старый</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							<input type="checkbox" name="tabouret">
+							Табурет:
+						</div>
+						количество
+						<input type="text" name="tabouretAmount" size="3" value="">
+						состояние
+						<select name="tabouretCurrentStatus">
+							<option value="0" selected></option>
+							<option value="1">новый</option>
+							<option value="2">старый</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							<input type="checkbox" name="deskTable">
+							Стол письменный, компьютерный:
+						</div>
+						количество
+						<input type="text" name="deskTableAmount" size="3" value="">
+						состояние
+						<select name="deskTableCurrentStatus">
+							<option value="0" selected></option>
+							<option value="1">новый</option>
+							<option value="2">старый</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							<input type="checkbox" name="coffeeTable">
+							Стол журнальный:
+						</div>
+						количество
+						<input type="text" name="coffeeTableAmount" size="3" value="">
+						состояние
+						<select name="coffeeTableCurrentStatus">
+							<option value="0" selected></option>
+							<option value="1">новый</option>
+							<option value="2">старый</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							<input type="checkbox" name="setOfCabinets">
+							Стенка:
+						</div>
+						количество
+						<input type="text" name="setOfCabinetsAmount" size="3" value="">
+						состояние
+						<select name="setOfCabinetsCurrentStatus">
+							<option value="0" selected></option>
+							<option value="1">новый</option>
+							<option value="2">старый</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							<input type="checkbox" name="cabinet">
+							Шкаф для одежды:
+						</div>
+						количество
+						<input type="text" name="cabinetAmount" size="3" value="">
+						состояние
+						<select name="cabinetCurrentStatus">
+							<option value="0" selected></option>
+							<option value="1">новый</option>
+							<option value="2">старый</option>
+						</select>
+					</div>
+
+					<br>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							<input type="checkbox" name="diningTable">
+							Стол обеденный:
+						</div>
+						количество
+						<input type="text" name="diningTableAmount" size="3" value="">
+						состояние
+						<select name="diningTableCurrentStatus">
+							<option value="0" selected></option>
+							<option value="1">новый</option>
+							<option value="2">старый</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							<input type="checkbox" name="kitchenSet">
+							Кухонный гарнитур:
+						</div>
+						количество
+						<input type="text" name="kitchenSetAmount" size="3" value="">
+						состояние
+						<select name="kitchenSetCurrentStatus">
+							<option value="0" selected></option>
+							<option value="1">новый</option>
+							<option value="2">старый</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							<input type="checkbox" name="cupboards">
+							Шкаф для посуды:
+						</div>
+						количество
+						<input type="text" name="cupboardsAmount" size="3" value="">
+						состояние
+						<select name="cupboardsCurrentStatus">
+							<option value="0" selected></option>
+							<option value="1">новый</option>
+							<option value="2">старый</option>
+						</select>
+					</div>
+
+					<br>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							<input type="checkbox" name="televisionSet">
+							Телевизор:
+						</div>
+						количество
+						<input type="text" name="televisionSetAmount" size="3" value="">
+						состояние
+						<select name="televisionSetCurrentStatus">
+							<option value="0" selected></option>
+							<option value="1">новый</option>
+							<option value="2">старый</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							<input type="checkbox" name="refrigerator">
+							Холодильник:
+						</div>
+						количество
+						<input type="text" name="refrigeratorAmount" size="3" value="">
+						состояние
+						<select name="refrigeratorCurrentStatus">
+							<option value="0" selected></option>
+							<option value="1">новый</option>
+							<option value="2">старый</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							<input type="checkbox" name="washingMachine">
+							Стиральная машина:
+						</div>
+						количество
+						<input type="text" name="washingMachineAmount" size="3" value="">
+						состояние
+						<select name="washingMachineCurrentStatus">
+							<option value="0" selected></option>
+							<option value="1">новый</option>
+							<option value="2">старый</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							<input type="checkbox" name="stove">
+							Плита (газовая, электрическая):
+						</div>
+						количество
+						<input type="text" name="stoveAmount" size="3" value="">
+						состояние
+						<select name="stoveCurrentStatus">
+							<option value="0" selected></option>
+							<option value="1">новый</option>
+							<option value="2">старый</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="advertDescriptionChapter" id="requirementsForTenant">
+					<div class="advertDescriptionChapterHeader">
+						Требования к арендатору
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Пол:
+						</div>
+						<div style="display: inline-block">
+							<input type="checkbox" name="sexOfTenantMan">
+							мужчина
+							<br>
+							<input type="checkbox" name="sexOfTenantWoman">
+							женщина
+						</div>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Отношения между арендаторами:
+						</div>
+						<div style="display: inline-block">
+							<input type="checkbox" name="relationsFamily">
+							семейная пара
+							<br>
+							<input type="checkbox" name="relationsNotFamily">
+							несемейная пара
+							<br>
+							<input type="checkbox" name="relationsAlone">
+							один человек
+							<br>
+							<input type="checkbox" name="relationsGroup">
+							группа людей
+						</div>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Национальность:
+						</div>
+						<div style="display: inline-block">
+							<input type="checkbox" name="nationalityRussian">
+							русским
+							<br>
+							<input type="checkbox" name="nationalityEuropean">
+							европейцам, американцам
+							<br>
+							<input type="checkbox" name="nationalityEast">
+							СНГ, восточным национальностям
+							<br>
+						</div>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Дети:
+						</div>
+						<select name="children">
+							<option value="0" selected></option>
+							<option value="1">не имеет значения</option>
+							<option value="2">с детьми старше 4-х лет</option>
+							<option value="3">только без детей</option>
+						</select>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Животные:
+						</div>
+						<select name="animals">
+							<option value="0" selected></option>
+							<option value="1">не имеет значения</option>
+							<option value="2">только без животных</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="advertDescriptionChapter" id="specialConditions">
+					<div class="advertDescriptionChapterHeader">
+						Особые условия
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Важные моменты, касающиеся сдаваемого объекта, которые не были указаны в форме выше:
+						</div>
+						<textarea name="comment" maxlength="1000" rows="7" cols="45"></textarea>
+					</div>
+				</div>
+				</form>
+
 			</div>
+		</div>
 		</div>
 
 		<!-- Заполнитель низа -->
-		<div class="footer"></div>
+		<div class="footerImage"></div>
+		<div class="footer">2012 «Долфин хоум», вопросы и пожелания по работе портала можно передавать по телефону 8-922-143-16-15</div>
+
 
 		<!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
 
