@@ -163,6 +163,12 @@
 							<input type="text" name="login" value="">
 						</div>
 						<div class="inputItem">
+							<div class="label">
+								Пароль:
+							</div>
+							<input type="password" name="password" value="">
+						</div>
+						<div class="inputItem">
 							<div class="label"></div>
 							<input type="submit" value="Сохранить">
 						</div>
@@ -175,6 +181,10 @@
 					<button id="newAdvertButton">
 						Новое объявление
 					</button>
+					
+					<div id="advert0Header" class="advertHeader">
+						<span class="advertHeader1">Квартира по улице Кирова 15, №3 </span><span class="advertHeader2" style="font-size: 0.9em; color: red" >статус: не опубликовано</span>
+					</div>
 					<form name="advert0" class="advertDescriptionEdit">
 						<div class="advertDescriptionChapter">
 							<div class="advertDescriptionChapterHeader">
@@ -341,6 +351,53 @@
 							Город:
 						</div>
 						<span> Екатеринбург </span>
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+							Район:
+						</div>
+						<select name="district">
+							<option value="0" selected></option>
+							<option value="1">Автовокзал (южный)</option>
+							<option value="2">Академический</option>
+							<option value="3">Ботанический</option>
+							<option value="4">ВИЗ</option>
+							<option value="5">Вокзальный</option>
+							<option value="6">Втузгородок</option>
+							<option value="7">Горный щит</option>
+							<option value="8">Елизавет</option>
+							<option value="9">ЖБИ</option>
+							<option value="10">Завокзальный</option>
+							<option value="11">Заречный</option>
+							<option value="12">Изоплит</option>
+							<option value="13">Исток</option>
+							<option value="14">Калиновский</option>
+							<option value="15">Кольцово</option>
+							<option value="16">Компрессорный</option>
+							<option value="17">Лечебный</option>
+							<option value="18">Медный</option>
+							<option value="19">Нижнеисетский</option>
+							<option value="20">Парковый</option>
+							<option value="21">Пионерский</option>
+							<option value="22">Птицефабрика</option>
+							<option value="23">Семь ключей</option>
+							<option value="24">Сибирский тракт</option>
+							<option value="25">Синие камни</option>
+							<option value="26">Совхозный</option>
+							<option value="27">Сортировка новая</option>
+							<option value="28">Сортировка старая</option>
+							<option value="29">Уктус</option>
+							<option value="30">УНЦ</option>
+							<option value="31">Уралмаш</option>
+							<option value="32">Химмаш</option>
+							<option value="33">Центр</option>
+							<option value="34">Чермет</option>
+							<option value="35">Шарташ</option>
+							<option value="36">Широкая речка</option>
+							<option value="37">Эльмаш</option>
+							<option value="38">Юго-запад</option>
+							<option value="39">За городом</option>
+						</select>
 					</div>
 					<div class="objectDescriptionItem">
 						<div class="objectDescriptionLabel">
@@ -873,8 +930,17 @@
 						<textarea name="comment" maxlength="1000" rows="7" cols="45"></textarea>
 					</div>
 				</div>
+				
+				<div class="advertDescriptionChapter" id="submitAdvertButton">
+					<div class="advertDescriptionChapterHeader">
+					</div>
+					<div class="objectDescriptionItem">
+						<div class="objectDescriptionLabel">
+						</div>
+						<input type="submit" value="Сохранить">
+					</div>
+				</div>
 				</form>
-
 			</div>
 		</div>
 		</div>

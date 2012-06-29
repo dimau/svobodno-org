@@ -15,6 +15,41 @@ body {
 	font-size: 1em;
 }
 
+.photoShot {
+	float: left;
+	width: 200px;
+	height: 300px;
+	border: 1px solid black;
+}
+
+.profileInformation {
+	margin-left: 212px;
+}
+
+.FIO {
+	font-size: 1.1em;
+	font-weight: bold;
+}
+
+.news {
+	border: 1px solid black;
+	padding: 5px;
+	margin: 5px;
+}
+
+.newsHeader {
+	background-color: #B5B5B5; 
+	padding-left: 5px;
+}
+
+.unread {
+	/*background-color: #5DCEC6;*/
+}
+
+div.unread > div.newsHeader {
+	background-color: #FF9340;
+}
+
 #addressForm {
 	clear: both;
 }
