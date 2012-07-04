@@ -12,9 +12,17 @@ $(function() {
 
 // Активируем кнопки "Новое объявление" через jQuery UI - добавляем пиктограммку плюсика в кружочке
 	$(function() {
-		$("button").button({
+		$("button#newAdvertButton").button({
             icons: {
                 primary: "ui-icon-circle-plus"
+            }
+        });
+	});
+	
+	$(function() {
+		$("button.saveAdvertButton").button({
+            icons: {
+                primary: "ui-icon-disk"
             }
         });
 	});

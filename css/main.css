@@ -442,6 +442,7 @@ td {
 body {
 	margin: auto;
 	font-family: 'Trebuchet MS', Tahoma, Verdana, Arial, sans-serif;
+	min-width: 780px;
 }
 
 .header {
@@ -531,6 +532,7 @@ ul.login a {
 	float: right;
 	padding-top: 10px;
 	padding-right: 10px;
+	text-align: right;
 }
 
 .headerOfPage {
@@ -554,6 +556,7 @@ ul.login a {
 	text-align: center;
 	padding: 7px;
 }
+
 
 /* ==|== media queries ======================================================
    EXAMPLE Media Query for Responsive Design.
