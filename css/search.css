@@ -3,6 +3,27 @@ body {
 	height: 100%;
 }
 
+.wrapperOfTabs{
+	width: 85%;
+	margin: auto;
+}
+
+.headerOfPage {
+	font-size: 1.5em;
+	text-align: left;
+	margin-left: -5%;
+}
+
+#tabs {
+	font-size: 1em;
+}
+
+/* Стили для параметров поиска*/
+.searchChapter {
+	display: inline-block;
+}
+
+/* Стили для списка объявлений*/
 .listOfRealtyObjects {
 	width: 50%;
 	float: left;
@@ -28,8 +49,9 @@ body {
 	background-color: grey;
 }
 
+/* Стили для карты*/
 #map {
 	float: left;
-	width: 48.5%; 
+	width: 50%; 
 	height: 400px;
 }

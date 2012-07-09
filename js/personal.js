@@ -19,6 +19,26 @@ $(function() {
         });
 	});
 	
+// Навешиваем обработчик на клик на кнопке нового объявления
+	$("button#newAdvertButton").on('click', clickNewAdvertButton);
+	
+	function clickNewAdvertButton() {
+		$("#modalWindowNewAdvert").dialog("open");
+		return false;
+	}
+		
+// Готовим форму для модального окна формирования нового объявления
+	$("#modalWindowNewAdvert").dialog({
+		autoOpen: false,
+		width: 820,              //ширина
+		minWidth: 200,
+		//height: 300,            //высота
+		title: "Новое объявление",  //тайтл, заголовок окна
+		position: 'center',  //месторасположение окна [отступ слева,отступ сверху]
+		modal: true           //булева переменная если она равно true -  то окно модальное, false -  то нет
+		});
+
+// Активируем кнопку сохранения параметров нового объявления
 	$(function() {
 		$("button.saveAdvertButton").button({
             icons: {

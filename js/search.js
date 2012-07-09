@@ -2,6 +2,17 @@
  * @author dimau
  */
 
+/* Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера */
+window.jQuery || document.write('<script src="js/vendor/jquery-1.7.2.min.js"><\/script>')
+
+/* Инициализируем отображение вкладок при помощи jQuery UI */
+$(function() {
+	$("#tabs").tabs();
+});
+
+/* Как только будет загружен API и готов DOM, выполняем инициализацию */
+ymaps.ready(init);
+
 function init() {
             // Создание экземпляра карты и его привязка к контейнеру с
             // заданным id ("map")
@@ -70,3 +81,7 @@ function placeMarkers() {
 
 }
 
+// Раскрытие списка расширенных параметров поиска по клику на ссылке
+$('#linkExcludedSearchConditions').on('click', function() {
+	$('#listOfSearchParameters').css({'display': 'block'});
+})

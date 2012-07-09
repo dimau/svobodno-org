@@ -2,13 +2,15 @@ body {
 
 }
 
-.nameOfServiceBox {
-	right: 0px;
-}
-
 .wrapperOfTabs{
 	width: 85%;
 	margin: auto;
+}
+
+.headerOfPage {
+	font-size: 1.5em;
+	text-align: left;
+	margin-left: -5%;
 }
 
 #tabs {
@@ -163,4 +165,3 @@ table td {
 	font-size: 1.2em;
 	padding-left: 5px;
 }
-
