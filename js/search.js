@@ -10,6 +10,12 @@ $(function() {
 	$("#tabs").tabs();
 });
 
+// Активируем кнопки "Найти" через jQuery UI
+	$(function() {
+		$("button").button({
+        });
+	});
+
 /* Как только будет загружен API и готов DOM, выполняем инициализацию */
 ymaps.ready(init);
 
@@ -81,7 +87,5 @@ function placeMarkers() {
 
 }
 
-// Раскрытие списка расширенных параметров поиска по клику на ссылке
-$('#linkExcludedSearchConditions').on('click', function() {
-	$('#listOfSearchParameters').css({'display': 'block'});
-})
+// Подгонка размера правого блока параметров (районы) расширенного поиска под размер левого блока параметров. 19 пикселей - на padding у fieldset
+document.getElementById('rightBlockOfSearchParameters').style.height = document.getElementById('leftBlockOfSearchParameters').offsetHeight - 22 + 'px';

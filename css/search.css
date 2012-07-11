@@ -23,9 +23,24 @@ body {
 	display: inline-block;
 }
 
+#fastSearchInput {
+	line-height: 2.4;
+
+}
+
+.searchItemBody {
+	display: inline-block;
+}
+
+/* Стили для блока с результатми поиска - список + карта */
+#resultOnSearchPage {
+	width: 95%;
+	margin: 10px auto;
+}
+
 /* Стили для списка объявлений*/
 .listOfRealtyObjects {
-	width: 50%;
+	width: 49%;
 	float: left;
 	border-collapse: collapse;
 }
@@ -51,7 +66,7 @@ body {
 
 /* Стили для карты*/
 #map {
-	float: left;
-	width: 50%; 
+	float: right;
+	width: 49%; 
 	height: 400px;
 }
