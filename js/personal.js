@@ -11,41 +11,41 @@ $(function() {
 });
 
 // Активируем кнопки "Новое объявление" через jQuery UI - добавляем пиктограммку плюсика в кружочке
-	$(function() {
-		$("button#newAdvertButton").button({
-            icons: {
-                primary: "ui-icon-circle-plus"
-            }
-        });
+$(function() {
+	$("button#newAdvertButton").button({
+		icons : {
+			primary : "ui-icon-circle-plus"
+		}
 	});
-	
+});
+
 // Навешиваем обработчик на клик на кнопке нового объявления
-	$("button#newAdvertButton").on('click', clickNewAdvertButton);
-	
-	function clickNewAdvertButton() {
-		$("#modalWindowNewAdvert").dialog("open");
-		return false;
-	}
-		
+$("button#newAdvertButton").on('click', clickNewAdvertButton);
+
+function clickNewAdvertButton() {
+	$("#modalWindowNewAdvert").dialog("open");
+	return false;
+}
+
 // Готовим форму для модального окна формирования нового объявления
-	$("#modalWindowNewAdvert").dialog({
-		autoOpen: false,
-		width: 820,              //ширина
-		minWidth: 200,
-		//height: 300,            //высота
-		title: "Новое объявление",  //тайтл, заголовок окна
-		position: 'center',  //месторасположение окна [отступ слева,отступ сверху]
-		modal: true           //булева переменная если она равно true -  то окно модальное, false -  то нет
-		});
+$("#modalWindowNewAdvert").dialog({
+	autoOpen : false,
+	width : 850, //ширина
+	minWidth : 200,
+	//height: 300,            //высота
+	title : "Новое объявление", //тайтл, заголовок окна
+	position : 'center', //месторасположение окна [отступ слева,отступ сверху]
+	modal : true //булева переменная если она равно true -  то окно модальное, false -  то нет
+});
 
 // Активируем кнопку сохранения параметров нового объявления
-	$(function() {
-		$("button.saveAdvertButton").button({
-            icons: {
-                primary: "ui-icon-disk"
-            }
-        });
+$(function() {
+	$("button.saveAdvertButton").button({
+		icons : {
+			primary : "ui-icon-disk"
+		}
 	});
+});
 
 /* Как только будет загружен API и готов DOM, выполняем инициализацию карты от Яндекса*/
 ymaps.ready(init);
@@ -86,7 +86,7 @@ function init() {
 	searchObjectCollection = new ymaps.GeoObjectCollection();
 
 	// При вводе адреса в строку и нажатии энтера ставим метку на карте города
-	$('#addressForm').submit(function() {
+	$('#checkAddressButton').on('click', function() {
 		// Записываем в переменную что конкретно ввел пользователь. Поле для ввода адреса располагается первым в форме!
 		var search_query = $('input:first').val();
 
@@ -149,11 +149,16 @@ function init() {
 			// Укажем адрес данного объекта в строке ввода
 			// Поле для ввода адреса располагается первым в форме!
 			document.getElementById('addressTextBox').value = point.properties.get('name');
+
+			// Координаты объекта для запоминания на сервер - для дальнейшего однозначного отображения метки на картах поиска
+			var coordX = point.geometry.getCoordinates()[0];
+			var coordY = point.geometry.getCoordinates()[1];
 		});
 	});
 
 	// Чтобы карта отображалась при открытии вкладки, ее нужно перестраивать по событию - открытие вкладки
-	$('#tabs').bind('tabsshow', function(event, ui) {
+	// Чтобы карта отображалась при открытии вкладки - нужно $('#tabs').bind('tabsshow', function(event, ui) {
+	$('#newAdvertButton').bind('click', function(event, ui) {
 		map.setCenter([56.829748, 60.617435]);
 		map.container.fitToViewport();
 	});

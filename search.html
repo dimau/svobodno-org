@@ -361,8 +361,12 @@
 		</div>
 
 		<div id="resultOnSearchPage">
+			<div>
+				<span id="expandList"><a href="#">Развернуть список</a>&nbsp;&nbsp;&nbsp;</span><span id="listPlusMap" style="display: none;"><a href="#">Список + карта</a>&nbsp;&nbsp;&nbsp;</span><span id="expandMap"><a href="#">Развернуть карту</a></span>
+			</div>
+
 			<!-- Информация об объектах, подходящих условиям поиска -->
-			<table class="listOfRealtyObjects">
+			<table class="listOfRealtyObjects" id="shortListOfRealtyObjects">
 				<thead>
 					<tr class="listOfRealtyObjectsHeader">
 						<th> Избранное </th>
@@ -375,7 +379,79 @@
 					<tr class="realtyObject">
 						<td> да </td>
 						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">ул. Серафимы Дерябиной 15</td>
+						<td class="realtyObjectAddress">улица Сибирский тракт 50 летия 107</td>
+						<td> 15000 </td>
+					</tr>
+					<tr class="realtyObject">
+						<td> нет </td>
+						<td> здесь будет картинка </td>
+						<td class="realtyObjectAddress">ул. Сумасранка 4</td>
+						<td> 35000 </td>
+					</tr>
+					<tr class="realtyObject">
+						<td> да </td>
+						<td> здесь будет картинка </td>
+						<td class="realtyObjectAddress">ул. Серафимы Дерябиной 154</td>
+						<td> 150000 </td>
+					</tr>
+					<tr class="realtyObject">
+						<td> нет </td>
+						<td> здесь будет картинка </td>
+						<td class="realtyObjectAddress">ул. Белореченская 24</td>
+						<td> 6000 </td>
+					</tr>
+					<tr class="realtyObject">
+						<td> да </td>
+						<td> здесь будет картинка </td>
+						<td class="realtyObjectAddress">ул. Маврода 2012</td>
+						<td> 2000 </td>
+					</tr>
+					<tr class="realtyObject">
+						<td> да </td>
+						<td> здесь будет картинка </td>
+						<td class="realtyObjectAddress">ул. Пискуна 1</td>
+						<td> 350000 </td>
+					</tr>
+					<tr class="realtyObject">
+						<td> да </td>
+						<td> здесь будет картинка </td>
+						<td class="realtyObjectAddress">улица Сибирский тракт 50 летия 107</td>
+						<td> 15000 </td>
+					</tr>
+					<tr class="realtyObject">
+						<td> нет </td>
+						<td> здесь будет картинка </td>
+						<td class="realtyObjectAddress">ул. Сумасранка 4</td>
+						<td> 35000 </td>
+					</tr>
+					<tr class="realtyObject">
+						<td> да </td>
+						<td> здесь будет картинка </td>
+						<td class="realtyObjectAddress">ул. Серафимы Дерябиной 154</td>
+						<td> 150000 </td>
+					</tr>
+					<tr class="realtyObject">
+						<td> нет </td>
+						<td> здесь будет картинка </td>
+						<td class="realtyObjectAddress">ул. Белореченская 24</td>
+						<td> 6000 </td>
+					</tr>
+					<tr class="realtyObject">
+						<td> да </td>
+						<td> здесь будет картинка </td>
+						<td class="realtyObjectAddress">ул. Маврода 2012</td>
+						<td> 2000 </td>
+					</tr>
+					<tr class="realtyObject">
+						<td> да </td>
+						<td> здесь будет картинка </td>
+						<td class="realtyObjectAddress">ул. Пискуна 1</td>
+						<td> 350000 </td>
+					</tr>
+					<tr class="realtyObject">
+						<td> да </td>
+						<td> здесь будет картинка </td>
+						<td class="realtyObjectAddress">улица Сибирский тракт 50 летия 107</td>
 						<td> 15000 </td>
 					</tr>
 					<tr class="realtyObject">
@@ -413,6 +489,78 @@
 
 			<!-- Область показа карты -->
 			<div id="map"></div>
+
+			<div style="clear: both;"></div>
+
+			<!-- Первоначально скрытый раздел с подробным списком объявлений-->
+			<div id="fullParametersListOfRealtyObjects" style="display: none;">
+				<table class="listOfRealtyObjects" style="width: 100%">
+					<thead>
+						<tr class="listOfRealtyObjectsHeader">
+							<th> Избранное </th>
+							<th> Фото </th>
+							<th> Адрес </th>
+							<th> Район </th>
+							<th> Комнат </th>
+							<th> Площадь </th>
+							<th> Этаж </th>
+							<th> Цена, руб. </th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="realtyObject">
+							<td> да </td>
+							<td> здесь будет картинка </td>
+							<td class="realtyObjectAddress" coordX="56.820769" coordY="60.560742">ул. Серафимы Дерябиной 17</td>
+							<td> ВИЗ </td>
+							<td> 2 </td>
+							<td> 22.4/34 </td>
+							<td> 2/13</td>
+							<td> 15000 </td>
+						</tr>
+						<tr class="realtyObject">
+							<td> да </td>
+							<td> здесь будет картинка </td>
+							<td class="realtyObjectAddress" coordX="56.825483" coordY="60.57357">ул. Гурзуфская 38</td>
+							<td> ВИЗ </td>
+							<td> 2 </td>
+							<td> 22.4/34 </td>
+							<td> 2/13</td>
+							<td> 15000 </td>
+						</tr>
+						<tr class="realtyObject">
+							<td> да </td>
+							<td> здесь будет картинка </td>
+							<td class="realtyObjectAddress" coordX="56.817405" coordY="60.558452">ул. Шаумяна 107</td>
+							<td> ВИЗ </td>
+							<td> 2 </td>
+							<td> 22.4/34 </td>
+							<td> 2/13</td>
+							<td> 15000 </td>
+						</tr>
+						<tr class="realtyObject">
+							<td> да </td>
+							<td> здесь будет картинка </td>
+							<td class="realtyObjectAddress" coordX="56.819927" coordY="60.539264">ул. Репина 105</td>
+							<td> ВИЗ </td>
+							<td> 2 </td>
+							<td> 22.4/34 </td>
+							<td> 2/13</td>
+							<td> 15000 </td>
+						</tr>
+						<tr class="realtyObject">
+							<td> да </td>
+							<td> здесь будет картинка </td>
+							<td class="realtyObjectAddress" coordX="56.836396" coordY="60.588662">ул. Ленина 13</td>
+							<td> ВИЗ </td>
+							<td> 2 </td>
+							<td> 22.4/34 </td>
+							<td> 2/13</td>
+							<td> 15000 </td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</div>
 
 		<!-- Заполнитель низа -->

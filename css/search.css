@@ -50,7 +50,7 @@ body {
 	text-align: center;
 	border-bottom: 1px solid grey;
 	border-top: 1px solid grey;
-	background-color: green;
+	background-color: #FFB073;
 }
 
 .realtyObject {
@@ -62,6 +62,7 @@ body {
 
 .realtyObject:hover {
 	background-color: grey;
+	cursor: pointer;
 }
 
 /* Стили для карты*/

@@ -419,8 +419,9 @@ table {
     border-spacing: 0;
 }
 
-td {
-    vertical-align: top;
+td, th {
+    vertical-align: middle;
+    padding: 4px;
 }
 
 
