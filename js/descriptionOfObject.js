@@ -93,7 +93,7 @@ function init() {
                     //iconContent: 'Щелкни по мне',
                     balloonContentHeader: 'улица Сибирский тракт 50 летия 107',
                     balloonContentBody: '<img class="miniImg"><img class="miniImg"><img class="miniImg"><br>Квартира<br>Стоимость в месяц: 15000 + к. у. от 1500 до 2500 руб.<br> + <a href="#">единовременная комиссия 3000 руб. (40%) собственнику</a><br>Количество комнат: 2, смежные<br>Площадь: 22.4/34<br>Этаж: 3 из 10<br>Срок сдачи: долгосрочно<br>Мебель: есть<br>Район: Центр<br>Телефон собственника: 89221431615, Алексей Иванович',
-                    balloonContentFooter: '<div style="width:100%;"><a href="descriptionOfObject.html">Подробнее</a><img alt="Значок избранного или не избранного" style="border: 1px solid black; float:right; width:10px; height:10px;"></div>'
+                    balloonContentFooter: '<div style="width:100%;"><a>Подробнее</a><img alt="Значок избранного или не избранного" style="border: 1px solid black; float:right; width:10px; height:10px;"></div>'
                 });
 			
 			// Добавляем метку на карту
