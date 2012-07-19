@@ -3,11 +3,6 @@ body {
 	height: 100%;
 }
 
-.wrapperOfTabs{
-	width: 85%;
-	margin: auto;
-}
-
 .headerOfPage {
 	font-size: 1.5em;
 	text-align: left;
@@ -19,74 +14,35 @@ body {
 }
 
 /* Стили для детального описания объекта*/
-.actionChangeStatusAdvert {
-	float: right; 
-	margin-top: -0.1em; 
-	margin-right: 4px; 
-	font-weight: normal;
-	font-size: 0.8em;
+
+.headerOfDescriptionObject {
+	font-size: 1.7em;
+	text-align: center;
 }
 
-#addressForm {
-	clear: both;
+.objectFoto {
+	margin: 5px;
 }
 
-.inputItem, .objectDescriptionItem {
-	width: 100%;
-	margin-top: 7px;
-	margin-bottom: 7px;
+.objectDescription {
+	
 }
 
-.inputItem .label, .objectDescriptionItem .objectDescriptionItemLabel {
-	min-width: 150px;
-	width: 49%;
-	text-align: right;
-	display: inline-block;
-	vertical-align: top;
-}
-
-.objectDescriptionItem .objectDescriptionBody {
-	display: inline-block;
-	width: 49%;
-}
-
-.objectDescriptionBody.furniture {
-	min-width: 300px;
-}
-
-table {
+/* Стили для блоков с описанием объекта*/
+.objectDescriptionChapter {
 	display: inline-block;
 }
 
-table td {
+.objectDescriptionChapter table td {
 	vertical-align: middle;
 	padding: 5px;
 }
 
-#newAdvertButton {
-	margin-bottom: 10px;
+.objectDescriptionChapter tr {
+	border-bottom: 1px dotted #A64800;
 }
 
-.advertHeader {
-	border: 1px solid #AAAAAA;
-	padding: 5px;
-	background-color: #B5B5B5;
-	font-size: 1.2em;
-	border-radius: 5px 5px 0 0;
-}
-
-.advertHeaderStatus {
-	color: red;
-	display: inline-block;
-}
-
-.advertDescriptionEdit {
-	border: 1px solid #AAAAAA;
-	border-radius: 0 0 5px 5px;
-	padding: 10px;
-}
-
-.advertDescriptionChapterHeader {
+.objectDescriptionChapterHeader {
 	background-color: #B5B5B5;
 	font-size: 1.2em;
 	padding-left: 5px;

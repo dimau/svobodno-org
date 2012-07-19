@@ -72,6 +72,7 @@ textarea {
 
 body {
     margin: 0;
+    padding: 0;
     font-size: 1em;
     line-height: 1.4;
 }
@@ -289,11 +290,18 @@ form {
 }
 
 fieldset {
-    /*border: 0;
-    margin: 0;
-    padding: 0;*/
+   margin: 5px;
    border-radius: 5px;
-   border: 1px solid #aa4451;
+   border: 1px solid #A64800;
+}
+
+fieldset legend {
+	font-weight: bold;
+	color: #A64800;
+}
+
+fieldset.edited {
+	line-height: 2;
 }
 
 /*
@@ -442,17 +450,34 @@ td, th {
    Author:
    ========================================================================== */
 
+html {
+	margin: 0;
+	padding: 0;
+	height: 100%; /* эта строчка для прижатия подвала к низу страницы*/
+}
+
 body {
 	margin: auto;
 	font-family: 'Trebuchet MS', Tahoma, Verdana, Arial, sans-serif;
 	min-width: 780px;
+	height: 100%; /* эта строчка для прижатия подвала к низу страницы*/
 }
 
+.page-wrapper {
+	min-height: 100%;
+    margin-bottom: -34px;
+}
+
+.page-buffer {
+	height: 34px;
+}
+
+/* Стили для шапки страницы*/
 .header {
 	height: 90px;
 	position: relative;
 	width: 100%;
-	min-width: 703px;
+	min-width: 780px;
 }
 
 .iconBox {
@@ -489,6 +514,11 @@ body {
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91')"; /* для IE8 */
 }
 
+.slogan {
+	font-size: 30px;
+}
+
+/* Стили для блога логина и регистрации пользователей*/
 .loginBox {
 	float: right;
 	width: 170px;
@@ -527,10 +557,6 @@ ul.login a {
 	padding-bottom: 3px;
 }
 
-.slogan {
-	font-size: 30px;
-}
-
 .enter {
 	float: right;
 	padding-top: 10px;
@@ -538,12 +564,21 @@ ul.login a {
 	text-align: right;
 }
 
+/* Стили для основного содержимого страницы*/
+
 .headerOfPage {
 	font-size: 1.5em;
 	text-align: left;
 	margin-left: 5%;
+	padding: 6px 0px 6px 0px;
 }
 
+.wrapperOfTabs{
+	width: 85%;
+	margin: auto;
+}
+
+/* Стили низа страницы*/
 .footerImage {
 	background-image: url('stripe.gif');
 	background-repeat: repeat-x; 
@@ -558,6 +593,7 @@ ul.login a {
 	color: #666666;
 	text-align: center;
 	padding: 7px;
+	height
 }
 
 

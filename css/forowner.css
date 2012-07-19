@@ -27,12 +27,6 @@ body {
 	display: inline-block;
 }
 
-/* Стили для блока с результатми поиска - список + карта */
-#resultOnSearchPage {
-	width: 95%;
-	margin: 10px auto;
-}
-
 /* Стили для списка объявлений*/
 .listOfRealtyObjects {
 	width: 49%;

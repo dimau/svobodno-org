@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+<!-- Consider specifying the language of your content by adding the `lang` attribute to <html> -->
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+	<!--<![endif]-->
+	<head>
+		<meta charset="utf-8">
+
+		<!-- Use the .htaccess and remove these lines to avoid edge case issues.
+		More info: h5bp.com/i/378 -->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+		<title>Как мы работаем с собственником</title>
+		<meta name="description" content="Как мы работаем с собственником">
+
+		<!-- Mobile viewport optimized: h5bp.com/viewport -->
+		<meta name="viewport" content="width=device-width">
+
+		<!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
+
+		<link rel="stylesheet" href="css/jquery-ui-1.8.21.custom.css">
+		<link rel="stylesheet" href="css/main.css">
+		<link rel="stylesheet" href="css/forowner.css">
+
+		<style>
+			/* Стиль для панели табов - ul*/
+			/* Важно, что пока он плавающий и основной текст из .ui-tabs-panel его обтекает*/
+			.ui-tabs-vertical .ui-tabs-nav {
+				padding: .2em .1em .2em .2em;
+				float: left;
+			}
+			/* Стиль для не выбранного таба - элемента li*/
+			.ui-tabs-vertical .ui-tabs-nav li {
+				clear: left;
+				width: 100%;
+				border-bottom-width: 1px !important;
+				border-right-width: 0 !important;
+				margin: 2px 0px 2px 0px;
+				padding: 0;
+				cursor: pointer;
+			}
+			.ui-tabs-vertical .ui-tabs-nav li a {
+				display: block;
+			}
+			/* Стиль для текущего выбранного таба - элемента li*/
+			.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-selected {
+				border-right-width: 1px;
+				margin: 2px 0px 2px 0px;
+				padding: 0;
+				cursor: text;
+			}
+			/* Стиль для основного текста, отображаемого справа от табов*/
+			.ui-tabs-vertical .ui-tabs-panel {
+				padding: 1em;
+				overflow: auto;
+			}
+		</style>
+
+		<!-- More ideas for your <head> here: h5bp.com/d/head-Tips -->
+
+		<!-- All JavaScript at the bottom, except this Modernizr build.
+		Modernizr enables HTML5 elements & feature detects for optimal performance.
+		Create your own custom Modernizr build: www.modernizr.com/download/ -->
+		<script src="js/vendor/modernizr-2.5.3.min.js"></script>
+
+	</head>
+	<body>
+		<!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
+		chromium.org/developers/how-tos/chrome-frame-getting-started -->
+		<!--[if lt IE 7]><p class="chromeframe">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+
+		<!-- Add your site or application content here -->
+		<div class="page-wrapper">
+			<div class="header">
+				<div class="nameOfServiceBox">
+					<div class="enter">
+						Дмитрий Ушаков
+						<br>
+						<a href="personal.html">Личный кабинет</a>
+						<br>
+						<a href="#">Выйти</a>
+					</div>
+					<span class='slogan'>Найди свой дом с нами!</span>
+					<br>
+					Мы помогаем хорошим людям сдать в аренду и снять жилье в Екатеринбурге
+				</div>
+				<div class="iconBox"></div>
+			</div>
+
+			<div class="wrapperOfTabs">
+				<div class="headerOfPage">
+					9 шагов с dolphin home - современный способ сдать недвижимость
+				</div>
+				<div id="tabs">
+					<ul>
+						<li>
+							<a href="#tabs-1">1. Заявка</a>
+						</li>
+						<li>
+							<a href="#tabs-2">2. Выезд специалиста</a>
+						</li>
+						<li>
+							<a href="#tabs-3">3. Оплата</a>
+						</li>
+						<li>
+							<a href="#tabs-4">4. Публикация</a>
+						</li>
+						<li>
+							<a href="#tabs-5">5. Выбор арендатора</a>
+						</li>
+						<li>
+							<a href="#tabs-6">6. Показ</a>
+						</li>
+						<li>
+							<a href="#tabs-7">7. Договор</a>
+						</li>
+						<li>
+							<a href="#tabs-8">8. Расчет</a>
+						</li>
+						<li>
+							<a href="#tabs-9">9. Успех!</a>
+						</li>
+					</ul>
+					<div id="tabs-1">
+						Вы оставляете заявку на выезд специалиста ниже на нашем сайте, либо по тел: 8-922-143-16-15
+					</div>
+					<div id="tabs-2">
+						Выезд специалиста. В удобное для Вас время приезжает наш специалист выполняет следующую работу:
+						<ul>
+							<li>
+								Подробно снимает параметры сдаваемого объекта
+							</li>
+							<li>
+								Фотографирует комнаты и другие помещения
+							</li>
+							<li>
+								Формирует для Вас договор аренды, который нужно будет подписать с арендатором
+							</li>
+							<li>
+								Консультирует по любым вопросам, связанным со сдачей объекта в аренду
+							</li>
+							<li>
+								Фиксирует требования к арендаторам
+							</li>
+							<li>
+								Публикует информацию на ресурсе dolphin-home.ru
+							</li>
+							<li>
+								Подписывает с Вами договор на оказание услуг
+							</li>
+						</ul>
+					</div>
+					<div id="tabs-3">
+						Вы производите оплату услуг нашего агентства - 20% от месячной стоимости аренды объекта
+					</div>
+					<div id="tabs-4">
+						Информация о Вашем объекте ежедневно перепубликуется на всех основных порталах города: e1.ru, 66.ru для привлечения максимального количества соответствующих Вашему запросу арендаторов
+					</div>
+					<div id="tabs-5">
+						Информация о каждом заинтересовавшемся потенциальном арендателе сохраняется для Вас в личном кабинете на портале. Это позволяет Вам лично выбрать наиболее интересного нанимателя
+					</div>
+					<div id="tabs-6">
+						Вы договариваетесь с потенциальным арендатором о дате и времени показа объекта, зачастую достаточно одного показа.
+					</div>
+					<div id="tabs-7">
+						Подписываете договор аренды, оставленный нашим специалистом.
+					</div>
+					<div id="tabs-8">
+						Вы получаете от арендатора единоразовую комиссию - 40% от месячной стоимости квартиры, которая покрывает расходы на выезд специалиста dolphin home и приносит Вам дополнительный доход. Береты залог (если нужно) и плату за первый месяц проживания
+					</div>
+					<div id="tabs-9">
+						Поздравляем, Вы сдали недвижимость порядочным людям максимально быстро и выгодно с помощью dolphin home!
+					</div>
+				</div>
+			</div>
+
+			<form style="width: 85%; margin: auto;">
+				<fieldset class="edited" style="margin-top: 15px;">
+					<legend>
+						Заявка
+					</legend>
+					<button>
+						Отправить заявку
+					</button>
+					<br>
+					Как к Вам обращаться?
+					<input type="text">
+					<br>
+					На какой номер Вам перезвонить?
+					<input type="text">
+					<br>
+					По какому адресу собираетесь сдать объект?
+					<input type="text">
+					<br>
+					Комментарии (например, в какое время Вам будет удобно принять наш звонок)?
+					<textarea></textarea>
+				</fieldset>
+			</form>
+
+			<!-- Заполнитель низа -->
+			<!--<div class="footerImage"></div>-->
+			<div class="page-buffer"></div>
+		</div>
+		<div class="footer">
+			2012 «Долфин хоум», вопросы и пожелания по работе портала можно передавать по телефону 8-922-143-16-15
+		</div>
+
+		<!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
+
+		<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+		<!-- jQuery UI с моей темой оформления -->
+		<script src="js/vendor/jquery-ui-1.8.21.custom.min.js"></script>
+
+		<!-- Загружаем библиотеку для работы с картой от Яндекса -->
+		<script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
+
+		<!-- scripts concatenated and minified via build script -->
+		<script src="js/forowner.js"></script>
+
+		<!-- end scripts -->
+
+		<!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.
+		mathiasbynens.be/notes/async-analytics-snippet -->
+		<!-- <script>
+		var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+		(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+		g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+		s.parentNode.insertBefore(g,s)}(document,'script'));
+		</script> -->
+	</body>
+</html>

@@ -40,470 +40,338 @@
 		<!--[if lt IE 7]><p class="chromeframe">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
 
 		<!-- Add your site or application content here -->
-
-		<div class="header">
-			<div class="nameOfServiceBox">
-				<div class="enter">
-					Дмитрий Ушаков
+		<div class="page-wrapper">
+			<div class="header">
+				<div class="nameOfServiceBox">
+					<div class="enter">
+						Дмитрий Ушаков
+						<br>
+						<a href="personal.html">Личный кабинет</a>
+						<br>
+						<a href="#">Выйти</a>
+					</div>
+					<span class='slogan'>Найди свой дом с нами!</span>
 					<br>
-					<a href="#">Личный кабинет</a>
-					<br>
-					<a href="#">Выйти</a>
+					Мы помогаем хорошим людям сдать в аренду и снять жилье в Екатеринбурге
 				</div>
-				<span class='slogan'>Найди свой дом с нами!</span>
-				<br>
-				Мы помогаем хорошим людям сдать в аренду и снять жилье в Екатеринбурге
+				<div class="iconBox"></div>
 			</div>
-			<div class="iconBox"></div>
-		</div>
 
-		<div class="wrapperOfTabs">
-			<div class="headerOfPage">
-				Поиск подходящих объявлений
-			</div>
-			<div id="tabs">
-				<ul>
-					<li>
-						<a href="#tabs-1">Быстрый</a>
-					</li>
-					<li>
-						<a href="#tabs-2">Расширенный</a>
-					</li>
-				</ul>
-				<div id="tabs-1">
-					<!-- Раздел для параметров поиска -->
-					<span id="fastSearchInput"> Я хочу арендовать
-						<select name="typeOfObject">
-							<option value="flat" selected>квартиру</option>
-							<option value="room">комнату</option>
-							<option value="house">дом, коттедж</option>
-							<option value="townhouse">таунхаус</option>
-							<option value="dacha">дачу</option>
-							<option value="garage">гараж</option>
-						</select> в районе
-						<select  name="12" style="width: 150px;">
-							<option value="0" selected> любой </option>
-							<option value="1"> Автовокзал (южный) </option>
-							<option value="2"> Академический </option>
-							<option value="3"> Ботанический </option>
-							<option value="4"> ВИЗ </option>
-							<option value="5"> Вокзальный </option>
-							<option value="6"> Втузгородок </option>
-							<option value="7"> Горный щит </option>
-							<option value="8"> Елизавет </option>
-							<option value="9"> ЖБИ </option>
-							<option value="10"> Завокзальный </option>
-							<option value="11"> Заречный </option>
-							<option value="12"> Изоплит </option>
-							<option value="13"> Исток </option>
-							<option value="14"> Калиновский </option>
-							<option value="15"> Кольцово </option>
-							<option value="16"> Компрессорный </option>
-							<option value="17"> Лечебный </option>
-							<option value="18"> Медный </option>
-							<option value="19"> Нижнеисетский </option>
-							<option value="20"> Парковый </option>
-							<option value="21"> Пионерский </option>
-							<option value="22"> Птицефабрика </option>
-							<option value="23"> Семь ключей </option>
-							<option value="24"> Сибирский тракт </option>
-							<option value="25"> Синие камни </option>
-							<option value="26"> Совхозный </option>
-							<option value="27"> Сортировка новая </option>
-							<option value="28"> Сортировка старая </option>
-							<option value="29"> Уктус </option>
-							<option value="30"> УНЦ </option>
-							<option value="31"> Уралмаш </option>
-							<option value="32"> Химмаш </option>
-							<option value="33"> Центр </option>
-							<option value="34"> Чермет </option>
-							<option value="35"> Шарташ </option>
-							<option value="36"> Широкая речка </option>
-							<option value="37"> Эльмаш </option>
-							<option value="38"> Юго-запад </option>
-							<option value="39"> За городом </option>
-						</select> стоимостью от
-						<input type="text" size="10" value="0">
-						до
-						<input type="text" size="10">
-						руб./мес.
-						&nbsp;
-						<button id="fastSearchButton">
-							Найти
-						</button> </span>
+			<div class="wrapperOfTabs">
+				<div class="headerOfPage">
+					Поиск подходящих объявлений
 				</div>
-				<div id="tabs-2">
-					<form id="searchConditions">
-						<div id="extendedSearchParametersBlock">
-							<div id="leftBlockOfSearchParameters" style="display: inline-block;">
-								<fieldset style="line-height: 2;">
-									<legend>
-										Характеристика объекта
-									</legend>
-									<div class="searchItem">
-										<span class="searchItemLabel"> Тип: </span>
-										<div class="searchItemBody">
-											<select name="typeOfObject">
-												<option value="flat" selected>квартира</option>
-												<option value="room">комната</option>
-												<option value="house">дом, коттедж</option>
-												<option value="townhouse">таунхаус</option>
-												<option value="dacha">дача</option>
-												<option value="garage">гараж</option>
-											</select>
-										</div>
-									</div>
-									<div class="searchItem">
-										<span class="searchItemLabel"> Количество комнат: </span>
-										<div class="searchItemBody">
-											<input type="checkbox" value="1" name="amountOfRooms">
-											1
-											<input type="checkbox" value="2" name="amountOfRooms">
-											2
-											<input type="checkbox" value="3" name="amountOfRooms">
-											3
-											<input type="checkbox" value="4" name="amountOfRooms">
-											4
-											<input type="checkbox" value="5" name="amountOfRooms">
-											5
-											<input type="checkbox" value="6" name="amountOfRooms">
-											6...
-										</div>
-									</div>
-									<div class="searchItem">
-										<span class="searchItemLabel"> Комнаты смежные: </span>
-										<div class="searchItemBody">
-											<select name="adjacentRooms">
-												<option value="1" selected>не имеет значения</option>
-												<option value="2">только изолированные</option>
-											</select>
-										</div>
-									</div>
-									<div class="searchItem">
-										<span class="searchItemLabel"> Этаж: </span>
-										<div class="searchItemBody">
-											<select name="floor">
-												<option value="1" selected>любой</option>
-												<option value="2">не первый</option>
-												<option value="3">не первый и не последний</option>
-											</select>
-										</div>
-									</div>
-									<div>
-										<input type="checkbox">
-										С мебелью и бытовой техникой
-									</div>
-								</fieldset>
-								<fieldset style="line-height: 2;">
-									<legend>
-										Стоимость
-									</legend>
-									<div class="searchItem">
-										<div class="searchItemLabel">
-											Ежемесячный платеж (с учетом к.у.)
-										</div>
-										<div class="searchItemBody">
-											от
-											<input type="text" name="minCost" size="10">
-											руб., до
-											<input type="text" name="maxCost" size="10">
-											руб.
-										</div>
-									</div>
-									<div class="searchItem">
-										<span class="searchItemLabel"> Залог </span>
-										<div class="searchItemBody">
-											до
-											<input type="text" name="maxCost" size="10">
-											руб.
-										</div>
-									</div>
-								</fieldset>
-							</div>
-							<div id="rightBlockOfSearchParameters" style="display: inline-block;">
-								<fieldset style="height: 100%;">
-									<legend>
-										Район
-									</legend>
-									<div class="searchItem" style="height: 100%;">
-										<div class="searchItemBody" style="height: 95%; width:200px; overflow-y: auto">
-											<input type="checkbox" name="district" value="1">
-											Автовокзал (южный)
-											<br>
-											<input type="checkbox" name="district" value="2">
-											Академический
-											<br>
-											<input type="checkbox" name="district" value="3">
-											Ботанический
-											<br>
-											<input type="checkbox" name="district" value="4">
-											ВИЗ
-											<br>
-											<input type="checkbox" name="district" value="5">
-											Вокзальный
-											<br>
-											<input type="checkbox" name="district" value="6">
-											Втузгородок
-											<br>
-											<input type="checkbox" name="district" value="7">
-											Горный щит
-											<br>
-											<input type="checkbox" name="district" value="8">
-											Елизавет
-											<br>
-											<input type="checkbox" name="district" value="9">
-											ЖБИ
-											<br>
-											<input type="checkbox" name="district" value="10">
-											Завокзальный
-											<br>
-											<input type="checkbox" name="district" value="11">
-											Заречный
-											<br>
-											<input type="checkbox" name="district" value="12">
-											Изоплит
-											<br>
-											<input type="checkbox" name="district" value="13">
-											Исток
-											<br>
-											<input type="checkbox" name="district" value="14">
-											Калиновский
-											<br>
-											<input type="checkbox" name="district" value="15">
-											Кольцово
-											<br>
-											<input type="checkbox" name="district" value="16">
-											Компрессорный
-											<br>
-											<input type="checkbox" name="district" value="17">
-											Лечебный
-											<br>
-											<input type="checkbox" name="district" value="18">
-											Медный
-											<br>
-											<input type="checkbox" name="district" value="19">
-											Нижнеисетский
-											<br>
-											<input type="checkbox" name="district" value="20">
-											Парковый
-											<br>
-											<input type="checkbox" name="district" value="21">
-											Пионерский
-											<br>
-											<input type="checkbox" name="district" value="22">
-											Птицефабрика
-											<br>
-											<input type="checkbox" name="district" value="23">
-											Семь ключей
-											<br>
-											<input type="checkbox" name="district" value="24">
-											Сибирский тракт
-											<br>
-											<input type="checkbox" name="district" value="25">
-											Синие камни
-											<br>
-											<input type="checkbox" name="district" value="26">
-											Совхозный
-											<br>
-											<input type="checkbox" name="district" value="27">
-											Сортировка новая
-											<br>
-											<input type="checkbox" name="district" value="28">
-											Сортировка старая
-											<br>
-											<input type="checkbox" name="district" value="29">
-											Уктус
-											<br>
-											<input type="checkbox" name="district" value="30">
-											УНЦ
-											<br>
-											<input type="checkbox" name="district" value="31">
-											Уралмаш
-											<br>
-											<input type="checkbox" name="district" value="32">
-											Химмаш
-											<br>
-											<input type="checkbox" name="district" value="33">
-											Центр
-											<br>
-											<input type="checkbox" name="district" value="34">
-											Чермет
-											<br>
-											<input type="checkbox" name="district" value="35">
-											Шарташ
-											<br>
-											<input type="checkbox" name="district" value="36">
-											Широкая речка
-											<br>
-											<input type="checkbox" name="district" value="37">
-											Эльмаш
-											<br>
-											<input type="checkbox" name="district" value="38">
-											Юго-запад
-											<br>
-											<input type="checkbox" name="district" value="39">
-											За городом
-											<br>
-										</div>
-									</div>
-								</fieldset>
-							</div>
-						</div>
-						<div style="margin-top: 10px;">
+				<div id="tabs">
+					<ul>
+						<li>
+							<a href="#tabs-1">Быстрый</a>
+						</li>
+						<li>
+							<a href="#tabs-2">Расширенный</a>
+						</li>
+					</ul>
+					<div id="tabs-1">
+						<!-- Раздел для параметров поиска -->
+						<span id="fastSearchInput"> Я хочу арендовать
+							<select name="typeOfObject">
+								<option value="flat" selected>квартиру</option>
+								<option value="room">комнату</option>
+								<option value="house">дом, коттедж</option>
+								<option value="townhouse">таунхаус</option>
+								<option value="dacha">дачу</option>
+								<option value="garage">гараж</option>
+							</select> в районе
+							<select  name="12" style="width: 150px;">
+								<option value="0" selected> любой </option>
+								<option value="1"> Автовокзал (южный) </option>
+								<option value="2"> Академический </option>
+								<option value="3"> Ботанический </option>
+								<option value="4"> ВИЗ </option>
+								<option value="5"> Вокзальный </option>
+								<option value="6"> Втузгородок </option>
+								<option value="7"> Горный щит </option>
+								<option value="8"> Елизавет </option>
+								<option value="9"> ЖБИ </option>
+								<option value="10"> Завокзальный </option>
+								<option value="11"> Заречный </option>
+								<option value="12"> Изоплит </option>
+								<option value="13"> Исток </option>
+								<option value="14"> Калиновский </option>
+								<option value="15"> Кольцово </option>
+								<option value="16"> Компрессорный </option>
+								<option value="17"> Лечебный </option>
+								<option value="18"> Медный </option>
+								<option value="19"> Нижнеисетский </option>
+								<option value="20"> Парковый </option>
+								<option value="21"> Пионерский </option>
+								<option value="22"> Птицефабрика </option>
+								<option value="23"> Семь ключей </option>
+								<option value="24"> Сибирский тракт </option>
+								<option value="25"> Синие камни </option>
+								<option value="26"> Совхозный </option>
+								<option value="27"> Сортировка новая </option>
+								<option value="28"> Сортировка старая </option>
+								<option value="29"> Уктус </option>
+								<option value="30"> УНЦ </option>
+								<option value="31"> Уралмаш </option>
+								<option value="32"> Химмаш </option>
+								<option value="33"> Центр </option>
+								<option value="34"> Чермет </option>
+								<option value="35"> Шарташ </option>
+								<option value="36"> Широкая речка </option>
+								<option value="37"> Эльмаш </option>
+								<option value="38"> Юго-запад </option>
+								<option value="39"> За городом </option>
+							</select> стоимостью от
+							<input type="text" size="10" value="0">
+							до
+							<input type="text" size="10">
+							руб./мес.
+							&nbsp;
 							<button id="fastSearchButton">
 								Найти
-							</button>
-							<a href="#">Запомнить условия поиска</a>
-						</div>
-					</form>
+							</button> </span>
+					</div>
+					<div id="tabs-2">
+						<form id="searchConditions">
+							<div id="extendedSearchParametersBlock">
+								<div id="leftBlockOfSearchParameters" style="display: inline-block;">
+									<fieldset class="edited">
+										<legend>
+											Характеристика объекта
+										</legend>
+										<div class="searchItem">
+											<span class="searchItemLabel"> Тип: </span>
+											<div class="searchItemBody">
+												<select name="typeOfObject">
+													<option value="flat" selected>квартира</option>
+													<option value="room">комната</option>
+													<option value="house">дом, коттедж</option>
+													<option value="townhouse">таунхаус</option>
+													<option value="dacha">дача</option>
+													<option value="garage">гараж</option>
+												</select>
+											</div>
+										</div>
+										<div class="searchItem">
+											<span class="searchItemLabel"> Количество комнат: </span>
+											<div class="searchItemBody">
+												<input type="checkbox" value="1" name="amountOfRooms">
+												1
+												<input type="checkbox" value="2" name="amountOfRooms">
+												2
+												<input type="checkbox" value="3" name="amountOfRooms">
+												3
+												<input type="checkbox" value="4" name="amountOfRooms">
+												4
+												<input type="checkbox" value="5" name="amountOfRooms">
+												5
+												<input type="checkbox" value="6" name="amountOfRooms">
+												6...
+											</div>
+										</div>
+										<div class="searchItem">
+											<span class="searchItemLabel"> Комнаты смежные: </span>
+											<div class="searchItemBody">
+												<select name="adjacentRooms">
+													<option value="1" selected>не имеет значения</option>
+													<option value="2">только изолированные</option>
+												</select>
+											</div>
+										</div>
+										<div class="searchItem">
+											<span class="searchItemLabel"> Этаж: </span>
+											<div class="searchItemBody">
+												<select name="floor">
+													<option value="1" selected>любой</option>
+													<option value="2">не первый</option>
+													<option value="3">не первый и не последний</option>
+												</select>
+											</div>
+										</div>
+										<div>
+											<input type="checkbox">
+											С мебелью и бытовой техникой
+										</div>
+									</fieldset>
+									<fieldset class="edited">
+										<legend>
+											Стоимость
+										</legend>
+										<div class="searchItem">
+											<div class="searchItemLabel">
+												Ежемесячный платеж (с учетом к.у.)
+											</div>
+											<div class="searchItemBody">
+												от
+												<input type="text" name="minCost" size="10">
+												руб., до
+												<input type="text" name="maxCost" size="10">
+												руб.
+											</div>
+										</div>
+										<div class="searchItem">
+											<span class="searchItemLabel"> Залог </span>
+											<div class="searchItemBody">
+												до
+												<input type="text" name="maxCost" size="10">
+												руб.
+											</div>
+										</div>
+									</fieldset>
+								</div>
+								<div id="rightBlockOfSearchParameters" style="display: inline-block;">
+									<fieldset style="height: 100%;">
+										<legend>
+											Район
+										</legend>
+										<div class="searchItem" style="height: 100%;">
+											<div class="searchItemBody" style="height: 95%; width:200px; overflow-y: auto">
+												<input type="checkbox" name="district" value="1">
+												Автовокзал (южный)
+												<br>
+												<input type="checkbox" name="district" value="2">
+												Академический
+												<br>
+												<input type="checkbox" name="district" value="3">
+												Ботанический
+												<br>
+												<input type="checkbox" name="district" value="4">
+												ВИЗ
+												<br>
+												<input type="checkbox" name="district" value="5">
+												Вокзальный
+												<br>
+												<input type="checkbox" name="district" value="6">
+												Втузгородок
+												<br>
+												<input type="checkbox" name="district" value="7">
+												Горный щит
+												<br>
+												<input type="checkbox" name="district" value="8">
+												Елизавет
+												<br>
+												<input type="checkbox" name="district" value="9">
+												ЖБИ
+												<br>
+												<input type="checkbox" name="district" value="10">
+												Завокзальный
+												<br>
+												<input type="checkbox" name="district" value="11">
+												Заречный
+												<br>
+												<input type="checkbox" name="district" value="12">
+												Изоплит
+												<br>
+												<input type="checkbox" name="district" value="13">
+												Исток
+												<br>
+												<input type="checkbox" name="district" value="14">
+												Калиновский
+												<br>
+												<input type="checkbox" name="district" value="15">
+												Кольцово
+												<br>
+												<input type="checkbox" name="district" value="16">
+												Компрессорный
+												<br>
+												<input type="checkbox" name="district" value="17">
+												Лечебный
+												<br>
+												<input type="checkbox" name="district" value="18">
+												Медный
+												<br>
+												<input type="checkbox" name="district" value="19">
+												Нижнеисетский
+												<br>
+												<input type="checkbox" name="district" value="20">
+												Парковый
+												<br>
+												<input type="checkbox" name="district" value="21">
+												Пионерский
+												<br>
+												<input type="checkbox" name="district" value="22">
+												Птицефабрика
+												<br>
+												<input type="checkbox" name="district" value="23">
+												Семь ключей
+												<br>
+												<input type="checkbox" name="district" value="24">
+												Сибирский тракт
+												<br>
+												<input type="checkbox" name="district" value="25">
+												Синие камни
+												<br>
+												<input type="checkbox" name="district" value="26">
+												Совхозный
+												<br>
+												<input type="checkbox" name="district" value="27">
+												Сортировка новая
+												<br>
+												<input type="checkbox" name="district" value="28">
+												Сортировка старая
+												<br>
+												<input type="checkbox" name="district" value="29">
+												Уктус
+												<br>
+												<input type="checkbox" name="district" value="30">
+												УНЦ
+												<br>
+												<input type="checkbox" name="district" value="31">
+												Уралмаш
+												<br>
+												<input type="checkbox" name="district" value="32">
+												Химмаш
+												<br>
+												<input type="checkbox" name="district" value="33">
+												Центр
+												<br>
+												<input type="checkbox" name="district" value="34">
+												Чермет
+												<br>
+												<input type="checkbox" name="district" value="35">
+												Шарташ
+												<br>
+												<input type="checkbox" name="district" value="36">
+												Широкая речка
+												<br>
+												<input type="checkbox" name="district" value="37">
+												Эльмаш
+												<br>
+												<input type="checkbox" name="district" value="38">
+												Юго-запад
+												<br>
+												<input type="checkbox" name="district" value="39">
+												За городом
+												<br>
+											</div>
+										</div>
+									</fieldset>
+								</div>
+							</div>
+							<div style="margin-top: 10px;">
+								<button id="fastSearchButton">
+									Найти
+								</button>
+								<a href="#">Запомнить условия поиска</a>
+							</div>
+						</form>
+					</div>
 				</div>
 			</div>
-		</div>
 
-		<div id="resultOnSearchPage">
-			<div>
-				<span id="expandList"><a href="#">Развернуть список</a>&nbsp;&nbsp;&nbsp;</span><span id="listPlusMap" style="display: none;"><a href="#">Список + карта</a>&nbsp;&nbsp;&nbsp;</span><span id="expandMap"><a href="#">Развернуть карту</a></span>
-			</div>
+			<div id="resultOnSearchPage">
+				<div>
+					<span id="expandList"><a href="#">Развернуть список</a>&nbsp;&nbsp;&nbsp;</span><span id="listPlusMap" style="display: none;"><a href="#">Список + карта</a>&nbsp;&nbsp;&nbsp;</span><span id="expandMap"><a href="#">Развернуть карту</a></span>
+				</div>
 
-			<!-- Информация об объектах, подходящих условиям поиска -->
-			<table class="listOfRealtyObjects" id="shortListOfRealtyObjects">
-				<thead>
-					<tr class="listOfRealtyObjectsHeader">
-						<th> Избранное </th>
-						<th> Фото </th>
-						<th> Адрес </th>
-						<th> Цена, руб. </th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr class="realtyObject">
-						<td> да </td>
-						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">улица Сибирский тракт 50 летия 107</td>
-						<td> 15000 </td>
-					</tr>
-					<tr class="realtyObject">
-						<td> нет </td>
-						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">ул. Сумасранка 4</td>
-						<td> 35000 </td>
-					</tr>
-					<tr class="realtyObject">
-						<td> да </td>
-						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">ул. Серафимы Дерябиной 154</td>
-						<td> 150000 </td>
-					</tr>
-					<tr class="realtyObject">
-						<td> нет </td>
-						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">ул. Белореченская 24</td>
-						<td> 6000 </td>
-					</tr>
-					<tr class="realtyObject">
-						<td> да </td>
-						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">ул. Маврода 2012</td>
-						<td> 2000 </td>
-					</tr>
-					<tr class="realtyObject">
-						<td> да </td>
-						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">ул. Пискуна 1</td>
-						<td> 350000 </td>
-					</tr>
-					<tr class="realtyObject">
-						<td> да </td>
-						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">улица Сибирский тракт 50 летия 107</td>
-						<td> 15000 </td>
-					</tr>
-					<tr class="realtyObject">
-						<td> нет </td>
-						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">ул. Сумасранка 4</td>
-						<td> 35000 </td>
-					</tr>
-					<tr class="realtyObject">
-						<td> да </td>
-						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">ул. Серафимы Дерябиной 154</td>
-						<td> 150000 </td>
-					</tr>
-					<tr class="realtyObject">
-						<td> нет </td>
-						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">ул. Белореченская 24</td>
-						<td> 6000 </td>
-					</tr>
-					<tr class="realtyObject">
-						<td> да </td>
-						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">ул. Маврода 2012</td>
-						<td> 2000 </td>
-					</tr>
-					<tr class="realtyObject">
-						<td> да </td>
-						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">ул. Пискуна 1</td>
-						<td> 350000 </td>
-					</tr>
-					<tr class="realtyObject">
-						<td> да </td>
-						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">улица Сибирский тракт 50 летия 107</td>
-						<td> 15000 </td>
-					</tr>
-					<tr class="realtyObject">
-						<td> нет </td>
-						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">ул. Сумасранка 4</td>
-						<td> 35000 </td>
-					</tr>
-					<tr class="realtyObject">
-						<td> да </td>
-						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">ул. Серафимы Дерябиной 154</td>
-						<td> 150000 </td>
-					</tr>
-					<tr class="realtyObject">
-						<td> нет </td>
-						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">ул. Белореченская 24</td>
-						<td> 6000 </td>
-					</tr>
-					<tr class="realtyObject">
-						<td> да </td>
-						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">ул. Маврода 2012</td>
-						<td> 2000 </td>
-					</tr>
-					<tr class="realtyObject">
-						<td> да </td>
-						<td> здесь будет картинка </td>
-						<td class="realtyObjectAddress">ул. Пискуна 1</td>
-						<td> 350000 </td>
-					</tr>
-				</tbody>
-			</table>
-
-			<!-- Область показа карты -->
-			<div id="map"></div>
-
-			<div style="clear: both;"></div>
-
-			<!-- Первоначально скрытый раздел с подробным списком объявлений-->
-			<div id="fullParametersListOfRealtyObjects" style="display: none;">
-				<table class="listOfRealtyObjects" style="width: 100%">
+				<!-- Информация об объектах, подходящих условиям поиска -->
+				<table class="listOfRealtyObjects" id="shortListOfRealtyObjects">
 					<thead>
 						<tr class="listOfRealtyObjectsHeader">
 							<th> Избранное </th>
 							<th> Фото </th>
 							<th> Адрес </th>
-							<th> Район </th>
-							<th> Комнат </th>
-							<th> Площадь </th>
-							<th> Этаж </th>
 							<th> Цена, руб. </th>
 						</tr>
 					</thead>
@@ -511,60 +379,194 @@
 						<tr class="realtyObject">
 							<td> да </td>
 							<td> здесь будет картинка </td>
-							<td class="realtyObjectAddress" coordX="56.820769" coordY="60.560742">ул. Серафимы Дерябиной 17</td>
-							<td> ВИЗ </td>
-							<td> 2 </td>
-							<td> 22.4/34 </td>
-							<td> 2/13</td>
+							<td class="realtyObjectAddress">улица Сибирский тракт 50 летия 107</td>
 							<td> 15000 </td>
+						</tr>
+						<tr class="realtyObject">
+							<td> нет </td>
+							<td> здесь будет картинка </td>
+							<td class="realtyObjectAddress">ул. Сумасранка 4</td>
+							<td> 35000 </td>
 						</tr>
 						<tr class="realtyObject">
 							<td> да </td>
 							<td> здесь будет картинка </td>
-							<td class="realtyObjectAddress" coordX="56.825483" coordY="60.57357">ул. Гурзуфская 38</td>
-							<td> ВИЗ </td>
-							<td> 2 </td>
-							<td> 22.4/34 </td>
-							<td> 2/13</td>
-							<td> 15000 </td>
+							<td class="realtyObjectAddress">ул. Серафимы Дерябиной 154</td>
+							<td> 150000 </td>
+						</tr>
+						<tr class="realtyObject">
+							<td> нет </td>
+							<td> здесь будет картинка </td>
+							<td class="realtyObjectAddress">ул. Белореченская 24</td>
+							<td> 6000 </td>
 						</tr>
 						<tr class="realtyObject">
 							<td> да </td>
 							<td> здесь будет картинка </td>
-							<td class="realtyObjectAddress" coordX="56.817405" coordY="60.558452">ул. Шаумяна 107</td>
-							<td> ВИЗ </td>
-							<td> 2 </td>
-							<td> 22.4/34 </td>
-							<td> 2/13</td>
-							<td> 15000 </td>
+							<td class="realtyObjectAddress">ул. Маврода 2012</td>
+							<td> 2000 </td>
 						</tr>
 						<tr class="realtyObject">
 							<td> да </td>
 							<td> здесь будет картинка </td>
-							<td class="realtyObjectAddress" coordX="56.819927" coordY="60.539264">ул. Репина 105</td>
-							<td> ВИЗ </td>
-							<td> 2 </td>
-							<td> 22.4/34 </td>
-							<td> 2/13</td>
-							<td> 15000 </td>
+							<td class="realtyObjectAddress">ул. Пискуна 1</td>
+							<td> 350000 </td>
 						</tr>
 						<tr class="realtyObject">
 							<td> да </td>
 							<td> здесь будет картинка </td>
-							<td class="realtyObjectAddress" coordX="56.836396" coordY="60.588662">ул. Ленина 13</td>
-							<td> ВИЗ </td>
-							<td> 2 </td>
-							<td> 22.4/34 </td>
-							<td> 2/13</td>
+							<td class="realtyObjectAddress">улица Сибирский тракт 50 летия 107</td>
 							<td> 15000 </td>
+						</tr>
+						<tr class="realtyObject">
+							<td> нет </td>
+							<td> здесь будет картинка </td>
+							<td class="realtyObjectAddress">ул. Сумасранка 4</td>
+							<td> 35000 </td>
+						</tr>
+						<tr class="realtyObject">
+							<td> да </td>
+							<td> здесь будет картинка </td>
+							<td class="realtyObjectAddress">ул. Серафимы Дерябиной 154</td>
+							<td> 150000 </td>
+						</tr>
+						<tr class="realtyObject">
+							<td> нет </td>
+							<td> здесь будет картинка </td>
+							<td class="realtyObjectAddress">ул. Белореченская 24</td>
+							<td> 6000 </td>
+						</tr>
+						<tr class="realtyObject">
+							<td> да </td>
+							<td> здесь будет картинка </td>
+							<td class="realtyObjectAddress">ул. Маврода 2012</td>
+							<td> 2000 </td>
+						</tr>
+						<tr class="realtyObject">
+							<td> да </td>
+							<td> здесь будет картинка </td>
+							<td class="realtyObjectAddress">ул. Пискуна 1</td>
+							<td> 350000 </td>
+						</tr>
+						<tr class="realtyObject">
+							<td> да </td>
+							<td> здесь будет картинка </td>
+							<td class="realtyObjectAddress">улица Сибирский тракт 50 летия 107</td>
+							<td> 15000 </td>
+						</tr>
+						<tr class="realtyObject">
+							<td> нет </td>
+							<td> здесь будет картинка </td>
+							<td class="realtyObjectAddress">ул. Сумасранка 4</td>
+							<td> 35000 </td>
+						</tr>
+						<tr class="realtyObject">
+							<td> да </td>
+							<td> здесь будет картинка </td>
+							<td class="realtyObjectAddress">ул. Серафимы Дерябиной 154</td>
+							<td> 150000 </td>
+						</tr>
+						<tr class="realtyObject">
+							<td> нет </td>
+							<td> здесь будет картинка </td>
+							<td class="realtyObjectAddress">ул. Белореченская 24</td>
+							<td> 6000 </td>
+						</tr>
+						<tr class="realtyObject">
+							<td> да </td>
+							<td> здесь будет картинка </td>
+							<td class="realtyObjectAddress">ул. Маврода 2012</td>
+							<td> 2000 </td>
+						</tr>
+						<tr class="realtyObject">
+							<td> да </td>
+							<td> здесь будет картинка </td>
+							<td class="realtyObjectAddress">ул. Пискуна 1</td>
+							<td> 350000 </td>
 						</tr>
 					</tbody>
 				</table>
-			</div>
-		</div>
 
-		<!-- Заполнитель низа -->
-		<div class="footerImage"></div>
+				<!-- Область показа карты -->
+				<div id="map"></div>
+
+				<div style="clear: both;"></div>
+
+				<!-- Первоначально скрытый раздел с подробным списком объявлений-->
+				<div id="fullParametersListOfRealtyObjects" style="display: none;">
+					<table class="listOfRealtyObjects" style="width: 100%">
+						<thead>
+							<tr class="listOfRealtyObjectsHeader">
+								<th> Избранное </th>
+								<th> Фото </th>
+								<th> Адрес </th>
+								<th> Район </th>
+								<th> Комнат </th>
+								<th> Площадь </th>
+								<th> Этаж </th>
+								<th> Цена, руб. </th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="realtyObject">
+								<td> да </td>
+								<td> здесь будет картинка </td>
+								<td class="realtyObjectAddress" coordX="56.820769" coordY="60.560742">ул. Серафимы Дерябиной 17</td>
+								<td> ВИЗ </td>
+								<td> 2 </td>
+								<td> 22.4/34 </td>
+								<td> 2/13</td>
+								<td> 15000 </td>
+							</tr>
+							<tr class="realtyObject">
+								<td> да </td>
+								<td> здесь будет картинка </td>
+								<td class="realtyObjectAddress" coordX="56.825483" coordY="60.57357">ул. Гурзуфская 38</td>
+								<td> ВИЗ </td>
+								<td> 2 </td>
+								<td> 22.4/34 </td>
+								<td> 2/13</td>
+								<td> 15000 </td>
+							</tr>
+							<tr class="realtyObject">
+								<td> да </td>
+								<td> здесь будет картинка </td>
+								<td class="realtyObjectAddress" coordX="56.817405" coordY="60.558452">ул. Шаумяна 107</td>
+								<td> ВИЗ </td>
+								<td> 2 </td>
+								<td> 22.4/34 </td>
+								<td> 2/13</td>
+								<td> 15000 </td>
+							</tr>
+							<tr class="realtyObject">
+								<td> да </td>
+								<td> здесь будет картинка </td>
+								<td class="realtyObjectAddress" coordX="56.819927" coordY="60.539264">ул. Репина 105</td>
+								<td> ВИЗ </td>
+								<td> 2 </td>
+								<td> 22.4/34 </td>
+								<td> 2/13</td>
+								<td> 15000 </td>
+							</tr>
+							<tr class="realtyObject">
+								<td> да </td>
+								<td> здесь будет картинка </td>
+								<td class="realtyObjectAddress" coordX="56.836396" coordY="60.588662">ул. Ленина 13</td>
+								<td> ВИЗ </td>
+								<td> 2 </td>
+								<td> 22.4/34 </td>
+								<td> 2/13</td>
+								<td> 15000 </td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Заполнитель низа -->
+			<div class="footerImage"></div>
+			<div class="page-buffer"></div>
+		</div>
 		<div class="footer">
 			2012 «Долфин хоум», вопросы и пожелания по работе портала можно передавать по телефону 8-922-143-16-15
 		</div>
@@ -580,8 +582,8 @@
 		<!-- Загружаем библиотеку для работы с картой от Яндекса -->
 		<script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
 
-		<!-- scripts concatenated and minified via build script -->
 		<script src="js/search.js"></script>
+		<!-- scripts concatenated and minified via build script -->
 
 		<!-- end scripts -->
 
