@@ -110,10 +110,10 @@ document.getElementById('rightBlockOfSearchParameters').style.height = document.
 $('#expandList').on('click', function() {
 	$('#shortListOfRealtyObjects').css('display', 'none');
 	$('#map').css('display', 'none');
-	$('#fullParametersListOfRealtyObjects').css('display', 'block');
-	$('#listPlusMap').css('display', '');
-	$('#expandMap').css('display', '');
-	$('#expandList').css('display', 'none');
+	$('#fullParametersListOfRealtyObjects').css('display', '');
+	//$('#listPlusMap').css('display', '');
+	//$('#expandMap').css('display', '');
+	//$('#expandList').css('display', 'none');
 	return false;
 });
 
@@ -123,9 +123,9 @@ $('#listPlusMap').on('click', function() {
 	$('#map').css('display', 'block');
 	$('#map').css('width', '49%');
 	$('#fullParametersListOfRealtyObjects').css('display', 'none');
-	$('#expandList').css('display', '');
-	$('#expandMap').css('display', '');
-	$('#listPlusMap').css('display', 'none');
+	//$('#expandList').css('display', '');
+	//$('#expandMap').css('display', '');
+	//$('#listPlusMap').css('display', 'none');
 	return false;
 });
 
@@ -135,9 +135,9 @@ $('#expandMap').on('click', function() {
 	$('#map').css('display', '');
 	$('#map').css('width', '100%');
 	$('#fullParametersListOfRealtyObjects').css('display', 'none');
-	$('#expandList').css('display', '');
-	$('#listPlusMap').css('display', '');
-	$('#expandMap').css('display', 'none');
+	//$('#expandList').css('display', '');
+	//$('#listPlusMap').css('display', '');
+	//$('#expandMap').css('display', 'none');
 	return false;
 });
 

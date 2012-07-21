@@ -1,24 +1,8 @@
-body {
-	width: 100%;
-	height: 100%;
-}
-
-.headerOfPage {
-	font-size: 1.5em;
-	text-align: left;
-	margin-left: -5%;
-}
-
 #tabs {
 	font-size: 1em;
 }
 
 /* Стили для детального описания объекта*/
-
-.headerOfDescriptionObject {
-	font-size: 1.7em;
-	text-align: center;
-}
 
 .objectFoto {
 	margin: 5px;
