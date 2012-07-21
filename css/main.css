@@ -463,9 +463,43 @@ body {
 	height: 100%; /* эта строчка для прижатия подвала к низу страницы*/
 }
 
+.backgroundOfHeader {
+	width: 100%; 
+	height: 600px;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: -5;
+	
+	/*background: #33CEC3; /* Для старых браузров */
+    /*background: -moz-linear-gradient(top, #33CEC3, #009D91); /* Firefox 3.6+ */
+    /*background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#33CEC3), color-stop(100%,#009D91)); /* Chrome 1-9, Safari 4-5 */
+    /*background: -webkit-linear-gradient(top, #33CEC3, #009D91); /* Chrome 10+, Safari 5.1+ */
+    /*background: -o-linear-gradient(top, #33CEC3, #009D91); /* Opera 11.10+ */
+    /*background: -ms-linear-gradient(top, #33CEC3, #009D91); /* IE10 */
+    /*background: linear-gradient(top, #33CEC3, #009D91); /* CSS3 */ 
+	/*filter:progid: DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91'); /* для IE 6-7 */
+	/*-ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91')"; /* для IE8 */
+	
+	background: #33CEC3; /* Для старых браузров */
+    background: -moz-linear-gradient(top, #33CEC3, #009D91); /* Firefox 3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#33CEC3), color-stop(100%,white)); /* Chrome 1-9, Safari 4-5 */
+    background: -webkit-linear-gradient(top, #33CEC3, white); /* Chrome 10+, Safari 5.1+ */
+    background: -o-linear-gradient(top, #33CEC3, #009D91); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #33CEC3, white); /* IE10 */
+    background: linear-gradient(top, #33CEC3, #009D91); /* CSS3 */ 
+	filter:progid: DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91'); /* для IE 6-7 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91')"; /* для IE8 */
+}
+
 .page-wrapper {
 	min-height: 100%;
-    margin-bottom: -34px;
+    margin: 20px auto -34px auto;
+    width: 90%;
+}
+
+.page-buffer-top {
+	height: 90px;
 }
 
 .page-buffer {
@@ -476,8 +510,9 @@ body {
 .header {
 	height: 90px;
 	position: relative;
-	width: 100%;
-	min-width: 780px;
+	width: 98%;
+	min-width: 765px; /*Исходим из того, что миним. ширина всей страницы - 780 px, а значит 96% = 749px */
+	margin: 10px auto 0px auto;
 }
 
 .iconBox {
@@ -486,50 +521,97 @@ body {
 	height: 90px;
 	/*float: left;*/
 	position: absolute;
-	left: 5px;
+	left: 0px;
 	top: 0px;
 }
 
 .nameOfServiceBox {
-	position: absolute;
-	left: 0px;
-	right: 0px;
 	min-width: 370px;
-	float: left;
-	padding-left: 90px;
-	padding-right: 15px;
+	margin-left: 100px;
+	margin-right: 130px;
 	height: 90px;
 	text-align: center;
-	
-	background: #33CEC3; /* Для старых браузров */
-    background: -moz-linear-gradient(top, #33CEC3, #009D91); /* Firefox 3.6+ */
-    /* Chrome 1-9, Safari 4-5 */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#33CEC3), color-stop(100%,#009D91));
-    /* Chrome 10+, Safari 5.1+ */
-    background: -webkit-linear-gradient(top, #33CEC3, #009D91);
-    background: -o-linear-gradient(top, #33CEC3, #009D91); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top, #33CEC3, #009D91); /* IE10 */
-    background: linear-gradient(top, #33CEC3, #009D91); /* CSS3 */ 
-	filter:progid: DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91'); /* для IE 6-7 */
-	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91')"; /* для IE8 */
 }
 
 .slogan {
-	font-size: 30px;
+	font-size: 24px; /* размер = размеру очень крупного шрифта в браузерах - с учетом плохо видящих пользователей, в то же время этот размер не позволяет при минимальной ширине строчке превращаться в 2 строчки*/
+}
+
+/* Стили для минималистской формы входа */
+.enter {
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	text-align: right;
+}
+
+.amountOfNewsInEnter {
+	color: red;
+}
+
+.enter a {
+	text-decoration: none;
+}
+
+/* Стили главного меню*/
+.menu {
+	margin: 8px auto 0px auto;
+	width: 100%;
+	min-width: 500px;
+}
+
+.menu ul {
+	list-style: none;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+}
+
+.menu ul li {
+	float: left;
+	background-color: #BF6E30;
+	width: 25%;
+	text-align: center;
+}
+
+.menu ul li.left {
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+}
+
+.menu ul li.right {
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+.menu ul li a {
+	display: block;
+	text-decoration: none;
+	white-space: nowrap;
+	font-size: 1.2em;
+	color: white;
+}
+
+.menu ul li a:hover {
+	color: #7bded9;
+}
+
+.selectedMenuItem {
+	white-space: nowrap;
+	font-size: 1.2em;
+	color: #7bded9;
 }
 
 /* Стили для блога логина и регистрации пользователей*/
-.loginBox {
+/*.loginBox {
 	float: right;
 	width: 170px;
 	border: 1px solid black;
-	padding: 7px;
-	
-	
-	background: #E2EEFD; /* Для старых браузров */
+	padding: 7px; */
+/*	background: #E2EEFD; /* Для старых браузров */
    /* background: -moz-linear-gradient(top, #CDDDF3, #009D91); /* Firefox 3.6+ */
     /* Chrome 1-9, Safari 4-5 */
-   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#BDDBF9), color-stop(100%,#F3F8FE));
+/*   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#BDDBF9), color-stop(100%,#F3F8FE));
     /* Chrome 10+, Safari 5.1+ */
    /* background: -webkit-linear-gradient(top, #33CEC3, #009D91);
     background: -o-linear-gradient(top, #33CEC3, #009D91); /* Opera 11.10+ */
@@ -537,32 +619,21 @@ body {
    /* background: linear-gradient(top, #33CEC3, #009D91); /* CSS3 */ 
 	/*filter:progid: DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91'); /* для IE 6-7 */
 	/*-ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91')"; /* для IE8 */
-
-}
-
-ul.login {
+/*} */
+/*ul.login {
 	font-size: 0.8em;
 	list-style-type: none;
 	margin: 0px;
 	padding: 0px;
 }
-
 ul.login a {
 	float: right;
 }
-
 .nameLoginBox {
 	font-size: 1.2em;
 	font-weight: bold;
 	padding-bottom: 3px;
-}
-
-.enter {
-	float: right;
-	padding-top: 10px;
-	padding-right: 10px;
-	text-align: right;
-}
+} */
 
 /* Стили для основного содержимого страницы*/
 
@@ -579,14 +650,14 @@ ul.login a {
 }
 
 /* Стили низа страницы*/
-.footerImage {
+/*.footerImage {
 	background-image: url('stripe.gif');
 	background-repeat: repeat-x; 
 	width: 100%;
 	height: 250px;
 	clear: both;
 	margin-top: -250px;
-}
+}*/
 
 .footer {
 	font-size: 13px;

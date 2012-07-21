@@ -3,16 +3,10 @@ body {
 	
 }
 
-.nameOfServiceBox {
-	right: 186px;
-}
-
 #descriptionBox {
 	clear: both;
 	padding-top: 10px;
-	width: 98%;
-	margin-left: 1%;
-	margin-right: 1%;
+	width: 100%;
 	min-width: 703px;
 }
 
@@ -23,14 +17,13 @@ body {
 
 .descriptionBlock1 {
 	float: left;
-	width: 49%;
+	width: 49.5%;
 	text-align: center;
-	margin-right: 2%;
 }
 
 .descriptionBlock2 {
-	float: left;
-	width: 49%;
+	float: right;
+	width: 49.5%;
 	text-align: center;
 }
 
