@@ -457,13 +457,16 @@ html {
 }
 
 body {
-	margin: auto;
+	margin: 0;
+	padding: 0;
 	font-family: 'Trebuchet MS', Tahoma, Verdana, Arial, sans-serif;
+	font-size: 100%;
 	min-width: 780px;
 	height: 100%; /* эта строчка для прижатия подвала к низу страницы*/
 	width: 100%;
 }
 
+/* Стили для шапки страницы*/
 .backgroundOfHeader {
 	width: 100%; 
 	min-width: 780px;
@@ -473,33 +476,24 @@ body {
 	left: 0px;
 	z-index: -5;
 	
-	/*background: #33CEC3; /* Для старых браузров */
-    /*background: -moz-linear-gradient(top, #33CEC3, #009D91); /* Firefox 3.6+ */
-    /*background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#33CEC3), color-stop(100%,#009D91)); /* Chrome 1-9, Safari 4-5 */
-    /*background: -webkit-linear-gradient(top, #33CEC3, #009D91); /* Chrome 10+, Safari 5.1+ */
-    /*background: -o-linear-gradient(top, #33CEC3, #009D91); /* Opera 11.10+ */
-    /*background: -ms-linear-gradient(top, #33CEC3, #009D91); /* IE10 */
-    /*background: linear-gradient(top, #33CEC3, #009D91); /* CSS3 */ 
-	/*filter:progid: DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91'); /* для IE 6-7 */
-	/*-ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91')"; /* для IE8 */
-	
-	background: #33CEC3; /* Для старых браузров */
-    background: -moz-linear-gradient(top, #33CEC3, #009D91); /* Firefox 3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#33CEC3), color-stop(100%,white)); /* Chrome 1-9, Safari 4-5 */
-    background: -webkit-linear-gradient(top, #33CEC3, white); /* Chrome 10+, Safari 5.1+ */
-    background: -o-linear-gradient(top, #33CEC3, #009D91); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top, #33CEC3, white); /* IE10 */
-    background: linear-gradient(top, #33CEC3, #009D91); /* CSS3 */ 
-	filter:progid: DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91'); /* для IE 6-7 */
-	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91')"; /* для IE8 */
+	background: #009D91; /* Для старых браузров */
+    background: -moz-linear-gradient(top, #009D91, white); /* Firefox 3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#009D91), color-stop(100%,white)); /* Chrome 1-9, Safari 4-5 */
+    background: -webkit-linear-gradient(top, #009D91, white); /* Chrome 10+, Safari 5.1+ */
+    background: -o-linear-gradient(top, #009D91, white); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #009D91, white); /* IE10 */
+    background: linear-gradient(top, #009D91, white); /* CSS3 */ 
+	filter:progid: DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#009D91', endColorstr='#ffffff'); /* для IE 6-7 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#009D91', endColorstr='#ffffff')"; /* для IE8 */
 }
 
-/* Стили для шапки страницы*/
 .header {
+	font-family: Georgia, "Times New Roman", Times, serif;
 	position: relative;
 	width: 98%;
 	min-width: 765px; /*Исходим из того, что миним. ширина всей страницы - 780 px, а значит 96% = 749px */
-	margin: 10px auto 0px auto;
+	margin: 0px auto 0px auto; /* верхний отступ должен быть = 0, пояснения в padding-top*/
+	padding-top: 10px; /* Используем вместо margin-top 10px padding-top=10px, так как это позволяет прижать футер к низу страницы без появления полосы прокрутки */
 }
 
 .iconBox {
@@ -520,7 +514,11 @@ body {
 }
 
 .slogan {
-	font-size: 24px; /* размер = размеру очень крупного шрифта в браузерах - с учетом плохо видящих пользователей, в то же время этот размер не позволяет при минимальной ширине строчке превращаться в 2 строчки*/
+	font-size: 1.5em; /* 24px / 16 px */
+}
+
+.underslogan {
+	font-size: 1em; /* 16px / 16 px */
 }
 
 /* Стили для минималистской формы входа */
@@ -626,14 +624,18 @@ ul.login a {
 } */
 
 /* Стили для основного содержимого страницы*/
-
-.page-wrapper {
+.page_without_footer {
 	min-height: 100%;
-    margin: 30px auto -34px auto;
+	margin-bottom: -34px;
+}
+
+.page_main_content {
+    margin: 30px auto 0px auto;
     width: 90%;
 }
 
 .headerOfPage {
+	font-family: Georgia, "Times New Roman", Times, serif;
 	font-size: 1.3em;
 	text-align: left;
 	padding: 6px 0px 6px 0px;
@@ -641,6 +643,10 @@ ul.login a {
 
 .wrapperOfTabs{
 	width: 100%;
+}
+
+#tabs {
+	font-size: 1em;
 }
 
 .page-buffer {

@@ -26,45 +26,6 @@
 		<link rel="stylesheet" href="css/main.css">
 		<link rel="stylesheet" href="css/forowner.css">
 
-		<style>
-			/* Стиль для панели табов - ul*/
-			/* Важно, что пока он плавающий и основной текст из .ui-tabs-panel его обтекает*/
-			.ui-tabs-vertical .ui-tabs-nav {
-				padding: .2em .1em .2em .2em;
-				float: left;
-			}
-			
-			.ui-widget-header {
-				background-color: #BF6E30;
-				background-image: none;
-			}
-			
-			/* Стиль для не выбранного таба - элемента li*/
-			.ui-tabs-vertical .ui-tabs-nav li {
-				clear: left;
-				width: 100%;
-				border-bottom-width: 1px !important;
-				border-right-width: 0 !important;
-				margin: 2px 0px 2px 0px;
-				padding: 0;
-				cursor: pointer;
-			}
-			.ui-tabs-vertical .ui-tabs-nav li a {
-				display: block;
-			}
-			/* Стиль для текущего выбранного таба - элемента li*/
-			.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-selected {
-				margin: 2px 0px 2px 0px;
-				padding: 0;
-				cursor: text;
-			}
-			/* Стиль для основного текста, отображаемого справа от табов*/
-			.ui-tabs-vertical .ui-tabs-panel {
-				padding: 1em;
-				overflow: auto;
-			}
-		</style>
-
 		<!-- More ideas for your <head> here: h5bp.com/d/head-Tips -->
 
 		<!-- All JavaScript at the bottom, except this Modernizr build.
@@ -79,161 +40,183 @@
 		<!--[if lt IE 7]><p class="chromeframe">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
 
 		<!-- Add your site or application content here -->
-		<div class="backgroundOfHeader"></div>
+		<div class="page_without_footer">
+			<div class="backgroundOfHeader"></div>
 
-		<div class="header">
-			<div class="nameOfServiceBox">
-				<div>
-					<span class='slogan'>Лучший способ аренды недвижимости!</span>
-					<br>
-					Мы помогаем людям сдать в аренду и снять жилье в Екатеринбурге
-				</div>
-				<div class="menu">
-					<ul>
-						<li class="left" style="width:15%">
-							<a href="index.html">Главная</a>
-						</li >
-						<li style="width:38%">
-							<a href="search.html">Поиск недвижимости</a>
-						</li>
-						<li class="selected" style="width:25.5%">
-							<span>Собственнику</span>
-						</li>
-						<li class="right" style="width:21%">
-							<a href="#">Арендатору</a>
-						</li>
-					</ul>
-					<div style="clear:both;"></div>
-				</div>
-			</div>
-			<div class="iconBox"></div>
-			<div class="enter">
-				<a href="registrationForm.html">Регистрация</a>
-				<br>
-				<a href="#">Вход</a>
-				<br>
-			</div>
-		</div>
-		
-		<div class="page-wrapper">
-
-			<div class="wrapperOfTabs">
-				<div class="headerOfPage">
-					9 шагов с Комфорт Реал - современный способ сдать недвижимость
-				</div>
-				<div id="tabs">
-					<ul>
-						<li>
-							<a href="#tabs-1">1. Заявка</a>
-						</li>
-						<li>
-							<a href="#tabs-2">2. Выезд специалиста</a>
-						</li>
-						<li>
-							<a href="#tabs-3">3. Оплата</a>
-						</li>
-						<li>
-							<a href="#tabs-4">4. Публикация</a>
-						</li>
-						<li>
-							<a href="#tabs-5">5. Выбор арендатора</a>
-						</li>
-						<li>
-							<a href="#tabs-6">6. Показ</a>
-						</li>
-						<li>
-							<a href="#tabs-7">7. Договор</a>
-						</li>
-						<li>
-							<a href="#tabs-8">8. Расчет</a>
-						</li>
-						<li>
-							<a href="#tabs-9">9. Успех!</a>
-						</li>
-					</ul>
-					<div id="tabs-1">
-						Вы оставляете заявку на выезд специалиста ниже на нашем сайте, либо по тел: 8-922-143-16-15
+			<div class="header">
+				<div class="nameOfServiceBox">
+					<div>
+						<span class='slogan'>Лучший способ аренды недвижимости!</span>
+						<br>
+						<span class="underslogan">Мы помогаем людям сдать в аренду и снять жилье в Екатеринбурге</span>
 					</div>
-					<div id="tabs-2">
-						Выезд специалиста. В удобное для Вас время приезжает наш специалист выполняет следующую работу:
+					<div class="menu">
 						<ul>
-							<li>
-								Подробно снимает параметры сдаваемого объекта
+							<li class="left" style="width:15%">
+								<a href="index.html">Главная</a>
+							</li >
+							<li style="width:38%">
+								<a href="search.html">Поиск недвижимости</a>
 							</li>
-							<li>
-								Фотографирует комнаты и другие помещения
+							<li class="selected" style="width:25.5%">
+								<span>Собственнику</span>
 							</li>
-							<li>
-								Формирует для Вас договор аренды, который нужно будет подписать с арендатором
-							</li>
-							<li>
-								Консультирует по любым вопросам, связанным со сдачей объекта в аренду
-							</li>
-							<li>
-								Фиксирует требования к арендаторам
-							</li>
-							<li>
-								Публикует информацию на ресурсе dolphin-home.ru
-							</li>
-							<li>
-								Подписывает с Вами договор на оказание услуг
+							<li class="right" style="width:21%">
+								<a href="fortenant.html">Арендатору</a>
 							</li>
 						</ul>
-					</div>
-					<div id="tabs-3">
-						Вы производите оплату услуг нашего агентства - 20% от месячной стоимости аренды объекта
-					</div>
-					<div id="tabs-4">
-						Информация о Вашем объекте ежедневно перепубликуется на всех основных порталах города: e1.ru, 66.ru для привлечения максимального количества соответствующих Вашему запросу арендаторов
-					</div>
-					<div id="tabs-5">
-						Информация о каждом заинтересовавшемся потенциальном арендателе сохраняется для Вас в личном кабинете на портале. Это позволяет Вам лично выбрать наиболее интересного нанимателя
-					</div>
-					<div id="tabs-6">
-						Вы договариваетесь с потенциальным арендатором о дате и времени показа объекта, зачастую достаточно одного показа.
-					</div>
-					<div id="tabs-7">
-						Подписываете договор аренды, оставленный нашим специалистом.
-					</div>
-					<div id="tabs-8">
-						Вы получаете от арендатора единоразовую комиссию - 40% от месячной стоимости квартиры, которая покрывает расходы на выезд специалиста dolphin home и приносит Вам дополнительный доход. Береты залог (если нужно) и плату за первый месяц проживания
-					</div>
-					<div id="tabs-9">
-						Поздравляем, Вы сдали недвижимость порядочным людям максимально быстро и выгодно с помощью dolphin home!
+						<div style="clear:both;"></div>
 					</div>
 				</div>
-			</div>
+				<div class="iconBox"></div>
+				<div class="enter">
+					<a href="registrationForm.html">Регистрация</a>
+					<br>
+					<a href="#">Вход</a>
+					<br>
+				</div>
+			</div><!-- /end.header -->
 
-			<form>
-				<fieldset class="edited" style="margin-top: 15px;">
-					<legend>
-						Заполните заявку
-					</legend>
-					<button>
-						Отправить заявку
-					</button>
-					<br>
-					Как к Вам обращаться?
-					<input type="text" size="30">
-					<br>
-					На какой номер Вам перезвонить?
-					<input type="text" size="15">
-					<br>
-					По какому адресу собираетесь сдать объект?
-					<input type="text" size="40">
-					<br>
-					Комментарии (например, в какое время Вам будет удобно принять наш звонок)?
-					<textarea rows="3" cols="50"></textarea>
-				</fieldset>
-			</form>
+			<div class="page_main_content">
 
-			<!-- Заполнитель низа -->
-			<!--<div class="footerImage"></div>-->
+				<div class="wrapperOfTabs">
+					<div class="headerOfPage">
+						Современный способ сдать недвижимость - с Комфорт Реал за 9 шагов
+					</div>
+					<div id="tabs">
+						<ul>
+							<li>
+								<a href="#tabs-1">1. Заявка</a>
+							</li>
+							<li>
+								<a href="#tabs-2">2. Выезд специалиста</a>
+							</li>
+							<li>
+								<a href="#tabs-3">3. Оплата</a>
+							</li>
+							<li>
+								<a href="#tabs-4">4. Публикация</a>
+							</li>
+							<li>
+								<a href="#tabs-5">5. Выбор арендатора</a>
+							</li>
+							<li>
+								<a href="#tabs-6">6. Показ</a>
+							</li>
+							<li>
+								<a href="#tabs-7">7. Договор</a>
+							</li>
+							<li>
+								<a href="#tabs-8">8. Расчет</a>
+							</li>
+							<li>
+								<a href="#tabs-9">9. Успех!</a>
+							</li>
+						</ul>
+						<div id="tabs-1">
+							<p>
+								Вы оставляете заявку на выезд специалиста ниже на нашем сайте, либо по тел: 8-922-143-16-15
+							</p>
+						</div>
+						<div id="tabs-2">
+							<p>
+								В удобное для Вас время приезжает специалист Комфорт Реал и выполняет следующую работу:
+								<ul>
+									<li>
+										Подробно снимает параметры сдаваемого объекта
+									</li>
+									<li>
+										Фотографирует комнаты и другие помещения
+									</li>
+									<li>
+										Формирует для Вас договор аренды, который нужно будет подписать с арендатором
+									</li>
+									<li>
+										Консультирует по любым вопросам, связанным со сдачей объекта в аренду
+									</li>
+									<li>
+										Фиксирует требования к арендаторам
+									</li>
+									<li>
+										Публикует информацию на ресурсе dolphin-home.ru
+									</li>
+									<li>
+										Подписывает с Вами договор на оказание услуг
+									</li>
+								</ul>
+							</p>
+						</div>
+						<div id="tabs-3">
+							<p>
+								Вы производите оплату услуг нашего агентства - 20% от месячной стоимости аренды объекта
+							</p>
+						</div>
+						<div id="tabs-4">
+							<p>
+								Информация о Вашем объекте ежедневно перепубликуется на всех основных порталах города: e1.ru, 66.ru для привлечения максимального количества соответствующих Вашему запросу арендаторов
+							</p>
+						</div>
+						<div id="tabs-5">
+							<p>
+								Информация о каждом заинтересовавшимся потенциальном арендаторе сохраняется для Вас в личном кабинете на портале. Это позволяет Вам лично выбрать наиболее подходящего нанимателя для своей недвижимости.
+							</p>
+							<p>
+								В отличие от обычных агентств мы стараемся представить Вам максимум информации о желающих снять недвижимость еще до показа, чтобы сэкономить и Ваше время, и время арендаторов
+							</p>
+						</div>
+						<div id="tabs-6">
+							<p>
+								Вы договариваетесь с потенциальным арендатором о дате и времени показа объекта, зачастую достаточно одного показа.
+							</p>
+						</div>
+						<div id="tabs-7">
+							<p>
+								Подписываете договор аренды, оставленный нашим специалистом.
+							</p>
+						</div>
+						<div id="tabs-8">
+							<p>
+								Вы получаете от арендатора единоразовую комиссию - 40% от месячной стоимости квартиры, которая покрывает расходы на выезд специалиста dolphin home и приносит Вам дополнительный доход. Береты залог (если нужно) и плату за первый месяц проживания
+							</p>
+						</div>
+						<div id="tabs-9">
+							<p>
+								Поздравляем, Вы сдали недвижимость порядочным людям максимально быстро, кроме того, получив дополнительный доход, с помощью Комфорт Реал!
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<form>
+					<fieldset class="edited" style="margin-top: 15px;">
+						<legend>
+							Заполните заявку
+						</legend>
+						<button>
+							Отправить заявку
+						</button>
+						<br>
+						Как к Вам обращаться?
+						<input type="text" size="30">
+						<br>
+						На какой номер Вам перезвонить?
+						<input type="text" size="15">
+						<br>
+						По какому адресу собираетесь сдать объект?
+						<input type="text" size="40">
+						<br>
+						Комментарии (например, в какое время Вам будет удобно принять наш звонок)?
+						<textarea rows="3" cols="50"></textarea>
+					</fieldset>
+				</form>
+
+			</div><!-- /end.page_main_content -->
+			<!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
 			<div class="page-buffer"></div>
-		</div>
+		</div><!-- /end.page_without_footer -->
 		<div class="footer">
-			2012 «Долфин хоум», вопросы и пожелания по работе портала можно передавать по телефону 8-922-143-16-15
-		</div>
+			2012 «Комфорт Реал», вопросы и пожелания по работе портала можно передавать по телефону 8-922-143-16-15
+		</div><!-- /end.footer -->
 
 		<!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
 
@@ -242,9 +225,6 @@
 
 		<!-- jQuery UI с моей темой оформления -->
 		<script src="js/vendor/jquery-ui-1.8.21.custom.min.js"></script>
-
-		<!-- Загружаем библиотеку для работы с картой от Яндекса -->
-		<script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
 
 		<!-- scripts concatenated and minified via build script -->
 		<script src="js/forowner.js"></script>

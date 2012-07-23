@@ -55,7 +55,7 @@ div.unread > div.newsHeader {
 /* Стили для вкладки Объявления личного кабинета */
 
 .advertForPersonalPage.published .newsHeader {
-	background-color: #33CEC3;
+	background-color: #009D91;
 }
 
 .advertForPersonalPage.published .advertHeaderStatus {

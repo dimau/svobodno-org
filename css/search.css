@@ -32,9 +32,15 @@
 .listOfRealtyObjectsHeader {
 	height: 30px;
 	text-align: center;
+	font-family: Georgia, "Times New Roman", Times, serif;
+	color: white;
 	border-bottom: 1px solid grey;
 	border-top: 1px solid grey;
-	background-color: #FFB073;
+	background-color: #8e4a15;
+}
+
+.listOfRealtyObjectsHeader th {
+	font-weight: normal;
 }
 
 .realtyObject {
@@ -45,7 +51,7 @@
 }
 
 .realtyObject:hover {
-	background-color: grey;
+	background-color: #BF6E30;
 	cursor: pointer;
 }
 

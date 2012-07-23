@@ -34,3 +34,7 @@
 	padding: 1em;
 	overflow: auto;
 }
+
+button, .yrt{
+	margin: 14px 0px 0px 50px;
+}
