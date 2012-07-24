@@ -31,3 +31,13 @@
 	font-size: 1.2em;
 	padding-left: 5px;
 }
+
+.highlighted {
+	background-color: #33CEC3;
+}
+
+/* Стили для контактов собственника */
+#showName, #showNumber, #addToFavorit {
+	color: #1A238B;
+	cursor: pointer;
+}

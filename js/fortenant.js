@@ -23,7 +23,7 @@ $("#tabs").on('click', function(event) {
 
 // Активируем кнопку "Зарегистрироваться" через jQuery UI
 $(function() {
-	$("button, .yrt").button({
+	$("button, a.button").button({
 	});
 });
 

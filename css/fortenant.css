@@ -35,6 +35,6 @@
 	overflow: auto;
 }
 
-button, .yrt{
+a.button{
 	margin: 14px 0px 0px 50px;
 }

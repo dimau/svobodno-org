@@ -99,11 +99,11 @@ body {
    ========================================================================== */
 
 a {
-    color: #00e;
+    color: #1A238B;
 }
 
 a:visited {
-    color: #551a8b;
+    color: #1A238B;
 }
 
 a:hover {
@@ -111,6 +111,24 @@ a:hover {
 }
 
 a:focus {
+    outline: thin dotted;
+}
+
+a.button, button, input.button {
+    color: #009D91;
+    border-color: #009D91 !important;
+}
+
+a.button:visited {
+    color: #009D91;
+}
+
+a.button:hover, button:hover, input.button:hover {
+    color: #C77405;
+    border-color: #C77405 !important;
+}
+
+a.button:focus {
     outline: thin dotted;
 }
 
@@ -122,108 +140,6 @@ a:hover,
 a:active {
     outline: 0;
 }
-
-
-/* =============================================================================
-   Typography
-   ========================================================================== */
-
-abbr[title] {
-    border-bottom: 1px dotted;
-}
-
-b,
-strong {
-    font-weight: bold;
-}
-
-blockquote {
-    margin: 1em 40px;
-}
-
-dfn {
-    font-style: italic;
-}
-
-hr {
-    display: block;
-    height: 1px;
-    border: 0;
-    border-top: 1px solid #ccc;
-    margin: 1em 0;
-    padding: 0;
-}
-
-ins {
-    background: #ff9;
-    color: #000;
-    text-decoration: none;
-}
-
-mark {
-    background: #ff0;
-    color: #000;
-    font-style: italic;
-    font-weight: bold;
-}
-
-/*
- * Redeclare monospace font family: h5bp.com/j
- */
-
-pre,
-code,
-kbd,
-samp {
-    font-family: monospace, serif;
-    _font-family: 'courier new', monospace;
-    font-size: 1em;
-}
-
-/*
- * Improve readability of pre-formatted text
- */
-
-pre {
-    white-space: pre;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-}
-
-q {
-    quotes: none;
-}
-
-q:before,
-q:after {
-    content: "";
-    content: none;
-}
-
-small {
-    font-size: 85%;
-}
-
-/*
- * Position subscript and superscript content without affecting line-height: h5bp.com/k
- */
-
-sub,
-sup {
-    font-size: 75%;
-    line-height: 0;
-    position: relative;
-    vertical-align: baseline;
-}
-
-sup {
-    top: -0.5em;
-}
-
-sub {
-    bottom: -0.25em;
-}
-
 
 /* =============================================================================
    Lists
@@ -426,6 +342,7 @@ textarea {
 table {
     border-collapse: collapse;
     border-spacing: 0;
+    border-top: 0px;
 }
 
 td, th {
@@ -433,6 +350,21 @@ td, th {
     padding: 4px;
 }
 
+td.top.left, th.top.left {
+	border-top-left-radius: 5px;
+}
+
+td.bottom.left, th.bottom.left {
+	border-bottom-left-radius: 5px;
+}
+
+td.top.right, th.top.right {
+	border-top-right-radius: 5px;
+}
+
+td.bottom.right, th.bottom.right {
+	border-bottom-right-radius: 5px;
+}
 
 /* =============================================================================
    Chrome Frame Prompt
@@ -533,10 +465,6 @@ body {
 	color: red;
 }
 
-.enter a {
-	text-decoration: none;
-}
-
 /* Стили главного меню*/
 .menu {
 	margin: 15px auto 0px auto;
@@ -588,6 +516,11 @@ body {
 
 .menu ul li a:hover {
 	color: #7bded9;
+}
+
+.enter a {
+	text-decoration: none;
+	border-bottom: 1px dotted;
 }
 
 /* Стили для блога логина и регистрации пользователей*/
@@ -661,6 +594,64 @@ ul.login a {
 	height
 }
 
+/* Стили для мини блока - используется при входе в сервис, при выборе роли на регистрации */
+.miniBlock {
+	width: 600px;
+	margin: 80px auto 0% auto;
+	line-height: 2em;
+	border: 1px solid #A64800;
+	border-radius: 5px;
+	text-align: center;
+	
+	background: #E2EEFD; /* Для старых браузров */
+    background: -moz-linear-gradient(top, #CDDDF3, #009D91); /* Firefox 3.6+ */
+     /*Chrome 1-9, Safari 4-5 */
+   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#BDDBF9), color-stop(100%,#F3F8FE));
+     /*Chrome 10+, Safari 5.1+ */
+    background: -webkit-linear-gradient(top, #33CEC3, #009D91);
+    background: -o-linear-gradient(top, #33CEC3, #009D91); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #33CEC3, #009D91); /* IE10 */
+    background: linear-gradient(top, #33CEC3, #009D91); /* CSS3 */ 
+	filter:progid: DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91'); /* для IE 6-7 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91')"; /* для IE8 */
+}
+
+.miniBlockHeader {
+	background-color: #8e4a15;
+	color: white;
+	text-align: center;
+}
+
+.miniBlockContent {
+	display: inline-block;
+	margin: 20px 0px 20px 0px;
+	text-align: left;
+}
+
+.miniBlock ul {
+	list-style: none;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+}
+
+#buttonSubmit {
+	clear: both;
+	float: right;
+	margin-bottom: 20px;
+	margin-right: 20px;
+}
+
+/* Стили для блока добавления и удаления из избранного */
+.blockOfFavorit {
+	display: inline-block; 
+	width: 1.2em;
+}
+
+.favotirStar {
+	width: 100%; 
+	margin-top: -0.3em;
+}
 
 /* ==|== media queries ======================================================
    EXAMPLE Media Query for Responsive Design.

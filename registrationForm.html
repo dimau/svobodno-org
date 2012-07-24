@@ -8,6 +8,22 @@
 <html class="no-js">
 	<!--<![endif]-->
 	<head>
+		
+		<!--
+			
+			
+			
+			
+			
+			Если запрос = registrationForm.html?type=tenant, то php должен сформировать форму без вкладки Мои объявления
+			Если запрос = registrationForm.html?type=owner, то php должен сформировать форму без вкладки Условий поиска
+			Если запрос = registrationForm.html, то выдаем страницу со всеми вкладками
+		
+			
+			
+			
+			
+			-->
 		<meta charset="utf-8">
 
 		<!-- Use the .htaccess and remove these lines to avoid edge case issues.
@@ -18,7 +34,7 @@
 		<meta name="description" content="Форма регистрации">
 
 		<!-- Mobile viewport optimized: h5bp.com/viewport -->
-		<meta name="viewport" content="width=device-width">
+		<meta name="viewport" content="initialscale=1.0, width=device-width">
 
 		<!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
 
@@ -70,9 +86,9 @@
 				</div>
 				<div class="iconBox"></div>
 				<div class="enter">
-					<a href="registrationForm.html">Регистрация</a>
+					<span>Регистрация</span>
 					<br>
-					<a href="#">Вход</a>
+					<a href="login.html">Вход</a>
 					<br>
 				</div>
 			</div><!-- /end.header -->
@@ -97,18 +113,6 @@
 						</ul>
 						<div id="tabs-1">
 							<form name="personalInformation" class="personalInformation">
-								<div class="inputItem">
-									<div class="label">
-										Собираюсь снимать:
-									</div>
-									<input type="checkbox" name="rentIn" value="">
-								</div>
-								<div class="inputItem">
-									<div class="label">
-										Собираюсь сдавать:
-									</div>
-									<input type="checkbox" name="rentOut" value="">
-								</div>
 								<div class="inputItem">
 									<div class="label">
 										Имя:
@@ -146,6 +150,7 @@
 								<div class="inputItem">
 									<div class="label">
 										Ссылки на личные странички в социальных сетях:
+										<div style="display: inline-block; font-size: 0.8em; color: #666666;">(Скопируйте ссылку из адресной строки вашего браузера при просмотре своей личной страницы в социальной сети)</div>
 									</div>
 									<table>
 										<tbody>
@@ -156,7 +161,7 @@
 													<option value="1">В контакте</option><option value="2">Одноклассники</option><option value="3">Facebook</option><option value="4">Twitter</option><option value="5">Мой круг</option><option value="6">Google+</option>
 												</select></td>
 												<td>
-												<input type="text" name="socialNetwork1" value="">
+												<input type="text" name="socialNetwork1" value="http://"> 
 												</td>
 											</tr>
 											<tr>
@@ -166,7 +171,7 @@
 													<option value="1">В контакте</option><option value="2">Одноклассники</option><option value="3">Facebook</option><option value="4">Twitter</option><option value="5">Мой круг</option><option value="6">Google+</option>
 												</select></td>
 												<td>
-												<input type="text" name="socialNetwork2" value="">
+												<input type="text" name="socialNetwork2" value="http://">
 												</td>
 											</tr>
 											<tr>
@@ -176,7 +181,13 @@
 													<option value="1">В контакте</option><option value="2">Одноклассники</option><option value="3">Facebook</option><option value="4">Twitter</option><option value="5">Мой круг</option><option value="6">Google+</option>
 												</select></td>
 												<td>
-												<input type="text" name="socialNetwork3" value="">
+												<input type="text" name="socialNetwork3" value="http://">
+												</td>
+											</tr>
+											<tr>
+												<td></td>
+												<td>
+												
 												</td>
 											</tr>
 										</tbody>

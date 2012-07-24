@@ -18,7 +18,7 @@
 		<meta name="description" content="Страница поиска объявлений">
 
 		<!-- Mobile viewport optimized: h5bp.com/viewport -->
-		<meta name="viewport" content="width=device-width">
+		<meta name="viewport" content="initialscale=1.0, width=device-width">
 
 		<!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
 
@@ -70,9 +70,9 @@
 				</div>
 				<div class="iconBox"></div>
 				<div class="enter">
-					<a href="registrationForm.html">Регистрация</a>
+					<a href="choiceOfRole.html">Регистрация</a>
 					<br>
-					<a href="#">Вход</a>
+					<a href="login.html">Вход</a>
 					<br>
 				</div>
 			</div><!-- /end.header -->
@@ -241,7 +241,7 @@
 											</div>
 										</fieldset>
 									</div>
-									<div id="rightBlockOfSearchParameters" style="display: inline-block;">
+									<div id="rightBlockOfSearchParameters">
 										<fieldset style="height: 100%;">
 											<legend>
 												Район
@@ -390,10 +390,10 @@
 					<table class="listOfRealtyObjects" id="shortListOfRealtyObjects">
 						<thead>
 							<tr class="listOfRealtyObjectsHeader">
-								<th> Избранное </th>
+								<th class="top left"> Избранное </th>
 								<th> Фото </th>
 								<th> Адрес </th>
-								<th> Цена, руб. </th>
+								<th class="top right"> Цена, руб. </th>
 							</tr>
 						</thead>
 						<tbody>
@@ -515,17 +515,17 @@
 
 					<!-- Первоначально скрытый раздел с подробным списком объявлений-->
 					<div id="fullParametersListOfRealtyObjects" style="display: none;">
-						<table class="listOfRealtyObjects" style="width: 100%">
+						<table class="listOfRealtyObjects" style="width: 100%; float:none;">
 							<thead>
 								<tr class="listOfRealtyObjectsHeader">
-									<th> Избранное </th>
+									<th class="top left"> Избранное </th>
 									<th> Фото </th>
 									<th> Адрес </th>
 									<th> Район </th>
 									<th> Комнат </th>
 									<th> Площадь </th>
 									<th> Этаж </th>
-									<th> Цена, руб. </th>
+									<th class="top right"> Цена, руб. </th>
 								</tr>
 							</thead>
 							<tbody>

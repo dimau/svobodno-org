@@ -16,6 +16,11 @@
 	display: inline-block;
 }
 
+#rightBlockOfSearchParameters {
+	display: inline-block;
+	height: 345px;
+}
+
 /* Стили для блока с результатми поиска - список + карта */
 #resultOnSearchPage {
 	width: 100%;
@@ -26,7 +31,6 @@
 .listOfRealtyObjects {
 	width: 49%;
 	float: left;
-	border-collapse: collapse;
 }
 
 .listOfRealtyObjectsHeader {
@@ -34,8 +38,6 @@
 	text-align: center;
 	font-family: Georgia, "Times New Roman", Times, serif;
 	color: white;
-	border-bottom: 1px solid grey;
-	border-top: 1px solid grey;
 	background-color: #8e4a15;
 }
 
