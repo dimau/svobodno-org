@@ -6,6 +6,23 @@
 	font-size: 1em;
 }
 
+/* Стили для личных данных*/
+.required {
+	display:inline-block; 
+	color: red; 
+	width: 5px;
+}
+
+.shadowText {
+	display: inline-block; 
+	font-size: 0.8em; 
+	color: #666666;
+}
+
+.private {
+	display: inline-block;
+}
+
 #addressForm {
 	clear: both;
 }
@@ -31,25 +48,42 @@ table td {
 	padding: 5px;
 }
 
-#newAdvertButton {
-	margin-bottom: 10px;
+/* Стили для параметров поиска*/
+.extendedSearchParametersBlock {
+	display: inline-block;
 }
 
-.advertHeader {
-	border: 1px solid #AAAAAA;
-	padding: 5px;
-	background-color: #B5B5B5;
-	font-size: 1.2em;
+#rightBlockOfSearchParameters {
+	display: inline-block;
+	height: 345px;
 }
 
-.advertDescriptionEdit {
-	border: 1px solid #AAAAAA;
-	padding: 10px;
+#rightBlockOfSearchParameters fieldset {
+	height: 100%;
+}
+#rightBlockOfSearchParameters .searchItem {
+	height: 100%;
 }
 
-.advertDescriptionChapterHeader {
-	background-color: #B5B5B5;
-	font-size: 1.2em;
-	padding-left: 5px;
+#rightBlockOfSearchParameters .searchItemBody {
+	height: 95%; 
+	width:200px; 
+	overflow-y: auto;
 }
+
+#rightBlockOfSearchParameters ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.searchChapter {
+	display: inline-block;
+}
+
+.searchItemBody {
+	display: inline-block;
+}
+
+
 

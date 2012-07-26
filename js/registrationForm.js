@@ -2,13 +2,16 @@
  * @author dimau
  */
 
-/* Добавляем элемент dateSelector для выбора Дня рождения */
-var dateSelector = new DateSelector({
-	yearFrom : 1900,
-	yearTo : 2000,
-	value : new Date(1990, 0, 01)
-});
-document.getElementById('selector').appendChild(dateSelector.getElement());
+/* Добавляем элемент datepicker для выбора Дня рождения */
+/*$(function() {
+	$("#datepicker").datepicker({
+		changeYear : true,
+		changeMonth: true,
+	});
+	$("#datepicker").datepicker("option", "regional", "ru");
+	/*$("#datepicker").datepicker("option", "yearRange", "1900:2002");
+	$("#datepicker").datepicker("option", $.datepicker.regional["ru"]);
+});*/
 
 /* Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера */
 window.jQuery || document.write('<script src="js/vendor/jquery-1.7.2.min.js"><\/script>')
@@ -19,18 +22,14 @@ $(function() {
 });
 
 // Активируем кнопки "Новое объявление" через jQuery UI - добавляем пиктограммку плюсика в кружочке
-	$(function() {
-		$("button").button({
-            icons: {
-                primary: "ui-icon-circle-plus"
-            }
-        });
+$(function() {
+	$("button").button({
 	});
+});
 
 /* Как только будет загружен API и готов DOM, выполняем инициализацию карты от Яндекса*/
-ymaps.ready(init);
-
-function init() {
+//ymaps.ready(init);
+/* function init() {
 	// Создание экземпляра карты и его привязка к контейнеру с
 	// заданным id ("map")
 	var map = new ymaps.Map('map', {
@@ -43,9 +42,9 @@ function init() {
 		// дополнительно включаем измеритель расстояний по клику левой кнопки мыши
 		behaviors : ['default', 'scrollZoom']
 	});
-
+*/
 	/***** Добавляем элементы управления на карту *****/
-	// Для добавления элемента управления на карту используется поле controls, ссылающееся на
+/*	// Для добавления элемента управления на карту используется поле controls, ссылающееся на
 	// коллекцию элементов управления картой. Добавление элемента в коллекцию производится с помощью метода add().
 	// В метод add можно передать строковый идентификатор элемента управления и его параметры.
 	// Список типов карты
@@ -59,9 +58,9 @@ function init() {
 	// Стандартный набор кнопок, кроме линейки
 	var myToolbar = new ymaps.control.MapTools(['drag', 'magnifier']);
 	map.controls.add(myToolbar);
-
+*/
 	/***** Настраиваем возможность указания адреса в форме регистрации *****/
-
+/*
 	// Создаем пустой массив маркеров - в него будет класть маркер, соответствующий адресу, введеному пользователем
 	searchObjectCollection = new ymaps.GeoObjectCollection();
 
@@ -137,4 +136,67 @@ function init() {
 		map.setCenter([56.829748, 60.617435]);
 		map.container.fitToViewport();
 	});
-}
+} 
+*/
+
+
+
+// Подгонка размера правого блока параметров (районы) расширенного поиска под размер левого блока параметров. 19 пикселей - на padding у fieldset
+document.getElementById('rightBlockOfSearchParameters').style.height = document.getElementById('leftBlockOfSearchParameters').offsetHeight - 22 + 'px';
+
+
+
+
+/* Если в форме Работа указан чекбокс - не работаю, то блокировать заполнение остальных инпутов */
+$("#notWorkCheckbox").on('change', function() {
+	if ($("input.ifWorked").attr('disabled') == 'disabled') {
+		$("input.ifWorked").removeAttr('disabled');
+		$("div.searchItem.ifWorked div.required").text("*");
+		
+	} else {
+		$("input.ifWorked").attr('disabled', 'disabled');
+		$("div.searchItem.ifWorked div.required").text("");
+	}
+});
+
+/* Если в форме Образование указан чекбокс - не учился, то блокировать заполнение остальных инпутов */
+$("#notLearnCheckbox").on('change', function() {
+	if ($("input.ifLearned").attr('disabled') == 'disabled') {
+		$("input.ifLearned").removeAttr('disabled');
+		$("div.searchItem.ifLearned div.required").text("*");
+		
+	} else {
+		$("input.ifLearned").attr('disabled', 'disabled');
+		$("div.searchItem.ifLearned div.required").text("");
+	}
+});
+
+
+
+
+/* Сценарии для появления блока с подробным описанием сожителей */
+$("#withWho").on('change', function(event) {
+	if ($("#withWho").attr('value') != 1) {
+		$("#withWhoDescription").css('display', '');
+	} else {
+		$("#withWhoDescription").css('display', 'none');
+	}
+});
+
+/* Сценарии для появления блока с подробным описанием детей */
+$("#children").on('change', function(event) {
+	if ($("#children").attr('value') != 0) {
+		$("#childrenDescription").css('display', '');
+	} else {
+		$("#childrenDescription").css('display', 'none');
+	}
+});
+
+/* Сценарии для появления блока с подробным описанием животных */
+$("#animals").on('change', function(event) {
+	if ($("#animals").attr('value') != 0) {
+		$("#animalsDescription").css('display', '');
+	} else {
+		$("#animalsDescription").css('display', 'none');
+	}
+});

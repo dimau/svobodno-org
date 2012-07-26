@@ -209,6 +209,8 @@ fieldset {
    margin: 5px;
    border-radius: 5px;
    border: 1px solid #A64800;
+   text-align: left;
+   vertical-align: top;
 }
 
 fieldset legend {
@@ -393,7 +395,6 @@ body {
 	padding: 0;
 	font-family: 'Trebuchet MS', Tahoma, Verdana, Arial, sans-serif;
 	font-size: 100%;
-	min-width: 780px;
 	height: 100%; /* эта строчка для прижатия подвала к низу страницы*/
 	width: 100%;
 }
@@ -430,8 +431,8 @@ body {
 
 .iconBox {
 	background-image: url('brand.png');
-	width: 90px;
-	height: 90px;
+	width: 94px;
+	height: 94px;
 	/*float: left;*/
 	position: absolute;
 	left: 0px;
@@ -482,6 +483,7 @@ body {
 .menu ul li {
 	float: left;
 	background-color: #BF6E30;
+	/*background: #BF6E30 url("menuBackground.png") 50% 50% repeat-x;*/
 	width: 25%;
 	text-align: center;
 }
@@ -498,6 +500,7 @@ body {
 
 .menu ul li.selected {
 	background-color: #8e4a15;
+	/*background: #8e4a15 url("menuHighlightBackground.png") 50% 50% repeat-x;*/
 }
 
 .menu ul li.selected span {
@@ -559,7 +562,9 @@ ul.login a {
 /* Стили для основного содержимого страницы*/
 .page_without_footer {
 	min-height: 100%;
-	margin-bottom: -34px;
+	margin: 0px auto -34px auto;
+	min-width: 780px;
+	max-width: 1400px;
 }
 
 .page_main_content {
@@ -591,7 +596,9 @@ ul.login a {
 	color: #666666;
 	text-align: center;
 	padding: 7px;
-	height
+	min-width: 780px;
+	max-width: 1400px;
+	margin: 0px auto 0px auto;
 }
 
 /* Стили для мини блока - используется при входе в сервис, при выборе роли на регистрации */
@@ -623,8 +630,8 @@ ul.login a {
 }
 
 .miniBlockContent {
-	display: inline-block;
-	margin: 20px 0px 20px 0px;
+	display: block;
+	margin: 20px auto 20px auto;
 	text-align: left;
 }
 

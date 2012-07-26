@@ -1,0 +1,11 @@
+.miniBlockContent {
+	text-align: center;
+}
+
+.miniBlockContent .text {
+	display: inline-block;
+	text-align: center;
+	line-height: normal;
+}
+
+

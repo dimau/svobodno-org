@@ -14,8 +14,8 @@
 		More info: h5bp.com/i/378 -->
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-		<title>Выбор роли пользователя</title>
-		<meta name="description" content="Выбор роли пользователя">
+		<title>Успешная регистрация</title>
+		<meta name="description" content="Регистрация успешно закончена">
 
 		<!-- Mobile viewport optimized: h5bp.com/viewport -->
 		<meta name="viewport" content="initialscale=1.0, width=device-width">
@@ -24,7 +24,7 @@
 
 		<link rel="stylesheet" href="css/jquery-ui-1.8.21.custom.css">
 		<link rel="stylesheet" href="css/main.css">
-		<link rel="stylesheet" href="css/choiceOfRole.css">
+		<link rel="stylesheet" href="css/successfullRegistration.css">
 
 		<!-- More ideas for your <head> here: h5bp.com/d/head-Tips -->
 
@@ -69,34 +69,28 @@
 				</div>
 				<div class="iconBox"></div>
 				<div class="enter">
-					<span>Регистрация</span>
+					<a href="choiceOfRole.html">Регистрация</a>
 					<br>
-					<a href="#">Вход</a>
-					<br>
+					<span>Вход<span>
+							<br>
 				</div>
 			</div><!-- /end.header -->
 
 			<div class="page_main_content">
 				<div class="miniBlock">
 					<div class="miniBlockHeader">
-						Укажите, пожалуйста, что Вы собираетесь сделать на этом ресурсе?
+						Вы успешно зарегистрировались на Хани Хом!
 					</div>
-					<form name="whoIsOurUser">
-						<div class="miniBlockContent">
-							<ul>
-								<li>
-									<input type="checkbox" name="type" value="tenant" checked>
-									Я собираюсь найти и снять недвижимость
-								</li>
-								<li>
-									<input type="checkbox" name="type" value="owner">
-									Я собираюсь сдать свою недвижимость
-								</li>
-							</ul>
+					<div class="miniBlockContent">
+						<div class="text">
+						<p style="text-align: left;">
+							Воспользуйтесь <a href="search.html">Поиском недвижимости</a>
+						</p>
+						<p style="text-align: left;">
+							Либо перейдите в <a href="personal.html">Личный кабинет</a>
+						</p>
 						</div>
-						<br>
-						<input type="submit" value="Готово" id="buttonSubmit" class="button">
-					</form>
+					</div>
 					<div style="clear:both;"></div>
 				</div>
 
@@ -117,7 +111,7 @@
 		<!-- jQuery UI с моей темой оформления -->
 		<script src="js/vendor/jquery-ui-1.8.21.custom.min.js"></script>
 
-		<script src="js/choiceOfRole.js"></script>
+		<script src="js/successfullRegistration.js"></script>
 		<!-- scripts concatenated and minified via build script -->
 
 		<!-- end scripts -->
