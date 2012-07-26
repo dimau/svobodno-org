@@ -589,6 +589,7 @@ ul.login a {
 
 .page-buffer {
 	height: 34px;
+	clear: both;
 }
 
 .footer {

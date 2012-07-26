@@ -8,13 +8,12 @@
 
 /* Стили для личных данных*/
 .required {
-	display:inline-block; 
+	display: inline-block; 
 	color: red; 
 	width: 5px;
 }
 
 .shadowText {
-	display: inline-block; 
 	font-size: 0.8em; 
 	color: #666666;
 }
@@ -85,5 +84,13 @@ table td {
 	display: inline-block;
 }
 
+/* Стили для капчи и для Готово */
+.capcha {
+	margin: 10px 10px 0px 20px; 
+	float: right;
+}
 
-
+.readyButton {
+	float: right;
+	margin: 10px 10px 0px 10px;
+}

@@ -200,3 +200,4 @@ $("#animals").on('change', function(event) {
 		$("#animalsDescription").css('display', 'none');
 	}
 });
+
