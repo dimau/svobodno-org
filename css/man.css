@@ -1,46 +1,36 @@
-#descriptionBox {
-	clear: both;
-	padding-top: 10px;
-	width: 100%;
-	min-width: 703px;
+#tabs {
+	font-size: 1em;
 }
 
-.descriptionBlockHeader {
-	font-family: Georgia, "Times New Roman", Times, serif;
-	font-size: 1.3em;
-	margin-bottom: 8px;
-}
+/* Стили для вкладки Профайл личного кабинета */
 
-.descriptionBlock1 {
+.profileInformation {
 	float: left;
-	width: 49.5%;
-	text-align: center;
+	margin: 10px 10px 0px 10px;
+	max-width: 40em;
 }
 
-.descriptionBlock2 {
-	float: right;
-	width: 49.5%;
-	text-align: center;
+.profileInformation ul {
+	list-style: none;
+	padding: 0;
+	margin-top: 0;
+	margin-left: 1%;
 }
 
-.accordion {
-	text-align: left;
+.FIO {
+	font-size: 1.1em;
+	font-weight: bold;
 }
 
-.accordionContentUnit {
-	font-size: 0.9em;
+.headOfString {
+	border-bottom: 1px dotted black;
 }
 
-button, a.button {
-	margin-top: 30px;
+.linksToAccounts {
+	list-style: none;
+	padding: 0;
+	margin: 0;
 }
 
-/* ==|== media queries ======================================================
-   EXAMPLE Media Query for Responsive Design.
-   This example overrides the primary ('mobile first') styles
-   Modify as content requires.
-   ========================================================================== */
-
-@media only screen and (min-width: 35em) {
-    /* Style adjustments for viewports that meet the condition */
+.linksToAccounts li {
 }

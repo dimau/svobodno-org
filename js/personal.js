@@ -163,3 +163,44 @@ function init() {
 		map.container.fitToViewport();
 	});
 }
+
+// Подгонка размера правого блока параметров (районы) вкладки Поиск под размер левого блока параметров. 19 пикселей - на padding у fieldset
+document.getElementById('rightBlockOfSearchParameters').style.height = document.getElementById('leftBlockOfSearchParameters').offsetHeight - 22 + 'px';
+
+/* Сценарии для появления блока с подробным описанием сожителей */
+$("#withWho").on('change', function(event) {
+	if ($("#withWho").attr('value') != 1) {
+		$("#withWhoDescription").css('display', '');
+	} else {
+		$("#withWhoDescription").css('display', 'none');
+	}
+});
+
+/* Сценарии для появления блока с подробным описанием детей */
+$("#children").on('change', function(event) {
+	if ($("#children").attr('value') != 0) {
+		$("#childrenDescription").css('display', '');
+	} else {
+		$("#childrenDescription").css('display', 'none');
+	}
+});
+
+/* Сценарии для появления блока с подробным описанием животных */
+$("#animals").on('change', function(event) {
+	if ($("#animals").attr('value') != 0) {
+		$("#animalsDescription").css('display', '');
+	} else {
+		$("#animalsDescription").css('display', 'none');
+	}
+});
+
+/* Переключение на вкладке поиск из режима просмотра в режим редактирования и обратно */
+$('#tabs-4 #notEditingSearchParametersBlock .setOfInstructions a').on('click', function() {
+	$("#notEditingSearchParametersBlock").css('display', 'none');
+	$("#extendedSearchParametersBlock").css('display', '');
+});
+
+$('#tabs-4 #extendedSearchParametersBlock .setOfInstructions a').on('click', function() {
+	$("#notEditingSearchParametersBlock").css('display', '');
+	$("#extendedSearchParametersBlock").css('display', 'none');
+});
