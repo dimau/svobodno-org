@@ -10,20 +10,9 @@
 	max-width: 40em;
 }
 
-.profileInformation ul {
-	list-style: none;
-	padding: 0;
-	margin-top: 0;
-	margin-left: 1%;
-}
-
 .FIO {
 	font-size: 1.1em;
 	font-weight: bold;
-}
-
-.headOfString {
-	border-bottom: 1px dotted black;
 }
 
 .linksToAccounts {
@@ -49,6 +38,7 @@
 	border-radius: 5px;
 	background-color: #B5B5B5; 
 	padding-left: 5px;
+	margin-bottom: 5px;
 	font-weight: normal;
 }
 
@@ -86,8 +76,11 @@ div.unread > div.newsHeader {
 }
 
 .setOfInstructions {
-	text-align:right; 
+	text-align: right; 
 	float: right;
+	list-style: none;
+	margin: 0;
+	padding: 0;
 }
 
 
@@ -166,30 +159,6 @@ table td {
 	padding-left: 5px;
 	border-radius: 5px;
 	color: white;
-}
-
-/* Стили для параметров поиска в режиме просмотра */
-.objectDescriptionChapter {
-	display: inline-block;
-}
-
-.objectDescriptionChapter table td {
-	vertical-align: middle;
-	padding: 5px;
-}
-
-.objectDescriptionChapter tr {
-	border-bottom: 1px dotted #A64800;
-}
-
-.objectDescriptionChapterHeader {
-	background-color: #B5B5B5;
-	font-size: 1.2em;
-	padding-left: 5px;
-}
-
-.highlighted {
-	background-color: #33CEC3;
 }
 
 /* Стили для параметров поиска в режиме редактирования */

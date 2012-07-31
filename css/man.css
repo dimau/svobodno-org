@@ -2,7 +2,7 @@
 	font-size: 1em;
 }
 
-/* Стили для вкладки Профайл личного кабинета */
+/* Стили для вкладки Профайл описания пользователя */
 
 .profileInformation {
 	float: left;
@@ -33,4 +33,44 @@
 }
 
 .linksToAccounts li {
+}
+
+/* Стили для контактов пользователя - если они закрыты */
+#showName {
+	color: #1A238B;
+	cursor: pointer;
+}
+
+/* Стили для вкладки Объявления личной страницы пользователя */
+
+.news {
+	border: 1px solid #A64800;
+	border-radius: 5px;
+	padding: 5px;
+	margin: 5px;
+}
+
+.newsHeader {
+	border: 0px solid #B5B5B5;
+	border-radius: 5px;
+	background-color: #B5B5B5; 
+	padding-left: 5px;
+	margin-bottom: 5px;
+	font-weight: normal;
+}
+
+.advertForPersonalPage.published .newsHeader {
+	background-color: #009D91;
+}
+
+.advertForPersonalPage.published .advertHeaderStatus {
+	color: white;
+}
+
+.setOfInstructions {
+	text-align: right; 
+	float: right;
+	list-style: none;
+	margin: 0;
+	padding: 0;
 }

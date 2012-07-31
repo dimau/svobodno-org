@@ -21,6 +21,15 @@
 	height: 345px;
 }
 
+.actionsOnSearch {
+	float: right;
+	margin-top: 10px;
+}
+
+#extendedSearchButton {
+	margin-left: 20px;
+}
+
 /* Стили для блока с результатми поиска - список + карта */
 #resultOnSearchPage {
 	width: 100%;

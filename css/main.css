@@ -10,42 +10,6 @@
  * ==|== normalize ==========================================================
  */
 
-
-/* =============================================================================
-   HTML5 display definitions
-   ========================================================================== */
-
-article,
-aside,
-details,
-figcaption,
-figure,
-footer,
-header,
-hgroup,
-nav,
-section,
-summary {
-    display: block;
-}
-
-audio,
-canvas,
-video {
-    display: inline-block;
-    *display: inline;
-    *zoom: 1;
-}
-
-audio:not([controls]) {
-    display: none;
-}
-
-[hidden] {
-    display: none;
-}
-
-
 /* =============================================================================
    Base
    ========================================================================== */
@@ -155,18 +119,19 @@ ol {
     padding: 0 0 0 40px;
 }
 
-dd {
-    margin: 0 0 0 40px;
+ul.listDescription {
+	list-style: none;
+	padding: 0;
+	margin-top: 0;
+	margin-left: 1%;
+	float: left;
+	line-height: 1.6em;
+	max-width: 40em;
 }
 
-nav ul,
-nav ol {
-    list-style: none;
-    list-style-image: none;
-    margin: 0;
-    padding: 0;
+ul.listDescription .headOfString {
+	border-bottom: 1px dotted black;
 }
-
 
 /* =============================================================================
    Embedded content
@@ -191,16 +156,6 @@ svg:not(:root) {
     overflow: hidden;
 }
 
-
-/* =============================================================================
-   Figures
-   ========================================================================== */
-
-figure {
-    margin: 0;
-}
-
-
 /* =============================================================================
    Forms
    ========================================================================== */
@@ -222,16 +177,27 @@ fieldset legend {
 	color: #A64800;
 }
 
+/* Стили для редактируемых блоков fieldset*/
 fieldset.edited {
 	line-height: 2;
 }
 
-/*
- * Indicate that 'label' will shift focus to the associated form element
- */
+/* Стили для НЕредактируемых блоков fieldset*/
+fieldset.notEdited {
+	display: inline-block;
+}
 
-label {
-    cursor: pointer;
+fieldset.notEdited table td {
+	vertical-align: middle;
+	padding: 5px;
+}
+
+fieldset.notEdited tr {
+	border-bottom: 1px dotted #A64800;
+}
+
+.highlighted {
+	background-color: #33CEC3;
 }
 
 /*
@@ -411,6 +377,10 @@ body {
    Foto
    ========================================================================== */
 
+.fotosWrapper {
+	float: left;
+}
+
 .bigFotoWrapper {
 	display: inline-block;
 	max-width: 300px;
@@ -424,6 +394,24 @@ body {
 }
 
 .bigFoto {
+	max-width: 100%;
+	max-height: 100%;
+	vertical-align: top;
+}
+
+.middleFotoWrapper {
+	display: inline-block;
+	max-width: 120px;
+	max-height: 120px;
+	margin: 5px;
+	/* Для тестирования */
+	border: 1px solid black;
+	width: 120px;
+	height: 120px;
+	/* Конец зоны тестирования */
+}
+
+.middleFoto {
 	max-width: 100%;
 	max-height: 100%;
 	vertical-align: top;
@@ -512,7 +500,10 @@ body {
 	color: red;
 }
 
-/* Стили главного меню*/
+/* =============================================================================
+   Стили для главного меню
+   ========================================================================== */
+  
 .menu {
 	margin: 15px auto 0px auto;
 	width: 100%;
@@ -529,7 +520,6 @@ body {
 .menu ul li {
 	float: left;
 	background-color: #BF6E30;
-	/*background: #BF6E30 url("menuBackground.png") 50% 50% repeat-x;*/
 	width: 25%;
 	text-align: center;
 }
@@ -546,7 +536,6 @@ body {
 
 .menu ul li.selected {
 	background-color: #8e4a15;
-	/*background: #8e4a15 url("menuHighlightBackground.png") 50% 50% repeat-x;*/
 }
 
 .menu ul li.selected span {
@@ -572,40 +561,10 @@ body {
 	border-bottom: 1px dotted;
 }
 
-/* Стили для блога логина и регистрации пользователей*/
-/*.loginBox {
-	float: right;
-	width: 170px;
-	border: 1px solid black;
-	padding: 7px; */
-/*	background: #E2EEFD; /* Для старых браузров */
-   /* background: -moz-linear-gradient(top, #CDDDF3, #009D91); /* Firefox 3.6+ */
-    /* Chrome 1-9, Safari 4-5 */
-/*   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#BDDBF9), color-stop(100%,#F3F8FE));
-    /* Chrome 10+, Safari 5.1+ */
-   /* background: -webkit-linear-gradient(top, #33CEC3, #009D91);
-    background: -o-linear-gradient(top, #33CEC3, #009D91); /* Opera 11.10+ */
-   /* background: -ms-linear-gradient(top, #33CEC3, #009D91); /* IE10 */
-   /* background: linear-gradient(top, #33CEC3, #009D91); /* CSS3 */ 
-	/*filter:progid: DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91'); /* для IE 6-7 */
-	/*-ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91')"; /* для IE8 */
-/*} */
-/*ul.login {
-	font-size: 0.8em;
-	list-style-type: none;
-	margin: 0px;
-	padding: 0px;
-}
-ul.login a {
-	float: right;
-}
-.nameLoginBox {
-	font-size: 1.2em;
-	font-weight: bold;
-	padding-bottom: 3px;
-} */
-
-/* Стили для основного содержимого страницы*/
+/* =============================================================================
+   Стили для основного содержимого страницы
+   ========================================================================== */
+  
 .page_without_footer {
 	min-height: 100%;
 	margin: 0px auto -34px auto;
@@ -648,7 +607,10 @@ ul.login a {
 	margin: 0px auto 0px auto;
 }
 
-/* Стили для мини блока - используется при входе в сервис, при выборе роли на регистрации */
+/* =============================================================================
+   Стили для мини блока - используется при входе в сервис, при выборе роли на регистрации
+   ========================================================================== */
+  
 .miniBlock {
 	width: 600px;
 	margin: 80px auto 0% auto;
@@ -684,9 +646,17 @@ ul.login a {
 
 .miniBlock ul {
 	list-style: none;
-	width: 100%;
 	padding: 0;
-	margin: 0;
+}
+
+.miniBlockContent form {
+	text-align: center;
+}
+
+.miniBlockContent table, .miniBlockContent ul {
+	display: inline-block;
+	margin: auto;
+	text-align: left;
 }
 
 #buttonSubmit {
@@ -696,7 +666,16 @@ ul.login a {
 	margin-right: 20px;
 }
 
-/* Стили для блока добавления и удаления из избранного */
+.buttonRegistration {
+	float: left;
+	margin-bottom: 20px;
+	margin-left: 20px;
+}
+
+/* =============================================================================
+   Стили для блока добавления и удаления из избранного
+   ========================================================================== */
+  
 .blockOfFavorit {
 	display: inline-block; 
 	width: 1.2em;

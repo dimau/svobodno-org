@@ -369,13 +369,49 @@
 											</div>
 										</fieldset>
 									</div>
+									<fieldset class="edited private" style="display: inline-block;">
+										<legend>
+											Особые параметры поиска
+										</legend>
+										<div class="searchItem">
+											<span class="searchItemLabel">Как собираетесь проживать: </span>
+											<div class="searchItemBody">
+												<select name="withWho" id="withWho">
+													<option value="1" selected>один</option>
+													<option value="2">семейная пара</option>
+													<option value="3">несемейная пара</option>
+													<option value="4">со знакомыми</option>
+												</select>
+											</div>
+										</div>
+										<div class="searchItem">
+											<span class="searchItemLabel">Дети: </span>
+											<div class="searchItemBody">
+												<select name="children" id="children">
+													<option value="0" selected>без детей</option>
+													<option value="1">с детьми младше 4-х лет</option>
+													<option value="2">с детьми старше 4-х лет</option>
+												</select>
+											</div>
+										</div>
+										<div class="searchItem">
+											<span class="searchItemLabel">Животные: </span>
+											<div class="searchItemBody">
+												<select name="animals" id="animals">
+													<option value="0" selected>без животных</option>
+													<option value="1">с животным(ми)</option>
+												</select>
+											</div>
+										</div>
+									</fieldset>
 								</div>
-								<div style="margin-top: 10px;">
-									<button id="fastSearchButton">
+								<div class="actionsOnSearch">
+									<a href="#">Запомнить условия поиска</a>
+									<button id="extendedSearchButton">
 										Найти
 									</button>
-									<a href="#">Запомнить условия поиска</a>
 								</div>
+								<div class="clearBoth"></div>
 							</form>
 						</div>
 					</div>

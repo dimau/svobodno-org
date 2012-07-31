@@ -1,15 +1,1 @@
-.miniBlockContent form {
-	text-align: center;
-}
 
-.miniBlockContent table{
-	display: inline-block;
-	margin: auto;
-	text-align: left;
-}
-
-.buttonRegistration {
-	float: left;
-	margin-bottom: 20px;
-	margin-left: 20px;
-}

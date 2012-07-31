@@ -12,28 +12,9 @@
 	
 }
 
-/* Стили для блоков с описанием объекта*/
-.objectDescriptionChapter {
-	display: inline-block;
-}
-
-.objectDescriptionChapter table td {
-	vertical-align: middle;
-	padding: 5px;
-}
-
-.objectDescriptionChapter tr {
-	border-bottom: 1px dotted #A64800;
-}
-
-.objectDescriptionChapterHeader {
-	background-color: #B5B5B5;
-	font-size: 1.2em;
-	padding-left: 5px;
-}
-
-.highlighted {
-	background-color: #33CEC3;
+/* Особые стили для блоков с описанием объекта - для выравнивания*/
+fieldset.notEdited {
+	min-width: 45%;
 }
 
 /* Стили для контактов собственника */
