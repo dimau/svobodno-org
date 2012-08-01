@@ -42,10 +42,6 @@
 	font-weight: normal;
 }
 
-.unread {
-	/*background-color: #5DCEC6;*/
-}
-
 .actionReaded {
 	float: right; 
 	margin-top: -3px; 
@@ -159,6 +155,16 @@ table td {
 	padding-left: 5px;
 	border-radius: 5px;
 	color: white;
+}
+
+/* Стили для параметров поиска в режиме просмотра */
+#additionalSearchDescription {
+	max-width: 70%; 
+	min-width: 32em;
+}
+
+#firstTableColumnSpecial {
+	min-width: 16em;
 }
 
 /* Стили для параметров поиска в режиме редактирования */

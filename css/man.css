@@ -41,6 +41,16 @@
 	cursor: pointer;
 }
 
+/* Стили для вкладки Поиск личной страницы пользователя */
+#additionalSearchDescription {
+	max-width: 70%; 
+	min-width: 32em;
+}
+
+#firstTableColumnSpecial {
+	min-width: 16em;
+}
+
 /* Стили для вкладки Объявления личной страницы пользователя */
 
 .news {

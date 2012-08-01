@@ -1303,7 +1303,7 @@
 								</ul>
 								<ul class="listDescription">
 									<li>
-										<span class="headOfString">Тип:</span> Квартира
+										<span class="headOfString" style="vertical-align: top;">Заинтересовавшиеся арендаторы:</span> <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>
 									</li>
 									<li>
 										<span class="headOfString">Плата за аренду:</span> 15000 + коммунальные услуги от 1500 до 2500 руб.
@@ -1372,7 +1372,7 @@
 								</ul>
 								<ul class="listDescription">
 									<li>
-										<span class="headOfString">Тип:</span> Квартира
+										<span class="headOfString" style="vertical-align: top;">Заинтересовавшиеся арендаторы:</span> <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>
 									</li>
 									<li>
 										<span class="headOfString">Плата за аренду:</span> 15000 + коммунальные услуги от 1500 до 2500 руб.
@@ -1476,14 +1476,14 @@
 										</tbody>
 									</table>
 								</fieldset>
-								<fieldset class="notEdited">
+								<fieldset class="notEdited" id="additionalSearchDescription">
 									<legend>
 										Особые параметры поиска
 									</legend>
 									<table>
 										<tbody>
 											<tr>
-												<td class="objectDescriptionItemLabel">Как собираетесь проживать:</td>
+												<td class="objectDescriptionItemLabel" id="firstTableColumnSpecial">Как собираетесь проживать:</td>
 												<td class="objectDescriptionBody"><span>семейная пара</span></td>
 											</tr>
 											<tr>
@@ -1509,6 +1509,10 @@
 											<tr>
 												<td class="objectDescriptionItemLabel">Ориентировочный срок аренды:</td>
 												<td class="objectDescriptionBody"><span>долгосрочно</span></td>
+											</tr>
+											<tr>
+												<td class="objectDescriptionItemLabel">Дополнительные условия поиска:</td>
+												<td class="objectDescriptionBody"><span>Хотелось бы жить рядом с парком: Зеленая роща или 50 лет ВЛКСМ, чтобы можно было по утрам бегать и заниматься спортом. У меня уже несколько олимпийских медалей и я хочу получить еще одну</span></td>
 											</tr>
 										</tbody>
 									</table>
@@ -1857,6 +1861,14 @@
 											<input type="text" name="period" size="20">
 										</div>
 									</div>
+									<div class="searchItem">
+											<div class="searchItemLabel">
+												Дополнительные условия поиска:
+											</div>
+											<div class="searchItemBody">
+												<textarea name="additionalDescriptionOfSearch" cols="50" rows="4"></textarea>
+											</div>
+										</div>
 								</fieldset>
 							</div>
 

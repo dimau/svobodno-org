@@ -34,6 +34,7 @@
 #resultOnSearchPage {
 	width: 100%;
 	margin: 10px auto;
+	position: relative;
 }
 
 /* Стили для списка объявлений*/
@@ -70,7 +71,10 @@
 #map {
 	float: right;
 	width: 49%; 
-	height: 400px;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
 }
 
 .miniImg {
