@@ -31,11 +31,35 @@
 }
 
 /* Стили для блока с результатми поиска - список + карта */
+.choiceViewSearchResult {
+	margin: 6px 0px 6px 0px;
+}
+
 #resultOnSearchPage {
 	width: 100%;
 	margin: 10px auto;
 	position: relative;
 }
+
+#map.fixedTopBlock {
+	position: fixed;
+	top: 0px;
+}
+
+#map.absoluteBottomBlock {
+	position: absolute;
+	bottom: 0px;
+	right: 0px;
+	top: auto;
+}
+
+.listOfRealtyObjects thead.fixedTopBlock {
+	position: fixed;
+	top: 0px;
+	width: 49%;
+}
+
+
 
 /* Стили для списка объявлений*/
 .listOfRealtyObjects {

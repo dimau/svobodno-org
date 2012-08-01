@@ -416,11 +416,10 @@
 						</div>
 					</div>
 				</div>
-
-				<div id="resultOnSearchPage">
-					<div style="margin: 0px 0px 6px 0px;">
-						<span id="expandList"><a href="#">Список</a>&nbsp;&nbsp;&nbsp;</span><span id="listPlusMap"><a href="#">Список + карта</a>&nbsp;&nbsp;&nbsp;</span><span id="expandMap"><a href="#">Карта</a></span>
-					</div>
+				<div class="choiceViewSearchResult">
+					<span id="expandList"><a href="#">Список</a>&nbsp;&nbsp;&nbsp;</span><span id="listPlusMap"><a href="#">Список + карта</a>&nbsp;&nbsp;&nbsp;</span><span id="expandMap"><a href="#">Карта</a></span>
+				</div>
+				<div id="resultOnSearchPage" style="height: 100%;">
 
 					<!-- Информация об объектах, подходящих условиям поиска -->
 					<table class="listOfRealtyObjects" id="shortListOfRealtyObjects">
@@ -639,6 +638,7 @@
 		<!-- Загружаем библиотеку для работы с картой от Яндекса -->
 		<script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
 
+		<script src="js/main.js"></script>
 		<script src="js/search.js"></script>
 		<!-- scripts concatenated and minified via build script -->
 

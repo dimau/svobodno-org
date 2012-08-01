@@ -2,9 +2,6 @@
  * @author dimau
  */
 
-/* Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера */
-window.jQuery || document.write('<script src="js/vendor/jquery-1.7.2.min.js"><\/script>')
-
 /* Инициализируем отображение вкладок при помощи jQuery UI */
 $(function() {
 	$("#tabs").tabs();
@@ -16,27 +13,31 @@ $(function() {
 	});
 });
 
-/* Переинициализируем функцию getElementsByClassName для работы во всех браузерах*/
-if (document.getElementsByClassName) {
-	getElementsByClass = function(classList, node) {
-		return (node || document).getElementsByClassName(classList)
-	}
-} else {
-	getElementsByClass = function(classList, node) {
-		var node = node || document, list = node.getElementsByTagName('*'), length = list.length, classArray = classList.split(/\s+/), classes = classArray.length, result = [], i, j
-		for ( i = 0; i < length; i++) {
-			for ( j = 0; j < classes; j++) {
-				if (list[i].className.search('\\b' + classArray[j] + '\\b') != -1) {
-					result.push(list[i])
-					break
-				}
-			}
-		}
-		return result
-	}
-}
 
-/* Как только будет загружен API и готов DOM, выполняем инициализацию основного текста, отображаемого спарава от табов - чтобы он ни при каких условиях не съезжал*/
+/* Считаем высоту видимой части экрана - чтобы задать ее высоте блока с картой */
+$('#map').css('height', document.documentElement.clientHeight + 'px');
+
+/* Навешиваем обработчик на прокрутку экрана с целью зафиксировать карту и заголовок таблицы в случае достижения ими верха страницы */
+var map = document.getElementById("map");
+var mapWrapper = document.getElementById("resultOnSearchPage");
+
+window.onscroll = function() {
+	// Если экран опустился ниже верхней границы карты, но карта не дошла до футера, то fixedTopBlock
+	if (getPageScroll().top <= getCoords(mapWrapper).top) {
+		$(map).removeClass('fixedTopBlock');
+		$(map).removeClass('absoluteBottomBlock');
+	} else {
+		if (getPageScroll().top + map.offsetHeight >= getCoords(mapWrapper).top + mapWrapper.offsetHeight) {
+			$(map).addClass('absoluteBottomBlock');
+			$(map).removeClass('fixedTopBlock');
+		} else {
+			$(map).addClass('fixedTopBlock');
+			$(map).removeClass('absoluteBottomBlock');
+		}
+	}
+};
+
+/* Как только будет загружен API и готов DOM, выполняем инициализацию карты*/
 ymaps.ready(init);
 
 function init() {
@@ -86,16 +87,16 @@ function init() {
 			// Получаем координаты очередного объекта недвижимости из атрибутов html объекта
 			var realtyObjCoordX = $(addressArray[i]).attr('coordX');
 			var realtyObjCoordY = $(addressArray[i]).attr('coordY');
-			
+
 			// Создаем метку на основе координат
 			myPlacemark = new ymaps.Placemark([realtyObjCoordX, realtyObjCoordY], {
-                    // Свойства
-                    //iconContent: 'Щелкни по мне',
-                    balloonContentHeader: 'улица Сибирский тракт 50 летия 107',
-                    balloonContentBody: '<img class="miniImg"><img class="miniImg"><img class="miniImg"><br>Квартира<br>Стоимость в месяц: 15000 + к. у. от 1500 до 2500 руб.<br> + <a href="#">единовременная комиссия 3000 руб. (40%) собственнику</a><br>Количество комнат: 2, смежные<br>Площадь: 22.4/34<br>Этаж: 3 из 10<br>Срок сдачи: долгосрочно<br>Мебель: есть<br>Район: Центр<br>Телефон собственника: 89221431615, Алексей Иванович',
-                    balloonContentFooter: '<div style="width:100%;"><a href="descriptionOfObject.html">Подробнее</a><img alt="Значок избранного или не избранного" style="border: 1px solid black; float:right; width:10px; height:10px;"></div>'
-                });
-			
+				// Свойства
+				//iconContent: 'Щелкни по мне',
+				balloonContentHeader : 'улица Сибирский тракт 50 летия 107',
+				balloonContentBody : '<img class="miniImg"><img class="miniImg"><img class="miniImg"><br>Квартира<br>Стоимость в месяц: 15000 + к. у. от 1500 до 2500 руб.<br> + <a href="#">единовременная комиссия 3000 руб. (40%) собственнику</a><br>Количество комнат: 2, смежные<br>Площадь: 22.4/34<br>Этаж: 3 из 10<br>Срок сдачи: долгосрочно<br>Мебель: есть<br>Район: Центр<br>Телефон собственника: 89221431615, Алексей Иванович',
+				balloonContentFooter : '<div style="width:100%;"><a href="descriptionOfObject.html">Подробнее</a><img alt="Значок избранного или не избранного" style="border: 1px solid black; float:right; width:10px; height:10px;"></div>'
+			});
+
 			// Добавляем метку на карту
 			map.geoObjects.add(myPlacemark);
 		}
