@@ -13,9 +13,9 @@ $(function() {
 	});
 });
 
-
 /* Считаем высоту видимой части экрана - чтобы задать ее высоте блока с картой */
 $('#map').css('height', document.documentElement.clientHeight + 'px');
+$('#resultOnSearchPage').css('min-height', document.documentElement.clientHeight + 'px');
 
 /* Навешиваем обработчик на прокрутку экрана с целью зафиксировать карту и заголовок таблицы в случае достижения ими верха страницы */
 var map = document.getElementById("map");
@@ -82,19 +82,20 @@ function init() {
 	}
 
 	function placeMarkers() {
-		var addressArray = getElementsByClass('realtyObjectAddress', document.getElementById("fullParametersListOfRealtyObjects"));
-		for (var i = 0; i < addressArray.length; i++) {
-			// Получаем координаты очередного объекта недвижимости из атрибутов html объекта
-			var realtyObjCoordX = $(addressArray[i]).attr('coordX');
-			var realtyObjCoordY = $(addressArray[i]).attr('coordY');
+		var realtyObjects = getElementsByClass('realtyObject', document.getElementById("shortListOfRealtyObjects"));
+
+		for (var i = 0; i < realtyObjects.length; i++) {
+			// Получаем описание и координаты очередного объекта недвижимости из атрибутов html объекта
+			var balloonContentBodyVar = $(realtyObjects[i]).attr('balloonContentBody');
+			var realtyObjCoordX = $(realtyObjects[i]).attr('coordX');
+			var realtyObjCoordY = $(realtyObjects[i]).attr('coordY');
 
 			// Создаем метку на основе координат
 			myPlacemark = new ymaps.Placemark([realtyObjCoordX, realtyObjCoordY], {
-				// Свойства
 				//iconContent: 'Щелкни по мне',
-				balloonContentHeader : 'улица Сибирский тракт 50 летия 107',
-				balloonContentBody : '<img class="miniImg"><img class="miniImg"><img class="miniImg"><br>Квартира<br>Стоимость в месяц: 15000 + к. у. от 1500 до 2500 руб.<br> + <a href="#">единовременная комиссия 3000 руб. (40%) собственнику</a><br>Количество комнат: 2, смежные<br>Площадь: 22.4/34<br>Этаж: 3 из 10<br>Срок сдачи: долгосрочно<br>Мебель: есть<br>Район: Центр<br>Телефон собственника: 89221431615, Алексей Иванович',
-				balloonContentFooter : '<div style="width:100%;"><a href="descriptionOfObject.html">Подробнее</a><img alt="Значок избранного или не избранного" style="border: 1px solid black; float:right; width:10px; height:10px;"></div>'
+				//balloonContentHeader : 
+				balloonContentBody : balloonContentBodyVar,
+				/*balloonContentFooter : */
 			});
 
 			// Добавляем метку на карту
@@ -102,7 +103,54 @@ function init() {
 		}
 	}
 
+	/* Вешаем обработчик на клик по строчке краткого списка - чтобы отобразить инфу в виде баллуна на карте */
+	$('#shortListOfRealtyObjects').on('click', function(event) {
+		var target = event.target;
+		
+		if (target.nodeName == 'A' && $(target).hasClass('linkToDescription')) {
+			var linkToDescription = $(target).attr('href');
+			window.open(linkToDescription);
+			return false;
+		}
+
+		while (target != this) {// пока target не поднялся до уровня table #shortListOfRealtyObjects ищем tr
+			if (target.nodeName == 'TR' && $(target).hasClass('realtyObject')) {
+
+				var balloonContentBodyVar = $(target).attr('balloonContentBody');
+				var realtyObjCoordX = $(target).attr('coordX');
+				var realtyObjCoordY = $(target).attr('coordY');
+
+				map.balloon.open(
+				// Позиция балуна
+				[realtyObjCoordX, realtyObjCoordY], {
+					// Свойства балуна
+					contentBody : balloonContentBodyVar,
+				});
+
+				return false;
+			}
+
+			target = target.parentNode;
+		}
+	})
 }
+
+/* Навешиваем обработчик клика на подробный список объектов недвижимости в результатах выполнения запроса */
+$('#fullParametersListOfRealtyObjects').on('click', function(event) {
+		var target = event.target;
+
+		while (target != this) {// пока target не поднялся до уровня table #fullParametersListOfRealtyObjects ищем tr
+			if (target.nodeName == 'TR' && $(target).hasClass('realtyObject')) {
+
+				var linkToDescription = $(target).attr('linkToDescription');
+				window.open(linkToDescription);
+
+				return false;
+			}
+
+			target = target.parentNode;
+		}
+	})
 
 // Подгонка размера правого блока параметров (районы) расширенного поиска под размер левого блока параметров. 19 пикселей - на padding у fieldset
 document.getElementById('rightBlockOfSearchParameters').style.height = document.getElementById('leftBlockOfSearchParameters').offsetHeight - 22 + 'px';
@@ -120,8 +168,8 @@ $('#expandList').on('click', function() {
 
 /* Событие клика по ссылке список + карта*/
 $('#listPlusMap').on('click', function() {
-	$('#shortListOfRealtyObjects').css('display', 'block');
-	$('#map').css('display', 'block');
+	$('#shortListOfRealtyObjects').css('display', '');
+	$('#map').css('display', '');
 	$('#map').css('width', '49%');
 	$('#fullParametersListOfRealtyObjects').css('display', 'none');
 	//$('#expandList').css('display', '');

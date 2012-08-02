@@ -1,24 +1,7 @@
-#tabs {
-	font-size: 1em;
-}
 
 /* Стили для параметров поиска*/
-.searchChapter {
-	display: inline-block;
-}
-
 #fastSearchInput {
 	line-height: 2.4;
-
-}
-
-.searchItemBody {
-	display: inline-block;
-}
-
-#rightBlockOfSearchParameters {
-	display: inline-block;
-	height: 345px;
 }
 
 .actionsOnSearch {
@@ -29,6 +12,8 @@
 #extendedSearchButton {
 	margin-left: 20px;
 }
+
+
 
 /* Стили для блока с результатми поиска - список + карта */
 .choiceViewSearchResult {
@@ -41,6 +26,15 @@
 	position: relative;
 }
 
+.numberOfRealtyObject {
+	position: absolute; 
+	top: 4px; 
+	left: 0px; 
+	text-align: center; 
+	width: 100%; 
+	font-size: 1em;
+}
+
 #map.fixedTopBlock {
 	position: fixed;
 	top: 0px;
@@ -49,14 +43,7 @@
 #map.absoluteBottomBlock {
 	position: absolute;
 	bottom: 0px;
-	right: 0px;
 	top: auto;
-}
-
-.listOfRealtyObjects thead.fixedTopBlock {
-	position: fixed;
-	top: 0px;
-	width: 49%;
 }
 
 
@@ -91,6 +78,24 @@
 	cursor: pointer;
 }
 
+.realtyObject td {
+	position: relative;
+}
+
+.linkToDescriptionBlock {
+	position: absolute; 
+	bottom: 4px; 
+	right: 4px;
+}
+
+.linkToDescriptionBlock a {
+	color: white;
+}
+
+.linkToDescriptionBlock a:hover {
+	color: #7BDED9;
+}
+
 /* Стили для карты*/
 #map {
 	float: right;
@@ -106,4 +111,9 @@
 	width: 50px; 
 	height: 50px;
 	margin: 3px;
+}
+
+.headOfBalloon {
+	text-align: center; 
+	font-size: 1.2em;
 }

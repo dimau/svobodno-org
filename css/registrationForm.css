@@ -2,10 +2,6 @@
 	right: 0px;
 }
 
-#tabs {
-	font-size: 1em;
-}
-
 /* Стили для личных данных*/
 .required {
 	display: inline-block; 
@@ -40,43 +36,6 @@ table {
 table td {
 	vertical-align: middle;
 	padding: 5px;
-}
-
-/* Стили для параметров поиска*/
-.extendedSearchParametersBlock {
-	display: inline-block;
-}
-
-#rightBlockOfSearchParameters {
-	display: inline-block;
-	height: 345px;
-}
-
-#rightBlockOfSearchParameters fieldset {
-	height: 100%;
-}
-#rightBlockOfSearchParameters .searchItem {
-	height: 100%;
-}
-
-#rightBlockOfSearchParameters .searchItemBody {
-	height: 95%; 
-	width:200px; 
-	overflow-y: auto;
-}
-
-#rightBlockOfSearchParameters ul {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-
-.searchChapter {
-	display: inline-block;
-}
-
-.searchItemBody {
-	display: inline-block;
 }
 
 /* Стили для капчи и для Готово */

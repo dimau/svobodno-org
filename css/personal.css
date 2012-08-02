@@ -1,7 +1,3 @@
-#tabs {
-	font-size: 1em;
-}
-
 /* Стили для вкладки Профайл личного кабинета */
 
 .profileInformation {
@@ -165,45 +161,4 @@ table td {
 
 #firstTableColumnSpecial {
 	min-width: 16em;
-}
-
-/* Стили для параметров поиска в режиме редактирования */
-.extendedSearchParametersBlock {
-	display: inline-block;
-}
-
-#rightBlockOfSearchParameters {
-	display: inline-block;
-	height: 345px;
-}
-
-#rightBlockOfSearchParameters fieldset {
-	height: 100%;
-}
-#rightBlockOfSearchParameters .searchItem {
-	height: 100%;
-}
-
-#rightBlockOfSearchParameters .searchItemBody {
-	height: 95%; 
-	width:200px; 
-	overflow-y: auto;
-}
-
-#rightBlockOfSearchParameters ul {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-
-.searchChapter {
-	display: inline-block;
-}
-
-.searchItemBody {
-	display: inline-block;
-}
-
-.private {
-	display: inline-block;
 }
