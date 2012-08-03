@@ -19,13 +19,49 @@
 
 		<!-- Mobile viewport optimized: h5bp.com/viewport -->
 		<meta name="viewport" content="initialscale=1.0, width=device-width">
-		
 
 		<!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
 
 		<link rel="stylesheet" href="css/jquery-ui-1.8.21.custom.css">
 		<link rel="stylesheet" href="css/main.css">
-		<link rel="stylesheet" href="css/index.css">
+		<style>
+			#descriptionBox {
+				clear: both;
+				padding-top: 10px;
+				width: 100%;
+				min-width: 703px;
+			}
+
+			.descriptionBlockHeader {
+				font-family: Georgia, "Times New Roman", Times, serif;
+				font-size: 1.3em;
+				margin-bottom: 8px;
+			}
+
+			.descriptionBlock1 {
+				float: left;
+				width: 49.5%;
+				text-align: center;
+			}
+
+			.descriptionBlock2 {
+				float: right;
+				width: 49.5%;
+				text-align: center;
+			}
+
+			.accordion {
+				text-align: left;
+			}
+
+			.accordionContentUnit {
+				font-size: 0.9em;
+			}
+
+			button, a.button {
+				margin-top: 30px;
+			}
+		</style>
 
 		<!-- More ideas for your <head> here: h5bp.com/d/head-Tips -->
 
@@ -118,9 +154,7 @@
 							</div>
 						</div>
 						<form name="IamOwner">
-							<a href="forowner.html" class="button">
-								Я - собственник
-							</a>
+							<a href="forowner.html" class="button"> Я - собственник </a>
 						</form>
 
 					</div>
@@ -160,9 +194,7 @@
 							</div>
 						</div>
 						<form name="IamLeaser">
-							<a href="fortenant.html" class="button">
-								Я - арендатор
-							</a>
+							<a href="fortenant.html" class="button"> Я - арендатор </a>
 						</form>
 					</div>
 				</div><!-- /end.descriptionBox -->
@@ -204,7 +236,7 @@
 		<!-- jQuery UI с моей темой оформления -->
 		<script src="js/vendor/jquery-ui-1.8.21.custom.min.js"></script>
 
-		<script src="js/index.js"></script>
+		<script src="js/main.js"></script>
 		<!-- scripts concatenated and minified via build script -->
 
 		<!-- end scripts -->

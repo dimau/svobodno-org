@@ -24,7 +24,79 @@
 
 		<link rel="stylesheet" href="css/jquery-ui-1.8.21.custom.css">
 		<link rel="stylesheet" href="css/main.css">
-		<link rel="stylesheet" href="css/personal.css">
+		<style>
+			/* Стили для создания нового Объявления*/
+			.actionChangeStatusAdvert {
+				float: right;
+				margin-top: -0.1em;
+				margin-right: 4px;
+				font-weight: normal;
+				font-size: 0.8em;
+			}
+
+			#addressForm {
+				clear: both;
+			}
+
+			.inputItem, .objectDescriptionItem {
+				width: 100%;
+				margin-top: 7px;
+				margin-bottom: 7px;
+			}
+
+			.inputItem .label, .objectDescriptionItem .objectDescriptionItemLabel {
+				min-width: 150px;
+				width: 49%;
+				text-align: right;
+				display: inline-block;
+				vertical-align: top;
+			}
+
+			.objectDescriptionItem .objectDescriptionBody {
+				display: inline-block;
+				width: 49%;
+			}
+
+			.objectDescriptionBody.furniture {
+				min-width: 300px;
+			}
+
+			table td {
+				vertical-align: middle;
+				padding: 5px;
+			}
+
+			#newAdvertButton {
+				margin-bottom: 10px;
+			}
+
+			.advertHeader {
+				border: 1px solid #AAAAAA;
+				padding: 5px;
+				background-color: #B5B5B5;
+				font-size: 1.2em;
+				border-radius: 5px 5px 0 0;
+			}
+
+			.advertHeaderStatus {
+				color: red;
+				display: inline-block;
+			}
+
+			.advertDescriptionEdit {
+				border: 1px solid #AAAAAA;
+				border-radius: 0 0 5px 5px;
+				padding: 10px;
+			}
+
+			.advertDescriptionChapterHeader {
+				background-color: #8e4a15;
+				font-size: 1.2em;
+				padding-left: 5px;
+				border-radius: 5px;
+				color: white;
+			}
+		</style>
 
 		<!-- More ideas for your <head> here: h5bp.com/d/head-Tips -->
 
@@ -213,7 +285,9 @@
 									</div>
 								</div>
 								<ul class="setOfInstructions">
-									<li><a href="#">подробнее</a></li>
+									<li>
+										<a href="#">подробнее</a>
+									</li>
 								</ul>
 								<ul class="listDescription">
 									<li>
@@ -261,7 +335,9 @@
 									</div>
 								</div>
 								<ul class="setOfInstructions">
-									<li><a href="#">подробнее</a></li>
+									<li>
+										<a href="#">подробнее</a>
+									</li>
 								</ul>
 								<ul class="listDescription">
 									<li>
@@ -280,7 +356,7 @@
 										<span class="headOfString">Комментарий к статусу:</span>
 										объявление опубликовано на ресурсе Хани Хом, а также поставлено в очередь на автоматическую ежедневную публикацию на основных интернет-порталах города. Это обеспечит максимальный приток арендаторов, из которых Вы сможете выбрать наиболее ответственных и надежных
 									</li>
-								</ul> 
+								</ul>
 								<div class="clearBoth"></div>
 							</div>
 							<div class="news">
@@ -293,7 +369,9 @@
 									</div>
 								</div>
 								<ul class="setOfInstructions">
-									<li><a href="#">подробнее</a></li>
+									<li>
+										<a href="#">подробнее</a>
+									</li>
 								</ul>
 								<ul class="listDescription">
 									<li>
@@ -337,8 +415,12 @@
 									</div>
 								</div>
 								<ul class="setOfInstructions">
-									<li><a href="#">подробнее</a></li>
-									<li><a href="#">посмотреть на карте</a></li>
+									<li>
+										<a href="#">подробнее</a>
+									</li>
+									<li>
+										<a href="#">посмотреть на карте</a>
+									</li>
 								</ul>
 								<ul class="listDescription">
 									<li>
@@ -652,7 +734,7 @@
 															</td>
 														</tr>
 														<tr>
-															<td><!-- Карта Яндекса --><div id="map" style="width: 400px; height: 400px; margin-top: 8px;"></div></td>
+															<td><!-- Карта Яндекса --><div id="mapForNewAdvert" style="width: 400px; height: 400px; margin-top: 8px;"></div></td>
 														</tr>
 													</tbody>
 												</table>
@@ -1303,7 +1385,7 @@
 								</ul>
 								<ul class="listDescription">
 									<li>
-										<span class="headOfString" style="vertical-align: top;">Заинтересовавшиеся арендаторы:</span> <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>
+										<span class="headOfString" style="vertical-align: top;">Заинтересовавшиеся арендаторы:</span><a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>
 									</li>
 									<li>
 										<span class="headOfString">Плата за аренду:</span> 15000 + коммунальные услуги от 1500 до 2500 руб.
@@ -1372,7 +1454,7 @@
 								</ul>
 								<ul class="listDescription">
 									<li>
-										<span class="headOfString" style="vertical-align: top;">Заинтересовавшиеся арендаторы:</span> <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>
+										<span class="headOfString" style="vertical-align: top;">Заинтересовавшиеся арендаторы:</span><a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>, <a style="text-decoration: none;" href="man.html">Алексей Мухмаев</a>
 									</li>
 									<li>
 										<span class="headOfString">Плата за аренду:</span> 15000 + коммунальные услуги от 1500 до 2500 руб.
@@ -1862,19 +1944,512 @@
 										</div>
 									</div>
 									<div class="searchItem">
-											<div class="searchItemLabel">
-												Дополнительные условия поиска:
-											</div>
-											<div class="searchItemBody">
-												<textarea name="additionalDescriptionOfSearch" cols="50" rows="4"></textarea>
-											</div>
+										<div class="searchItemLabel">
+											Дополнительные условия поиска:
 										</div>
+										<div class="searchItemBody">
+											<textarea name="additionalDescriptionOfSearch" cols="50" rows="4"></textarea>
+										</div>
+									</div>
 								</fieldset>
 							</div>
 
 						</div>
 						<div id="tabs-5">
-							А здесь избранные объявления
+							<div class="shadowText">
+								На этой вкладке расположены все объявления, добавленные Вами в избранные
+							</div>
+							<div class="choiceViewSearchResult">
+								<span id="expandList"><a href="#">Список</a>&nbsp;&nbsp;&nbsp;</span><span id="listPlusMap"><a href="#">Список + карта</a>&nbsp;&nbsp;&nbsp;</span><span id="expandMap"><a href="#">Карта</a></span>
+							</div>
+							<div id="resultOnSearchPage" style="height: 100%;">
+
+								<!-- Информация об объектах, подходящих условиям поиска -->
+								<table class="listOfRealtyObjects" id="shortListOfRealtyObjects">
+									<thead>
+										<tr class="listOfRealtyObjectsHeader">
+											<th class="top left"></th>
+											<th> Фото </th>
+											<th> Адрес </th>
+											<th class="top right"> Цена, руб. </th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="realtyObject" coordX="56.836396" coordY="60.588662" balloonContentBody='<div class="headOfBalloon">ул. Ленина 13</div><div class="fotosWrapper"><div class="middleFotoWrapper"><img class="middleFoto" src=""></div><div class="middleFotoWrapper"><img class="middleFoto" src=""></div><div class="middleFotoWrapper"><img class="middleFoto" src=""></div></div><ul class="listDescription"><li><span class="headOfString">Тип:</span> Квартира</li><li><span class="headOfString">Плата за аренду:</span> 15000 + коммунальные услуги от 1500 до 2500 руб.</li><li><span class="headOfString">Единовременная комиссия:</span><a href="#"> 3000 руб. (40%) собственнику</a></li><li><span class="headOfString">Адрес:</span> улица Посадская 51</li><li><span class="headOfString">Количество комнат:</span> 2, смежные</li><li><span class="headOfString">Площадь (жилая/общая):</span> 22.4/34 м²</li><li><span class="headOfString">Этаж:</span> 3 из 10</li><li><span class="headOfString">Срок сдачи:</span> долгосрочно</li><li><span class="headOfString">Мебель:</span> есть</li><li><span class="headOfString">Район:</span> Центр</li><li><span class="headOfString">Телефон собственника:</span> 89221431615, <a href="#">Алексей Иванович</a></li></ul><div class="clearBoth"></div><div style="width:100%;"><a href="descriptionOfObject.html">Подробнее</a><div style="float: right; cursor: pointer;"><div class="blockOfIcon"><a><img class="icon" title="Добавить в избранное" src="img/blue_star.png"></a></div><a id="addToFavorit"> добавить в избранное</a></div></div>'>
+											<td>
+											<div class="numberOfRealtyObject">
+												1
+											</div>
+											<div class="blockOfIcon">
+												<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+											</div></td>
+											<td>
+											<div class="fotosWrapper resultSearchFoto">
+												<div class="middleFotoWrapper">
+													<img class="middleFoto" src="">
+												</div>
+											</div></td>
+											<td>ул. Ленина 13
+											<div class="linkToDescriptionBlock">
+												<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+											</div></td>
+											<td> 15000 </td>
+										</tr>
+										<tr class="realtyObject" coordX="56.819927" coordY="60.539264" balloonContentBody='<div class="headOfBalloon">ул. Репина 105</div><div class="fotosWrapper"><div class="middleFotoWrapper"><img class="middleFoto" src=""></div><div class="middleFotoWrapper"><img class="middleFoto" src=""></div><div class="middleFotoWrapper"><img class="middleFoto" src=""></div></div><ul class="listDescription"><li><span class="headOfString">Тип:</span> Квартира</li><li><span class="headOfString">Плата за аренду:</span> 15000 + коммунальные услуги от 1500 до 2500 руб.</li><li><span class="headOfString">Единовременная комиссия:</span><a href="#"> 3000 руб. (40%) собственнику</a></li><li><span class="headOfString">Адрес:</span> улица Посадская 51</li><li><span class="headOfString">Количество комнат:</span> 2, смежные</li><li><span class="headOfString">Площадь (жилая/общая):</span> 22.4/34 м²</li><li><span class="headOfString">Этаж:</span> 3 из 10</li><li><span class="headOfString">Срок сдачи:</span> долгосрочно</li><li><span class="headOfString">Мебель:</span> есть</li><li><span class="headOfString">Район:</span> Центр</li><li><span class="headOfString">Телефон собственника:</span> 89221431615, <a href="#">Алексей Иванович</a></li></ul><div class="clearBoth"></div><div style="width:100%;"><a href="descriptionOfObject.html">Подробнее</a><div style="float: right; cursor: pointer;"><div class="blockOfIcon"><a><img class="icon" title="Добавить в избранное" src="img/blue_star.png"></a></div><a id="addToFavorit"> добавить в избранное</a></div></div>'>
+											<td>
+											<div class="numberOfRealtyObject">
+												2
+											</div>
+											<div class="blockOfIcon">
+												<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+											</div></td>
+											<td>
+											<div class="fotosWrapper resultSearchFoto">
+												<div class="middleFotoWrapper">
+													<img class="middleFoto" src="">
+												</div>
+											</div></td>
+											<td>ул. Репина 105
+											<div class="linkToDescriptionBlock">
+												<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+											</div></td>
+											<td> 35000 </td>
+										</tr>
+										<tr class="realtyObject" coordX="56.817405" coordY="60.558452" balloonContentBody='<div class="headOfBalloon">ул. Шаумяна 107</div><div class="fotosWrapper"><div class="middleFotoWrapper"><img class="middleFoto" src=""></div><div class="middleFotoWrapper"><img class="middleFoto" src=""></div><div class="middleFotoWrapper"><img class="middleFoto" src=""></div></div><ul class="listDescription"><li><span class="headOfString">Тип:</span> Квартира</li><li><span class="headOfString">Плата за аренду:</span> 15000 + коммунальные услуги от 1500 до 2500 руб.</li><li><span class="headOfString">Единовременная комиссия:</span><a href="#"> 3000 руб. (40%) собственнику</a></li><li><span class="headOfString">Адрес:</span> улица Посадская 51</li><li><span class="headOfString">Количество комнат:</span> 2, смежные</li><li><span class="headOfString">Площадь (жилая/общая):</span> 22.4/34 м²</li><li><span class="headOfString">Этаж:</span> 3 из 10</li><li><span class="headOfString">Срок сдачи:</span> долгосрочно</li><li><span class="headOfString">Мебель:</span> есть</li><li><span class="headOfString">Район:</span> Центр</li><li><span class="headOfString">Телефон собственника:</span> 89221431615, <a href="#">Алексей Иванович</a></li></ul><div class="clearBoth"></div><div style="width:100%;"><a href="descriptionOfObject.html">Подробнее</a><div style="float: right; cursor: pointer;"><div class="blockOfIcon"><a><img class="icon" title="Добавить в избранное" src="img/blue_star.png"></a></div><a id="addToFavorit"> добавить в избранное</a></div></div>'>
+											<td>
+											<div class="numberOfRealtyObject">
+												3
+											</div>
+											<div class="blockOfIcon">
+												<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+											</div></td>
+											<td>
+											<div class="fotosWrapper resultSearchFoto">
+												<div class="middleFotoWrapper">
+													<img class="middleFoto" src="">
+												</div>
+											</div></td>
+											<td>ул. Шаумяна 107
+											<div class="linkToDescriptionBlock">
+												<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+											</div></td>
+											<td> 150000 </td>
+										</tr>
+										<tr class="realtyObject" coordX="56.825483" coordY="60.57357" balloonContentBody='<div class="headOfBalloon">ул. Гурзуфская 38</div><div class="fotosWrapper"><div class="middleFotoWrapper"><img class="middleFoto" src=""></div><div class="middleFotoWrapper"><img class="middleFoto" src=""></div><div class="middleFotoWrapper"><img class="middleFoto" src=""></div></div><ul class="listDescription"><li><span class="headOfString">Тип:</span> Квартира</li><li><span class="headOfString">Плата за аренду:</span> 15000 + коммунальные услуги от 1500 до 2500 руб.</li><li><span class="headOfString">Единовременная комиссия:</span><a href="#"> 3000 руб. (40%) собственнику</a></li><li><span class="headOfString">Адрес:</span> улица Посадская 51</li><li><span class="headOfString">Количество комнат:</span> 2, смежные</li><li><span class="headOfString">Площадь (жилая/общая):</span> 22.4/34 м²</li><li><span class="headOfString">Этаж:</span> 3 из 10</li><li><span class="headOfString">Срок сдачи:</span> долгосрочно</li><li><span class="headOfString">Мебель:</span> есть</li><li><span class="headOfString">Район:</span> Центр</li><li><span class="headOfString">Телефон собственника:</span> 89221431615, <a href="#">Алексей Иванович</a></li></ul><div class="clearBoth"></div><div style="width:100%;"><a href="descriptionOfObject.html">Подробнее</a><div style="float: right; cursor: pointer;"><div class="blockOfIcon"><a><img class="icon" title="Добавить в избранное" src="img/blue_star.png"></a></div><a id="addToFavorit"> добавить в избранное</a></div></div>'>
+											<td>
+											<div class="numberOfRealtyObject">
+												123
+											</div>
+											<div class="blockOfIcon">
+												<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+											</div></td>
+											<td>
+											<div class="fotosWrapper resultSearchFoto">
+												<div class="middleFotoWrapper">
+													<img class="middleFoto" src="">
+												</div>
+											</div></td>
+											<td>ул. Гурзуфская 38
+											<div class="linkToDescriptionBlock">
+												<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+											</div></td>
+											<td> 6000 </td>
+										</tr>
+										<tr class="realtyObject" coordX="56.820769" coordY="60.560742" balloonContentBody='<div class="headOfBalloon">ул. Серафимы Дерябиной 17</div><div class="fotosWrapper"><div class="middleFotoWrapper"><img class="middleFoto" src=""></div><div class="middleFotoWrapper"><img class="middleFoto" src=""></div><div class="middleFotoWrapper"><img class="middleFoto" src=""></div></div><ul class="listDescription"><li><span class="headOfString">Тип:</span> Квартира</li><li><span class="headOfString">Плата за аренду:</span> 15000 + коммунальные услуги от 1500 до 2500 руб.</li><li><span class="headOfString">Единовременная комиссия:</span><a href="#"> 3000 руб. (40%) собственнику</a></li><li><span class="headOfString">Адрес:</span> улица Посадская 51</li><li><span class="headOfString">Количество комнат:</span> 2, смежные</li><li><span class="headOfString">Площадь (жилая/общая):</span> 22.4/34 м²</li><li><span class="headOfString">Этаж:</span> 3 из 10</li><li><span class="headOfString">Срок сдачи:</span> долгосрочно</li><li><span class="headOfString">Мебель:</span> есть</li><li><span class="headOfString">Район:</span> Центр</li><li><span class="headOfString">Телефон собственника:</span> 89221431615, <a href="#">Алексей Иванович</a></li></ul><div class="clearBoth"></div><div style="width:100%;"><a href="descriptionOfObject.html">Подробнее</a><div style="float: right; cursor: pointer;"><div class="blockOfIcon"><a><img class="icon" title="Добавить в избранное" src="img/blue_star.png"></a></div><a id="addToFavorit"> добавить в избранное</a></div></div>'>
+											<td>
+											<div class="numberOfRealtyObject">
+												1254
+											</div>
+											<div class="blockOfIcon">
+												<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+											</div></td>
+											<td>
+											<div class="fotosWrapper resultSearchFoto">
+												<div class="middleFotoWrapper">
+													<img class="middleFoto" src="">
+												</div>
+											</div></td>
+											<td>ул. Серафимы Дерябиной 17
+											<div class="linkToDescriptionBlock">
+												<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+											</div></td>
+											<td> 2000 </td>
+										</tr>
+										<tr class="realtyObject" coordX="56.820769" coordY="60.560742" balloonContentBody='<div class="headOfBalloon">ул. Серафимы Дерябиной 17</div><div class="fotosWrapper"><div class="middleFotoWrapper"><img class="middleFoto" src=""></div><div class="middleFotoWrapper"><img class="middleFoto" src=""></div><div class="middleFotoWrapper"><img class="middleFoto" src=""></div></div><ul class="listDescription"><li><span class="headOfString">Тип:</span> Квартира</li><li><span class="headOfString">Плата за аренду:</span> 15000 + коммунальные услуги от 1500 до 2500 руб.</li><li><span class="headOfString">Единовременная комиссия:</span><a href="#"> 3000 руб. (40%) собственнику</a></li><li><span class="headOfString">Адрес:</span> улица Посадская 51</li><li><span class="headOfString">Количество комнат:</span> 2, смежные</li><li><span class="headOfString">Площадь (жилая/общая):</span> 22.4/34 м²</li><li><span class="headOfString">Этаж:</span> 3 из 10</li><li><span class="headOfString">Срок сдачи:</span> долгосрочно</li><li><span class="headOfString">Мебель:</span> есть</li><li><span class="headOfString">Район:</span> Центр</li><li><span class="headOfString">Телефон собственника:</span> 89221431615, <a href="#">Алексей Иванович</a></li></ul><div class="clearBoth"></div><div style="width:100%;"><a href="descriptionOfObject.html">Подробнее</a><div style="float: right; cursor: pointer;"><div class="blockOfIcon"><a><img class="icon" title="Добавить в избранное" src="img/blue_star.png"></a></div><a id="addToFavorit"> добавить в избранное</a></div></div>'>
+											<td>
+											<div class="numberOfRealtyObject">
+												12
+											</div>
+											<div class="blockOfIcon">
+												<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+											</div></td>
+											<td>
+											<div class="fotosWrapper resultSearchFoto">
+												<div class="middleFotoWrapper">
+													<img class="middleFoto" src="">
+												</div>
+											</div></td>
+											<td>ул. Серафимы Дерябиной 17
+											<div class="linkToDescriptionBlock">
+												<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+											</div></td>
+											<td> 350000 </td>
+										</tr>
+										<tr class="realtyObject">
+											<td>
+											<div class="numberOfRealtyObject">
+												15
+											</div>
+											<div class="blockOfIcon">
+												<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+											</div></td>
+											<td>
+											<div class="fotosWrapper resultSearchFoto">
+												<div class="middleFotoWrapper">
+													<img class="middleFoto" src="">
+												</div>
+											</div></td>
+											<td>улица Сибирский тракт 50 летия 107
+											<div class="linkToDescriptionBlock">
+												<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+											</div></td>
+											<td> 15000 </td>
+										</tr>
+										<tr class="realtyObject">
+											<td>
+											<div class="numberOfRealtyObject">
+												15
+											</div>
+											<div class="blockOfIcon">
+												<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+											</div></td>
+											<td>
+											<div class="fotosWrapper resultSearchFoto">
+												<div class="middleFotoWrapper">
+													<img class="middleFoto" src="">
+												</div>
+											</div></td>
+											<td>ул. Сумасранка 4
+											<div class="linkToDescriptionBlock">
+												<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+											</div></td>
+											<td> 35000 </td>
+										</tr>
+										<tr class="realtyObject">
+											<td>
+											<div class="blockOfIcon">
+												<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+											</div></td>
+											<td>
+											<div class="fotosWrapper resultSearchFoto">
+												<div class="middleFotoWrapper">
+													<img class="middleFoto" src="">
+												</div>
+											</div></td>
+											<td>ул. Серафимы Дерябиной 154
+											<div class="linkToDescriptionBlock">
+												<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+											</div></td>
+											<td> 150000 </td>
+										</tr>
+										<tr class="realtyObject">
+											<td>
+											<div class="blockOfIcon">
+												<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+											</div></td>
+											<td>
+											<div class="fotosWrapper resultSearchFoto">
+												<div class="middleFotoWrapper">
+													<img class="middleFoto" src="">
+												</div>
+											</div></td>
+											<td>ул. Белореченская 24
+											<div class="linkToDescriptionBlock">
+												<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+											</div></td>
+											<td> 6000 </td>
+										</tr>
+										<tr class="realtyObject">
+											<td>
+											<div class="blockOfIcon">
+												<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+											</div></td>
+											<td>
+											<div class="fotosWrapper resultSearchFoto">
+												<div class="middleFotoWrapper">
+													<img class="middleFoto" src="">
+												</div>
+											</div></td>
+											<td>ул. Маврода 2012
+											<div class="linkToDescriptionBlock">
+												<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+											</div></td>
+											<td> 2000 </td>
+										</tr>
+										<tr class="realtyObject">
+											<td>
+											<div class="blockOfIcon">
+												<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+											</div></td>
+											<td>
+											<div class="fotosWrapper resultSearchFoto">
+												<div class="middleFotoWrapper">
+													<img class="middleFoto" src="">
+												</div>
+											</div></td>
+											<td>ул. Пискуна 1
+											<div class="linkToDescriptionBlock">
+												<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+											</div></td>
+											<td> 350000 </td>
+										</tr>
+										<tr class="realtyObject">
+											<td>
+											<div class="blockOfIcon">
+												<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+											</div></td>
+											<td>
+											<div class="fotosWrapper resultSearchFoto">
+												<div class="middleFotoWrapper">
+													<img class="middleFoto" src="">
+												</div>
+											</div></td>
+											<td>улица Сибирский тракт 50 летия 107
+											<div class="linkToDescriptionBlock">
+												<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+											</div></td>
+											<td> 15000 </td>
+										</tr>
+										<tr class="realtyObject">
+											<td>
+											<div class="blockOfIcon">
+												<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+											</div></td>
+											<td>
+											<div class="fotosWrapper resultSearchFoto">
+												<div class="middleFotoWrapper">
+													<img class="middleFoto" src="">
+												</div>
+											</div></td>
+											<td>ул. Сумасранка 4
+											<div class="linkToDescriptionBlock">
+												<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+											</div></td>
+											<td> 35000 </td>
+										</tr>
+										<tr class="realtyObject">
+											<td>
+											<div class="blockOfIcon">
+												<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+											</div></td>
+											<td>
+											<div class="fotosWrapper resultSearchFoto">
+												<div class="middleFotoWrapper">
+													<img class="middleFoto" src="">
+												</div>
+											</div></td>
+											<td>ул. Серафимы Дерябиной 154
+											<div class="linkToDescriptionBlock">
+												<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+											</div></td>
+											<td> 150000 </td>
+										</tr>
+										<tr class="realtyObject">
+											<td>
+											<div class="blockOfIcon">
+												<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+											</div></td>
+											<td>
+											<div class="fotosWrapper resultSearchFoto">
+												<div class="middleFotoWrapper">
+													<img class="middleFoto" src="">
+												</div>
+											</div></td>
+											<td>ул. Белореченская 24
+											<div class="linkToDescriptionBlock">
+												<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+											</div></td>
+											<td> 6000 </td>
+										</tr>
+										<tr class="realtyObject">
+											<td>
+											<div class="blockOfIcon">
+												<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+											</div></td>
+											<td>
+											<div class="fotosWrapper resultSearchFoto">
+												<div class="middleFotoWrapper">
+													<img class="middleFoto" src="">
+												</div>
+											</div></td>
+											<td>ул. Маврода 2012
+											<div class="linkToDescriptionBlock">
+												<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+											</div></td>
+											<td> 2000 </td>
+										</tr>
+										<tr class="realtyObject">
+											<td>
+											<div class="blockOfIcon">
+												<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+											</div></td>
+											<td>
+											<div class="fotosWrapper resultSearchFoto">
+												<div class="middleFotoWrapper">
+													<img class="middleFoto" src="">
+												</div>
+											</div></td>
+											<td>ул. Пискуна 1
+											<div class="linkToDescriptionBlock">
+												<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+											</div></td>
+											<td> 350000 </td>
+										</tr>
+									</tbody>
+								</table>
+
+								<!-- Область показа карты -->
+								<div id="map"></div>
+
+								<div class="clearBoth"></div>
+
+								<!-- Первоначально скрытый раздел с подробным списком объявлений-->
+								<div id="fullParametersListOfRealtyObjects" style="display: none;">
+									<table class="listOfRealtyObjects" style="width: 100%; float:none;">
+										<thead>
+											<tr class="listOfRealtyObjectsHeader">
+												<th class="top left"></th>
+												<th> Фото </th>
+												<th> Адрес </th>
+												<th> Район </th>
+												<th> Комнат </th>
+												<th> Площадь </th>
+												<th> Этаж </th>
+												<th class="top right"> Цена, руб. </th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr class="realtyObject" linkToDescription="descriptionOfObject.html">
+												<td>
+												<div class="numberOfRealtyObject">
+													15
+												</div>
+												<div class="blockOfIcon">
+													<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+												</div></td>
+												<td>
+												<div class="fotosWrapper resultSearchFoto">
+													<div class="middleFotoWrapper">
+														<img class="middleFoto" src="">
+													</div>
+													<div class="middleFotoWrapper">
+														<img class="middleFoto" src="">
+													</div>
+												</div></td>
+												<td>ул. Серафимы Дерябиной 17</td>
+												<td> ВИЗ </td>
+												<td> 2 </td>
+												<td> 22.4/34 </td>
+												<td> 2/13</td>
+												<td> 15000 </td>
+											</tr>
+											<tr class="realtyObject" linkToDescription="descriptionOfObject.html">
+												<td>
+												<div class="numberOfRealtyObject">
+													15
+												</div>
+												<div class="blockOfIcon">
+													<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+												</div></td>
+												<td>
+												<div class="fotosWrapper resultSearchFoto">
+													<div class="middleFotoWrapper">
+														<img class="middleFoto" src="">
+													</div>
+													<div class="middleFotoWrapper">
+														<img class="middleFoto" src="">
+													</div>
+												</div></td>
+												<td>ул. Гурзуфская 38</td>
+												<td> ВИЗ </td>
+												<td> 2 </td>
+												<td> 22.4/34 </td>
+												<td> 2/13</td>
+												<td> 15000 </td>
+											</tr>
+											<tr class="realtyObject" linkToDescription="descriptionOfObject.html">
+												<td>
+												<div class="numberOfRealtyObject">
+													15
+												</div>
+												<div class="blockOfIcon">
+													<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+												</div></td>
+												<td>
+												<div class="fotosWrapper resultSearchFoto">
+													<div class="middleFotoWrapper">
+														<img class="middleFoto" src="">
+													</div>
+													<div class="middleFotoWrapper">
+														<img class="middleFoto" src="">
+													</div>
+												</div></td>
+												<td>ул. Шаумяна 107</td>
+												<td> ВИЗ </td>
+												<td> 2 </td>
+												<td> 22.4/34 </td>
+												<td> 2/13</td>
+												<td> 15000 </td>
+											</tr>
+											<tr class="realtyObject" linkToDescription="descriptionOfObject.html">
+												<td>
+												<div class="numberOfRealtyObject">
+													15
+												</div>
+												<div class="blockOfIcon">
+													<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+												</div></td>
+												<td>
+												<div class="fotosWrapper resultSearchFoto">
+													<div class="middleFotoWrapper">
+														<img class="middleFoto" src="">
+													</div>
+													<div class="middleFotoWrapper">
+														<img class="middleFoto" src="">
+													</div>
+												</div></td>
+												<td>ул. Репина 105</td>
+												<td> ВИЗ </td>
+												<td> 2 </td>
+												<td> 22.4/34 </td>
+												<td> 2/13</td>
+												<td> 15000 </td>
+											</tr>
+											<tr class="realtyObject" linkToDescription="descriptionOfObject.html">
+												<td>
+												<div class="blockOfIcon">
+													<a><img class="icon" title="Удалить из избранного" src="img/gold_star.png"></a>
+												</div></td>
+												<td>
+												<div class="fotosWrapper resultSearchFoto">
+													<div class="middleFotoWrapper">
+														<img class="middleFoto" src="">
+													</div>
+													<div class="middleFotoWrapper">
+														<img class="middleFoto" src="">
+													</div>
+												</div></td>
+												<td>ул. Ленина 13</td>
+												<td> ВИЗ </td>
+												<td> 2 </td>
+												<td> 22.4/34 </td>
+												<td> 2/13</td>
+												<td> 15000 </td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div><!-- /end.resultOnSearchPage -->
 						</div>
 					</div>
 				</div>
@@ -1904,6 +2479,7 @@
 		<script src="js/dateSelector/dateselector.js"></script>
 
 		<!-- scripts concatenated and minified via build script -->
+		<script src="js/main.js"></script>
 		<script src="js/personal.js"></script>
 
 		<!-- end scripts -->

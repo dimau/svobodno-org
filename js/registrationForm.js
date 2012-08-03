@@ -1,31 +1,4 @@
-/**
- * @author dimau
- */
 
-/* Добавляем элемент datepicker для выбора Дня рождения */
-/*$(function() {
-	$("#datepicker").datepicker({
-		changeYear : true,
-		changeMonth: true,
-	});
-	$("#datepicker").datepicker("option", "regional", "ru");
-	/*$("#datepicker").datepicker("option", "yearRange", "1900:2002");
-	$("#datepicker").datepicker("option", $.datepicker.regional["ru"]);
-});*/
-
-/* Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера */
-window.jQuery || document.write('<script src="js/vendor/jquery-1.7.2.min.js"><\/script>')
-
-/* Инициализируем отображение вкладок при помощи jQuery UI */
-$(function() {
-	$("#tabs").tabs();
-});
-
-// Активируем кнопки "Новое объявление" через jQuery UI - добавляем пиктограммку плюсика в кружочке
-$(function() {
-	$("button").button({
-	});
-});
 
 /* Как только будет загружен API и готов DOM, выполняем инициализацию карты от Яндекса*/
 //ymaps.ready(init);

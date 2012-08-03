@@ -2,17 +2,6 @@
  * @author dimau
  */
 
-/* Инициализируем отображение вкладок при помощи jQuery UI */
-$(function() {
-	$("#tabs").tabs();
-});
-
-// Активируем кнопки "Найти" через jQuery UI
-$(function() {
-	$("button").button({
-	});
-});
-
 /* Считаем высоту видимой части экрана - чтобы задать ее высоте блока с картой */
 $('#map').css('height', document.documentElement.clientHeight + 'px');
 $('#resultOnSearchPage').css('min-height', document.documentElement.clientHeight + 'px');
@@ -24,15 +13,13 @@ var mapWrapper = document.getElementById("resultOnSearchPage");
 window.onscroll = function() {
 	// Если экран опустился ниже верхней границы карты, но карта не дошла до футера, то fixedTopBlock
 	if (getPageScroll().top <= getCoords(mapWrapper).top) {
-		$(map).removeClass('fixedTopBlock');
-		$(map).removeClass('absoluteBottomBlock');
+		$(map).css('top', 0 + 'px');
 	} else {
 		if (getPageScroll().top + map.offsetHeight >= getCoords(mapWrapper).top + mapWrapper.offsetHeight) {
-			$(map).addClass('absoluteBottomBlock');
-			$(map).removeClass('fixedTopBlock');
+			$(map).css('top', 'auto');
+			$(map).css('bottom', 0 + 'px');
 		} else {
-			$(map).addClass('fixedTopBlock');
-			$(map).removeClass('absoluteBottomBlock');
+			$(map).css('top', getPageScroll().top - getCoords(mapWrapper).top + 'px');
 		}
 	}
 };

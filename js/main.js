@@ -1,9 +1,30 @@
-/* Author:
-
-*/
+/**
+ * @author dimau
+ */
 
 /* Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера */
 window.jQuery || document.write('<script src="js/vendor/jquery-1.7.2.min.js"><\/script>')
+
+
+/* Инициализируем отображение вкладок при помощи jQuery UI */
+$(function() {
+	$("#tabs").tabs();
+});
+
+// Активиуем аккордеон, установим возможность сворачиваться одновременно всем вкладкам, установим параметр, который будет позволять высоте вкладки автоматически подстраиваться под размер содержимого. При запуске аккордеона закроем все вкладки
+$(function() {
+	$(".accordion").accordion({
+		collapsible : true,
+		autoHeight : false
+	});
+	$(".accordion").accordion("activate", false);
+});
+
+// Активируем кнопки через jQuery UI
+$(function() {
+	$("button, a.button, input.button").button();
+});
+
 
 /* Переинициализируем функцию getElementsByClassName для работы во всех браузерах*/
 if (document.getElementsByClassName) {

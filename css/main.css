@@ -739,6 +739,189 @@ body {
 	display: inline-block;
 }
 
+/* =============================================================================
+   Стили для НЕредактируемых блоков с параметрами поиска - в режиме просмотра
+   ========================================================================== */
+  
+  #additionalSearchDescription {
+				max-width: 70%;
+				min-width: 32em;
+			}
+
+			#firstTableColumnSpecial {
+				min-width: 16em;
+			}
+
+/* =============================================================================
+   Стили для результатов поиска и избранных объявлений
+   ========================================================================== */
+
+/* Стили для список + карта */
+.choiceViewSearchResult {
+	margin: 6px 0px 6px 0px;
+}
+
+#resultOnSearchPage {
+	width: 100%;
+	margin: 10px auto;
+	position: relative;
+}
+
+.numberOfRealtyObject {
+	position: absolute; 
+	top: 4px; 
+	left: 0px; 
+	text-align: center; 
+	width: 100%; 
+	font-size: 1em;
+}
+
+/* Стили для чистого списка объявлений - без карты */
+.listOfRealtyObjects {
+	width: 49%;
+	float: left;
+}
+
+.listOfRealtyObjectsHeader {
+	height: 30px;
+	text-align: center;
+	font-family: Georgia, "Times New Roman", Times, serif;
+	color: white;
+	background-color: #8e4a15;
+}
+
+.listOfRealtyObjectsHeader th {
+	font-weight: normal;
+}
+
+.realtyObject {
+	height: 50px;
+	text-align: center;
+	border-bottom: 1px solid grey;
+	background-color: white;
+}
+
+.realtyObject:hover {
+	background-color: #BF6E30;
+	cursor: pointer;
+}
+
+.realtyObject td {
+	position: relative; /* Чтобы абсолютно позиционированная ссылка Подробнее не уезжала из ячейки */
+}
+
+.linkToDescriptionBlock { /* Блок для ссылки подробнее под каждым объявлением в списке */
+	position: absolute; 
+	bottom: 4px; 
+	right: 4px;
+}
+
+.linkToDescriptionBlock a { /* Белый цвет для ссылки дает иллюзию невидимости ссылки на белом фоне, пока не будет наведен указатель мыши */
+	color: white;
+}
+
+.linkToDescriptionBlock a:hover {
+	color: #7BDED9;
+}
+
+/* Режим только карты */
+#map {
+	width: 49%; 
+	position: absolute;
+	top: 0px;
+	right: 0px;
+}
+
+.headOfBalloon {
+	text-align: center; 
+	font-size: 1.2em;
+}
+
+/* =============================================================================================================
+   Стили для блоков краткого описания объявлений о недвижимости (Мои объявления) и новостей
+   ========================================================================================================== */
+  
+.news {
+	border: 1px solid #A64800;
+	border-radius: 5px;
+	padding: 5px;
+	margin: 5px;
+}
+
+.newsHeader {
+	border: 0px solid #B5B5B5;
+	border-radius: 5px;
+	background-color: #B5B5B5; 
+	padding-left: 5px;
+	margin-bottom: 5px;
+	font-weight: normal;
+}
+
+.advertForPersonalPage.published .newsHeader {
+	background-color: #009D91;
+}
+
+.advertForPersonalPage.published .advertHeaderStatus {
+	color: white;
+}
+
+.advertForPersonalPage.unpublished .newsHeader {
+	background-color: #B5B5B5;
+}
+
+.advertForPersonalPage.unpublished .advertHeaderStatus {
+	color: white;
+}
+
+.setOfInstructions {
+	text-align: right; 
+	float: right;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+/* Стили для вкладки Новости личного кабинета */
+.actionReaded {
+	float: right; 
+	margin-top: -3px; 
+	margin-right: 4px; 
+	font-weight: normal;
+}
+
+div.unread > div.newsHeader {
+	background-color: #FF9340;
+}
+
+/* =======================================================================
+   Стили для описания человека - вкладки Профайл личного кабинета и страничек пользователей
+   ====================================================================== */
+  
+.profileInformation {
+	float: left;
+	margin: 10px 10px 0px 10px;
+	max-width: 40em;
+}
+
+.FIO {
+	font-size: 1.1em;
+	font-weight: bold;
+}
+
+.linksToAccounts {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+/* =======================================================================
+   Стили для закрытых контактов, предоставляемых по требованию
+   ====================================================================== */
+  
+  #showName {
+	color: #1A238B;
+	cursor: pointer;
+}
 
 /* ==|== media queries ======================================================
    EXAMPLE Media Query for Responsive Design.

@@ -24,7 +24,18 @@
 
 		<link rel="stylesheet" href="css/jquery-ui-1.8.21.custom.css">
 		<link rel="stylesheet" href="css/main.css">
-		<link rel="stylesheet" href="css/descriptionOfObject.css">
+		<style>
+			/* Особые стили для блоков с описанием объекта - для выравнивания*/
+			fieldset.notEdited {
+				min-width: 45%;
+			}
+
+			/* Стили для контактов собственника */
+			#showName, #showNumber, #addToFavorit {
+				color: #1A238B;
+				cursor: pointer;
+			}
+		</style>
 
 		<!-- More ideas for your <head> here: h5bp.com/d/head-Tips -->
 
@@ -176,7 +187,9 @@
 												<td class="objectDescriptionItemLabel">Коммунальные услуги
 												<br>
 												оплачиваются дополнительно:</td>
-												<td class="objectDescriptionBody"><span>да,<br></span>летом<span> 1500</span> руб. зимой<span> 2500 </span>руб.</td>
+												<td class="objectDescriptionBody"><span>да,
+													<br>
+												</span>летом<span> 1500</span> руб. зимой<span> 2500 </span>руб.</td>
 											</tr>
 											<tr>
 												<td class="objectDescriptionItemLabel">Электроэнергия
@@ -230,7 +243,9 @@
 											</tr>
 											<tr>
 												<td class="objectDescriptionItemLabel">Отделка (жилых помещений):</td>
-												<td class="objectDescriptionBody"><span>косметическая<br>(новые обои, побелка потолков)</span></td>
+												<td class="objectDescriptionBody"><span>косметическая
+													<br>
+													(новые обои, побелка потолков)</span></td>
 											</tr>
 											<tr>
 												<td class="objectDescriptionItemLabel">Окна:</td>
@@ -300,7 +315,9 @@
 										<tbody>
 											<tr>
 												<td class="objectDescriptionItemLabel">Наличие мебели и бытовой техники:</td>
-												<td class="objectDescriptionBody"><span>cдается с мебелью<br>и бытовой техникой</span></td>
+												<td class="objectDescriptionBody"><span>cдается с мебелью
+													<br>
+													и бытовой техникой</span></td>
 											</tr>
 											<tr>
 												<td class="objectDescriptionItemLabel">Диван:</td>
@@ -405,7 +422,7 @@
 										</tbody>
 									</table>
 								</fieldset>
-								
+
 								<fieldset class="notEdited">
 									<legend>
 										Особые условия
@@ -423,7 +440,7 @@
 											<tr>
 												<td class="objectDescriptionItemLabel">Другие условия:</td>
 												<td class="objectDescriptionBody"><span>Чтоб не пили, не курили и баб не водили. Нельзя проводить Дни рождения и другие пьянки так, чтобы соседи приходили и ходили в милицию полицию</td>
-											</span></td>
+												</span></td>
 											</tr>
 										</tbody>
 									</table>
@@ -500,6 +517,7 @@
 		<script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
 
 		<!-- scripts concatenated and minified via build script -->
+		<script src="js/main.js"></script>
 		<script src="js/descriptionOfObject.js"></script>
 
 		<!-- end scripts -->

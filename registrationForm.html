@@ -32,7 +32,58 @@
 
 		<link rel="stylesheet" href="css/jquery-ui-1.8.21.custom.css">
 		<link rel="stylesheet" href="css/main.css">
-		<link rel="stylesheet" href="css/registrationForm.css">
+		<style>
+			.nameOfServiceBox {
+				right: 0px;
+			}
+
+			/* Стили для личных данных*/
+			.required {
+				display: inline-block;
+				color: red;
+				width: 5px;
+			}
+
+			.private {
+				display: inline-block;
+			}
+
+			#addressForm {
+				clear: both;
+			}
+
+			.inputItem, .objectDescriptionItem {
+				margin: 7px;
+			}
+
+			.inputItem .label, .objectDescriptionItem .objectDescriptionLabel {
+				width: 300px;
+				text-align: right;
+				display: inline-block;
+				vertical-align: top;
+				margin-right: 7px;
+			}
+
+			table {
+				display: inline-block;
+			}
+
+			table td {
+				vertical-align: middle;
+				padding: 5px;
+			}
+
+			/* Стили для капчи и для Готово */
+			.capcha {
+				margin: 10px 10px 0px 20px;
+				float: right;
+			}
+
+			.readyButton {
+				float: right;
+				margin: 10px 10px 0px 10px;
+			}
+		</style>
 
 		<!-- More ideas for your <head> here: h5bp.com/d/head-Tips -->
 
@@ -359,20 +410,18 @@
 											</div>
 										</div>
 									</fieldset>
-									
-									<!-- 
-										
-										
-										Кроме того, для собственников не нужно передавать блоки Образование и Работа, Коротко о себе
-										Также для собственника не формируется вкладка Условия поиска
-										Фото становится необязательным - убрать звездочку
-										
-										Сделать проверку перед отправкой и серверную часть капчи
-										
-										Но собственнику отправляется дополнительно
-										
+
+									<!--
+
+									Кроме того, для собственников не нужно передавать блоки Образование и Работа, Коротко о себе
+									Также для собственника не формируется вкладка Условия поиска
+									Фото становится необязательным - убрать звездочку
+
+									Сделать проверку перед отправкой и серверную часть капчи
+
+									Но собственнику отправляется дополнительно
+
 									-->
-									
 
 									<fieldset class="edited private" style="min-width: 300px; min-height: 200px;">
 										<legend title="Для успешной регистрации должна быть загружена хотя бы 1 фотография">
@@ -737,13 +786,13 @@
 							</button>
 						</div>
 						<div class="capcha">
-						<script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=6LfPj9QSAAAAADiTQL68cyA1TlIBZMq5wHe6n_TK"></script>
-						<noscript>
-							<iframe src="http://www.google.com/recaptcha/api/noscript?k=your_public_key" height="300" width="500" frameborder="0"></iframe>
-							<br>
-							<textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
-							<input type="hidden" name="recaptcha_response_field" value="manual_challenge">
-						</noscript>
+							<script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=6LfPj9QSAAAAADiTQL68cyA1TlIBZMq5wHe6n_TK"></script>
+							<noscript>
+								<iframe src="http://www.google.com/recaptcha/api/noscript?k=your_public_key" height="300" width="500" frameborder="0"></iframe>
+								<br>
+								<textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
+								<input type="hidden" name="recaptcha_response_field" value="manual_challenge">
+							</noscript>
 						</div>
 					</form>
 				</div><!-- /end.wrapperOfTabs-->
@@ -764,6 +813,7 @@
 		<script src="js/vendor/jquery-ui-1.8.21.custom.min.js"></script>
 
 		<!-- scripts concatenated and minified via build script -->
+		<script src="js/main.js"></script>
 		<script src="js/registrationForm.js"></script>
 
 		<!-- end scripts -->
