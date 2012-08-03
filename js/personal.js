@@ -186,13 +186,24 @@ $("#animals").on('change', function(event) {
 	}
 });
 
+/* Переключение на вкладке Профиль из режима просмотра в режим редактирования и обратно */
+$('#tabs-1 #notEditingProfileParametersBlock .setOfInstructions a').on('click', function() {
+	$("#notEditingProfileParametersBlock").css('display', 'none');
+	$("#editingProfileParametersBlock").css('display', '');
+});
+
+$('#editingProfileParametersBlock').on('submit', function() {
+	$("#notEditingProfileParametersBlock").css('display', '');
+	$("#editingProfileParametersBlock").css('display', 'none');
+});
+
 /* Переключение на вкладке поиск из режима просмотра в режим редактирования и обратно */
 $('#tabs-4 #notEditingSearchParametersBlock .setOfInstructions a').on('click', function() {
 	$("#notEditingSearchParametersBlock").css('display', 'none');
 	$("#extendedSearchParametersBlock").css('display', '');
 });
 
-$('#tabs-4 #extendedSearchParametersBlock .setOfInstructions a').on('click', function() {
+$('#extendedSearchParametersBlock').on('submit', function() {
 	$("#notEditingSearchParametersBlock").css('display', '');
 	$("#extendedSearchParametersBlock").css('display', 'none');
 });
