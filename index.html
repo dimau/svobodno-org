@@ -85,23 +85,23 @@
 						<br>
 						<span class="underslogan">Мы помогаем людям сдать в аренду и снять жилье в Екатеринбурге</span>
 					</div>
-					<div class="menu">
-						<ul>
-							<li class="left selected" style="width:15%">
-								<span class="selectedMenuItem">Главная</span>
-							</li >
-							<li style="width:38%">
-								<a href="search.html">Поиск недвижимости</a>
-							</li>
-							<li style="width:25.5%">
-								<a href="forowner.html">Собственнику</a>
-							</li>
-							<li class="right" style="width:21%">
-								<a href="fortenant.html">Арендатору</a>
-							</li>
-						</ul>
-						<div style="clear:both;"></div>
-					</div>
+				</div>
+				<div class="menu">
+					<ul>
+						<li class="left selected" style="width:15%">
+							<span class="selectedMenuItem">Главная</span>
+						</li >
+						<li style="width:38%">
+							<a href="search.html">Поиск недвижимости</a>
+						</li>
+						<li style="width:25.5%">
+							<a href="forowner.html">Собственнику</a>
+						</li>
+						<li class="right" style="width:21%">
+							<a href="fortenant.html">Арендатору</a>
+						</li>
+					</ul>
+					<div style="clear:both;"></div>
 				</div>
 				<div class="iconBox"></div>
 				<div class="enter">
@@ -152,10 +152,9 @@
 								</p>
 							</div>
 						</div>
-						<form name="IamOwner">
-							<a href="forowner.html" class="button"> Я - собственник </a>
-						</form>
-
+						<button id="forowner">
+							Я - собственник
+						</button>
 					</div>
 
 					<div class="descriptionBlock2">
@@ -192,9 +191,9 @@
 								</p>
 							</div>
 						</div>
-						<form name="IamLeaser">
-							<a href="fortenant.html" class="button"> Я - арендатор </a>
-						</form>
+						<button id="fortenant">
+							Я - арендатор
+						</button>
 					</div>
 				</div><!-- /end.descriptionBox -->
 				<!--
@@ -236,6 +235,14 @@
 		<script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
 
 		<script src="js/main.js"></script>
+		<script>
+			$("#fortenant").on('click', function() {
+				window.open('fortenant.html');
+			});
+			$("#forowner").on('click', function() {
+				window.open('forowner.html');
+			});
+		</script>
 		<!-- scripts concatenated and minified via build script -->
 
 		<!-- end scripts -->

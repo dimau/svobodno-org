@@ -25,6 +25,11 @@
 		<link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
 		<link rel="stylesheet" href="css/main.css">
 		<style>
+			#registration {
+				margin-top: 7px;
+				margin-left: 15px;
+			}
+			
 			/* Стиль для панели табов - ul*/
 			/* Важно, что пока он плавающий и основной текст из .ui-tabs-panel его обтекает*/
 			.ui-tabs-vertical .ui-tabs-nav {
@@ -86,7 +91,8 @@
 						<br>
 						<span class="underslogan">Мы помогаем людям сдать в аренду и снять жилье в Екатеринбурге</span>
 					</div>
-					<div class="menu">
+				</div>
+				<div class="menu">
 						<ul>
 							<li class="left" style="width:15%">
 								<a href="index.html">Главная</a>
@@ -103,7 +109,6 @@
 						</ul>
 						<div style="clear:both;"></div>
 					</div>
-				</div>
 				<div class="iconBox"></div>
 				<div class="enter">
 					<a href="registrationForm.html?type=tenant">Регистрация</a>
@@ -230,7 +235,7 @@
 					</div>
 				</div>
 
-				<a href="registrationForm.html?type=tenant" class="button">Зарегистрироваться</a>
+				<button id="registration">Зарегистрироваться</button>
 			</div><!-- /end.page_main_content -->
 			<!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
 			<div class="page-buffer"></div>
@@ -250,6 +255,11 @@
 		<!-- scripts concatenated and minified via build script -->
 		<script src="js/main.js"></script>
 		<script src="js/fortenant.js"></script>
+		<script>
+			$("#registration").on('click', function() {
+				window.open('registrationForm.html?type=tenant');
+			});
+		</script>
 
 		<!-- end scripts -->
 
