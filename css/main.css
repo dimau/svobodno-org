@@ -78,28 +78,6 @@ a:focus {
     outline: thin dotted;
 }
 
-/* =============================================================================
-   Links and buttons
-   ========================================================================== */
-
-a.button, button, input.button {
-    color: #009D91;
-    border-color: #009D91 !important;
-}
-
-a.button:visited {
-    color: #009D91;
-}
-
-a.button:hover, button:hover, input.button:hover {
-    color: #C77405;
-    border-color: #C77405 !important;
-}
-
-a.button:focus {
-    outline: thin dotted;
-}
-
 /*
  * Improve readability when focused and hovered in all browsers: h5bp.com/h
  */
@@ -371,6 +349,7 @@ body {
 	font-size: 100%;
 	height: 100%; /* эта строчка для прижатия подвала к низу страницы*/
 	width: 100%;
+	background: #A7A4A1 url('bg_white.jpg');
 }
 
 /* =============================================================================
@@ -444,26 +423,6 @@ body {
    Стили для шапки страницы
    ========================================================================== */
 
-.backgroundOfHeader {
-	width: 100%; 
-	min-width: 780px;
-	height: 600px;
-	position: absolute;
-	top: 0px;
-	left: 0px;
-	z-index: -5;
-	
-	background: #009D91; /* Для старых браузров */
-    background: -moz-linear-gradient(top, #009D91, white); /* Firefox 3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#009D91), color-stop(100%,white)); /* Chrome 1-9, Safari 4-5 */
-    background: -webkit-linear-gradient(top, #009D91, white); /* Chrome 10+, Safari 5.1+ */
-    background: -o-linear-gradient(top, #009D91, white); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top, #009D91, white); /* IE10 */
-    background: linear-gradient(top, #009D91, white); /* CSS3 */ 
-	filter:progid: DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#009D91', endColorstr='#ffffff'); /* для IE 6-7 */
-	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#009D91', endColorstr='#ffffff')"; /* для IE8 */
-}
-
 .header {
 	font-family: Georgia, "Times New Roman", Times, serif;
 	position: relative;
@@ -529,9 +488,12 @@ body {
 
 .menu ul li {
 	float: left;
-	background-color: #BF6E30;
+	height: 3em;
+	line-height: 3em;
+	background: #336784 url('bg_blue.jpg');
 	width: 25%;
 	text-align: center;
+	vertical-align: middle;
 }
 
 .menu ul li.left {
@@ -544,14 +506,10 @@ body {
 	border-bottom-right-radius: 5px;
 }
 
-.menu ul li.selected {
-	background-color: #8e4a15;
-}
-
 .menu ul li.selected span {
 	white-space: nowrap;
 	font-size: 1.2em;
-	color: #7bded9;
+	color: #a4a3a3;
 }
 
 .menu ul li a {
@@ -563,7 +521,7 @@ body {
 }
 
 .menu ul li a:hover {
-	color: #7bded9;
+	color: #cccccb;
 }
 
 .enter a {
@@ -786,18 +744,6 @@ body {
 .listOfRealtyObjects {
 	width: 49%;
 	float: left;
-}
-
-.listOfRealtyObjectsHeader {
-	height: 30px;
-	text-align: center;
-	font-family: Georgia, "Times New Roman", Times, serif;
-	color: white;
-	background-color: #8e4a15;
-}
-
-.listOfRealtyObjectsHeader th {
-	font-weight: normal;
 }
 
 .realtyObject {
