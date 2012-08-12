@@ -1,3 +1,32 @@
+<?php
+include_once 'lib/connect.php'; //подключаемся к БД
+include_once 'lib/function_global.php'; //подключаем файл с глобальными функциями
+
+if (login()) //вызываем функцию login, определяющую, авторизирован юзер или нет
+{
+    $UID = $_SESSION['id']; //если юзер авторизирован, присвоим переменной $UID его id
+    header('Location: personal.php'); // пересылаем юзера сразу в личный кабинет
+}
+else //если пользователь не авторизирован, то проверим, была ли нажата кнопка входа на сайт
+{
+    if(isset($_POST['buttonSubmit']))
+    {
+        $error = enter(); //функция входа на сайт
+
+        if (count($error) == 0) //если нет ошибок, авторизируем юзера
+        {
+            $UID = $_SESSION['id'];
+            header('Location: personal.php');
+        }
+        else
+        {
+
+            // TODO:что-то нужно делать в случае, если возникли ошибки при авторизации - как минимум вывести их текст во всплывающем окошке
+        }
+    }
+}
+?>
+
 <!DOCTYPE html>
 <!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
 <!-- Consider specifying the language of your content by adding the `lang` attribute to <html> -->
@@ -14,8 +43,8 @@
 		More info: h5bp.com/i/378 -->
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-		<title>Выбор роли пользователя</title>
-		<meta name="description" content="Выбор роли пользователя">
+		<title>Вход на портал Хани Хом</title>
+		<meta name="description" content="Вход на портал Хани Хом">
 
 		<!-- Mobile viewport optimized: h5bp.com/viewport -->
 		<meta name="viewport" content="initialscale=1.0, width=device-width">
@@ -40,61 +69,54 @@
 		<!-- Add your site or application content here -->
 		<div class="page_without_footer">
 
-			<div class="header">
-				<div class="nameOfServiceBox">
-					<div>
-						<span class='slogan'>Лучший способ аренды недвижимости!</span>
-						<br>
-						<span class="underslogan">Мы помогаем людям сдать в аренду и снять жилье в Екатеринбурге</span>
-					</div>
-				</div>
-				<div class="menu">
-						<ul>
-							<li class="left" style="width:15%">
-								<a href="index.html">Главная</a>
-							</li >
-							<li style="width:38%">
-								<a href="search.html">Поиск недвижимости</a>
-							</li>
-							<li style="width:25.5%">
-								<a href="forowner.html">Собственнику</a>
-							</li>
-							<li class="right" style="width:21%">
-								<a href="fortenant.html">Арендатору</a>
-							</li>
-						</ul>
-						<div style="clear:both;"></div>
-					</div>
-				<div class="iconBox"></div>
-				<div class="enter">
-					<span>Регистрация</span>
-					<br>
-					<a href="login.html">Вход</a>
-					<br>
-				</div>
-			</div><!-- /end.header -->
+            <!-- Сформируем и вставим заголовок страницы -->
+            <?php
+                include("lib/header.php");
+            ?>
 
 			<div class="page_main_content">
+
+                <div id="userMistakesBlock" class="ui-widget" style="width: 600px; margin: auto;">
+                    <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;">
+                        <p>
+                        <span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+                        <span id="userMistakesText">Текст ошибки</span>
+                        </p>
+                    </div>
+                </div>
+
 				<div class="miniBlock">
 					<div class="miniBlockHeader">
-						Укажите, пожалуйста, что Вы собираетесь сделать на этом ресурсе?
+						Введите логин (e-mail или номер телефона) и пароль
 					</div>
 					<div class="miniBlockContent">
-						<form name="whoIsOurUser">
-							<ul>
-								<li>
-									<input type="checkbox" name="type" value="tenant" checked>
-									Я собираюсь найти и снять недвижимость
-								</li>
-								<li>
-									<input type="checkbox" name="type" value="owner">
-									Я собираюсь сдать свою недвижимость
-								</li>
-							</ul>
-							<br>
-							<button type="submit" id="buttonSubmit"> Готово </button>
+						<form name="loginParol" method="post">
+							<table>
+								<tbody>
+									<tr>
+										<td><label>Логин: </label></td>
+										<td>
+										<input type="text" name="login" size="23">
+										</td>
+									</tr>
+									<tr>
+										<td><label>Пароль: </label></td>
+										<td>
+										<input type="password" name="password" size="23">
+										</td>
+									</tr>
+									<tr>
+										<td></td>
+										<td><a href="#">Забыли пароль?</a></td>
+									</tr>
+								</tbody>
+							</table>
+							<div>
+							<button type="submit" id="buttonSubmit" name="buttonSubmit">Войти</button>
+							<a class="buttonRegistration" href="choiceOfRole.php">Зарегистрироваться</a>
+							</div>
 						</form>
-					</div>
+					</div><!-- /end.miniBlockContent -->
 					<div class="clearBoth"></div>
 				</div>
 
@@ -115,8 +137,8 @@
 		<!-- jQuery UI с моей темой оформления -->
 		<script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
 
-		<script src="js/main.js"></script>
 		<!-- scripts concatenated and minified via build script -->
+		<script src="js/main.js"></script>
 
 		<!-- end scripts -->
 

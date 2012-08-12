@@ -1,3 +1,7 @@
+<?php
+include_once 'lib/out.php';
+?>
+
 <!DOCTYPE html>
 <!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
 <!-- Consider specifying the language of your content by adding the `lang` attribute to <html> -->
@@ -84,39 +88,10 @@
 		<!-- Add your site or application content here -->
 		<div class="page_without_footer">
 
-			<div class="header">
-				<div class="nameOfServiceBox">
-					<div>
-						<span class='slogan'>Лучший способ аренды недвижимости!</span>
-						<br>
-						<span class="underslogan">Мы помогаем людям сдать в аренду и снять жилье в Екатеринбурге</span>
-					</div>
-				</div>
-				<div class="menu">
-						<ul>
-							<li class="left" style="width:15%">
-								<a href="index.html">Главная</a>
-							</li >
-							<li style="width:38%">
-								<a href="search.html">Поиск недвижимости</a>
-							</li>
-							<li style="width:25.5%">
-								<a href="forowner.html">Собственнику</a>
-							</li>
-							<li class="right selected" style="width:21%">
-								<span>Арендатору</span>
-							</li>
-						</ul>
-						<div style="clear:both;"></div>
-					</div>
-				<div class="iconBox"></div>
-				<div class="enter">
-					<a href="registrationForm.html?type=tenant">Регистрация</a>
-					<br>
-					<a href="login.html">Вход</a>
-					<br>
-				</div>
-			</div><!-- /end.header -->
+            <!-- Сформируем и вставим заголовок страницы -->
+            <?php
+                include("lib/header.php");
+            ?>
 
 			<div class="page_main_content">
 
@@ -173,7 +148,7 @@
 						</div>
 						<div id="tabs-2">
 							<p>
-								С помощью специального раздела <a href="search.html">Поиск недвижимости</a> Вы можете просмотреть текущие доступные для аренды объекты, узнать максимально подробные сведения по каждому из них. Вся информация, публикуемая на портале, проверяется нашими специалистами.
+								С помощью специального раздела <a href="search.php">Поиск недвижимости</a> Вы можете просмотреть текущие доступные для аренды объекты, узнать максимально подробные сведения по каждому из них. Вся информация, публикуемая на портале, проверяется нашими специалистами.
 							</p>
 							<p>
 								Понравившиеся объекты Вы можете добавлять в Избранные. Все избранные объявления доступны в личном кабинете.

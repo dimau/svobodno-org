@@ -145,14 +145,14 @@ form {
 fieldset {
    margin: 5px;
    border-radius: 5px;
-   border: 1px solid #A64800;
+   border: 1px solid #336784;
    text-align: left;
    vertical-align: top;
 }
 
 fieldset legend {
 	font-weight: bold;
-	color: #A64800;
+	color: #336784;
 }
 
 /* Стили для редактируемых блоков fieldset*/
@@ -171,7 +171,7 @@ fieldset.notEdited table td {
 }
 
 fieldset.notEdited tr {
-	border-bottom: 1px dotted #A64800;
+	border-bottom: 1px dotted #336784;
 }
 
 .highlighted {
@@ -583,25 +583,14 @@ body {
 	width: 600px;
 	margin: 80px auto 0% auto;
 	line-height: 2em;
-	border: 1px solid #A64800;
+	border: 1px solid #336784;
 	border-radius: 5px;
 	text-align: center;
-	
-	background: #E2EEFD; /* Для старых браузров */
-    background: -moz-linear-gradient(top, #CDDDF3, #009D91); /* Firefox 3.6+ */
-     /*Chrome 1-9, Safari 4-5 */
-   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#BDDBF9), color-stop(100%,#F3F8FE));
-     /*Chrome 10+, Safari 5.1+ */
-    background: -webkit-linear-gradient(top, #33CEC3, #009D91);
-    background: -o-linear-gradient(top, #33CEC3, #009D91); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top, #33CEC3, #009D91); /* IE10 */
-    background: linear-gradient(top, #33CEC3, #009D91); /* CSS3 */ 
-	filter:progid: DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91'); /* для IE 6-7 */
-	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#33CEC3', endColorstr='#009D91')"; /* для IE8 */
+	background-color: white;
 }
 
 .miniBlockHeader {
-	background-color: #8e4a15;
+	background-color: #6A9D02;
 	color: white;
 	text-align: center;
 }
@@ -754,7 +743,7 @@ body {
 }
 
 .realtyObject:hover {
-	background-color: #BF6E30;
+	background-color: #6A9D02;
 	cursor: pointer;
 }
 
@@ -794,7 +783,7 @@ body {
    ========================================================================================================== */
   
 .news {
-	border: 1px solid #A64800;
+	border: 1px solid #336784;
 	border-radius: 5px;
 	padding: 5px;
 	margin: 5px;

@@ -1,3 +1,46 @@
+<?php
+//ini_set ("session.use_trans_sid", true); вроде как PHP сам умеет устанавливать id сессии либо в куки, либо в строку запроса (http://www.phpfaq.ru/sessions)
+session_start();
+include_once 'lib/connect.php'; //подключаемся к БД
+include_once 'lib/function_global.php'; //подключаем библиотеку функций
+
+//проверим, быть может пользователь уже авторизирован. Если это так, перенаправим его на главную страницу сайта
+if (isset($_SESSION['id']) || (isset($_COOKIE['login']) && isset($_COOKIE['password'])))
+{
+    header('Location: index.php');
+}
+else
+{
+    if (isset($_POST['readyButton'])) //если была нажата кнопка регистрации, проверим данные на корректность и, если данные введены и введены правильно, добавим запись с новым пользователем в БД
+    {
+        $correct = registrationCorrect(); //записываем в переменную результат работы функции registrationCorrect(), которая возвращает true, если введённые данные верны и false в противном случае
+        if ($correct) //если данные верны, запишем их в базу данных
+        {
+            $login = htmlspecialchars($_POST['login']);
+            $password = $_POST['password'];
+            //$mail = htmlspecialchars($_POST['mail']); также я удалил mail из следующей строчки с записью в базу данных
+            $salt = mt_rand(100, 999);
+            $tm = time();
+            $password = md5(md5($password).$salt);
+            if (mysql_query("INSERT INTO users (login,password,salt,reg_date,last_act) VALUES ('".$login."','".$password."','".$salt."','".$tm."','".$tm."')")) //пишем данные в БД и авторизовываем пользователя
+            {
+                setcookie ("login", $login, time() + 50000, '/');
+                setcookie ("password", md5($login.$password), time() + 50000, '/');
+                $rez = mysql_query("SELECT * FROM users WHERE login=".$login);
+                @$row = mysql_fetch_assoc($rez);
+                $_SESSION['id'] = $row['id'];
+                $regged = true;
+                header('Location: successfullRegistration.php'); //после успешной регистрации - переходим на соответствующую страницу
+            }
+        }
+        else
+        {
+            exit("данные не верны!"); // действия в случае некорректности данных
+        }
+    }
+}
+?>
+
 <!DOCTYPE html>
 <!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
 <!-- Consider specifying the language of your content by adding the `lang` attribute to <html> -->
@@ -11,9 +54,9 @@
 
 		<!--
 
-		Если запрос = registrationForm.html?type=tenant, то php должен сформировать форму без вкладки Мои объявления
-		Если запрос = registrationForm.html?type=owner, то php должен сформировать форму без вкладки Условий поиска
-		Если запрос = registrationForm.html, то выдаем страницу со всеми вкладками
+		Если запрос = registration.php?type=tenant, то php должен сформировать форму без вкладки Мои объявления
+		Если запрос = registration.php?type=owner, то php должен сформировать форму без вкладки Условий поиска
+		Если запрос = registration.php, то выдаем страницу со всеми вкладками
 
 		-->
 		<meta charset="utf-8">
@@ -61,44 +104,15 @@
 		<!-- Add your site or application content here -->
 		<div class="page_without_footer">
 
-			<div class="header">
-				<div class="nameOfServiceBox">
-					<div>
-						<span class='slogan'>Лучший способ аренды недвижимости!</span>
-						<br>
-						<span class="underslogan">Мы помогаем людям сдать в аренду и снять жилье в Екатеринбурге</span>
-					</div>
-				</div>
-				<div class="menu">
-						<ul>
-							<li class="left" style="width:15%">
-								<a href="index.html">Главная</a>
-							</li >
-							<li style="width:38%">
-								<a href="search.html">Поиск недвижимости</a>
-							</li>
-							<li style="width:25.5%">
-								<a href="forowner.html">Собственнику</a>
-							</li>
-							<li class="right" style="width:21%">
-								<a href="fortenant.html">Арендатору</a>
-							</li>
-						</ul>
-						<div style="clear:both;"></div>
-					</div>
-				<div class="iconBox"></div>
-				<div class="enter">
-					<span>Регистрация</span>
-					<br>
-					<a href="login.html">Вход</a>
-					<br>
-				</div>
-			</div><!-- /end.header -->
+        <!-- Сформируем и вставим заголовок страницы -->
+        <?php
+        include("lib/header.php");
+        ?>
 
 			<div class="page_main_content">
 
 				<div class="wrapperOfTabs">
-					<form name="personalInformation">
+					<form name="personalInformation" method="post">
 						<div class="headerOfPage">
 							Зарегистрируйтесь
 						</div>
@@ -193,13 +207,13 @@
 											<legend>
 												Логин и пароль
 											</legend>
-											<div class="searchItem">
+											<div class="searchItem" title="Используйте в качестве логина ваш e-mail или телефон">
 												<div class="required">
 													*
 												</div>
 												<span class="searchItemLabel">Логин: </span>
 												<div class="searchItemBody">
-													<input type="text" size="20">
+													<input type="text" size="20" maxlength="50" name="login">
 												</div>
 											</div>
 											<div class="searchItem">
@@ -208,7 +222,7 @@
 												</div>
 												<span class="searchItemLabel">Пароль: </span>
 												<div class="searchItemBody">
-													<input type="password" size="20">
+													<input type="password" size="20" maxlength="50" name="password">
 												</div>
 											</div>
 										</fieldset>
@@ -740,7 +754,7 @@
 							</div><!-- /end.tabs-2 -->
 						</div><!-- /end.tabs -->
 						<div class="readyButton">
-							<button id="readyButton">
+							<button type="submit" name="readyButton" id="readyButton">
 								Готово
 							</button>
 						</div>

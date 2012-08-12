@@ -14,8 +14,8 @@
 		More info: h5bp.com/i/378 -->
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-		<title>Вход на портал Хани Хом</title>
-		<meta name="description" content="Вход на портал Хани Хом">
+		<title>Выбор роли пользователя</title>
+		<meta name="description" content="Выбор роли пользователя">
 
 		<!-- Mobile viewport optimized: h5bp.com/viewport -->
 		<meta name="viewport" content="initialscale=1.0, width=device-width">
@@ -40,73 +40,32 @@
 		<!-- Add your site or application content here -->
 		<div class="page_without_footer">
 
-			<div class="header">
-				<div class="nameOfServiceBox">
-					<div>
-						<span class='slogan'>Лучший способ аренды недвижимости!</span>
-						<br>
-						<span class="underslogan">Мы помогаем людям сдать в аренду и снять жилье в Екатеринбурге</span>
-					</div>
-				</div>
-				<div class="menu">
-						<ul>
-							<li class="left" style="width:15%">
-								<a href="index.html">Главная</a>
-							</li >
-							<li style="width:38%">
-								<a href="search.html">Поиск недвижимости</a>
-							</li>
-							<li style="width:25.5%">
-								<a href="forowner.html">Собственнику</a>
-							</li>
-							<li class="right" style="width:21%">
-								<a href="fortenant.html">Арендатору</a>
-							</li>
-						</ul>
-						<div style="clear:both;"></div>
-					</div>
-				<div class="iconBox"></div>
-				<div class="enter">
-					<a href="choiceOfRole.html">Регистрация</a>
-					<br>
-					<span>Вход<span>
-							<br>
-				</div>
-			</div><!-- /end.header -->
+            <!-- Сформируем и вставим заголовок страницы -->
+            <?php
+                include("lib/header.php");
+            ?>
 
 			<div class="page_main_content">
 				<div class="miniBlock">
 					<div class="miniBlockHeader">
-						Введите логин (e-mail или номер телефона) и пароль
+						Укажите, пожалуйста, что Вы собираетесь сделать на этом ресурсе?
 					</div>
 					<div class="miniBlockContent">
-						<form name="loginParol">
-							<table>
-								<tbody>
-									<tr>
-										<td><label>Логин: </label></td>
-										<td>
-										<input type="text" name="login" size="23">
-										</td>
-									</tr>
-									<tr>
-										<td><label>Пароль: </label></td>
-										<td>
-										<input type="password" name="password" size="23">
-										</td>
-									</tr>
-									<tr>
-										<td></td>
-										<td><a href="#">Забыли пароль?</a></td>
-									</tr>
-								</tbody>
-							</table>
-							<div>
-							<button type="submit" id="buttonSubmit"> Войти </button>
-							<a class="buttonRegistration" href="choiceOfRole.html">Зарегистрироваться</a>
-							</div>
+						<form name="whoIsOurUser">
+							<ul>
+								<li>
+									<input type="checkbox" name="type" value="tenant" checked>
+									Я собираюсь найти и снять недвижимость
+								</li>
+								<li>
+									<input type="checkbox" name="type" value="owner">
+									Я собираюсь сдать свою недвижимость
+								</li>
+							</ul>
+							<br>
+							<button type="submit" id="buttonSubmit"> Готово </button>
 						</form>
-					</div><!-- /end.miniBlockContent -->
+					</div>
 					<div class="clearBoth"></div>
 				</div>
 
@@ -127,8 +86,8 @@
 		<!-- jQuery UI с моей темой оформления -->
 		<script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
 
-		<!-- scripts concatenated and minified via build script -->
 		<script src="js/main.js"></script>
+		<!-- scripts concatenated and minified via build script -->
 
 		<!-- end scripts -->
 

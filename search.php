@@ -1,3 +1,7 @@
+<?php
+include_once 'lib/out.php';
+?>
+
 <!DOCTYPE html>
 <!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
 <!-- Consider specifying the language of your content by adding the `lang` attribute to <html> -->
@@ -56,39 +60,10 @@
 		<!-- Add your site or application content here -->
 		<div class="page_without_footer">
 
-			<div class="header">
-				<div class="nameOfServiceBox">
-					<div>
-						<span class='slogan'>Лучший способ аренды недвижимости!</span>
-						<br>
-						<span class="underslogan">Мы помогаем людям сдать в аренду и снять жилье в Екатеринбурге</span>
-					</div>
-				</div>
-				<div class="menu">
-						<ul>
-							<li class="left" style="width:15%">
-								<a href="index.html">Главная</a>
-							</li >
-							<li class="selected" style="width:38%">
-								<span>Поиск недвижимости</span>
-							</li>
-							<li style="width:25.5%">
-								<a href="forowner.html">Собственнику</a>
-							</li>
-							<li class="right" style="width:21%">
-								<a href="fortenant.html">Арендатору</a>
-							</li>
-						</ul>
-						<div class="clearBoth"></div>
-					</div>
-				<div class="iconBox"></div>
-				<div class="enter">
-					<a href="choiceOfRole.html">Регистрация</a>
-					<br>
-					<a href="login.html">Вход</a>
-					<br>
-				</div>
-			</div><!-- /end.header -->
+        <!-- Сформируем и вставим заголовок страницы -->
+        <?php
+             include("lib/header.php");
+         ?>
 
 			<div class="page_main_content">
 				<div class="headerOfPage">
@@ -453,7 +428,7 @@
 								</div></td>
 								<td>ул. Ленина 13
 								<div class="linkToDescriptionBlock">
-									<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+									<a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
 								</div></td>
 								<td> 15000 </td>
 							</tr>
@@ -473,7 +448,7 @@
 								</div></td>
 								<td>ул. Репина 105
 								<div class="linkToDescriptionBlock">
-									<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+									<a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
 								</div></td>
 								<td> 35000 </td>
 							</tr>
@@ -493,7 +468,7 @@
 								</div></td>
 								<td>ул. Шаумяна 107
 								<div class="linkToDescriptionBlock">
-									<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+									<a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
 								</div></td>
 								<td> 150000 </td>
 							</tr>
@@ -513,7 +488,7 @@
 								</div></td>
 								<td>ул. Гурзуфская 38
 								<div class="linkToDescriptionBlock">
-									<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+									<a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
 								</div></td>
 								<td> 6000 </td>
 							</tr>
@@ -533,7 +508,7 @@
 								</div></td>
 								<td>ул. Серафимы Дерябиной 17
 								<div class="linkToDescriptionBlock">
-									<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+									<a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
 								</div></td>
 								<td> 2000 </td>
 							</tr>
@@ -553,7 +528,7 @@
 								</div></td>
 								<td>ул. Серафимы Дерябиной 17
 								<div class="linkToDescriptionBlock">
-									<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+									<a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
 								</div></td>
 								<td> 350000 </td>
 							</tr>
@@ -573,7 +548,7 @@
 								</div></td>
 								<td>улица Сибирский тракт 50 летия 107
 								<div class="linkToDescriptionBlock">
-									<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+									<a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
 								</div></td>
 								<td> 15000 </td>
 							</tr>
@@ -593,7 +568,7 @@
 								</div></td>
 								<td>ул. Сумасранка 4
 								<div class="linkToDescriptionBlock">
-									<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+									<a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
 								</div></td>
 								<td> 35000 </td>
 							</tr>
@@ -610,7 +585,7 @@
 								</div></td>
 								<td>ул. Серафимы Дерябиной 154
 								<div class="linkToDescriptionBlock">
-									<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+									<a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
 								</div></td>
 								<td> 150000 </td>
 							</tr>
@@ -627,7 +602,7 @@
 								</div></td>
 								<td>ул. Белореченская 24
 								<div class="linkToDescriptionBlock">
-									<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+									<a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
 								</div></td>
 								<td> 6000 </td>
 							</tr>
@@ -644,7 +619,7 @@
 								</div></td>
 								<td>ул. Маврода 2012
 								<div class="linkToDescriptionBlock">
-									<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+									<a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
 								</div></td>
 								<td> 2000 </td>
 							</tr>
@@ -661,7 +636,7 @@
 								</div></td>
 								<td>ул. Пискуна 1
 								<div class="linkToDescriptionBlock">
-									<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+									<a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
 								</div></td>
 								<td> 350000 </td>
 							</tr>
@@ -678,7 +653,7 @@
 								</div></td>
 								<td>улица Сибирский тракт 50 летия 107
 								<div class="linkToDescriptionBlock">
-									<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+									<a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
 								</div></td>
 								<td> 15000 </td>
 							</tr>
@@ -695,7 +670,7 @@
 								</div></td>
 								<td>ул. Сумасранка 4
 								<div class="linkToDescriptionBlock">
-									<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+									<a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
 								</div></td>
 								<td> 35000 </td>
 							</tr>
@@ -712,7 +687,7 @@
 								</div></td>
 								<td>ул. Серафимы Дерябиной 154
 								<div class="linkToDescriptionBlock">
-									<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+									<a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
 								</div></td>
 								<td> 150000 </td>
 							</tr>
@@ -729,7 +704,7 @@
 								</div></td>
 								<td>ул. Белореченская 24
 								<div class="linkToDescriptionBlock">
-									<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+									<a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
 								</div></td>
 								<td> 6000 </td>
 							</tr>
@@ -746,7 +721,7 @@
 								</div></td>
 								<td>ул. Маврода 2012
 								<div class="linkToDescriptionBlock">
-									<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+									<a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
 								</div></td>
 								<td> 2000 </td>
 							</tr>
@@ -763,7 +738,7 @@
 								</div></td>
 								<td>ул. Пискуна 1
 								<div class="linkToDescriptionBlock">
-									<a class="linkToDescription" href="descriptionOfObject.html">Подробнее</a>
+									<a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
 								</div></td>
 								<td> 350000 </td>
 							</tr>
