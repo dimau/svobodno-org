@@ -71,7 +71,7 @@ else //если пользователь не авторизирован, то �
 
             <!-- Сформируем и вставим заголовок страницы -->
             <?php
-                include("lib/header.php");
+                include("header.php");
             ?>
 
 			<div class="page_main_content">
@@ -87,7 +87,7 @@ else //если пользователь не авторизирован, то �
 
 				<div class="miniBlock">
 					<div class="miniBlockHeader">
-						Введите логин (e-mail или номер телефона) и пароль
+						Введите логин и пароль
 					</div>
 					<div class="miniBlockContent">
 						<form name="loginParol" method="post">
@@ -96,7 +96,7 @@ else //если пользователь не авторизирован, то �
 									<tr>
 										<td><label>Логин: </label></td>
 										<td>
-										<input type="text" name="login" size="23">
+										<input type="text" name="login" size="23" tabindex="0" placeholder=" e-mail или телефон" autofocus>
 										</td>
 									</tr>
 									<tr>

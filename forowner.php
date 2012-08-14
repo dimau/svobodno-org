@@ -1,7 +1,3 @@
-<?php
-include_once 'lib/out.php';
-?>
-
 <!DOCTYPE html>
 <!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
 <!-- Consider specifying the language of your content by adding the `lang` attribute to <html> -->
@@ -80,7 +76,7 @@ include_once 'lib/out.php';
 
             <!-- Сформируем и вставим заголовок страницы -->
             <?php
-                include("lib/header.php");
+                include("header.php");
             ?>
 
 			<div class="page_main_content">
@@ -210,28 +206,29 @@ include_once 'lib/out.php';
 					</div>
 				</div>
 
-				<form>
-					<fieldset class="edited" style="margin-top: 15px;">
-						<legend>
-							Заполните заявку
-						</legend>
-						<button>
-							Отправить заявку
-						</button>
-						<br>
-						Как к Вам обращаться?
-						<input type="text" size="30">
-						<br>
-						На какой номер Вам перезвонить?
-						<input type="text" size="15">
-						<br>
-						По какому адресу собираетесь сдать объект?
-						<input type="text" size="40">
-						<br>
-						Комментарии (например, в какое время Вам будет удобно принять наш звонок)?
-						<textarea rows="3" cols="50"></textarea>
-					</fieldset>
-				</form>
+                <form name="requestNewOwner" method="post">
+                    <fieldset class="edited" style="margin-top: 15px; float: left;">
+                        <legend>
+                            Заполните заявку
+                        </legend>
+                        Как к Вам обращаться?
+                        <input type="text" size="30" name="Name">
+                        <br>
+                        На какой номер Вам перезвонить?
+                        <input type="text" size="15" name="telNumber">
+                        <br>
+                        По какому адресу собираетесь сдать объект?
+                        <input type="text" size="40" name="address">
+                        <br>
+                        Комментарии (например, в какое время Вам будет удобно принять наш звонок)?
+                        <br>
+                        <textarea rows="3" cols="90" name="comment"></textarea>
+                        <div class="clearBoth"></div>
+                        <button type="submit" style="float: right; margin-top: 10px;">
+                            Отправить заявку
+                        </button>
+                    </fieldset>
+                </form>
 
 			</div><!-- /end.page_main_content -->
 			<!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->

@@ -106,7 +106,7 @@ else
 
         <!-- Сформируем и вставим заголовок страницы -->
         <?php
-        include("lib/header.php");
+        include("header.php");
         ?>
 
 			<div class="page_main_content">
@@ -263,7 +263,7 @@ else
 												<option value="1">В контакте</option><option value="2">Одноклассники</option><option value="3">Facebook</option><option value="4">Twitter</option><option value="5">Мой круг</option><option value="6">Google+</option>
 											</select>
 											<div class="searchItemBody">
-												<input type="text" name="socialNetwork1" size="30" value="http://">
+												<input type="text" name="socialNetwork1" size="30" placeholder="http://">
 											</div>
 										</div>
 										<div class="searchItem" title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
@@ -273,7 +273,7 @@ else
 												<option value="1">В контакте</option><option value="2">Одноклассники</option><option value="3">Facebook</option><option value="4">Twitter</option><option value="5">Мой круг</option><option value="6">Google+</option>
 											</select>
 											<div class="searchItemBody">
-												<input type="text" name="socialNetwork2" size="30" value="http://">
+												<input type="text" name="socialNetwork2" size="30" placeholder="http://">
 											</div>
 										</div>
 										<div class="searchItem" title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
@@ -283,7 +283,7 @@ else
 												<option value="1">В контакте</option><option value="2">Одноклассники</option><option value="3">Facebook</option><option value="4">Twitter</option><option value="5">Мой круг</option><option value="6">Google+</option>
 											</select>
 											<div class="searchItemBody">
-												<input type="text" name="socialNetwork3" size="30" value="http://">
+												<input type="text" name="socialNetwork3" size="30" placeholder="http://">
 											</div>
 										</div>
 									</fieldset>

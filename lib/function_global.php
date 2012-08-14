@@ -14,6 +14,28 @@ function registrationCorrect()
     return true; //если выполнение функции дошло до этого места, возвращаем true
 }
 
+//Функция для генерации случайной строки
+function generateCode($length=6)
+{
+    $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHI JKLMNOPRQSTUVWXYZ0123456789";
+    $code = "";
+
+    $clen = strlen($chars) - 1;
+    while (strlen($code) < $length)
+    {
+        $code .= $chars[mt_rand(0,$clen)];
+    }
+
+    return $code;
+}
+
+function newSession($userId)
+{
+    $hash = md5(generateCode(10)); // генерируем случайное 32-х значное число - идентификатор сессии
+    mysql_query("UPDATE users SET user_hash='".$hash."' WHERE id='".$userId."'");
+    $_SESSION['id'] = $hash; //записываем id сессии
+}
+
 
 function lastAct($id)
 {
@@ -38,12 +60,12 @@ function enter()
             if (md5(md5($password) . $row['salt']) == $row['password']) //сравниваем хэшированный пароль из БД с хэшированными паролем, введённым пользователем и солью (алгоритм хэширования описан в предыдущей статье)
             {
                 //пишем логин и хэшированный пароль в cookie, также создаём переменную сессии
-                setcookie("login", $row['login'], time() + 50000);
-                setcookie("password", md5($row['login'] . $row['password']), time() + 50000);
-                $_SESSION['id'] = $row['id']; //записываем в сессию id пользователя
+                setcookie("login", $row['login'], time() + 60*60*24*7);
+                setcookie("password", md5($row['login'] . $row['password']), time() + 60*60*24*7);
 
-                $id = $_SESSION['id'];
-                lastAct($id);
+                newSession($row['id']);
+
+                lastAct($row['id']);
                 return $error;
             }
             else //если пароли не совпали
@@ -68,66 +90,58 @@ function enter()
 function login()
 {
     //ini_set("session.use_trans_sid", true); выдает ошибку при использовании, да и вроде как команда не нужна на самом деле
-    session_start();
-    if (isset($_SESSION['id'])) //если сесcия есть
+    if(!isset($_SESSION))
     {
-        if (isset($_COOKIE['login']) && isset($_COOKIE['password'])) //если cookie есть, то просто обновим время их жизни и вернём true
-        {
-            SetCookie("login", "", time() - 1, '/');
-            SetCookie("password", "", time() - 1, '/');
-            setcookie("login", $_COOKIE['login'], time() + 50000, '/');
-            setcookie("password", $_COOKIE['password'], time() + 50000, '/');
-
-            $id = $_SESSION['id'];
-            lastAct($id);
-            return true;
-        }
-        else //иначе добавим cookie с логином и паролем, чтобы после перезапуска браузера сессия не слетала
-        {
-            $rez = mysql_query("SELECT * FROM users WHERE id='{$_SESSION['id']}'"); //запрашиваем строку с искомым id
-
-            if (mysql_num_rows($rez) == 1) //если получена одна строка
-            {
-                $row = mysql_fetch_assoc($rez); //записываем её в ассоциативный массив
-
-                setcookie("login", $row['login'], time() + 50000, '/');
-                setcookie("password", md5($row['login'] . $row['password']), time() + 50000, '/');
-
-                $id = $_SESSION['id'];
-                lastAct($id);
-                return true;
-            }
-            else return false;
-        }
+        session_start();
     }
-    else //если сессии нет, то проверим существование cookie. Если они существуют, то проверим их валидность по БД
+    $rez = false;
+
+    if (isset($_SESSION['id'])) //если какая-то сесcия есть - проверим ее актуальность
     {
-        if (isset($_COOKIE['login']) && isset($_COOKIE['password'])) //если куки существуют.
+        $rez = mysql_query("SELECT * FROM users WHERE user_hash='{$_SESSION['id']}'");
+    }
 
-        {
-            $rez = mysql_query("SELECT * FROM users WHERE login='{$_COOKIE['login']}'"); //запрашиваем строку с искомым логином и паролем
-            @$row = mysql_fetch_assoc($rez);
+    if ($rez != false && mysql_num_rows($rez) == 1 ) // Если текущая сессия актуальна - добавим куки, чтобы после перезапуска браузера сессия не слетала
+    {
+        $row = mysql_fetch_assoc($rez);
 
-            if (@mysql_num_rows($rez) == 1 && md5($row['login'] . $row['password']) == $_COOKIE['password']) //если логин и пароль нашлись в БД
+            setcookie("login", "", time() - 1, '/');
+            setcookie("password", "", time() - 1, '/');
+            setcookie("login", $row['login'], time() + 60*60*24*7, '/');
+            setcookie("password", md5($row['login'] . $row['password']), time() + 60*60*24*7, '/');
+
+        return true;
+    }
+    else // Если сессия уже потеряла актуальность или не существовала
+    {
+            if (isset($_COOKIE['login']) && isset($_COOKIE['password'])) // смотрим куки, если cookie есть, то проверим их актуальность
             {
-                $_SESSION['id'] = $row['id']; //записываем в сесиию id
-                $id = $_SESSION['id'];
+                $rez = mysql_query("SELECT * FROM users WHERE login='{$_COOKIE['login']}'"); //запрашиваем строку с искомым логином
 
-                lastAct($id);
-                return true;
+                // чтобы избежать ошибок при вычислении row -  делаем это с проверкой переменной rez
+                if ($rez != false)
+                {
+                    $row = mysql_fetch_assoc($rez);
+                }
+
+                if ($rez != false && mysql_num_rows($rez) == 1 && md5($row['login'] . $row['password']) == $_COOKIE['password']) //если логин и пароль нашлись в БД
+                {
+                    newSession($row['id']);
+
+                    lastAct($row['id']);
+                    return true;
+                }
+                else //если данные из cookie не подошли, то удаляем эти куки, ибо нахуй они такие нам не нужны
+                {
+                    setcookie("login", "", time() - 360000, '/');
+                    setcookie("password", "", time() - 360000, '/');
+                    return false;
+                }
             }
-            else //если данные из cookie не подошли, то удаляем эти куки, ибо нахуй они такие нам не нужны
+            else // Если сессия не актуальна и куки не существуют
             {
-                SetCookie("login", "", time() - 360000, '/');
-
-                SetCookie("password", "", time() - 360000, '/');
                 return false;
             }
-        }
-        else //если куки не существуют
-        {
-            return false;
-        }
     }
 }
 ?>

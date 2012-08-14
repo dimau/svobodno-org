@@ -1,7 +1,3 @@
-<?php
-include_once 'lib/out.php';
-?>
-
 <!DOCTYPE html>
 <!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
 <!-- Consider specifying the language of your content by adding the `lang` attribute to <html> -->
@@ -120,7 +116,7 @@ include_once 'lib/out.php';
 
         <!-- Сформируем и вставим заголовок страницы -->
         <?php
-                include("lib/header.php");
+                include("header.php");
             ?>
 
 			<div class="page_main_content">
@@ -2218,14 +2214,6 @@ include_once 'lib/out.php';
 
 								<!-- Информация об объектах, подходящих условиям поиска -->
 								<table class="listOfRealtyObjects" id="shortListOfRealtyObjects">
-									<thead>
-										<tr class="listOfRealtyObjectsHeader">
-											<th class="top left"></th>
-											<th> Фото </th>
-											<th> Адрес </th>
-											<th class="top right"> Цена, руб. </th>
-										</tr>
-									</thead>
 									<tbody>
 										<tr class="realtyObject" coordX="56.836396" coordY="60.588662" balloonContentBody='<div class="headOfBalloon">ул. Ленина 13</div><div class="fotosWrapper"><div class="middleFotoWrapper"><img class="middleFoto" src=""></div><div class="middleFotoWrapper"><img class="middleFoto" src=""></div><div class="middleFotoWrapper"><img class="middleFoto" src=""></div></div><ul class="listDescription"><li><span class="headOfString">Тип:</span> Квартира</li><li><span class="headOfString">Плата за аренду:</span> 15000 + коммунальные услуги от 1500 до 2500 руб.</li><li><span class="headOfString">Единовременная комиссия:</span><a href="#"> 3000 руб. (40%) собственнику</a></li><li><span class="headOfString">Адрес:</span> улица Посадская 51</li><li><span class="headOfString">Количество комнат:</span> 2, смежные</li><li><span class="headOfString">Площадь (жилая/общая):</span> 22.4/34 м²</li><li><span class="headOfString">Этаж:</span> 3 из 10</li><li><span class="headOfString">Срок сдачи:</span> долгосрочно</li><li><span class="headOfString">Мебель:</span> есть</li><li><span class="headOfString">Район:</span> Центр</li><li><span class="headOfString">Телефон собственника:</span> 89221431615, <a href="#">Алексей Иванович</a></li></ul><div class="clearBoth"></div><div style="width:100%;"><a href="descriptionOfObject.html">Подробнее</a><div style="float: right; cursor: pointer;"><div class="blockOfIcon"><a><img class="icon" title="Добавить в избранное" src="img/blue_star.png"></a></div><a id="addToFavorit"> добавить в избранное</a></div></div>'>
 											<td>

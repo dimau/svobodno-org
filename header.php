@@ -54,22 +54,40 @@ else //если пользователь не авторизирован, то �
     <div class="iconBox"></div>
     <div class="enter">
         <?php
-        if ($UID == false) {
-            ?>
+        if ($UID == false)
+        {
+            if ($_SERVER['PHP_SELF'] == "/registration.php" || $_SERVER['PHP_SELF'] == "/choiceOfRole.php")
+            {
+                echo ("<span>Регистрация</span><br>");
+            }
+            else
+            {
+                echo ("<a href='choiceOfRole.php'>Регистрация</a><br>");
+            }
 
-            <a href="choiceOfRole.php">Регистрация</a>
-            <br>
-            <a href="login.php">Вход</a>
-            <br>
-        <?php
+            if ($_SERVER['PHP_SELF'] == "/login.php")
+            {
+                echo ("<span>Вход</span><br>");
+            }
+            else
+            {
+                echo ("<a href='login.php'>Вход</a><br>");
+            }
         }
-        else {
+        else
+        {
+            if ($_SERVER['PHP_SELF'] == "/personal.php")
+            {
+                echo ("<span>Личный кабинет</span><br>");
+            }
+            else
+            {
+                echo ("<a href='personal.php'>Личный кабинет</a><br>");
+            }
             ?>
-            <a href="personal.php">Личный кабинет</a>
-            <br>
             <a href="personal.php">Новости: <span class="amountOfNewsInEnter">3</span></a>
             <br>
-            <a href="/?action=out">Выйти</a>
+            <a href="out.php">Выйти</a>
             <br>
             <?php } ?>
     </div>

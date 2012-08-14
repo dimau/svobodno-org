@@ -42,7 +42,7 @@
 
             <!-- Сформируем и вставим заголовок страницы -->
             <?php
-                include("lib/header.php");
+                include("header.php");
             ?>
 
 			<div class="page_main_content">

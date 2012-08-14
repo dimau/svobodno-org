@@ -1,7 +1,3 @@
-<?php
-include_once 'lib/out.php';
-?>
-
 <!DOCTYPE html>
 <!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
 <!-- Consider specifying the language of your content by adding the `lang` attribute to <html> -->
@@ -46,7 +42,7 @@ include_once 'lib/out.php';
 
         <!-- Сформируем и вставим заголовок страницы -->
         <?php
-                include("lib/header.php");
+                include("header.php");
             ?>
 
 			<div class="page_main_content">

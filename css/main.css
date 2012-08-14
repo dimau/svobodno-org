@@ -731,7 +731,7 @@ body {
 
 /* Стили для чистого списка объявлений - без карты */
 .listOfRealtyObjects {
-	width: 49%;
+	width: 50%;
 	float: left;
 }
 
@@ -767,7 +767,7 @@ body {
 
 /* Режим только карты */
 #map {
-	width: 49%; 
+	width: 50%;
 	position: absolute;
 	top: 0px;
 	right: 0px;
@@ -883,10 +883,6 @@ div.unread > div.newsHeader {
 	display: inline-block;
 	vertical-align: top;
 	margin-right: 7px;
-}
-
-table {
-	display: inline-block;
 }
 
 table td {
