@@ -1,0 +1,99 @@
+/* Have ideas for improving this CSS for the general community? Submit your changes at: https://github.com/Valums-File-Uploader/file-uploader */
+.qq-uploader {
+	position: relative;
+	width: 100%;
+}
+.qq-upload-button {
+    border: 1px solid #CCC;
+    background: #F6F6F6 url(images/ui-bg_glass_100_f6f6f6_1x400.png) 50% 50% repeat-x;
+    border-radius: 5px;
+    color: #336784;
+    font-weight: bold;
+    width: 200px;
+    line-height: 1.4;
+	display: block;
+	padding: 6.4px 0;
+	text-align: center;
+}
+.qq-upload-button-hover {
+    border: 1px solid #6A9D02;
+    background: #DEEAC8 url(images/ui-bg_highlight-hard_100_deeac8_1x100.png) 50% 50% repeat-x;
+}
+
+.qq-upload-button-focus {
+	outline: 1px dotted #000000;
+}
+.qq-upload-drop-area, .qq-upload-extra-drop-area {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	min-height: 30px;
+	z-index: 2;
+	background: #FF9797;
+	text-align: center;
+}
+.qq-upload-drop-area span {
+	display: block;
+	position: absolute;
+	top: 50%;
+	width: 100%;
+	margin-top: -8px;
+	font-size: 16px;
+}
+.qq-upload-extra-drop-area {
+	position: relative;
+	margin-top: 50px;
+	font-size: 16px;
+	padding-top: 30px;
+	height: 20px;
+	min-height: 40px;
+}
+.qq-upload-drop-area-active {
+	background: #FF7171;
+}
+.qq-upload-list {
+	margin: 5px auto 0px auto;
+	padding: 0;
+	list-style: none;
+}
+.qq-upload-list li {
+	margin: 0;
+	padding: 9px;
+	line-height: 15px;
+	font-size: 16px;
+	background-color: #FFF0BD;
+}
+.qq-upload-file, .qq-upload-spinner, .qq-upload-size, .qq-upload-cancel, .qq-upload-failed-text {
+	margin-right: 12px;
+}
+.qq-upload-file {
+}
+.qq-upload-spinner {
+	display: inline-block;
+	background: url("loading.gif");
+	width: 15px;
+	height: 15px;
+	vertical-align: text-bottom;
+}
+.qq-upload-size, .qq-upload-cancel {
+	font-size: 12px;
+	font-weight: normal;
+}
+.qq-upload-failed-text {
+	display: none;
+}
+.qq-upload-fail .qq-upload-failed-text {
+	display: inline;
+}
+.qq-upload-list li.qq-upload-success {
+	background-color: #6A9D02;
+	color: #FFFFFF;
+    border-radius: 5px;
+}
+.qq-upload-list li.qq-upload-fail {
+	background-color: #D60000;
+	color: #FFFFFF;
+    border-radius: 5px;
+}

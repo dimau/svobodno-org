@@ -51,19 +51,19 @@
 						Укажите, пожалуйста, что Вы собираетесь сделать на этом ресурсе?
 					</div>
 					<div class="miniBlockContent">
-						<form name="whoIsOurUser">
+						<form name="whoIsOurUser" method="get" action="registration.php">
 							<ul>
 								<li>
 									<input type="checkbox" name="type" value="tenant" checked>
-									Я собираюсь найти и снять недвижимость
+									Найти и снять недвижимость
 								</li>
 								<li>
 									<input type="checkbox" name="type" value="owner">
-									Я собираюсь сдать свою недвижимость
+									Сдать свою недвижимость
 								</li>
 							</ul>
 							<br>
-							<button type="submit" id="buttonSubmit"> Готово </button>
+							<button type="submit" id="buttonSubmit">Готово</button>
 						</form>
 					</div>
 					<div class="clearBoth"></div>
@@ -87,6 +87,7 @@
 		<script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
 
 		<script src="js/main.js"></script>
+
 		<!-- scripts concatenated and minified via build script -->
 
 		<!-- end scripts -->

@@ -16,12 +16,14 @@ else
         $correct = registrationCorrect(); //записываем в переменную результат работы функции registrationCorrect(), которая возвращает true, если введённые данные верны и false в противном случае
         if ($correct) //если данные верны, запишем их в базу данных
         {
+            // Формируем набор переменных для сохранения в базу данных
             $login = htmlspecialchars($_POST['login']);
             $password = $_POST['password'];
             //$mail = htmlspecialchars($_POST['mail']); также я удалил mail из следующей строчки с записью в базу данных
             $salt = mt_rand(100, 999);
             $tm = time();
             $password = md5(md5($password).$salt);
+
             if (mysql_query("INSERT INTO users (login,password,salt,reg_date,last_act) VALUES ('".$login."','".$password."','".$salt."','".$tm."','".$tm."')")) //пишем данные в БД и авторизовываем пользователя
             {
                 setcookie ("login", $login, time() + 50000, '/');
@@ -74,7 +76,8 @@ else
 		<!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
 
 		<link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
-		<link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/fileuploader.css">
+        <link rel="stylesheet" href="css/main.css">
 		<style>
 			/* Стили для капчи и для Готово */
 			.capcha {
@@ -112,7 +115,7 @@ else
 			<div class="page_main_content">
 
 				<div class="wrapperOfTabs">
-					<form name="personalInformation" method="post">
+					<form name="personalInformation" method="post" enctype="multipart/form-data">
 						<div class="headerOfPage">
 							Зарегистрируйтесь
 						</div>
@@ -120,15 +123,21 @@ else
 						<div id="tabs">
 							<ul>
 								<li>
-									<a href="#tabs-1">Личная информация</a>
+									<a href="#tabs-1">Личные данные</a>
 								</li>
+                                <li>
+                                    <a href="#tabs-2">Образование / Работа</a>
+                                </li>
+                                <li>
+                                    <a href="#tabs-3">Социальные сети</a>
+                                </li>
 								<li>
-									<a href="#tabs-2">Условия поиска</a>
+									<a href="#tabs-4">Что ищете?</a>
 								</li>
 							</ul>
 							<div id="tabs-1">
 								<div class="shadowText">
-									Заполните форму как можно подробнее, это позволит подобрать для Вас наиболее интересные предложения, а также заранее представить Вас собственникам, тем самым, cэкономив время всем сторонам: не нужно ездить смотреть объекты, по которым собственники не готовы сдать Вам недвижимость в аренду.
+									Информация, указаннная при регистрации, необходима для того, чтобы представить Вас собственникам тех объектов, которыми Вы заинтересутесь. Заполните форму на этой и следующих вкладках как можно подробнее.
 									<br>
 									<span class="required">* </span> - обязательное для заполнения поле
 								</div>
@@ -143,7 +152,7 @@ else
 											</div>
 											<span class="searchItemLabel">Имя: </span>
 											<div class="searchItemBody">
-												<input type="text" size="23">
+												<input type="text" size="38">
 											</div>
 										</div>
 										<div class="searchItem">
@@ -152,7 +161,7 @@ else
 											</div>
 											<span class="searchItemLabel">Отчество: </span>
 											<div class="searchItemBody">
-												<input type="text" size="23">
+												<input type="text" size="33">
 											</div>
 										</div>
 										<div class="searchItem">
@@ -161,7 +170,7 @@ else
 											</div>
 											<span class="searchItemLabel">Фамилия: </span>
 											<div class="searchItemBody">
-												<input type="text" size="23">
+												<input type="text" size="33">
 											</div>
 										</div>
 										<div class="searchItem">
@@ -213,7 +222,7 @@ else
 												</div>
 												<span class="searchItemLabel">Логин: </span>
 												<div class="searchItemBody">
-													<input type="text" size="20" maxlength="50" name="login">
+													<input type="text" size="30" maxlength="50" name="login">
 												</div>
 											</div>
 											<div class="searchItem">
@@ -222,7 +231,7 @@ else
 												</div>
 												<span class="searchItemLabel">Пароль: </span>
 												<div class="searchItemBody">
-													<input type="password" size="20" maxlength="50" name="password">
+													<input type="password" size="29" maxlength="50" name="password">
 												</div>
 											</div>
 										</fieldset>
@@ -237,7 +246,7 @@ else
 												</div>
 												<span class="searchItemLabel">Телефон: </span>
 												<div class="searchItemBody">
-													<input type="text" size="15">
+													<input type="text" size="27">
 												</div>
 											</div>
 											<div class="searchItem">
@@ -246,143 +255,11 @@ else
 												</div>
 												<span class="searchItemLabel">e-mail: </span>
 												<div class="searchItemBody">
-													<input type="text" size="15">
+													<input type="text" size="30">
 												</div>
 											</div>
 										</fieldset>
 									</div>
-
-									<fieldset class="edited private">
-										<legend>
-											Страницы в социальных сетях
-										</legend>
-										<div class="searchItem" title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
-											<div class="required"></div>
-											<select name="selectSocialNetwork1">
-												<option value="0" selected></option>
-												<option value="1">В контакте</option><option value="2">Одноклассники</option><option value="3">Facebook</option><option value="4">Twitter</option><option value="5">Мой круг</option><option value="6">Google+</option>
-											</select>
-											<div class="searchItemBody">
-												<input type="text" name="socialNetwork1" size="30" placeholder="http://">
-											</div>
-										</div>
-										<div class="searchItem" title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
-											<div class="required"></div>
-											<select name="selectSocialNetwork2">
-												<option value="0" selected></option>
-												<option value="1">В контакте</option><option value="2">Одноклассники</option><option value="3">Facebook</option><option value="4">Twitter</option><option value="5">Мой круг</option><option value="6">Google+</option>
-											</select>
-											<div class="searchItemBody">
-												<input type="text" name="socialNetwork2" size="30" placeholder="http://">
-											</div>
-										</div>
-										<div class="searchItem" title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
-											<div class="required"></div>
-											<select name="selectSocialNetwork3">
-												<option value="0" selected></option>
-												<option value="1">В контакте</option><option value="2">Одноклассники</option><option value="3">Facebook</option><option value="4">Twitter</option><option value="5">Мой круг</option><option value="6">Google+</option>
-											</select>
-											<div class="searchItemBody">
-												<input type="text" name="socialNetwork3" size="30" placeholder="http://">
-											</div>
-										</div>
-									</fieldset>
-
-									<fieldset class="edited private">
-										<legend>
-											Образование
-										</legend>
-										<div>
-											<input type="checkbox" name="notLearnCheckbox" id="notLearnCheckbox">
-											Я нигде не учился
-										</div>
-										<div class="searchItem ifLearned" title="Укажите последнее учебное заведение, если Вы заканчивали несколько">
-											<div class="required">
-												*
-											</div>
-											<span class="searchItemLabel">Учебное заведение: </span>
-											<div class="searchItemBody">
-												<input class="ifLearned" type="text" size="30">
-											</div>
-										</div>
-										<div class="searchItem ifLearned">
-											<div class="required">
-												*
-											</div>
-											<span class="searchItemLabel">Специальность: </span>
-											<div class="searchItemBody">
-												<input class="ifLearned" type="text" size="30">
-											</div>
-										</div>
-										<div class="searchItem ifLearned" title="Укажите курс, на котором учитесь или год окончания, если Вы уже закончили учебное заведение">
-											<div class="required">
-												*
-											</div>
-											<span class="searchItemLabel">Текущий статус: </span>
-											<div class="searchItemBody">
-												<input class="ifLearned" type="text" size="30">
-											</div>
-										</div>
-									</fieldset>
-
-									<fieldset class="edited private">
-										<legend>
-											Работа
-										</legend>
-										<div>
-											<input type="checkbox" name="notWorkCheckbox" id="notWorkCheckbox">
-											Я не работаю
-										</div>
-										<div class="searchItem ifWorked">
-											<div class="required">
-												*
-											</div>
-											<span class="searchItemLabel">Место работы: </span>
-											<div class="searchItemBody">
-												<input class="ifWorked" type="text" size="30">
-											</div>
-										</div>
-										<div class="searchItem ifWorked">
-											<div class="required">
-												*
-											</div>
-											<span class="searchItemLabel">Должность: </span>
-											<div class="searchItemBody">
-												<input class="ifWorked" type="text" size="30">
-											</div>
-										</div>
-									</fieldset>
-
-									<fieldset class="edited private">
-										<legend>
-											Коротко о себе
-										</legend>
-										<div class="searchItem">
-											<div class="required">
-												*
-											</div>
-											<span class="searchItemLabel">В каком регионе родились: </span>
-											<div class="searchItemBody">
-												<input type="text" size="20">
-											</div>
-										</div>
-										<div class="searchItem">
-											<div class="required">
-												*
-											</div>
-											<span class="searchItemLabel">Родной город, населенный пункт: </span>
-											<div class="searchItemBody">
-												<input type="text" size="20">
-											</div>
-										</div>
-										<div class="searchItem">
-											<div class="required"></div>
-											<span class="searchItemLabel">Коротко о себе и своих интересах: </span>
-											<div class="searchItemBody">
-												<textarea name="shortlyAboutMe" cols="70" rows="4"></textarea>
-											</div>
-										</div>
-									</fieldset>
 
 									<!--
 
@@ -396,26 +273,207 @@ else
 
 									-->
 
-									<fieldset class="edited private" style="min-width: 300px; min-height: 200px;">
+									<fieldset class="edited private" style="min-width: 300px;">
 										<legend title="Для успешной регистрации должна быть загружена хотя бы 1 фотография">
 											<div class="required">
 												*
 											</div>
 											Фотографии
 										</legend>
-										<button>
-											Загрузить фотографии
-										</button>
+                                        <div id="file-uploader">
+                                            <noscript>
+                                                <p>Пожалуйста, активируйте JavaScript для загрузки файлов</p>
+                                                <!-- or put a simple form for upload here -->
+                                            </noscript>
+                                        </div>
 									</fieldset>
 
 								</div><!-- /end.descriptionFieldsetsWrapper -->
 								<div class="shadowText" style="margin-top: 7px;">
-									По окончании заполнения полей на обеих вкладках введите текст капчи и нажмите кнопку "Готово" справа внизу
+									По окончании заполнения полей на всех вкладках введите текст капчи и нажмите кнопку "Готово" справа внизу
 								</div>
 							</div>
-							<div id="tabs-2">
+                            <div id="tabs-2">
+                                <div class="shadowText">
+                                    Данные об образовании и работе арендатора - одни из самых востребованных для любого собственника жилья. Эта информация предоставляется собственникам только тех объектов, которыми Вы заинтересуетесь.
+                                </div>
+                                <fieldset class="edited private">
+                                    <legend>
+                                        Образование
+                                    </legend>
+                                    <div class="searchItem" title="Укажите курс, на котором учитесь, или год окончания, если Вы уже закончили учебное заведение">
+                                        <div class="required">
+                                            *
+                                        </div>
+                                        <span class="searchItemLabel">Текущий статус: </span>
+                                        <div class="searchItemBody">
+                                            <select name="currentStatusEducation" id="currentStatusEducation">
+                                                <option value="0" selected></option>
+                                                <option value="1">Нигде не учился</option>
+                                                <option value="2">Сейчас учусь</option>
+                                                <option value="3">Закончил</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div id="almamater" class="searchItem ifLearned" title="Укажите учебное заведение, в котором учитесь сейчас, либо последнее из тех, что заканчивали">
+                                        <div class="required">
+                                            *
+                                        </div>
+                                        <span class="searchItemLabel">Учебное заведение: </span>
+                                        <div class="searchItemBody">
+                                            <input class="ifLearned" type="text" size="50">
+                                        </div>
+                                    </div>
+                                    <div id="speciality" class="searchItem ifLearned">
+                                        <div class="required">
+                                            *
+                                        </div>
+                                        <span class="searchItemLabel">Специальность: </span>
+                                        <div class="searchItemBody">
+                                            <input class="ifLearned" type="text" size="55">
+                                        </div>
+                                    </div>
+                                    <div id="kurs" class="searchItem ifLearned" title="Укажите курс, на котором учитесь">
+                                        <div class="required">
+                                            *
+                                        </div>
+                                        <span class="searchItemLabel">Курс: </span>
+                                        <div class="searchItemBody">
+                                            <input class="ifLearned" type="text" size="19">
+                                        </div>
+                                    </div>
+                                    <div id="formatEducation" class="searchItem ifLearned" title="Укажите форму обучения">
+                                        <div class="required">
+                                            *
+                                        </div>
+                                        <span class="searchItemLabel">Очно / Заочно: </span>
+                                        <div class="searchItemBody">
+                                            <select name="ochnoZaochno" class="ifLearned">
+                                                <option value="0" selected></option>
+                                                <option value="1">Очно</option>
+                                                <option value="2">Заочно</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div id="yearOfEnd" class="searchItem ifLearned" title="Укажите год окончания учебного заведения">
+                                        <div class="required">
+                                            *
+                                        </div>
+                                        <span class="searchItemLabel">Год окончания: </span>
+                                        <div class="searchItemBody">
+                                            <input class="ifLearned" type="text" size="9">
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <fieldset class="edited private">
+                                    <legend>
+                                        Работа
+                                    </legend>
+                                    <div>
+                                        <input type="checkbox" name="notWorkCheckbox" id="notWorkCheckbox">
+                                        Я не работаю
+                                    </div>
+                                    <div class="searchItem ifWorked">
+                                        <div class="required">
+                                            *
+                                        </div>
+                                        <span class="searchItemLabel">Место работы: </span>
+                                        <div class="searchItemBody">
+                                            <input class="ifWorked" type="text" size="30">
+                                        </div>
+                                    </div>
+                                    <div class="searchItem ifWorked">
+                                        <div class="required">
+                                            *
+                                        </div>
+                                        <span class="searchItemLabel">Должность: </span>
+                                        <div class="searchItemBody">
+                                            <input class="ifWorked" type="text" size="33">
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <fieldset class="edited private">
+                                    <legend>
+                                        Коротко о себе
+                                    </legend>
+                                    <div class="searchItem">
+                                        <div class="required">
+                                            *
+                                        </div>
+                                        <span class="searchItemLabel">В каком регионе родились: </span>
+                                        <div class="searchItemBody">
+                                            <input type="text" size="36">
+                                        </div>
+                                    </div>
+                                    <div class="searchItem">
+                                        <div class="required">
+                                            *
+                                        </div>
+                                        <span class="searchItemLabel">Родной город, населенный пункт: </span>
+                                        <div class="searchItemBody">
+                                            <input type="text" size="30">
+                                        </div>
+                                    </div>
+                                    <div class="searchItem">
+                                        <div class="required"></div>
+                                        <span class="searchItemLabel">Коротко о себе и своих интересах: </span>
+                                        <div class="searchItemBody">
+                                            <textarea name="shortlyAboutMe" cols="70" rows="4"></textarea>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <div class="shadowText" style="margin-top: 7px;">
+                                    По окончании заполнения полей на всех вкладках введите текст капчи и нажмите кнопку "Готово" справа внизу
+                                </div>
+                            </div>
+                            <div id="tabs-3">
+                                <div class="shadowText">
+                                    Укажите, пожалуйста, минимум одну социальную сеть, используемую Вами. Это позволит системе представить Вас собственникам (только тех объектов, которыми Вы сами заинтересуетесь).
+                                </div>
+                                <fieldset class="edited private">
+                                    <legend>
+                                        Страницы в социальных сетях
+                                    </legend>
+                                    <div class="searchItem" title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
+                                        <div class="required"></div>
+                                        <select name="selectSocialNetwork1">
+                                            <option value="0" selected></option>
+                                            <option value="1">В контакте</option><option value="2">Одноклассники</option><option value="3">Facebook</option><option value="4">Twitter</option><option value="5">Мой круг</option><option value="6">Google+</option>
+                                        </select>
+                                        <div class="searchItemBody">
+                                            <input type="text" name="socialNetwork1" size="30" placeholder="http://">
+                                        </div>
+                                    </div>
+                                    <div class="searchItem" title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
+                                        <div class="required"></div>
+                                        <select name="selectSocialNetwork2">
+                                            <option value="0" selected></option>
+                                            <option value="1">В контакте</option><option value="2">Одноклассники</option><option value="3">Facebook</option><option value="4">Twitter</option><option value="5">Мой круг</option><option value="6">Google+</option>
+                                        </select>
+                                        <div class="searchItemBody">
+                                            <input type="text" name="socialNetwork2" size="30" placeholder="http://">
+                                        </div>
+                                    </div>
+                                    <div class="searchItem" title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
+                                        <div class="required"></div>
+                                        <select name="selectSocialNetwork3">
+                                            <option value="0" selected></option>
+                                            <option value="1">В контакте</option><option value="2">Одноклассники</option><option value="3">Facebook</option><option value="4">Twitter</option><option value="5">Мой круг</option><option value="6">Google+</option>
+                                        </select>
+                                        <div class="searchItemBody">
+                                            <input type="text" name="socialNetwork3" size="30" placeholder="http://">
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <div class="shadowText" style="margin-top: 7px;">
+                                    По окончании заполнения полей на всех вкладках введите текст капчи и нажмите кнопку "Готово" справа внизу
+                                </div>
+                            </div>
+							<div id="tabs-4">
 								<div class="shadowText">
-									Заполните форму как можно подробнее, это позволит подобрать для Вас наиболее интересные предложения, а также заранее представить Вас собственникам, тем самым, cэкономив время всем сторонам: не нужно ездить смотреть объекты, по которым собственники не готовы сдать Вам недвижимость в аренду.
+									Заполните форму как можно подробнее, это позволит системе подобрать для Вас наиболее интересные предложения
 								</div>
 								<div id="extendedSearchParametersBlock">
 									<div id="leftBlockOfSearchParameters" style="display: inline-block;">
@@ -749,7 +807,7 @@ else
 									</fieldset>
 								</div>
 								<div class="shadowText" style="margin-top: 7px;">
-									По окончании заполнения полей на обеих вкладках введите текст капчи и нажмите кнопку "Готово" справа внизу
+									По окончании заполнения полей на всех вкладках введите текст капчи и нажмите кнопку "Готово" справа внизу
 								</div>
 							</div><!-- /end.tabs-2 -->
 						</div><!-- /end.tabs -->
@@ -784,6 +842,7 @@ else
 
 		<!-- jQuery UI с моей темой оформления -->
 		<script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
+        <script src="js/vendor/fileuploader.js" type="text/javascript"></script>
 
 		<!-- scripts concatenated and minified via build script -->
 		<script src="js/main.js"></script>
