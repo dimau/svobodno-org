@@ -1,17 +1,30 @@
 <?php
 function registrationCorrect()
 {
-    if ($_POST['login'] == "") return false; //не пусто ли поле логина
-    if ($_POST['password'] == "") return false; //не пусто ли поле пароля
+    $errors = array();
+
+    if ($_POST['login'] == "") $errors[] = 'Укажите логин'; //не пусто ли поле логина
+    //if (!preg_match('/^([a-zA-Z0-9])(\w|-|_)+([a-z0-9])$/is', $_POST['login'])) return false; // соответствует ли логин регулярному выражению
+    if ($_POST['password'] == "") $errors[] = 'Укажите пароль'; //не пусто ли поле пароля
+    //if (!preg_match('/^([a-zA-Z0-9])(\w|-|_)+([a-z0-9])$/is', $_POST['password'])) return false; // соответствует ли пароль регулярному выражению
+    if ($_POST['name'] == "") $errors[] = 'Укажите имя';
+    if ($_POST['secondName'] == "") $errors[] = 'Укажите отчество';
+    if ($_POST['surname'] == "") $errors[] = 'Укажите фамилию';
+    if ($_POST['sex'] == "0") $errors[] = 'Укажите пол';
+    if ($_POST['nationality'] == "0") $errors[] = 'Укажите национальность';
+    if ($_POST['birthday'] == "") $errors[] = 'Укажите дату рождения';
+    if ($_POST['telephon'] == "") $errors[] = 'Укажите контактный (мобильный) телефон';
+    if ($_POST['email'] == "") $errors[] = 'Укажите e-mail';
     //if ($_POST['mail'] == "") return false; //не пусто ли поле e-mail
     //if ($_POST['lic'] != "ok") return false; //приняты ли правила
     //if (!preg_match('/^([a-z0-9])(\w|[.]|-|_)+([a-z0-9])@([a-z0-9])([a-z0-9.-]*)([a-z0-9])([.]{1})([a-z]{2,4})$/is', $_POST['mail'])) return false; //соответствует ли поле e-mail регулярному выражению
-    //if (!preg_match('/^([a-zA-Z0-9])(\w|-|_)+([a-z0-9])$/is', $_POST['login'])) return false; // соответствует ли логин регулярному выражению
     //if (strlen($_POST['password']) < 5) return false; //не меньше ли 5 символов длина пароля
+
     $login = $_POST['login'];
     $rez = mysql_query("SELECT * FROM users WHERE login=$login");
-    if (@mysql_num_rows($rez) != 0) return false; // проверка на существование в БД такого же логина
-    return true; //если выполнение функции дошло до этого места, возвращаем true
+    if (@mysql_num_rows($rez) != 0) $errors[] = 'Пользователь с таким логином уже существует, укажите другой логин'; // проверка на существование в БД такого же логина
+
+    return $errors; // Возвращаем список ошибок, если все в порядке, то он будет пуст
 }
 
 //Функция для генерации случайной строки

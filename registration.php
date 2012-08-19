@@ -13,7 +13,18 @@ else
 {
     if (isset($_POST['readyButton'])) //если была нажата кнопка регистрации, проверим данные на корректность и, если данные введены и введены правильно, добавим запись с новым пользователем в БД
     {
-        $correct = registrationCorrect(); //записываем в переменную результат работы функции registrationCorrect(), которая возвращает true, если введённые данные верны и false в противном случае
+        $errors = registrationCorrect(); //записываем в переменную результат работы функции registrationCorrect(), которая возвращает пустой array, если введённые данные верны и array с ошибками в противном случае
+
+        // Считаем ошибки, если 0, то можно будет записать данные в БД
+        if (count($errors) == 0)
+        {
+            $correct = true;
+        }
+        else
+        {
+            $correct = false;
+        }
+
         if ($correct) //если данные верны, запишем их в базу данных
         {
             // Формируем набор переменных для сохранения в базу данных
@@ -152,7 +163,7 @@ else
 											</div>
 											<span class="searchItemLabel">Имя: </span>
 											<div class="searchItemBody">
-												<input type="text" size="38">
+												<input name="name" type="text" size="38" autofocus>
 											</div>
 										</div>
 										<div class="searchItem">
@@ -161,7 +172,7 @@ else
 											</div>
 											<span class="searchItemLabel">Отчество: </span>
 											<div class="searchItemBody">
-												<input type="text" size="33">
+												<input name="secondName" type="text" size="33">
 											</div>
 										</div>
 										<div class="searchItem">
@@ -170,7 +181,7 @@ else
 											</div>
 											<span class="searchItemLabel">Фамилия: </span>
 											<div class="searchItemBody">
-												<input type="text" size="33">
+												<input name="surname" type="text" size="33">
 											</div>
 										</div>
 										<div class="searchItem">
@@ -200,13 +211,13 @@ else
 												</select>
 											</div>
 										</div>
-										<div class="searchItem">
+										<div class="searchItem"> <!-- TODO: поменять контроль поля при подключении календаря -->
 											<div class="required">
 												*
 											</div>
 											<span class="searchItemLabel">День рождения: </span>
 											<div class="searchItemBody">
-												<input type="text" size="15">
+                                                <input name="birthday" type="text" id="datepicker" size="15">
 											</div>
 										</div>
 									</fieldset>
@@ -246,7 +257,7 @@ else
 												</div>
 												<span class="searchItemLabel">Телефон: </span>
 												<div class="searchItemBody">
-													<input type="text" size="27">
+													<input name="telephon" type="text" size="27">
 												</div>
 											</div>
 											<div class="searchItem">
@@ -255,7 +266,7 @@ else
 												</div>
 												<span class="searchItemLabel">e-mail: </span>
 												<div class="searchItemBody">
-													<input type="text" size="30">
+													<input name="email" type="text" size="30">
 												</div>
 											</div>
 										</fieldset>
@@ -842,6 +853,8 @@ else
 
 		<!-- jQuery UI с моей темой оформления -->
 		<script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
+        <script src="js/vendor/jquery.ui.datepicker-ru.js"></script>
+
         <script src="js/vendor/fileuploader.js" type="text/javascript"></script>
 
 		<!-- scripts concatenated and minified via build script -->

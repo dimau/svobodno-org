@@ -1,6 +1,35 @@
+// Вставляем календарь для выбора дня рождения
+$(function() {
+    $( "#datepicker" ).datepicker({
+        changeMonth: true,
+        changeYear: true,
+        minDate: new Date(1900, 0, 1),
+        maxDate: new Date(2004, 11, 31),
+        defaultDate: new Date(1987, 0, 27),
+        yearRange: "1900:2004",
+    });
+    $( "#datepicker" ).datepicker($.datepicker.regional["ru"]);
 
-// Подгонка размера правого блока параметров (районы) расширенного поиска под размер левого блока параметров. 19 пикселей - на padding у fieldset
-document.getElementById('rightBlockOfSearchParameters').style.height = document.getElementById('leftBlockOfSearchParameters').offsetHeight - 22 + 'px';
+});
+    //$.datepicker.setDefaults( $.datepicker.regional[ "ru" ] );
+    //$( "#datepicker" ).datepicker( $.datepicker.regional[ "ru" ] );
+
+// Подготовим возможность загрузки фотографий
+function createUploader(){
+    var uploader = new qq.FileUploader({
+        element: document.getElementById('file-uploader'),
+        action: '../lib/uploader.php',
+        allowedExtensions: ["jpeg", "jpg", "img", "bmp"], //Также расширения нужно менять в файле uploader.php
+        sizeLimit: 10 * 1024 * 1024,
+        //debug: true,
+        //extraDropzones: [qq.getByClass(document, 'qq-upload-extra-drop-area')[0]]
+    });
+}
+// in your app create uploader as soon as the DOM is ready
+// don't wait for the window to load
+$(document).ready(createUploader);
+
+
 
 /* Если в форме Работа указан чекбокс - не работаю, то блокировать заполнение остальных инпутов */
 $("#notWorkCheckbox").on('change', function() {
@@ -40,6 +69,10 @@ $("#currentStatusEducation").change(function() {
 });
 
 
+
+// Подгонка размера правого блока параметров (районы) расширенного поиска под размер левого блока параметров. 19 пикселей - на padding у fieldset
+document.getElementById('rightBlockOfSearchParameters').style.height = document.getElementById('leftBlockOfSearchParameters').offsetHeight - 22 + 'px';
+
 /* Сценарии для появления блока с подробным описанием сожителей */
 $("#withWho").on('change', function(event) {
     if ($("#withWho").attr('value') != 1) {
@@ -66,19 +99,3 @@ $("#animals").on('change', function(event) {
         $("#animalsDescription").css('display', 'none');
     }
 });
-
-// Подготовим возможность загрузки фотографий
-function createUploader(){
-    var uploader = new qq.FileUploader({
-        element: document.getElementById('file-uploader'),
-        action: '../lib/uploader.php',
-        allowedExtensions: ["jpeg", "jpg", "img", "bmp"], //Также расширения нужно менять в файле uploader.php
-        sizeLimit: 10 * 1024 * 1024,
-        //debug: true,
-        //extraDropzones: [qq.getByClass(document, 'qq-upload-extra-drop-area')[0]]
-    });
-}
-// in your app create uploader as soon as the DOM is ready
-// don't wait for the window to load
-$(document).ready(createUploader);
-
