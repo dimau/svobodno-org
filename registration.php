@@ -3,6 +3,7 @@
 session_start();
 include_once 'lib/connect.php'; //подключаемся к БД
 include_once 'lib/function_global.php'; //подключаем библиотеку функций
+$correct = null; // Инициализируем переменную корректности - нужно для того, чтобы не менять лишний раз идентификатор в input hidden у фотографий
 
 //проверим, быть может пользователь уже авторизирован. Если это так, перенаправим его на главную страницу сайта
 if (isset($_SESSION['id']) || (isset($_COOKIE['login']) && isset($_COOKIE['password'])))
@@ -25,12 +26,32 @@ else
             $correct = false;
         }
 
+        // Формируем набор переменных для сохранения в базу данных, либо для возвращения вместе с формой при их некорректности
+        $name = htmlspecialchars($_POST['name']);
+        $secondName = htmlspecialchars($_POST['secondName']);
+        $surname = htmlspecialchars($_POST['surname']);
+        $sex = htmlspecialchars($_POST['sex']);
+        $nationality = htmlspecialchars($_POST['nationality']);
+        $birthday = htmlspecialchars($_POST['birthday']);
+        $login = htmlspecialchars($_POST['login']);
+        $password = htmlspecialchars($_POST['password']);
+        $telephon = htmlspecialchars($_POST['telephon']);
+        $email = htmlspecialchars($_POST['email']);
+
+        $fileUploadId = $_POST['fileUploadId'];
+        if ($rez = mysql_query("SELECT filename FROM tempregfotos WHERE fileUploadId = $fileUploadId")) // ищем уже загруженные пользователем фотки
+        {
+            $row = mysql_fetch_assoc($rez);
+            $numUploadedFiles = mysql_num_rows($rez);
+            $row["filename"];
+        }
+
+
+
+
         if ($correct) //если данные верны, запишем их в базу данных
         {
-            // Формируем набор переменных для сохранения в базу данных
-            $login = htmlspecialchars($_POST['login']);
-            $password = $_POST['password'];
-            //$mail = htmlspecialchars($_POST['mail']); также я удалил mail из следующей строчки с записью в базу данных
+            $login = htmlspecialchars($login);
             $salt = mt_rand(100, 999);
             $tm = time();
             $password = md5(md5($password).$salt);
@@ -48,8 +69,22 @@ else
         }
         else
         {
-            exit("данные не верны!"); // действия в случае некорректности данных
+            //exit("данные не верны!"); // действия в случае некорректности данных
         }
+    }
+    else
+    {
+        $name = "";
+        $secondName = "";
+        $surname = "";
+        $sex = "0";
+        $nationality = "0";
+        $birthday = "";
+        $login = "";
+        $password = "";
+        $telephon = "";
+        $email = "";
+        $fileUploadId = generateCode(7);
     }
 }
 ?>
@@ -100,6 +135,20 @@ else
 				float: right;
 				margin: 10px 10px 0px 10px;
 			}
+
+            /* Стили для страницы социальных сетей*/
+            #tabs-3 .searchItem {
+                line-height: 2.8;
+            }
+
+            #tabs-3 .searchItemBody {
+                margin-left: 10px;
+            }
+
+            #tabs-3 .searchItemBody input, #tabs-3 .searchItemBody img  {
+                vertical-align: middle;
+            }
+
 		</style>
 
 		<!-- More ideas for your <head> here: h5bp.com/d/head-Tips -->
@@ -163,7 +212,7 @@ else
 											</div>
 											<span class="searchItemLabel">Имя: </span>
 											<div class="searchItemBody">
-												<input name="name" type="text" size="38" autofocus>
+												<input name="name" type="text" size="38" autofocus <?php echo "value='$name'";?>>
 											</div>
 										</div>
 										<div class="searchItem">
@@ -172,7 +221,7 @@ else
 											</div>
 											<span class="searchItemLabel">Отчество: </span>
 											<div class="searchItemBody">
-												<input name="secondName" type="text" size="33">
+												<input name="secondName" type="text" size="33" <?php echo "value='$secondName'";?>>
 											</div>
 										</div>
 										<div class="searchItem">
@@ -181,7 +230,7 @@ else
 											</div>
 											<span class="searchItemLabel">Фамилия: </span>
 											<div class="searchItemBody">
-												<input name="surname" type="text" size="33">
+												<input name="surname" type="text" size="33" <?php echo "value='$surname'";?>>
 											</div>
 										</div>
 										<div class="searchItem">
@@ -191,9 +240,9 @@ else
 											<span class="searchItemLabel">Пол: </span>
 											<div class="searchItemBody">
 												<select name="sex">
-													<option value="0" selected></option>
-													<option value="man">мужской</option>
-													<option value="woman">женский</option>
+													<option value="0" <?php if ($sex == "0") echo "selected";?>></option>
+													<option value="man" <?php if ($sex == "man") echo "selected";?>>мужской</option>
+													<option value="woman" <?php if ($sex == "woman") echo "selected";?>>женский</option>
 												</select>
 											</div>
 										</div>
@@ -204,10 +253,10 @@ else
 											<span class="searchItemLabel">Национальность: </span>
 											<div class="searchItemBody">
 												<select name="nationality">
-													<option value="0" selected></option>
-													<option value="1">русский</option>
-													<option value="2">европеец, американец</option>
-													<option value="3">СНГ, восточная нац-сть</option>
+													<option value="0" <?php if ($nationality == "0") echo "selected";?>></option>
+													<option value="1" <?php if ($nationality == "1") echo "selected";?>>русский</option>
+													<option value="2" <?php if ($nationality == "2") echo "selected";?>>европеец, американец</option>
+													<option value="3" <?php if ($nationality == "3") echo "selected";?>>СНГ, восточная нац-сть</option>
 												</select>
 											</div>
 										</div>
@@ -217,7 +266,7 @@ else
 											</div>
 											<span class="searchItemLabel">День рождения: </span>
 											<div class="searchItemBody">
-                                                <input name="birthday" type="text" id="datepicker" size="15">
+                                                <input name="birthday" type="text" id="datepicker" size="15" placeholder="дд.мм.гггг" <?php echo "value='$birthday'";?>>
 											</div>
 										</div>
 									</fieldset>
@@ -233,7 +282,7 @@ else
 												</div>
 												<span class="searchItemLabel">Логин: </span>
 												<div class="searchItemBody">
-													<input type="text" size="30" maxlength="50" name="login">
+													<input type="text" size="30" maxlength="50" name="login" <?php echo "value='$login'";?>>
 												</div>
 											</div>
 											<div class="searchItem">
@@ -242,7 +291,7 @@ else
 												</div>
 												<span class="searchItemLabel">Пароль: </span>
 												<div class="searchItemBody">
-													<input type="password" size="29" maxlength="50" name="password">
+													<input type="password" size="29" maxlength="50" name="password" <?php echo "value='$password'";?>>
 												</div>
 											</div>
 										</fieldset>
@@ -257,7 +306,7 @@ else
 												</div>
 												<span class="searchItemLabel">Телефон: </span>
 												<div class="searchItemBody">
-													<input name="telephon" type="text" size="27">
+													<input name="telephon" type="text" size="27" <?php echo "value='$telephon'";?>>
 												</div>
 											</div>
 											<div class="searchItem">
@@ -266,7 +315,7 @@ else
 												</div>
 												<span class="searchItemLabel">e-mail: </span>
 												<div class="searchItemBody">
-													<input name="email" type="text" size="30">
+													<input name="email" type="text" size="30" <?php echo "value='$email'";?>>
 												</div>
 											</div>
 										</fieldset>
@@ -291,6 +340,7 @@ else
 											</div>
 											Фотографии
 										</legend>
+                                        <input type="hidden" name="fileUploadId" id="fileUploadId" <?php echo "value='$fileUploadId'";?>>
                                         <div id="file-uploader">
                                             <noscript>
                                                 <p>Пожалуйста, активируйте JavaScript для загрузки файлов</p>
@@ -415,7 +465,7 @@ else
                                         </div>
                                         <span class="searchItemLabel">В каком регионе родились: </span>
                                         <div class="searchItemBody">
-                                            <input type="text" size="36">
+                                            <input type="text" size="42">
                                         </div>
                                     </div>
                                     <div class="searchItem">
@@ -424,15 +474,16 @@ else
                                         </div>
                                         <span class="searchItemLabel">Родной город, населенный пункт: </span>
                                         <div class="searchItemBody">
-                                            <input type="text" size="30">
+                                            <input type="text" size="36">
                                         </div>
                                     </div>
                                     <div class="searchItem">
                                         <div class="required"></div>
                                         <span class="searchItemLabel">Коротко о себе и своих интересах: </span>
-                                        <div class="searchItemBody">
-                                            <textarea name="shortlyAboutMe" cols="70" rows="4"></textarea>
-                                        </div>
+                                    </div>
+                                    <div class="searchItem">
+                                        <div class="required"></div>
+                                            <textarea name="shortlyAboutMe" cols="71" rows="4"></textarea>
                                     </div>
                                 </fieldset>
                                 <div class="shadowText" style="margin-top: 7px;">
@@ -441,7 +492,7 @@ else
                             </div>
                             <div id="tabs-3">
                                 <div class="shadowText">
-                                    Укажите, пожалуйста, минимум одну социальную сеть, используемую Вами. Это позволит системе представить Вас собственникам (только тех объектов, которыми Вы сами заинтересуетесь).
+                                    Укажите, пожалуйста, адрес Вашей личной страницы минимум в одной социальной сети. Это позволит системе представить Вас собственникам (только тех объектов, которыми Вы сами заинтересуетесь).
                                 </div>
                                 <fieldset class="edited private">
                                     <legend>
@@ -449,32 +500,30 @@ else
                                     </legend>
                                     <div class="searchItem" title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
                                         <div class="required"></div>
-                                        <select name="selectSocialNetwork1">
-                                            <option value="0" selected></option>
-                                            <option value="1">В контакте</option><option value="2">Одноклассники</option><option value="3">Facebook</option><option value="4">Twitter</option><option value="5">Мой круг</option><option value="6">Google+</option>
-                                        </select>
+                                        <img src="img/vkontakte.jpg">
                                         <div class="searchItemBody">
-                                            <input type="text" name="socialNetwork1" size="30" placeholder="http://">
+                                            <input type="text" name="vkontakte" size="62" placeholder="http://vk.com/...">
                                         </div>
                                     </div>
                                     <div class="searchItem" title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
                                         <div class="required"></div>
-                                        <select name="selectSocialNetwork2">
-                                            <option value="0" selected></option>
-                                            <option value="1">В контакте</option><option value="2">Одноклассники</option><option value="3">Facebook</option><option value="4">Twitter</option><option value="5">Мой круг</option><option value="6">Google+</option>
-                                        </select>
+                                        <img src="img/odnoklassniki.png">
                                         <div class="searchItemBody">
-                                            <input type="text" name="socialNetwork2" size="30" placeholder="http://">
+                                            <input type="text" name="odnoklassniki" size="68" placeholder="http://www.odnoklassniki.ru/profile/...">
                                         </div>
                                     </div>
                                     <div class="searchItem" title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
                                         <div class="required"></div>
-                                        <select name="selectSocialNetwork3">
-                                            <option value="0" selected></option>
-                                            <option value="1">В контакте</option><option value="2">Одноклассники</option><option value="3">Facebook</option><option value="4">Twitter</option><option value="5">Мой круг</option><option value="6">Google+</option>
-                                        </select>
+                                        <img src="img/facebook.jpg">
                                         <div class="searchItemBody">
-                                            <input type="text" name="socialNetwork3" size="30" placeholder="http://">
+                                            <input type="text" name="facebook" size="71" placeholder="https://www.facebook.com/profile.php?...">
+                                        </div>
+                                    </div>
+                                    <div class="searchItem" title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
+                                        <div class="required"></div>
+                                        <img src="img/twitter.png">
+                                        <div class="searchItemBody">
+                                            <input type="text" name="twitter" size="62" placeholder="https://twitter.com/...">
                                         </div>
                                     </div>
                                 </fieldset>

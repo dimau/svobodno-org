@@ -11,8 +11,6 @@ $(function() {
     $( "#datepicker" ).datepicker($.datepicker.regional["ru"]);
 
 });
-    //$.datepicker.setDefaults( $.datepicker.regional[ "ru" ] );
-    //$( "#datepicker" ).datepicker( $.datepicker.regional[ "ru" ] );
 
 // Подготовим возможность загрузки фотографий
 function createUploader(){
@@ -21,9 +19,18 @@ function createUploader(){
         action: '../lib/uploader.php',
         allowedExtensions: ["jpeg", "jpg", "img", "bmp"], //Также расширения нужно менять в файле uploader.php
         sizeLimit: 10 * 1024 * 1024,
-        //debug: true,
+        debug: true,
+        onSubmit: function(id, fileName){
+            uploader.setParams({
+                fileuploadid: $("#fileUploadId").val(),
+                sourcefilename: fileName,
+            });
+        },
         //extraDropzones: [qq.getByClass(document, 'qq-upload-extra-drop-area')[0]]
     });
+    var rezult = {success: true};
+    uploader._addToList(1, "писикаки2.jpg");
+    uploader._onComplete(1, "писикаки2.jpg", rezult);
 }
 // in your app create uploader as soon as the DOM is ready
 // don't wait for the window to load
