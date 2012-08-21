@@ -3,26 +3,63 @@ function registrationCorrect()
 {
     $errors = array();
 
-    if ($_POST['login'] == "") $errors[] = 'Укажите логин'; //не пусто ли поле логина
+    global $name, $secondName, $surname, $sex, $nationality, $birthday, $login, $password, $telephon, $email, $fileUploadId, $currentStatusEducation, $almamater, $speciality, $kurs, $ochnoZaochno, $yearOfEnd, $placeOfWork, $workPosition, $regionOfBorn, $cityOfBorn, $shortlyAboutMe, $vkontakte, $odnoklassniki, $facebook, $twitter, $typeOfObject, $adjacentRooms, $floor, $minCost, $maxCost, $pledge, $withWho, $liksToFriends, $children, $howManyChildren, $animals, $howManyAnimals, $period, $additionalDescriptionOfSearch;
+
+    if ($name == "") $errors[] = 'Укажите имя';
+    if ($secondName == "") $errors[] = 'Укажите отчество';
+    if ($surname == "") $errors[] = 'Укажите фамилию';
+    if ($sex == "0") $errors[] = 'Укажите пол';
+    if ($nationality == "0") $errors[] = 'Укажите национальность';
+    if ($birthday == "") $errors[] = 'Укажите дату рождения';
+    //if (!preg_match('/^([a-zA-Z0-9])(\w|-|_)+([a-z0-9])$/is', $_POST['login'])) $errors[] = 'Неправильный формат даты рождения, должен быть: дд.мм.гггг';
+
+    if ($login == "") $errors[] = 'Укажите логин'; //не пусто ли поле логина
+    $rez = mysql_query("SELECT * FROM users WHERE login='".$login."'");
+    if (@mysql_num_rows($rez) != 0) $errors[] = 'Пользователь с таким логином уже существует, укажите другой логин'; // проверка на существование в БД такого же логина
     //if (!preg_match('/^([a-zA-Z0-9])(\w|-|_)+([a-z0-9])$/is', $_POST['login'])) return false; // соответствует ли логин регулярному выражению
-    if ($_POST['password'] == "") $errors[] = 'Укажите пароль'; //не пусто ли поле пароля
+    if ($password == "") $errors[] = 'Укажите пароль'; //не пусто ли поле пароля
     //if (!preg_match('/^([a-zA-Z0-9])(\w|-|_)+([a-z0-9])$/is', $_POST['password'])) return false; // соответствует ли пароль регулярному выражению
-    if ($_POST['name'] == "") $errors[] = 'Укажите имя';
-    if ($_POST['secondName'] == "") $errors[] = 'Укажите отчество';
-    if ($_POST['surname'] == "") $errors[] = 'Укажите фамилию';
-    if ($_POST['sex'] == "0") $errors[] = 'Укажите пол';
-    if ($_POST['nationality'] == "0") $errors[] = 'Укажите национальность';
-    if ($_POST['birthday'] == "") $errors[] = 'Укажите дату рождения';
-    if ($_POST['telephon'] == "") $errors[] = 'Укажите контактный (мобильный) телефон';
-    if ($_POST['email'] == "") $errors[] = 'Укажите e-mail';
-    //if ($_POST['mail'] == "") return false; //не пусто ли поле e-mail
+
+
+    if ($telephon == "") $errors[] = 'Укажите контактный (мобильный) телефон';
+    if ($email == "") $errors[] = 'Укажите e-mail';
+    if ($fileUploadId == "") $errors[] = 'Перезагрузите браузер, пожалуйста, возникла ошибка при формировании формы для загрузки фотографий';
+    if ($currentStatusEducation == "0") $errors[] = 'Укажите Ваше образование (текущий статус)';
+    if ($almamater == "") $errors[] = 'Укажите учебное заведение';
+    if ($speciality == "") $errors[] = 'Укажите специальность';
+    if ($kurs == "") $errors[] = 'Укажите курс обучения';
+    if ($ochnoZaochno == "0") $errors[] = 'Укажите форму обучения (очная, заочная)';
+    if ($yearOfEnd == "") $errors[] = 'Укажите e-mail';
+    if ($placeOfWork == "") $errors[] = 'Укажите e-mail';
+    if ($workPosition == "") $errors[] = 'Укажите e-mail';
+    if ($regionOfBorn == "") $errors[] = 'Укажите e-mail';
+    if ($cityOfBorn == "") $errors[] = 'Укажите e-mail';
+    if ($shortlyAboutMe == "") $errors[] = 'Укажите e-mail';
+    if ($vkontakte == "") $errors[] = 'Укажите e-mail';
+    if ($odnoklassniki == "") $errors[] = 'Укажите e-mail';
+    if ($facebook == "") $errors[] = 'Укажите e-mail';
+    if ($twitter == "") $errors[] = 'Укажите e-mail';
+    if ($typeOfObject == "") $errors[] = 'Укажите e-mail';
+    if ($adjacentRooms == "") $errors[] = 'Укажите e-mail';
+    if ($floor == "") $errors[] = 'Укажите e-mail';
+    if ($minCost == "") $errors[] = 'Укажите e-mail';
+    if ($maxCost == "") $errors[] = 'Укажите e-mail';
+    if ($pledge == "") $errors[] = 'Укажите e-mail';
+    if ($withWho == "") $errors[] = 'Укажите e-mail';
+    if ($liksToFriends == "") $errors[] = 'Укажите e-mail';
+    if ($children == "") $errors[] = 'Укажите e-mail';
+    if ($howManyChildren == "") $errors[] = 'Укажите e-mail';
+    if ($animals == "") $errors[] = 'Укажите e-mail';
+    if ($howManyAnimals == "") $errors[] = 'Укажите e-mail';
+    if ($period == "") $errors[] = 'Укажите e-mail';
+    if ($additionalDescriptionOfSearch == "") $errors[] = 'Укажите e-mail';
+
+
+
     //if ($_POST['lic'] != "ok") return false; //приняты ли правила
     //if (!preg_match('/^([a-z0-9])(\w|[.]|-|_)+([a-z0-9])@([a-z0-9])([a-z0-9.-]*)([a-z0-9])([.]{1})([a-z]{2,4})$/is', $_POST['mail'])) return false; //соответствует ли поле e-mail регулярному выражению
     //if (strlen($_POST['password']) < 5) return false; //не меньше ли 5 символов длина пароля
 
-    $login = $_POST['login'];
-    $rez = mysql_query("SELECT * FROM users WHERE login=$login");
-    if (@mysql_num_rows($rez) != 0) $errors[] = 'Пользователь с таким логином уже существует, укажите другой логин'; // проверка на существование в БД такого же логина
 
     return $errors; // Возвращаем список ошибок, если все в порядке, то он будет пуст
 }

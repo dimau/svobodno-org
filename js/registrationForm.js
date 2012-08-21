@@ -20,6 +20,7 @@ function createUploader(){
         allowedExtensions: ["jpeg", "jpg", "img", "bmp"], //Также расширения нужно менять в файле uploader.php
         sizeLimit: 10 * 1024 * 1024,
         debug: true,
+        // О каждом загруженном файле информацию передаем на сервер через переменные - для сохранения в БД
         onSubmit: function(id, fileName){
             uploader.setParams({
                 fileuploadid: $("#fileUploadId").val(),
@@ -28,30 +29,40 @@ function createUploader(){
         },
         //extraDropzones: [qq.getByClass(document, 'qq-upload-extra-drop-area')[0]]
     });
+
+    // Сформируем зеленые блоки для уже загруженных фотографий руками, чтобы пользователя не путать
     var rezult = {success: true};
-    uploader._addToList(1, "писикаки2.jpg");
-    uploader._onComplete(1, "писикаки2.jpg", rezult);
+    var uploadedFoto = document.getElementsByClassName('uploadedFoto');
+    for (var i = 0; i < uploadedFoto.length; i++) {
+        var uploadedFotoName = $(uploadedFoto[i]).attr('filename');
+
+        // Формируем зеленый блок в списке загруженных файлов в разделе Фотографии
+        uploader._addToList(i + 100, uploadedFotoName);
+        uploader._onComplete(i + 100, uploadedFotoName, rezult);
+    }
+
+   // Чтобы обмануть загрузчик файлов и он не выдавал при отправке страницы сообщение о том, что мол есть еще не загруженные фотографии, ориентируясь на сформированные вручную зеленые блоки
+   uploader._filesInProgress = 0;
 }
-// in your app create uploader as soon as the DOM is ready
-// don't wait for the window to load
 $(document).ready(createUploader);
 
-
-
 /* Если в форме Работа указан чекбокс - не работаю, то блокировать заполнение остальных инпутов */
-$("#notWorkCheckbox").on('change', function() {
-    if ($("input.ifWorked").attr('disabled') == 'disabled') {
-        $("input.ifWorked").removeAttr('disabled').css('color', '');
-        $("div.searchItem.ifWorked div.required").text("*");
-
-    } else {
+$("#notWorkCheckbox").on('change', notWorkCheckbox);
+$(document).ready(notWorkCheckbox);
+function notWorkCheckbox() {
+    if ($("#notWorkCheckbox").is(':checked')) {
         $("input.ifWorked").attr('disabled', 'disabled').css('color', 'grey');
         $("div.searchItem.ifWorked div.required").text("");
+    } else {
+        $("input.ifWorked").removeAttr('disabled').css('color', '');
+        $("div.searchItem.ifWorked div.required").text("*");
     }
-});
+}
 
 /* Если в форме Образование указан чекбокс - не учился, то блокировать заполнение остальных инпутов */
-$("#currentStatusEducation").change(function() {
+$("#currentStatusEducation").change(currentStatusEducation);
+$(document).ready(currentStatusEducation);
+function currentStatusEducation() {
     var currentValue = $("#currentStatusEducation option:selected").attr('value');
     if (currentValue == 0) {
         $("input.ifLearned, select.ifLearned").removeAttr('disabled').css('color', '');
@@ -73,7 +84,7 @@ $("#currentStatusEducation").change(function() {
         $('#kurs').css('display', 'none');
         $('#yearOfEnd').css('display', '');
     }
-});
+}
 
 
 
@@ -81,28 +92,34 @@ $("#currentStatusEducation").change(function() {
 document.getElementById('rightBlockOfSearchParameters').style.height = document.getElementById('leftBlockOfSearchParameters').offsetHeight - 22 + 'px';
 
 /* Сценарии для появления блока с подробным описанием сожителей */
-$("#withWho").on('change', function(event) {
-    if ($("#withWho").attr('value') != 1) {
+$("#withWho").on('change', withWho);
+$(document).ready(withWho);
+function withWho() {
+    if ($("#withWho").attr('value') != 0) {
         $("#withWhoDescription").css('display', '');
     } else {
         $("#withWhoDescription").css('display', 'none');
     }
-});
+}
 
 /* Сценарии для появления блока с подробным описанием детей */
-$("#children").on('change', function(event) {
+$("#children").on('change', children);
+$(document).ready(children);
+function children() {
     if ($("#children").attr('value') != 0) {
         $("#childrenDescription").css('display', '');
     } else {
         $("#childrenDescription").css('display', 'none');
     }
-});
+}
 
 /* Сценарии для появления блока с подробным описанием животных */
-$("#animals").on('change', function(event) {
+$("#animals").on('change', animals);
+$(document).ready(animals);
+function animals() {
     if ($("#animals").attr('value') != 0) {
         $("#animalsDescription").css('display', '');
     } else {
         $("#animalsDescription").css('display', 'none');
     }
-});
+}
