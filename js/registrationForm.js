@@ -17,7 +17,7 @@ function createUploader(){
     var uploader = new qq.FileUploader({
         element: document.getElementById('file-uploader'),
         action: '../lib/uploader.php',
-        allowedExtensions: ["jpeg", "jpg", "img", "bmp"], //Также расширения нужно менять в файле uploader.php
+        allowedExtensions: ["jpeg", "jpg", "img", "bmp", "png", "gif"], //Также расширения нужно менять в файле uploader.php
         sizeLimit: 10 * 1024 * 1024,
         debug: true,
         // О каждом загруженном файле информацию передаем на сервер через переменные - для сохранения в БД
@@ -122,4 +122,12 @@ function animals() {
     } else {
         $("#animalsDescription").css('display', 'none');
     }
+}
+
+// Если есть оповещения для пользователя - отобразить их
+if ($('#userMistakesBlock ol').html() != "") {
+    $('#userMistakesBlock').on('click', function() {
+        $(this).slideUp(800);
+    });
+    $('#userMistakesBlock').css('display', 'block');
 }

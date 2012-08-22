@@ -111,7 +111,7 @@ else {
         $howManyAnimals = htmlspecialchars($_POST['howManyAnimals']);
         $period = htmlspecialchars($_POST['period']);
         $additionalDescriptionOfSearch = htmlspecialchars($_POST['additionalDescriptionOfSearch']);
-
+        if (isset($_POST['lic'])) $lic = htmlspecialchars($_POST['lic']); else $lic = "";
 
         $errors = registrationCorrect(); //записываем в переменную результат работы функции registrationCorrect(), которая возвращает пустой array, если введённые данные верны и array с ошибками в противном случае
         // Считаем ошибки, если 0, то можно будет записать данные в БД
@@ -135,9 +135,6 @@ else {
                 $regged = true;
                 header('Location: successfullRegistration.php'); //после успешной регистрации - переходим на соответствующую страницу
             }
-        }
-        else {
-            //exit("данные не верны!"); // действия в случае некорректности данных
         }
     }
     else {
@@ -241,6 +238,7 @@ else {
         $period = "";
         $additionalDescriptionOfSearch = "";
 
+        $lic = "";
     }
 }
 ?>
@@ -279,6 +277,8 @@ else {
 
     <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
     <link rel="stylesheet" href="css/fileuploader.css">
+    <!-- Стили для оформления валидационных комментариев к полям при их заполнении -->
+    <link rel="stylesheet" href="css/validationEngine.jquery.css" type="text/css" media="screen" title="no title" charset="utf-8" />
     <link rel="stylesheet" href="css/main.css">
     <style>
             /* Стили для капчи и для Готово */
@@ -324,6 +324,25 @@ else {
 
 <!-- Add your site or application content here -->
 <div class="page_without_footer">
+
+<div id="userMistakesBlock" class="ui-widget" style="display: none; width: 94%; position: absolute; top: 0px; left: 3%; z-index: 100;">
+    <div class="ui-state-highlight ui-corner-all" style="text-align: center; padding: 0 .7em;">
+        <div style="display: inline-block; text-align: left;">
+        <p>
+            <span class="ui-icon ui-icon-info" style="display: inline-block; vertical-align: middle; margin-right: .3em;"></span>
+            <span id="userMistakesText" style="vertical-align: middle;">При обработке данных возникли ошибки:</span>
+        </p>
+        <ol><?php
+                if ($correct == false && isset($errors))
+                {
+                    foreach ($errors as $key => $value) {
+                        echo "<li>$value</li>";
+                    }
+                }
+            ?></ol>
+            </div>
+    </div>
+</div>
 
 <!-- Сформируем и вставим заголовок страницы -->
 <?php
@@ -372,7 +391,7 @@ include("header.php");
                 <span class="searchItemLabel">Имя: </span>
 
                 <div class="searchItemBody">
-                    <input name="name" type="text" size="38" autofocus <?php echo "value='$name'";?>>
+                    <input class="validate[required]" name="name" type="text" size="38" autofocus <?php echo "value='$name'";?>>
                 </div>
             </div>
             <div class="searchItem">
@@ -382,7 +401,7 @@ include("header.php");
                 <span class="searchItemLabel">Отчество: </span>
 
                 <div class="searchItemBody">
-                    <input name="secondName" type="text" size="33" <?php echo "value='$secondName'";?>>
+                    <input class="validate[required]" name="secondName" type="text" size="33" <?php echo "value='$secondName'";?>>
                 </div>
             </div>
             <div class="searchItem">
@@ -392,7 +411,7 @@ include("header.php");
                 <span class="searchItemLabel">Фамилия: </span>
 
                 <div class="searchItemBody">
-                    <input name="surname" type="text" size="33" <?php echo "value='$surname'";?>>
+                    <input class="validate[required]" name="surname" type="text" size="33" <?php echo "value='$surname'";?>>
                 </div>
             </div>
             <div class="searchItem">
@@ -1180,7 +1199,7 @@ include("header.php");
 <!-- /end.tabs -->
 <div style="float: right;">
     <div style="text-align: left; margin-top: 7px;">
-        <input type="checkbox" name="lic" value="yes"> С условиями <a href="#">лицензионного соглашения</a> согласен
+        <input type="checkbox" name="lic" value="yes"> Я принимаю условия <a href="#">лицензионного соглашения</a>
     </div>
     <div class="readyButton">
         <button type="submit" name="readyButton" id="readyButton">
@@ -1220,7 +1239,10 @@ include("header.php");
 
 <!-- jQuery UI с моей темой оформления -->
 <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
+<!-- Русификатор виджета календарь -->
 <script src="js/vendor/jquery.ui.datepicker-ru.js"></script>
+<!-- Скрипт для валидации на лету полей формы -->
+<script src="js/vendor/jquery.validationEngine.js"></script>
 
 <script src="js/vendor/fileuploader.js" type="text/javascript"></script>
 

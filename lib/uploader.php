@@ -1,7 +1,7 @@
 <?php
 
 // list of valid extensions, ex. array("jpeg", "xml", "bmp") Также важно поменять список расширений в js файле vendor\fileuploader.js
-$allowedExtensions = array("jpeg", "jpg", "img", "bmp");
+$allowedExtensions = array("jpeg", "jpg", "img", "bmp", "png", "gif");
 // max file size in bytes
 $sizeLimit = 10 * 1024 * 1024;
 
