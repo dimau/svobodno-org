@@ -86,8 +86,6 @@ function currentStatusEducation() {
     }
 }
 
-
-
 // Подгонка размера правого блока параметров (районы) расширенного поиска под размер левого блока параметров. 19 пикселей - на padding у fieldset
 document.getElementById('rightBlockOfSearchParameters').style.height = document.getElementById('leftBlockOfSearchParameters').offsetHeight - 22 + 'px';
 
@@ -124,10 +122,42 @@ function animals() {
     }
 }
 
-// Если есть оповещения для пользователя - отобразить их
+// Отображение результатов обработки формы на PHP
 if ($('#userMistakesBlock ol').html() != "") {
     $('#userMistakesBlock').on('click', function() {
         $(this).slideUp(800);
     });
     $('#userMistakesBlock').css('display', 'block');
+}
+
+
+// Подключение и настройка динамической проверки формы на JS
+$('#tabs').bind('tabsshow', function(event, ui) {
+    newTabId = ui.panel.id; // Определяем идентификатор вновь открытой вкладки
+    $(".formError." + newTabId).css("display", "");
+    $(".formError").not("." + newTabId).css('display', "none");
+
+    // Перепозиционируем подсказки по валидации при открытии вкладки - это важно при проверке формы перед отправкой, когда появляются все подсказки на всех вкладках (даже невидимых)
+    $(".formError." + newTabId).each(function() {
+        var validatedElemName = $(this).attr("class").split(" ")[1];
+        var validatedElem = document.body.querySelector("[name=" + validatedElemName + "]");
+        rePosition(validatedElem, this);
+    });
+});
+
+// В качестве входных параметров получает caller - валидируемый элемент и divFormError - элемент всплывающей подсказки с текстом сообщения об ошибке валидации
+function rePosition(caller, divFormError) { // Соответствует действиям по позиционированию функции buildPrompt из jquery.validationEngine.js - строчка 84
+    callerTopPosition = $(caller).offset().top;
+    callerleftPosition = $(caller).offset().left;
+    callerWidth = $(caller).width();
+    callerHeight = $(caller).height();
+    inputHeight = $(divFormError).height();
+
+    callerleftPosition = callerleftPosition + callerWidth - 30;
+    callerTopPosition = callerTopPosition - inputHeight - 10;
+
+    $(divFormError).css({
+        top: callerTopPosition,
+        left: callerleftPosition,
+    });
 }

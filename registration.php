@@ -391,7 +391,7 @@ include("header.php");
                 <span class="searchItemLabel">Имя: </span>
 
                 <div class="searchItemBody">
-                    <input class="validate[required]" name="name" type="text" size="38" autofocus <?php echo "value='$name'";?>>
+                    <input name="name" type="text" size="38" autofocus validations="validate[required]" <?php echo "value='$name'";?>>
                 </div>
             </div>
             <div class="searchItem">
@@ -401,7 +401,7 @@ include("header.php");
                 <span class="searchItemLabel">Отчество: </span>
 
                 <div class="searchItemBody">
-                    <input class="validate[required]" name="secondName" type="text" size="33" <?php echo "value='$secondName'";?>>
+                    <input name="secondName" type="text" size="33" validations="validate[required]" <?php echo "value='$secondName'";?>>
                 </div>
             </div>
             <div class="searchItem">
@@ -411,7 +411,7 @@ include("header.php");
                 <span class="searchItemLabel">Фамилия: </span>
 
                 <div class="searchItemBody">
-                    <input class="validate[required]" name="surname" type="text" size="33" <?php echo "value='$surname'";?>>
+                    <input name="surname" type="text" size="33" validations="validate[required]" <?php echo "value='$surname'";?>>
                 </div>
             </div>
             <div class="searchItem">
@@ -421,7 +421,7 @@ include("header.php");
                 <span class="searchItemLabel">Пол: </span>
 
                 <div class="searchItemBody">
-                    <select name="sex">
+                    <select name="sex" validations="validate[required]">
                         <option value="0" <?php if ($sex == "0") echo "selected";?>></option>
                         <option value="man" <?php if ($sex == "man") echo "selected";?>>мужской</option>
                         <option value="woman" <?php if ($sex == "woman") echo "selected";?>>женский</option>
@@ -435,7 +435,7 @@ include("header.php");
                 <span class="searchItemLabel">Национальность: </span>
 
                 <div class="searchItemBody">
-                    <select name="nationality">
+                    <select name="nationality" validations="validate[required]">
                         <option value="0" <?php if ($nationality == "0") echo "selected";?>></option>
                         <option value="1" <?php if ($nationality == "1") echo "selected";?>>русский</option>
                         <option value="2" <?php if ($nationality == "2") echo "selected";?>>европеец, американец
@@ -470,7 +470,7 @@ include("header.php");
                     <span class="searchItemLabel">Логин: </span>
 
                     <div class="searchItemBody">
-                        <input type="text" size="30" maxlength="50" name="login" <?php echo "value='$login'";?>>
+                        <input type="text" size="30" maxlength="50" name="login" validations="validate[required]" <?php echo "value='$login'";?>>
                     </div>
                 </div>
                 <div class="searchItem">
@@ -481,7 +481,7 @@ include("header.php");
 
                     <div class="searchItemBody">
                         <input type="password" size="29" maxlength="50"
-                               name="password" <?php echo "value='$password'";?>>
+                               name="password" validations="validate[required]" <?php echo "value='$password'";?>>
                     </div>
                 </div>
             </fieldset>
@@ -497,7 +497,7 @@ include("header.php");
                     <span class="searchItemLabel">Телефон: </span>
 
                     <div class="searchItemBody">
-                        <input name="telephon" type="text" size="27" <?php echo "value='$telephon'";?>>
+                        <input name="telephon" type="text" size="27" validations="validate[required,custom[telephone]]" <?php echo "value='$telephon'";?>>
                     </div>
                 </div>
                 <div class="searchItem">
@@ -507,7 +507,7 @@ include("header.php");
                     <span class="searchItemLabel">e-mail: </span>
 
                     <div class="searchItemBody">
-                        <input name="email" type="text" size="30" <?php echo "value='$email'";?>>
+                        <input name="email" type="text" size="30" validations="validate[required,custom[email]]" <?php echo "value='$email'";?>>
                     </div>
                 </div>
             </fieldset>
@@ -574,7 +574,7 @@ include("header.php");
             <span class="searchItemLabel">Текущий статус: </span>
 
             <div class="searchItemBody">
-                <select name="currentStatusEducation" id="currentStatusEducation">
+                <select name="currentStatusEducation" id="currentStatusEducation" validations="validate[required]">
                     <option value="0" <?php if ($currentStatusEducation == "0") echo "selected";?>></option>
                     <option value="1" <?php if ($currentStatusEducation == "1") echo "selected";?>>Нигде не учился
                     </option>
@@ -591,7 +591,7 @@ include("header.php");
             <span class="searchItemLabel">Учебное заведение: </span>
 
             <div class="searchItemBody">
-                <input name="almamater" class="ifLearned" type="text" size="50" <?php echo "value='$almamater'";?>>
+                <input name="almamater" class="ifLearned" type="text" size="50" validations="validate[required]" <?php echo "value='$almamater'";?>>
             </div>
         </div>
         <div id="speciality" class="searchItem ifLearned">
@@ -601,7 +601,7 @@ include("header.php");
             <span class="searchItemLabel">Специальность: </span>
 
             <div class="searchItemBody">
-                <input name="speciality" class="ifLearned" type="text" size="55" <?php echo "value='$speciality'";?>>
+                <input name="speciality" class="ifLearned" type="text" size="55" validations="validate[required]" <?php echo "value='$speciality'";?>>
             </div>
         </div>
         <div id="kurs" class="searchItem ifLearned" title="Укажите курс, на котором учитесь">
@@ -611,7 +611,7 @@ include("header.php");
             <span class="searchItemLabel">Курс: </span>
 
             <div class="searchItemBody">
-                <input name="kurs" class="ifLearned" type="text" size="19" <?php echo "value='$kurs'";?>>
+                <input name="kurs" class="ifLearned" type="text" size="19" validations="validate[required]" <?php echo "value='$kurs'";?>>
             </div>
         </div>
         <div id="formatEducation" class="searchItem ifLearned" title="Укажите форму обучения">
@@ -621,7 +621,7 @@ include("header.php");
             <span class="searchItemLabel">Очно / Заочно: </span>
 
             <div class="searchItemBody">
-                <select name="ochnoZaochno" class="ifLearned">
+                <select name="ochnoZaochno" class="ifLearned" validations="validate[required]">
                     <option value="0" <?php if ($ochnoZaochno == "0") echo "selected";?>></option>
                     <option value="1" <?php if ($ochnoZaochno == "1") echo "selected";?>>Очно</option>
                     <option value="2" <?php if ($ochnoZaochno == "2") echo "selected";?>>Заочно</option>
@@ -635,7 +635,7 @@ include("header.php");
             <span class="searchItemLabel">Год окончания: </span>
 
             <div class="searchItemBody">
-                <input name="yearOfEnd" class="ifLearned" type="text" size="9" <?php echo "value='$yearOfEnd'";?>>
+                <input name="yearOfEnd" class="ifLearned" type="text" size="9" validations="validate[required]" <?php echo "value='$yearOfEnd'";?>>
             </div>
         </div>
     </fieldset>
@@ -656,7 +656,7 @@ include("header.php");
             <span class="searchItemLabel">Место работы: </span>
 
             <div class="searchItemBody">
-                <input name="placeOfWork" class="ifWorked" type="text" size="30" <?php echo "value='$placeOfWork'";?>>
+                <input name="placeOfWork" class="ifWorked" type="text" size="30" validations="validate[required]" <?php echo "value='$placeOfWork'";?>>
             </div>
         </div>
         <div class="searchItem ifWorked">
@@ -666,7 +666,7 @@ include("header.php");
             <span class="searchItemLabel">Должность: </span>
 
             <div class="searchItemBody">
-                <input name="workPosition" class="ifWorked" type="text" size="33" <?php echo "value='$workPosition'";?>>
+                <input name="workPosition" class="ifWorked" type="text" size="33" validations="validate[required]" <?php echo "value='$workPosition'";?>>
             </div>
         </div>
     </fieldset>
@@ -682,7 +682,7 @@ include("header.php");
             <span class="searchItemLabel">В каком регионе родились: </span>
 
             <div class="searchItemBody">
-                <input name="regionOfBorn" type="text" size="42" <?php echo "value='$regionOfBorn'";?>>
+                <input name="regionOfBorn" type="text" size="42" validations="validate[required]" <?php echo "value='$regionOfBorn'";?>>
             </div>
         </div>
         <div class="searchItem">
@@ -692,7 +692,7 @@ include("header.php");
             <span class="searchItemLabel">Родной город, населенный пункт: </span>
 
             <div class="searchItemBody">
-                <input name="cityOfBorn" type="text" size="36" <?php echo "value='$cityOfBorn'";?>>
+                <input name="cityOfBorn" type="text" size="36" validations="validate[required]" <?php echo "value='$cityOfBorn'";?>>
             </div>
         </div>
         <div class="searchItem">
@@ -1176,7 +1176,7 @@ include("header.php");
         <span class="searchItemLabel">Ориентировочный срок аренды:</span>
 
         <div class="searchItemBody">
-            <input type="text" name="period" size="20" <?php echo "value='$period'";?>>
+            <input type="text" name="period" size="20" validations="validate[required]" <?php echo "value='$period'";?>>
         </div>
     </div>
     <div class="searchItem">
