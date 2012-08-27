@@ -54,11 +54,11 @@
 						<form name="whoIsOurUser" method="get" action="registration.php">
 							<ul>
 								<li>
-									<input type="checkbox" name="type" value="tenant" checked>
+									<input type="checkbox" name="typeTenant" value="true" checked>
 									Найти и снять недвижимость
 								</li>
 								<li>
-									<input type="checkbox" name="type" value="owner">
+									<input type="checkbox" name="typeOwner" value="true">
 									Сдать свою недвижимость
 								</li>
 							</ul>

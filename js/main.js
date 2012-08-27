@@ -3,7 +3,7 @@
  */
 
 /* Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера */
-window.jQuery || document.write('<script src="js/vendor/jquery-1.7.2.min.js"><\/script>')
+window.jQuery || document.write('<script src="js/vendor/jquery-1.7.2.min.js"></script>')
 
 
 /* Инициализируем отображение вкладок при помощи jQuery UI */

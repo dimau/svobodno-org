@@ -46,6 +46,7 @@ function createUploader(){
 }
 $(document).ready(createUploader);
 
+
 /* Если в форме Работа указан чекбокс - не работаю, то блокировать заполнение остальных инпутов */
 $("#notWorkCheckbox").on('change', notWorkCheckbox);
 $(document).ready(notWorkCheckbox);
@@ -86,41 +87,44 @@ function currentStatusEducation() {
     }
 }
 
-// Подгонка размера правого блока параметров (районы) расширенного поиска под размер левого блока параметров. 19 пикселей - на padding у fieldset
-document.getElementById('rightBlockOfSearchParameters').style.height = document.getElementById('leftBlockOfSearchParameters').offsetHeight - 22 + 'px';
+if (document.getElementById("tabs-4")) {
+    // Подгонка размера правого блока параметров (районы) расширенного поиска под размер левого блока параметров. 19 пикселей - на padding у fieldset
+    document.getElementById('rightBlockOfSearchParameters').style.height = document.getElementById('leftBlockOfSearchParameters').offsetHeight - 22 + 'px';
 
-/* Сценарии для появления блока с подробным описанием сожителей */
-$("#withWho").on('change', withWho);
-$(document).ready(withWho);
-function withWho() {
-    if ($("#withWho").attr('value') != 0) {
-        $("#withWhoDescription").css('display', '');
-    } else {
-        $("#withWhoDescription").css('display', 'none');
+    /* Сценарии для появления блока с подробным описанием сожителей */
+    $("#withWho").on('change', withWho);
+    $(document).ready(withWho);
+    function withWho() {
+        if ($("#withWho").attr('value') != 0) {
+            $("#withWhoDescription").css('display', '');
+        } else {
+            $("#withWhoDescription").css('display', 'none');
+        }
+    }
+
+    /* Сценарии для появления блока с подробным описанием детей */
+    $("#children").on('change', children);
+    $(document).ready(children);
+    function children() {
+        if ($("#children").attr('value') != 0) {
+            $("#childrenDescription").css('display', '');
+        } else {
+            $("#childrenDescription").css('display', 'none');
+        }
+    }
+
+    /* Сценарии для появления блока с подробным описанием животных */
+    $("#animals").on('change', animals);
+    $(document).ready(animals);
+    function animals() {
+        if ($("#animals").attr('value') != 0) {
+            $("#animalsDescription").css('display', '');
+        } else {
+            $("#animalsDescription").css('display', 'none');
+        }
     }
 }
 
-/* Сценарии для появления блока с подробным описанием детей */
-$("#children").on('change', children);
-$(document).ready(children);
-function children() {
-    if ($("#children").attr('value') != 0) {
-        $("#childrenDescription").css('display', '');
-    } else {
-        $("#childrenDescription").css('display', 'none');
-    }
-}
-
-/* Сценарии для появления блока с подробным описанием животных */
-$("#animals").on('change', animals);
-$(document).ready(animals);
-function animals() {
-    if ($("#animals").attr('value') != 0) {
-        $("#animalsDescription").css('display', '');
-    } else {
-        $("#animalsDescription").css('display', 'none');
-    }
-}
 
 // Отображение результатов обработки формы на PHP
 if ($('#userMistakesBlock ol').html() != "") {
@@ -144,7 +148,6 @@ $('#tabs').bind('tabsshow', function(event, ui) {
         rePosition(validatedElem, this);
     });
 });
-
 // В качестве входных параметров получает caller - валидируемый элемент и divFormError - элемент всплывающей подсказки с текстом сообщения об ошибке валидации
 function rePosition(caller, divFormError) { // Соответствует действиям по позиционированию функции buildPrompt из jquery.validationEngine.js - строчка 84
     callerTopPosition = $(caller).offset().top;

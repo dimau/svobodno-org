@@ -10,6 +10,11 @@ if (isset($_SESSION['id']) || (isset($_COOKIE['login']) && isset($_COOKIE['passw
     header('Location: index.php');
 }
 else {
+    // Выясняем роль пользователя - только арендатор, только собственник, или и то и другое.
+    if (isset($_GET['typeTenant'])) {$typeTenant = true;} else {$typeTenant = false;}
+    if (isset($_GET['typeOwner'])) {$typeOwner = true;} else {$typeOwner = false;}
+    if (!isset($_GET['typeTenant']) && !isset($_GET['typeOwner'])) {$typeTenant = true; $typeOwner = true;}
+
     if (isset($_POST['readyButton'])) //если была нажата кнопка регистрации, проверим данные на корректность и, если данные введены и введены правильно, добавим запись с новым пользователем в БД
     {
         // Формируем набор переменных для сохранения в базу данных, либо для возвращения вместе с формой при их некорректности
@@ -22,7 +27,7 @@ else {
         $login = htmlspecialchars($_POST['login']);
         $password = htmlspecialchars($_POST['password']);
         $telephon = htmlspecialchars($_POST['telephon']);
-        $email = htmlspecialchars($_POST['email']);
+        if (isset($_POST['email'])) $email = htmlspecialchars($_POST['email']); else $email = "";
         $fileUploadId = $_POST['fileUploadId'];
 
         $currentStatusEducation = htmlspecialchars($_POST['currentStatusEducation']);
@@ -120,20 +125,26 @@ else {
 
         if ($correct) //если данные верны, запишем их в базу данных
         {
-            $login = htmlspecialchars($login);
             $salt = mt_rand(100, 999);
             $tm = time();
+            $last_act = $tm;
+            $reg_date = $tm;
             $password = md5(md5($password) . $salt);
 
-            if (mysql_query("INSERT INTO users (login,password,salt,reg_date,last_act) VALUES ('" . $login . "','" . $password . "','" . $salt . "','" . $tm . "','" . $tm . "')")) //пишем данные в БД и авторизовываем пользователя
+            if (mysql_query("INSERT INTO users (typeTenant,typeOwner,name,secondName,surname,sex,nationality,      birthday,      login,password,telephon,emailReg,email,        fotoFilesId,currentStatusEducation,almamater,speciality,kurs,ochnoZaochno,yearOfEnd,notWorkCheckbox,placeOfWork,workPosition,regionOfBorn,cityOfBorn,shortlyAboutMe,vkontakte,odnoklassniki,facebook,twitter,searchRequestId,salt,user_hash,last_act,reg_date) VALUES ('" . $typeTenant . "','" . $typeOwner . "','" . $name . "','" . $secondName . "','" . $surname . "','" . $sex . "','" . $nationality . "','" .              $birthday              . "','" . $login . "','" . $password . "','" . $telephon . "','" . $email . "','" . $email . "','" .                  $fotoFilesId . "','" . $currentStatusEducation . "','" . $almamater . "','" . $speciality . "','" . $kurs . "','" . $ochnoZaochno . "','" . $yearOfEnd . "','" . $notWorkCheckbox . "','" . $placeOfWork . "','" . $workPosition . "','" . $regionOfBorn . "','" . $cityOfBorn . "','" . $shortlyAboutMe . "','" . $vkontakte . "','" . $odnoklassniki . "','" . $facebook . "','" . $twitter . "','" . $searchRequestId . "','" . $salt . "','" . $user_hash . "','" . $last_act . "','" . $reg_date . "')")) //пишем данные в БД и авторизовываем пользователя
             {
                 setcookie("login", $login, time() + 50000, '/');
                 setcookie("password", md5($login . $password), time() + 50000, '/');
                 $rez = mysql_query("SELECT * FROM users WHERE login=" . $login);
-                @$row = mysql_fetch_assoc($rez);
+                $row = mysql_fetch_assoc($rez);
                 $_SESSION['id'] = $row['id'];
-                $regged = true;
                 header('Location: successfullRegistration.php'); //после успешной регистрации - переходим на соответствующую страницу
+            }
+            else
+            {
+                $correct = false;
+                $errors[] = 'К сожалению, при сохранении данных произошла ошибка: проверьте, пожалуйста, еще раз корректность Вашей информации и повторите попытку регистрации';
+                // Сохранении данных в БД не прошло - пользователь не зарегистрирован
             }
         }
     }
@@ -250,14 +261,14 @@ else {
 <!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>    <html class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]><!-->
-<html class="no-js">
+<html class="no-js" xmlns="http://www.w3.org/1999/html">
 <!--<![endif]-->
 <head>
 
     <!--
 
-         Если запрос = registration.php?type=tenant, то php должен сформировать форму без вкладки Мои объявления
-         Если запрос = registration.php?type=owner, то php должен сформировать форму без вкладки Условий поиска
+         Если запрос = registration.php?typeTenant=true, то php должен сформировать форму без вкладки Мои объявления
+         Если запрос = registration.php?typeOwner=true, то php должен сформировать форму без вкладки Условий поиска
          Если запрос = registration.php, то выдаем страницу со всеми вкладками
 
          -->
@@ -368,9 +379,11 @@ include("header.php");
     <li>
         <a href="#tabs-3">Социальные сети</a>
     </li>
+<?php if($typeTenant):?>
     <li>
         <a href="#tabs-4">Что ищете?</a>
     </li>
+<?php endif; ?>
 </ul>
 <div id="tabs-1">
     <div class="shadowText">
@@ -437,10 +450,10 @@ include("header.php");
                 <div class="searchItemBody">
                     <select name="nationality" validations="validate[required]">
                         <option value="0" <?php if ($nationality == "0") echo "selected";?>></option>
-                        <option value="1" <?php if ($nationality == "1") echo "selected";?>>русский</option>
-                        <option value="2" <?php if ($nationality == "2") echo "selected";?>>европеец, американец
+                        <option value="russian" <?php if ($nationality == "russian") echo "selected";?>>русский</option>
+                        <option value="west" <?php if ($nationality == "west") echo "selected";?>>европеец, американец
                         </option>
-                        <option value="3" <?php if ($nationality == "3") echo "selected";?>>СНГ, восточная нац-сть
+                        <option value="east" <?php if ($nationality == "east") echo "selected";?>>СНГ, восточная нац-сть
                         </option>
                     </select>
                 </div>
@@ -502,12 +515,12 @@ include("header.php");
                 </div>
                 <div class="searchItem">
                     <div class="required">
-                        *
+                        <?php if ($typeTenant) {echo "*";} ?>
                     </div>
                     <span class="searchItemLabel">e-mail: </span>
 
                     <div class="searchItemBody">
-                        <input name="email" type="text" size="30" validations="validate[required,custom[email]]" <?php echo "value='$email'";?>>
+                        <input name="email" type="text" size="30" <?php if ($typeTenant) {echo "validations='validate[required,custom[email]]'";} echo "value='$email'"; ?>>
                     </div>
                 </div>
             </fieldset>
@@ -528,7 +541,7 @@ include("header.php");
         <fieldset class="edited private" style="min-width: 300px;">
             <legend title="Для успешной регистрации должна быть загружена хотя бы 1 фотография">
                 <div class="required">
-                    *
+                    <?php if ($typeTenant) {echo "*";} ?>
                 </div>
                 Фотографии
             </legend>
@@ -569,12 +582,12 @@ include("header.php");
         </legend>
         <div class="searchItem">
             <div class="required">
-                *
+                <?php if ($typeTenant) {echo "*";} ?>
             </div>
             <span class="searchItemLabel">Текущий статус: </span>
 
             <div class="searchItemBody">
-                <select name="currentStatusEducation" id="currentStatusEducation" validations="validate[required]">
+                <select name="currentStatusEducation" id="currentStatusEducation" <?php if ($typeTenant) {echo "validations='validate[required]'";} ?>>
                     <option value="0" <?php if ($currentStatusEducation == "0") echo "selected";?>></option>
                     <option value="1" <?php if ($currentStatusEducation == "1") echo "selected";?>>Нигде не учился
                     </option>
@@ -586,42 +599,42 @@ include("header.php");
         <div id="almamater" class="searchItem ifLearned"
              title="Укажите учебное заведение, в котором учитесь сейчас, либо последнее из тех, что заканчивали">
             <div class="required">
-                *
+                <?php if ($typeTenant) {echo "*";} ?>
             </div>
             <span class="searchItemLabel">Учебное заведение: </span>
 
             <div class="searchItemBody">
-                <input name="almamater" class="ifLearned" type="text" size="50" validations="validate[required]" <?php echo "value='$almamater'";?>>
+                <input name="almamater" class="ifLearned" type="text" size="50" <?php if ($typeTenant) {echo "validations='validate[required]'";} echo "value='$almamater'";?>>
             </div>
         </div>
         <div id="speciality" class="searchItem ifLearned">
             <div class="required">
-                *
+                <?php if ($typeTenant) {echo "*";} ?>
             </div>
             <span class="searchItemLabel">Специальность: </span>
 
             <div class="searchItemBody">
-                <input name="speciality" class="ifLearned" type="text" size="55" validations="validate[required]" <?php echo "value='$speciality'";?>>
+                <input name="speciality" class="ifLearned" type="text" size="55" <?php if ($typeTenant) {echo "validations='validate[required]'";} echo "value='$speciality'";?>>
             </div>
         </div>
         <div id="kurs" class="searchItem ifLearned" title="Укажите курс, на котором учитесь">
             <div class="required">
-                *
+                <?php if ($typeTenant) {echo "*";} ?>
             </div>
             <span class="searchItemLabel">Курс: </span>
 
             <div class="searchItemBody">
-                <input name="kurs" class="ifLearned" type="text" size="19" validations="validate[required]" <?php echo "value='$kurs'";?>>
+                <input name="kurs" class="ifLearned" type="text" size="19" <?php if ($typeTenant) {echo "validations='validate[required]'";} echo "value='$kurs'";?>>
             </div>
         </div>
         <div id="formatEducation" class="searchItem ifLearned" title="Укажите форму обучения">
             <div class="required">
-                *
+                <?php if ($typeTenant) {echo "*";} ?>
             </div>
             <span class="searchItemLabel">Очно / Заочно: </span>
 
             <div class="searchItemBody">
-                <select name="ochnoZaochno" class="ifLearned" validations="validate[required]">
+                <select name="ochnoZaochno" class="ifLearned" <?php if ($typeTenant) {echo "validations='validate[required]'";} ?>>
                     <option value="0" <?php if ($ochnoZaochno == "0") echo "selected";?>></option>
                     <option value="1" <?php if ($ochnoZaochno == "1") echo "selected";?>>Очно</option>
                     <option value="2" <?php if ($ochnoZaochno == "2") echo "selected";?>>Заочно</option>
@@ -630,12 +643,12 @@ include("header.php");
         </div>
         <div id="yearOfEnd" class="searchItem ifLearned" title="Укажите год окончания учебного заведения">
             <div class="required">
-                *
+                <?php if ($typeTenant) {echo "*";} ?>
             </div>
             <span class="searchItemLabel">Год окончания: </span>
 
             <div class="searchItemBody">
-                <input name="yearOfEnd" class="ifLearned" type="text" size="9" validations="validate[required]" <?php echo "value='$yearOfEnd'";?>>
+                <input name="yearOfEnd" class="ifLearned" type="text" size="9" <?php if ($typeTenant) {echo "validations='validate[required]'";} echo "value='$yearOfEnd'";?>>
             </div>
         </div>
     </fieldset>
@@ -651,22 +664,22 @@ include("header.php");
         </div>
         <div class="searchItem ifWorked">
             <div class="required">
-                *
+                <?php if ($typeTenant) {echo "*";} ?>
             </div>
             <span class="searchItemLabel">Место работы: </span>
 
             <div class="searchItemBody">
-                <input name="placeOfWork" class="ifWorked" type="text" size="30" validations="validate[required]" <?php echo "value='$placeOfWork'";?>>
+                <input name="placeOfWork" class="ifWorked" type="text" size="30" <?php if ($typeTenant) {echo "validations='validate[required]'";} echo "value='$placeOfWork'";?>>
             </div>
         </div>
         <div class="searchItem ifWorked">
             <div class="required">
-                *
+                <?php if ($typeTenant) {echo "*";} ?>
             </div>
             <span class="searchItemLabel">Должность: </span>
 
             <div class="searchItemBody">
-                <input name="workPosition" class="ifWorked" type="text" size="33" validations="validate[required]" <?php echo "value='$workPosition'";?>>
+                <input name="workPosition" class="ifWorked" type="text" size="33" <?php if ($typeTenant) {echo "validations='validate[required]'";} echo "value='$workPosition'";?>>
             </div>
         </div>
     </fieldset>
@@ -677,22 +690,22 @@ include("header.php");
         </legend>
         <div class="searchItem">
             <div class="required">
-                *
+                <?php if ($typeTenant) {echo "*";} ?>
             </div>
             <span class="searchItemLabel">В каком регионе родились: </span>
 
             <div class="searchItemBody">
-                <input name="regionOfBorn" type="text" size="42" validations="validate[required]" <?php echo "value='$regionOfBorn'";?>>
+                <input name="regionOfBorn" type="text" size="42" <?php if ($typeTenant) {echo "validations='validate[required]'";} echo "value='$regionOfBorn'";?>>
             </div>
         </div>
         <div class="searchItem">
             <div class="required">
-                *
+                <?php if ($typeTenant) {echo "*";} ?>
             </div>
             <span class="searchItemLabel">Родной город, населенный пункт: </span>
 
             <div class="searchItemBody">
-                <input name="cityOfBorn" type="text" size="36" validations="validate[required]" <?php echo "value='$cityOfBorn'";?>>
+                <input name="cityOfBorn" type="text" size="36" <?php if ($typeTenant) {echo "validations='validate[required]'";} echo "value='$cityOfBorn'";?>>
             </div>
         </div>
         <div class="searchItem">
@@ -762,6 +775,7 @@ include("header.php");
         По окончании заполнения полей на всех вкладках введите текст капчи и нажмите кнопку "Готово" справа внизу
     </div>
 </div>
+<?php if($typeTenant):?>
 <div id="tabs-4">
 <div class="shadowText">
     Заполните форму как можно подробнее, это позволит системе подобрать для Вас наиболее интересные предложения
@@ -1194,7 +1208,8 @@ include("header.php");
     По окончании заполнения полей на всех вкладках введите текст капчи и нажмите кнопку "Готово" справа внизу
 </div>
 </div>
-<!-- /end.tabs-2 -->
+<!-- /end.tabs-4 -->
+<?php endif;?>
 </div>
 <!-- /end.tabs -->
 <div style="float: right;">
@@ -1236,6 +1251,7 @@ include("header.php");
 
 <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<!-- Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера -->
 
 <!-- jQuery UI с моей темой оформления -->
 <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>

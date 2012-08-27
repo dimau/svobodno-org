@@ -3,11 +3,15 @@ function registrationCorrect()
 {
     $errors = array();
 
-    global $name, $secondName, $surname, $sex, $nationality, $birthday, $login, $password, $telephon, $email, $fileUploadId, $currentStatusEducation, $almamater, $speciality, $kurs, $ochnoZaochno, $yearOfEnd, $notWorkCheckbox, $placeOfWork, $workPosition, $regionOfBorn, $cityOfBorn, $minCost, $maxCost, $pledge, $period, $lic;
+    global $typeTenant, $typeOwner, $name, $secondName, $surname, $sex, $nationality, $birthday, $login, $password, $telephon, $email, $fileUploadId, $currentStatusEducation, $almamater, $speciality, $kurs, $ochnoZaochno, $yearOfEnd, $notWorkCheckbox, $placeOfWork, $workPosition, $regionOfBorn, $cityOfBorn, $minCost, $maxCost, $pledge, $period, $lic;
 
+    // Обязательные проверки и для арендатора и для собственника
     if ($name == "") $errors[] = 'Укажите имя';
+    if (strlen($name) > 50) $errors[] = 'Слишком длинное имя. Можно указать не более 50-ти символов';
     if ($secondName == "") $errors[] = 'Укажите отчество';
+    if (strlen($secondName) > 50) $errors[] = 'Слишком длинное отчество. Можно указать не более 50-ти символов';
     if ($surname == "") $errors[] = 'Укажите фамилию';
+    if (strlen($surname) > 50) $errors[] = 'Слишком длинная фамилия. Можно указать не более 50-ти символов';
     if ($sex == "0") $errors[] = 'Укажите пол';
     if ($nationality == "0") $errors[] = 'Укажите национальность';
     if ($birthday != "") {
@@ -19,6 +23,7 @@ function registrationCorrect()
     if ($login != "") {
         $rez = mysql_query("SELECT * FROM users WHERE login='".$login."'");
         if (@mysql_num_rows($rez) != 0) $errors[] = 'Пользователь с таким логином уже существует, укажите другой логин'; // проверка на существование в БД такого же логина
+        if (strlen($login) > 50) $errors[] = "Слишком длинный логин. Можно указать не более 50-ти символов";
     } else {
         $errors[] = 'Укажите логин';
     }
@@ -30,35 +35,41 @@ function registrationCorrect()
     else {
         $errors[] = 'Укажите контактный (мобильный) телефон';
     }
-    if ($email != "") {
-        if (!preg_match("/^(([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+\.)*([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]{2,5}$/", $email)) $errors[] = 'Укажите, пожалуйста, Ваш настоящий e-mail (указанный Вами e-mail не прошел проверку формата)'; //соответствует ли поле e-mail регулярному выражению
-    }
-    else {
-        $errors[] = 'Укажите e-mail';
-    }
 
-    if ($fileUploadId != "") {
-        $rez = mysql_query("SELECT * FROM tempregfotos WHERE fileuploadid='".$fileUploadId."'");
-        if (@mysql_num_rows($rez) == 0) $errors[] = 'Загрузите как минимум 1 Вашу фотографию'; // проверка на хотя бы 1 фотку
-    } else {
-        $errors[] = 'Перезагрузите браузер, пожалуйста: возникла ошибка при формировании формы для загрузки фотографий';
+    // Обязательные проверки только для арендатора
+    if ($typeTenant == true) {
+        if ($email != "") {
+            if (!preg_match("/^(([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+\.)*([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]{2,5}$/", $email)) $errors[] = 'Укажите, пожалуйста, Ваш настоящий e-mail (указанный Вами e-mail не прошел проверку формата)'; //соответствует ли поле e-mail регулярному выражению
+        }
+        else {
+            $errors[] = 'Укажите e-mail';
+        }
+
+        if ($fileUploadId != "") {
+            $rez = mysql_query("SELECT * FROM tempregfotos WHERE fileuploadid='".$fileUploadId."'");
+            if (@mysql_num_rows($rez) == 0) $errors[] = 'Загрузите как минимум 1 Вашу фотографию'; // проверка на хотя бы 1 фотку
+        } else {
+            $errors[] = 'Перезагрузите браузер, пожалуйста: возникла ошибка при формировании формы для загрузки фотографий';
+        }
+
+        if ($currentStatusEducation == "0") $errors[] = 'Укажите Ваше образование (текущий статус)';
+        if (($currentStatusEducation == 2 || $currentStatusEducation == 3) && $almamater == "") $errors[] = 'Укажите учебное заведение';
+        if (($currentStatusEducation == 2 || $currentStatusEducation == 3) && $speciality == "") $errors[] = 'Укажите специальность';
+        if ($currentStatusEducation == 2 && $kurs == "") $errors[] = 'Укажите курс обучения';
+        if (($currentStatusEducation == 2 || $currentStatusEducation == 3) && $ochnoZaochno == "0") $errors[] = 'Укажите форму обучения (очная, заочная)';
+        if ($currentStatusEducation == 3 && $yearOfEnd == "") $errors[] = 'Укажите год окончания учебного заведения';
+        if ($notWorkCheckbox != "isNotWorking" && $placeOfWork == "") $errors[] = 'Укажите Ваше место работы (название организации)';
+        if ($notWorkCheckbox != "isNotWorking" && $workPosition == "") $errors[] = 'Укажите Вашу должность';
+
+        if ($regionOfBorn == "") $errors[] = 'Укажите регион, в котором Вы родились';
+        if ($cityOfBorn == "") $errors[] = 'Укажите город (населенный пункт), в котором Вы родились';
+
+        if ($minCost == "") $minCost = 0;
+        if ($maxCost == "") $maxCost = 99999999;
+        if ($pledge == "") $pledge = 99999999;
+        if ($period == "") $errors[] = 'Укажите ориентировочный срок аренды, например: долговременно (более года)';
+
     }
-
-    if ($currentStatusEducation == "0") $errors[] = 'Укажите Ваше образование (текущий статус)';
-    if (($currentStatusEducation == 2 || $currentStatusEducation == 3) && $almamater == "") $errors[] = 'Укажите учебное заведение';
-    if (($currentStatusEducation == 2 || $currentStatusEducation == 3) && $speciality == "") $errors[] = 'Укажите специальность';
-    if ($currentStatusEducation == 2 && $kurs == "") $errors[] = 'Укажите курс обучения';
-    if (($currentStatusEducation == 2 || $currentStatusEducation == 3) && $ochnoZaochno == "0") $errors[] = 'Укажите форму обучения (очная, заочная)';
-    if ($currentStatusEducation == 3 && $yearOfEnd == "") $errors[] = 'Укажите год окончания учебного заведения';
-    if ($notWorkCheckbox != "isNotWorking" && $placeOfWork == "") $errors[] = 'Укажите Ваше место работы (название организации)';
-    if ($notWorkCheckbox != "isNotWorking" && $workPosition == "") $errors[] = 'Укажите Вашу должность';
-    if ($regionOfBorn == "") $errors[] = 'Укажите регион, в котором Вы родились';
-    if ($cityOfBorn == "") $errors[] = 'Укажите город (населенный пункт), в котором Вы родились';
-
-    if ($minCost == "") $minCost = 0;
-    if ($maxCost == "") $maxCost = 9999999999;
-    if ($pledge == "") $pledge = 9999999999;
-    if ($period == "") $errors[] = 'Укажите ориентировочный срок аренды, например: долговременно (более года)';
 
     if ($lic != "yes") $errors[] = 'Регистрация возможна только при согласии с условиями лицензионного соглашения'; //приняты ли правила
 
