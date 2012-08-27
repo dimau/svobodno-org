@@ -1190,7 +1190,7 @@ include("header.php");
         <span class="searchItemLabel">Ориентировочный срок аренды:</span>
 
         <div class="searchItemBody">
-            <input type="text" name="period" size="20" validations="validate[required]" <?php echo "value='$period'";?>>
+            <input type="text" name="period" size="18" validations="validate[required]" <?php echo "value='$period'";?>>
         </div>
     </div>
     <div class="searchItem">
