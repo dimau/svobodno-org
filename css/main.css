@@ -1,13 +1,5 @@
 /*
- * HTML5 Boilerplate
- *
- * What follows is the result of much research on cross-browser styling.
- * Credit left inline and big thanks to Nicolas Gallagher, Jonathan Neal,
- * Kroc Camen, and the H5BP dev community and team.
- *
  * Detailed information about this CSS: h5bp.com/css
- *
- * ==|== normalize ==========================================================
  */
 
 /* =============================================================================
@@ -18,21 +10,12 @@
  * 1. Correct text resizing oddly in IE6/7 when body font-size is set using em units
  * 2. Prevent iOS text size adjust on device orientation change, without disabling user zoom: h5bp.com/g
  */
-
 html {
     font-size: 100%;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
-}
-
-html,
-button,
-input,
-select,
-textarea {
     font-family: sans-serif;
     color: #222;
-    padding: 0.2em 0.4em;
 }
 
 body {
@@ -49,12 +32,12 @@ body {
  */
 
 ::-moz-selection {
-    background: #b3d4fc;
+    background: #FFE45C;
     text-shadow: none;
 }
 
 ::selection {
-    background: #b3d4fc;
+    background: #FFE45C;
     text-shadow: none;
 }
 
@@ -98,7 +81,7 @@ ol {
     padding: 0 0 0 40px;
 }
 
-ul.listDescription {
+ul.listDescription {    /* Используется для блоков с описанием человека, объекта и др в виде списка параметров*/
 	list-style: none;
 	padding: 0;
 	margin-top: 0;
@@ -188,7 +171,6 @@ legend {
     border: 0;
     padding: 0;
     white-space: normal;
-    *margin-left: -7px;
 }
 
 /*
@@ -197,6 +179,10 @@ legend {
  * 3. Define consistent vertical alignment display in all browsers
  */
 
+/* =============================================================================
+   Элементы управления - кнопки, чекбоксы, селекты и textarea
+   ========================================================================== */
+
 button,
 input,
 select,
@@ -204,7 +190,7 @@ textarea {
     font-size: 100%;
     margin: 0;
     vertical-align: baseline;
-    *vertical-align: middle;
+    padding: 0.2em 0.4em;
 }
 
 /*
@@ -228,7 +214,7 @@ input[type="reset"],
 input[type="submit"] {
     cursor: pointer;
     -webkit-appearance: button;
-    *overflow: visible;
+    overflow: visible;
 }
 
 /*
@@ -248,20 +234,6 @@ input[type="checkbox"],
 input[type="radio"] {
     box-sizing: border-box;
     padding: 0;
-    *width: 13px;
-    *height: 13px;
-}
-
-input[type="search"] {
-    -webkit-appearance: textfield;
-    -moz-box-sizing: content-box;
-    -webkit-box-sizing: content-box;
-    box-sizing: content-box;
-}
-
-input[type="search"]::-webkit-search-decoration,
-input[type="search"]::-webkit-search-cancel-button {
-    -webkit-appearance: none;
 }
 
 /*
@@ -285,7 +257,6 @@ textarea {
     resize: vertical;
     margin-bottom: 3px;
 }
-
 
 /* =============================================================================
    Tables

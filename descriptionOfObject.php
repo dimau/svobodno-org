@@ -36,23 +36,10 @@
 				cursor: pointer;
 			}
 		</style>
-
-		<!-- More ideas for your <head> here: h5bp.com/d/head-Tips -->
-
-		<!-- All JavaScript at the bottom, except this Modernizr build.
-		Modernizr enables HTML5 elements & feature detects for optimal performance.
-		Create your own custom Modernizr build: www.modernizr.com/download/ -->
-		<script src="js/vendor/modernizr-2.5.3.min.js"></script>
-
 	</head>
+
 	<body>
-		<!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
-		chromium.org/developers/how-tos/chrome-frame-getting-started -->
-		<!--[if lt IE 7]><p class="chromeframe">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
-
-		<!-- Add your site or application content here -->
 		<div class="page_without_footer">
-
         <!-- Сформируем и вставим заголовок страницы -->
         <?php
                 include("header.php");
