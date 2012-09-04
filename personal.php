@@ -2131,7 +2131,7 @@
 											Ссылки на страницы сожителей:
 										</div>
 										<div class="searchItemBody">
-											<textarea name="liksToFriends" cols="40" rows="3"></textarea>
+											<textarea name="linksToFriends" cols="40" rows="3"></textarea>
 										</div>
 									</div>
 									<div class="searchItem">

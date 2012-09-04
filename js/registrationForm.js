@@ -30,6 +30,8 @@ function createUploader(){
         //extraDropzones: [qq.getByClass(document, 'qq-upload-extra-drop-area')[0]]
     });
 
+// Важно, что в конце файла uploader.php располагается функция handleUpload, в которой есть и мой код, работающий на сервере при получении файла
+
     // Сформируем зеленые блоки для уже загруженных фотографий руками, чтобы пользователя не путать
     var rezult = {success: true};
     var uploadedFoto = document.getElementsByClassName('uploadedFoto');
@@ -95,7 +97,7 @@ if (document.getElementById("tabs-4")) {
     $("#withWho").on('change', withWho);
     $(document).ready(withWho);
     function withWho() {
-        if ($("#withWho").attr('value') != 0) {
+        if ($("#withWho").attr('value') != "alone") {
             $("#withWhoDescription").css('display', '');
         } else {
             $("#withWhoDescription").css('display', 'none');
@@ -106,7 +108,7 @@ if (document.getElementById("tabs-4")) {
     $("#children").on('change', children);
     $(document).ready(children);
     function children() {
-        if ($("#children").attr('value') != 0) {
+        if ($("#children").attr('value') != "without") {
             $("#childrenDescription").css('display', '');
         } else {
             $("#childrenDescription").css('display', 'none');
@@ -117,7 +119,7 @@ if (document.getElementById("tabs-4")) {
     $("#animals").on('change', animals);
     $(document).ready(animals);
     function animals() {
-        if ($("#animals").attr('value') != 0) {
+        if ($("#animals").attr('value') != "without") {
             $("#animalsDescription").css('display', '');
         } else {
             $("#animalsDescription").css('display', 'none');
@@ -134,7 +136,7 @@ if ($('#userMistakesBlock ol').html() != "") {
     $('#userMistakesBlock').css('display', 'block');
 }
 
-
+/*
 // Подключение и настройка динамической проверки формы на JS
 $('#tabs').bind('tabsshow', function(event, ui) {
     newTabId = ui.panel.id; // Определяем идентификатор вновь открытой вкладки
@@ -164,3 +166,5 @@ function rePosition(caller, divFormError) { // Соответствует дей
         left: callerleftPosition,
     });
 }
+
+*/

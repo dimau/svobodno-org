@@ -167,7 +167,7 @@ class qqFileUploader {
         if ($this->file->save($uploadDirectory . $filename . '.' . $ext)){
             include_once 'connect.php'; //подключаемся к БД
             $sizeMb = round ($size / 1024 / 1024, 1);
-            mysql_query("INSERT INTO tempregfotos (id, fileUploadId, filename, extension, filesizeMb) VALUES ('".$filename."','".$_GET['fileuploadid']."','".$_GET['sourcefilename']."','".$pathinfo['extension']."','".$sizeMb."')"); // Сохраняем информацию и загруженной фотке
+            mysql_query("INSERT INTO tempfotos (id, fileUploadId, filename, extension, filesizeMb) VALUES ('".$filename."','".$_GET['fileuploadid']."','".$_GET['sourcefilename']."','".$pathinfo['extension']."','".$sizeMb."')"); // Сохраняем информацию и загруженной фотке
             return array('success'=>true);
         } else {
             return array('error'=> 'Could not save uploaded file.' .
