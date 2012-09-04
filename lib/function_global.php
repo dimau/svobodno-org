@@ -3,7 +3,7 @@ function registrationCorrect()
 {
     $errors = array();
 
-    global $typeTenant, $typeOwner, $name, $secondName, $surname, $sex, $nationality, $birthday, $login, $password, $telephon, $email, $fileUploadId, $currentStatusEducation, $almamater, $speciality, $kurs, $ochnoZaochno, $yearOfEnd, $notWorkCheckbox, $placeOfWork, $workPosition, $regionOfBorn, $cityOfBorn, $minCost, $maxCost, $pledge, $period, $lic;
+    global $typeTenant, $typeOwner, $name, $secondName, $surname, $sex, $nationality, $birthday, $login, $password, $telephon, $email, $fileUploadId, $currentStatusEducation, $almamater, $speciality, $kurs, $ochnoZaochno, $yearOfEnd, $notWorkCheckbox, $placeOfWork, $workPosition, $regionOfBorn, $cityOfBorn, $vkontakte, $odnoklassniki, $facebook, $twitter, $minCost, $maxCost, $pledge, $period, $lic;
 
     // Обязательные проверки и для арендатора и для собственника
     if ($name == "") $errors[] = 'Укажите имя';
@@ -16,6 +16,9 @@ function registrationCorrect()
     if ($nationality == "0") $errors[] = 'Укажите национальность';
     if ($birthday != "") {
         if (!preg_match('/^\d\d.\d\d.\d\d\d\d$/', $birthday)) $errors[] = 'Неправильный формат даты рождения, должен быть: дд.мм.гггг';
+        if (substr($birthday, 0, 2) < "01" || substr($birthday, 0, 2) > "31") $errors[] = 'Проверьте дату Дня рождения (допустимо от 01 до 31)';
+        if (substr($birthday, 3, 2) < "01" || substr($birthday, 3, 2) > "12") $errors[] = 'Проверьте месяц Дня рождения (допустимо от 01 до 12)';
+        if (substr($birthday, 6, 4) < "1000" || substr($birthday, 6, 4) > "9999") $errors[] = 'Проверьте год Дня рождения (допустимо от 1000 до 9999)';
     } else {
         $errors[] = 'Укажите дату рождения';
     }
@@ -46,30 +49,50 @@ function registrationCorrect()
         }
 
         if ($fileUploadId != "") {
-            $rez = mysql_query("SELECT * FROM tempregfotos WHERE fileuploadid='".$fileUploadId."'");
-            if (@mysql_num_rows($rez) == 0) $errors[] = 'Загрузите как минимум 1 Вашу фотографию'; // проверка на хотя бы 1 фотку
+            $rez = mysql_query("SELECT * FROM tempFotos WHERE fileuploadid='".$fileUploadId."'");
+            if (mysql_num_rows($rez) == 0) $errors[] = 'Загрузите как минимум 1 Вашу фотографию'; // проверка на хотя бы 1 фотку
         } else {
             $errors[] = 'Перезагрузите браузер, пожалуйста: возникла ошибка при формировании формы для загрузки фотографий';
         }
 
         if ($currentStatusEducation == "0") $errors[] = 'Укажите Ваше образование (текущий статус)';
         if (($currentStatusEducation == 2 || $currentStatusEducation == 3) && $almamater == "") $errors[] = 'Укажите учебное заведение';
+        if (($currentStatusEducation == 2 || $currentStatusEducation == 3) && strlen($almamater) > 100) $errors[] = 'Слишком длинное название учебного заведения (используйте не более 100 символов)';
         if (($currentStatusEducation == 2 || $currentStatusEducation == 3) && $speciality == "") $errors[] = 'Укажите специальность';
+        if (($currentStatusEducation == 2 || $currentStatusEducation == 3) && strlen($speciality) > 100) $errors[] = 'Слишком длинное название специальности (используйте не более 100 символов)';
         if ($currentStatusEducation == 2 && $kurs == "") $errors[] = 'Укажите курс обучения';
+        if ($currentStatusEducation == 2 && strlen($kurs) > 30) $errors[] = 'Курс. Указана слишком длинная строка (используйте не более 30 символов)';
         if (($currentStatusEducation == 2 || $currentStatusEducation == 3) && $ochnoZaochno == "0") $errors[] = 'Укажите форму обучения (очная, заочная)';
         if ($currentStatusEducation == 3 && $yearOfEnd == "") $errors[] = 'Укажите год окончания учебного заведения';
+        if ($currentStatusEducation == 3 && strlen($yearOfEnd) > 20) $errors[] = 'Год окончания учебного заведения. Указана слишком длинная строка (используйте не более 20 символов)';
         if ($notWorkCheckbox != "isNotWorking" && $placeOfWork == "") $errors[] = 'Укажите Ваше место работы (название организации)';
+        if ($notWorkCheckbox != "isNotWorking" && strlen($placeOfWork) > 100) $errors[] = 'Слишком длинное наименование места работы (используйте не более 100 символов)';
         if ($notWorkCheckbox != "isNotWorking" && $workPosition == "") $errors[] = 'Укажите Вашу должность';
+        if ($notWorkCheckbox != "isNotWorking" && strlen($workPosition) > 100) $errors[] = 'Слишком длинное название должности (используйте не более 100 символов)';
 
         if ($regionOfBorn == "") $errors[] = 'Укажите регион, в котором Вы родились';
+        if (strlen($regionOfBorn) > 50) $errors[] = 'Слишком длинное наименование региона, в котором Вы родились (используйте не более 50 символов)';
         if ($cityOfBorn == "") $errors[] = 'Укажите город (населенный пункт), в котором Вы родились';
+        if (strlen($cityOfBorn) > 50) $errors[] = 'Слишком длинное наименование города, в котором Вы родились (используйте не более 50 символов)';
 
-        if ($minCost == "") $minCost = 0;
-        if ($maxCost == "") $maxCost = 99999999;
-        if ($pledge == "") $pledge = 99999999;
+        if (!preg_match("/^\d{0,8}$/", $minCost)) $errors[] = 'Неправильный формат числа в поле минимальной величины арендной платы (проверьте: только числа, не более 8 символов)';
+        if (!preg_match("/^\d{0,8}$/", $maxCost)) $errors[] = 'Неправильный формат числа в поле максимальной величины арендной платы (проверьте: только числа, не более 8 символов)';
+        if (!preg_match("/^\d{0,8}$/", $pledge)) $errors[] = 'Неправильный формат числа в поле максимальной величины залога (проверьте: только числа, не более 8 символов)';
         if ($period == "") $errors[] = 'Укажите ориентировочный срок аренды, например: долговременно (более года)';
+        if (strlen($period) > 80) $errors[] = 'Указана слишком длинная строка в поле для ориентировочного срока проживания (используйте не более 80 символов)';
 
     }
+
+    // Контроль длины необязательных полей и минимальный контроль на структуру - для безопасного сохранения в базу данных и небольшая защита от мошенничества
+    if (strlen($vkontakte) > 100) $errors[] = 'Указана слишком длинная ссылка на личную страницу Вконтакте (используйте не более 100 символов)';
+    if (strlen($vkontakte) > 0 && !preg_match("/vk\.com/", $vkontakte)) $errors[] = 'Укажите, пожалуйста, Вашу настоящую личную страницу Вконтакте, либо оставьте поле пустым (ссылка должна содержать строчку "vk.com")';
+    if (strlen($odnoklassniki) > 100) $errors[] = 'Указана слишком длинная ссылка на личную страницу в Одноклассниках (используйте не более 100 символов)';
+    if (strlen($odnoklassniki) > 0 && !preg_match("/www\.odnoklassniki\.ru\/profile\//", $odnoklassniki)) $errors[] = 'Укажите, пожалуйста, Вашу настоящую личную страницу в Одноклассниках, либо оставьте поле пустым (ссылка должна содержать строчку "www.odnoklassniki.ru/profile/")';
+    if (strlen($facebook) > 100) $errors[] = 'Указана слишком длинная ссылка на личную страницу на Facebook (используйте не более 100 символов)';
+    if (strlen($facebook) > 0 && !preg_match("/www\.facebook\.com\/profile\.php/", $facebook)) $errors[] = 'Укажите, пожалуйста, Вашу настоящую личную страницу на Facebook, либо оставьте поле пустым (ссылка должна содержать строчку с "www.facebook.com/profile.php")';
+    if (strlen($twitter) > 100) $errors[] = 'Указана слишком длинная ссылка на личную страницу в Twitter (используйте не более 100 символов)';
+    if (strlen($twitter) > 0 && !preg_match("/twitter\.com/", $twitter)) $errors[] = 'Укажите, пожалуйста, Вашу настоящую личную страницу в Twitter, либо оставьте поле пустым (ссылка должна содержать строчку "twitter.com")';
+
 
     if ($lic != "yes") $errors[] = 'Регистрация возможна только при согласии с условиями лицензионного соглашения'; //приняты ли правила
 
@@ -106,7 +129,7 @@ function lastAct($id)
 }
 
 
-// Функция для авторизации пользователя на сайте
+// Функция для авторизации (входа) пользователя на сайте
 function enter()
 {
     $error = array(); //массив для ошибок
@@ -151,7 +174,7 @@ function enter()
 
 function login()
 {
-    //ini_set("session.use_trans_sid", true); выдает ошибку при использовании, да и вроде как команда не нужна на самом деле
+    // Запускаем сессию для работы с ней и готовим переменную rez
     if(!isset($_SESSION))
     {
         session_start();
@@ -160,7 +183,7 @@ function login()
 
     if (isset($_SESSION['id'])) //если какая-то сесcия есть - проверим ее актуальность
     {
-        $rez = mysql_query("SELECT * FROM users WHERE user_hash='{$_SESSION['id']}'");
+        $rez = mysql_query("SELECT * FROM users WHERE user_hash='" . $_SESSION['id'] . "'");
     }
 
     if ($rez != false && mysql_num_rows($rez) == 1 ) // Если текущая сессия актуальна - добавим куки, чтобы после перезапуска браузера сессия не слетала

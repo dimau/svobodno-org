@@ -8,19 +8,31 @@
 include_once 'connect.php'; //подключаемся к БД
 
 // Создаем таблицу для хранения информации о ПОЛЬЗОВАТЕЛЯХ
-$rez = mysql_query("CREATE TABLE users (id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT, typeTenant BOOLEAN NOT NULL, typeOwner BOOLEAN NOT NULL, name VARCHAR(50) NOT NULL, secondName VARCHAR(50) NOT NULL, surname VARCHAR(50) NOT NULL, sex VARCHAR(20) NOT NULL, nationality VARCHAR(20) NOT NULL,                         birthday DATE NOT NULL,              login VARCHAR(50) NOT NULL, password VARCHAR(32) NOT NULL, telephon INT(10) NOT NULL, emailReg VARCHAR(50) NOT NULL, email VARCHAR(50) NOT NULL, fotoFilesId VARCHAR(255) NOT NULL, currentStatusEducation VARCHAR(20) NOT NULL, almamater VARCHAR(80) NOT NULL, speciality VARCHAR(80) NOT NULL, kurs VARCHAR(20) NOT NULL, ochnoZaochno VARCHAR(20) NOT NULL, yearOfEnd VARCHAR(20) NOT NULL, notWorkCheckbox BOOLEAN NOT NULL, placeOfWork VARCHAR(50) NOT NULL, workPosition VARCHAR(50) NOT NULL, regionOfBorn VARCHAR(50) NOT NULL, cityOfBorn VARCHAR(50) NOT NULL, shortlyAboutMe VARCHAR(255) NOT NULL, vkontakte VARCHAR(80) NOT NULL, odnoklassniki VARCHAR(80) NOT NULL, facebook VARCHAR(80) NOT NULL, twitter VARCHAR(80) NOT NULL, searchRequestId VARCHAR(32) NOT NULL, salt VARCHAR(3) NOT NULL, user_hash VARCHAR(32) NOT NULL, last_act INT(11) NOT NULL, reg_date INT(11) NOT NULL");
+$rez = mysql_query("CREATE TABLE users (id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT, typeTenant VARCHAR(5) NOT NULL, typeOwner VARCHAR(5) NOT NULL, name VARCHAR(50) NOT NULL, secondName VARCHAR(50) NOT NULL, surname VARCHAR(50) NOT NULL, sex VARCHAR(20) NOT NULL, nationality VARCHAR(20) NOT NULL, birthday DATE NOT NULL, login VARCHAR(50) NOT NULL, password VARCHAR(32) NOT NULL, telephon INT(10) NOT NULL, emailReg VARCHAR(50), email VARCHAR(50), currentStatusEducation VARCHAR(20), almamater VARCHAR(100), speciality VARCHAR(100), kurs VARCHAR(30), ochnoZaochno VARCHAR(20), yearOfEnd VARCHAR(20), notWorkCheckbox VARCHAR(20), placeOfWork VARCHAR(100), workPosition VARCHAR(100), regionOfBorn VARCHAR(50), cityOfBorn VARCHAR(50), shortlyAboutMe TEXT, vkontakte VARCHAR(100), odnoklassniki VARCHAR(100), facebook VARCHAR(100), twitter VARCHAR(100),         searchRequestId VARCHAR(32), lic VARCHAR(5) NOT NULL, salt VARCHAR(3) NOT NULL, user_hash VARCHAR(32), last_act INT(11) NOT NULL, reg_date INT(11) NOT NULL)");
 
-// Создаем таблицу для постоянного хранения информации о ФОТОГРАФИЯХ пользователей
-$rez = mysql_query("CREATE TABLE userFotos (id VARCHAR(32) NOT NULL PRIMARY KEY, filename VARCHAR(255) NOT NULL, extension VARCHAR(5) NOT NULL, filesizeMb FLOAT(1) NOT NULL)");
+echo "Статус создания таблицы users: " . $rez;
 
 // Создаем таблицу для временного хранения информации о ЗАГРУЖЕННЫХ при регистрации ФОТОГРАФИЯХ пользователей
-$rez = mysql_query("CREATE TABLE tempregfotos (id VARCHAR(32) NOT NULL PRIMARY KEY, fileUploadId VARCHAR(7) NOT NULL, filename VARCHAR(255) NOT NULL, extension VARCHAR(5) NOT NULL, filesizeMb FLOAT(1) NOT NULL)");
+$rez = mysql_query("CREATE TABLE tempFotos (id VARCHAR(32) NOT NULL PRIMARY KEY, fileUploadId VARCHAR(7) NOT NULL, filename VARCHAR(255) NOT NULL, extension VARCHAR(5) NOT NULL, filesizeMb FLOAT(1) NOT NULL)");
+
+echo "Статус создания таблицы tempFotos: " . $rez;
+
+// Создаем таблицу для постоянного хранения информации о ФОТОГРАФИЯХ пользователей (только личные)
+$rez = mysql_query("CREATE TABLE userFotos (id VARCHAR(32) NOT NULL PRIMARY KEY, filename VARCHAR(255) NOT NULL, extension VARCHAR(5) NOT NULL, filesizeMb FLOAT(1) NOT NULL, userId INT(11) NOT NULL)");
+// userId - содержит идентификатор пользователя, к которому относится фотография
+
+echo "Статус создания таблицы userFotos: " . $rez;
 
 // Создаем таблицу для хранения информации о ПОИСКОВЫХ ЗАПРОСАХ пользователей
-$rez = mysql_query("CREATE TABLE searchRequests (id VARCHAR(32) NOT NULL PRIMARY KEY, typeOfObject VARCHAR(20) NOT NULL, amountOfRooms INT(6) NOT NULL, adjacentRooms VARCHAR(20) NOT NULL), floor VARCHAR(20) NOT NULL, withWithoutFurniture BOOLEAN NOT NULL, minCost INT(8) NOT NULL, maxCost INT(8) NOT NULL, pledge INT(8) NOT NULL, district VARCHAR(255) NOT NULL, withWho VARCHAR(20) NOT NULL, liksToFriends VARCHAR(255) NOT NULL, children VARCHAR(20) NOT NULL, howManyChildren VARCHAR(255) NOT NULL, animals VARCHAR(20) NOT NULL, howManyAnimals VARCHAR(255) NOT NULL, period VARCHAR(80) NOT NULL, additionalDescriptionOfSearch VARCHAR(255) NOT NULL, lic BOOLEAN NOT NULL");
+$rez = mysql_query("CREATE TABLE searchRequests (id VARCHAR(32) NOT NULL PRIMARY KEY, typeOfObject VARCHAR(20) NOT NULL, amountOfRooms BLOB NOT NULL, adjacentRooms VARCHAR(20) NOT NULL, floor VARCHAR(20) NOT NULL, withWithoutFurniture VARCHAR(20) NOT NULL, minCost INT(8) NOT NULL, maxCost INT(8) NOT NULL, pledge INT(8) NOT NULL, district BLOB NOT NULL, withWho VARCHAR(20) NOT NULL, liksToFriends TEXT, children VARCHAR(20) NOT NULL, howManyChildren TEXT, animals VARCHAR(20) NOT NULL, howManyAnimals TEXT, period VARCHAR(80) NOT NULL, additionalDescriptionOfSearch TEXT)");
 // amountOfRooms храним в виде 001011, где каждый разряд соответствует количеству комнат (1 разряд - 1 комната, 2-ой разряд - 2 комнаты и т.д.), а 0 - не отмечено, 1 - отмечено
 // district храним в виде последовательности идентификаторов районов, выбранных пользователем, разделенных знаком ","
 
-echo $rez;
+echo "Статус создания таблицы searchRequests: " . $rez;
 
+/**
+ * Проверяем настройки PHP сервера
+ *
+ * ini_set ("session.use_trans_sid", true); вроде как PHP сам умеет устанавливать id сессии либо в куки, либо в строку запроса (http://www.phpfaq.ru/sessions)
+ */
 ?>

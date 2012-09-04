@@ -1,12 +1,11 @@
 <?php
-//ini_set ("session.use_trans_sid", true); вроде как PHP сам умеет устанавливать id сессии либо в куки, либо в строку запроса (http://www.phpfaq.ru/sessions)
 session_start();
 include_once 'lib/connect.php'; //подключаемся к БД
 include_once 'lib/function_global.php'; //подключаем библиотеку функций
 $correct = null; // Инициализируем переменную корректности - нужно для того, чтобы не менять лишний раз идентификатор в input hidden у фотографий
 
 //проверим, быть может пользователь уже авторизирован. Если это так, перенаправим его на главную страницу сайта
-if (isset($_SESSION['id']) || (isset($_COOKIE['login']) && isset($_COOKIE['password']))) {
+if (login()) {
     header('Location: index.php');
 }
 else {
@@ -15,22 +14,23 @@ else {
     if (isset($_GET['typeOwner'])) {$typeOwner = true;} else {$typeOwner = false;}
     if (!isset($_GET['typeTenant']) && !isset($_GET['typeOwner'])) {$typeTenant = true; $typeOwner = true;}
 
-    if (isset($_POST['readyButton'])) //если была нажата кнопка регистрации, проверим данные на корректность и, если данные введены и введены правильно, добавим запись с новым пользователем в БД
+    // Если была нажата кнопка регистрации, проверим данные на корректность и, если данные введены и введены правильно, добавим запись с новым пользователем в БД
+    if (isset($_POST['readyButton']))
     {
         // Формируем набор переменных для сохранения в базу данных, либо для возвращения вместе с формой при их некорректности
-        $name = htmlspecialchars($_POST['name']);
-        $secondName = htmlspecialchars($_POST['secondName']);
-        $surname = htmlspecialchars($_POST['surname']);
-        $sex = htmlspecialchars($_POST['sex']);
-        $nationality = htmlspecialchars($_POST['nationality']);
-        $birthday = htmlspecialchars($_POST['birthday']);
-        $login = htmlspecialchars($_POST['login']);
-        $password = htmlspecialchars($_POST['password']);
-        $telephon = htmlspecialchars($_POST['telephon']);
+        if (isset($_POST['name'])) $name = htmlspecialchars($_POST['name']); else $name = "";
+        if (isset($_POST['secondName'])) $secondName = htmlspecialchars($_POST['secondName']); else $secondName = "";
+        if (isset($_POST['surname'])) $surname = htmlspecialchars($_POST['surname']); else $surname = "";
+        if (isset($_POST['sex'])) $sex = htmlspecialchars($_POST['sex']); else $sex = "0";
+        if (isset($_POST['nationality'])) $nationality = htmlspecialchars($_POST['nationality']); else $nationality = "0";
+        if (isset($_POST['birthday'])) $birthday = htmlspecialchars($_POST['birthday']); else $birthday = "";
+        if (isset($_POST['login'])) $login = htmlspecialchars($_POST['login']); else $login = "";
+        if (isset($_POST['password'])) $password = htmlspecialchars($_POST['password']); else $password = "";
+        if (isset($_POST['telephon'])) $telephon = htmlspecialchars($_POST['telephon']); else $telephon = "";
         if (isset($_POST['email'])) $email = htmlspecialchars($_POST['email']); else $email = "";
         $fileUploadId = $_POST['fileUploadId'];
 
-        $currentStatusEducation = htmlspecialchars($_POST['currentStatusEducation']);
+        if (isset($_POST['currentStatusEducation'])) $currentStatusEducation = htmlspecialchars($_POST['currentStatusEducation']); else $currentStatusEducation = "0";
         if (isset($_POST['almamater'])) $almamater = htmlspecialchars($_POST['almamater']); else $almamater = "";
         if (isset($_POST['speciality'])) $speciality = htmlspecialchars($_POST['speciality']); else $speciality = "";
         if (isset($_POST['kurs'])) $kurs = htmlspecialchars($_POST['kurs']); else $kurs = "";
@@ -39,28 +39,41 @@ else {
         if (isset($_POST['notWorkCheckbox'])) $notWorkCheckbox = htmlspecialchars($_POST['notWorkCheckbox']); else $notWorkCheckbox = "";
         if (isset($_POST['placeOfWork'])) $placeOfWork = htmlspecialchars($_POST['placeOfWork']); else $placeOfWork = "";
         if (isset($_POST['workPosition'])) $workPosition = htmlspecialchars($_POST['workPosition']); else $workPosition = "";
-        $regionOfBorn = htmlspecialchars($_POST['regionOfBorn']);
-        $cityOfBorn = htmlspecialchars($_POST['cityOfBorn']);
-        $shortlyAboutMe = htmlspecialchars($_POST['shortlyAboutMe']);
+        if (isset($_POST['regionOfBorn'])) $regionOfBorn = htmlspecialchars($_POST['regionOfBorn']); else $regionOfBorn = "";
+        if (isset($_POST['cityOfBorn'])) $cityOfBorn = htmlspecialchars($_POST['cityOfBorn']); else $cityOfBorn = "";
+        if (isset($_POST['shortlyAboutMe'])) $shortlyAboutMe = htmlspecialchars($_POST['shortlyAboutMe']); else $shortlyAboutMe = "";
 
-        $vkontakte = htmlspecialchars($_POST['vkontakte']);
-        $odnoklassniki = htmlspecialchars($_POST['odnoklassniki']);
-        $facebook = htmlspecialchars($_POST['facebook']);
-        $twitter = htmlspecialchars($_POST['twitter']);
+        if (isset($_POST['vkontakte'])) $vkontakte = htmlspecialchars($_POST['vkontakte']); else $vkontakte = "";
+        if (isset($_POST['odnoklassniki'])) $odnoklassniki = htmlspecialchars($_POST['odnoklassniki']); else $odnoklassniki = "";
+        if (isset($_POST['facebook'])) $facebook = htmlspecialchars($_POST['facebook']); else $facebook = "";
+        if (isset($_POST['twitter'])) $twitter = htmlspecialchars($_POST['twitter']); else $twitter = "";
 
-        $typeOfObject = htmlspecialchars($_POST['typeOfObject']);
-        if (isset($_POST['amountOfRooms1'])) $amountOfRooms1 = htmlspecialchars($_POST['amountOfRooms1']); else $amountOfRooms1 = "";
-        if (isset($_POST['amountOfRooms2'])) $amountOfRooms2 = htmlspecialchars($_POST['amountOfRooms2']); else $amountOfRooms2 = "";
-        if (isset($_POST['amountOfRooms3'])) $amountOfRooms3 = htmlspecialchars($_POST['amountOfRooms3']); else $amountOfRooms3 = "";
-        if (isset($_POST['amountOfRooms4'])) $amountOfRooms4 = htmlspecialchars($_POST['amountOfRooms4']); else $amountOfRooms4 = "";
-        if (isset($_POST['amountOfRooms5'])) $amountOfRooms5 = htmlspecialchars($_POST['amountOfRooms5']); else $amountOfRooms5 = "";
-        if (isset($_POST['amountOfRooms6'])) $amountOfRooms6 = htmlspecialchars($_POST['amountOfRooms6']); else $amountOfRooms6 = "";
-        $adjacentRooms = htmlspecialchars($_POST['adjacentRooms']);
-        $floor = htmlspecialchars($_POST['floor']);
+        if (isset($_POST['typeOfObject'])) $typeOfObject = htmlspecialchars($_POST['typeOfObject']); else $typeOfObject = "flat";
+
+        if (is_array($_POST['amountOfRooms'])) // Проверяем, передан ли массив значений
+        {
+            $amountOfRooms = $_POST['amountOfRooms']; // Будем использовать переменную при записи данных в таблицу в виде массива
+            foreach ($_POST['amountOfRooms'] as $value)
+            {
+                if ($value == "1") $amountOfRooms1 = "1"; else $amountOfRooms1 = "";
+                if ($value == "2") $amountOfRooms2 = "2"; else $amountOfRooms2 = "";
+                if ($value == "3") $amountOfRooms3 = "3"; else $amountOfRooms3 = "";
+                if ($value == "4") $amountOfRooms4 = "4"; else $amountOfRooms4 = "";
+                if ($value == "5") $amountOfRooms5 = "5"; else $amountOfRooms5 = "";
+                if ($value == "6") $amountOfRooms6 = "6"; else $amountOfRooms6 = "";
+            }
+        }
+        else
+        {
+            $amountOfRooms = array("1", "2", "3", "4", "5", "6");
+        }
+
+        if (isset($_POST['adjacentRooms'])) $adjacentRooms = htmlspecialchars($_POST['adjacentRooms']); else $adjacentRooms = "yes";
+        if (isset($_POST['floor'])) $floor = htmlspecialchars($_POST['floor']); else $floor = "any";
         if (isset($_POST['withWithoutFurniture'])) $withWithoutFurniture = htmlspecialchars($_POST['withWithoutFurniture']); else $withWithoutFurniture = "";
-        $minCost = htmlspecialchars($_POST['minCost']);
-        $maxCost = htmlspecialchars($_POST['maxCost']);
-        $pledge = htmlspecialchars($_POST['pledge']);
+        if (isset($_POST['minCost']) && $_POST['minCost'] != "") $minCost = htmlspecialchars($_POST['minCost']); else $minCost = "0";
+        if (isset($_POST['maxCost']) && $_POST['maxCost'] != "") $maxCost = htmlspecialchars($_POST['maxCost']); else $maxCost = "99999999";
+        if (isset($_POST['pledge']) && $_POST['pledge'] != "") $pledge = htmlspecialchars($_POST['pledge']); else $pledge = "99999999";
         if (isset($_POST['district1'])) $district1 = htmlspecialchars($_POST['district1']); else $district1 = "";
         if (isset($_POST['district2'])) $district2 = htmlspecialchars($_POST['district2']); else $district2 = "";
         if (isset($_POST['district3'])) $district3 = htmlspecialchars($_POST['district3']); else $district3 = "";
@@ -108,37 +121,77 @@ else {
         if (isset($_POST['district45'])) $district45 = htmlspecialchars($_POST['district45']); else $district45 = "";
         if (isset($_POST['district46'])) $district46 = htmlspecialchars($_POST['district46']); else $district46 = "";
 
-        $withWho = htmlspecialchars($_POST['withWho']);
-        $liksToFriends = htmlspecialchars($_POST['liksToFriends']);
-        $children = htmlspecialchars($_POST['children']);
-        $howManyChildren = htmlspecialchars($_POST['howManyChildren']);
-        $animals = htmlspecialchars($_POST['animals']);
-        $howManyAnimals = htmlspecialchars($_POST['howManyAnimals']);
-        $period = htmlspecialchars($_POST['period']);
-        $additionalDescriptionOfSearch = htmlspecialchars($_POST['additionalDescriptionOfSearch']);
+        if (isset($_POST['withWho'])) $withWho = htmlspecialchars($_POST['withWho']); else $withWho = "alone";
+        if (isset($_POST['linksToFriends'])) $linksToFriends = htmlspecialchars($_POST['linksToFriends']); else $linksToFriends = "";
+        if (isset($_POST['children'])) $children = htmlspecialchars($_POST['children']); else $children = "without";
+        if (isset($_POST['howManyChildren'])) $howManyChildren = htmlspecialchars($_POST['howManyChildren']); else $howManyChildren = "";
+        if (isset($_POST['animals'])) $animals = htmlspecialchars($_POST['animals']); else $animals = "without";
+        if (isset($_POST['howManyAnimals'])) $howManyAnimals = htmlspecialchars($_POST['howManyAnimals']); else $howManyAnimals = "";
+        if (isset($_POST['period'])) $period = htmlspecialchars($_POST['period']); else $period = "";
+        if (isset($_POST['additionalDescriptionOfSearch'])) $additionalDescriptionOfSearch = htmlspecialchars($_POST['additionalDescriptionOfSearch']); else $additionalDescriptionOfSearch = "";
+
         if (isset($_POST['lic'])) $lic = htmlspecialchars($_POST['lic']); else $lic = "";
 
-        $errors = registrationCorrect(); //записываем в переменную результат работы функции registrationCorrect(), которая возвращает пустой array, если введённые данные верны и array с ошибками в противном случае
-        // Считаем ошибки, если 0, то можно будет записать данные в БД
-        if (count($errors) == 0) $correct = true; else $correct = false;
+        // Проверяем корректность данных пользователя. Функции registrationCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
+        $errors = registrationCorrect();
+        if (count($errors) == 0) $correct = true; else $correct = false; // Считаем ошибки, если 0, то можно будет записать данные в БД
 
-
-        if ($correct) //если данные верны, запишем их в базу данных
+        // Если данные, указанные пользователем, корректны, запишем их в базу данных
+        if ($correct)
         {
+            // Корректируем дату дня рождения для того, чтобы сделать ее пригодной для сохранения в базу данных
+            $date = substr($birthday, 0, 2);
+            $month = substr($birthday, 3, 2);
+            $year = substr($birthday, 6, 4);
+            $birthday = $year.$month.$date;
+
             $salt = mt_rand(100, 999);
             $tm = time();
             $last_act = $tm;
             $reg_date = $tm;
             $password = md5(md5($password) . $salt);
 
-            if (mysql_query("INSERT INTO users (typeTenant,typeOwner,name,secondName,surname,sex,nationality,      birthday,      login,password,telephon,emailReg,email,        fotoFilesId,currentStatusEducation,almamater,speciality,kurs,ochnoZaochno,yearOfEnd,notWorkCheckbox,placeOfWork,workPosition,regionOfBorn,cityOfBorn,shortlyAboutMe,vkontakte,odnoklassniki,facebook,twitter,searchRequestId,salt,user_hash,last_act,reg_date) VALUES ('" . $typeTenant . "','" . $typeOwner . "','" . $name . "','" . $secondName . "','" . $surname . "','" . $sex . "','" . $nationality . "','" .              $birthday              . "','" . $login . "','" . $password . "','" . $telephon . "','" . $email . "','" . $email . "','" .                  $fotoFilesId . "','" . $currentStatusEducation . "','" . $almamater . "','" . $speciality . "','" . $kurs . "','" . $ochnoZaochno . "','" . $yearOfEnd . "','" . $notWorkCheckbox . "','" . $placeOfWork . "','" . $workPosition . "','" . $regionOfBorn . "','" . $cityOfBorn . "','" . $shortlyAboutMe . "','" . $vkontakte . "','" . $odnoklassniki . "','" . $facebook . "','" . $twitter . "','" . $searchRequestId . "','" . $salt . "','" . $user_hash . "','" . $last_act . "','" . $reg_date . "')")) //пишем данные в БД и авторизовываем пользователя
+            if (mysql_query("INSERT INTO users (typeTenant,typeOwner,name,secondName,surname,sex,nationality,birthday,login,password,telephon,emailReg,email,currentStatusEducation,almamater,speciality,kurs,ochnoZaochno,yearOfEnd,notWorkCheckbox,placeOfWork,workPosition,regionOfBorn,cityOfBorn,shortlyAboutMe,vkontakte,odnoklassniki,facebook,twitter,searchRequestId,lic,salt,last_act,reg_date) VALUES ('" . $typeTenant . "','" . $typeOwner . "','" . $name . "','" . $secondName . "','" . $surname . "','" . $sex . "','" . $nationality . "','" . $birthday . "','" . $login . "','" . $password . "','" . $telephon . "','" . $email . "','" . $email . "','" . $currentStatusEducation . "','" . $almamater . "','" . $speciality . "','" . $kurs . "','" . $ochnoZaochno . "','" . $yearOfEnd . "','" . $notWorkCheckbox . "','" . $placeOfWork . "','" . $workPosition . "','" . $regionOfBorn . "','" . $cityOfBorn . "','" . $shortlyAboutMe . "','" . $vkontakte . "','" . $odnoklassniki . "','" . $facebook . "','" . $twitter . "','" . $searchRequestId . "','" . $lic . "','" . $salt . "','" . $last_act . "','" . $reg_date . "')")) // Пишем данные нового пользователя в БД
             {
-                setcookie("login", $login, time() + 50000, '/');
-                setcookie("password", md5($login . $password), time() + 50000, '/');
-                $rez = mysql_query("SELECT * FROM users WHERE login=" . $login);
-                $row = mysql_fetch_assoc($rez);
-                $_SESSION['id'] = $row['id'];
-                header('Location: successfullRegistration.php'); //после успешной регистрации - переходим на соответствующую страницу
+
+                /******* Переносим информацию о фотографиях пользователя в таблицу для постоянного хранения *******/
+                // Узнаем id пользователя - необходимо при сохранении информации о фотке в постоянную базу
+                $rezId = mysql_query("SELECT id FROM users WHERE login = '" . $login . "'");
+                $rowId = mysql_fetch_assoc($rezId);
+                // Получим информацию о всех фотках, соответствующих текущему fileUploadId
+                $rezTempFotos = mysql_query("SELECT filename, extension, filesizeMb FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'");
+                for ($i = 0; $i < mysql_num_rows($rezTempFotos); $i++)
+                {
+                    $rowTempFotos = mysql_fetch_assoc($rezTempFotos);
+                    mysql_query("INSERT INTO userFotos (filename, extension, filesizeMb, userId) VALUES ('" . $rowTempFotos['filename'] . "','" . $rowTempFotos['extension'] . "','" . $rowTempFotos['filesizeMb'] . "','" . $rowId['id'] . "')"); // Переносим информацию о фотографиях на постоянное хранение
+                }
+                // Удаляем записи о фотках в таблице для временного хранения данных
+                mysql_query("DELETE FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'");
+
+
+
+                /******* Сохраняем поисковый запрос, если он был указан пользователем *******/
+                // Преобразование формата инфы об искомом кол-ве комнат и районах, так как MySQL не умеет хранить массивы
+
+                // Непосредственное сохранение данных о поисковом запросе
+                if ($typeTenant == true)
+                {
+                    mysql_query("INSERT INTO searchRequests (id, typeOfObject, amountOfRooms, adjacentRooms, floor, withWithoutFurniture, minCost, maxCost, pledge, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, period, additionalDescriptionOfSearch) VALUES ('" . $rowId['id'] . "','" . $typeOfObject . "','" . $amountOfRooms . "','" . $adjacentRooms . "','" . $floor . "','" . $withWithoutFurniture . "','" . $minCost . "','" . $maxCost . "','" . $pledge . "','" . "!!!!!!!!!!!!!!!!!!" . "','" . $withWho . "','" . $linksToFriends . "','" . $children . "','" . $howManyChildren . "','" . $children . "','" . $howManyChildren . "','" . $animals . "','" . $howManyAnimals . "','" . $period . "','" . $additionalDescriptionOfSearch . "')"); // Поисковый запрос пользователя сохраняется в специальной таблице
+                }
+
+
+
+                /******* Авторизовываем пользователя *******/
+                $error = enter();
+                if (count($error) == 0) //если нет ошибок, отправляем уже авторизованного пользователя на страницу успешной регистрации
+                {
+                    header('Location: successfullRegistration.php'); //после успешной регистрации - переходим на соответствующую страницу
+                }
+                else
+                {
+                    // TODO:что-то нужно делать в случае, если возникли ошибки при авторизации во время регистрации - как минимум вывести их текст во всплывающем окошке
+                }
+
             }
             else
             {
@@ -148,6 +201,7 @@ else {
             }
         }
     }
+    // Действия при первой загрузке страницы регистрации - пользователь еще не заполнял поля и не отправлял данные на проверку серверу
     else {
         $name = "";
         $secondName = "";
@@ -187,8 +241,8 @@ else {
         $amountOfRooms5 = "";
         $amountOfRooms6 = "";
 
-        $adjacentRooms = "0";
-        $floor = "0";
+        $adjacentRooms = "yes";
+        $floor = "any";
         $withWithoutFurniture = "";
         $minCost = "";
         $maxCost = "";
@@ -240,11 +294,11 @@ else {
         $district45 = "";
         $district46 = "";
 
-        $withWho = "0";
-        $liksToFriends = "";
-        $children = "0";
+        $withWho = "alone";
+        $linksToFriends = "";
+        $children = "without";
         $howManyChildren = "";
-        $animals = "0";
+        $animals = "without";
         $howManyAnimals = "";
         $period = "";
         $additionalDescriptionOfSearch = "";
@@ -264,14 +318,6 @@ else {
 <html class="no-js" xmlns="http://www.w3.org/1999/html">
 <!--<![endif]-->
 <head>
-
-    <!--
-
-         Если запрос = registration.php?typeTenant=true, то php должен сформировать форму без вкладки Мои объявления
-         Если запрос = registration.php?typeOwner=true, то php должен сформировать форму без вкладки Условий поиска
-         Если запрос = registration.php, то выдаем страницу со всеми вкладками
-
-         -->
     <meta charset="utf-8">
 
     <!-- Use the .htaccess and remove these lines to avoid edge case issues.
@@ -322,6 +368,7 @@ else {
 <body>
 <div class="page_without_footer">
 
+<!-- Всплывающее поле для отображения списка ошибок, полученных при проверке данных на сервере (PHP)-->
 <div id="userMistakesBlock" class="ui-widget" style="display: none; width: 94%; position: absolute; top: 0px; left: 3%; z-index: 100;">
     <div class="ui-state-highlight ui-corner-all" style="text-align: center; padding: 0 .7em;">
         <div style="display: inline-block; text-align: left;">
@@ -534,7 +581,7 @@ include("header.php");
             <input type="hidden" name="fileUploadId" id="fileUploadId" <?php echo "value='$fileUploadId'";?>>
             <?php
             // Получаем информацию о всех загруженных фото и формируем для каждого свой input type hidden для передачи данных в обработчик яваскрипта
-            if ($rez = mysql_query("SELECT * FROM tempregfotos WHERE fileuploadid = '" . $fileUploadId . "'")) // ищем уже загруженные пользователем фотки
+            if ($rez = mysql_query("SELECT * FROM tempFotos WHERE fileuploadid = '" . $fileUploadId . "'")) // ищем уже загруженные пользователем фотки
             {
                 $numUploadedFiles = mysql_num_rows($rez);
                 for ($i = 0; $i < $numUploadedFiles; $i++) {
@@ -575,10 +622,10 @@ include("header.php");
             <div class="searchItemBody">
                 <select name="currentStatusEducation" id="currentStatusEducation" <?php if ($typeTenant) {echo "validations='validate[required]'";} ?>>
                     <option value="0" <?php if ($currentStatusEducation == "0") echo "selected";?>></option>
-                    <option value="1" <?php if ($currentStatusEducation == "1") echo "selected";?>>Нигде не учился
+                    <option value="withoutEducation" <?php if ($currentStatusEducation == "withoutEducation") echo "selected";?>>Нигде не учился
                     </option>
-                    <option value="2" <?php if ($currentStatusEducation == "2") echo "selected";?>>Сейчас учусь</option>
-                    <option value="3" <?php if ($currentStatusEducation == "3") echo "selected";?>>Закончил</option>
+                    <option value="learningNow" <?php if ($currentStatusEducation == "learningNow") echo "selected";?>>Сейчас учусь</option>
+                    <option value="finishedEducation" <?php if ($currentStatusEducation == "finishedEducation") echo "selected";?>>Закончил</option>
                 </select>
             </div>
         </div>
@@ -622,8 +669,8 @@ include("header.php");
             <div class="searchItemBody">
                 <select name="ochnoZaochno" class="ifLearned" <?php if ($typeTenant) {echo "validations='validate[required]'";} ?>>
                     <option value="0" <?php if ($ochnoZaochno == "0") echo "selected";?>></option>
-                    <option value="1" <?php if ($ochnoZaochno == "1") echo "selected";?>>Очно</option>
-                    <option value="2" <?php if ($ochnoZaochno == "2") echo "selected";?>>Заочно</option>
+                    <option value="ochno" <?php if ($ochnoZaochno == "ochno") echo "selected";?>>Очно</option>
+                    <option value="zaochno" <?php if ($ochnoZaochno == "zaochno") echo "selected";?>>Заочно</option>
                 </select>
             </div>
         </div>
@@ -792,22 +839,22 @@ include("header.php");
 
             <div class="searchItemBody">
                 <input type="checkbox" value="1"
-                       name="amountOfRooms1" <?php if ($amountOfRooms1 == "1") echo "checked";?>>
+                       name="amountOfRooms[]" <?php if ($amountOfRooms1 == "1") echo "checked";?>>
                 1
                 <input type="checkbox" value="2"
-                       name="amountOfRooms2" <?php if ($amountOfRooms2 == "2") echo "checked";?>>
+                       name="amountOfRooms[]" <?php if ($amountOfRooms2 == "2") echo "checked";?>>
                 2
                 <input type="checkbox" value="3"
-                       name="amountOfRooms3" <?php if ($amountOfRooms3 == "3") echo "checked";?>>
+                       name="amountOfRooms[]" <?php if ($amountOfRooms3 == "3") echo "checked";?>>
                 3
                 <input type="checkbox" value="4"
-                       name="amountOfRooms4" <?php if ($amountOfRooms4 == "4") echo "checked";?>>
+                       name="amountOfRooms[]" <?php if ($amountOfRooms4 == "4") echo "checked";?>>
                 4
                 <input type="checkbox" value="5"
-                       name="amountOfRooms5" <?php if ($amountOfRooms5 == "5") echo "checked";?>>
+                       name="amountOfRooms[]" <?php if ($amountOfRooms5 == "5") echo "checked";?>>
                 5
                 <input type="checkbox" value="6"
-                       name="amountOfRooms6" <?php if ($amountOfRooms6 == "6") echo "checked";?>>
+                       name="amountOfRooms[]" <?php if ($amountOfRooms6 == "6") echo "checked";?>>
                 6...
             </div>
         </div>
@@ -816,8 +863,8 @@ include("header.php");
 
             <div class="searchItemBody">
                 <select name="adjacentRooms">
-                    <option value="0" <?php if ($adjacentRooms == "0") echo "selected";?>>не имеет значения</option>
-                    <option value="1" <?php if ($adjacentRooms == "1") echo "selected";?>>только изолированные</option>
+                    <option value="yes" <?php if ($adjacentRooms == "yes") echo "selected";?>>не имеет значения</option>
+                    <option value="no" <?php if ($adjacentRooms == "no") echo "selected";?>>только изолированные</option>
                 </select>
             </div>
         </div>
@@ -826,9 +873,9 @@ include("header.php");
 
             <div class="searchItemBody">
                 <select name="floor">
-                    <option value="0" <?php if ($floor == "0") echo "selected";?>>любой</option>
-                    <option value="1" <?php if ($floor == "1") echo "selected";?>>не первый</option>
-                    <option value="2" <?php if ($floor == "2") echo "selected";?>>не первый и не последний</option>
+                    <option value="any" <?php if ($floor == "any") echo "selected";?>>любой</option>
+                    <option value="not1" <?php if ($floor == "not1") echo "selected";?>>не первый</option>
+                    <option value="not1notLasted" <?php if ($floor == "not1notLasted") echo "selected";?>>не первый и не последний</option>
                 </select>
             </div>
         </div>
@@ -848,9 +895,9 @@ include("header.php");
             </div>
             <div class="searchItemBody">
                 от
-                <input type="text" name="minCost" size="10" <?php echo "value='$minCost'";?>>
+                <input type="text" name="minCost" size="10" maxlength="8" <?php echo "value='$minCost'";?>>
                 руб., до
-                <input type="text" name="maxCost" size="10" <?php echo "value='$maxCost'";?>>
+                <input type="text" name="maxCost" size="10" maxlength="8" <?php echo "value='$maxCost'";?>>
                 руб.
             </div>
         </div>
@@ -860,7 +907,7 @@ include("header.php");
 
             <div class="searchItemBody">
                 до
-                <input type="text" name="pledge" size="10" <?php echo "value='$pledge'";?>>
+                <input type="text" name="pledge" size="10" maxlength="8" <?php echo "value='$pledge'";?>>
                 руб.
             </div>
         </div>
@@ -1120,10 +1167,10 @@ include("header.php");
 
         <div class="searchItemBody">
             <select name="withWho" id="withWho">
-                <option value="0" <?php if ($withWho == "0") echo "selected";?>>один</option>
-                <option value="1" <?php if ($withWho == "1") echo "selected";?>>семейная пара</option>
-                <option value="2" <?php if ($withWho == "2") echo "selected";?>>несемейная пара</option>
-                <option value="3" <?php if ($withWho == "3") echo "selected";?>>со знакомыми</option>
+                <option value="alone" <?php if ($withWho == "alone") echo "selected";?>>один</option>
+                <option value="couple" <?php if ($withWho == "couple") echo "selected";?>>семейная пара</option>
+                <option value="nonFamilyPair" <?php if ($withWho == "nonFamilyPair") echo "selected";?>>несемейная пара</option>
+                <option value="withFriends" <?php if ($withWho == "withFriends") echo "selected";?>>со знакомыми</option>
             </select>
         </div>
     </div>
@@ -1132,7 +1179,7 @@ include("header.php");
             Ссылки на страницы сожителей:
         </div>
         <div class="searchItemBody">
-            <textarea name="liksToFriends" cols="40" rows="3"><?php echo $liksToFriends;?></textarea>
+            <textarea name="linksToFriends" cols="40" rows="3"><?php echo $linksToFriends;?></textarea>
         </div>
     </div>
     <div class="searchItem">
@@ -1140,9 +1187,9 @@ include("header.php");
 
         <div class="searchItemBody">
             <select name="children" id="children">
-                <option value="0" <?php if ($children == "0") echo "selected";?>>без детей</option>
-                <option value="1" <?php if ($children == "1") echo "selected";?>>с детьми младше 4-х лет</option>
-                <option value="2" <?php if ($children == "2") echo "selected";?>>с детьми старше 4-х лет</option>
+                <option value="without" <?php if ($children == "without") echo "selected";?>>без детей</option>
+                <option value="childrenUnder4" <?php if ($children == "childrenUnder4") echo "selected";?>>с детьми младше 4-х лет</option>
+                <option value="childrenOlder4" <?php if ($children == "childrenOlder4") echo "selected";?>>с детьми старше 4-х лет</option>
             </select>
         </div>
     </div>
@@ -1159,8 +1206,8 @@ include("header.php");
 
         <div class="searchItemBody">
             <select name="animals" id="animals">
-                <option value="0" <?php if ($animals == "0") echo "selected";?>>без животных</option>
-                <option value="1" <?php if ($animals == "1") echo "selected";?>>с животным(ми)</option>
+                <option value="without" <?php if ($animals == "without") echo "selected";?>>без животных</option>
+                <option value="with" <?php if ($animals == "with") echo "selected";?>>с животным(ми)</option>
             </select>
         </div>
     </div>
@@ -1176,7 +1223,7 @@ include("header.php");
         <span class="searchItemLabel">Ориентировочный срок аренды:</span>
 
         <div class="searchItemBody">
-            <input type="text" name="period" size="18" validations="validate[required]" <?php echo "value='$period'";?>>
+            <input type="text" name="period" size="18" maxlength="80" validations="validate[required]" <?php echo "value='$period'";?>>
         </div>
     </div>
     <div class="searchItem">
