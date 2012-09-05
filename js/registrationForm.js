@@ -30,7 +30,7 @@ function createUploader(){
         //extraDropzones: [qq.getByClass(document, 'qq-upload-extra-drop-area')[0]]
     });
 
-// Важно, что в конце файла uploader.php располагается функция handleUpload, в которой есть и мой код, работающий на сервере при получении файла
+    // Важно, что в конце файла uploader.php располагается функция handleUpload, в которой есть и мой код, работающий на сервере при получении файла
 
     // Сформируем зеленые блоки для уже загруженных фотографий руками, чтобы пользователя не путать
     var rezult = {success: true};
@@ -53,39 +53,61 @@ $(document).ready(createUploader);
 $("#notWorkCheckbox").on('change', notWorkCheckbox);
 $(document).ready(notWorkCheckbox);
 function notWorkCheckbox() {
+    var userTypeTenant = $(".userType").attr('typeTenant') == "true";
     if ($("#notWorkCheckbox").is(':checked')) {
         $("input.ifWorked").attr('disabled', 'disabled').css('color', 'grey');
         $("div.searchItem.ifWorked div.required").text("");
     } else {
         $("input.ifWorked").removeAttr('disabled').css('color', '');
-        $("div.searchItem.ifWorked div.required").text("*");
+        // Отметим звездочкой обязательность заполнения полей для арендаторов
+        if (userTypeTenant) {
+            $("div.searchItem.ifWorked div.required").text("*");
+        } else {
+            $("div.searchItem.ifWorked div.required").text("");
+        }
     }
 }
 
-/* Если в форме Образование указан чекбокс - не учился, то блокировать заполнение остальных инпутов */
+/* Если в форме Образование выбран селект - не учился, то блокировать заполнение остальных инпутов */
 $("#currentStatusEducation").change(currentStatusEducation);
 $(document).ready(currentStatusEducation);
 function currentStatusEducation() {
+    var userTypeTenant = $(".userType").attr('typeTenant') == "true";
     var currentValue = $("#currentStatusEducation option:selected").attr('value');
-    if (currentValue == 0) {
+    if (currentValue == "0") {
         $("input.ifLearned, select.ifLearned").removeAttr('disabled').css('color', '');
-        $("div.searchItem.ifLearned div.required").text("*");
+        // Отметим звездочкой обязательность заполнения полей только для арендаторов
+        if (userTypeTenant) {
+            $("div.searchItem.ifLearned div.required").text("*");
+        } else {
+            $("div.searchItem.ifLearned div.required").text("");
+        }
     }
-    if (currentValue == 1) {
+    if (currentValue == "withoutEducation") {
         $("input.ifLearned, select.ifLearned").attr('disabled', 'disabled').css('color', 'grey');
         $("div.searchItem.ifLearned div.required").text("");
     }
-    if (currentValue == 2) {
+    if (currentValue == "learningNow") {
         $("input.ifLearned, select.ifLearned").removeAttr('disabled').css('color', '');
-        $("div.searchItem.ifLearned div.required").text("*");
         $('#kurs').css('display', '');
         $('#yearOfEnd').css('display', 'none');
+        // Отметим звездочкой обязательность заполнения полей только для арендаторов
+        if (userTypeTenant) {
+            $("div.searchItem.ifLearned div.required").text("*");
+        } else {
+            $("div.searchItem.ifLearned div.required").text("");
+        }
     }
-    if (currentValue == 3) {
+    if (currentValue == "finishedEducation") {
         $("input.ifLearned, select.ifLearned").removeAttr('disabled').css('color', '');
-        $("div.searchItem.ifLearned div.required").text("*");
         $('#kurs').css('display', 'none');
         $('#yearOfEnd').css('display', '');
+        // Отметим звездочкой обязательность заполнения полей для арендаторов
+        if (userTypeTenant) {
+            $("div.searchItem.ifLearned div.required").text("*");
+        } else {
+            $("div.searchItem.ifLearned div.required").text("");
+        }
     }
 }
 
@@ -136,7 +158,7 @@ if ($('#userMistakesBlock ol').html() != "") {
     $('#userMistakesBlock').css('display', 'block');
 }
 
-/*
+
 // Подключение и настройка динамической проверки формы на JS
 $('#tabs').bind('tabsshow', function(event, ui) {
     newTabId = ui.panel.id; // Определяем идентификатор вновь открытой вкладки
@@ -166,5 +188,3 @@ function rePosition(caller, divFormError) { // Соответствует дей
         left: callerleftPosition,
     });
 }
-
-*/

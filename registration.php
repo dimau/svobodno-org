@@ -10,18 +10,18 @@ if (login()) {
 
 // Выясняем роль пользователя - только арендатор, только собственник, или и то и другое.
 if (isset($_GET['typeTenant'])) {
-    $typeTenant = true;
+    $typeTenant = "true";
 } else {
-    $typeTenant = false;
+    $typeTenant = "false";
 }
 if (isset($_GET['typeOwner'])) {
-    $typeOwner = true;
+    $typeOwner = "true";
 } else {
-    $typeOwner = false;
+    $typeOwner = "false";
 }
 if (!isset($_GET['typeTenant']) && !isset($_GET['typeOwner'])) {
-    $typeTenant = true;
-    $typeOwner = true;
+    $typeTenant = "true";
+    $typeOwner = "true";
 }
 
 // Присваиваем всем переменным значения по умолчанию
@@ -297,8 +297,8 @@ if (isset($_POST['readyButton'])) {
             $amountOfRoomsSerialized = serialize($amountOfRooms);
             $districtSerialized = serialize($district);
             // Непосредственное сохранение данных о поисковом запросе
-            if ($typeTenant == true) {
-                $rez = mysql_query("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, withWithoutFurniture, minCost, maxCost, pledge, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, period, additionalDescriptionOfSearch) VALUES ('" . $rowId['id'] . "','" . $typeOfObject . "','" . "amountOfRoomsSerialized" . "','" . $adjacentRooms . "','" . $floor . "','" . $withWithoutFurniture . "','" . $minCost . "','" . $maxCost . "','" . $pledge . "','" . "districtSerialized" . "','" . $withWho . "','" . $linksToFriends . "','" . $children . "','" . $howManyChildren . "','" . $animals . "','" . $howManyAnimals . "','" . $period . "','" . $additionalDescriptionOfSearch . "')"); // Поисковый запрос пользователя сохраняется в специальной таблице
+            if ($typeTenant == "true") {
+                $rez = mysql_query("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, withWithoutFurniture, minCost, maxCost, pledge, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, period, additionalDescriptionOfSearch) VALUES ('" . $rowId['id'] . "','" . $typeOfObject . "','" . $amountOfRoomsSerialized . "','" . $adjacentRooms . "','" . $floor . "','" . $withWithoutFurniture . "','" . $minCost . "','" . $maxCost . "','" . $pledge . "','" . $districtSerialized . "','" . $withWho . "','" . $linksToFriends . "','" . $children . "','" . $howManyChildren . "','" . $animals . "','" . $howManyAnimals . "','" . $period . "','" . $additionalDescriptionOfSearch . "')"); // Поисковый запрос пользователя сохраняется в специальной таблице
             }
 
 
@@ -306,11 +306,7 @@ if (isset($_POST['readyButton'])) {
             $error = enter();
             if (count($error) == 0) //если нет ошибок, отправляем уже авторизованного пользователя на страницу успешной регистрации
             {
-                // TODO: тест
-                /*$rez = mysql_query("SELECT amountOfRooms, district FROM searchRequests");
-                $row = mysql_fetch_assoc($rez);
-                echo $row['amountOfRooms'] . "   " . $row['district']; */
-                //header('Location: successfullRegistration.php'); //после успешной регистрации - переходим на соответствующую страницу
+                header('Location: successfullRegistration.php'); //после успешной регистрации - переходим на соответствующую страницу
             }
             else {
                 // TODO:что-то нужно делать в случае, если возникли ошибки при авторизации во время регистрации - как минимум вывести их текст во всплывающем окошке
@@ -432,7 +428,7 @@ include("header.php");
     <li>
         <a href="#tabs-3">Социальные сети</a>
     </li>
-    <?php if ($typeTenant): ?>
+    <?php if ($typeTenant == "true"): ?>
     <li>
         <a href="#tabs-4">Что ищете?</a>
     </li>
@@ -514,7 +510,7 @@ include("header.php");
                     </select>
                 </div>
             </div>
-            <div class="searchItem"> <!-- TODO: поменять контроль поля при подключении календаря -->
+            <div class="searchItem">
                 <div class="required">
                     *
                 </div>
@@ -573,14 +569,14 @@ include("header.php");
                 </div>
                 <div class="searchItem">
                     <div class="required">
-                        <?php if ($typeTenant) {
+                        <?php if ($typeTenant == "true") {
                         echo "*";
                     } ?>
                     </div>
                     <span class="searchItemLabel">e-mail: </span>
 
                     <div class="searchItemBody">
-                        <input name="email" type="text" size="30" <?php if ($typeTenant) {
+                        <input name="email" type="text" size="30" <?php if ($typeTenant == "true") {
                             echo "validations='validate[required,custom[email]]'";
                         } echo "value='$email'"; ?>>
                     </div>
@@ -591,7 +587,7 @@ include("header.php");
         <fieldset class="edited private" style="min-width: 300px;">
             <legend title="Для успешной регистрации должна быть загружена хотя бы 1 фотография">
                 <div class="required">
-                    <?php if ($typeTenant) {
+                    <?php if ($typeTenant == "true") {
                     echo "*";
                 } ?>
                 </div>
@@ -634,14 +630,14 @@ include("header.php");
         </legend>
         <div class="searchItem">
             <div class="required">
-                <?php if ($typeTenant) {
+                <?php if ($typeTenant == "true") {
                 echo "*";
             } ?>
             </div>
             <span class="searchItemLabel">Текущий статус: </span>
 
             <div class="searchItemBody">
-                <select name="currentStatusEducation" id="currentStatusEducation" <?php if ($typeTenant) {
+                <select name="currentStatusEducation" id="currentStatusEducation" <?php if ($typeTenant == "true") {
                     echo "validations='validate[required]'";
                 } ?>>
                     <option value="0" <?php if ($currentStatusEducation == "0") echo "selected";?>></option>
@@ -662,58 +658,38 @@ include("header.php");
         <div id="almamater" class="searchItem ifLearned"
              title="Укажите учебное заведение, в котором учитесь сейчас, либо последнее из тех, что заканчивали">
             <div class="required">
-                <?php if ($typeTenant) {
-                echo "*";
-            } ?>
             </div>
             <span class="searchItemLabel">Учебное заведение: </span>
 
             <div class="searchItemBody">
-                <input name="almamater" class="ifLearned" type="text" size="50" <?php if ($typeTenant) {
-                    echo "validations='validate[required]'";
-                } echo "value='$almamater'";?>>
+                <input name="almamater" class="ifLearned" type="text" size="50" <?php echo "value='$almamater'";?>>
             </div>
         </div>
         <div id="speciality" class="searchItem ifLearned">
             <div class="required">
-                <?php if ($typeTenant) {
-                echo "*";
-            } ?>
             </div>
             <span class="searchItemLabel">Специальность: </span>
 
             <div class="searchItemBody">
-                <input name="speciality" class="ifLearned" type="text" size="55" <?php if ($typeTenant) {
-                    echo "validations='validate[required]'";
-                } echo "value='$speciality'";?>>
+                <input name="speciality" class="ifLearned" type="text" size="55" <?php echo "value='$speciality'";?>>
             </div>
         </div>
         <div id="kurs" class="searchItem ifLearned" title="Укажите курс, на котором учитесь">
             <div class="required">
-                <?php if ($typeTenant) {
-                echo "*";
-            } ?>
             </div>
             <span class="searchItemLabel">Курс: </span>
 
             <div class="searchItemBody">
-                <input name="kurs" class="ifLearned" type="text" size="19" <?php if ($typeTenant) {
-                    echo "validations='validate[required]'";
-                } echo "value='$kurs'";?>>
+                <input name="kurs" class="ifLearned" type="text" size="19" <?php echo "value='$kurs'";?>>
             </div>
         </div>
         <div id="formatEducation" class="searchItem ifLearned" title="Укажите форму обучения">
             <div class="required">
-                <?php if ($typeTenant) {
-                echo "*";
-            } ?>
             </div>
             <span class="searchItemLabel">Очно / Заочно: </span>
 
             <div class="searchItemBody">
-                <select name="ochnoZaochno" class="ifLearned" <?php if ($typeTenant) {
-                    echo "validations='validate[required]'";
-                } ?>>
+                <select name="ochnoZaochno" class="ifLearned">
                     <option value="0" <?php if ($ochnoZaochno == "0") echo "selected";?>></option>
                     <option value="ochno" <?php if ($ochnoZaochno == "ochno") echo "selected";?>>Очно</option>
                     <option value="zaochno" <?php if ($ochnoZaochno == "zaochno") echo "selected";?>>Заочно</option>
@@ -722,16 +698,11 @@ include("header.php");
         </div>
         <div id="yearOfEnd" class="searchItem ifLearned" title="Укажите год окончания учебного заведения">
             <div class="required">
-                <?php if ($typeTenant) {
-                echo "*";
-            } ?>
             </div>
             <span class="searchItemLabel">Год окончания: </span>
 
             <div class="searchItemBody">
-                <input name="yearOfEnd" class="ifLearned" type="text" size="9" <?php if ($typeTenant) {
-                    echo "validations='validate[required]'";
-                } echo "value='$yearOfEnd'";?>>
+                <input name="yearOfEnd" class="ifLearned" type="text" size="9" <?php echo "value='$yearOfEnd'";?>>
             </div>
         </div>
     </fieldset>
@@ -747,30 +718,20 @@ include("header.php");
         </div>
         <div class="searchItem ifWorked">
             <div class="required">
-                <?php if ($typeTenant) {
-                echo "*";
-            } ?>
             </div>
             <span class="searchItemLabel">Место работы: </span>
 
             <div class="searchItemBody">
-                <input name="placeOfWork" class="ifWorked" type="text" size="30" <?php if ($typeTenant) {
-                    echo "validations='validate[required]'";
-                } echo "value='$placeOfWork'";?>>
+                <input name="placeOfWork" class="ifWorked" type="text" size="30" <?php echo "value='$placeOfWork'";?>>
             </div>
         </div>
         <div class="searchItem ifWorked">
             <div class="required">
-                <?php if ($typeTenant) {
-                echo "*";
-            } ?>
             </div>
             <span class="searchItemLabel">Должность: </span>
 
             <div class="searchItemBody">
-                <input name="workPosition" class="ifWorked" type="text" size="33" <?php if ($typeTenant) {
-                    echo "validations='validate[required]'";
-                } echo "value='$workPosition'";?>>
+                <input name="workPosition" class="ifWorked" type="text" size="33" <?php echo "value='$workPosition'";?>>
             </div>
         </div>
     </fieldset>
@@ -781,28 +742,28 @@ include("header.php");
         </legend>
         <div class="searchItem">
             <div class="required">
-                <?php if ($typeTenant) {
+                <?php if ($typeTenant == "true") {
                 echo "*";
             } ?>
             </div>
             <span class="searchItemLabel">В каком регионе родились: </span>
 
             <div class="searchItemBody">
-                <input name="regionOfBorn" type="text" size="42" <?php if ($typeTenant) {
+                <input name="regionOfBorn" type="text" size="42" <?php if ($typeTenant == "true") {
                     echo "validations='validate[required]'";
                 } echo "value='$regionOfBorn'";?>>
             </div>
         </div>
         <div class="searchItem">
             <div class="required">
-                <?php if ($typeTenant) {
+                <?php if ($typeTenant == "true") {
                 echo "*";
             } ?>
             </div>
             <span class="searchItemLabel">Родной город, населенный пункт: </span>
 
             <div class="searchItemBody">
-                <input name="cityOfBorn" type="text" size="36" <?php if ($typeTenant) {
+                <input name="cityOfBorn" type="text" size="36" <?php if ($typeTenant == "true") {
                     echo "validations='validate[required]'";
                 } echo "value='$cityOfBorn'";?>>
             </div>
@@ -874,7 +835,7 @@ include("header.php");
         По окончании заполнения полей на всех вкладках введите текст капчи и нажмите кнопку "Готово" справа внизу
     </div>
 </div>
-<?php if ($typeTenant): ?>
+<?php if ($typeTenant == "true"): ?>
 <div id="tabs-4">
 <div class="shadowText">
     Заполните форму как можно подробнее, это позволит системе подобрать для Вас наиболее интересные предложения
@@ -1324,7 +1285,7 @@ include("header.php");
 <!-- /end.tabs -->
 <div style="float: right;">
     <div style="text-align: left; margin-top: 7px;">
-        <input type="checkbox" name="lic" value="yes"> Я принимаю условия <a href="#">лицензионного соглашения</a>
+        <input type="checkbox" name="lic" value="yes" <?php if ($lic == "yes") echo "checked";?>> Я принимаю условия <a href="#">лицензионного соглашения</a>
     </div>
     <div class="readyButton">
         <button type="submit" name="readyButton" id="readyButton">
@@ -1343,6 +1304,8 @@ include("header.php");
         </noscript>
     </div>
 </div>
+<!-- Добавялем невидимый input для того, чтобы передать тип пользователя (собственник/арендатор) - это используется в JS для простановки обязательности полей для заполнения -->
+<?php echo "<input type='hidden' class='userType' typeTenant='" . $typeTenant . "' typeOwner='" . $typeOwner . "'>"; ?>
 </form>
 </div>
 <!-- /end.wrapperOfTabs-->
@@ -1368,7 +1331,7 @@ include("header.php");
 <!-- Русификатор виджета календарь -->
 <script src="js/vendor/jquery.ui.datepicker-ru.js"></script>
 <!-- Скрипт для валидации на лету полей формы -->
-<!--<script src="js/vendor/jquery.validationEngine.js"></script>-->
+<script src="js/vendor/jquery.validationEngine.js"></script>
 
 <script src="js/vendor/fileuploader.js" type="text/javascript"></script>
 

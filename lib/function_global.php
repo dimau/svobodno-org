@@ -40,48 +40,53 @@ function registrationCorrect()
     }
 
     // Обязательные проверки только для арендатора
-    if ($typeTenant == true) {
-        if ($email != "") {
-            if (!preg_match("/^(([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+\.)*([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]{2,5}$/", $email)) $errors[] = 'Укажите, пожалуйста, Ваш настоящий e-mail (указанный Вами e-mail не прошел проверку формата)'; //соответствует ли поле e-mail регулярному выражению
-        }
-        else {
+    if ($typeTenant == "true") {
+        if ($email == "") {
             $errors[] = 'Укажите e-mail';
         }
 
         if ($fileUploadId != "") {
             $rez = mysql_query("SELECT * FROM tempFotos WHERE fileuploadid='".$fileUploadId."'");
             if (mysql_num_rows($rez) == 0) $errors[] = 'Загрузите как минимум 1 Вашу фотографию'; // проверка на хотя бы 1 фотку
-        } else {
-            $errors[] = 'Перезагрузите браузер, пожалуйста: возникла ошибка при формировании формы для загрузки фотографий';
         }
 
         if ($currentStatusEducation == "0") $errors[] = 'Укажите Ваше образование (текущий статус)';
-        if (($currentStatusEducation == 2 || $currentStatusEducation == 3) && $almamater == "") $errors[] = 'Укажите учебное заведение';
-        if (($currentStatusEducation == 2 || $currentStatusEducation == 3) && strlen($almamater) > 100) $errors[] = 'Слишком длинное название учебного заведения (используйте не более 100 символов)';
-        if (($currentStatusEducation == 2 || $currentStatusEducation == 3) && $speciality == "") $errors[] = 'Укажите специальность';
-        if (($currentStatusEducation == 2 || $currentStatusEducation == 3) && strlen($speciality) > 100) $errors[] = 'Слишком длинное название специальности (используйте не более 100 символов)';
-        if ($currentStatusEducation == 2 && $kurs == "") $errors[] = 'Укажите курс обучения';
-        if ($currentStatusEducation == 2 && strlen($kurs) > 30) $errors[] = 'Курс. Указана слишком длинная строка (используйте не более 30 символов)';
-        if (($currentStatusEducation == 2 || $currentStatusEducation == 3) && $ochnoZaochno == "0") $errors[] = 'Укажите форму обучения (очная, заочная)';
-        if ($currentStatusEducation == 3 && $yearOfEnd == "") $errors[] = 'Укажите год окончания учебного заведения';
-        if ($currentStatusEducation == 3 && strlen($yearOfEnd) > 20) $errors[] = 'Год окончания учебного заведения. Указана слишком длинная строка (используйте не более 20 символов)';
+        if (($currentStatusEducation == "learningNow" || $currentStatusEducation == "finishedEducation") && $almamater == "") $errors[] = 'Укажите учебное заведение';
+        if (($currentStatusEducation == "learningNow" || $currentStatusEducation == "finishedEducation") && $speciality == "") $errors[] = 'Укажите специальность';
+        if ($currentStatusEducation == "learningNow" && $kurs == "") $errors[] = 'Укажите курс обучения';
+        if (($currentStatusEducation == "learningNow" || $currentStatusEducation == "finishedEducation") && $ochnoZaochno == "0") $errors[] = 'Укажите форму обучения (очная, заочная)';
+        if ($currentStatusEducation == "finishedEducation" && $yearOfEnd == "") $errors[] = 'Укажите год окончания учебного заведения';
         if ($notWorkCheckbox != "isNotWorking" && $placeOfWork == "") $errors[] = 'Укажите Ваше место работы (название организации)';
-        if ($notWorkCheckbox != "isNotWorking" && strlen($placeOfWork) > 100) $errors[] = 'Слишком длинное наименование места работы (используйте не более 100 символов)';
         if ($notWorkCheckbox != "isNotWorking" && $workPosition == "") $errors[] = 'Укажите Вашу должность';
-        if ($notWorkCheckbox != "isNotWorking" && strlen($workPosition) > 100) $errors[] = 'Слишком длинное название должности (используйте не более 100 символов)';
 
         if ($regionOfBorn == "") $errors[] = 'Укажите регион, в котором Вы родились';
-        if (strlen($regionOfBorn) > 50) $errors[] = 'Слишком длинное наименование региона, в котором Вы родились (используйте не более 50 символов)';
         if ($cityOfBorn == "") $errors[] = 'Укажите город (населенный пункт), в котором Вы родились';
-        if (strlen($cityOfBorn) > 50) $errors[] = 'Слишком длинное наименование города, в котором Вы родились (используйте не более 50 символов)';
 
         if (!preg_match("/^\d{0,8}$/", $minCost)) $errors[] = 'Неправильный формат числа в поле минимальной величины арендной платы (проверьте: только числа, не более 8 символов)';
         if (!preg_match("/^\d{0,8}$/", $maxCost)) $errors[] = 'Неправильный формат числа в поле максимальной величины арендной платы (проверьте: только числа, не более 8 символов)';
         if (!preg_match("/^\d{0,8}$/", $pledge)) $errors[] = 'Неправильный формат числа в поле максимальной величины залога (проверьте: только числа, не более 8 символов)';
+        if ($minCost > $maxCost) $errors[] = 'Минимальная стоимость аренды не может быть больше, чем максимальная. Исправьте поля, в которых указаны Ваши требования к диапазону стоимости аренды';
         if ($period == "") $errors[] = 'Укажите ориентировочный срок аренды, например: долговременно (более года)';
-        if (strlen($period) > 80) $errors[] = 'Указана слишком длинная строка в поле для ориентировочного срока проживания (используйте не более 80 символов)';
 
     }
+
+    // Обязательные проверки для полей, которые могут быть заполнены как арендаторами, так и собственниками
+    if ($email != "") {
+        if (!preg_match("/^(([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+\.)*([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]{2,5}$/", $email)) $errors[] = 'Укажите, пожалуйста, Ваш настоящий e-mail (указанный Вами e-mail не прошел проверку формата)'; //соответствует ли поле e-mail регулярному выражению
+    }
+    if ($fileUploadId == "") {
+        $errors[] = 'Перезагрузите браузер, пожалуйста: возникла ошибка при формировании формы для загрузки фотографий';
+    }
+    if (isset($almamater) && strlen($almamater) > 100) $errors[] = 'Слишком длинное название учебного заведения (используйте не более 100 символов)';
+    if (isset($speciality) && strlen($speciality) > 100) $errors[] = 'Слишком длинное название специальности (используйте не более 100 символов)';
+    if (isset($kurs) && strlen($kurs) > 30) $errors[] = 'Курс. Указана слишком длинная строка (используйте не более 30 символов)';
+    if (isset($yearOfEnd) && strlen($yearOfEnd) > 20) $errors[] = 'Год окончания учебного заведения. Указана слишком длинная строка (используйте не более 20 символов)';
+    if (isset($placeOfWork) && strlen($placeOfWork) > 100) $errors[] = 'Слишком длинное наименование места работы (используйте не более 100 символов)';
+    if (isset($workPosition) && strlen($workPosition) > 100) $errors[] = 'Слишком длинное название должности (используйте не более 100 символов)';
+    if (isset($period) && strlen($period) > 80) $errors[] = 'Указана слишком длинная строка в поле для ориентировочного срока проживания (используйте не более 80 символов)';
+    if (isset($regionOfBorn) && strlen($regionOfBorn) > 50) $errors[] = 'Слишком длинное наименование региона, в котором Вы родились (используйте не более 50 символов)';
+    if (isset($cityOfBorn) && strlen($cityOfBorn) > 50) $errors[] = 'Слишком длинное наименование города, в котором Вы родились (используйте не более 50 символов)';
+
 
     // Контроль длины необязательных полей и минимальный контроль на структуру - для безопасного сохранения в базу данных и небольшая защита от мошенничества
     if (strlen($vkontakte) > 100) $errors[] = 'Указана слишком длинная ссылка на личную страницу Вконтакте (используйте не более 100 символов)';
@@ -93,7 +98,7 @@ function registrationCorrect()
     if (strlen($twitter) > 100) $errors[] = 'Указана слишком длинная ссылка на личную страницу в Twitter (используйте не более 100 символов)';
     if (strlen($twitter) > 0 && !preg_match("/twitter\.com/", $twitter)) $errors[] = 'Укажите, пожалуйста, Вашу настоящую личную страницу в Twitter, либо оставьте поле пустым (ссылка должна содержать строчку "twitter.com")';
 
-
+    // Проверка согласия пользователя с лицензией
     if ($lic != "yes") $errors[] = 'Регистрация возможна только при согласии с условиями лицензионного соглашения'; //приняты ли правила
 
     return $errors; // Возвращаем список ошибок, если все в порядке, то он будет пуст
