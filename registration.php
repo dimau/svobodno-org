@@ -384,14 +384,12 @@ if (isset($_POST['readyButton'])) {
 <div class="page_without_footer">
 
 <!-- Всплывающее поле для отображения списка ошибок, полученных при проверке данных на сервере (PHP)-->
-<div id="userMistakesBlock" class="ui-widget"
-     style="display: none; width: 94%; position: absolute; top: 0px; left: 3%; z-index: 100;">
-    <div class="ui-state-highlight ui-corner-all" style="text-align: center; padding: 0 .7em;">
-        <div style="display: inline-block; text-align: left;">
+<div id="userMistakesBlock" class="ui-widget">
+    <div class="ui-state-highlight ui-corner-all">
+        <div>
             <p>
-                <span class="ui-icon ui-icon-info"
-                      style="display: inline-block; vertical-align: middle; margin-right: .3em;"></span>
-                <span id="userMistakesText" style="vertical-align: middle;">При обработке данных возникли ошибки:</span>
+                <span class="icon-mistake ui-icon ui-icon-info"></span>
+                <span id="userMistakesText">При обработке данных возникли ошибки:</span>
             </p>
             <ol><?php
                 if ($correct == false && isset($errors)) {

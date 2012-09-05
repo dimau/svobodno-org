@@ -171,7 +171,7 @@ function enter()
         }
     }
     else {
-        $error[] = "Поля не должны быть пустыми!";
+        $error[] = "Укажите Ваш логин и пароль";
         return $error;
     }
 }

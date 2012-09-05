@@ -17,10 +17,7 @@ else //если пользователь не авторизирован, то �
         {
             header('Location: personal.php');
         }
-        else
-        {
-            // TODO:что-то нужно делать в случае, если возникли ошибки при авторизации - как минимум вывести их текст во всплывающем окошке
-        }
+        // Если при авторизации возникли ошибки, мы их покажем в специальном всплывающем сверху блоке вместе со страницей авторизации
     }
 }
 ?>
@@ -55,6 +52,26 @@ else //если пользователь не авторизирован, то �
 
 	<body>
 		<div class="page_without_footer">
+
+            <!-- Всплывающее поле для отображения списка ошибок, полученных при проверке данных на сервере (PHP)-->
+            <div id="userMistakesBlock" class="ui-widget">
+                <div class="ui-state-highlight ui-corner-all">
+                    <div>
+                        <p>
+                            <span class="icon-mistake ui-icon ui-icon-info"></span>
+                            <span id="userMistakesText">При обработке данных возникли ошибки:</span>
+                        </p>
+                        <ol><?php
+                            if (isset($error) && count($error) != 0) {
+                                foreach ($error as $key => $value) {
+                                    echo "<li>$value</li>";
+                                }
+                            }
+                            ?></ol>
+                    </div>
+                </div>
+            </div>
+
             <!-- Сформируем и вставим заголовок страницы -->
             <?php
                 include("header.php");
@@ -62,14 +79,6 @@ else //если пользователь не авторизирован, то �
 
 			<div class="page_main_content">
 
-                <div id="userMistakesBlock" class="ui-widget" style="width: 600px; margin: auto;">
-                    <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;">
-                        <p>
-                        <span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
-                        <span id="userMistakesText">Текст ошибки</span>
-                        </p>
-                    </div>
-                </div>
 
 				<div class="miniBlock">
 					<div class="miniBlockHeader">
@@ -125,6 +134,16 @@ else //если пользователь не авторизирован, то �
 
 		<!-- scripts concatenated and minified via build script -->
 		<script src="js/main.js"></script>
+
+        <script>
+            // Отображение результатов обработки формы на PHP
+            if ($('#userMistakesBlock ol').html() != "") {
+                $('#userMistakesBlock').on('click', function() {
+                    $(this).slideUp(800);
+                });
+                $('#userMistakesBlock').css('display', 'block');
+            }
+        </script>
 
 		<!-- end scripts -->
 

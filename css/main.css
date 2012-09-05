@@ -603,6 +603,39 @@ body {
 }
 
 /* =============================================================================
+   Стили для блока отображения ошибок - используется при входе в сервис и при регистрации
+   ========================================================================== */
+
+#userMistakesBlock {
+    display: none;
+    width: 94%;
+    position: absolute;
+    top: 0px;
+    left: 3%;
+    z-index: 100;
+}
+
+#userMistakesBlock div {
+    text-align: center;
+    padding: 0 .7em;
+}
+
+#userMistakesBlock div div {
+    display: inline-block;
+    text-align: left;
+}
+
+#userMistakesBlock .icon-mistake {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: .3em;
+}
+
+#userMistakesText {
+    vertical-align: middle;
+}
+
+/* =============================================================================
    Стили для блока добавления и удаления из избранного
    ========================================================================== */
   

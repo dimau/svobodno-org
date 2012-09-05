@@ -194,10 +194,10 @@
 		<script src="js/main.js"></script>
 		<script>
 			$("#fortenant").on('click', function() {
-				window.open('fortenant.html');
+				window.open('fortenant.php');
 			});
 			$("#forowner").on('click', function() {
-				window.open('forowner.html');
+				window.open('forowner.php');
 			});
 		</script>
 		<!-- scripts concatenated and minified via build script -->
