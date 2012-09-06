@@ -24,7 +24,7 @@ $rez = mysql_query("CREATE TABLE userFotos (id VARCHAR(32) NOT NULL PRIMARY KEY,
 echo "Статус создания таблицы userFotos: " . $rez;
 
 // Создаем таблицу для хранения информации о ПОИСКОВЫХ ЗАПРОСАХ пользователей
-$rez = mysql_query("CREATE TABLE searchRequests (userId INT(11) NOT NULL PRIMARY KEY, typeOfObject VARCHAR(20), amountOfRooms BLOB, adjacentRooms VARCHAR(20), floor VARCHAR(20), withWithoutFurniture VARCHAR(20), minCost INT NOT NULL, maxCost INT NOT NULL, pledge INT NOT NULL, district BLOB, withWho VARCHAR(20), linksToFriends TEXT, children VARCHAR(20), howManyChildren TEXT, animals VARCHAR(20), howManyAnimals TEXT, period VARCHAR(80), additionalDescriptionOfSearch TEXT)");
+$rez = mysql_query("CREATE TABLE searchRequests (userId INT(11) NOT NULL PRIMARY KEY, typeOfObject VARCHAR(20), amountOfRooms BLOB, adjacentRooms VARCHAR(20), floor VARCHAR(20), furniture VARCHAR(20), minCost INT NOT NULL, maxCost INT NOT NULL, pledge INT NOT NULL, district BLOB, withWho VARCHAR(20), linksToFriends TEXT, children VARCHAR(20), howManyChildren TEXT, animals VARCHAR(20), howManyAnimals TEXT, period VARCHAR(80), additionalDescriptionOfSearch TEXT)");
 // в поле userId указывается идентификатор пользователя, к которому привязан данный поисковый запрос. Так как я считаю, что каждый пользователь может иметь только 1 поисковый запрос, то данное поле является ключом таблицы
 // amountOfRooms храним в виде 001011, где каждый разряд соответствует количеству комнат (1 разряд - 1 комната, 2-ой разряд - 2 комнаты и т.д.), а 0 - не отмечено, 1 - отмечено
 // district храним в виде последовательности идентификаторов районов, выбранных пользователем, разделенных знаком ","

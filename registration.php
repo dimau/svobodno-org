@@ -67,7 +67,7 @@ $amountOfRooms6 = "";
 
 $adjacentRooms = "yes";
 $floor = "any";
-$withWithoutFurniture = "";
+$furniture = "any";
 $minCost = "";
 $maxCost = "";
 $pledge = "";
@@ -241,7 +241,7 @@ if (isset($_POST['readyButton'])) {
 
     if (isset($_POST['adjacentRooms'])) $adjacentRooms = htmlspecialchars($_POST['adjacentRooms']);
     if (isset($_POST['floor'])) $floor = htmlspecialchars($_POST['floor']);
-    if (isset($_POST['withWithoutFurniture'])) $withWithoutFurniture = htmlspecialchars($_POST['withWithoutFurniture']);
+    if (isset($_POST['furniture'])) $furniture = htmlspecialchars($_POST['furniture']);
     if (isset($_POST['minCost']) && $_POST['minCost'] != "") $minCost = htmlspecialchars($_POST['minCost']); else $minCost = "0";
     if (isset($_POST['maxCost']) && $_POST['maxCost'] != "") $maxCost = htmlspecialchars($_POST['maxCost']); else $maxCost = "99999999";
     if (isset($_POST['pledge']) && $_POST['pledge'] != "") $pledge = htmlspecialchars($_POST['pledge']); else $pledge = "99999999";
@@ -298,7 +298,7 @@ if (isset($_POST['readyButton'])) {
             $districtSerialized = serialize($district);
             // Непосредственное сохранение данных о поисковом запросе
             if ($typeTenant == "true") {
-                $rez = mysql_query("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, withWithoutFurniture, minCost, maxCost, pledge, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, period, additionalDescriptionOfSearch) VALUES ('" . $rowId['id'] . "','" . $typeOfObject . "','" . $amountOfRoomsSerialized . "','" . $adjacentRooms . "','" . $floor . "','" . $withWithoutFurniture . "','" . $minCost . "','" . $maxCost . "','" . $pledge . "','" . $districtSerialized . "','" . $withWho . "','" . $linksToFriends . "','" . $children . "','" . $howManyChildren . "','" . $animals . "','" . $howManyAnimals . "','" . $period . "','" . $additionalDescriptionOfSearch . "')"); // Поисковый запрос пользователя сохраняется в специальной таблице
+                $rez = mysql_query("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, furniture, minCost, maxCost, pledge, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, period, additionalDescriptionOfSearch) VALUES ('" . $rowId['id'] . "','" . $typeOfObject . "','" . $amountOfRoomsSerialized . "','" . $adjacentRooms . "','" . $floor . "','" . $furniture . "','" . $minCost . "','" . $maxCost . "','" . $pledge . "','" . $districtSerialized . "','" . $withWho . "','" . $linksToFriends . "','" . $children . "','" . $howManyChildren . "','" . $animals . "','" . $howManyAnimals . "','" . $period . "','" . $additionalDescriptionOfSearch . "')"); // Поисковый запрос пользователя сохраняется в специальной таблице
             }
 
 
@@ -533,7 +533,7 @@ include("header.php");
                     <span class="searchItemLabel">Логин: </span>
 
                     <div class="searchItemBody">
-                        <input type="text" size="30" maxlength="50" name="login"
+                        <input type="text" size="30" maxlength="50" name="login" placeholder="e-mail или номер телефона"
                                validations="validate[required]" <?php echo "value='$login'";?>>
                     </div>
                 </div>
@@ -907,10 +907,16 @@ include("header.php");
                 </select>
             </div>
         </div>
-        <div>
-            <input type="checkbox" value="with"
-                   name="withWithoutFurniture" <?php if ($withWithoutFurniture == "with") echo "checked";?>>
-            С мебелью и бытовой техникой
+        <div class="searchItem">
+            <span class="searchItemLabel"> Мебель: </span>
+
+            <div class="searchItemBody">
+                <select name="furniture">
+                    <option value="any" <?php if ($furniture == "any") echo "selected";?>>не имеет значения</option>
+                    <option value="with" <?php if ($furniture == "with") echo "selected";?>>с мебелью и быт. техникой</option>
+                    <option value="without" <?php if ($furniture == "without") echo "selected";?>>без мебели</option>
+                </select>
+            </div>
         </div>
     </fieldset>
     <fieldset class="edited">

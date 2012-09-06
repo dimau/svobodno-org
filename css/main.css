@@ -342,11 +342,6 @@ body {
 	max-width: 300px;
 	max-height: 300px;
 	margin: 5px;
-	/* Для тестирования */
-	border: 1px solid black;
-	width: 200px;
-	height: 300px;
-	/* Конец зоны тестирования */
 }
 
 .bigFoto {

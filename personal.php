@@ -1,3 +1,27 @@
+<?php
+include_once 'lib/connect.php'; //подключаемся к БД
+include_once 'lib/function_global.php'; //подключаем файл с глобальными функциями
+
+// Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
+if (!login())
+{
+    header('Location: login.php');
+}
+
+// Получаем информацию о пользователе по его логину
+$login = $_COOKIE['login'];
+
+$rezUsers = mysql_query("SELECT * FROM users WHERE login = '" . $login . "'");
+$rowUsers = mysql_fetch_assoc($rezUsers);
+
+$rezSearchRequests = mysql_query("SELECT * FROM searchrequests WHERE userId = '" . $rowUsers['id'] . "'");
+$rowSearchRequests = mysql_fetch_assoc($rezSearchRequests);
+
+$rezUserFotos = mysql_query("SELECT * FROM userfotos WHERE userId = '" . $rowUsers['id'] . "'");
+$rowUserFotos = mysql_fetch_assoc($rezUserFotos); // TODO: сделать отображение нескольких фоток, если пользователь загрузит не одну
+
+?>
+
 <!DOCTYPE html>
 <!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
 <!-- Consider specifying the language of your content by adding the `lang` attribute to <html> -->
@@ -136,35 +160,97 @@
 									<br>
 								</div>
 								<div class="fotosWrapper">
-									<div class="bigFotoWrapper">
-										<img class="bigFoto">
-									</div>
+                                        <?php
+                                            if (isset($rowUserFotos['id']) && isset($rowUserFotos['extension'])) echo "<div class='bigFotoWrapper'><img class='bigFoto' src='uploaded_files/" . $rowUserFotos['id'] . "." . $rowUserFotos['extension'] . "'></div>";
+                                        ?>
 								</div>
 								<div class="profileInformation">
 									<ul class="listDescription">
 										<li>
-											<span class="FIO">Ушаков Дмитрий Владимирович</span>
+											<span class="FIO"><?php echo $rowUsers['surname'] . " " . $rowUsers['name'] . " " . $rowUsers['secondName']?></span>
 										</li>
 										<li>
 											<br>
 										</li>
 										<li>
-											<span class="headOfString">Образование:</span> УГТУ-УПИ, инженер автоматики и управления в информационных системах, закончил в 2009 г. причем с отличием
+											<span class="headOfString">Образование:</span> <?php
+                                            if ($rowUsers['currentStatusEducation'] == "0") {
+                                                echo "";
+                                            }
+                                            if ($rowUsers['currentStatusEducation'] == "withoutEducation") {
+                                                echo "не получал и не получаю";
+                                            }
+                                            if ($rowUsers['currentStatusEducation'] == "learningNow") {
+                                                if (isset($rowUsers['almamater'])) echo $rowUsers['almamater'] . ", ";
+                                                if (isset($rowUsers['speciality'])) echo $rowUsers['speciality'] . ", ";
+                                                if (isset($rowUsers['ochnoZaochno'])) {
+                                                    if ($rowUsers['ochnoZaochno'] == "ochno") echo "очно, "; else echo "заочно, ";
+                                                }
+                                                if (isset($rowUsers['kurs'])) echo $rowUsers['kurs'];
+                                            }
+                                            if ($rowUsers['currentStatusEducation'] == "finishedEducation") {
+                                                if (isset($rowUsers['almamater'])) echo $rowUsers['almamater'] . ", ";
+                                                if (isset($rowUsers['speciality'])) echo $rowUsers['speciality'] . ", ";
+                                                if (isset($rowUsers['ochnoZaochno'])) {
+                                                    if ($rowUsers['ochnoZaochno'] == "ochno") echo "очно, "; else echo "заочно, ";
+                                                }
+                                                if (isset($rowUsers['yearOfEnd'])) echo "закончил в " . $rowUsers['yearOfEnd'] . " году";
+                                            }
+                                            ?>
 										</li>
 										<li>
-											<span class="headOfString">Работа:</span> СКБ Контур, менеджер проектов
+											<span class="headOfString">Работа:</span> <?php
+                                            if ($rowUsers['notWorkCheckbox'] == "isNotWorking") {
+                                                echo "не работаю";
+                                            }
+                                            else {
+                                                if (isset($rowUsers['placeOfWork']) && $rowUsers['placeOfWork'] != "") {
+                                                    echo $rowUsers['placeOfWork'] . ", ";
+                                                }
+                                                if (isset($rowUsers['workPosition'])) {
+                                                    echo $rowUsers['workPosition'];
+                                                }
+                                            }
+                                            ?>
 										</li>
 										<li>
-											<span class="headOfString">Национальность:</span> русский
+											<span class="headOfString">Национальность:</span> <?php
+                                            if ($rowUsers['nationality'] == "russian") {
+                                                echo "русский";
+                                            }
+                                            if ($rowUsers['currentStatusEducation'] == "west") {
+                                                echo "европеец, американец";
+                                            }
+                                            if ($rowUsers['currentStatusEducation'] == "east") {
+                                                echo "СНГ, восточная нац-сть";
+                                            }
+                                            ?>
 										</li>
 										<li>
-											<span class="headOfString">Пол:</span> мужской
+											<span class="headOfString">Пол:</span> <?php
+                                            if ($rowUsers['sex'] == "man") {
+                                                echo "мужской";
+                                            }
+                                            if ($rowUsers['currentStatusEducation'] == "woman") {
+                                                echo "женский";
+                                            }
+                                            ?>
 										</li>
 										<li>
-											<span class="headOfString">День рождения:</span> 27.01.1987
+											<span class="headOfString">День рождения:</span> <?php
+                                            $date = substr($rowUsers['birthday'], 8, 2);
+                                            $month = substr($rowUsers['birthday'], 5, 2);
+                                            $year = substr($rowUsers['birthday'], 0, 4);
+                                            $birthday = $date . "." . $month . "." . $year;
+                                            echo $birthday;
+                                            ?>
 										</li>
 										<li>
-											<span class="headOfString">Возраст:</span> 25
+											<span class="headOfString">Возраст:</span> <?php
+                                            $birthday = mktime(0, 0, 0, $month, $date, $year);
+                                            $currentDate = time();
+                                            echo date_interval_format(date_diff(new DateTime("@{$currentDate}"),new DateTime("@{$birthday}")) ,'%y');
+                                            ?>
 										</li>
 										<li>
 											<br>
@@ -173,10 +259,14 @@
 											<span style="font-weight: bold;">Контакты:</span>
 										</li>
 										<li>
-											<span class="headOfString">e-mail:</span> dimau777@gmail.com
+											<span class="headOfString">E-mail:</span> <?php
+                                            if (isset($rowUsers['email'])) echo $rowUsers['email'];
+                                            ?>
 										</li>
 										<li>
-											<span class="headOfString">Телефон:</span> 89221431615
+											<span class="headOfString">Телефон:</span> <?php
+                                            if (isset($rowUsers['telephon'])) echo $rowUsers['telephon'];
+                                            ?>
 										</li>
 										<li>
 											<br>
@@ -185,10 +275,14 @@
 											<span style="font-weight: bold;">Малая Родина:</span>
 										</li>
 										<li>
-											<span class="headOfString">Город (населенный пункт):</span> Лысьва
+											<span class="headOfString">Город (населенный пункт):</span> <?php
+                                            if (isset($rowUsers['cityOfBorn'])) echo $rowUsers['cityOfBorn'];
+                                            ?>
 										</li>
 										<li>
-											<span class="headOfString">Регион:</span> Пермский край
+											<span class="headOfString">Регион:</span> <?php
+                                            if (isset($rowUsers['regionOfBorn'])) echo $rowUsers['regionOfBorn'];
+                                            ?>
 										</li>
 										<li>
 											<br>
@@ -197,7 +291,9 @@
 											<span style="font-weight: bold;">Коротко о себе и своих интересах:</span>
 										</li>
 										<li>
-											Я немного замкнутый перфекционист и вообще неадекватный человек, возьмите меня замуж или в жены, ха-ха-ха
+                                            <?php
+                                            if (isset($rowUsers['shortlyAboutMe'])) echo $rowUsers['shortlyAboutMe'];
+                                            ?>
 										</li>
 										<li>
 											<br>
@@ -207,15 +303,18 @@
 										</li>
 										<li>
 											<ul class="linksToAccounts">
-												<li>
-													<a href="http://vk.com/ushakovd">http://vk.com/ushakovd</a>
-												</li>
-												<li>
-													<a href="http://vk.com/ushakovd">http://vk.com/ushakovd</a>
-												</li>
-												<li>
-													<a href="http://vk.com/ushakovd">http://vk.com/ushakovd</a>
-												</li>
+                                                <?php
+                                                if (isset($rowUsers['vkontakte'])) echo "<li><a href='" . $rowUsers['vkontakte'] . "'>" . $rowUsers['vkontakte'] . "</a></li>";
+                                                ?>
+                                                <?php
+                                                if (isset($rowUsers['odnoklassniki'])) echo "<li><a href='" . $rowUsers['odnoklassniki'] . "'>" . $rowUsers['odnoklassniki'] . "</a></li>";
+                                                ?>
+                                                <?php
+                                                if (isset($rowUsers['facebook'])) echo "<li><a href='" . $rowUsers['facebook'] . "'>" . $rowUsers['facebook'] . "</a></li>";
+                                                ?>
+                                                <?php
+                                                if (isset($rowUsers['twitter'])) echo "<li><a href='" . $rowUsers['twitter'] . "'>" . $rowUsers['twitter'] . "</a></li>";
+                                                ?>
 											</ul>
 										</li>
 									</ul>
@@ -473,18 +572,6 @@
 										</div>
 									</div>
 								</fieldset>
-
-								<!--
-
-								Кроме того, для собственников не нужно передавать блоки Образование и Работа, Коротко о себе
-								Также для собственника не формируется вкладка Условия поиска
-								Фото становится необязательным - убрать звездочку
-
-								Сделать проверку перед отправкой и серверную часть капчи
-
-								Но собственнику отправляется дополнительно
-
-								-->
 
 								<fieldset class="edited private" style="min-width: 300px; min-height: 200px;">
 									<legend title="Для успешной регистрации должна быть загружена хотя бы 1 фотография">
@@ -1753,23 +1840,76 @@
 										<tbody>
 											<tr>
 												<td class="objectDescriptionItemLabel">Тип:</td>
-												<td class="objectDescriptionBody"><span>квартира</span></td>
+												<td class="objectDescriptionBody"><span>
+                                                    <?php
+                                                    if ($rowSearchRequests['typeOfObject'] == "flat") {
+                                                        echo "квартира";
+                                                    }
+                                                    if ($rowSearchRequests['typeOfObject'] == "room") {
+                                                        echo "комната";
+                                                    }
+                                                    if ($rowSearchRequests['typeOfObject'] == "house") {
+                                                        echo "дом, коттедж";
+                                                    }
+                                                    if ($rowSearchRequests['typeOfObject'] == "townhouse") {
+                                                        echo "таунхаус";
+                                                    }
+                                                    if ($rowSearchRequests['typeOfObject'] == "dacha") {
+                                                        echo "дача";
+                                                    }
+                                                    if ($rowSearchRequests['typeOfObject'] == "garage") {
+                                                        echo "гараж";
+                                                    }
+                                                    ?></span></td>
 											</tr>
 											<tr>
 												<td class="objectDescriptionItemLabel">Количество комнат:</td>
-												<td class="objectDescriptionBody"><span>1, 2</span></td>
+												<td class="objectDescriptionBody"><span><?php
+                                                    $amountOfRooms = unserialize($rowSearchRequests['amountOfRooms']);
+                                                    for ($i = 0; $i < count($amountOfRooms); $i++) {
+                                                        echo $amountOfRooms[$i];
+                                                        if ($i < count($amountOfRooms) - 1) echo ", ";
+                                                    }
+                                                    ?></span></td>
 											</tr>
 											<tr>
 												<td class="objectDescriptionItemLabel">Комнаты смежные:</td>
-												<td class="objectDescriptionBody"><span>только изолированные</span></td>
+												<td class="objectDescriptionBody"><span><?php
+                                                    if ($rowSearchRequests['adjacentRooms'] == "yes") {
+                                                        echo "не имеет значения";
+                                                    }
+                                                    if ($rowSearchRequests['adjacentRooms'] == "no") {
+                                                        echo "только изолированные";
+                                                    }
+                                                    ?></span></td>
 											</tr>
 											<tr>
 												<td class="objectDescriptionItemLabel">Этаж:</td>
-												<td class="objectDescriptionBody"><span>не первый</span></td>
+												<td class="objectDescriptionBody"><span><?php
+                                                    if ($rowSearchRequests['floor'] == "any") {
+                                                        echo "любой";
+                                                    }
+                                                    if ($rowSearchRequests['floor'] == "not1") {
+                                                        echo "не первый";
+                                                    }
+                                                    if ($rowSearchRequests['floor'] == "not1notLasted") {
+                                                        echo "не первый и не последний";
+                                                    }
+                                                    ?></span></td>
 											</tr>
 											<tr>
-												<td class="objectDescriptionItemLabel">С мебелью и бытовой техникой:</td>
-												<td class="objectDescriptionBody"><span>нет</span></td>
+												<td class="objectDescriptionItemLabel">Мебель:</td>
+												<td class="objectDescriptionBody"><span><?php
+                                                    if ($rowSearchRequests['furniture'] == "any") {
+                                                        echo "не имеет значения";
+                                                    }
+                                                    if ($rowSearchRequests['furniture'] == "with") {
+                                                        echo "с мебелью и быт. техникой";
+                                                    }
+                                                    if ($rowSearchRequests['furniture'] == "without") {
+                                                        echo "без мебели";
+                                                    }
+                                                    ?></span></td>
 											</tr>
 										</tbody>
 									</table>
@@ -1782,15 +1922,21 @@
 										<tbody>
 											<tr>
 												<td class="objectDescriptionItemLabel">Арендная плата в месяц от:</td>
-												<td class="objectDescriptionBody"><span>0</span> руб.</td>
+												<td class="objectDescriptionBody"><?php
+                                                    if (isset($rowSearchRequests['minCost'])) echo "<span>" . $rowSearchRequests['minCost'] . "</span> руб.";
+                                                    ?></td>
 											</tr>
 											<tr>
 												<td class="objectDescriptionItemLabel">Арендная плата в месяц до:</td>
-												<td class="objectDescriptionBody"><span>20000</span> руб.</td>
+												<td class="objectDescriptionBody"><?php
+                                                    if (isset($rowSearchRequests['maxCost'])) echo "<span>" . $rowSearchRequests['maxCost'] . "</span> руб.";
+                                                    ?></td>
 											</tr>
 											<tr>
 												<td class="objectDescriptionItemLabel">Залог до:</td>
-												<td class="objectDescriptionBody"><span>25000</span> руб.</td>
+												<td class="objectDescriptionBody"><?php
+                                                    if (isset($rowSearchRequests['pledge'])) echo "<span>" . $rowSearchRequests['pledge'] . "</span> руб.";
+                                                    ?></td>
 											</tr>
 										</tbody>
 									</table>
@@ -1803,35 +1949,78 @@
 										<tbody>
 											<tr>
 												<td class="objectDescriptionItemLabel" id="firstTableColumnSpecial">Как собираетесь проживать:</td>
-												<td class="objectDescriptionBody"><span>семейная пара</span></td>
+												<td class="objectDescriptionBody"><span><?php
+                                                    if ($rowSearchRequests['withWho'] == "alone") {
+                                                        echo "один";
+                                                    }
+                                                    if ($rowSearchRequests['withWho'] == "couple") {
+                                                        echo "семейная пара";
+                                                    }
+                                                    if ($rowSearchRequests['withWho'] == "nonFamilyPair") {
+                                                        echo "несемейная пара";
+                                                    }
+                                                    if ($rowSearchRequests['withWho'] == "withFriends") {
+                                                        echo "со знакомыми";
+                                                    }
+                                                    ?></span></td>
 											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">Ссылки на страницы сожителей:</td>
-												<td class="objectDescriptionBody"><span>20000ывывыа выапваппв ывавыаывапы ываывпаыв</span></td>
-											</tr>
+                                            <?php
+                                            if ($rowSearchRequests['withWho'] != "alone") {
+                                                echo "<tr><td class='objectDescriptionItemLabel'>Ссылки на страницы сожителей:</td><td class='objectDescriptionBody''><span>";
+                                                if (isset($rowSearchRequests['linksToFriends'])) echo $rowSearchRequests['linksToFriends'];
+                                                echo "</span></td></tr>";
+                                            }
+                                            ?>
 											<tr>
 												<td class="objectDescriptionItemLabel">Дети:</td>
-												<td class="objectDescriptionBody"><span>С детьми младше 4-х лет</span></td>
+												<td class="objectDescriptionBody"><span><?php
+                                                    if ($rowSearchRequests['children'] == "without") {
+                                                        echo "без детей";
+                                                    }
+                                                    if ($rowSearchRequests['children'] == "childrenUnder4") {
+                                                        echo "с детьми младше 4-х лет";
+                                                    }
+                                                    if ($rowSearchRequests['children'] == "childrenOlder4") {
+                                                        echo "с детьми старше 4-х лет";
+                                                    }
+                                                    ?></span></td>
 											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">Количество детей и их возраст:</td>
-												<td class="objectDescriptionBody"><span>2 ребенка по 2 и 6 лет</span></td>
-											</tr>
+                                            <?php
+                                            if ($rowSearchRequests['children'] != "without") {
+                                                echo "<tr><td class='objectDescriptionItemLabel'>Количество детей и их возраст:</td><td class='objectDescriptionBody''><span>";
+                                                if (isset($rowSearchRequests['howManyChildren'])) echo $rowSearchRequests['howManyChildren'];
+                                                echo "</span></td></tr>";
+                                            }
+                                            ?>
 											<tr>
 												<td class="objectDescriptionItemLabel">Животные:</td>
-												<td class="objectDescriptionBody"><span>С животным(ми)</span></td>
+												<td class="objectDescriptionBody"><span><?php
+                                                    if ($rowSearchRequests['animals'] == "without") {
+                                                        echo "без животных";
+                                                    }
+                                                    if ($rowSearchRequests['animals'] == "with") {
+                                                        echo "с животным(ми)";
+                                                    }
+                                                    ?></span></td>
 											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">Количество животных и их вид:</td>
-												<td class="objectDescriptionBody"><span>1 кошка</span></td>
-											</tr>
+                                            <?php
+                                            if ($rowSearchRequests['animals'] != "without") {
+                                                echo "<tr><td class='objectDescriptionItemLabel'>Количество животных и их вид:</td><td class='objectDescriptionBody''><span>";
+                                                if (isset($rowSearchRequests['howManyAnimals'])) echo $rowSearchRequests['howManyAnimals'];
+                                                echo "</span></td></tr>";
+                                            }
+                                            ?>
 											<tr>
 												<td class="objectDescriptionItemLabel">Ориентировочный срок аренды:</td>
-												<td class="objectDescriptionBody"><span>долгосрочно</span></td>
+												<td class="objectDescriptionBody"><span><?php
+                                                    if (isset($rowSearchRequests['period'])) echo $rowSearchRequests['period'];
+                                                    ?></span></td>
 											</tr>
 											<tr>
 												<td class="objectDescriptionItemLabel">Дополнительные условия поиска:</td>
-												<td class="objectDescriptionBody"><span>Хотелось бы жить рядом с парком: Зеленая роща или 50 лет ВЛКСМ, чтобы можно было по утрам бегать и заниматься спортом. У меня уже несколько олимпийских медалей и я хочу получить еще одну</span></td>
+												<td class="objectDescriptionBody"><span><?php
+                                                    if (isset($rowSearchRequests['additionalDescriptionOfSearch'])) echo $rowSearchRequests['additionalDescriptionOfSearch'];
+                                                    ?></span></td>
 											</tr>
 										</tbody>
 									</table>
