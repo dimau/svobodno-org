@@ -257,8 +257,8 @@ if (isset($_POST['readyButton'])) {
 
     if (isset($_POST['lic'])) $lic = htmlspecialchars($_POST['lic']);
 
-    // Проверяем корректность данных пользователя. Функции registrationCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
-    $errors = registrationCorrect();
+    // Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
+    $errors = userDataCorrect("registration");
     if (count($errors) == 0) $correct = true; else $correct = false; // Считаем ошибки, если 0, то можно будет записать данные в БД
 
     // Если данные, указанные пользователем, корректны, запишем их в базу данных
@@ -389,7 +389,7 @@ if (isset($_POST['readyButton'])) {
         <div>
             <p>
                 <span class="icon-mistake ui-icon ui-icon-info"></span>
-                <span id="userMistakesText">При обработке данных возникли ошибки:</span>
+                <span id="userMistakesText">Для продолжения, пожалуйста, дополните или исправьте следующие данные:</span>
             </p>
             <ol><?php
                 if ($correct == false && isset($errors)) {

@@ -25,11 +25,6 @@
 		<link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
 		<link rel="stylesheet" href="css/main.css">
 		<style>
-			#registration {
-				margin-top: 7px;
-				margin-left: 15px;
-			}
-			
 			/* Стиль для панели табов - ul*/
 			/* Важно, что пока он плавающий и основной текст из .ui-tabs-panel его обтекает*/
 			.ui-tabs-vertical .ui-tabs-nav {
@@ -193,7 +188,7 @@
 					</div>
 				</div>
 
-				<button id="registration">Зарегистрироваться</button>
+				<button id="registration" class="left-bottom">Зарегистрироваться</button>
 			</div><!-- /end.page_main_content -->
 			<!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
 			<div class="page-buffer"></div>

@@ -1,11 +1,13 @@
 <?php
-function registrationCorrect()
+function userDataCorrect($typeOfValidation)
 {
+    // Подготовим массив для сохранения сообщений об ошибках
     $errors = array();
 
+    // Получаем переменные, содержащие данные пользователя, для проверки
     global $typeTenant, $typeOwner, $name, $secondName, $surname, $sex, $nationality, $birthday, $login, $password, $telephon, $email, $fileUploadId, $currentStatusEducation, $almamater, $speciality, $kurs, $ochnoZaochno, $yearOfEnd, $notWorkCheckbox, $placeOfWork, $workPosition, $regionOfBorn, $cityOfBorn, $vkontakte, $odnoklassniki, $facebook, $twitter, $minCost, $maxCost, $pledge, $period, $lic;
 
-    // Обязательные проверки и для арендатора и для собственника
+    // Проверки для блока "Личные данные"
     if ($name == "") $errors[] = 'Укажите имя';
     if (strlen($name) > 50) $errors[] = 'Слишком длинное имя. Можно указать не более 50-ти символов';
     if ($secondName == "") $errors[] = 'Укажите отчество';
@@ -14,6 +16,7 @@ function registrationCorrect()
     if (strlen($surname) > 50) $errors[] = 'Слишком длинная фамилия. Можно указать не более 50-ти символов';
     if ($sex == "0") $errors[] = 'Укажите пол';
     if ($nationality == "0") $errors[] = 'Укажите национальность';
+
     if ($birthday != "") {
         if (!preg_match('/^\d\d.\d\d.\d\d\d\d$/', $birthday)) $errors[] = 'Неправильный формат даты рождения, должен быть: дд.мм.гггг';
         if (substr($birthday, 0, 2) < "01" || substr($birthday, 0, 2) > "31") $errors[] = 'Проверьте дату Дня рождения (допустимо от 01 до 31)';
@@ -23,14 +26,13 @@ function registrationCorrect()
         $errors[] = 'Укажите дату рождения';
     }
 
-    if ($login != "") {
+    if ($login == "") $errors[] = 'Укажите логин';
+    if (strlen($login) > 50) $errors[] = "Слишком длинный логин. Можно указать не более 50-ти символов";
+    if ($login != "" && strlen($login) < 50 && $typeOfValidation == "registration") { // Проверяем логин на занятость
         $rez = mysql_query("SELECT * FROM users WHERE login='".$login."'");
-        if (@mysql_num_rows($rez) != 0) $errors[] = 'Пользователь с таким логином уже существует, укажите другой логин'; // проверка на существование в БД такого же логина
-        if (strlen($login) > 50) $errors[] = "Слишком длинный логин. Можно указать не более 50-ти символов";
-    } else {
-        $errors[] = 'Укажите логин';
+        if (mysql_num_rows($rez) != 0) $errors[] = 'Пользователь с таким логином уже существует, укажите другой логин'; // проверка на существование в БД такого же логина
     }
-    if ($password == "") $errors[] = 'Укажите пароль'; //не пусто ли поле пароля
+    if ($password == "" && $typeOfValidation == "registration") $errors[] = 'Укажите пароль'; // Проверить наличие пароля при типе валидации = createSearchRequest не представляется возможным, так как он не хранится в БД
 
     if ($telephon != "") {
         if (!preg_match('/^[0-9]{10}$/', $telephon)) $errors[] = 'Укажите, пожалуйста, Ваш мобильный номер без 8-ки, например: 9226470019';
@@ -39,59 +41,49 @@ function registrationCorrect()
         $errors[] = 'Укажите контактный (мобильный) телефон';
     }
 
-    // Обязательные проверки только для арендатора
-    if ($typeTenant == "true") {
-        if ($email == "") {
-            $errors[] = 'Укажите e-mail';
-        }
+    if (($typeOfValidation == "registration" && $typeTenant == "true" && $email == "") || ($typeOfValidation == "createSearchRequest" && $email == "")) $errors[] = 'Укажите e-mail';
+    if ($email != "" && !preg_match("/^(([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+\.)*([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]{2,5}$/", $email)) $errors[] = 'Укажите, пожалуйста, Ваш настоящий e-mail (указанный Вами e-mail не прошел проверку формата)'; //соответствует ли поле e-mail регулярному выражению
 
-        if ($fileUploadId != "") {
-            $rez = mysql_query("SELECT * FROM tempFotos WHERE fileuploadid='".$fileUploadId."'");
-            if (mysql_num_rows($rez) == 0) $errors[] = 'Загрузите как минимум 1 Вашу фотографию'; // проверка на хотя бы 1 фотку
-        }
-
-        if ($currentStatusEducation == "0") $errors[] = 'Укажите Ваше образование (текущий статус)';
-        if (($currentStatusEducation == "learningNow" || $currentStatusEducation == "finishedEducation") && $almamater == "") $errors[] = 'Укажите учебное заведение';
-        if (($currentStatusEducation == "learningNow" || $currentStatusEducation == "finishedEducation") && $speciality == "") $errors[] = 'Укажите специальность';
-        if ($currentStatusEducation == "learningNow" && $kurs == "") $errors[] = 'Укажите курс обучения';
-        if (($currentStatusEducation == "learningNow" || $currentStatusEducation == "finishedEducation") && $ochnoZaochno == "0") $errors[] = 'Укажите форму обучения (очная, заочная)';
-        if ($currentStatusEducation == "finishedEducation" && $yearOfEnd == "") $errors[] = 'Укажите год окончания учебного заведения';
-        if ($notWorkCheckbox != "isNotWorking" && $placeOfWork == "") $errors[] = 'Укажите Ваше место работы (название организации)';
-        if ($notWorkCheckbox != "isNotWorking" && $workPosition == "") $errors[] = 'Укажите Вашу должность';
-
-        if ($regionOfBorn == "") $errors[] = 'Укажите регион, в котором Вы родились';
-        if ($cityOfBorn == "") $errors[] = 'Укажите город (населенный пункт), в котором Вы родились';
-
-        if (!preg_match("/^\d{0,8}$/", $minCost)) $errors[] = 'Неправильный формат числа в поле минимальной величины арендной платы (проверьте: только числа, не более 8 символов)';
-        if (!preg_match("/^\d{0,8}$/", $maxCost)) $errors[] = 'Неправильный формат числа в поле максимальной величины арендной платы (проверьте: только числа, не более 8 символов)';
-        if (!preg_match("/^\d{0,8}$/", $pledge)) $errors[] = 'Неправильный формат числа в поле максимальной величины залога (проверьте: только числа, не более 8 символов)';
-        if ($minCost > $maxCost) $errors[] = 'Минимальная стоимость аренды не может быть больше, чем максимальная. Исправьте поля, в которых указаны Ваши требования к диапазону стоимости аренды';
-        if ($period == "") $errors[] = 'Укажите ориентировочный срок аренды, например: долговременно (более года)';
-
+    // Проверяем наличие хотя бы 1 фотографии пользователя
+    if ($typeOfValidation == "createSearchRequest") { // Валидации при попытке пользователя добавить поисковый запрос (из личного кабинета) (не при регистрации!)
+        $rez = mysql_query("SELECT id FROM users WHERE login='".$login."'"); // Нужно получить id пользователя, чтобы проверить, есть ли у него хотя бы 1 фотка в БД
+        $row = mysql_fetch_assoc($rez);
+        $rez = mysql_query("SELECT * FROM userFotos WHERE userId='".$row['id']."'");
+        if (mysql_num_rows($rez) == 0) $errors[] = 'Загрузите как минимум 1 Вашу фотографию'; // проверка на хотя бы 1 фотку
     }
+    if ($typeOfValidation == "registration" && $typeTenant == "true" && $fileUploadId != "") // Эта ветка выполняется, если валидации производятся при попытке регистрации пользователем
+    {
+        $rez = mysql_query("SELECT * FROM tempFotos WHERE fileuploadid='".$fileUploadId."'");
+        if (mysql_num_rows($rez) == 0) $errors[] = 'Загрузите как минимум 1 Вашу фотографию'; // проверка на хотя бы 1 фотку
+    }
+    if ($typeOfValidation == "registration" && $fileUploadId == "") $errors[] = 'Перезагрузите браузер, пожалуйста: возникла ошибка при формировании формы для загрузки фотографий';
 
-    // Обязательные проверки для полей, которые могут быть заполнены как арендаторами, так и собственниками
-    if ($email != "") {
-        if (!preg_match("/^(([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+\.)*([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]{2,5}$/", $email)) $errors[] = 'Укажите, пожалуйста, Ваш настоящий e-mail (указанный Вами e-mail не прошел проверку формата)'; //соответствует ли поле e-mail регулярному выражению
-    }
-    if ($fileUploadId == "") {
-        $errors[] = 'Перезагрузите браузер, пожалуйста: возникла ошибка при формировании формы для загрузки фотографий';
-    }
+    // Проверки для блока "Образование"
+    if ($currentStatusEducation == "0" && (($typeOfValidation == "registration" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest")) $errors[] = 'Укажите Ваше образование (текущий статус)';
+    if ($almamater == "" && ($currentStatusEducation == "learningNow" || $currentStatusEducation == "finishedEducation") && (($typeOfValidation == "registration" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest")) $errors[] = 'Укажите учебное заведение';
     if (isset($almamater) && strlen($almamater) > 100) $errors[] = 'Слишком длинное название учебного заведения (используйте не более 100 символов)';
+    if ($speciality == "" && ($currentStatusEducation == "learningNow" || $currentStatusEducation == "finishedEducation") && (($typeOfValidation == "registration" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest")) $errors[] = 'Укажите специальность';
     if (isset($speciality) && strlen($speciality) > 100) $errors[] = 'Слишком длинное название специальности (используйте не более 100 символов)';
+    if ($kurs == "" && $currentStatusEducation == "learningNow" && (($typeOfValidation == "registration" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest")) $errors[] = 'Укажите курс обучения';
     if (isset($kurs) && strlen($kurs) > 30) $errors[] = 'Курс. Указана слишком длинная строка (используйте не более 30 символов)';
+    if ($ochnoZaochno == "0" && ($currentStatusEducation == "learningNow" || $currentStatusEducation == "finishedEducation") && (($typeOfValidation == "registration" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest")) $errors[] = 'Укажите форму обучения (очная, заочная)';
+    if ($yearOfEnd == "" && $currentStatusEducation == "finishedEducation" && (($typeOfValidation == "registration" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest")) $errors[] = 'Укажите год окончания учебного заведения';
     if (isset($yearOfEnd) && strlen($yearOfEnd) > 20) $errors[] = 'Год окончания учебного заведения. Указана слишком длинная строка (используйте не более 20 символов)';
-    if ($yearOfEnd != "") {
-        if (!preg_match("/^[12]{1}[0-9]{3}$/", $yearOfEnd)) $errors[] = 'Укажите год окончания учебного заведения в формате: "гггг". Например: 2007';
-    }
+    if ($yearOfEnd != "" && !preg_match("/^[12]{1}[0-9]{3}$/", $yearOfEnd)) $errors[] = 'Укажите год окончания учебного заведения в формате: "гггг". Например: 2007';
+
+    // Проверки для блока "Работа"
+    if ($placeOfWork == "" && $notWorkCheckbox != "isNotWorking" && (($typeOfValidation == "registration" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest")) $errors[] = 'Укажите Ваше место работы (название организации)';
     if (isset($placeOfWork) && strlen($placeOfWork) > 100) $errors[] = 'Слишком длинное наименование места работы (используйте не более 100 символов)';
+    if ($workPosition == "" && $notWorkCheckbox != "isNotWorking" && (($typeOfValidation == "registration" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest")) $errors[] = 'Укажите Вашу должность';
     if (isset($workPosition) && strlen($workPosition) > 100) $errors[] = 'Слишком длинное название должности (используйте не более 100 символов)';
-    if (isset($period) && strlen($period) > 80) $errors[] = 'Указана слишком длинная строка в поле для ориентировочного срока проживания (используйте не более 80 символов)';
+
+    // Проверки для блока "Коротко о себе"
+    if ($regionOfBorn == "" && (($typeOfValidation == "registration" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest")) $errors[] = 'Укажите регион, в котором Вы родились';
     if (isset($regionOfBorn) && strlen($regionOfBorn) > 50) $errors[] = 'Слишком длинное наименование региона, в котором Вы родились (используйте не более 50 символов)';
+    if ($cityOfBorn == "" && (($typeOfValidation == "registration" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest")) $errors[] = 'Укажите город (населенный пункт), в котором Вы родились';
     if (isset($cityOfBorn) && strlen($cityOfBorn) > 50) $errors[] = 'Слишком длинное наименование города, в котором Вы родились (используйте не более 50 символов)';
 
-
-    // Контроль длины необязательных полей и минимальный контроль на структуру - для безопасного сохранения в базу данных и небольшая защита от мошенничества
+    // Проверки для блока "Социальные сети"
     if (strlen($vkontakte) > 100) $errors[] = 'Указана слишком длинная ссылка на личную страницу Вконтакте (используйте не более 100 символов)';
     if (strlen($vkontakte) > 0 && !preg_match("/vk\.com/", $vkontakte)) $errors[] = 'Укажите, пожалуйста, Вашу настоящую личную страницу Вконтакте, либо оставьте поле пустым (ссылка должна содержать строчку "vk.com")';
     if (strlen($odnoklassniki) > 100) $errors[] = 'Указана слишком длинная ссылка на личную страницу в Одноклассниках (используйте не более 100 символов)';
@@ -101,8 +93,16 @@ function registrationCorrect()
     if (strlen($twitter) > 100) $errors[] = 'Указана слишком длинная ссылка на личную страницу в Twitter (используйте не более 100 символов)';
     if (strlen($twitter) > 0 && !preg_match("/twitter\.com/", $twitter)) $errors[] = 'Укажите, пожалуйста, Вашу настоящую личную страницу в Twitter, либо оставьте поле пустым (ссылка должна содержать строчку "twitter.com")';
 
+    // Проверки для блока "Параметры поиска"
+    if ($typeOfValidation == "registration" && $typeTenant == "true" && !preg_match("/^\d{0,8}$/", $minCost)) $errors[] = 'Неправильный формат числа в поле минимальной величины арендной платы (проверьте: только числа, не более 8 символов)';
+    if ($typeOfValidation == "registration" && $typeTenant == "true" && !preg_match("/^\d{0,8}$/", $maxCost)) $errors[] = 'Неправильный формат числа в поле максимальной величины арендной платы (проверьте: только числа, не более 8 символов)';
+    if ($typeOfValidation == "registration" && $typeTenant == "true" && !preg_match("/^\d{0,8}$/", $pledge)) $errors[] = 'Неправильный формат числа в поле максимальной величины залога (проверьте: только числа, не более 8 символов)';
+    if ($typeOfValidation == "registration" && $typeTenant == "true" && $minCost > $maxCost) $errors[] = 'Минимальная стоимость аренды не может быть больше, чем максимальная. Исправьте поля, в которых указаны Ваши требования к диапазону стоимости аренды';
+    if ($typeOfValidation == "registration" && $typeTenant == "true" && $period == "") $errors[] = 'Укажите ориентировочный срок аренды, например: долговременно (более года)';
+    if (isset($period) && strlen($period) > 80) $errors[] = 'Указана слишком длинная строка в поле для ориентировочного срока проживания (используйте не более 80 символов)';
+
     // Проверка согласия пользователя с лицензией
-    if ($lic != "yes") $errors[] = 'Регистрация возможна только при согласии с условиями лицензионного соглашения'; //приняты ли правила
+    if ($typeOfValidation == "registration" && $lic != "yes") $errors[] = 'Регистрация возможна только при согласии с условиями лицензионного соглашения'; //приняты ли правила
 
     return $errors; // Возвращаем список ошибок, если все в порядке, то он будет пуст
 }
@@ -136,6 +136,12 @@ function lastAct($id)
     mysql_query("UPDATE users SET online='$tm', last_act='$tm' WHERE id='$id'");
 }
 
+function birthdayFromDBToView($birthdayFromDB) {
+    $date = substr($birthdayFromDB, 8, 2);
+    $month = substr($birthdayFromDB, 5, 2);
+    $year = substr($birthdayFromDB, 0, 4);
+    return $date . "." . $month . "." . $year;
+}
 
 // Функция для авторизации (входа) пользователя на сайте
 function enter()
