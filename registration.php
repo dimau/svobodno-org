@@ -264,10 +264,7 @@ if (isset($_POST['readyButton'])) {
     // Если данные, указанные пользователем, корректны, запишем их в базу данных
     if ($correct) {
         // Корректируем дату дня рождения для того, чтобы сделать ее пригодной для сохранения в базу данных
-        $date = substr($birthday, 0, 2);
-        $month = substr($birthday, 3, 2);
-        $year = substr($birthday, 6, 4);
-        $birthday = $year . $month . $date;
+        $birthday = birthdayFromViewToDB($birthday);
 
         $salt = mt_rand(100, 999);
         $tm = time();
@@ -571,7 +568,7 @@ include("header.php");
                         echo "*";
                     } ?>
                     </div>
-                    <span class="searchItemLabel">e-mail: </span>
+                    <span class="searchItemLabel">E-mail: </span>
 
                     <div class="searchItemBody">
                         <input name="email" type="text" size="30" <?php if ($typeTenant == "true") {
@@ -1293,8 +1290,8 @@ include("header.php");
     </div>
     <div class="readyButton">
         <button type="submit" name="readyButton" id="readyButton">
-            Готово
-        </button>
+        Готово
+    </button>
     </div>
     <div class="capcha">
         <script type="text/javascript"
@@ -1332,11 +1329,14 @@ include("header.php");
 
 <!-- jQuery UI с моей темой оформления -->
 <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
+
 <!-- Русификатор виджета календарь -->
 <script src="js/vendor/jquery.ui.datepicker-ru.js"></script>
+
 <!-- Скрипт для валидации на лету полей формы -->
 <script src="js/vendor/jquery.validationEngine.js"></script>
 
+<!-- Загрузчик фотографий на AJAX -->
 <script src="js/vendor/fileuploader.js" type="text/javascript"></script>
 
 <!-- scripts concatenated and minified via build script -->

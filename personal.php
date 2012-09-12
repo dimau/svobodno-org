@@ -2,78 +2,429 @@
 include_once 'lib/connect.php'; //подключаемся к БД
 include_once 'lib/function_global.php'; //подключаем файл с глобальными функциями
 
-// Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
+/*************************************************************************************
+ * Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
+ ************************************************************************************/
 if (!login()) {
     header('Location: login.php');
 }
 
-// Получаем информацию о пользователе по его логину
-$login = $_COOKIE['login'];
+/*************************************************************************************
+ * Получаем информацию о пользователе по его логину из БД сервера
+ ************************************************************************************/
+
+$login = $_COOKIE['login']; // TODO: что будет, если куки подчищены?
 
 $rezUsers = mysql_query("SELECT * FROM users WHERE login = '" . $login . "'");
 $rowUsers = mysql_fetch_assoc($rezUsers);
 
-$rezSearchRequests = mysql_query("SELECT * FROM searchrequests WHERE userId = '" . $rowUsers['id'] . "'");
-$rowSearchRequests = mysql_fetch_assoc($rezSearchRequests);
+// Если пользователь пожелал удалить поисковый запрос, то это нужно сделать вместо получения данных из таблицы БД searchrequests
+if (isset($_GET['action']) && $_GET['action'] == 'deleteSearchRequest') {
+    $rez = mysql_query("DELETE FROM searchrequests WHERE userId='" . $rowUsers['id'] . "'");
+    $rowSearchRequests = false;
+    $rez = mysql_query("UPDATE users SET typeTenant='" . "false" . "' WHERE id='" . $rowUsers['id'] . "'");
+    $rowUsers['typeTenant'] = "false";
+} else {
+    $rezSearchRequests = mysql_query("SELECT * FROM searchrequests WHERE userId = '" . $rowUsers['id'] . "'");
+    $rowSearchRequests = mysql_fetch_assoc($rezSearchRequests);
+}
 
 $rezUserFotos = mysql_query("SELECT * FROM userfotos WHERE userId = '" . $rowUsers['id'] . "'");
 $rowUserFotos = mysql_fetch_assoc($rezUserFotos); // TODO: сделать отображение нескольких фоток, если пользователь загрузит не одну
 
 // Готовим массив со списком районов в городе пользователя: нужно только для вкладки Поиск Личного кабинета
-if ($rowUsers['typeTenant'] == "true") {
-    $rezDistricts = mysql_query("SELECT * FROM districts WHERE city = '" . "Екатеринбург" . "'");
-    for ($i = 0; $i < mysql_num_rows($rezDistricts); $i++) {
-        $rowDistricts = mysql_fetch_assoc($rezDistricts);
-        $allDistrictsInCity[$rowDistricts['id']] = $rowDistricts['name'];
+$rezDistricts = mysql_query("SELECT * FROM districts WHERE city = '" . "Екатеринбург" . "'");
+for ($i = 0; $i < mysql_num_rows($rezDistricts); $i++) {
+    $rowDistricts = mysql_fetch_assoc($rezDistricts);
+    $allDistrictsInCity[$rowDistricts['id']] = $rowDistricts['name'];
+}
+
+// Инициализируем переменную корректности - используется при формировании нового Запроса на поиск
+$correct = "null";
+$correctNewSearchRequest = "null";
+$correctNewProfileParameters = "null";
+
+/**************************************************************************************************************
+ * Инициализируем переменные поискового запроса, а также данные Профиля пользователя в зависимости от ситуации
+ **************************************************************************************************************/
+
+// Если данные по пользователю есть в БД, присваиваем их соответствующим переменным, иначе - значения по умолчанию.
+if (isset($rowUsers['typeTenant'])) $typeTenant = $rowUsers['typeTenant']; else $typeTenant = "true";
+if (isset($rowUsers['typeOwner'])) $typeOwner = $rowUsers['typeOwner']; else $typeOwner = "true";
+if (isset($rowUsers['name'])) $name = $rowUsers['name']; else $name = "";
+if (isset($rowUsers['secondName'])) $secondName = $rowUsers['secondName']; else $secondName = "";
+if (isset($rowUsers['surname'])) $surname = $rowUsers['surname']; else $surname = "";
+if (isset($rowUsers['sex'])) $sex = $rowUsers['sex']; else $sex = "0";
+if (isset($rowUsers['nationality'])) $nationality = $rowUsers['nationality']; else $nationality = "0";
+if (isset($rowUsers['birthday'])) $birthday = birthdayFromDBToView($rowUsers['birthday']); else $birthday = "";
+if (isset($rowUsers['login'])) $login = $rowUsers['login']; else $login = "";
+if (isset($rowUsers['password'])) $password = $rowUsers['password']; else $password = ""; // Реальный пароль пользователя в БД не хранится, но так как пароль проверяется только на наличие (не = 0 длину), то достаточно того, что хранится в БД в поле password
+if (isset($rowUsers['telephon'])) $telephon = $rowUsers['telephon']; else $telephon = "";
+if (isset($rowUsers['email'])) $email = $rowUsers['email']; else $email = "";
+$fileUploadId = generateCode(7);
+if (isset($rowUsers['currentStatusEducation'])) $currentStatusEducation = $rowUsers['currentStatusEducation']; else $currentStatusEducation = "0";
+if (isset($rowUsers['almamater'])) $almamater = $rowUsers['almamater']; else $almamater = "";
+if (isset($rowUsers['speciality'])) $speciality = $rowUsers['speciality']; else $speciality = "";
+if (isset($rowUsers['kurs'])) $kurs = $rowUsers['kurs']; else $kurs = "";
+if (isset($rowUsers['ochnoZaochno'])) $ochnoZaochno = $rowUsers['ochnoZaochno']; else $ochnoZaochno = "0";
+if (isset($rowUsers['yearOfEnd'])) $yearOfEnd = $rowUsers['yearOfEnd']; else $yearOfEnd = "";
+if (isset($rowUsers['notWorkCheckbox'])) $notWorkCheckbox = $rowUsers['notWorkCheckbox']; else $notWorkCheckbox = "";
+if (isset($rowUsers['placeOfWork'])) $placeOfWork = $rowUsers['placeOfWork']; else $placeOfWork = "";
+if (isset($rowUsers['workPosition'])) $workPosition = $rowUsers['workPosition']; else $workPosition = "";
+if (isset($rowUsers['regionOfBorn'])) $regionOfBorn = $rowUsers['regionOfBorn']; else $regionOfBorn = "";
+if (isset($rowUsers['cityOfBorn'])) $cityOfBorn = $rowUsers['cityOfBorn']; else $cityOfBorn = "";
+if (isset($rowUsers['shortlyAboutMe'])) $shortlyAboutMe = $rowUsers['shortlyAboutMe']; else $shortlyAboutMe = "";
+if (isset($rowUsers['vkontakte'])) $vkontakte = $rowUsers['vkontakte']; else $vkontakte = "";
+if (isset($rowUsers['odnoklassniki'])) $odnoklassniki = $rowUsers['odnoklassniki']; else $odnoklassniki = "";
+if (isset($rowUsers['facebook'])) $facebook = $rowUsers['facebook']; else $facebook = "";
+if (isset($rowUsers['twitter'])) $twitter = $rowUsers['twitter']; else $twitter = "";
+
+if (isset($rowSearchRequests['typeOfObject'])) $typeOfObject = $rowSearchRequests['typeOfObject']; else $typeOfObject = "flat";
+// Инициализируем переменные для отображения количества комнат
+$amountOfRooms1 = ""; $amountOfRooms2 = ""; $amountOfRooms3 = ""; $amountOfRooms4 = ""; $amountOfRooms5 = ""; $amountOfRooms6 = "";
+if (isset($rowSearchRequests['amountOfRooms']))
+{
+    $amountOfRooms = unserialize($rowSearchRequests['amountOfRooms']);
+    foreach ($amountOfRooms as $value) {
+        if ($value == "1") $amountOfRooms1 = "1";
+        if ($value == "2") $amountOfRooms2 = "2";
+        if ($value == "3") $amountOfRooms3 = "3";
+        if ($value == "4") $amountOfRooms4 = "4";
+        if ($value == "5") $amountOfRooms5 = "5";
+        if ($value == "6") $amountOfRooms6 = "6";
+    }
+}
+else {
+    $amountOfRooms = array("1", "2", "3", "4", "5", "6");
+}
+if (isset($rowSearchRequests['adjacentRooms'])) $adjacentRooms = $rowSearchRequests['adjacentRooms']; else $adjacentRooms = "yes";
+if (isset($rowSearchRequests['floor'])) $floor = $rowSearchRequests['floor']; else $floor = "any";
+if (isset($rowSearchRequests['furniture'])) $furniture = $rowSearchRequests['furniture']; else $furniture = "any";
+if (isset($rowSearchRequests['minCost'])) $minCost = $rowSearchRequests['minCost']; else $minCost = "";
+if (isset($rowSearchRequests['maxCost'])) $maxCost = $rowSearchRequests['maxCost']; else $maxCost = "";
+if (isset($rowSearchRequests['pledge'])) $pledge = $rowSearchRequests['pledge']; else $pledge = "";
+// Инициализируем переменные для отображения районов
+$district1 = ""; $district2 = ""; $district3 = ""; $district4 = ""; $district5 = ""; $district6 = ""; $district7 = ""; $district8 = ""; $district9 = ""; $district10 = ""; $district11 = ""; $district12 = ""; $district13 = ""; $district14 = ""; $district15 = ""; $district16 = ""; $district17 = ""; $district18 = ""; $district19 = ""; $district20 = ""; $district21 = ""; $district22 = ""; $district23 = ""; $district24 = ""; $district25 = ""; $district26 = ""; $district27 = ""; $district28 = ""; $district29 = ""; $district30 = ""; $district31 = ""; $district32 = ""; $district33 = ""; $district34 = ""; $district35 = ""; $district36 = ""; $district37 = ""; $district38 = ""; $district39 = ""; $district40 = ""; $district41 = ""; $district42 = ""; $district43 = ""; $district44 = ""; $district45 = ""; $district46 = "";
+if (isset($rowSearchRequests['district']))
+{
+    $district = unserialize($rowSearchRequests['district']);
+    foreach ($district as $value) {
+        if ($value == "1") $district1 = "1";
+        if ($value == "2") $district2 = "2";
+        if ($value == "3") $district3 = "3";
+        if ($value == "4") $district4 = "4";
+        if ($value == "5") $district5 = "5";
+        if ($value == "6") $district6 = "6";
+        if ($value == "7") $district7 = "7";
+        if ($value == "8") $district8 = "8";
+        if ($value == "9") $district9 = "9";
+        if ($value == "10") $district10 = "10";
+        if ($value == "11") $district11 = "11";
+        if ($value == "12") $district12 = "12";
+        if ($value == "13") $district13 = "13";
+        if ($value == "14") $district14 = "14";
+        if ($value == "15") $district15 = "15";
+        if ($value == "16") $district16 = "16";
+        if ($value == "17") $district17 = "17";
+        if ($value == "18") $district18 = "18";
+        if ($value == "19") $district19 = "19";
+        if ($value == "20") $district20 = "20";
+        if ($value == "21") $district21 = "21";
+        if ($value == "22") $district22 = "22";
+        if ($value == "23") $district23 = "23";
+        if ($value == "24") $district24 = "24";
+        if ($value == "25") $district25 = "25";
+        if ($value == "26") $district26 = "26";
+        if ($value == "27") $district27 = "27";
+        if ($value == "28") $district28 = "28";
+        if ($value == "29") $district29 = "29";
+        if ($value == "30") $district30 = "30";
+        if ($value == "31") $district31 = "31";
+        if ($value == "32") $district32 = "32";
+        if ($value == "33") $district33 = "33";
+        if ($value == "34") $district34 = "34";
+        if ($value == "35") $district35 = "35";
+        if ($value == "36") $district36 = "36";
+        if ($value == "37") $district37 = "37";
+        if ($value == "38") $district38 = "38";
+        if ($value == "39") $district39 = "39";
+        if ($value == "40") $district40 = "40";
+        if ($value == "41") $district41 = "41";
+        if ($value == "42") $district42 = "42";
+        if ($value == "43") $district43 = "43";
+        if ($value == "44") $district44 = "44";
+        if ($value == "45") $district45 = "45";
+        if ($value == "46") $district46 = "46";
+    }
+}
+else {
+    $district = array("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46");
+}
+if (isset($rowSearchRequests['withWho'])) $withWho = $rowSearchRequests['withWho']; else $withWho = "alone";
+if (isset($rowSearchRequests['linksToFriends'])) $linksToFriends = $rowSearchRequests['linksToFriends']; else $linksToFriends = "";
+if (isset($rowSearchRequests['children'])) $children = $rowSearchRequests['children']; else $children = "without";
+if (isset($rowSearchRequests['howManyChildren'])) $howManyChildren = $rowSearchRequests['howManyChildren']; else $howManyChildren = "";
+if (isset($rowSearchRequests['animals'])) $animals = $rowSearchRequests['animals']; else $animals = "without";
+if (isset($rowSearchRequests['howManyAnimals'])) $howManyAnimals = $rowSearchRequests['howManyAnimals']; else $howManyAnimals = "";
+if (isset($rowSearchRequests['period'])) $period = $rowSearchRequests['period']; else $period = "";
+if (isset($rowSearchRequests['additionalDescriptionOfSearch'])) $additionalDescriptionOfSearch = $rowSearchRequests['additionalDescriptionOfSearch']; else $additionalDescriptionOfSearch = "";
+
+/********************************************************************************
+ * РЕДАКТИРОВАНИЕ ЛИЧНЫХ ДАННЫХ ПРОФИЛЯ. Если пользователь отправил редактированные параметры своего профиля
+ *******************************************************************************/
+if (isset($_POST['saveProfileParameters'])) {
+    // Формируем набор переменных для сохранения в базу данных, либо для возвращения вместе с формой при их некорректности
+    if (isset($_POST['name'])) $name = htmlspecialchars($_POST['name']);
+    if (isset($_POST['secondName'])) $secondName = htmlspecialchars($_POST['secondName']);
+    if (isset($_POST['surname'])) $surname = htmlspecialchars($_POST['surname']);
+    if (isset($_POST['sex'])) $sex = htmlspecialchars($_POST['sex']);
+    if (isset($_POST['nationality'])) $nationality = htmlspecialchars($_POST['nationality']);
+    if (isset($_POST['birthday'])) $birthday = htmlspecialchars($_POST['birthday']);
+    if (isset($_POST['login'])) { $oldLogin = $login; $login = htmlspecialchars($_POST['login']); }
+    if (isset($_POST['password'])) $password = htmlspecialchars($_POST['password']);
+    if (isset($_POST['telephon'])) $telephon = htmlspecialchars($_POST['telephon']);
+    if (isset($_POST['email'])) $email = htmlspecialchars($_POST['email']);
+    $fileUploadId = $_POST['fileUploadId'];
+
+    if (isset($_POST['currentStatusEducation'])) $currentStatusEducation = htmlspecialchars($_POST['currentStatusEducation']);
+    if (isset($_POST['almamater'])) $almamater = htmlspecialchars($_POST['almamater']);
+    if (isset($_POST['speciality'])) $speciality = htmlspecialchars($_POST['speciality']);
+    if (isset($_POST['kurs'])) $kurs = htmlspecialchars($_POST['kurs']);
+    if (isset($_POST['ochnoZaochno'])) $ochnoZaochno = htmlspecialchars($_POST['ochnoZaochno']);
+    if (isset($_POST['yearOfEnd'])) $yearOfEnd = htmlspecialchars($_POST['yearOfEnd']);
+    if (isset($_POST['notWorkCheckbox'])) $notWorkCheckbox = htmlspecialchars($_POST['notWorkCheckbox']);
+    if (isset($_POST['placeOfWork'])) $placeOfWork = htmlspecialchars($_POST['placeOfWork']);
+    if (isset($_POST['workPosition'])) $workPosition = htmlspecialchars($_POST['workPosition']);
+    if (isset($_POST['regionOfBorn'])) $regionOfBorn = htmlspecialchars($_POST['regionOfBorn']);
+    if (isset($_POST['cityOfBorn'])) $cityOfBorn = htmlspecialchars($_POST['cityOfBorn']);
+    if (isset($_POST['shortlyAboutMe'])) $shortlyAboutMe = htmlspecialchars($_POST['shortlyAboutMe']);
+
+    if (isset($_POST['vkontakte'])) $vkontakte = htmlspecialchars($_POST['vkontakte']);
+    if (isset($_POST['odnoklassniki'])) $odnoklassniki = htmlspecialchars($_POST['odnoklassniki']);
+    if (isset($_POST['facebook'])) $facebook = htmlspecialchars($_POST['facebook']);
+    if (isset($_POST['twitter'])) $twitter = htmlspecialchars($_POST['twitter']);
+
+    // Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
+    $errors = userDataCorrect("validateProfileParameters");
+    if (count($errors) == 0) $correctNewProfileParameters = "true"; else $correctNewProfileParameters = "false"; // Считаем ошибки, если 0, то можно сохранит новые параметры в БД
+
+    // Если данные верны, сохраним их в БД
+    if ($correctNewProfileParameters == "true") {
+
+        // Корректируем дату дня рождения для того, чтобы сделать ее пригодной для сохранения в базу данных
+        $birthdayDB = birthdayFromViewToDB($birthday);
+        $salt = mt_rand(100, 999);
+        $password = md5(md5($password) . $salt);
+
+        // Сохраняем новые параметры Профиля пользователя в БД
+            $rez = mysql_query("UPDATE users SET
+            name='" . $name ."',
+            secondName='" . $secondName ."',
+            surname='" . $surname ."',
+            sex='" . $sex ."',
+            nationality='" . $nationality ."',
+            birthday='" . $birthdayDB ."',
+
+
+            login='" . $login ."',
+
+
+            password='" . $typeOfObject ."',
+
+
+            telephon='" . $telephon ."',
+            email='" . $email ."',
+            currentStatusEducation='" . $currentStatusEducation ."',
+            almamater='" . $almamater ."',
+            speciality='" . $speciality ."',
+            kurs='" . $kurs ."',
+            ochnoZaochno='" . $ochnoZaochno ."',
+            yearOfEnd='" . $yearOfEnd ."',
+            notWorkCheckbox='" . $notWorkCheckbox ."',
+            placeOfWork='" . $placeOfWork ."',
+            workPosition='" . $workPosition ."',
+            regionOfBorn='" . $regionOfBorn ."',
+            cityOfBorn='" . $cityOfBorn ."',
+            shortlyAboutMe='" . $shortlyAboutMe ."',
+            vkontakte='" . $vkontakte ."',
+            odnoklassniki='" . $odnoklassniki ."',
+            facebook='" . $facebook ."',
+            twitter='" . $twitter ."'
+            WHERE id = '" . $rowUsers['id'] . "'");
+
+        /******* Переносим информацию о фотографиях пользователя в таблицу для постоянного хранения *******/
+        // Получим информацию о всех фотках, соответствующих текущему fileUploadId
+        $rezTempFotos = mysql_query("SELECT id, filename, extension, filesizeMb FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'");
+        for ($i = 0; $i < mysql_num_rows($rezTempFotos); $i++) {
+            $rowTempFotos = mysql_fetch_assoc($rezTempFotos);
+            mysql_query("INSERT INTO userFotos (id, filename, extension, filesizeMb, userId) VALUES ('" . $rowTempFotos['id'] . "','" . $rowTempFotos['filename'] . "','" . $rowTempFotos['extension'] . "','" . $rowTempFotos['filesizeMb'] . "','" . $rowUsers['id'] . "')"); // Переносим информацию о фотографиях на постоянное хранение
+        }
+        // Удаляем записи о фотках в таблице для временного хранения данных
+        mysql_query("DELETE FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'");
     }
 }
 
-// Инициализируем переменную корректности
-$correct = null;
+/********************************************************************************
+ * РЕДАКТИРОВАНИЕ УСЛОВИЙ ПОИСКА. Если пользователь отправил редактированные параметры поискового запроса
+ *******************************************************************************/
+
+// Так как пользователь ввел новые парметры поискового запроса - их нужно воспроизвести в форму - это необходимо, чтобы в случае ошибки пользователю не пришлось все данные перебивать заново
+if (isset($_POST['saveSearchParametersButton'])) {
+    // Формируем набор переменных для сохранения в базу данных, либо для возвращения вместе с формой при их некорректности
+    if (isset($_POST['typeOfObject'])) $typeOfObject = htmlspecialchars($_POST['typeOfObject']);
+    if (isset($_POST['amountOfRooms']) && is_array($_POST['amountOfRooms'])) // Проверяем, передан ли массив значений
+    {
+        $amountOfRooms = $_POST['amountOfRooms']; // Будем использовать переменную при записи данных в таблицу в виде массива
+        foreach ($_POST['amountOfRooms'] as $value) {
+            if ($value == "1") $amountOfRooms1 = "1";
+            if ($value == "2") $amountOfRooms2 = "2";
+            if ($value == "3") $amountOfRooms3 = "3";
+            if ($value == "4") $amountOfRooms4 = "4";
+            if ($value == "5") $amountOfRooms5 = "5";
+            if ($value == "6") $amountOfRooms6 = "6";
+        }
+    }
+    else {
+        $amountOfRooms = array("1", "2", "3", "4", "5", "6");
+    }
+    if (isset($_POST['district']) && is_array($_POST['district'])) // Проверяем, передан ли массив значений
+    {
+        $district = $_POST['district']; // Будем использовать переменную при записи данных в таблицу в виде массива
+        foreach ($_POST['district'] as $value) {
+            if ($value == "1") $district1 = "1";
+            if ($value == "2") $district2 = "2";
+            if ($value == "3") $district3 = "3";
+            if ($value == "4") $district4 = "4";
+            if ($value == "5") $district5 = "5";
+            if ($value == "6") $district6 = "6";
+            if ($value == "7") $district7 = "7";
+            if ($value == "8") $district8 = "8";
+            if ($value == "9") $district9 = "9";
+            if ($value == "10") $district10 = "10";
+            if ($value == "11") $district11 = "11";
+            if ($value == "12") $district12 = "12";
+            if ($value == "13") $district13 = "13";
+            if ($value == "14") $district14 = "14";
+            if ($value == "15") $district15 = "15";
+            if ($value == "16") $district16 = "16";
+            if ($value == "17") $district17 = "17";
+            if ($value == "18") $district18 = "18";
+            if ($value == "19") $district19 = "19";
+            if ($value == "20") $district20 = "20";
+            if ($value == "21") $district21 = "21";
+            if ($value == "22") $district22 = "22";
+            if ($value == "23") $district23 = "23";
+            if ($value == "24") $district24 = "24";
+            if ($value == "25") $district25 = "25";
+            if ($value == "26") $district26 = "26";
+            if ($value == "27") $district27 = "27";
+            if ($value == "28") $district28 = "28";
+            if ($value == "29") $district29 = "29";
+            if ($value == "30") $district30 = "30";
+            if ($value == "31") $district31 = "31";
+            if ($value == "32") $district32 = "32";
+            if ($value == "33") $district33 = "33";
+            if ($value == "34") $district34 = "34";
+            if ($value == "35") $district35 = "35";
+            if ($value == "36") $district36 = "36";
+            if ($value == "37") $district37 = "37";
+            if ($value == "38") $district38 = "38";
+            if ($value == "39") $district39 = "39";
+            if ($value == "40") $district40 = "40";
+            if ($value == "41") $district41 = "41";
+            if ($value == "42") $district42 = "42";
+            if ($value == "43") $district43 = "43";
+            if ($value == "44") $district44 = "44";
+            if ($value == "45") $district45 = "45";
+            if ($value == "46") $district46 = "46";
+        }
+    }
+    else {
+        $district = array("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46");
+    }
+    if (isset($_POST['adjacentRooms'])) $adjacentRooms = htmlspecialchars($_POST['adjacentRooms']);
+    if (isset($_POST['floor'])) $floor = htmlspecialchars($_POST['floor']);
+    if (isset($_POST['furniture'])) $furniture = htmlspecialchars($_POST['furniture']);
+    if (isset($_POST['minCost']) && $_POST['minCost'] != "") $minCost = htmlspecialchars($_POST['minCost']); else $minCost = "0";
+    if (isset($_POST['maxCost']) && $_POST['maxCost'] != "") $maxCost = htmlspecialchars($_POST['maxCost']); else $maxCost = "99999999";
+    if (isset($_POST['pledge']) && $_POST['pledge'] != "") $pledge = htmlspecialchars($_POST['pledge']); else $pledge = "99999999";
+    if (isset($_POST['withWho'])) $withWho = htmlspecialchars($_POST['withWho']);
+    if (isset($_POST['linksToFriends'])) $linksToFriends = htmlspecialchars($_POST['linksToFriends']);
+    if (isset($_POST['children'])) $children = htmlspecialchars($_POST['children']);
+    if (isset($_POST['howManyChildren'])) $howManyChildren = htmlspecialchars($_POST['howManyChildren']);
+    if (isset($_POST['animals'])) $animals = htmlspecialchars($_POST['animals']);
+    if (isset($_POST['howManyAnimals'])) $howManyAnimals = htmlspecialchars($_POST['howManyAnimals']);
+    if (isset($_POST['period'])) $period = htmlspecialchars($_POST['period']);
+    if (isset($_POST['additionalDescriptionOfSearch'])) $additionalDescriptionOfSearch = htmlspecialchars($_POST['additionalDescriptionOfSearch']);
+
+    // Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
+    $errors = userDataCorrect("validateSearchRequest"); // Параметр createSearchRequest задает режим проверки "Создание запроса на поиск", который активирует только соответствующие ему проверки
+    if (count($errors) == 0) $correctNewSearchRequest = "true"; else $correctNewSearchRequest = "false"; // Считаем ошибки, если 0, то можно выдать пользователю форму для ввода параметров Запроса поиска
+
+    // Если данные верны, сохраним их в БД
+    if ($correctNewSearchRequest == "true") {
+        $amountOfRoomsSerialized = serialize($amountOfRooms);
+        $districtSerialized = serialize($district);
+
+        if ($typeTenant == "true") {
+            $rez = mysql_query("UPDATE searchrequests SET
+            typeOfObject='" . $typeOfObject ."',
+            amountOfRooms='" . $amountOfRoomsSerialized ."',
+            adjacentRooms='" . $adjacentRooms ."',
+            floor='" . $floor ."',
+            furniture='" . $furniture ."',
+            minCost='" . $minCost ."',
+            maxCost='" . $maxCost ."',
+            pledge='" . $pledge ."',
+            district='" . $districtSerialized ."',
+            withWho='" . $withWho ."',
+            linksToFriends='" . $linksToFriends ."',
+            children='" . $children ."',
+            howManyChildren='" . $howManyChildren ."',
+            animals='" . $animals ."',
+            howManyAnimals='" . $howManyAnimals ."',
+            period='" . $period ."',
+            additionalDescriptionOfSearch='" . $additionalDescriptionOfSearch ."'
+            WHERE userId = '" . $rowUsers['id'] . "'");
+        } else {
+            $rez = mysql_query("INSERT INTO searchrequests SET
+            userId='" . $rowUsers['id'] ."',
+            typeOfObject='" . $typeOfObject ."',
+            amountOfRooms='" . $amountOfRoomsSerialized ."',
+            adjacentRooms='" . $adjacentRooms ."',
+            floor='" . $floor ."',
+            furniture='" . $furniture ."',
+            minCost='" . $minCost ."',
+            maxCost='" . $maxCost ."',
+            pledge='" . $pledge ."',
+            district='" . $districtSerialized ."',
+            withWho='" . $withWho ."',
+            linksToFriends='" . $linksToFriends ."',
+            children='" . $children ."',
+            howManyChildren='" . $howManyChildren ."',
+            animals='" . $animals ."',
+            howManyAnimals='" . $howManyAnimals ."',
+            period='" . $period ."',
+            additionalDescriptionOfSearch='" . $additionalDescriptionOfSearch ."'");
+        }
+
+        $rez = mysql_query("UPDATE users SET typeTenant='true' WHERE login = '" . $login . "'");
+        $typeTenant = "true";
+    }
+}
+
+/********************************************************************************
+ * ЗАПРОС НА СОЗДАНИЕ УСЛОВИЙ ПОИСКА. Если пользователь нажал на кнопку Формирования поискового запроса
+ *******************************************************************************/
 
 // Проверяем: захотел ли пользователь добавить поисковый запрос. На этом месте мы можем быть уверены, что пользователь является только собственником, но не является пока арендатором, лишь собирается им стать (для чего он и хочет сформировать поисковый запрос)
 if (isset($_POST['createSearchRequestButton'])) {
-    $typeTenant = $rowUsers['typeTenant'];
-    $typeOwner = $rowUsers['typeOwner'];
-    $name = $rowUsers['name'];
-    $secondName = $rowUsers['secondName'];
-    $surname = $rowUsers['surname'];
-    $sex = $rowUsers['sex'];
-    $nationality = $rowUsers['nationality'];
-    $birthday = birthdayFromDBToView($rowUsers['birthday']);
-    $login = $rowUsers['login'];
-    $password = $rowUsers['password']; // Реальный пароль пользователя в БД не хранится, но так как пароль проверяется только на наличие (не = 0 длину), то достаточно того, что хранится в БД в поле password
-    $telephon = $rowUsers['telephon'];
-    $email = $rowUsers['email'];
-    $currentStatusEducation = $rowUsers['currentStatusEducation'];
-    $almamater = $rowUsers['almamater'];
-    $speciality = $rowUsers['speciality'];
-    $kurs = $rowUsers['kurs'];
-    $ochnoZaochno = $rowUsers['ochnoZaochno'];
-    $yearOfEnd = $rowUsers['yearOfEnd'];
-    $notWorkCheckbox = $rowUsers['notWorkCheckbox'];
-    $placeOfWork = $rowUsers['placeOfWork'];
-    $workPosition = $rowUsers['workPosition'];
-    $regionOfBorn = $rowUsers['regionOfBorn'];
-    $cityOfBorn = $rowUsers['cityOfBorn'];
-    $vkontakte = $rowUsers['vkontakte'];
-    $odnoklassniki = $rowUsers['odnoklassniki'];
-    $facebook = $rowUsers['facebook'];
-    $twitter = $rowUsers['twitter'];
-    $minCost = "";
-    $maxCost = "";
-    $pledge = "";
-    $period = "";
-    $lic = $rowUsers['lic'];
-
     // Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
-    $errors = userDataCorrect("createSearchRequest");
-    if (count($errors) == 0) $correct = true; else $correct = false; // Считаем ошибки, если 0, то можно выдать пользователю форму для ввода параметров Запроса поиска
-
+    $errors = userDataCorrect("createSearchRequest"); // Параметр createSearchRequest задает режим проверки "Создание запроса на поиск", который активирует только соответствующие ему проверки
+    if (count($errors) == 0) $correct = "true"; else $correct = "false"; // Считаем ошибки, если 0, то можно выдать пользователю форму для ввода параметров Запроса поиска
 }
 
 ?>
-
 <!DOCTYPE html>
 <!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
 <!-- Consider specifying the language of your content by adding the `lang` attribute to <html> -->
@@ -99,6 +450,7 @@ if (isset($_POST['createSearchRequestButton'])) {
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
 
     <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
+    <link rel="stylesheet" href="css/fileuploader.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
             /* Стили для создания нового Объявления*/
@@ -187,8 +539,8 @@ if (isset($_POST['createSearchRequestButton'])) {
                 <span id="userMistakesText">Для продолжения, пожалуйста, дополните или исправьте следующие данные:</span>
             </p>
             <ol><?php
-                if ($correct == false && isset($errors)) {
-                    foreach ($errors as $key => $value) {
+                if (isset($errors) && count($errors) != 0) {
+                    foreach ($errors as $value) {
                         echo "<li>$value</li>";
                     }
                 }
@@ -226,6 +578,7 @@ include("header.php");
     </li>
 </ul>
 <div id="tabs-1">
+<?php if ($correctNewProfileParameters != "false"): ?> <!-- Блок с нередактируемыми параметрами Профайла не выдается только в 1 случае: если пользователь корректировал свои параметры, и они не прошли проверку -->
 <div id="notEditingProfileParametersBlock">
     <div class="setOfInstructions">
         <a href="#">редактировать</a>
@@ -240,88 +593,88 @@ include("header.php");
         <ul class="listDescription">
             <li>
                 <span
-                    class="FIO"><?php echo $rowUsers['surname'] . " " . $rowUsers['name'] . " " . $rowUsers['secondName']?></span>
+                    class="FIO"><?php echo $surname . " " . $name . " " . $secondName?></span>
             </li>
             <li>
                 <br>
             </li>
             <li>
                 <span class="headOfString">Образование:</span> <?php
-                if ($rowUsers['currentStatusEducation'] == "0") {
+                if ($currentStatusEducation == "0") {
                     echo "";
                 }
-                if ($rowUsers['currentStatusEducation'] == "withoutEducation") {
-                    echo "не получал и не получаю";
+                if ($currentStatusEducation == "withoutEducation") {
+                    echo "нет";
                 }
-                if ($rowUsers['currentStatusEducation'] == "learningNow") {
-                    if (isset($rowUsers['almamater'])) echo $rowUsers['almamater'] . ", ";
-                    if (isset($rowUsers['speciality'])) echo $rowUsers['speciality'] . ", ";
-                    if (isset($rowUsers['ochnoZaochno'])) {
-                        if ($rowUsers['ochnoZaochno'] == "ochno") echo "очно, "; else echo "заочно, ";
+                if ($currentStatusEducation == "learningNow") {
+                    if (isset($almamater)) echo $almamater . ", ";
+                    if (isset($speciality)) echo $speciality . ", ";
+                    if (isset($ochnoZaochno)) {
+                        if ($ochnoZaochno == "ochno") echo "очно, "; else echo "заочно, ";
                     }
-                    if (isset($rowUsers['kurs'])) echo $rowUsers['kurs'];
+                    if (isset($kurs)) echo $kurs;
                 }
-                if ($rowUsers['currentStatusEducation'] == "finishedEducation") {
-                    if (isset($rowUsers['almamater'])) echo $rowUsers['almamater'] . ", ";
-                    if (isset($rowUsers['speciality'])) echo $rowUsers['speciality'] . ", ";
-                    if (isset($rowUsers['ochnoZaochno'])) {
-                        if ($rowUsers['ochnoZaochno'] == "ochno") echo "очно, "; else echo "заочно, ";
+                if ($currentStatusEducation == "finishedEducation") {
+                    if (isset($almamater)) echo $almamater . ", ";
+                    if (isset($speciality)) echo $speciality . ", ";
+                    if (isset($ochnoZaochno)) {
+                        if ($ochnoZaochno == "ochno") echo "очно, "; else echo "заочно, ";
                     }
-                    if (isset($rowUsers['yearOfEnd'])) echo "закончил в " . $rowUsers['yearOfEnd'] . " году";
+                    if (isset($yearOfEnd)) echo "закончил в " . $yearOfEnd . " году";
                 }
                 ?>
             </li>
             <li>
                 <span class="headOfString">Работа:</span> <?php
-                if ($rowUsers['notWorkCheckbox'] == "isNotWorking") {
+                if ($notWorkCheckbox == "isNotWorking") {
                     echo "не работаю";
                 }
                 else {
-                    if (isset($rowUsers['placeOfWork']) && $rowUsers['placeOfWork'] != "") {
-                        echo $rowUsers['placeOfWork'] . ", ";
+                    if (isset($placeOfWork) && $placeOfWork != "") {
+                        echo $placeOfWork . ", ";
                     }
-                    if (isset($rowUsers['workPosition'])) {
-                        echo $rowUsers['workPosition'];
+                    if (isset($workPosition)) {
+                        echo $workPosition;
                     }
                 }
                 ?>
             </li>
             <li>
                 <span class="headOfString">Национальность:</span> <?php
-                if ($rowUsers['nationality'] == "russian") {
+                if ($nationality == "russian") {
                     echo "русский";
                 }
-                if ($rowUsers['nationality'] == "west") {
+                if ($nationality == "west") {
                     echo "европеец, американец";
                 }
-                if ($rowUsers['nationality'] == "east") {
+                if ($nationality == "east") {
                     echo "СНГ, восточная нац-сть";
                 }
                 ?>
             </li>
             <li>
                 <span class="headOfString">Пол:</span> <?php
-                if ($rowUsers['sex'] == "man") {
+                if ($sex == "man") {
                     echo "мужской";
                 }
-                if ($rowUsers['sex'] == "woman") {
+                if ($sex == "woman") {
                     echo "женский";
                 }
                 ?>
             </li>
             <li>
                 <span class="headOfString">День рождения:</span> <?php
-                if (isset($rowUsers['birthday'])) echo birthdayFromDBToView($rowUsers['birthday']);
+                if (isset($birthday)) echo $birthday;
                 ?>
             </li>
             <li>
                 <span class="headOfString">Возраст:</span> <?php
-                $date = substr($rowUsers['birthday'], 8, 2);
-                $month = substr($rowUsers['birthday'], 5, 2);
-                $year = substr($rowUsers['birthday'], 0, 4);
-                $birthday = mktime(0, 0, 0, $month, $date, $year);
+                $date = substr($birthday, 8, 2);
+                $month = substr($birthday, 5, 2);
+                $year = substr($birthday, 0, 4);
+                $birthdayForAge = mktime(0, 0, 0, $month, $date, $year);
                 $currentDate = time();
-                echo date_interval_format(date_diff(new DateTime("@{$currentDate}"), new DateTime("@{$birthday}")), '%y');
+                echo date_interval_format(date_diff(new DateTime("@{$currentDate}"), new DateTime("@{$birthdayForAge}")), '%y');
                 ?>
             </li>
             <li>
@@ -332,12 +685,12 @@ include("header.php");
             </li>
             <li>
                 <span class="headOfString">E-mail:</span> <?php
-                if (isset($rowUsers['email'])) echo $rowUsers['email'];
+                if (isset($email)) echo $email;
                 ?>
             </li>
             <li>
                 <span class="headOfString">Телефон:</span> <?php
-                if (isset($rowUsers['telephon'])) echo $rowUsers['telephon'];
+                if (isset($telephon)) echo $telephon;
                 ?>
             </li>
             <li>
@@ -348,12 +701,12 @@ include("header.php");
             </li>
             <li>
                 <span class="headOfString">Город (населенный пункт):</span> <?php
-                if (isset($rowUsers['cityOfBorn'])) echo $rowUsers['cityOfBorn'];
+                if (isset($cityOfBorn)) echo $cityOfBorn;
                 ?>
             </li>
             <li>
                 <span class="headOfString">Регион:</span> <?php
-                if (isset($rowUsers['regionOfBorn'])) echo $rowUsers['regionOfBorn'];
+                if (isset($regionOfBorn)) echo $regionOfBorn;
                 ?>
             </li>
             <li>
@@ -364,7 +717,7 @@ include("header.php");
             </li>
             <li>
                 <?php
-                if (isset($rowUsers['shortlyAboutMe'])) echo $rowUsers['shortlyAboutMe'];
+                if (isset($shortlyAboutMe)) echo $shortlyAboutMe;
                 ?>
             </li>
             <li>
@@ -376,248 +729,286 @@ include("header.php");
             <li>
                 <ul class="linksToAccounts">
                     <?php
-                    if (isset($rowUsers['vkontakte'])) echo "<li><a href='" . $rowUsers['vkontakte'] . "'>" . $rowUsers['vkontakte'] . "</a></li>";
+                    if (isset($vkontakte)) echo "<li><a href='" . $vkontakte . "'>" . $vkontakte . "</a></li>";
                     ?>
                     <?php
-                    if (isset($rowUsers['odnoklassniki'])) echo "<li><a href='" . $rowUsers['odnoklassniki'] . "'>" . $rowUsers['odnoklassniki'] . "</a></li>";
+                    if (isset($odnoklassniki)) echo "<li><a href='" . $odnoklassniki . "'>" . $odnoklassniki . "</a></li>";
                     ?>
                     <?php
-                    if (isset($rowUsers['facebook'])) echo "<li><a href='" . $rowUsers['facebook'] . "'>" . $rowUsers['facebook'] . "</a></li>";
+                    if (isset($facebook)) echo "<li><a href='" . $facebook . "'>" . $facebook . "</a></li>";
                     ?>
                     <?php
-                    if (isset($rowUsers['twitter'])) echo "<li><a href='" . $rowUsers['twitter'] . "'>" . $rowUsers['twitter'] . "</a></li>";
+                    if (isset($twitter)) echo "<li><a href='" . $twitter . "'>" . $twitter . "</a></li>";
                     ?>
                 </ul>
             </li>
         </ul>
     </div>
 </div>
-
-<form name="profileParameters" id="editingProfileParametersBlock" class="descriptionFieldsetsWrapper"
-      style="display: none;">
-<fieldset class="edited private">
-    <legend>
-        ФИО
-    </legend>
-    <div class="searchItem">
-        <div class="required">
-            *
-        </div>
-        <span class="searchItemLabel">Имя: </span>
-
-        <div class="searchItemBody">
-            <input type="text" size="23">
-        </div>
-    </div>
-    <div class="searchItem">
-        <div class="required">
-            *
-        </div>
-        <span class="searchItemLabel">Отчество: </span>
-
-        <div class="searchItemBody">
-            <input type="text" size="23">
-        </div>
-    </div>
-    <div class="searchItem">
-        <div class="required">
-            *
-        </div>
-        <span class="searchItemLabel">Фамилия: </span>
-
-        <div class="searchItemBody">
-            <input type="text" size="23">
-        </div>
-    </div>
-    <div class="searchItem">
-        <div class="required">
-            *
-        </div>
-        <span class="searchItemLabel">Пол: </span>
-
-        <div class="searchItemBody">
-            <select name="sex">
-                <option value="0" selected></option>
-                <option value="man">мужской</option>
-                <option value="woman">женский</option>
-            </select>
-        </div>
-    </div>
-    <div class="searchItem">
-        <div class="required">
-            *
-        </div>
-        <span class="searchItemLabel">Национальность: </span>
-
-        <div class="searchItemBody">
-            <select name="nationality">
-                <option value="0" selected></option>
-                <option value="1">русский</option>
-                <option value="2">европеец, американец</option>
-                <option value="3">СНГ, восточная нац-сть</option>
-            </select>
-        </div>
-    </div>
-    <div class="searchItem">
-        <div class="required">
-            *
-        </div>
-        <span class="searchItemLabel">День рождения: </span>
-
-        <div class="searchItemBody">
-            <input type="text" size="15">
-        </div>
-    </div>
-</fieldset>
-
-<div style="display: inline-block; vertical-align: top;">
-    <fieldset class="edited private" style="display: block;">
+<?php endif; ?>
+<form method="post" name="profileParameters" id="editingProfileParametersBlock" class="descriptionFieldsetsWrapper"
+      style='<?php if ($correctNewProfileParameters != "false") echo "display: none;"?>'>
+<div class="descriptionFieldsetsWrapper">
+    <fieldset class="edited private">
         <legend>
-            Логин и пароль
+            ФИО
         </legend>
         <div class="searchItem">
             <div class="required">
                 *
             </div>
-            <span class="searchItemLabel">Логин: </span>
+            <span class="searchItemLabel">Имя: </span>
 
             <div class="searchItemBody">
-                <input type="text" size="20">
+                <input name="name" type="text" size="38" autofocus
+                       validations="validate[required]" <?php echo "value='$name'";?>>
             </div>
         </div>
         <div class="searchItem">
             <div class="required">
                 *
             </div>
-            <span class="searchItemLabel">Пароль: </span>
+            <span class="searchItemLabel">Отчество: </span>
 
             <div class="searchItemBody">
-                <input type="password" size="20">
+                <input name="secondName" type="text" size="33"
+                       validations="validate[required]" <?php echo "value='$secondName'";?>>
+            </div>
+        </div>
+        <div class="searchItem">
+            <div class="required">
+                *
+            </div>
+            <span class="searchItemLabel">Фамилия: </span>
+
+            <div class="searchItemBody">
+                <input name="surname" type="text" size="33"
+                       validations="validate[required]" <?php echo "value='$surname'";?>>
+            </div>
+        </div>
+        <div class="searchItem">
+            <div class="required">
+                *
+            </div>
+            <span class="searchItemLabel">Пол: </span>
+
+            <div class="searchItemBody">
+                <select name="sex" validations="validate[required]">
+                    <option value="0" <?php if ($sex == "0") echo "selected";?>></option>
+                    <option value="man" <?php if ($sex == "man") echo "selected";?>>мужской</option>
+                    <option value="woman" <?php if ($sex == "woman") echo "selected";?>>женский</option>
+                </select>
+            </div>
+        </div>
+        <div class="searchItem">
+            <div class="required">
+                *
+            </div>
+            <span class="searchItemLabel">Национальность: </span>
+
+            <div class="searchItemBody">
+                <select name="nationality" validations="validate[required]">
+                    <option value="0" <?php if ($nationality == "0") echo "selected";?>></option>
+                    <option value="russian" <?php if ($nationality == "russian") echo "selected";?>>русский</option>
+                    <option value="west" <?php if ($nationality == "west") echo "selected";?>>европеец, американец
+                    </option>
+                    <option value="east" <?php if ($nationality == "east") echo "selected";?>>СНГ, восточная нац-сть
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="searchItem">
+            <div class="required">
+                *
+            </div>
+            <span class="searchItemLabel">День рождения: </span>
+
+            <div class="searchItemBody">
+                <input name="birthday" type="text" id="datepicker" size="15"
+                       placeholder="дд.мм.гггг" <?php echo "value='$birthday'";?>>
             </div>
         </div>
     </fieldset>
 
-    <fieldset class="edited private" style="display: block;">
-        <legend>
-            Контакты
+    <div style="display: inline-block; vertical-align: top;">
+        <fieldset class="edited private" style="display: block;">
+            <legend>
+                Логин и пароль
+            </legend>
+            <div class="searchItem" title="Используйте в качестве логина ваш e-mail или телефон">
+                <div class="required">
+                    *
+                </div>
+                <span class="searchItemLabel">Логин: </span>
+
+                <div class="searchItemBody">
+                    <input type="text" size="30" maxlength="50" name="login" placeholder="e-mail или номер телефона"
+                           validations="validate[required]" <?php echo "value='$login'";?>>
+                </div>
+            </div>
+            <div class="searchItem">
+                <div class="required">
+                    *
+                </div>
+                <span class="searchItemLabel">Пароль: </span>
+
+                <div class="searchItemBody">
+                    <input type="password" size="29" maxlength="50"
+                           name="password" validations="validate[required]" <?php echo "value='$password'";?>>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="edited private" style="display: block;">
+            <legend>
+                Контакты
+            </legend>
+            <div class="searchItem">
+                <div class="required">
+                    *
+                </div>
+                <span class="searchItemLabel">Телефон: </span>
+
+                <div class="searchItemBody">
+                    <input name="telephon" type="text" size="27"
+                           validations="validate[required,custom[telephone]]" <?php echo "value='$telephon'";?>>
+                </div>
+            </div>
+            <div class="searchItem">
+                <div class="required">
+                    <?php if ($typeTenant == "true") {
+                    echo "*";
+                } ?>
+                </div>
+                <span class="searchItemLabel">e-mail: </span>
+
+                <div class="searchItemBody">
+                    <input name="email" type="text" size="30" <?php if ($typeTenant == "true") {
+                        echo "validations='validate[required,custom[email]]'";
+                    } echo "value='$email'"; ?>>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+
+    <fieldset class="edited private" style="min-width: 300px;">
+        <legend title="Для успешной регистрации должна быть загружена хотя бы 1 фотография">
+            <div class="required">
+                <?php if ($typeTenant == "true") {
+                echo "*";
+            } ?>
+            </div>
+            Фотографии
         </legend>
-        <div class="searchItem">
-            <div class="required">
-                *
-            </div>
-            <span class="searchItemLabel">Телефон: </span>
-
-            <div class="searchItemBody">
-                <input type="text" size="15">
-            </div>
-        </div>
-        <div class="searchItem">
-            <div class="required">
-                *
-            </div>
-            <span class="searchItemLabel">e-mail: </span>
-
-            <div class="searchItemBody">
-                <input type="text" size="15">
-            </div>
+        <input type="hidden" name="fileUploadId" id="fileUploadId" <?php echo "value='$fileUploadId'";?>>
+        <?php
+        // Получаем информацию о всех загруженных фото и формируем для каждого свой input type hidden для передачи данных в обработчик яваскрипта
+        if ($rez = mysql_query("SELECT * FROM userFotos WHERE userId = '" . $rowUsers['id'] . "'")) // ищем уже загруженные пользователем фотки
+        {
+            $numUploadedFiles = mysql_num_rows($rez);
+            for ($i = 0; $i < $numUploadedFiles; $i++) {
+                $row = mysql_fetch_assoc($rez);
+                echo "<input type='hidden' class='uploadedFoto' filename='" . $row['filename'] . "' filesizeMb='" . $row['filesizeMb'] . "'>";
+            }
+        }
+        if ($rez = mysql_query("SELECT * FROM tempFotos WHERE fileuploadid = '" . $fileUploadId . "'")) // ищем уже загруженные пользователем фотки
+        {
+            $numUploadedFiles = mysql_num_rows($rez);
+            for ($i = 0; $i < $numUploadedFiles; $i++) {
+                $row = mysql_fetch_assoc($rez);
+                echo "<input type='hidden' class='uploadedFoto' filename='" . $row['filename'] . "' filesizeMb='" . $row['filesizeMb'] . "'>";
+            }
+        }
+        ?>
+        <div id="file-uploader">
+            <noscript>
+                <p>Пожалуйста, активируйте JavaScript для загрузки файлов</p>
+                <!-- or put a simple form for upload here -->
+            </noscript>
         </div>
     </fieldset>
+
 </div>
-
-<fieldset class="edited private">
-    <legend>
-        Страницы в социальных сетях
-    </legend>
-    <div class="searchItem"
-         title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
-        <div class="required"></div>
-        <select name="selectSocialNetwork1">
-            <option value="0" selected></option>
-            <option value="1">В контакте</option>
-            <option value="2">Одноклассники</option>
-            <option value="3">Facebook</option>
-            <option value="4">Twitter</option>
-            <option value="5">Мой круг</option>
-            <option value="6">Google+</option>
-        </select>
-
-        <div class="searchItemBody">
-            <input type="text" name="socialNetwork1" size="30" value="http://">
-        </div>
-    </div>
-    <div class="searchItem"
-         title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
-        <div class="required"></div>
-        <select name="selectSocialNetwork2">
-            <option value="0" selected></option>
-            <option value="1">В контакте</option>
-            <option value="2">Одноклассники</option>
-            <option value="3">Facebook</option>
-            <option value="4">Twitter</option>
-            <option value="5">Мой круг</option>
-            <option value="6">Google+</option>
-        </select>
-
-        <div class="searchItemBody">
-            <input type="text" name="socialNetwork2" size="30" value="http://">
-        </div>
-    </div>
-    <div class="searchItem"
-         title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
-        <div class="required"></div>
-        <select name="selectSocialNetwork3">
-            <option value="0" selected></option>
-            <option value="1">В контакте</option>
-            <option value="2">Одноклассники</option>
-            <option value="3">Facebook</option>
-            <option value="4">Twitter</option>
-            <option value="5">Мой круг</option>
-            <option value="6">Google+</option>
-        </select>
-
-        <div class="searchItemBody">
-            <input type="text" name="socialNetwork3" size="30" value="http://">
-        </div>
-    </div>
-</fieldset>
-
+<!-- /end.descriptionFieldsetsWrapper -->
 <fieldset class="edited private">
     <legend>
         Образование
     </legend>
-    <div>
-        <input type="checkbox" name="notLearnCheckbox" id="notLearnCheckbox">
-        Я нигде не учился
-    </div>
-    <div class="searchItem ifLearned" title="Укажите последнее учебное заведение, если Вы заканчивали несколько">
+    <div class="searchItem">
         <div class="required">
-            *
-        </div>
-        <span class="searchItemLabel">Учебное заведение: </span>
-
-        <div class="searchItemBody">
-            <input class="ifLearned" type="text" size="30">
-        </div>
-    </div>
-    <div class="searchItem ifLearned">
-        <div class="required">
-            *
-        </div>
-        <span class="searchItemLabel">Специальность: </span>
-
-        <div class="searchItemBody">
-            <input class="ifLearned" type="text" size="30">
-        </div>
-    </div>
-    <div class="searchItem ifLearned"
-         title="Укажите курс, на котором учитесь или год окончания, если Вы уже закончили учебное заведение">
-        <div class="required">
-            *
+            <?php if ($typeTenant == "true") {
+            echo "*";
+        } ?>
         </div>
         <span class="searchItemLabel">Текущий статус: </span>
 
         <div class="searchItemBody">
-            <input class="ifLearned" type="text" size="30">
+            <select name="currentStatusEducation" id="currentStatusEducation" <?php if ($typeTenant == "true") {
+                echo "validations='validate[required]'";
+            } ?>>
+                <option value="0" <?php if ($currentStatusEducation == "0") echo "selected";?>></option>
+                <option
+                    value="withoutEducation" <?php if ($currentStatusEducation == "withoutEducation") echo "selected";?>>
+                    Нигде не учился
+                </option>
+                <option value="learningNow" <?php if ($currentStatusEducation == "learningNow") echo "selected";?>>
+                    Сейчас учусь
+                </option>
+                <option
+                    value="finishedEducation" <?php if ($currentStatusEducation == "finishedEducation") echo "selected";?>>
+                    Закончил
+                </option>
+            </select>
+        </div>
+    </div>
+    <div id="almamater" class="searchItem ifLearned"
+         title="Укажите учебное заведение, в котором учитесь сейчас, либо последнее из тех, что заканчивали">
+        <div class="required">
+        </div>
+        <span class="searchItemLabel">Учебное заведение: </span>
+
+        <div class="searchItemBody">
+            <input name="almamater" class="ifLearned" type="text" size="50" <?php echo "value='$almamater'";?>>
+        </div>
+    </div>
+    <div id="speciality" class="searchItem ifLearned">
+        <div class="required">
+        </div>
+        <span class="searchItemLabel">Специальность: </span>
+
+        <div class="searchItemBody">
+            <input name="speciality" class="ifLearned" type="text" size="55" <?php echo "value='$speciality'";?>>
+        </div>
+    </div>
+    <div id="kurs" class="searchItem ifLearned" title="Укажите курс, на котором учитесь">
+        <div class="required">
+        </div>
+        <span class="searchItemLabel">Курс: </span>
+
+        <div class="searchItemBody">
+            <input name="kurs" class="ifLearned" type="text" size="19" <?php echo "value='$kurs'";?>>
+        </div>
+    </div>
+    <div id="formatEducation" class="searchItem ifLearned" title="Укажите форму обучения">
+        <div class="required">
+        </div>
+        <span class="searchItemLabel">Очно / Заочно: </span>
+
+        <div class="searchItemBody">
+            <select name="ochnoZaochno" class="ifLearned">
+                <option value="0" <?php if ($ochnoZaochno == "0") echo "selected";?>></option>
+                <option value="ochno" <?php if ($ochnoZaochno == "ochno") echo "selected";?>>Очно</option>
+                <option value="zaochno" <?php if ($ochnoZaochno == "zaochno") echo "selected";?>>Заочно</option>
+            </select>
+        </div>
+    </div>
+    <div id="yearOfEnd" class="searchItem ifLearned" title="Укажите год окончания учебного заведения">
+        <div class="required">
+        </div>
+        <span class="searchItemLabel">Год окончания: </span>
+
+        <div class="searchItemBody">
+            <input name="yearOfEnd" class="ifLearned" type="text" size="9" <?php echo "value='$yearOfEnd'";?>>
         </div>
     </div>
 </fieldset>
@@ -627,27 +1018,26 @@ include("header.php");
         Работа
     </legend>
     <div>
-        <input type="checkbox" name="notWorkCheckbox" id="notWorkCheckbox">
+        <input type="checkbox" name="notWorkCheckbox" value="isNotWorking"
+               id="notWorkCheckbox" <?php if ($notWorkCheckbox == "isNotWorking") echo "checked";?>>
         Я не работаю
     </div>
     <div class="searchItem ifWorked">
         <div class="required">
-            *
         </div>
         <span class="searchItemLabel">Место работы: </span>
 
         <div class="searchItemBody">
-            <input class="ifWorked" type="text" size="30">
+            <input name="placeOfWork" class="ifWorked" type="text" size="30" <?php echo "value='$placeOfWork'";?>>
         </div>
     </div>
     <div class="searchItem ifWorked">
         <div class="required">
-            *
         </div>
         <span class="searchItemLabel">Должность: </span>
 
         <div class="searchItemBody">
-            <input class="ifWorked" type="text" size="30">
+            <input name="workPosition" class="ifWorked" type="text" size="33" <?php echo "value='$workPosition'";?>>
         </div>
     </div>
 </fieldset>
@@ -658,48 +1048,93 @@ include("header.php");
     </legend>
     <div class="searchItem">
         <div class="required">
-            *
+            <?php if ($typeTenant == "true") {
+            echo "*";
+        } ?>
         </div>
         <span class="searchItemLabel">В каком регионе родились: </span>
 
         <div class="searchItemBody">
-            <input type="text" size="20">
+            <input name="regionOfBorn" type="text" size="42" <?php if ($typeTenant == "true") {
+                echo "validations='validate[required]'";
+            } echo "value='$regionOfBorn'";?>>
         </div>
     </div>
     <div class="searchItem">
         <div class="required">
-            *
+            <?php if ($typeTenant == "true") {
+            echo "*";
+        } ?>
         </div>
         <span class="searchItemLabel">Родной город, населенный пункт: </span>
 
         <div class="searchItemBody">
-            <input type="text" size="20">
+            <input name="cityOfBorn" type="text" size="36" <?php if ($typeTenant == "true") {
+                echo "validations='validate[required]'";
+            } echo "value='$cityOfBorn'";?>>
         </div>
     </div>
     <div class="searchItem">
         <div class="required"></div>
         <span class="searchItemLabel">Коротко о себе и своих интересах: </span>
+    </div>
+    <div class="searchItem">
+        <div class="required"></div>
+        <textarea name="shortlyAboutMe" cols="71" rows="4"><?php echo $shortlyAboutMe;?></textarea>
+    </div>
+</fieldset>
+<fieldset class="edited private">
+    <legend>
+        Страницы в социальных сетях
+    </legend>
+    <div class="searchItem"
+         title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
+        <div class="required"></div>
+        <img src="img/vkontakte.jpg">
 
         <div class="searchItemBody">
-            <textarea name="shortlyAboutMe" cols="70" rows="4"></textarea>
+            <input type="text" name="vkontakte" size="62"
+                   placeholder="http://vk.com/..." <?php echo "value='$vkontakte'";?>>
+        </div>
+    </div>
+    <div class="searchItem"
+         title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
+        <div class="required"></div>
+        <img src="img/odnoklassniki.png">
+
+        <div class="searchItemBody">
+            <input type="text" name="odnoklassniki" size="68"
+                   placeholder="http://www.odnoklassniki.ru/profile/..." <?php echo "value='$odnoklassniki'";?>>
+        </div>
+    </div>
+    <div class="searchItem"
+         title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
+        <div class="required"></div>
+        <img src="img/facebook.jpg">
+
+        <div class="searchItemBody">
+            <input type="text" name="facebook" size="71"
+                   placeholder="https://www.facebook.com/profile.php?..." <?php echo "value='$facebook'";?>>
+        </div>
+    </div>
+    <div class="searchItem"
+         title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
+        <div class="required"></div>
+        <img src="img/twitter.png">
+
+        <div class="searchItemBody">
+            <input type="text" name="twitter" size="62"
+                   placeholder="https://twitter.com/..." <?php echo "value='$twitter'";?>>
         </div>
     </div>
 </fieldset>
-
-<fieldset class="edited private" style="min-width: 300px; min-height: 200px;">
-    <legend title="Для успешной регистрации должна быть загружена хотя бы 1 фотография">
-        <div class="required">
-            *
-        </div>
-        Фотографии
-    </legend>
-    <button>
-        Загрузить фотографии
-    </button>
-</fieldset>
 <div class="clearBoth"></div>
-<input type="submit" value="Сохранить" id="saveProfileParameters" class="bottomButton button">
-
+<div class="bottomButton">
+    <a href="personal.php" style="margin-right: 10px;">Отмена</a>
+    <button type="submit" name="saveProfileParameters" id="saveProfileParameters" class="button">
+        Сохранить
+    </button>
+</div>
 <div class="clearBoth"></div>
 </form>
 <!-- /end.descriptionFieldsetsWrapper -->
@@ -1969,16 +2404,18 @@ include("header.php");
     автоматический поиск объявлений на портале и будет оповещать Вас о появлении новых объектов по указанному в профиле
     e-mail
 </div>
-<?php if ($rowSearchRequests == false): ?>
+<?php if ($typeTenant != "true" && $correct != "true" && $correctNewSearchRequest == "null"): ?> <!-- Если пользователь еще не сформировал поисковый запрос (а значит не является арендатором) и он либо не нажимал на кнопку формирования запроса, либо нажимал, но не прошел проверку на полноту информации о пользователи, то ему доступна только кнопка формирования нового запроса. В ином случае будет отображаться сам поисковый запрос пользователя, либо форма для его заполнения -->
 <form name="createSearchRequest" method="post">
     <button type="submit" name="createSearchRequestButton" id='createSearchRequestButton' class='left-bottom'>
         Запрос на поиск
     </button>
 </form>
-    <?php else: ?>
+    <?php endif;?>
+<?php if ($typeTenant == "true"): ?> <!-- Если пользователь является арендатором, то у него уже сформирован поисковый запрос, который мы и показываем на этой вкладке -->
 <div id="notEditingSearchParametersBlock" class="objectDescription">
 <div class="setOfInstructions">
-    <a href="#">редактировать</a>
+    <li><a href="#">редактировать</a></li>
+    <li><a href="personal.php?action=deleteSearchRequest" title="Удаляет запрос на поиск - кликните по этой ссылке, когда Вы найдете недвижимость">удалить</a></li>
     <br>
 </div>
 <fieldset class="notEdited">
@@ -1991,22 +2428,22 @@ include("header.php");
             <td class="objectDescriptionItemLabel">Тип:</td>
             <td class="objectDescriptionBody"><span>
                                                     <?php
-                if ($rowSearchRequests['typeOfObject'] == "flat") {
+                if ($typeOfObject == "flat") {
                     echo "квартира";
                 }
-                if ($rowSearchRequests['typeOfObject'] == "room") {
+                if ($typeOfObject == "room") {
                     echo "комната";
                 }
-                if ($rowSearchRequests['typeOfObject'] == "house") {
+                if ($typeOfObject == "house") {
                     echo "дом, коттедж";
                 }
-                if ($rowSearchRequests['typeOfObject'] == "townhouse") {
+                if ($typeOfObject == "townhouse") {
                     echo "таунхаус";
                 }
-                if ($rowSearchRequests['typeOfObject'] == "dacha") {
+                if ($typeOfObject == "dacha") {
                     echo "дача";
                 }
-                if ($rowSearchRequests['typeOfObject'] == "garage") {
+                if ($typeOfObject == "garage") {
                     echo "гараж";
                 }
                 ?></span></td>
@@ -2014,7 +2451,6 @@ include("header.php");
         <tr>
             <td class="objectDescriptionItemLabel">Количество комнат:</td>
             <td class="objectDescriptionBody"><span><?php
-                $amountOfRooms = unserialize($rowSearchRequests['amountOfRooms']);
                 for ($i = 0; $i < count($amountOfRooms); $i++) {
                     echo $amountOfRooms[$i];
                     if ($i < count($amountOfRooms) - 1) echo ", ";
@@ -2024,10 +2460,10 @@ include("header.php");
         <tr>
             <td class="objectDescriptionItemLabel">Комнаты смежные:</td>
             <td class="objectDescriptionBody"><span><?php
-                if ($rowSearchRequests['adjacentRooms'] == "yes") {
+                if ($adjacentRooms == "yes") {
                     echo "не имеет значения";
                 }
-                if ($rowSearchRequests['adjacentRooms'] == "no") {
+                if ($adjacentRooms == "no") {
                     echo "только изолированные";
                 }
                 ?></span></td>
@@ -2035,13 +2471,13 @@ include("header.php");
         <tr>
             <td class="objectDescriptionItemLabel">Этаж:</td>
             <td class="objectDescriptionBody"><span><?php
-                if ($rowSearchRequests['floor'] == "any") {
+                if ($floor == "any") {
                     echo "любой";
                 }
-                if ($rowSearchRequests['floor'] == "not1") {
+                if ($floor == "not1") {
                     echo "не первый";
                 }
-                if ($rowSearchRequests['floor'] == "not1notLasted") {
+                if ($floor == "not1notLasted") {
                     echo "не первый и не последний";
                 }
                 ?></span></td>
@@ -2049,13 +2485,13 @@ include("header.php");
         <tr>
             <td class="objectDescriptionItemLabel">Мебель:</td>
             <td class="objectDescriptionBody"><span><?php
-                if ($rowSearchRequests['furniture'] == "any") {
+                if ($furniture == "any") {
                     echo "не имеет значения";
                 }
-                if ($rowSearchRequests['furniture'] == "with") {
+                if ($furniture == "with") {
                     echo "с мебелью и быт. техникой";
                 }
-                if ($rowSearchRequests['furniture'] == "without") {
+                if ($furniture == "without") {
                     echo "без мебели";
                 }
                 ?></span></td>
@@ -2072,19 +2508,19 @@ include("header.php");
         <tr>
             <td class="objectDescriptionItemLabel">Арендная плата в месяц от:</td>
             <td class="objectDescriptionBody"><?php
-                if (isset($rowSearchRequests['minCost'])) echo "<span>" . $rowSearchRequests['minCost'] . "</span> руб.";
+                echo "<span>" . $minCost . "</span> руб.";
                 ?></td>
         </tr>
         <tr>
             <td class="objectDescriptionItemLabel">Арендная плата в месяц до:</td>
             <td class="objectDescriptionBody"><?php
-                if (isset($rowSearchRequests['maxCost'])) echo "<span>" . $rowSearchRequests['maxCost'] . "</span> руб.";
+                echo "<span>" . $maxCost . "</span> руб.";
                 ?></td>
         </tr>
         <tr>
             <td class="objectDescriptionItemLabel">Залог до:</td>
             <td class="objectDescriptionBody"><?php
-                if (isset($rowSearchRequests['pledge'])) echo "<span>" . $rowSearchRequests['pledge'] . "</span> руб.";
+                echo "<span>" . $pledge . "</span> руб.";
                 ?></td>
         </tr>
         </tbody>
@@ -2099,76 +2535,76 @@ include("header.php");
         <tr>
             <td class="objectDescriptionItemLabel" id="firstTableColumnSpecial">Как собираетесь проживать:</td>
             <td class="objectDescriptionBody"><span><?php
-                if ($rowSearchRequests['withWho'] == "alone") {
+                if ($withWho == "alone") {
                     echo "один";
                 }
-                if ($rowSearchRequests['withWho'] == "couple") {
+                if ($withWho == "couple") {
                     echo "семейная пара";
                 }
-                if ($rowSearchRequests['withWho'] == "nonFamilyPair") {
+                if ($withWho == "nonFamilyPair") {
                     echo "несемейная пара";
                 }
-                if ($rowSearchRequests['withWho'] == "withFriends") {
+                if ($withWho == "withFriends") {
                     echo "со знакомыми";
                 }
                 ?></span></td>
         </tr>
             <?php
-            if ($rowSearchRequests['withWho'] != "alone") {
+            if ($withWho != "alone") {
                 echo "<tr><td class='objectDescriptionItemLabel'>Ссылки на страницы сожителей:</td><td class='objectDescriptionBody''><span>";
-                if (isset($rowSearchRequests['linksToFriends'])) echo $rowSearchRequests['linksToFriends'];
+                if (isset($linksToFriends)) echo $linksToFriends;
                 echo "</span></td></tr>";
             }
             ?>
         <tr>
             <td class="objectDescriptionItemLabel">Дети:</td>
             <td class="objectDescriptionBody"><span><?php
-                if ($rowSearchRequests['children'] == "without") {
+                if ($children == "without") {
                     echo "без детей";
                 }
-                if ($rowSearchRequests['children'] == "childrenUnder4") {
+                if ($children == "childrenUnder4") {
                     echo "с детьми младше 4-х лет";
                 }
-                if ($rowSearchRequests['children'] == "childrenOlder4") {
+                if ($children == "childrenOlder4") {
                     echo "с детьми старше 4-х лет";
                 }
                 ?></span></td>
         </tr>
             <?php
-            if ($rowSearchRequests['children'] != "without") {
+            if ($children != "without") {
                 echo "<tr><td class='objectDescriptionItemLabel'>Количество детей и их возраст:</td><td class='objectDescriptionBody''><span>";
-                if (isset($rowSearchRequests['howManyChildren'])) echo $rowSearchRequests['howManyChildren'];
+                if (isset($howManyChildren)) echo $howManyChildren;
                 echo "</span></td></tr>";
             }
             ?>
         <tr>
             <td class="objectDescriptionItemLabel">Животные:</td>
             <td class="objectDescriptionBody"><span><?php
-                if ($rowSearchRequests['animals'] == "without") {
+                if ($animals == "without") {
                     echo "без животных";
                 }
-                if ($rowSearchRequests['animals'] == "with") {
+                if ($animals == "with") {
                     echo "с животным(ми)";
                 }
                 ?></span></td>
         </tr>
             <?php
-            if ($rowSearchRequests['animals'] != "without") {
+            if ($animals != "without") {
                 echo "<tr><td class='objectDescriptionItemLabel'>Количество животных и их вид:</td><td class='objectDescriptionBody''><span>";
-                if (isset($rowSearchRequests['howManyAnimals'])) echo $rowSearchRequests['howManyAnimals'];
+                if (isset($howManyAnimals)) echo $howManyAnimals;
                 echo "</span></td></tr>";
             }
             ?>
         <tr>
             <td class="objectDescriptionItemLabel">Ориентировочный срок аренды:</td>
             <td class="objectDescriptionBody"><span><?php
-                if (isset($rowSearchRequests['period'])) echo $rowSearchRequests['period'];
+                if (isset($period)) echo $period;
                 ?></span></td>
         </tr>
         <tr>
             <td class="objectDescriptionItemLabel">Дополнительные условия поиска:</td>
             <td class="objectDescriptionBody"><span><?php
-                if (isset($rowSearchRequests['additionalDescriptionOfSearch'])) echo $rowSearchRequests['additionalDescriptionOfSearch'];
+                if (isset($additionalDescriptionOfSearch)) echo $additionalDescriptionOfSearch;
                 ?></span></td>
         </tr>
         </tbody>
@@ -2181,8 +2617,7 @@ include("header.php");
     <table>
         <tbody>
             <?php
-            if (isset($rowSearchRequests['district']) && isset($allDistrictsInCity)) { // Если район указан пользователем
-                $district = unserialize($rowSearchRequests['district']);
+            if (isset($district) && isset($allDistrictsInCity)) { // Если район указан пользователем
                 foreach ($district as $value) { // Для каждого идентификатора района подбираем название из таблицы
                     echo "<tr><td class='objectDescriptionItemLabel'>" . $allDistrictsInCity[$value] . "</td></tr>";
                 }
@@ -2193,7 +2628,8 @@ include("header.php");
 </fieldset>
 </div>
     <?php endif;?>
-<form name="searchParameters" id="extendedSearchParametersBlock" style="display: none;">
+<?php if ($typeTenant == "true" || $correct == "true" || $correctNewSearchRequest == "false"): ?> <!-- Если пользователь является арендатором, то вместе с отображением текущих параметров поискового запроса мы выдаем скрытую форму для их редактирования, также мы выдаем видимую форму для редактирования параметров поиска в случае, если пользователь нажал на кнопку Нового поискового запроса и проверка на корректность его данных Профиля профла успешно, а также в случае если пользователь корректировал данные поискового запроса, но они не прошли проверку -->
+<form method="post" name="searchParameters" id="extendedSearchParametersBlock" style='<?php if ($typeTenant == "true") echo "display: none;"?>'> <!-- Блок редактируемых параметров поиска невидим в случае если пользователь уже является арендатором (у него есть поисковый запрос, данные которого и отображаются в нередактируемом виде (блок id="notEditingSearchParametersBlock")) -->
 <div id="leftBlockOfSearchParameters" style="display: inline-block;">
     <fieldset class="edited">
         <legend>
@@ -2204,12 +2640,13 @@ include("header.php");
 
             <div class="searchItemBody">
                 <select name="typeOfObject">
-                    <option value="flat" selected>квартира</option>
-                    <option value="room">комната</option>
-                    <option value="house">дом, коттедж</option>
-                    <option value="townhouse">таунхаус</option>
-                    <option value="dacha">дача</option>
-                    <option value="garage">гараж</option>
+                    <option value="flat" <?php if ($typeOfObject == "flat") echo "selected";?>>квартира</option>
+                    <option value="room" <?php if ($typeOfObject == "room") echo "selected";?>>комната</option>
+                    <option value="house" <?php if ($typeOfObject == "house") echo "selected";?>>дом, коттедж</option>
+                    <option value="townhouse" <?php if ($typeOfObject == "townhouse") echo "selected";?>>таунхаус
+                    </option>
+                    <option value="dacha" <?php if ($typeOfObject == "dacha") echo "selected";?>>дача</option>
+                    <option value="garage" <?php if ($typeOfObject == "garage") echo "selected";?>>гараж</option>
                 </select>
             </div>
         </div>
@@ -2217,17 +2654,23 @@ include("header.php");
             <span class="searchItemLabel"> Количество комнат: </span>
 
             <div class="searchItemBody">
-                <input type="checkbox" value="1" name="amountOfRooms">
+                <input type="checkbox" value="1"
+                       name="amountOfRooms[]" <?php if ($amountOfRooms1 == "1") echo "checked";?>>
                 1
-                <input type="checkbox" value="2" name="amountOfRooms">
+                <input type="checkbox" value="2"
+                       name="amountOfRooms[]" <?php if ($amountOfRooms2 == "2") echo "checked";?>>
                 2
-                <input type="checkbox" value="3" name="amountOfRooms">
+                <input type="checkbox" value="3"
+                       name="amountOfRooms[]" <?php if ($amountOfRooms3 == "3") echo "checked";?>>
                 3
-                <input type="checkbox" value="4" name="amountOfRooms">
+                <input type="checkbox" value="4"
+                       name="amountOfRooms[]" <?php if ($amountOfRooms4 == "4") echo "checked";?>>
                 4
-                <input type="checkbox" value="5" name="amountOfRooms">
+                <input type="checkbox" value="5"
+                       name="amountOfRooms[]" <?php if ($amountOfRooms5 == "5") echo "checked";?>>
                 5
-                <input type="checkbox" value="6" name="amountOfRooms">
+                <input type="checkbox" value="6"
+                       name="amountOfRooms[]" <?php if ($amountOfRooms6 == "6") echo "checked";?>>
                 6...
             </div>
         </div>
@@ -2236,8 +2679,9 @@ include("header.php");
 
             <div class="searchItemBody">
                 <select name="adjacentRooms">
-                    <option value="1" selected>не имеет значения</option>
-                    <option value="2">только изолированные</option>
+                    <option value="yes" <?php if ($adjacentRooms == "yes") echo "selected";?>>не имеет значения</option>
+                    <option value="no" <?php if ($adjacentRooms == "no") echo "selected";?>>только изолированные
+                    </option>
                 </select>
             </div>
         </div>
@@ -2246,15 +2690,24 @@ include("header.php");
 
             <div class="searchItemBody">
                 <select name="floor">
-                    <option value="1" selected>любой</option>
-                    <option value="2">не первый</option>
-                    <option value="3">не первый и не последний</option>
+                    <option value="any" <?php if ($floor == "any") echo "selected";?>>любой</option>
+                    <option value="not1" <?php if ($floor == "not1") echo "selected";?>>не первый</option>
+                    <option value="not1notLasted" <?php if ($floor == "not1notLasted") echo "selected";?>>не первый и не
+                        последний
+                    </option>
                 </select>
             </div>
         </div>
-        <div>
-            <input type="checkbox">
-            С мебелью и бытовой техникой
+        <div class="searchItem">
+            <span class="searchItemLabel"> Мебель: </span>
+
+            <div class="searchItemBody">
+                <select name="furniture">
+                    <option value="any" <?php if ($furniture == "any") echo "selected";?>>не имеет значения</option>
+                    <option value="with" <?php if ($furniture == "with") echo "selected";?>>с мебелью и быт. техникой</option>
+                    <option value="without" <?php if ($furniture == "without") echo "selected";?>>без мебели</option>
+                </select>
+            </div>
         </div>
     </fieldset>
     <fieldset class="edited">
@@ -2267,9 +2720,9 @@ include("header.php");
             </div>
             <div class="searchItemBody">
                 от
-                <input type="text" name="minCost" size="10">
+                <input type="text" name="minCost" size="10" maxlength="8" <?php echo "value='$minCost'";?>>
                 руб., до
-                <input type="text" name="maxCost" size="10">
+                <input type="text" name="maxCost" size="10" maxlength="8" <?php echo "value='$maxCost'";?>>
                 руб.
             </div>
         </div>
@@ -2279,183 +2732,256 @@ include("header.php");
 
             <div class="searchItemBody">
                 до
-                <input type="text" name="maxCost" size="10">
+                <input type="text" name="pledge" size="10" maxlength="8" <?php echo "value='$pledge'";?>>
                 руб.
             </div>
         </div>
     </fieldset>
 </div>
 <div id="rightBlockOfSearchParameters">
-    <fieldset>
-        <legend>
-            Район
-        </legend>
-        <div class="searchItem">
-            <div class="searchItemBody">
-                <ul>
-                    <li>
-                        <input type="checkbox" name="district" value="1">
-                        Автовокзал (южный)
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="2">
-                        Академический
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="3">
-                        Ботанический
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="4">
-                        ВИЗ
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="5">
-                        Вокзальный
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="6">
-                        Втузгородок
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="7">
-                        Горный щит
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="8">
-                        Елизавет
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="9">
-                        ЖБИ
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="10">
-                        Завокзальный
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="11">
-                        Заречный
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="12">
-                        Изоплит
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="13">
-                        Исток
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="14">
-                        Калиновский
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="15">
-                        Кольцово
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="16">
-                        Компрессорный
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="17">
-                        Лечебный
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="18">
-                        Медный
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="19">
-                        Нижнеисетский
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="20">
-                        Парковый
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="21">
-                        Пионерский
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="22">
-                        Птицефабрика
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="23">
-                        Семь ключей
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="24">
-                        Сибирский тракт
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="25">
-                        Синие камни
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="26">
-                        Совхозный
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="27">
-                        Сортировка новая
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="28">
-                        Сортировка старая
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="29">
-                        Уктус
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="30">
-                        УНЦ
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="31">
-                        Уралмаш
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="32">
-                        Химмаш
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="33">
-                        Центр
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="34">
-                        Чермет
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="35">
-                        Шарташ
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="36">
-                        Широкая речка
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="37">
-                        Эльмаш
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="38">
-                        Юго-запад
-                    </li>
-                    <li>
-                        <input type="checkbox" name="district" value="39">
-                        За городом
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </fieldset>
+<fieldset>
+<legend>
+    Район
+</legend>
+<div class="searchItem">
+<div class="searchItemBody">
+<ul>
+<li>
+    <input type="checkbox" name="district[]"
+           value="1" <?php if ($district1 == "1") echo "checked";?>>
+    Автовокзал (южный)
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="2" <?php if ($district2 == "2") echo "checked";?>>
+    Академический
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="3" <?php if ($district3 == "3") echo "checked";?>>
+    Ботанический
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="4" <?php if ($district4 == "4") echo "checked";?>>
+    ВИЗ
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="5" <?php if ($district5 == "5") echo "checked";?>>
+    Вокзальный
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="6" <?php if ($district6 == "6") echo "checked";?>>
+    Втузгородок
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="7" <?php if ($district7 == "7") echo "checked";?>>
+    Горный щит
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="8" <?php if ($district8 == "8") echo "checked";?>>
+    Елизавет
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="9" <?php if ($district9 == "9") echo "checked";?>>
+    ЖБИ
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="10" <?php if ($district10 == "10") echo "checked";?>>
+    Завокзальный
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="11" <?php if ($district11 == "11") echo "checked";?>>
+    Заречный
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="12" <?php if ($district12 == "12") echo "checked";?>>
+    Изоплит
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="13" <?php if ($district13 == "13") echo "checked";?>>
+    Исток
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="14" <?php if ($district14 == "14") echo "checked";?>>
+    Калиновский
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="15" <?php if ($district15 == "15") echo "checked";?>>
+    Кольцово
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="16" <?php if ($district16 == "16") echo "checked";?>>
+    Компрессорный
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="17" <?php if ($district17 == "17") echo "checked";?>>
+    Лечебный
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="18" <?php if ($district18 == "18") echo "checked";?>>
+    Малый исток
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="19" <?php if ($district19 == "19") echo "checked";?>>
+    Нижнеисетский
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="20" <?php if ($district20 == "20") echo "checked";?>>
+    Парковый
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="21" <?php if ($district21 == "21") echo "checked";?>>
+    Пионерский
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="22" <?php if ($district22 == "22") echo "checked";?>>
+    Птицефабрика
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="23" <?php if ($district23 == "23") echo "checked";?>>
+    Рудный
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="24" <?php if ($district24 == "24") echo "checked";?>>
+    Садовый
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="25" <?php if ($district25 == "25") echo "checked";?>>
+    Северка
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="26" <?php if ($district26 == "26") echo "checked";?>>
+    Семь ключей
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="27" <?php if ($district27 == "27") echo "checked";?>>
+    Сибирский тракт
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="28" <?php if ($district28 == "28") echo "checked";?>>
+    Синие камни
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="29" <?php if ($district29 == "29") echo "checked";?>>
+    Совхозный
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="30" <?php if ($district30 == "30") echo "checked";?>>
+    Сортировка новая
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="31" <?php if ($district31 == "31") echo "checked";?>>
+    Сортировка старая
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="32" <?php if ($district32 == "32") echo "checked";?>>
+    Уктус
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="33" <?php if ($district33 == "33") echo "checked";?>>
+    УНЦ
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="34" <?php if ($district34 == "34") echo "checked";?>>
+    Уралмаш
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="35" <?php if ($district35 == "35") echo "checked";?>>
+    Химмаш
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="36" <?php if ($district36 == "36") echo "checked";?>>
+    Центр
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="37" <?php if ($district37 == "37") echo "checked";?>>
+    Чермет
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="38" <?php if ($district38 == "38") echo "checked";?>>
+    Чусовское озеро
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="39" <?php if ($district39 == "39") echo "checked";?>>
+    Шабровский
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="40" <?php if ($district40 == "40") echo "checked";?>>
+    Шарташ
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="41" <?php if ($district41 == "41") echo "checked";?>>
+    Шарташский рынок
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="42" <?php if ($district42 == "42") echo "checked";?>>
+    Широкая речка
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="43" <?php if ($district43 == "43") echo "checked";?>>
+    Шувакиш
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="44" <?php if ($district44 == "44") echo "checked";?>>
+    Эльмаш
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="45" <?php if ($district45 == "45") echo "checked";?>>
+    Юго-запад
+</li>
+<li>
+    <input type="checkbox" name="district[]"
+           value="46" <?php if ($district46 == "46") echo "checked";?>>
+    За городом
+</li>
+</ul>
+</div>
+</div>
+</fieldset>
 </div>
 <!-- /end.rightBlockOfSearchParameters -->
-
 <fieldset class="edited private">
     <legend>
         Особые параметры поиска
@@ -2465,10 +2991,13 @@ include("header.php");
 
         <div class="searchItemBody">
             <select name="withWho" id="withWho">
-                <option value="1" selected>один</option>
-                <option value="2">семейная пара</option>
-                <option value="3">несемейная пара</option>
-                <option value="4">со знакомыми</option>
+                <option value="alone" <?php if ($withWho == "alone") echo "selected";?>>один</option>
+                <option value="couple" <?php if ($withWho == "couple") echo "selected";?>>семейная пара</option>
+                <option value="nonFamilyPair" <?php if ($withWho == "nonFamilyPair") echo "selected";?>>несемейная
+                    пара
+                </option>
+                <option value="withFriends" <?php if ($withWho == "withFriends") echo "selected";?>>со знакомыми
+                </option>
             </select>
         </div>
     </div>
@@ -2477,7 +3006,7 @@ include("header.php");
             Ссылки на страницы сожителей:
         </div>
         <div class="searchItemBody">
-            <textarea name="linksToFriends" cols="40" rows="3"></textarea>
+            <textarea name="linksToFriends" cols="40" rows="3"><?php echo $linksToFriends;?></textarea>
         </div>
     </div>
     <div class="searchItem">
@@ -2485,9 +3014,13 @@ include("header.php");
 
         <div class="searchItemBody">
             <select name="children" id="children">
-                <option value="0" selected>без детей</option>
-                <option value="1">с детьми младше 4-х лет</option>
-                <option value="2">с детьми старше 4-х лет</option>
+                <option value="without" <?php if ($children == "without") echo "selected";?>>без детей</option>
+                <option value="childrenUnder4" <?php if ($children == "childrenUnder4") echo "selected";?>>с детьми
+                    младше 4-х лет
+                </option>
+                <option value="childrenOlder4" <?php if ($children == "childrenOlder4") echo "selected";?>>с детьми
+                    старше 4-х лет
+                </option>
             </select>
         </div>
     </div>
@@ -2496,7 +3029,7 @@ include("header.php");
             Сколько у Вас детей и какого возраста:
         </div>
         <div class="searchItemBody">
-            <textarea name="howManyChildren" cols="40" rows="3"></textarea>
+            <textarea name="howManyChildren" cols="40" rows="3"><?php echo $howManyChildren;?></textarea>
         </div>
     </div>
     <div class="searchItem">
@@ -2504,8 +3037,8 @@ include("header.php");
 
         <div class="searchItemBody">
             <select name="animals" id="animals">
-                <option value="0" selected>без животных</option>
-                <option value="1">с животным(ми)</option>
+                <option value="without" <?php if ($animals == "without") echo "selected";?>>без животных</option>
+                <option value="with" <?php if ($animals == "with") echo "selected";?>>с животным(ми)</option>
             </select>
         </div>
     </div>
@@ -2514,14 +3047,15 @@ include("header.php");
             Сколько у Вас животных и какого вида:
         </div>
         <div class="searchItemBody">
-            <textarea name="howManyAnimals" cols="40" rows="3"></textarea>
+            <textarea name="howManyAnimals" cols="40" rows="3"><?php echo $howManyAnimals;?></textarea>
         </div>
     </div>
     <div class="searchItem">
-        <span class="searchItemLabel">Ориентировочный срок аренды: </span>
+        <span class="searchItemLabel">Ориентировочный срок аренды:</span>
 
         <div class="searchItemBody">
-            <input type="text" name="period" size="20">
+            <input type="text" name="period" size="18" maxlength="80"
+                   validations="validate[required]" <?php echo "value='$period'";?>>
         </div>
     </div>
     <div class="searchItem">
@@ -2529,17 +3063,24 @@ include("header.php");
             Дополнительные условия поиска:
         </div>
         <div class="searchItemBody">
-            <textarea name="additionalDescriptionOfSearch" cols="50" rows="4"></textarea>
+            <textarea name="additionalDescriptionOfSearch" cols="50"
+                      rows="4"><?php echo $additionalDescriptionOfSearch;?></textarea>
         </div>
     </div>
 </fieldset>
+
 <div class="clearBoth"></div>
-<input type="submit" value="Сохранить" id="saveSearchParameters" class="bottomButton button">
+<div class="bottomButton">
+<a href="personal.php" style="margin-right: 10px;">Отмена</a>
+<button type="submit" name="saveSearchParametersButton" id="saveSearchParametersButton" class="button">
+    Сохранить
+</button>
+</div>
 
 <div class="clearBoth"></div>
 </form>
 <!-- /end.extendedSearchParametersBlock -->
-
+    <?php endif;?>
 </div>
 <!-- /end.tabs-4 -->
 <div id="tabs-5">
@@ -3123,6 +3664,12 @@ include("header.php");
 
 <!-- jQuery UI с моей темой оформления -->
 <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
+
+<!-- Русификатор виджета календарь -->
+<script src="js/vendor/jquery.ui.datepicker-ru.js"></script>
+
+<!-- Загрузчик фотографий на AJAX -->
+<script src="js/vendor/fileuploader.js" type="text/javascript"></script>
 
 <!-- Загружаем библиотеку для работы с картой от Яндекса -->
 <script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
