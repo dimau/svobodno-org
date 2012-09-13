@@ -96,7 +96,7 @@ else //если пользователь не авторизирован, то �
 									<tr>
 										<td><label>Пароль: </label></td>
 										<td>
-										<input type="password" name="password" size="23">
+										<input type="password" name="password" size="23" maxlength="50">
 										</td>
 									</tr>
 									<tr>

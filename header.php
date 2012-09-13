@@ -85,7 +85,7 @@ else //если пользователь не авторизирован, то �
                 echo ("<a href='personal.php'>Личный кабинет</a><br>");
             }
             ?>
-            <a href="personal.php">Новости: <span class="amountOfNewsInEnter">3</span></a>
+            <a href="personal.php?tabsId=2">Новости: <span class="amountOfNewsInEnter">3</span></a>
             <br>
             <a href="out.php">Выйти</a>
             <br>

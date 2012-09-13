@@ -2,6 +2,21 @@
  * @author dimau
  */
 
+// Отображение результатов обработки формы на PHP - найденных ошибок при заполнении форм на этой странице
+if ($('#userMistakesBlock ol').html() != "") {
+    $('#userMistakesBlock').on('click', function() {
+        $(this).slideUp(800);
+    });
+    $('#userMistakesBlock').css('display', 'block');
+}
+
+// Выбор вкладки для отображения в качестве текущей после загрузки страницы
+var index = "tabs-1"; // По умолчанию открываем первую вкладку - Профайл
+if ($(".tabsId").attr('tabsId')) index = $(".tabsId").attr('tabsId');
+$(function() {
+    $("#tabs").tabs("select" , index);
+});
+
 /***********************************************************
  * Вкладка Профиль
  ***********************************************************/
@@ -136,11 +151,11 @@ function currentStatusEducation() {
 
 // Активируем кнопки "Новое объявление" через jQuery UI - добавляем пиктограммку плюсика в кружочке
 $(function() {
-	$("button#newAdvertButton, button#createSearchRequestButton").button({
-		icons : {
-			primary : "ui-icon-circle-plus"
-		}
-	});
+    $("button#newAdvertButton").button({
+        icons : {
+            primary : "ui-icon-circle-plus"
+        }
+    });
 });
 
 // Навешиваем обработчик на клик на кнопке нового объявления
@@ -291,9 +306,17 @@ function init() {
  * Вкладка Поиск
  ***********************************************************/
 
+// Активируем кнопку Нового поискового запроса, если она есть на странице
+$(function() {
+    $("button#createSearchRequestButton").button({
+        icons : {
+            primary : "ui-icon-circle-plus"
+        }
+    });
+});
+
 // Подгонка размера правого блока параметров (районы) вкладки Поиск под размер левого блока параметров. 19 пикселей - на padding у fieldset
 if (document.getElementById('rightBlockOfSearchParameters')) {
-    alert(document.getElementById('leftBlockOfSearchParameters').offsetHeight); // TODO: тест
     document.getElementById('rightBlockOfSearchParameters').style.height = document.getElementById('leftBlockOfSearchParameters').offsetHeight - 22 + 'px';
 }
 
@@ -323,14 +346,6 @@ $("#animals").on('change', function(event) {
         $("#animalsDescription").css('display', 'none');
     }
 });
-
-// Отображение результатов обработки формы на PHP
-if ($('#userMistakesBlock ol').html() != "") {
-    $('#userMistakesBlock').on('click', function() {
-        $(this).slideUp(800);
-    });
-    $('#userMistakesBlock').css('display', 'block');
-}
 
 /* Переключение на вкладке поиск из режима просмотра в режим редактирования и обратно */
 $('#tabs-4 #notEditingSearchParametersBlock .setOfInstructions a').on('click', function() {

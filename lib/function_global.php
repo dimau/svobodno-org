@@ -163,7 +163,7 @@ function birthdayFromViewToDB($birthdayFromView) {
     $date = substr($birthdayFromView, 0, 2);
     $month = substr($birthdayFromView, 3, 2);
     $year = substr($birthdayFromView, 6, 4);
-    return $date . "." . $month . "." . $year;
+    return $year . "." . $month . "." . $date;
 }
 
 // Функция для авторизации (входа) пользователя на сайте
@@ -179,12 +179,11 @@ function enter()
         if ($rez != false && mysql_num_rows($rez) == 1) //если нашлась одна строка, значит такой юзер существует в БД
         {
             $row = mysql_fetch_assoc($rez);
-            if (md5(md5($password) . $row['salt']) == $row['password']) //сравниваем хэшированный пароль из БД с хэшированными паролем, введённым пользователем и солью (алгоритм хэширования описан в предыдущей статье)
+            if ($password == $row['password']) // Cравниваем указанный пользователем пароль с паролем из БД
             {
                 //пишем логин и хэшированный пароль в cookie, также создаём переменную сессии
                 setcookie("login", $row['login'], time() + 60*60*24*7);
                 setcookie("password", md5($row['login'] . $row['password']), time() + 60*60*24*7);
-
                 newSession($row['id']);
 
                 lastAct($row['id']);
@@ -227,10 +226,11 @@ function login()
     {
         $row = mysql_fetch_assoc($rez);
 
-            setcookie("login", "", time() - 1, '/');
+        // выдается ошибка при попытке обновить куки из header.php, так как уже начал отправляться текст странички - html
+           /* setcookie("login", "", time() - 1, '/');
             setcookie("password", "", time() - 1, '/');
             setcookie("login", $row['login'], time() + 60*60*24*7, '/');
-            setcookie("password", md5($row['login'] . $row['password']), time() + 60*60*24*7, '/');
+            setcookie("password", md5($row['login'] . $row['password']), time() + 60*60*24*7, '/'); */
 
         return true;
     }
@@ -246,7 +246,7 @@ function login()
                     $row = mysql_fetch_assoc($rez);
                 }
 
-                if ($rez != false && mysql_num_rows($rez) == 1 && md5($row['login'] . $row['password']) == $_COOKIE['password']) //если логин и пароль нашлись в БД
+                if ($rez != false && mysql_num_rows($rez) == 1 && isset($row['login']) && isset($row['password']) &&  md5($row['login'] . $row['password']) == $_COOKIE['password']) //если логин и пароль нашлись в БД
                 {
                     newSession($row['id']);
 

@@ -58,7 +58,7 @@ if (isset($rowUsers['sex'])) $sex = $rowUsers['sex']; else $sex = "0";
 if (isset($rowUsers['nationality'])) $nationality = $rowUsers['nationality']; else $nationality = "0";
 if (isset($rowUsers['birthday'])) $birthday = birthdayFromDBToView($rowUsers['birthday']); else $birthday = "";
 if (isset($rowUsers['login'])) $login = $rowUsers['login']; else $login = "";
-if (isset($rowUsers['password'])) $password = $rowUsers['password']; else $password = ""; // Реальный пароль пользователя в БД не хранится, но так как пароль проверяется только на наличие (не = 0 длину), то достаточно того, что хранится в БД в поле password
+if (isset($rowUsers['password'])) $password = $rowUsers['password']; else $password = "";
 if (isset($rowUsers['telephon'])) $telephon = $rowUsers['telephon']; else $telephon = "";
 if (isset($rowUsers['email'])) $email = $rowUsers['email']; else $email = "";
 $fileUploadId = generateCode(7);
@@ -192,7 +192,7 @@ if (isset($_POST['saveProfileParameters'])) {
     if (isset($_POST['kurs'])) $kurs = htmlspecialchars($_POST['kurs']);
     if (isset($_POST['ochnoZaochno'])) $ochnoZaochno = htmlspecialchars($_POST['ochnoZaochno']);
     if (isset($_POST['yearOfEnd'])) $yearOfEnd = htmlspecialchars($_POST['yearOfEnd']);
-    if (isset($_POST['notWorkCheckbox'])) $notWorkCheckbox = htmlspecialchars($_POST['notWorkCheckbox']);
+    if (isset($_POST['notWorkCheckbox'])) $notWorkCheckbox = htmlspecialchars($_POST['notWorkCheckbox']); else $notWorkCheckbox = ""; // Если пользователь отправил форму submit, и в параметрах нет значения notWorkCheckbox, значит пользователь не отметил этот чекбокс, чему соответствует пустая строка
     if (isset($_POST['placeOfWork'])) $placeOfWork = htmlspecialchars($_POST['placeOfWork']);
     if (isset($_POST['workPosition'])) $workPosition = htmlspecialchars($_POST['workPosition']);
     if (isset($_POST['regionOfBorn'])) $regionOfBorn = htmlspecialchars($_POST['regionOfBorn']);
@@ -213,8 +213,6 @@ if (isset($_POST['saveProfileParameters'])) {
 
         // Корректируем дату дня рождения для того, чтобы сделать ее пригодной для сохранения в базу данных
         $birthdayDB = birthdayFromViewToDB($birthday);
-        $salt = mt_rand(100, 999);
-        $password = md5(md5($password) . $salt);
 
         // Сохраняем новые параметры Профиля пользователя в БД
             $rez = mysql_query("UPDATE users SET
@@ -224,14 +222,8 @@ if (isset($_POST['saveProfileParameters'])) {
             sex='" . $sex ."',
             nationality='" . $nationality ."',
             birthday='" . $birthdayDB ."',
-
-
             login='" . $login ."',
-
-
-            password='" . $typeOfObject ."',
-
-
+            password='" . $password ."',
             telephon='" . $telephon ."',
             email='" . $email ."',
             currentStatusEducation='" . $currentStatusEducation ."',
@@ -549,6 +541,18 @@ if (isset($_POST['createSearchRequestButton'])) {
     </div>
 </div>
 
+<!-- Добавялем невидимый input для того, чтобы передать тип пользователя (собственник/арендатор) - это используется в JS для простановки обязательности полей для заполнения -->
+<?php echo "<input type='hidden' class='userType' typeTenant='" . $typeTenant . "' typeOwner='" . $typeOwner . "'>"; ?>
+
+<!-- Добавялем невидимый input для того, чтобы передать идентификатор вкладки, которую нужно открыть через JS -->
+<?php
+    // При загрузке страницы открываем вкладку № 4 "Поиск", если пользователь создает поисковый запрос и его личные данные для этого достаточны ($correct == "true"), либо если он редактирует поисковый запрос ($correctNewSearchRequest == "true", $correctNewSearchRequest == "false"). В ином случае - открываем вкладку №1.
+if ($correct == "true" || $correctNewSearchRequest == "true" || $correctNewSearchRequest == "false") $tabsId = "tabs-4";
+elseif (isset($_GET['tabsId'])) $tabsId = $_GET['tabsId'];
+else $tabsId = "tabs-1";
+echo "<input type='hidden' class='tabsId' tabsId='" . $tabsId . "'>";
+?>
+
 <!-- Сформируем и вставим заголовок страницы -->
 <?php
 include("header.php");
@@ -612,7 +616,7 @@ include("header.php");
                     if (isset($ochnoZaochno)) {
                         if ($ochnoZaochno == "ochno") echo "очно, "; else echo "заочно, ";
                     }
-                    if (isset($kurs)) echo $kurs;
+                    if (isset($kurs)) echo "курс: " . $kurs;
                 }
                 if ($currentStatusEducation == "finishedEducation") {
                     if (isset($almamater)) echo $almamater . ", ";
@@ -620,7 +624,7 @@ include("header.php");
                     if (isset($ochnoZaochno)) {
                         if ($ochnoZaochno == "ochno") echo "очно, "; else echo "заочно, ";
                     }
-                    if (isset($yearOfEnd)) echo "закончил в " . $yearOfEnd . " году";
+                    if (isset($yearOfEnd)) echo "<span style='white-space: nowrap;'>закончил в " . $yearOfEnd . " году</span>";
                 }
                 ?>
             </li>
@@ -645,10 +649,10 @@ include("header.php");
                     echo "русский";
                 }
                 if ($nationality == "west") {
-                    echo "европеец, американец";
+                    echo "<span style='white-space: nowrap;'>европеец, американец</span>";
                 }
                 if ($nationality == "east") {
-                    echo "СНГ, восточная нац-сть";
+                    echo "<span style='white-space: nowrap;'>СНГ, восточная нац-сть</span>";
                 }
                 ?>
             </li>
@@ -669,9 +673,9 @@ include("header.php");
             </li>
             <li>
                 <span class="headOfString">Возраст:</span> <?php
-                $date = substr($birthday, 8, 2);
-                $month = substr($birthday, 5, 2);
-                $year = substr($birthday, 0, 4);
+                $date = substr($birthday, 0, 2);
+                $month = substr($birthday, 3, 2);
+                $year = substr($birthday, 6, 4);
                 $birthdayForAge = mktime(0, 0, 0, $month, $date, $year);
                 $currentDate = time();
                 echo date_interval_format(date_diff(new DateTime("@{$currentDate}"), new DateTime("@{$birthdayForAge}")), '%y');
@@ -1130,7 +1134,7 @@ include("header.php");
 </fieldset>
 <div class="clearBoth"></div>
 <div class="bottomButton">
-    <a href="personal.php" style="margin-right: 10px;">Отмена</a>
+    <a href="personal.php?tabsId=1" style="margin-right: 10px;">Отмена</a>
     <button type="submit" name="saveProfileParameters" id="saveProfileParameters" class="button">
         Сохранить
     </button>
@@ -2415,7 +2419,7 @@ include("header.php");
 <div id="notEditingSearchParametersBlock" class="objectDescription">
 <div class="setOfInstructions">
     <li><a href="#">редактировать</a></li>
-    <li><a href="personal.php?action=deleteSearchRequest" title="Удаляет запрос на поиск - кликните по этой ссылке, когда Вы найдете недвижимость">удалить</a></li>
+    <li><a href="personal.php?action=deleteSearchRequest&tabsId=4" title="Удаляет запрос на поиск - кликните по этой ссылке, когда Вы найдете недвижимость">удалить</a></li>
     <br>
 </div>
 <fieldset class="notEdited">
@@ -3071,7 +3075,7 @@ include("header.php");
 
 <div class="clearBoth"></div>
 <div class="bottomButton">
-<a href="personal.php" style="margin-right: 10px;">Отмена</a>
+<a href="personal.php?tabsId=4" style="margin-right: 10px;">Отмена</a>
 <button type="submit" name="saveSearchParametersButton" id="saveSearchParametersButton" class="button">
     Сохранить
 </button>

@@ -162,8 +162,8 @@ if ($('#userMistakesBlock ol').html() != "") {
 // Подключение и настройка динамической проверки формы на JS
 $('#tabs').bind('tabsshow', function(event, ui) {
     newTabId = ui.panel.id; // Определяем идентификатор вновь открытой вкладки
-    $(".formError." + newTabId).css("display", "");
-    $(".formError").not("." + newTabId).css('display', "none");
+    $(".formError." + newTabId).css("display", ""); // Показываем все ошибки к полям на этой вкладке
+    $(".formError").not("." + newTabId).css('display', "none"); // Скрываем все ошибки полей на других вкладках
 
     // Перепозиционируем подсказки по валидации при открытии вкладки - это важно при проверке формы перед отправкой, когда появляются все подсказки на всех вкладках (даже невидимых)
     $(".formError." + newTabId).each(function() {
