@@ -19,7 +19,7 @@ function userDataCorrect($typeOfValidation)
     if ($surname == "") $errors[] = 'Укажите фамилию';
     if (strlen($surname) > 50) $errors[] = 'Слишком длинная фамилия. Можно указать не более 50-ти символов';
     if ($sex == "0") $errors[] = 'Укажите пол';
-    if ($nationality == "0") $errors[] = 'Укажите национальность';
+    if ($nationality == "") $errors[] = 'Укажите национальность';
 
     if ($birthday != "") {
         if (!preg_match('/^\d\d.\d\d.\d\d\d\d$/', $birthday)) $errors[] = 'Неправильный формат даты рождения, должен быть: дд.мм.гггг';
@@ -114,8 +114,8 @@ function userDataCorrect($typeOfValidation)
     if ((($typeOfValidation == "registration" && $typeTenant == "true")  || $typeOfValidation == "validateSearchRequest") && !preg_match("/^\d{0,8}$/", $maxCost)) $errors[] = 'Неправильный формат числа в поле максимальной величины арендной платы (проверьте: только числа, не более 8 символов)';
     if ((($typeOfValidation == "registration" && $typeTenant == "true")  || $typeOfValidation == "validateSearchRequest") && !preg_match("/^\d{0,8}$/", $pledge)) $errors[] = 'Неправильный формат числа в поле максимальной величины залога (проверьте: только числа, не более 8 символов)';
     if ((($typeOfValidation == "registration" && $typeTenant == "true")  || $typeOfValidation == "validateSearchRequest") && $minCost > $maxCost) $errors[] = 'Минимальная стоимость аренды не может быть больше, чем максимальная. Исправьте поля, в которых указаны Ваши требования к диапазону стоимости аренды';
-    if ((($typeOfValidation == "registration" && $typeTenant == "true")  || $typeOfValidation == "validateSearchRequest") && $period == "") $errors[] = 'Укажите ориентировочный срок аренды, например: долговременно (более года)';
-    if (isset($period) && strlen($period) > 80) $errors[] = 'Указана слишком длинная строка в поле для ориентировочного срока проживания (используйте не более 80 символов)';
+    if ((($typeOfValidation == "registration" && $typeTenant == "true")  || $typeOfValidation == "validateSearchRequest") && $period == "") $errors[] = 'Укажите предполагаемый срок аренды, например: долговременно (более года)';
+    if (isset($period) && strlen($period) > 80) $errors[] = 'Указана слишком длинная строка в поле для предполагаемого срока аренды (используйте не более 80 символов)';
 
     // Проверка согласия пользователя с лицензией
     if ($typeOfValidation == "registration" && $lic != "yes") $errors[] = 'Регистрация возможна только при согласии с условиями лицензионного соглашения'; //приняты ли правила

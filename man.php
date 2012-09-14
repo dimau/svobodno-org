@@ -1,12 +1,5 @@
 <!DOCTYPE html>
-<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
-<!-- Consider specifying the language of your content by adding the `lang` attribute to <html> -->
-<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>    <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!-->
-<html class="no-js">
-	<!--<![endif]-->
+<html>
 	<head>
 		<meta charset="utf-8">
 
@@ -224,7 +217,7 @@
 												<td class="objectDescriptionBody"><span>1 кошка</span></td>
 											</tr>
 											<tr>
-												<td class="objectDescriptionItemLabel">Ориентировочный срок аренды:</td>
+												<td class="objectDescriptionItemLabel">Предполагаемый срок аренды:</td>
 												<td class="objectDescriptionBody"><span>долгосрочно</span></td>
 											</tr>
 											<tr>

@@ -2,13 +2,11 @@
 /**
  * Формирует необходимую для работы сайта базу данных со всей структурой и таблицами
  * При изменении структуры таблиц в этом файле или в БД, не забудь соответствующим образом изменить проверку валидности введенных пользователем данных на JS и на PHP, а также запрос на сохранение данных в БД при регистрации и другие запросы к БД
-
  */
-
 include_once 'connect.php'; //подключаемся к БД
 
 // Создаем таблицу для хранения информации о ПОЛЬЗОВАТЕЛЯХ
-$rez = mysql_query("CREATE TABLE users (id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT, typeTenant VARCHAR(5) NOT NULL COMMENT 'Равен строке true, если пользователь в данный момент ищет недвижимость (является потенциальным арендатором), в том числе, обязательно имеет поисковый запрос', typeOwner VARCHAR(5) NOT NULL, name VARCHAR(50) NOT NULL, secondName VARCHAR(50) NOT NULL, surname VARCHAR(50) NOT NULL, sex VARCHAR(20) NOT NULL, nationality VARCHAR(20) NOT NULL, birthday DATE NOT NULL, login VARCHAR(50) NOT NULL, password VARCHAR(50) NOT NULL, telephon VARCHAR(20) NOT NULL, emailReg VARCHAR(50), email VARCHAR(50), currentStatusEducation VARCHAR(20), almamater VARCHAR(100), speciality VARCHAR(100), kurs VARCHAR(30), ochnoZaochno VARCHAR(20), yearOfEnd VARCHAR(20), notWorkCheckbox VARCHAR(20), placeOfWork VARCHAR(100), workPosition VARCHAR(100), regionOfBorn VARCHAR(50), cityOfBorn VARCHAR(50), shortlyAboutMe TEXT, vkontakte VARCHAR(100), odnoklassniki VARCHAR(100), facebook VARCHAR(100), twitter VARCHAR(100), lic VARCHAR(5) NOT NULL, user_hash VARCHAR(32), last_act INT(11) NOT NULL, reg_date INT(11) NOT NULL)");
+$rez = mysql_query("CREATE TABLE users (id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT, typeTenant VARCHAR(5) NOT NULL COMMENT 'Равен строке true, если пользователь в данный момент ищет недвижимость (является потенциальным арендатором), в том числе, обязательно имеет поисковый запрос', typeOwner VARCHAR(5) NOT NULL, name VARCHAR(50) NOT NULL, secondName VARCHAR(50) NOT NULL, surname VARCHAR(50) NOT NULL, sex VARCHAR(20) NOT NULL, nationality VARCHAR(50) NOT NULL, birthday DATE NOT NULL, login VARCHAR(50) NOT NULL, password VARCHAR(50) NOT NULL, telephon VARCHAR(20) NOT NULL, emailReg VARCHAR(50), email VARCHAR(50), currentStatusEducation VARCHAR(20), almamater VARCHAR(100), speciality VARCHAR(100), kurs VARCHAR(30), ochnoZaochno VARCHAR(20), yearOfEnd VARCHAR(20), notWorkCheckbox VARCHAR(20), placeOfWork VARCHAR(100), workPosition VARCHAR(100), regionOfBorn VARCHAR(50), cityOfBorn VARCHAR(50), shortlyAboutMe TEXT, vkontakte VARCHAR(100), odnoklassniki VARCHAR(100), facebook VARCHAR(100), twitter VARCHAR(100), lic VARCHAR(5) NOT NULL, user_hash VARCHAR(32), last_act INT(11) NOT NULL, reg_date INT(11) NOT NULL)");
 
 echo "Статус создания таблицы users: " . $rez . "\n";
 
@@ -32,7 +30,7 @@ $rez = mysql_query("CREATE TABLE searchRequests (userId INT(11) NOT NULL PRIMARY
 echo "Статус создания таблицы searchRequests: " . $rez . "\n";
 
 // Создаем таблицу для хранения информации о соотношении названия района его идентификатора и города нахождения
-$rez = mysql_query("CREATE TABLE districts (id VARCHAR(20) NOT NULL PRIMARY KEY, name VARCHAR(50), city VARCHAR(50))");
+$rez = mysql_query("CREATE TABLE districts (keyOfDistricts INT NOT NULL PRIMARY KEY AUTO_INCREMENT, id VARCHAR(20) NOT NULL, name VARCHAR(50), city VARCHAR(50))");
 echo "Статус создания таблицы districts: " . $rez . "\n";
 // Записываем в таблицу с районами инфу о районах
 // Записываем в таблицу с районами инфу о районах

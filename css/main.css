@@ -811,6 +811,7 @@ body {
 
 .advertForPersonalPage.published .advertHeaderStatus {
 	color: white;
+    display: inline-block;
 }
 
 .advertForPersonalPage.unpublished .newsHeader {
@@ -819,6 +820,7 @@ body {
 
 .advertForPersonalPage.unpublished .advertHeaderStatus {
 	color: white;
+    display: inline-block;
 }
 
 .setOfInstructions {
@@ -881,8 +883,9 @@ div.unread > div.newsHeader {
 	clear: both;
 }
 
-.inputItem, .objectDescriptionItem {
+.objectDescriptionItem {
 	margin: 7px;
+    width: 100%;
 }
 
 .inputItem .label, .objectDescriptionItem .objectDescriptionLabel {

@@ -31,7 +31,7 @@ $name = "";
 $secondName = "";
 $surname = "";
 $sex = "0";
-$nationality = "0";
+$nationality = "";
 $birthday = "";
 $login = "";
 $password = "";
@@ -320,14 +320,7 @@ if (isset($_POST['readyButton'])) {
 ?>
 
 <!DOCTYPE html>
-<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
-<!-- Consider specifying the language of your content by adding the `lang` attribute to <html> -->
-<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>    <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!-->
-<html class="no-js" xmlns="http://www.w3.org/1999/html">
-<!--<![endif]-->
+<html>
 <head>
     <meta charset="utf-8">
 
@@ -495,14 +488,7 @@ include("header.php");
                 <span class="searchItemLabel">Национальность: </span>
 
                 <div class="searchItemBody">
-                    <select name="nationality" validations="validate[required]">
-                        <option value="0" <?php if ($nationality == "0") echo "selected";?>></option>
-                        <option value="russian" <?php if ($nationality == "russian") echo "selected";?>>русский</option>
-                        <option value="west" <?php if ($nationality == "west") echo "selected";?>>европеец, американец
-                        </option>
-                        <option value="east" <?php if ($nationality == "east") echo "selected";?>>СНГ, восточная нац-сть
-                        </option>
-                    </select>
+                    <input type="text" name="nationality" id="nationality" size="15" maxlength="50" <?php echo "value='$nationality'";?>>
                 </div>
             </div>
             <div class="searchItem">
@@ -954,7 +940,7 @@ include("header.php");
 <ul>
 <li>
     <input type="checkbox" name="district[]"
-           value="1" <?php if ($district1 == "1") echo "checked";?>>
+                     value="1" <?php if ($district1 == "1") echo "checked";?>>
     Автовокзал (южный)
 </li>
 <li>
@@ -1258,7 +1244,7 @@ include("header.php");
         </div>
     </div>
     <div class="searchItem">
-        <span class="searchItemLabel">Ориентировочный срок аренды:</span>
+        <span class="searchItemLabel">Предполагаемый срок аренды:</span>
 
         <div class="searchItemBody">
             <input type="text" name="period" size="18" maxlength="80"

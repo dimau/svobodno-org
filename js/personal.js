@@ -161,7 +161,7 @@ $(function() {
 // Навешиваем обработчик на клик на кнопке нового объявления
 $("button#newAdvertButton").on('click', clickNewAdvertButton);
 function clickNewAdvertButton() {
-	$("#modalWindowNewAdvert").dialog("open");
+    window.open('newadvert.php');
 	return false;
 }
 
