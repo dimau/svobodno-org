@@ -54,7 +54,7 @@
 	background: #FF7171;
 }
 .qq-upload-list {
-	margin: 5px auto 0px auto;
+	margin: 5px auto 0px auto !important;
 	padding: 0;
 	list-style: none;
 }
@@ -88,7 +88,7 @@
 	display: inline;
 }
 .qq-upload-list li.qq-upload-success {
-	background-color: #6A9D02;
+	background-color: #81bf02 /*#6A9D02*/;
 	color: #FFFFFF;
     border-radius: 5px;
 }

@@ -56,7 +56,7 @@ if (isset($rowUsers['secondName'])) $secondName = $rowUsers['secondName']; else 
 if (isset($rowUsers['surname'])) $surname = $rowUsers['surname']; else $surname = "";
 if (isset($rowUsers['sex'])) $sex = $rowUsers['sex']; else $sex = "0";
 if (isset($rowUsers['nationality'])) $nationality = $rowUsers['nationality']; else $nationality = "";
-if (isset($rowUsers['birthday'])) $birthday = birthdayFromDBToView($rowUsers['birthday']); else $birthday = "";
+if (isset($rowUsers['birthday'])) $birthday = dateFromDBToView($rowUsers['birthday']); else $birthday = "";
 if (isset($rowUsers['login'])) $login = $rowUsers['login']; else $login = "";
 if (isset($rowUsers['password'])) $password = $rowUsers['password']; else $password = "";
 if (isset($rowUsers['telephon'])) $telephon = $rowUsers['telephon']; else $telephon = "";
@@ -212,7 +212,7 @@ if (isset($_POST['saveProfileParameters'])) {
     if ($correctNewProfileParameters == "true") {
 
         // Корректируем дату дня рождения для того, чтобы сделать ее пригодной для сохранения в базу данных
-        $birthdayDB = birthdayFromViewToDB($birthday);
+        $birthdayDB = dateFromViewToDB($birthday);
 
         // Сохраняем новые параметры Профиля пользователя в БД
             $rez = mysql_query("UPDATE users SET

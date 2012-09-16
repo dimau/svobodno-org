@@ -264,7 +264,7 @@ if (isset($_POST['readyButton'])) {
     // Если данные, указанные пользователем, корректны, запишем их в базу данных
     if ($correct) {
         // Корректируем дату дня рождения для того, чтобы сделать ее пригодной для сохранения в базу данных
-        $birthday = birthdayFromViewToDB($birthday);
+        $birthday = dateFromViewToDB($birthday);
         $tm = time();
         $last_act = $tm;
         $reg_date = $tm;

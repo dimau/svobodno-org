@@ -53,7 +53,7 @@ function createUploader(){
         action: '../lib/uploader.php',
         allowedExtensions: ["jpeg", "jpg", "img", "bmp", "png", "gif"], //Также расширения нужно менять в файле uploader.php
         sizeLimit: 10 * 1024 * 1024,
-        debug: true,
+        debug: false,
         // О каждом загруженном файле информацию передаем на сервер через переменные - для сохранения в БД
         onSubmit: function(id, fileName){
             uploader.setParams({
