@@ -5,7 +5,8 @@ include_once 'lib/function_global.php'; //подключаем файл с гл�
 /*************************************************************************************
  * Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
  ************************************************************************************/
-if (!login()) {
+$userId = login();
+if (!$userId) {
     header('Location: login.php');
 }
 
@@ -153,64 +154,113 @@ if (isset($_POST['saveAdvertButton'])) {
     if (count($errors) == 0) $correct = true; else $correct = false; // Считаем ошибки, если 0, то можно будет записать данные в БД
 
     // Если данные, указанные пользователем, корректны, запишем объявление в базу данных
-   /* if ($correct) {
+    if ($correct) {
         // Корректируем даты для того, чтобы сделать их пригодными для сохранения в базу данных
-        $dateOfEntry = dateFromViewToDB($dateOfEntry);
-        $dateOfCheckOut = dateFromViewToDB($dateOfCheckOut);
+        $dateOfEntryForDB = dateFromViewToDB($dateOfEntry);
+        $dateOfCheckOutForDB = dateFromViewToDB($dateOfCheckOut);
+
+        // Для хранения массивов в БД, их необходимо сериализовать
+        $furnitureInLivingAreaSerialized = serialize($furnitureInLivingArea);
+        $furnitureInKitchenSerialized = serialize($furnitureInKitchen);
+        $appliancesSerialized = serialize($appliances);
+        $sexOfTenantSerialized = serialize($sexOfTenant);
+        $relationsSerialized = serialize($relations);
 
         $tm = time();
         $last_act = $tm; // время последнего редактирования объявления
         $reg_date = $tm; // время регистрации ("рождения") объявления
 
-
-        if (mysql_query("INSERT INTO users (typeTenant,typeOwner,name,secondName,surname,sex,nationality,birthday,login,password,telephon,emailReg,email,currentStatusEducation,almamater,speciality,kurs,ochnoZaochno,yearOfEnd,notWorkCheckbox,placeOfWork,workPosition,regionOfBorn,cityOfBorn,shortlyAboutMe,vkontakte,odnoklassniki,facebook,twitter,lic,last_act,reg_date) VALUES ('" . $typeTenant . "','" . $typeOwner . "','" . $name . "','" . $secondName . "','" . $surname . "','" . $sex . "','" . $nationality . "','" . $birthday . "','" . $login . "','" . $password . "','" . $telephon . "','" . $email . "','" . $email . "','" . $currentStatusEducation . "','" . $almamater . "','" . $speciality . "','" . $kurs . "','" . $ochnoZaochno . "','" . $yearOfEnd . "','" . $notWorkCheckbox . "','" . $placeOfWork . "','" . $workPosition . "','" . $regionOfBorn . "','" . $cityOfBorn . "','" . $shortlyAboutMe . "','" . $vkontakte . "','" . $odnoklassniki . "','" . $facebook . "','" . $twitter . "','" . $lic . "','" . $last_act . "','" . $reg_date . "')")) // Пишем данные нового пользователя в БД
+        if (mysql_query("INSERT INTO property SET
+                            userId='" . $userId ."',
+                            typeOfObject='" . $typeOfObject ."',
+                            dateOfEntry='" . $dateOfEntryForDB ."',
+                            termOfLease='" . $termOfLease ."',
+                            dateOfCheckOut='" . $dateOfCheckOutForDB ."',
+                            amountOfRooms='" . $amountOfRooms ."',
+                            adjacentRooms='" . $adjacentRooms ."',
+                            amountOfAdjacentRooms='" . $amountOfAdjacentRooms ."',
+                            typeOfBathrooms='" . $typeOfBathrooms ."',
+                            typeOfBalcony='" . $typeOfBalcony ."',
+                            balconyGlazed='" . $balconyGlazed ."',
+                            roomSpace='" . $roomSpace ."',
+                            totalArea='" . $totalArea ."',
+                            livingSpace='" . $livingSpace ."',
+                            kitchenSpace='" . $kitchenSpace ."',
+                            floor='" . $floor ."',
+                            totalAmountFloor='" . $totalAmountFloor ."',
+                            numberOfFloor='" . $numberOfFloor ."',
+                            concierge='" . $concierge ."',
+                            intercom='" . $intercom ."',
+                            parking='" . $parking ."',
+                            city='" . $city ."',
+                            district='" . $district ."',
+                            coordX='" . $coordX ."',
+                            coordY='" . $coordY ."',
+                            address='" . $address ."',
+                            apartmentNumber='" . $apartmentNumber ."',
+                            subwayStation='" . $subwayStation ."',
+                            distanceToMetroStation='" . $distanceToMetroStation ."',
+                            currency='" . $currency ."',
+                            costOfRenting='" . $costOfRenting ."',
+                            utilities='" . $utilities ."',
+                            costInSummer='" . $costInSummer ."',
+                            costInWinter='" . $costInWinter ."',
+                            electricPower='" . $electricPower ."',
+                            bail='" . $bail ."',
+                            bailCost='" . $bailCost ."',
+                            prepayment='" . $prepayment ."',
+                            compensationMoney='" . $compensationMoney ."',
+                            compensationPercent='" . $compensationPercent ."',
+                            repair='" . $repair ."',
+                            furnish='" . $furnish ."',
+                            windows='" . $windows ."',
+                            internet='" . $internet ."',
+                            telephoneLine='" . $telephoneLine ."',
+                            cableTV='" . $cableTV ."',
+                            furnitureInLivingArea='" . $furnitureInLivingAreaSerialized ."',
+                            furnitureInLivingAreaExtra='" . $furnitureInLivingAreaExtra ."',
+                            furnitureInKitchen='" . $furnitureInKitchenSerialized ."',
+                            furnitureInKitchenExtra='" . $furnitureInKitchenExtra ."',
+                            appliances='" . $appliancesSerialized ."',
+                            appliancesExtra='" . $appliancesExtra ."',
+                            sexOfTenant='" . $sexOfTenantSerialized ."',
+                            relations='" . $relationsSerialized ."',
+                            children='" . $children ."',
+                            animals='" . $animals ."',
+                            contactTelephonNumber='" . $contactTelephonNumber ."',
+                            timeForRingBegin='" . $timeForRingBegin ."',
+                            timeForRingEnd='" . $timeForRingEnd ."',
+                            checking='" . $checking ."',
+                            responsibility='" . $responsibility ."',
+                            comment='" . $comment ."',
+                            last_act='" . $last_act ."',
+                            reg_date='" . $reg_date ."'"))
         {
-
-            /******* Переносим информацию о фотографиях пользователя в таблицу для постоянного хранения *******/
-            // Узнаем id пользователя - необходимо при сохранении информации о фотке в постоянную базу
-       /*     $rezId = mysql_query("SELECT id FROM users WHERE login = '" . $login . "'");
+            /******* Переносим информацию о фотографиях объекта недвижимости в таблицу для постоянного хранения *******/
+            // Узнаем id объявления - необходимо при сохранении информации о фотке в постоянную базу
+            $rezId = mysql_query("SELECT id FROM property WHERE address='".$address."' AND coordX='".$coordX."' AND coordY='".$coordY."' AND apartmentNumber='".$apartmentNumber."'");
             $rowId = mysql_fetch_assoc($rezId);
             // Получим информацию о всех фотках, соответствующих текущему fileUploadId
             $rezTempFotos = mysql_query("SELECT id, filename, extension, filesizeMb FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'");
             for ($i = 0; $i < mysql_num_rows($rezTempFotos); $i++) {
                 $rowTempFotos = mysql_fetch_assoc($rezTempFotos);
-                mysql_query("INSERT INTO userFotos (id, filename, extension, filesizeMb, userId) VALUES ('" . $rowTempFotos['id'] . "','" . $rowTempFotos['filename'] . "','" . $rowTempFotos['extension'] . "','" . $rowTempFotos['filesizeMb'] . "','" . $rowId['id'] . "')"); // Переносим информацию о фотографиях на постоянное хранение
+                mysql_query("INSERT INTO propertyFotos (id, filename, extension, filesizeMb, propertyId) VALUES ('" . $rowTempFotos['id'] . "','" . $rowTempFotos['filename'] . "','" . $rowTempFotos['extension'] . "','" . $rowTempFotos['filesizeMb'] . "','" . $rowId['id'] . "')"); // Переносим информацию о фотографиях на постоянное хранение
             }
             // Удаляем записи о фотках в таблице для временного хранения данных
             mysql_query("DELETE FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'");
 
-
-            /******* Сохраняем поисковый запрос, если он был указан пользователем *******/
-            // Преобразование формата инфы об искомом кол-ве комнат и районах, так как MySQL не умеет хранить массивы
-        /*    $amountOfRoomsSerialized = serialize($amountOfRooms);
-            $districtSerialized = serialize($district);
-            // Непосредственное сохранение данных о поисковом запросе
-            if ($typeTenant == "true") {
-                $rez = mysql_query("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, furniture, minCost, maxCost, pledge, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, period, additionalDescriptionOfSearch) VALUES ('" . $rowId['id'] . "','" . $typeOfObject . "','" . $amountOfRoomsSerialized . "','" . $adjacentRooms . "','" . $floor . "','" . $furniture . "','" . $minCost . "','" . $maxCost . "','" . $pledge . "','" . $districtSerialized . "','" . $withWho . "','" . $linksToFriends . "','" . $children . "','" . $howManyChildren . "','" . $animals . "','" . $howManyAnimals . "','" . $period . "','" . $additionalDescriptionOfSearch . "')"); // Поисковый запрос пользователя сохраняется в специальной таблице
-            }
-
-
-            /******* Авторизовываем пользователя *******/
-         /*   $error = enter();
-            if (count($error) == 0) //если нет ошибок, отправляем уже авторизованного пользователя на страницу успешной регистрации
-            {
-                header('Location: successfullRegistration.php'); //после успешной регистрации - переходим на соответствующую страницу
-            }
-            else {
-                // TODO:что-то нужно делать в случае, если возникли ошибки при авторизации во время регистрации - как минимум вывести их текст во всплывающем окошке
-            }
-
+            // Пересылаем пользователя в личный кабинет на вкладку Мои объявления
+            header('Location: personal.php?tabsId=3');
         }
         else {
             $correct = false;
-            $errors[] = 'К сожалению, при сохранении данных произошла ошибка: проверьте, пожалуйста, еще раз корректность Вашей информации и повторите попытку регистрации';
-            // Сохранении данных в БД не прошло - пользователь не зарегистрирован
+            $errors[] = 'Не прошел запрос к БД. К сожалению, при сохранении данных произошла ошибка: проверьте, пожалуйста, еще раз корректность Вашей информации и повторите попытку';
+            // Сохранении данных в БД не прошло - объявление не сохранено
         }
-    } */
+    }
 }
 
-// Проверить личные данные пользователя на полноту для его работы в качестве собственника, если у него typeOwner != "true"
-
+// В будущем необходимо будет проверять личные данные пользователя на полноту для его работы в качестве собственника, если у него typeOwner != "true"
 ?>
 
 <!DOCTYPE html>
@@ -633,7 +683,7 @@ include("header.php");
             Номер квартиры:
         </div>
         <div class="objectDescriptionBody">
-            <input type="text" name="apartmentNumber" size="7" <?php echo "value='$apartmentNumber'";?>>
+            <input type="text" name="apartmentNumber" size="7" maxlength="20" <?php echo "value='$apartmentNumber'";?>>
         </div>
     </div>
     <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_dacha typeOfObject_garage">
@@ -964,7 +1014,7 @@ include("header.php");
                 ?>> комод
         </li>
         <li>
-            <input type="text" name="furnitureInLivingAreaExtra" <?php echo "value='$furnitureInLivingAreaExtra'";?>>
+            <input type="text" name="furnitureInLivingAreaExtra" maxlength="254" <?php echo "value='$furnitureInLivingAreaExtra'";?>>
         </li>
             </ul>
     </div>
@@ -1012,7 +1062,7 @@ include("header.php");
                 ?>> шкафчики напольные
         </li>
         <li>
-            <input type="text" name="furnitureInKitchenExtra" <?php echo "value='$furnitureInKitchenExtra'";?>>
+            <input type="text" name="furnitureInKitchenExtra" maxlength="254" <?php echo "value='$furnitureInKitchenExtra'";?>>
         </li>
             </ul>
     </div>
@@ -1078,7 +1128,7 @@ include("header.php");
                 ?>> охранная сигнализация
         </li>
         <li>
-            <input type="text" name="appliancesExtra" <?php echo "value='$appliancesExtra'";?>>
+            <input type="text" name="appliancesExtra" maxlength="254" <?php echo "value='$appliancesExtra'";?>>
         </li>
             </ul>
     </div>
@@ -1089,7 +1139,7 @@ include("header.php");
     <div class="advertDescriptionChapterHeader">
         Требования к арендатору
     </div>
-    <div class="objectDescriptionItem">
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
         <div class="objectDescriptionItemLabel">
             Пол:
         </div>
@@ -1107,7 +1157,7 @@ include("header.php");
             женщина
         </div>
     </div>
-    <div class="objectDescriptionItem">
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
         <div class="objectDescriptionItemLabel">
             Отношения между арендаторами:
         </div>
@@ -1137,7 +1187,7 @@ include("header.php");
             группа людей
         </div>
     </div>
-    <div class="objectDescriptionItem">
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
         <div class="objectDescriptionItemLabel">
             Дети:
         </div>
@@ -1150,7 +1200,7 @@ include("header.php");
             </select>
         </div>
     </div>
-    <div class="objectDescriptionItem">
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
         <div class="objectDescriptionItemLabel">
             Животные:
         </div>

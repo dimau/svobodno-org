@@ -16,7 +16,7 @@ $rez = mysql_query("CREATE TABLE tempFotos (id VARCHAR(32) NOT NULL PRIMARY KEY,
 echo "Статус создания таблицы tempFotos: " . $rez . "\n";
 
 // Создаем таблицу для постоянного хранения информации о ФОТОГРАФИЯХ пользователей (только личные)
-$rez = mysql_query("CREATE TABLE userFotos (id VARCHAR(32) NOT NULL PRIMARY KEY, filename VARCHAR(255) NOT NULL, extension VARCHAR(5) NOT NULL, filesizeMb FLOAT(1) NOT NULL, userId INT(11) NOT NULL)");
+$rez = mysql_query("CREATE TABLE userFotos (id VARCHAR(32) NOT NULL PRIMARY KEY, filename VARCHAR(255) NOT NULL, extension VARCHAR(5) NOT NULL, filesizeMb FLOAT(1) NOT NULL, userId INT(11))");
 // userId - содержит идентификатор пользователя, к которому относится фотография
 
 echo "Статус создания таблицы userFotos: " . $rez . "\n";
@@ -30,10 +30,16 @@ $rez = mysql_query("CREATE TABLE searchRequests (userId INT(11) NOT NULL PRIMARY
 echo "Статус создания таблицы searchRequests: " . $rez . "\n";
 
 // Создаем таблицу для хранения информации об ОБЪЕКТАХ НЕДВИЖИМОСТИ пользователей
-$rez = mysql_query("CREATE TABLE property (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, userId INT(11) NOT NULL, typeOfObject VARCHAR(20), dateOfEntry DATE, termOfLease VARCHAR(20), dateOfCheckOut DATE, amountOfRooms VARCHAR(20), adjacentRooms VARCHAR(20), amountOfAdjacentRooms VARCHAR(20), typeOfBathrooms VARCHAR(20), typeOfBalcony VARCHAR(20), balconyGlazed VARCHAR(20), roomSpace INT, totalArea INT, livingSpace INT, kitchenSpace INT, floor INT, totalAmountFloor INT, numberOfFloor INT, concierge VARCHAR(20), intercom VARCHAR(20), parking VARCHAR(20), city VARCHAR(50), district VARCHAR(50), coordX VARCHAR(30), coordY VARCHAR(30), address VARCHAR(60), apartmentNumber VARCHAR(20), subwayStation VARCHAR(50), distanceToMetroStation INT, currency VARCHAR(20), costOfRenting FLOAT(2), utilities VARCHAR(20), costInSummer FLOAT(2), costInWinter FLOAT(2), electricPower VARCHAR(20), bail VARCHAR(20), bailCost FLOAT(2), prepayment VARCHAR(20), compensationMoney FLOAT(2), compensationPercent FLOAT(2), repair VARCHAR(20), furnish VARCHAR(20), windows VARCHAR(20), internet VARCHAR(20), telephoneLine VARCHAR(20), cableTV VARCHAR(20), furnitureInLivingArea BLOB, furnitureInLivingAreaExtra VARCHAR(255), furnitureInKitchen BLOB, furnitureInKitchenExtra VARCHAR(255), appliances BLOB, appliancesExtra VARCHAR(255), sexOfTenant BLOB, relations BLOB, children VARCHAR(20), animals VARCHAR(20), contactTelephonNumber VARCHAR(20), timeForRingBegin VARCHAR(20), timeForRingEnd VARCHAR(20), checking VARCHAR(20), responsibility TEXT, comment TEXT, last_act INT(11), reg_date INT(11))");
+$rez = mysql_query("CREATE TABLE property (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, userId INT(11) NOT NULL, typeOfObject VARCHAR(20), dateOfEntry DATE, termOfLease VARCHAR(20), dateOfCheckOut DATE, amountOfRooms VARCHAR(20), adjacentRooms VARCHAR(20), amountOfAdjacentRooms VARCHAR(20), typeOfBathrooms VARCHAR(20), typeOfBalcony VARCHAR(20), balconyGlazed VARCHAR(20), roomSpace FLOAT(2), totalArea FLOAT(2), livingSpace FLOAT(2), kitchenSpace FLOAT(2), floor INT, totalAmountFloor INT, numberOfFloor INT, concierge VARCHAR(20), intercom VARCHAR(20), parking VARCHAR(20), city VARCHAR(50), district VARCHAR(50), coordX VARCHAR(30), coordY VARCHAR(30), address VARCHAR(60), apartmentNumber VARCHAR(20), subwayStation VARCHAR(50), distanceToMetroStation INT, currency VARCHAR(20), costOfRenting FLOAT(2), utilities VARCHAR(20), costInSummer FLOAT(2), costInWinter FLOAT(2), electricPower VARCHAR(20), bail VARCHAR(20), bailCost FLOAT(2), prepayment VARCHAR(20), compensationMoney FLOAT(2), compensationPercent FLOAT(2), repair VARCHAR(20), furnish VARCHAR(20), windows VARCHAR(20), internet VARCHAR(20), telephoneLine VARCHAR(20), cableTV VARCHAR(20), furnitureInLivingArea BLOB, furnitureInLivingAreaExtra VARCHAR(255), furnitureInKitchen BLOB, furnitureInKitchenExtra VARCHAR(255), appliances BLOB, appliancesExtra VARCHAR(255), sexOfTenant BLOB, relations BLOB, children VARCHAR(20), animals VARCHAR(20), contactTelephonNumber VARCHAR(20), timeForRingBegin VARCHAR(20), timeForRingEnd VARCHAR(20), checking VARCHAR(20), responsibility TEXT, comment TEXT, last_act INT(11), reg_date INT(11))");
 // userId - содержит идентификатор пользователя, к которому относится объект недвижимости (собственник)
 
 echo "Статус создания таблицы property: " . $rez . "\n";
+
+// Создаем таблицу для постоянного хранения информации о ФОТОГРАФИЯХ объектов недвижимости
+$rez = mysql_query("CREATE TABLE propertyFotos (id VARCHAR(32) NOT NULL PRIMARY KEY, filename VARCHAR(255) NOT NULL, extension VARCHAR(5) NOT NULL, filesizeMb FLOAT(1) NOT NULL, propertyId INT(11))");
+// propertyId - содержит идентификатор объявления недвижимости, к которому относится фотография
+
+echo "Статус создания таблицы propertyFotos: " . $rez . "\n";
 
 // Создаем таблицу для хранения информации о соотношении названия района его идентификатора и города нахождения
 $rez = mysql_query("CREATE TABLE districts (keyOfDistricts INT NOT NULL PRIMARY KEY AUTO_INCREMENT, id VARCHAR(20) NOT NULL, name VARCHAR(50), city VARCHAR(50))");
