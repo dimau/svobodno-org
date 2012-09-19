@@ -361,11 +361,6 @@ body {
 	max-width: 120px;
 	max-height: 120px;
 	margin: 5px;
-	/* Для тестирования */
-	border: 1px solid black;
-	width: 120px;
-	height: 120px;
-	/* Конец зоны тестирования */
 }
 
 .middleFoto {
@@ -800,9 +795,10 @@ body {
 	border: 0px solid #B5B5B5;
 	border-radius: 5px;
 	background-color: #B5B5B5; 
-	padding-left: 5px;
+	padding-left: 1em;
 	margin-bottom: 5px;
 	font-weight: normal;
+    line-height: 2em;
 }
 
 .advertForPersonalPage.published .newsHeader {
@@ -812,6 +808,7 @@ body {
 .advertForPersonalPage.published .advertHeaderStatus {
 	color: white;
     display: inline-block;
+    margin-left: 1em;
 }
 
 .advertForPersonalPage.unpublished .newsHeader {
@@ -821,6 +818,7 @@ body {
 .advertForPersonalPage.unpublished .advertHeaderStatus {
 	color: white;
     display: inline-block;
+    margin-left: 1em;
 }
 
 .setOfInstructions {

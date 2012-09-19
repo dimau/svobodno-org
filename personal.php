@@ -28,8 +28,24 @@ if (isset($_GET['action']) && $_GET['action'] == 'deleteSearchRequest') {
     $rowSearchRequests = mysql_fetch_assoc($rezSearchRequests);
 }
 
+// Получаем информацию о фотографиях пользователя
 $rezUserFotos = mysql_query("SELECT * FROM userfotos WHERE userId = '" . $rowUsers['id'] . "'");
 $rowUserFotos = mysql_fetch_assoc($rezUserFotos); // TODO: сделать отображение нескольких фоток, если пользователь загрузит не одну
+
+// Получаем информацию о всех объектах пользователя (возможно он является собственником)
+$rowPropertyArr = array(); // в итоге получаем массив, каждый элемент которого представляет собой еще один массив значений конкретного объявления данного пользователя
+$rezProperty = mysql_query("SELECT * FROM property WHERE userId = '" . $rowUsers['id'] . "'");
+for ($i = 0; $i < mysql_num_rows($rezProperty); $i++) {
+    $rowPropertyArr[] = mysql_fetch_assoc($rezProperty);
+}
+
+// Получаем информацию о фотографиях объектов недвижимости пользователя (возможно он является собственником)
+// На самом деле мы получаем информацию только по 1 первой попавшейся фотке каждого из объектов недвижимости
+$rowPropertyFotosArr = array();
+for ($i = 0; $i < count($rowPropertyArr); $i++) {
+    $rezPropertyFotos = mysql_query("SELECT * FROM propertyFotos WHERE propertyId = '" . $rowPropertyArr[$i]['id'] . "'");
+    $rowPropertyFotosArr[] = mysql_fetch_assoc($rezPropertyFotos);
+}
 
 // Готовим массив со списком районов в городе пользователя: нужно только для вкладки Поиск Личного кабинета
 $rezDistricts = mysql_query("SELECT * FROM districts WHERE city = '" . "Екатеринбург" . "'");
@@ -413,6 +429,304 @@ if (isset($_POST['createSearchRequestButton'])) {
     // Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
     $errors = userDataCorrect("createSearchRequest"); // Параметр createSearchRequest задает режим проверки "Создание запроса на поиск", который активирует только соответствующие ему проверки
     if (count($errors) == 0) $correct = "true"; else $correct = "false"; // Считаем ошибки, если 0, то можно выдать пользователю форму для ввода параметров Запроса поиска
+}
+
+/********************************************************************************
+ * МОИ ОБЪЯВЛЕНИЯ. Наполнение шаблона из БД
+ *******************************************************************************/
+
+// Шаблон для блока с описанием объявления для вкладки tabs-3 Мои объявления
+$tmpl_MyAdvert = "
+<div class='news advertForPersonalPage {statusEng}'>
+    <div class='newsHeader'>
+        <span class='advertHeaderAddress'>{typeOfObject} по адресу: {address}{apartmentNumber}</span>
+        <div class='advertHeaderStatus'>
+            статус: {status}
+        </div>
+    </div>
+    <div class='fotosWrapper'>
+        <div class='middleFotoWrapper'>
+            <img class='middleFoto' src='{urlFoto}'>
+        </div>
+    </div>
+    <ul class='setOfInstructions'>
+        <li>
+            <a href='#'>удалить</a>
+    </li>
+        <li>
+            <a href='#'>редактировать</a>
+        </li>
+        <li>
+            <a href='#'>подробнее</a>
+        </li>
+        <li>
+            <a href='#'>опубликовать</a>
+        </li>
+    </ul>
+    <ul class='listDescription'>
+        <li>
+            <span class='headOfString' style='vertical-align: top;'>Возможные арендаторы:</span>{probableTenants}
+        </li>
+        <li>
+            <br>
+        </li>
+        <li>
+            <span class='headOfString'>Плата за аренду:</span> {costOfRenting} {currency} {utilities} {electricPower}
+        </li>
+        <li>
+            <span class='headOfString'>Залог:</span> {bail}
+        </li>
+        <li>
+            <span class='headOfString'>Предоплата:</span> {prepayment}
+        </li>
+        <li>
+            <span class='headOfString'>Единовременная комиссия:</span>
+            <span title='Предназначена для компенсации затрат собственника, связанных с поиском арендаторов'> {compensationMoney} {currency} ({compensationPercent}%) собственнику</span>
+        </li>
+        <li>
+            <span class='headOfString'>Срок аренды:</span> {termOfLease}, c {dateOfEntry} {dateOfCheckOut}
+        </li>
+        <li>
+            <span class='headOfString'>Адрес:</span> {address}
+        </li>
+         <li>
+            <span class='headOfString'>Район:</span> {district}
+        </li>
+        <li>
+            <span class='headOfString'>{amountOfRoomsName}</span> {amountOfRooms}{adjacentRooms}
+        </li>
+        <li>
+            <span class='headOfString'>Площадь ({areaNames}):</span> {areaValues} м²
+        </li>
+        <li>
+            <span class='headOfString'>{floorName}</span> {floor}
+        </li>
+        <li>
+            <span class='headOfString'>{furnitureName}</span> {furniture}
+        </li>
+        <li>
+            <span class='headOfString'>{repairName}</span> {repair}
+        </li>
+        <li>
+            <span class='headOfString'>{parkingName}</span> {parking}
+        </li>
+        <li>
+            <span class='headOfString'>Телефон собственника:</span>
+            {contactTelephonNumber}, <a href='{urlMan}'>{name} {secondName}</a>, c {timeForRingBegin} до {timeForRingEnd}
+        </li>
+    </ul>
+    <div class='clearBoth'></div>
+</div>
+";
+
+// Сортируем объявления, если их несколько
+if (count($rowPropertyArr) > 1) {
+    // Делим на 2 массива - для опубликованных и для неопубликованных объявлений, каждый из которых отсортируем позже
+    $unpublishedArr = array();
+    $publishedArr = array();
+    foreach ($rowPropertyArr as $value) {
+        if ($value['status'] == "не опубликовано") $unpublishedArr[] = $value;
+        if ($value['status'] == "опубликовано") $publishedArr[] = $value;
+    }
+
+    // Сортируем неопубликованные объявления - сверху те, которые пользователь редактировал позже
+    for ($i = 0; $i < count($unpublishedArr) - 1; $i++) {
+        $max = $unpublishedArr[$i]['last_act'];
+        $pos = $i;
+        for ($j = $i + 1; $j < count($unpublishedArr); $j++) {
+            if ($unpublishedArr[$j]['last_act'] > $max) {
+                $max = $unpublishedArr[$j]['last_act'];
+                $pos = $j;
+            }
+        $temp = $unpublishedArr[$i];
+        $unpublishedArr[$i] = $unpublishedArr[$pos];
+        $unpublishedArr[$pos] = $temp;
+        }
+    }
+    // Сортируем опубликованные объявления - сверху те, которые пользователь редактировал позже
+    for ($i = 0; $i < count($publishedArr) - 1; $i++) {
+        $max = $publishedArr[$i]['last_act'];
+        $pos = $i;
+        for ($j = $i + 1; $j < count($publishedArr); $j++) {
+            if ($publishedArr[$j]['last_act'] > $max) {
+                $max = $publishedArr[$j]['last_act'];
+                $pos = $j;
+            }
+            $temp = $publishedArr[$i];
+            $publishedArr[$i] = $publishedArr[$pos];
+            $publishedArr[$pos] = $temp;
+        }
+    }
+    // Объединяем отсортированные массивы в один
+    $rowPropertyArr = array();
+    foreach ($publishedArr as $value) $rowPropertyArr[] = $value;
+    foreach ($unpublishedArr as $value) $rowPropertyArr[] = $value;
+}
+
+// Создаем бриф объявления на основе шаблона для вкладки МОИ ОБЪЯВЛЕНИЯ.
+// Если объявлений у пользователя несколько, то в переменную, содержащую весь HTML - $briefOfAdverts, записываем каждое из них последовательно
+$briefOfAdverts = "";
+for ($i = 0; $i < count($rowPropertyArr); $i++) {
+    // Копируем html-текст шаблона
+    $currentAdvert = $tmpl_MyAdvert;
+
+    // Подставляем класс в заголовок html объявления для применения соответствующего css оформления
+    $str = "";
+    if ($rowPropertyArr[$i]['status'] == "не опубликовано") $str = "unpublished";
+    if ($rowPropertyArr[$i]['status'] == "опубликовано") $str = "published";
+    $currentAdvert = str_replace("{statusEng}", $str, $currentAdvert);
+
+    // В заголовке блока отображаем тип недвижимости, для красоты первую букву типа сделаем в верхнем регистре
+    $str = $rowPropertyArr[$i]['typeOfObject'];
+    $firstChar = mb_substr($str, 0, 1, 'UTF-8'); // Первая буква
+    $lastStr = mb_substr($str, 1); // Все кроме первой буквы
+    $firstChar = mb_strtoupper($firstChar, 'UTF-8');
+    $lastStr = mb_strtolower($lastStr, 'UTF-8');
+    $str = $firstChar . $lastStr;
+    $currentAdvert = str_replace("{typeOfObject}", $str, $currentAdvert);
+
+    // Адрес и номер квартиры, если он есть
+    $str = $rowPropertyArr[$i]['address'];
+    $currentAdvert = str_replace("{address}", $str, $currentAdvert);
+    if ($rowPropertyArr[$i]['apartmentNumber'] != "") $str = ", № " . $rowPropertyArr[$i]['apartmentNumber']; else $str = "";
+    $currentAdvert = str_replace("{apartmentNumber}", $str, $currentAdvert);
+
+    // Статус объявления
+    $str = $rowPropertyArr[$i]['status'];
+    $currentAdvert = str_replace("{status}", $str, $currentAdvert);
+
+    // Фотографию
+    $str = "uploaded_files/" . $rowPropertyFotosArr[$i]['id'] . "." . $rowPropertyFotosArr[$i]['extension'];
+    $currentAdvert = str_replace("{urlFoto}", $str, $currentAdvert);
+
+    // TODO: обязательно доделать вывод арендаторов
+    $str = "А никооооого нету ещеееее";
+    $currentAdvert = str_replace("{probableTenants}", $str, $currentAdvert);
+
+    // Все, что касается СТОИМОСТИ АРЕНДЫ
+    $str = $rowPropertyArr[$i]['costOfRenting'];
+    $currentAdvert = str_replace("{costOfRenting}", $str, $currentAdvert);
+    $str = $rowPropertyArr[$i]['currency'];
+    $currentAdvert = str_replace("{currency}", $str, $currentAdvert);
+    if ($rowPropertyArr[$i]['utilities'] == "да") $str = "+ коммунальные услуги от " . $rowPropertyArr[$i]['costInSummer'] . " до " . $rowPropertyArr[$i]['costInWinter'] . " " .$rowPropertyArr[$i]['currency']; else $str = "";
+    $currentAdvert = str_replace("{utilities}", $str, $currentAdvert);
+    if ($rowPropertyArr[$i]['electricPower'] == "да") $str = "+ плата за электричество"; else $str = "";
+    $currentAdvert = str_replace("{electricPower}", $str, $currentAdvert);
+    if ($rowPropertyArr[$i]['bail'] == "есть") $str = $rowPropertyArr[$i]['bailCost'] . " " . $rowPropertyArr[$i]['currency']; else $str = "нет";
+    $currentAdvert = str_replace("{bail}", $str, $currentAdvert);
+    $str = $rowPropertyArr[$i]['prepayment'];
+    $currentAdvert = str_replace("{prepayment}", $str, $currentAdvert);
+    $str = $rowPropertyArr[$i]['compensationMoney'];
+    $currentAdvert = str_replace("{compensationMoney}", $str, $currentAdvert);
+    $str = $rowPropertyArr[$i]['compensationPercent'];
+    $currentAdvert = str_replace("{compensationPercent}", $str, $currentAdvert);
+
+    // Срок аренды
+    $str = $rowPropertyArr[$i]['termOfLease'];
+    $currentAdvert = str_replace("{termOfLease}", $str, $currentAdvert);
+    $str = dateFromDBToView($rowPropertyArr[$i]['dateOfEntry']);
+    $currentAdvert = str_replace("{dateOfEntry}", $str, $currentAdvert);
+    if ($rowPropertyArr[$i]['bail'] == "есть") $str = $rowPropertyArr[$i]['bailCost'] . " " . $rowPropertyArr[$i]['currency']; else $str = "нет";
+    if ($rowPropertyArr[$i]['dateOfCheckOut'] != "0000-00-00") $str = " по " . dateFromDBToView($rowPropertyArr[$i]['dateOfCheckOut']); else $str = "";
+    $currentAdvert = str_replace("{dateOfCheckOut}", $str, $currentAdvert);
+
+    // Вычисляем человеческое название района по его идентификатору
+    $str = mysql_result(mysql_query("SELECT name FROM districts WHERE city = '" . "Екатеринбург" . "' AND id = '" . $rowPropertyArr[$i]['district'] . "'"), 0, "name");
+    $currentAdvert = str_replace("{district}", $str, $currentAdvert);
+
+    // Комнаты
+    if ($rowPropertyArr[$i]['amountOfRooms'] != "0") {
+        $str = $rowPropertyArr[$i]['amountOfRooms'];
+        $strAmountOfRoomsName = "Количество комнат:";
+    } else {
+        $str = "";
+        $strAmountOfRoomsName = "";
+    }
+    $currentAdvert = str_replace("{amountOfRooms}", $str, $currentAdvert);
+    $currentAdvert = str_replace("{amountOfRoomsName}", $strAmountOfRoomsName, $currentAdvert);
+    if ($rowPropertyArr[$i]['adjacentRooms'] == "да") {
+        if ($rowPropertyArr[$i]['amountOfAdjacentRooms'] != "0") {
+            $str = ", из них смежных: " . $rowPropertyArr[$i]['amountOfAdjacentRooms'];
+        } else {
+            $str = ", смежные";
+        }
+    } else {
+        $str = "";
+    }
+    $currentAdvert = str_replace("{adjacentRooms}", $str, $currentAdvert);
+    if ($rowPropertyArr[$i]['amountOfRooms'] != "0") $str = $rowPropertyArr[$i]['amountOfRooms']; else $str = "-";
+
+    // Площади помещений
+    $strAreaNames = "";
+    $strAreaValues = "";
+    if ($rowPropertyArr[$i]['typeOfObject'] != "квартира" && $rowPropertyArr[$i]['typeOfObject'] != "дом, коттедж" && $rowPropertyArr[$i]['typeOfObject'] != "таунхаус" && $rowPropertyArr[$i]['typeOfObject'] != "дача" && $rowPropertyArr[$i]['typeOfObject'] != "гараж") { $strAreaNames .= "комнаты"; $strAreaValues .= $rowPropertyArr[$i]['roomSpace']; }
+    if ($rowPropertyArr[$i]['typeOfObject'] != "комната") { $strAreaNames .= "общая"; $strAreaValues .= $rowPropertyArr[$i]['totalArea']; }
+    if ($rowPropertyArr[$i]['typeOfObject'] != "комната" && $rowPropertyArr[$i]['typeOfObject'] != "гараж") { $strAreaNames .= "/жилая"; $strAreaValues .= " / " . $rowPropertyArr[$i]['livingSpace']; }
+    if ($rowPropertyArr[$i]['typeOfObject'] != "дача" && $rowPropertyArr[$i]['typeOfObject'] != "гараж") { $strAreaNames .= "/кухни"; $strAreaValues .= " / " . $rowPropertyArr[$i]['kitchenSpace']; }
+    $currentAdvert = str_replace("{areaNames}", $strAreaNames, $currentAdvert);
+    $currentAdvert = str_replace("{areaValues}", $strAreaValues, $currentAdvert);
+
+    // Этаж
+    $strFloorName = "";
+    $strFloor = "";
+    if ($rowPropertyArr[$i]['floor'] != "0" && $rowPropertyArr[$i]['totalAmountFloor'] != "0") {
+        $strFloorName = "Этаж:";
+        $strFloor = $rowPropertyArr[$i]['floor'] . " из " . $rowPropertyArr[$i]['totalAmountFloor'];
+    }
+    if ($rowPropertyArr[$i]['numberOfFloor'] != "0") {
+        $strFloorName = "Этажность:";
+        $strFloor = $rowPropertyArr[$i]['numberOfFloor'];
+    }
+    $currentAdvert = str_replace("{floorName}", $strFloorName, $currentAdvert);
+    $currentAdvert = str_replace("{floor}", $strFloor, $currentAdvert);
+
+    // Мебель
+    $strFurnitureName = "";
+    $strFurniture = "";
+    if (count(unserialize($rowPropertyArr[$i]['furnitureInLivingArea'])) != 0 || $rowPropertyArr[$i]['furnitureInLivingAreaExtra'] != "") $strFurniture = "есть в жилой зоне";
+    if (count(unserialize($rowPropertyArr[$i]['furnitureInKitchen'])) != 0 || $rowPropertyArr[$i]['furnitureInKitchenExtra'] != "") if ($strFurniture == "") $strFurniture = "есть на кухне"; else $strFurniture .= ", есть на кухне";
+    if (count(unserialize($rowPropertyArr[$i]['appliances'])) != 0 || $rowPropertyArr[$i]['appliancesExtra'] != "") if ($strFurniture == "") $strFurniture = "есть бытовая техника"; else $strFurniture .= ", есть бытовая техника";
+    if ($strFurniture != "") $strFurnitureName = "Мебель:";
+    $currentAdvert = str_replace("{furnitureName}", $strFurnitureName, $currentAdvert);
+    $currentAdvert = str_replace("{furniture}", $strFurniture, $currentAdvert);
+
+    // Ремонт
+    $strRepairName = "";
+    $strRepair = "";
+    if ($rowPropertyArr[$i]['repair'] != "0" && $rowPropertyArr[$i]['furnish'] != "0") {
+        $strRepairName = "Ремонт:";
+        $strRepair = $rowPropertyArr[$i]['repair'] . ", отделка " . $rowPropertyArr[$i]['furnish'];
+    }
+    $currentAdvert = str_replace("{repairName}", $strRepairName, $currentAdvert);
+    $currentAdvert = str_replace("{repair}", $strRepair, $currentAdvert);
+
+    // Парковка
+    $strParkingName = "";
+    $strParking = "";
+    if ($rowPropertyArr[$i]['parking'] != "0") {
+        $strParkingName = "Парковка во дворе:";
+        $strParking = $rowPropertyArr[$i]['parking'];
+    }
+    $currentAdvert = str_replace("{parkingName}", $strParkingName, $currentAdvert);
+    $currentAdvert = str_replace("{parking}", $strParking, $currentAdvert);
+
+    // Контакты собственника
+    $str = $rowPropertyArr[$i]['contactTelephonNumber'];
+    $currentAdvert = str_replace("{contactTelephonNumber}", $str, $currentAdvert);
+    $str = "man.php?compId=" . ($rowUsers['id'] * 5 + 2); // compId - "вычисленное id пользователя. Равняется id пользователя * 5 + 2. Идентификатор пользователя подвергаем математическим вычислениям с целью скрыть его реальное значение от чужих глаз - для безопасности"
+    $currentAdvert = str_replace("{urlMan}", $str, $currentAdvert);
+    $str = $rowUsers['name'];
+    $currentAdvert = str_replace("{name}", $str, $currentAdvert);
+    $str = $rowUsers['secondName'];
+    $currentAdvert = str_replace("{secondName}", $str, $currentAdvert);
+    $str = $rowPropertyArr[$i]['timeForRingBegin'];
+    $currentAdvert = str_replace("{timeForRingBegin}", $str, $currentAdvert);
+    $str = $rowPropertyArr[$i]['timeForRingEnd'];
+    $currentAdvert = str_replace("{timeForRingEnd}", $str, $currentAdvert);
+
+    // TODO: address и currency повторяются
+
+    $briefOfAdverts .= $currentAdvert; // Добавим html-текст еще одного объявления. Готовим html-текст к добавлению на вкладку tabs-3 в Мои объявления
 }
 
 ?>
@@ -1262,174 +1576,16 @@ include("header.php");
     <div class="clearBoth"></div>
 </div>
 </div>
+
 <div id="tabs-3">
 <button id="newAdvertButton">
     Новое объявление
 </button>
-<div class="news advertForPersonalPage unpublished">
-    <div class="newsHeader">
-        <span class="advertHeaderAddress">Квартира по улице Кирова 15, №3</span>
+    <?php
+        echo $briefOfAdverts;
+    ?>
+</div>
 
-        <div class="advertHeaderStatus">
-            статус: не опубликовано
-        </div>
-    </div>
-    <div class="fotosWrapper">
-        <div class="middleFotoWrapper">
-            <img class="middleFoto" src="">
-        </div>
-    </div>
-    <ul class="setOfInstructions">
-        <li>
-            <a href="#">удалить</a>
-        </li>
-        <li>
-            <a href="#">редактировать</a>
-        </li>
-        <li>
-            <a href="#">подробнее</a>
-        </li>
-        <li>
-            <a href="#">опубликовать</a>
-        </li>
-    </ul>
-    <ul class="listDescription">
-        <li>
-            <span class="headOfString" style="vertical-align: top;">Возможные арендаторы:</span><a
-            style="text-decoration: none;" href="man.php">Алексей Мухмаев</a>, <a style="text-decoration: none;"
-                                                                                  href="man.php">Алексей Мухмаев</a>, <a
-            style="text-decoration: none;" href="man.php">Алексей Мухмаев</a>, <a style="text-decoration: none;"
-                                                                                  href="man.php">Алексей Мухмаев</a>, <a
-            style="text-decoration: none;" href="man.php">Алексей Мухмаев</a>, <a style="text-decoration: none;"
-                                                                                  href="man.php">Алексей Мухмаев</a>, <a
-            style="text-decoration: none;" href="man.php">Алексей Мухмаев</a>
-        </li>
-        <li>
-            <br>
-        </li>
-        <li>
-            <span class="headOfString">Плата за аренду:</span> 15000 + коммунальные услуги от 1500 до 2500 руб.
-        </li>
-        <li>
-            <span class="headOfString">Единовременная комиссия:</span>
-            <a href="#"> 3000 руб. (40%) собственнику</a>
-        </li>
-        <li>
-            <span class="headOfString">Адрес:</span>
-            улица Посадская 51
-        </li>
-        <li>
-            <span class="headOfString">Количество комнат:</span>
-            2, смежные
-        </li>
-        <li>
-            <span class="headOfString">Площадь (жилая/общая):</span>
-            22.4/34 м²
-        </li>
-        <li>
-            <span class="headOfString">Этаж:</span>
-            3 из 10
-        </li>
-        <li>
-            <span class="headOfString">Срок сдачи:</span>
-            долгосрочно
-        </li>
-        <li>
-            <span class="headOfString">Мебель:</span>
-            есть
-        </li>
-        <li>
-            <span class="headOfString">Район:</span>
-            Центр
-        </li>
-        <li>
-            <span class="headOfString">Телефон собственника:</span>
-            89221431615, <a href="#">Алексей Иванович</a>
-        </li>
-    </ul>
-    <div class="clearBoth"></div>
-</div>
-<div class="news advertForPersonalPage published">
-    <div class="newsHeader">
-        <span class="advertHeaderAddress">Квартира по улице Кирова 15, №3</span>
-
-        <div class="advertHeaderStatus">
-            статус: опубликовано
-        </div>
-    </div>
-    <div class="fotosWrapper">
-        <div class="middleFotoWrapper">
-            <img class="middleFoto" src="">
-        </div>
-    </div>
-    <ul class="setOfInstructions">
-        <li>
-            <a href="#">редактировать</a>
-        </li>
-        <li>
-            <a href="#">подробнее</a>
-        </li>
-        <li>
-            <a href="#">снять с публикации</a>
-        </li>
-    </ul>
-    <ul class="listDescription">
-        <li>
-            <span class="headOfString" style="vertical-align: top;">Возможные арендаторы:</span><a
-            style="text-decoration: none;" href="man.php">Алексей Мухмаев</a>, <a style="text-decoration: none;"
-                                                                                  href="man.php">Алексей Мухмаев</a>, <a
-            style="text-decoration: none;" href="man.php">Алексей Мухмаев</a>, <a style="text-decoration: none;"
-                                                                                  href="man.php">Алексей Мухмаев</a>, <a
-            style="text-decoration: none;" href="man.php">Алексей Мухмаев</a>, <a style="text-decoration: none;"
-                                                                                  href="man.php">Алексей Мухмаев</a>, <a
-            style="text-decoration: none;" href="man.php">Алексей Мухмаев</a>
-        </li>
-        <li>
-            <br>
-        </li>
-        <li>
-            <span class="headOfString">Плата за аренду:</span> 15000 + коммунальные услуги от 1500 до 2500 руб.
-        </li>
-        <li>
-            <span class="headOfString">Единовременная комиссия:</span>
-            <a href="#"> 3000 руб. (40%) собственнику</a>
-        </li>
-        <li>
-            <span class="headOfString">Адрес:</span>
-            улица Посадская 51
-        </li>
-        <li>
-            <span class="headOfString">Количество комнат:</span>
-            2, смежные
-        </li>
-        <li>
-            <span class="headOfString">Площадь (жилая/общая):</span>
-            22.4/34 м²
-        </li>
-        <li>
-            <span class="headOfString">Этаж:</span>
-            3 из 10
-        </li>
-        <li>
-            <span class="headOfString">Срок сдачи:</span>
-            долгосрочно
-        </li>
-        <li>
-            <span class="headOfString">Мебель:</span>
-            есть
-        </li>
-        <li>
-            <span class="headOfString">Район:</span>
-            Центр
-        </li>
-        <li>
-            <span class="headOfString">Телефон собственника:</span>
-            89221431615, <a href="#">Алексей Иванович</a>
-        </li>
-    </ul>
-    <div class="clearBoth"></div>
-</div>
-</div>
 <div id="tabs-4">
 <div class="shadowText">
     На этой вкладке Вы можете задать параметры, в соответствии с которыми ресурс Хани Хом будет осуществлять

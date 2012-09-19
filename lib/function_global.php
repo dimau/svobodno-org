@@ -1,4 +1,5 @@
 <?php
+
 // $typeOfValidation = registration - режим проверки при поступлении данных на регистрацию пользователя (включает в себя проверки параметров профиля и поискового запроса как для арендатора, так и для собственника)
 // $typeOfValidation = createSearchRequest - режим проверки при потуплении команды на создание поискового запроса (нет проверки данных поисковой формы, проверка параметров профиля как у арендатора)
 // $typeOfValidation = validateSearchRequest - режим проверки указанных пользователем параметров поиска в совокупности с данными Профиля (причем вне зависимости от того, является ли пользователь арендатором, проверка осуществляется как будто бы является, так как он желает стать арендатором, формируя поисковый запрос)
@@ -143,50 +144,13 @@ function isAdvertCorrect($typeOfValidation)
         if (substr($dateOfEntry, 6, 4) < "1000" || substr($dateOfEntry, 6, 4) > "9999") $errors[] = 'Проверьте год даты въезда (допустимо от 1000 до 9999)';
     }
     if ($termOfLease == "0") $errors[] = 'Укажите на какой срок сдается недвижимость';
-    if ($dateOfCheckOut == "" && $termOfLease != "0" && $termOfLease != "long") $errors[] = 'Укажите крайний срок выезда для арендатора(ов)';
+    if ($dateOfCheckOut == "" && $termOfLease != "0" && $termOfLease != "длительный срок") $errors[] = 'Укажите крайний срок выезда для арендатора(ов)';
     if ($dateOfCheckOut != "") {
         if (!preg_match('/^\d\d.\d\d.\d\d\d\d$/', $dateOfCheckOut)) $errors[] = 'Неправильный формат крайней даты выезда для арендатора, должен быть: дд.мм.гггг';
         if (substr($dateOfCheckOut, 0, 2) < "01" || substr($dateOfCheckOut, 0, 2) > "31") $errors[] = 'Проверьте число даты выезда (допустимо от 01 до 31)';
         if (substr($dateOfCheckOut, 3, 2) < "01" || substr($dateOfCheckOut, 3, 2) > "12") $errors[] = 'Проверьте месяц даты выезда (допустимо от 01 до 12)';
         if (substr($dateOfCheckOut, 6, 4) < "1000" || substr($dateOfCheckOut, 6, 4) > "9999") $errors[] = 'Проверьте год даты выезда (допустимо от 1000 до 9999)';
     }
-    if ($amountOfRooms == "0" && $typeOfObject != "0" && $typeOfObject != "garage") $errors[] = 'Укажите количество комнат в квартире, доме';
-    if ($adjacentRooms == "0" && $amountOfRooms != "0" && $amountOfRooms != "1") $errors[] = 'Укажите: есть ли смежные комнаты в сдаваемом объекте недвижимости';
-    if ($amountOfAdjacentRooms == "0" && $typeOfObject != "0" && $typeOfObject != "room" && $typeOfObject != "garage" && $adjacentRooms != "0" && $adjacentRooms != "no" && $amountOfRooms != "0" && $amountOfRooms != "1" && $amountOfRooms != "2") $errors[] = 'Укажите количество смежных комнат';
-    if ($typeOfBathrooms == "0" && $typeOfObject != "0" && $typeOfObject != "garage") $errors[] = 'Укажите тип санузла';
-    if ($typeOfBalcony == "0" && $typeOfObject != "0" && $typeOfObject != "garage") $errors[] = 'Укажите: есть ли балкон, лоджия или эркер в сдаваемом объекте недвижимости';
-    if ($balconyGlazed == "0" && $typeOfBalcony != "0" && $typeOfBalcony != "not" && $typeOfBalcony != "oriel" && $typeOfBalcony != "2oriel") $errors[] = 'Укажите остекление балкона/лоджии';
-    if ($roomSpace == "" && $typeOfObject != "0" && $typeOfObject != "flat" && $typeOfObject != "house" && $typeOfObject != "townhouse" && $typeOfObject != "dacha" && $typeOfObject != "garage") $errors[] = 'Укажите площадь комнаты';
-    if ($roomSpace != "") {
-        if (!preg_match('/^\d{0,5}\.{0,1}\d{0,2}$/', $roomSpace)) $errors[] = 'Неправильный формат для площади комнаты, используйте только цифры и точку, например: 16.55';
-    }
-    if ($totalArea == "" && $typeOfObject != "0" && $typeOfObject != "room") $errors[] = 'Укажите общую площадь';
-    if ($totalArea != "") {
-        if (!preg_match('/^\d{0,5}\.{0,1}\d{0,2}$/', $totalArea)) $errors[] = 'Неправильный формат для общей площади, используйте только цифры и точку, например: 86.55';
-    }
-    if ($livingSpace == "" && $typeOfObject != "0" && $typeOfObject != "room" && $typeOfObject != "garage") $errors[] = 'Укажите жилую площадь';
-    if ($livingSpace != "") {
-        if (!preg_match('/^\d{0,5}\.{0,1}\d{0,2}$/', $livingSpace)) $errors[] = 'Неправильный формат для жилой площади, используйте только цифры и точку, например: 86.55';
-    }
-    if ($kitchenSpace == "") $errors[] = 'Укажите площадь кухни';
-    if ($kitchenSpace != "" && $typeOfObject != "0" && $typeOfObject != "dacha" && $typeOfObject != "garage") {
-        if (!preg_match('/^\d{0,5}\.{0,1}\d{0,2}$/', $kitchenSpace)) $errors[] = 'Неправильный формат для площади кухни, используйте только цифры и точку, например: 86.55';
-    }
-    if ($floor == "" && $typeOfObject != "0" && $typeOfObject != "house" && $typeOfObject != "townhouse" && $typeOfObject != "dacha" && $typeOfObject != "garage") $errors[] = 'Укажите этаж, на котором расположена квартира, комната';
-    if ($floor != "") {
-        if (!preg_match('/^\d{0,3}$/', $floor)) $errors[] = 'Неправильный формат для этажа, на котором расположена квартира, дом: должно быть не более 3 цифр';
-    }
-    if ($totalAmountFloor == "" && $typeOfObject != "0" && $typeOfObject != "house" && $typeOfObject != "townhouse" && $typeOfObject != "dacha" && $typeOfObject != "garage") $errors[] = 'Укажите количество этажей в доме';
-    if ($totalAmountFloor != "") {
-        if (!preg_match('/^\d{0,3}$/', $totalAmountFloor)) $errors[] = 'Неправильный формат для количества этажей: должно быть не более 3 цифр';
-    }
-    if ($numberOfFloor == "" && $typeOfObject != "0" && $typeOfObject != "flat" && $typeOfObject != "room" && $typeOfObject != "garage") $errors[] = 'Укажите количество этажей в доме';
-    if ($numberOfFloor != "") {
-        if (!preg_match('/^\d{0,2}$/', $numberOfFloor)) $errors[] = 'Неправильный формат для количества этажей: должно быть не более 2 цифр';
-    }
-    if ($concierge == "0" && $typeOfObject != "0" && $typeOfObject != "house" && $typeOfObject != "townhouse" && $typeOfObject != "dacha" && $typeOfObject != "garage") $errors[] = 'Укажите: есть ли в доме консьерж';
-    if ($intercom == "0" && $typeOfObject != "0" && $typeOfObject != "dacha" && $typeOfObject != "garage") $errors[] = 'Укажите наличие домофона';
-    if ($parking == "0" && $typeOfObject != "0" && $typeOfObject != "dacha" && $typeOfObject != "garage") $errors[] = 'Укажите наличие и тип парковки во дворе';
 
     // Проверяем наличие хотя бы 1 фотографии объекта недвижимости
     if ($fileUploadId != "")
@@ -196,6 +160,44 @@ function isAdvertCorrect($typeOfValidation)
     }
     if ($fileUploadId == "") $errors[] = 'Перезагрузите браузер, пожалуйста: возникла ошибка при формировании формы для загрузки фотографий';
 
+    if ($amountOfRooms == "0" && $typeOfObject != "0" && $typeOfObject != "гараж") $errors[] = 'Укажите количество комнат в квартире, доме';
+    if ($adjacentRooms == "0" && $amountOfRooms != "0" && $amountOfRooms != "1") $errors[] = 'Укажите: есть ли смежные комнаты в сдаваемом объекте недвижимости';
+    if ($amountOfAdjacentRooms == "0" && $typeOfObject != "0" && $typeOfObject != "комната" && $typeOfObject != "гараж" && $adjacentRooms != "0" && $adjacentRooms != "нет" && $amountOfRooms != "0" && $amountOfRooms != "1" && $amountOfRooms != "2") $errors[] = 'Укажите количество смежных комнат';
+    if ($typeOfBathrooms == "0" && $typeOfObject != "0" && $typeOfObject != "гараж") $errors[] = 'Укажите тип санузла';
+    if ($typeOfBalcony == "0" && $typeOfObject != "0" && $typeOfObject != "гараж") $errors[] = 'Укажите: есть ли балкон, лоджия или эркер в сдаваемом объекте недвижимости';
+    if ($balconyGlazed == "0" && $typeOfBalcony != "0" && $typeOfBalcony != "нет" && $typeOfBalcony != "эркер" && $typeOfBalcony != "2 эркера и более") $errors[] = 'Укажите остекление балкона/лоджии';
+    if ($roomSpace == "" && $typeOfObject != "0" && $typeOfObject != "квартира" && $typeOfObject != "дом, коттедж" && $typeOfObject != "таунхаус" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите площадь комнаты';
+    if ($roomSpace != "") {
+        if (!preg_match('/^\d{0,5}\.{0,1}\d{0,2}$/', $roomSpace)) $errors[] = 'Неправильный формат для площади комнаты, используйте только цифры и точку, например: 16.55';
+    }
+    if ($totalArea == "" && $typeOfObject != "0" && $typeOfObject != "комната") $errors[] = 'Укажите общую площадь';
+    if ($totalArea != "") {
+        if (!preg_match('/^\d{0,5}\.{0,1}\d{0,2}$/', $totalArea)) $errors[] = 'Неправильный формат для общей площади, используйте только цифры и точку, например: 86.55';
+    }
+    if ($livingSpace == "" && $typeOfObject != "0" && $typeOfObject != "комната" && $typeOfObject != "гараж") $errors[] = 'Укажите жилую площадь';
+    if ($livingSpace != "") {
+        if (!preg_match('/^\d{0,5}\.{0,1}\d{0,2}$/', $livingSpace)) $errors[] = 'Неправильный формат для жилой площади, используйте только цифры и точку, например: 86.55';
+    }
+    if ($kitchenSpace == "" && $typeOfObject != "0" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите площадь кухни';
+    if ($kitchenSpace != "") {
+        if (!preg_match('/^\d{0,5}\.{0,1}\d{0,2}$/', $kitchenSpace)) $errors[] = 'Неправильный формат для площади кухни, используйте только цифры и точку, например: 86.55';
+    }
+    if ($floor == "" && $typeOfObject != "0" && $typeOfObject != "дом, коттедж" && $typeOfObject != "таунхаус" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите этаж, на котором расположена квартира, комната';
+    if ($floor != "") {
+        if (!preg_match('/^\d{0,3}$/', $floor)) $errors[] = 'Неправильный формат для этажа, на котором расположена квартира, комната: должно быть не более 3 цифр';
+    }
+    if ($totalAmountFloor == "" && $typeOfObject != "0" && $typeOfObject != "дом, коттедж" && $typeOfObject != "таунхаус" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите количество этажей в доме';
+    if ($totalAmountFloor != "") {
+        if (!preg_match('/^\d{0,3}$/', $totalAmountFloor)) $errors[] = 'Неправильный формат для количества этажей: должно быть не более 3 цифр';
+    }
+    if ($numberOfFloor == "" && $typeOfObject != "0" && $typeOfObject != "квартира" && $typeOfObject != "комната" && $typeOfObject != "гараж") $errors[] = 'Укажите количество этажей в доме';
+    if ($numberOfFloor != "") {
+        if (!preg_match('/^\d{0,2}$/', $numberOfFloor)) $errors[] = 'Неправильный формат для количества этажей: должно быть не более 2 цифр';
+    }
+    if ($concierge == "0" && $typeOfObject != "0" && $typeOfObject != "дом, коттедж" && $typeOfObject != "таунхаус" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите: есть ли в доме консьерж';
+    if ($intercom == "0" && $typeOfObject != "0" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите наличие домофона';
+    if ($parking == "0" && $typeOfObject != "0" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите наличие и тип парковки во дворе';
+
     if ($city != "Екатеринбург") $errors[] = 'Укажите в качестве города местонахождения Екатеринбург';
     if ($district == "0") $errors[] = 'Укажите район';
     if ($coordX == "" || $coordY == "") $errors[] = 'Укажите улицу и номер дома, затем нажмите кнопку "Проверить адрес"';
@@ -204,7 +206,7 @@ function isAdvertCorrect($typeOfValidation)
     }
     if ($address == "") $errors[] = 'Укажите улицу и номер дома';
     if (strlen($address) > 60) $errors[] = 'Указан слишком длинный адрес (используйте не более 60 символов)';
-    if ($apartmentNumber == "" && $typeOfObject != "0" && $typeOfObject != "house" && $typeOfObject != "dacha" && $typeOfObject != "garage") $errors[] = 'Укажите номер квартиры';
+    if ($apartmentNumber == "" && $typeOfObject != "0" && $typeOfObject != "дом, коттедж" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите номер квартиры';
     if (strlen($apartmentNumber) > 20) $errors[] = 'Указан слишком длинный номер квартиры (используйте не более 20 символов)';
 
     // Убеждаемся что данный пользователь еще не публиковал объявлений по этому адресу. Не стоит позволять публиковать несколько разных объявлений одному человеку с привязкой к одному и тому же адресу
@@ -215,8 +217,8 @@ function isAdvertCorrect($typeOfValidation)
         if ($row['apartmentNumber'] == "") $errors[] = 'Вы уже завели ранее объявление по данному адресу. Пожалуйста, воспользуйтесь ранее сформированным Вами объявлением в личном кабинете';
     }
 
-    if ($subwayStation == "0" && $typeOfObject != "0" && $typeOfObject != "dacha" && $typeOfObject != "garage") $errors[] = 'Укажите станцию метро рядом';
-    if ($distanceToMetroStation == "" && $typeOfObject != "0" && $typeOfObject != "dacha" && $typeOfObject != "garage" && $subwayStation != "0" && $subwayStation != "not") $errors[] = 'Укажите количество минут ходьбы до ближайшей станции метро';
+    if ($subwayStation == "0" && $typeOfObject != "0" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите станцию метро рядом';
+    if ($distanceToMetroStation == "" && $typeOfObject != "0" && $typeOfObject != "дача" && $typeOfObject != "гараж" && $subwayStation != "0" && $subwayStation != "нет") $errors[] = 'Укажите количество минут ходьбы до ближайшей станции метро';
     if ($distanceToMetroStation != "") {
         if (!preg_match('/^\d{0,3}$/', $distanceToMetroStation)) $errors[] = 'Неправильный формат для количества минут ходьбы до ближайшей станции метро: должно быть не более 3 цифр';
     }
@@ -226,17 +228,17 @@ function isAdvertCorrect($typeOfValidation)
         if (!preg_match('/^\d{0,7}\.{0,1}\d{0,2}$/', $costOfRenting)) $errors[] = 'Неправильный формат для платы за аренду, используйте только цифры и точку, например: 25550.50';
     }
     if ($utilities == "0") $errors[] = 'Укажите условия оплаты коммунальных услуг';
-    if ($costInSummer == "" && $utilities != "0" && $utilities != "no") $errors[] = 'Укажите примерную стоимость коммунальных услуг летом';
+    if ($costInSummer == "" && $utilities != "0" && $utilities != "нет") $errors[] = 'Укажите примерную стоимость коммунальных услуг летом';
     if ($costInSummer != "") {
         if (!preg_match('/^\d{0,7}\.{0,1}\d{0,2}$/', $costInSummer)) $errors[] = 'Неправильный формат для стоимости коммунальных услуг летом, используйте только цифры и точку, например: 2550.50';
     }
-    if ($costInWinter == "" && $utilities != "0" && $utilities != "no") $errors[] = 'Укажите примерную стоимость коммунальных услуг зимой';
+    if ($costInWinter == "" && $utilities != "0" && $utilities != "нет") $errors[] = 'Укажите примерную стоимость коммунальных услуг зимой';
     if ($costInWinter != "") {
         if (!preg_match('/^\d{0,7}\.{0,1}\d{0,2}$/', $costInWinter)) $errors[] = 'Неправильный формат для стоимости коммунальных услуг зимой, используйте только цифры и точку, например: 2550.50';
     }
     if ($electricPower == "0") $errors[] = 'Укажите условия оплаты электроэнергии';
     if ($bail == "0") $errors[] = 'Укажите наличие залога';
-    if ($bailCost == "" && $bail != "0" && $bail != "no") $errors[] = 'Укажите величину залога';
+    if ($bailCost == "" && $bail != "0" && $bail != "нет") $errors[] = 'Укажите величину залога';
     if ($bailCost != "") {
         if (!preg_match('/^\d{0,7}\.{0,1}\d{0,2}$/', $bailCost)) $errors[] = 'Неправильный формат для величины залога, используйте только цифры и точку, например: 2550.50';
     }
@@ -251,17 +253,17 @@ function isAdvertCorrect($typeOfValidation)
             if ($compensationPercent > 30) $errors[] = "Слишком большая единовременная комиссия. При работе с нашим сайтом разрешается устанавливать размер единовременной комиссии собственника не более 30% от месячной платы за аренду недвижимости";
         }
     }
-    if ($repair == "0" && $typeOfObject != "0" && $typeOfObject != "garage") $errors[] = 'Укажите текущее состояние ремонта';
-    if ($furnish == "0" && $typeOfObject != "0" && $typeOfObject != "garage") $errors[] = 'Укажите текущее состояние отделки';
-    if ($windows == "0" && $typeOfObject != "0" && $typeOfObject != "garage") $errors[] = 'Укажите материал окон';
-    if ($internet == "0" && $typeOfObject != "0" && $typeOfObject != "garage") $errors[] = 'Укажите наличие интернета';
-    if ($telephoneLine == "0" && $typeOfObject != "0" && $typeOfObject != "garage") $errors[] = 'Укажите наличие телефонной линии';
-    if ($cableTV == "0" && $typeOfObject != "0" && $typeOfObject != "garage") $errors[] = 'Укажите наличие кабельного телевидения';
+    if ($repair == "0" && $typeOfObject != "0" && $typeOfObject != "гараж") $errors[] = 'Укажите текущее состояние ремонта';
+    if ($furnish == "0" && $typeOfObject != "0" && $typeOfObject != "гараж") $errors[] = 'Укажите текущее состояние отделки';
+    if ($windows == "0" && $typeOfObject != "0" && $typeOfObject != "гараж") $errors[] = 'Укажите материал окон';
+    if ($internet == "0" && $typeOfObject != "0" && $typeOfObject != "гараж") $errors[] = 'Укажите наличие интернета';
+    if ($telephoneLine == "0" && $typeOfObject != "0" && $typeOfObject != "гараж") $errors[] = 'Укажите наличие телефонной линии';
+    if ($cableTV == "0" && $typeOfObject != "0" && $typeOfObject != "гараж") $errors[] = 'Укажите наличие кабельного телевидения';
 
-    if (count($sexOfTenant) == 0  && $typeOfObject != "0" && $typeOfObject != "garage") $errors[] = 'Укажите допустимый пол арендатора';
-    if (count($relations) == 0  && $typeOfObject != "0" && $typeOfObject != "garage") $errors[] = 'Укажите допустимые взаимоотношения между арендаторами';
-    if ($children == "0" && $typeOfObject != "0" && $typeOfObject != "garage") $errors[] = 'Укажите: готовы ли Вы поселить арендаторов с детьми';
-    if ($animals == "0" && $typeOfObject != "0" && $typeOfObject != "garage") $errors[] = 'Укажите: готовы ли Вы поселить арендаторов с животными';
+    if (count($sexOfTenant) == 0  && $typeOfObject != "0" && $typeOfObject != "гараж") $errors[] = 'Укажите допустимый пол арендатора';
+    if (count($relations) == 0  && $typeOfObject != "0" && $typeOfObject != "гараж") $errors[] = 'Укажите допустимые взаимоотношения между арендаторами';
+    if ($children == "0" && $typeOfObject != "0" && $typeOfObject != "гараж") $errors[] = 'Укажите: готовы ли Вы поселить арендаторов с детьми';
+    if ($animals == "0" && $typeOfObject != "0" && $typeOfObject != "гараж") $errors[] = 'Укажите: готовы ли Вы поселить арендаторов с животными';
     if ($contactTelephonNumber != "") {
         if (!preg_match('/^[0-9]{10}$/', $contactTelephonNumber)) $errors[] = 'Укажите, пожалуйста, Ваш мобильный номер без 8-ки, например: 9226540018';
     }

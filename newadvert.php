@@ -368,9 +368,9 @@ include("header.php");
 </div>
 
 <form method="post" name="newAdvert" class="advertDescriptionEdit">
-<div class="advertDescriptionChapter" id="mainParametersChapter">
+<div class="advertDescriptionChapter" id="typeAndPeriodChapter">
     <div class="advertDescriptionChapterHeader">
-        Описание объекта
+        Тип и сроки
     </div>
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
@@ -379,12 +379,12 @@ include("header.php");
         <div class="objectDescriptionBody">
             <select name="typeOfObject" id="typeOfObject">
                 <option value="0" <?php if ($typeOfObject == "0") echo "selected";?>></option>
-                <option value="flat" <?php if ($typeOfObject == "flat") echo "selected";?>>квартира</option>
-                <option value="room" <?php if ($typeOfObject == "room") echo "selected";?>>комната</option>
-                <option value="house" <?php if ($typeOfObject == "house") echo "selected";?>>дом, коттедж</option>
-                <option value="townhouse" <?php if ($typeOfObject == "townhouse") echo "selected";?>>таунхаус</option>
-                <option value="dacha" <?php if ($typeOfObject == "dacha") echo "selected";?>>дача</option>
-                <option value="garage" <?php if ($typeOfObject == "garage") echo "selected";?>>гараж</option>
+                <option value="квартира" <?php if ($typeOfObject == "квартира") echo "selected";?>>квартира</option>
+                <option value="комната" <?php if ($typeOfObject == "комната") echo "selected";?>>комната</option>
+                <option value="дом, коттедж" <?php if ($typeOfObject == "дом, коттедж") echo "selected";?>>дом, коттедж</option>
+                <option value="таунхаус" <?php if ($typeOfObject == "таунхаус") echo "selected";?>>таунхаус</option>
+                <option value="дача" <?php if ($typeOfObject == "дача") echo "selected";?>>дача</option>
+                <option value="гараж" <?php if ($typeOfObject == "гараж") echo "selected";?>>гараж</option>
             </select>
         </div>
     </div>
@@ -403,197 +403,17 @@ include("header.php");
         <div class="objectDescriptionBody">
             <select name="termOfLease" id="termOfLease">
                 <option value="0" <?php if ($termOfLease == "0") echo "selected";?>></option>
-                <option value="long" <?php if ($termOfLease == "long") echo "selected";?>>длительный срок (от года)</option>
-                <option value="little" <?php if ($termOfLease == "little") echo "selected";?>>несколько месяцев (до года)</option>
+                <option value="длительный срок" <?php if ($termOfLease == "длительный срок") echo "selected";?>>длительный срок (от года)</option>
+                <option value="несколько месяцев" <?php if ($termOfLease == "несколько месяцев") echo "selected";?>>несколько месяцев (до года)</option>
             </select>
         </div>
     </div>
-    <div class="objectDescriptionItem" notavailability="termOfLease_0 termOfLease_long">
+    <div class="objectDescriptionItem" notavailability="termOfLease_0&termOfLease_длительный срок">
         <div class="objectDescriptionItemLabel">
             Крайний срок выезда арендатора(ов):
         </div>
         <div class="objectDescriptionBody">
             <input name="dateOfCheckOut" type="text" id="datepicker2" size="15" placeholder="дд.мм.гггг" <?php echo "value='$dateOfCheckOut'";?>>
-        </div>
-    </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
-        <div class="objectDescriptionItemLabel">
-            Количество комнат в квартире, доме:
-        </div>
-        <div class="objectDescriptionBody">
-            <select name="amountOfRooms" id="amountOfRooms">
-                <option value="0" <?php if ($amountOfRooms == "0") echo "selected";?>></option>
-                <option value="1" <?php if ($amountOfRooms == "1") echo "selected";?>>1</option>
-                <option value="2" <?php if ($amountOfRooms == "2") echo "selected";?>>2</option>
-                <option value="3" <?php if ($amountOfRooms == "3") echo "selected";?>>3</option>
-                <option value="4" <?php if ($amountOfRooms == "4") echo "selected";?>>4</option>
-                <option value="5" <?php if ($amountOfRooms == "5") echo "selected";?>>5</option>
-                <option value="6" <?php if ($amountOfRooms == "6") echo "selected";?>>6 и более</option>
-            </select>
-        </div>
-    </div>
-    <div class="objectDescriptionItem" notavailability="amountOfRooms_0 amountOfRooms_1">
-        <div class="objectDescriptionItemLabel">
-            Комнаты смежные:
-        </div>
-        <div class="objectDescriptionBody">
-            <select name="adjacentRooms" id="adjacentRooms">
-                <option value="0" <?php if ($adjacentRooms == "0") echo "selected";?>></option>
-                <option value="yes" <?php if ($adjacentRooms == "yes") echo "selected";?>>да</option>
-                <option value="no" <?php if ($adjacentRooms == "no") echo "selected";?>>нет</option>
-            </select>
-        </div>
-    </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_room typeOfObject_garage adjacentRooms_0 adjacentRooms_no amountOfRooms_0 amountOfRooms_1 amountOfRooms_2">
-        <div class="objectDescriptionItemLabel">
-            Количество смежных комнат в квартире, доме:
-        </div>
-        <div class="objectDescriptionBody">
-            <select name="amountOfAdjacentRooms">
-                <option value="0" <?php if ($amountOfAdjacentRooms == "0") echo "selected";?>></option>
-                <option value="2" <?php if ($amountOfAdjacentRooms == "2") echo "selected";?>>2</option>
-                <option value="3" <?php if ($amountOfAdjacentRooms == "3") echo "selected";?>>3</option>
-                <option value="4" <?php if ($amountOfAdjacentRooms == "4") echo "selected";?>>4</option>
-                <option value="5" <?php if ($amountOfAdjacentRooms == "5") echo "selected";?>>5</option>
-                <option value="6" <?php if ($amountOfAdjacentRooms == "6") echo "selected";?>>6 и более</option>
-            </select>
-        </div>
-    </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
-        <div class="objectDescriptionItemLabel">
-            Санузел:
-        </div>
-        <div class="objectDescriptionBody">
-            <select name="typeOfBathrooms">
-                <option value="0" <?php if ($typeOfBathrooms == "0") echo "selected";?>></option>
-                <option value="separate" <?php if ($typeOfBathrooms == "separate") echo "selected";?>>раздельный</option>
-                <option value="combined" <?php if ($typeOfBathrooms == "combined") echo "selected";?>>совмещенный</option>
-                <option value="2" <?php if ($typeOfBathrooms == "2") echo "selected";?>>2</option>
-                <option value="3" <?php if ($typeOfBathrooms == "3") echo "selected";?>>3</option>
-            </select>
-        </div>
-    </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
-        <div class="objectDescriptionItemLabel">
-            Балкон/лоджия:
-        </div>
-        <div class="objectDescriptionBody">
-            <select name="typeOfBalcony" id="typeOfBalcony">
-                <option value="0" <?php if ($typeOfBalcony == "0") echo "selected";?>></option>
-                <option value="not" <?php if ($typeOfBalcony == "not") echo "selected";?>>нет</option>
-                <option value="balcony" <?php if ($typeOfBalcony == "balcony") echo "selected";?>>балкон</option>
-                <option value="loggia" <?php if ($typeOfBalcony == "loggia") echo "selected";?>>лоджия</option>
-                <option value="oriel" <?php if ($typeOfBalcony == "oriel") echo "selected";?>>эркер</option>
-                <option value="balconyAndLoggia" <?php if ($typeOfBalcony == "balconyAndLoggia") echo "selected";?>>балкон и лоджия</option>
-                <option value="balconyAndOriel" <?php if ($typeOfBalcony == "balconyAndOriel") echo "selected";?>>балкон и эркер</option>
-                <option value="2balcony" <?php if ($typeOfBalcony == "2balcony") echo "selected";?>>2 балкона и более</option>
-                <option value="2loggia" <?php if ($typeOfBalcony == "2loggia") echo "selected";?>>2 лоджии и более</option>
-                <option value="2oriel" <?php if ($typeOfBalcony == "2oriel") echo "selected";?>>2 эркера и более</option>
-            </select>
-        </div>
-    </div>
-    <div class="objectDescriptionItem" notavailability="typeOfBalcony_0 typeOfBalcony_not typeOfBalcony_oriel typeOfBalcony_2oriel">
-        <div class="objectDescriptionItemLabel">
-            Остекление балкона/лоджии:
-        </div>
-        <div class="objectDescriptionBody">
-            <select name="balconyGlazed">
-                <option value="0" <?php if ($balconyGlazed == "0") echo "selected";?>></option>
-                <option value="yes" <?php if ($balconyGlazed == "yes") echo "selected";?>>да</option>
-                <option value="no" <?php if ($balconyGlazed == "no") echo "selected";?>>нет</option>
-            </select>
-        </div>
-    </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_flat typeOfObject_house typeOfObject_townhouse typeOfObject_dacha typeOfObject_garage">
-        <div class="objectDescriptionItemLabel">
-            Площадь комнаты:
-        </div>
-        <div class="objectDescriptionBody">
-            <input type="text" size="7" name="roomSpace" <?php echo "value='$roomSpace'";?>>
-            м²
-        </div>
-    </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_room">
-        <div class="objectDescriptionItemLabel">
-            Площадь общая:
-        </div>
-        <div class="objectDescriptionBody">
-            <input type="text" size="7" name="totalArea" <?php echo "value='$totalArea'";?>>
-            м²
-        </div>
-    </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_room typeOfObject_garage">
-        <div class="objectDescriptionItemLabel">
-            Площадь жилая:
-        </div>
-        <div class="objectDescriptionBody">
-            <input type="text" size="7" name="livingSpace" <?php echo "value='$livingSpace'";?>>
-            м²
-        </div>
-    </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_dacha typeOfObject_garage">
-        <div class="objectDescriptionItemLabel">
-            Площадь кухни:
-        </div>
-        <div class="objectDescriptionBody">
-            <input type="text" size="7" name="kitchenSpace" <?php echo "value='$kitchenSpace'";?>>
-            м²
-        </div>
-    </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_house typeOfObject_townhouse typeOfObject_dacha typeOfObject_garage">
-        <div class="objectDescriptionItemLabel">
-            Этаж:
-        </div>
-        <div class="objectDescriptionBody">
-            <input type="text" size="3" name="floor" <?php echo "value='$floor'";?>>
-            из
-            <input type="text" size="3" name="totalAmountFloor" <?php echo "value='$totalAmountFloor'";?>>
-        </div>
-    </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_flat typeOfObject_room typeOfObject_garage">
-        <div class="objectDescriptionItemLabel">
-            Этажность дома:
-        </div>
-        <div class="objectDescriptionBody">
-            <input type="text" size="3" name="numberOfFloor" <?php echo "value='$numberOfFloor'";?>>
-        </div>
-    </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_house typeOfObject_townhouse typeOfObject_dacha typeOfObject_garage">
-        <div class="objectDescriptionItemLabel">
-            Консьерж:
-        </div>
-        <div class="objectDescriptionBody">
-            <select name="concierge">
-                <option value="0" <?php if ($concierge == "0") echo "selected";?>></option>
-                <option value="yes" <?php if ($concierge == "yes") echo "selected";?>>есть</option>
-                <option value="no" <?php if ($concierge == "no") echo "selected";?>>нет</option>
-            </select>
-        </div>
-    </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_dacha typeOfObject_garage">
-        <div class="objectDescriptionItemLabel">
-            Домофон:
-        </div>
-        <div class="objectDescriptionBody">
-            <select name="intercom">
-                <option value="0" <?php if ($intercom == "0") echo "selected";?>></option>
-                <option value="yes" <?php if ($intercom == "yes") echo "selected";?>>есть</option>
-                <option value="no" <?php if ($intercom == "no") echo "selected";?>>нет</option>
-            </select>
-        </div>
-    </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_dacha typeOfObject_garage">
-        <div class="objectDescriptionItemLabel">
-            Парковка во дворе:
-        </div>
-        <div class="objectDescriptionBody">
-            <select name="parking">
-                <option value="0" <?php if ($parking == "0") echo "selected";?>></option>
-                <option value="guarded" <?php if ($parking == "guarded") echo "selected";?>>охраняемая</option>
-                <option value="unguarded" <?php if ($parking == "unguarded") echo "selected";?>>неохраняемая</option>
-                <option value="underground" <?php if ($parking == "underground") echo "selected";?>>подземная</option>
-                <option value="no" <?php if ($parking == "no") echo "selected";?>>отсутствует</option>
-            </select>
         </div>
     </div>
     <div class="objectDescriptionItem">
@@ -619,6 +439,198 @@ include("header.php");
                     <!-- or put a simple form for upload here -->
                 </noscript>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="advertDescriptionChapter" id="roomsAndFacilitiesChapter">
+    <div class="advertDescriptionChapterHeader">
+        Комнаты и помещения
+    </div>
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
+        <div class="objectDescriptionItemLabel">
+            Количество комнат в квартире, доме:
+        </div>
+        <div class="objectDescriptionBody">
+            <select name="amountOfRooms" id="amountOfRooms">
+                <option value="0" <?php if ($amountOfRooms == "0") echo "selected";?>></option>
+                <option value="1" <?php if ($amountOfRooms == "1") echo "selected";?>>1</option>
+                <option value="2" <?php if ($amountOfRooms == "2") echo "selected";?>>2</option>
+                <option value="3" <?php if ($amountOfRooms == "3") echo "selected";?>>3</option>
+                <option value="4" <?php if ($amountOfRooms == "4") echo "selected";?>>4</option>
+                <option value="5" <?php if ($amountOfRooms == "5") echo "selected";?>>5</option>
+                <option value="6" <?php if ($amountOfRooms == "6") echo "selected";?>>6 и более</option>
+            </select>
+        </div>
+    </div>
+    <div class="objectDescriptionItem" notavailability="amountOfRooms_0&amountOfRooms_1">
+        <div class="objectDescriptionItemLabel">
+            Комнаты смежные:
+        </div>
+        <div class="objectDescriptionBody">
+            <select name="adjacentRooms" id="adjacentRooms">
+                <option value="0" <?php if ($adjacentRooms == "0") echo "selected";?>></option>
+                <option value="да" <?php if ($adjacentRooms == "да") echo "selected";?>>да</option>
+                <option value="нет" <?php if ($adjacentRooms == "нет") echo "selected";?>>нет</option>
+            </select>
+        </div>
+    </div>
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_комната&typeOfObject_гараж&adjacentRooms_0&adjacentRooms_нет&amountOfRooms_0&amountOfRooms_1&amountOfRooms_2">
+        <div class="objectDescriptionItemLabel">
+            Количество смежных комнат в квартире, доме:
+        </div>
+        <div class="objectDescriptionBody">
+            <select name="amountOfAdjacentRooms">
+                <option value="0" <?php if ($amountOfAdjacentRooms == "0") echo "selected";?>></option>
+                <option value="2" <?php if ($amountOfAdjacentRooms == "2") echo "selected";?>>2</option>
+                <option value="3" <?php if ($amountOfAdjacentRooms == "3") echo "selected";?>>3</option>
+                <option value="4" <?php if ($amountOfAdjacentRooms == "4") echo "selected";?>>4</option>
+                <option value="5" <?php if ($amountOfAdjacentRooms == "5") echo "selected";?>>5</option>
+                <option value="6" <?php if ($amountOfAdjacentRooms == "6") echo "selected";?>>6 и более</option>
+            </select>
+        </div>
+    </div>
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
+        <div class="objectDescriptionItemLabel">
+            Санузел:
+        </div>
+        <div class="objectDescriptionBody">
+            <select name="typeOfBathrooms">
+                <option value="0" <?php if ($typeOfBathrooms == "0") echo "selected";?>></option>
+                <option value="раздельный" <?php if ($typeOfBathrooms == "раздельный") echo "selected";?>>раздельный</option>
+                <option value="совмещенный" <?php if ($typeOfBathrooms == "совмещенный") echo "selected";?>>совмещенный</option>
+                <option value="2 шт." <?php if ($typeOfBathrooms == "2 шт.") echo "selected";?>>2</option>
+                <option value="3 шт." <?php if ($typeOfBathrooms == "3 шт.") echo "selected";?>>3</option>
+            </select>
+        </div>
+    </div>
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
+        <div class="objectDescriptionItemLabel">
+            Балкон/лоджия:
+        </div>
+        <div class="objectDescriptionBody">
+            <select name="typeOfBalcony" id="typeOfBalcony">
+                <option value="0" <?php if ($typeOfBalcony == "0") echo "selected";?>></option>
+                <option value="нет" <?php if ($typeOfBalcony == "нет") echo "selected";?>>нет</option>
+                <option value="балкон" <?php if ($typeOfBalcony == "балкон") echo "selected";?>>балкон</option>
+                <option value="лоджия" <?php if ($typeOfBalcony == "лоджия") echo "selected";?>>лоджия</option>
+                <option value="эркер" <?php if ($typeOfBalcony == "эркер") echo "selected";?>>эркер</option>
+                <option value="балкон и лоджия" <?php if ($typeOfBalcony == "балкон и лоджия") echo "selected";?>>балкон и лоджия</option>
+                <option value="балкон и эркер" <?php if ($typeOfBalcony == "балкон и эркер") echo "selected";?>>балкон и эркер</option>
+                <option value="2 балкона и более" <?php if ($typeOfBalcony == "2 балкона и более") echo "selected";?>>2 балкона и более</option>
+                <option value="2 лоджии и более" <?php if ($typeOfBalcony == "2 лоджии и более") echo "selected";?>>2 лоджии и более</option>
+                <option value="2 эркера и более" <?php if ($typeOfBalcony == "2 эркера и более") echo "selected";?>>2 эркера и более</option>
+            </select>
+        </div>
+    </div>
+    <div class="objectDescriptionItem" notavailability="typeOfBalcony_0&typeOfBalcony_нет&typeOfBalcony_эркер&typeOfBalcony_2 эркера и более">
+        <div class="objectDescriptionItemLabel">
+            Остекление балкона/лоджии:
+        </div>
+        <div class="objectDescriptionBody">
+            <select name="balconyGlazed">
+                <option value="0" <?php if ($balconyGlazed == "0") echo "selected";?>></option>
+                <option value="да" <?php if ($balconyGlazed == "да") echo "selected";?>>да</option>
+                <option value="нет" <?php if ($balconyGlazed == "нет") echo "selected";?>>нет</option>
+            </select>
+        </div>
+    </div>
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_квартира&typeOfObject_дом, коттедж&typeOfObject_таунхаус&typeOfObject_дача&typeOfObject_гараж">
+        <div class="objectDescriptionItemLabel">
+            Площадь комнаты:
+        </div>
+        <div class="objectDescriptionBody">
+            <input type="text" size="7" name="roomSpace" <?php echo "value='$roomSpace'";?>>
+            м²
+        </div>
+    </div>
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_комната">
+        <div class="objectDescriptionItemLabel">
+            Площадь общая:
+        </div>
+        <div class="objectDescriptionBody">
+            <input type="text" size="7" name="totalArea" <?php echo "value='$totalArea'";?>>
+            м²
+        </div>
+    </div>
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_комната&typeOfObject_гараж">
+        <div class="objectDescriptionItemLabel">
+            Площадь жилая:
+        </div>
+        <div class="objectDescriptionBody">
+            <input type="text" size="7" name="livingSpace" <?php echo "value='$livingSpace'";?>>
+            м²
+        </div>
+    </div>
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_дача&typeOfObject_гараж">
+        <div class="objectDescriptionItemLabel">
+            Площадь кухни:
+        </div>
+        <div class="objectDescriptionBody">
+            <input type="text" size="7" name="kitchenSpace" <?php echo "value='$kitchenSpace'";?>>
+            м²
+        </div>
+    </div>
+</div>
+
+<div class="advertDescriptionChapter" id="floorAndPorchChapter">
+    <div class="advertDescriptionChapterHeader">
+        Этаж и подъезд
+    </div>
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_дом, коттедж&typeOfObject_таунхаус&typeOfObject_дача&typeOfObject_гараж">
+        <div class="objectDescriptionItemLabel">
+            Этаж:
+        </div>
+        <div class="objectDescriptionBody">
+            <input type="text" size="3" name="floor" <?php echo "value='$floor'";?>>
+            из
+            <input type="text" size="3" name="totalAmountFloor" <?php echo "value='$totalAmountFloor'";?>>
+        </div>
+    </div>
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_квартира&typeOfObject_комната&typeOfObject_гараж">
+        <div class="objectDescriptionItemLabel">
+            Этажность дома:
+        </div>
+        <div class="objectDescriptionBody">
+            <input type="text" size="3" name="numberOfFloor" <?php echo "value='$numberOfFloor'";?>>
+        </div>
+    </div>
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_дом, коттедж&typeOfObject_таунхаус&typeOfObject_дача&typeOfObject_гараж">
+        <div class="objectDescriptionItemLabel">
+            Консьерж:
+        </div>
+        <div class="objectDescriptionBody">
+            <select name="concierge">
+                <option value="0" <?php if ($concierge == "0") echo "selected";?>></option>
+                <option value="есть" <?php if ($concierge == "есть") echo "selected";?>>есть</option>
+                <option value="нет" <?php if ($concierge == "нет") echo "selected";?>>нет</option>
+            </select>
+        </div>
+    </div>
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_дача&typeOfObject_гараж">
+        <div class="objectDescriptionItemLabel">
+            Домофон:
+        </div>
+        <div class="objectDescriptionBody">
+            <select name="intercom">
+                <option value="0" <?php if ($intercom == "0") echo "selected";?>></option>
+                <option value="есть" <?php if ($intercom == "есть") echo "selected";?>>есть</option>
+                <option value="нет" <?php if ($intercom == "нет") echo "selected";?>>нет</option>
+            </select>
+        </div>
+    </div>
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_дача&typeOfObject_гараж">
+        <div class="objectDescriptionItemLabel">
+            Парковка во дворе:
+        </div>
+        <div class="objectDescriptionBody">
+            <select name="parking">
+                <option value="0" <?php if ($parking == "0") echo "selected";?>></option>
+                <option value="охраняемая" <?php if ($parking == "охраняемая") echo "selected";?>>охраняемая</option>
+                <option value="неохраняемая" <?php if ($parking == "неохраняемая") echo "selected";?>>неохраняемая</option>
+                <option value="подземная" <?php if ($parking == "подземная") echo "selected";?>>подземная</option>
+                <option value="отсутствует" <?php if ($parking == "отсутствует") echo "selected";?>>отсутствует</option>
+            </select>
         </div>
     </div>
 </div>
@@ -678,7 +690,7 @@ include("header.php");
             </table>
         </div>
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_house typeOfObject_dacha typeOfObject_garage">
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_дом, коттедж&typeOfObject_дача&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Номер квартиры:
         </div>
@@ -686,25 +698,25 @@ include("header.php");
             <input type="text" name="apartmentNumber" size="7" maxlength="20" <?php echo "value='$apartmentNumber'";?>>
         </div>
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_dacha typeOfObject_garage">
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_дача&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Станция метро рядом:
         </div>
         <div class="objectDescriptionBody">
             <select name="subwayStation" id="subwayStation">
                 <option value="0" <?php if ($subwayStation == "0") echo "selected";?>></option>
-                <option value="not" <?php if ($subwayStation == "not") echo "selected";?>>Нет</option>
-                <option value="ProspectCosmonauts" <?php if ($subwayStation == "ProspectCosmonauts") echo "selected";?>>Проспект Космонавтов</option>
-                <option value="Uralmash" <?php if ($subwayStation == "Uralmash") echo "selected";?>>Уралмаш</option>
-                <option value="Mashinostroiteley" <?php if ($subwayStation == "Mashinostroiteley") echo "selected";?>>Машиностроителей</option>
-                <option value="Uralskaya" <?php if ($subwayStation == "Uralskaya") echo "selected";?>>Уральская</option>
-                <option value="Dinamo" <?php if ($subwayStation == "Dinamo") echo "selected";?>>Динамо</option>
-                <option value="Ploshchad1905g" <?php if ($subwayStation == "Ploshchad1905g") echo "selected";?>>Площадь 1905 г.</option>
-                <option value="Geologicheskaya" <?php if ($subwayStation == "Geologicheskaya") echo "selected";?>>Геологическая</option>
-                <option value="Chkalovskaya" <?php if ($subwayStation == "Chkalovskaya") echo "selected";?>>Чкаловская</option>
-                <option value="Botanicheskaya" <?php if ($subwayStation == "Botanicheskaya") echo "selected";?>>Ботаническая</option>
+                <option value="нет" <?php if ($subwayStation == "нет") echo "selected";?>>Нет</option>
+                <option value="Проспект Космонавтов" <?php if ($subwayStation == "Проспект Космонавтов") echo "selected";?>>Проспект Космонавтов</option>
+                <option value="Уралмаш" <?php if ($subwayStation == "Уралмаш") echo "selected";?>>Уралмаш</option>
+                <option value="Машиностроителей" <?php if ($subwayStation == "Машиностроителей") echo "selected";?>>Машиностроителей</option>
+                <option value="Уральская" <?php if ($subwayStation == "Уральская") echo "selected";?>>Уральская</option>
+                <option value="Динамо" <?php if ($subwayStation == "Динамо") echo "selected";?>>Динамо</option>
+                <option value="Площадь 1905 г." <?php if ($subwayStation == "Площадь 1905 г.") echo "selected";?>>Площадь 1905 г.</option>
+                <option value="Геологическая" <?php if ($subwayStation == "Геологическая") echo "selected";?>>Геологическая</option>
+                <option value="Чкаловская" <?php if ($subwayStation == "Чкаловская") echo "selected";?>>Чкаловская</option>
+                <option value="Ботаническая" <?php if ($subwayStation == "Ботаническая") echo "selected";?>>Ботаническая</option>
             </select>
-            <span notavailability="subwayStation_0 subwayStation_not">
+            <span notavailability="subwayStation_0&subwayStation_нет">
             <input type="text" name="distanceToMetroStation" size="7" <?php echo "value='$distanceToMetroStation'";?>>
             мин. ходьбы
             </span>
@@ -723,9 +735,9 @@ include("header.php");
         <div class="objectDescriptionBody">
             <select name="currency" id="currency">
                 <option value="0" <?php if ($currency == "0") echo "selected";?>></option>
-                <option value="rubl" <?php if ($currency == "rubl") echo "selected";?>>рубль</option>
-                <option value="dollar" <?php if ($currency == "dollar") echo "selected";?>>доллар США</option>
-                <option value="euro" <?php if ($currency == "euro") echo "selected";?>>евро</option>
+                <option value="руб." <?php if ($currency == "руб.") echo "selected";?>>рубль</option>
+                <option value="дол. США" <?php if ($currency == "дол. США") echo "selected";?>>доллар США</option>
+                <option value="евро" <?php if ($currency == "евро") echo "selected";?>>евро</option>
             </select>
         </div>
     </div>
@@ -745,10 +757,10 @@ include("header.php");
         <div class="objectDescriptionBody">
             <select name="utilities" id="utilities">
                 <option value="0" <?php if ($utilities == "0") echo "selected";?>></option>
-                <option value="yes" <?php if ($utilities == "yes") echo "selected";?>>да</option>
-                <option value="no" <?php if ($utilities == "no") echo "selected";?>>нет</option>
+                <option value="да" <?php if ($utilities == "да") echo "selected";?>>да</option>
+                <option value="нет" <?php if ($utilities == "нет") echo "selected";?>>нет</option>
             </select>
-            <span notavailability="utilities_0 utilities_no">
+            <span notavailability="utilities_0&utilities_нет">
             Летом
             <input type="text" name="costInSummer" size="7" <?php echo "value='$costInSummer'";?>>
             <span class="currency"></span> Зимой
@@ -764,8 +776,8 @@ include("header.php");
         <div class="objectDescriptionBody">
             <select name="electricPower">
                 <option value="0" <?php if ($electricPower == "0") echo "selected";?>></option>
-                <option value="yes" <?php if ($electricPower == "yes") echo "selected";?>>да</option>
-                <option value="no" <?php if ($electricPower == "no") echo "selected";?>>нет</option>
+                <option value="да" <?php if ($electricPower == "да") echo "selected";?>>да</option>
+                <option value="нет" <?php if ($electricPower == "нет") echo "selected";?>>нет</option>
             </select>
         </div>
     </div>
@@ -776,10 +788,10 @@ include("header.php");
         <div class="objectDescriptionBody">
             <select name="bail" id="bail">
                 <option value="0" <?php if ($bail == "0") echo "selected";?>></option>
-                <option value="yes" <?php if ($bail == "yes") echo "selected";?>>есть</option>
-                <option value="no" <?php if ($bail == "no") echo "selected";?>>нет</option>
+                <option value="есть" <?php if ($bail == "есть") echo "selected";?>>есть</option>
+                <option value="нет" <?php if ($bail == "нет") echo "selected";?>>нет</option>
             </select>
-            <span notavailability="bail_0 bail_no">
+            <span notavailability="bail_0&bail_нет">
             <input type="text" name="bailCost" size="7" <?php echo "value='$bailCost'";?>>
             <span class="currency"></span>
             </span>
@@ -792,13 +804,13 @@ include("header.php");
         <div class="objectDescriptionBody">
             <select name="prepayment">
                 <option value="0" <?php if ($prepayment == "0") echo "selected";?>></option>
-                <option value="no" <?php if ($prepayment == "no") echo "selected";?>>нет</option>
-                <option value="1" <?php if ($prepayment == "1") echo "selected";?>>1 месяц</option>
-                <option value="2" <?php if ($prepayment == "2") echo "selected";?>>2 месяца</option>
-                <option value="3" <?php if ($prepayment == "3") echo "selected";?>>3 месяца</option>
-                <option value="4" <?php if ($prepayment == "4") echo "selected";?>>4 месяца</option>
-                <option value="5" <?php if ($prepayment == "5") echo "selected";?>>5 месяцев</option>
-                <option value="6" <?php if ($prepayment == "6") echo "selected";?>>6 месяцев</option>
+                <option value="нет" <?php if ($prepayment == "нет") echo "selected";?>>нет</option>
+                <option value="1 месяц" <?php if ($prepayment == "1 месяц") echo "selected";?>>1 месяц</option>
+                <option value="2 месяца" <?php if ($prepayment == "2 месяца") echo "selected";?>>2 месяца</option>
+                <option value="3 месяца" <?php if ($prepayment == "3 месяца") echo "selected";?>>3 месяца</option>
+                <option value="4 месяца" <?php if ($prepayment == "4 месяца") echo "selected";?>>4 месяца</option>
+                <option value="5 месяцев" <?php if ($prepayment == "5 месяцев") echo "selected";?>>5 месяцев</option>
+                <option value="6 месяцев" <?php if ($prepayment == "6 месяцев") echo "selected";?>>6 месяцев</option>
             </select>
         </div>
     </div>
@@ -817,45 +829,45 @@ include("header.php");
     <div class="advertDescriptionChapterHeader">
         Текущее состояние
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Ремонт:
         </div>
         <div class="objectDescriptionBody">
             <select name="repair">
                 <option value="0" <?php if ($repair == "0") echo "selected";?>></option>
-                <option value="no" <?php if ($repair == "no") echo "selected";?>>не выполнялся (новый дом)</option>
-                <option value="just" <?php if ($repair == "just") echo "selected";?>>сделан только что</option>
-                <option value="less1year" <?php if ($repair == "less1year") echo "selected";?>>меньше 1 года назад</option>
-                <option value="over1year" <?php if ($repair == "over1year") echo "selected";?>>больше года назад</option>
-                <option value="long" <?php if ($repair == "long") echo "selected";?>>выполнялся давно</option>
+                <option value="не выполнялся (новый дом)" <?php if ($repair == "не выполнялся (новый дом)") echo "selected";?>>не выполнялся (новый дом)</option>
+                <option value="сделан только что" <?php if ($repair == "сделан только что") echo "selected";?>>сделан только что</option>
+                <option value="меньше 1 года назад" <?php if ($repair == "меньше 1 года назад") echo "selected";?>>меньше 1 года назад</option>
+                <option value="больше года назад" <?php if ($repair == "больше года назад") echo "selected";?>>больше года назад</option>
+                <option value="выполнялся давно" <?php if ($repair == "выполнялся давно") echo "selected";?>>выполнялся давно</option>
             </select>
         </div>
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Отделка:
         </div>
         <div class="objectDescriptionBody" style="min-width: 400px">
             <select name="furnish">
                 <option value="0" <?php if ($furnish == "0") echo "selected";?>></option>
-                <option value="euro" <?php if ($furnish == "euro") echo "selected";?>>евростандарт</option>
-                <option value="fresh" <?php if ($furnish == "fresh") echo "selected";?>>свежая (новые обои, побелка потолков)</option>
-                <option value="grandma" <?php if ($furnish == "grandma") echo "selected";?>>бабушкин вариант</option>
-                <option value="needsUpdated" <?php if ($furnish == "needsUpdated") echo "selected";?>>требует обновления</option>
+                <option value="евростандарт" <?php if ($furnish == "евростандарт") echo "selected";?>>евростандарт</option>
+                <option value="свежая (новые обои, побелка потолков)" <?php if ($furnish == "свежая (новые обои, побелка потолков)") echo "selected";?>>свежая (новые обои, побелка потолков)</option>
+                <option value="бабушкин вариант" <?php if ($furnish == "бабушкин вариант") echo "selected";?>>бабушкин вариант</option>
+                <option value="требует обновления" <?php if ($furnish == "требует обновления") echo "selected";?>>требует обновления</option>
             </select>
         </div>
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Окна:
         </div>
         <div class="objectDescriptionBody">
             <select name="windows">
                 <option value="0" <?php if ($windows == "0") echo "selected";?>></option>
-                <option value="wooden" <?php if ($windows == "wooden") echo "selected";?>>деревянные</option>
-                <option value="plastic" <?php if ($windows == "plastic") echo "selected";?>>пластиковые</option>
-                <option value="otherwise" <?php if ($windows == "otherwise") echo "selected";?>>иное</option>
+                <option value="деревянные" <?php if ($windows == "деревянные") echo "selected";?>>деревянные</option>
+                <option value="пластиковые" <?php if ($windows == "пластиковые") echo "selected";?>>пластиковые</option>
+                <option value="иное" <?php if ($windows == "иное") echo "selected";?>>иное</option>
             </select>
         </div>
     </div>
@@ -865,42 +877,39 @@ include("header.php");
     <div class="advertDescriptionChapterHeader">
         Связь
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Интернет:
         </div>
         <div class="objectDescriptionBody">
             <select name="internet">
                 <option value="0" <?php if ($internet == "0") echo "selected";?>></option>
-                <option value="nono" <?php if ($internet == "nono") echo "selected";?>>не проведен, нельзя провести</option>
-                <option value="no" <?php if ($internet == "no") echo "selected";?>>не проведен, можно провести</option>
-                <option value="yes" <?php if ($internet == "yes") echo "selected";?>>проведен, можно использовать</option>
+                <option value="проведен" <?php if ($internet == "проведен") echo "selected";?>>проведен</option>
+                <option value="не проведен" <?php if ($internet == "не проведен") echo "selected";?>>не проведен</option>
             </select>
         </div>
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Телефон:
         </div>
         <div class="objectDescriptionBody">
             <select name="telephoneLine">
                 <option value="0" <?php if ($telephoneLine == "0") echo "selected";?>></option>
-                <option value="nono" <?php if ($telephoneLine == "nono") echo "selected";?>>не проведен, нельзя провести</option>
-                <option value="no" <?php if ($telephoneLine == "no") echo "selected";?>>не проведен, можно провести</option>
-                <option value="yes" <?php if ($telephoneLine == "yes") echo "selected";?>>проведен, можно использовать</option>
+                <option value="проведен" <?php if ($telephoneLine == "проведен") echo "selected";?>>проведен</option>
+                <option value="не проведен" <?php if ($telephoneLine == "не проведен") echo "selected";?>>не проведен</option>
             </select>
         </div>
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Кабельное ТВ:
         </div>
         <div class="objectDescriptionBody">
             <select name="cableTV">
                 <option value="0" <?php if ($cableTV == "0") echo "selected";?>></option>
-                <option value="nono" <?php if ($cableTV == "nono") echo "selected";?>>не проведено, нельзя провести</option>
-                <option value="no" <?php if ($cableTV == "no") echo "selected";?>>не проведено, можно провести</option>
-                <option value="yes" <?php if ($cableTV == "yes") echo "selected";?>>проведено, можно использовать</option>
+                <option value="проведено" <?php if ($cableTV == "проведено") echo "selected";?>>проведено</option>
+                <option value="не проведено" <?php if ($cableTV == "не проведено") echo "selected";?>>не проведено</option>
             </select>
         </div>
     </div>
@@ -910,106 +919,106 @@ include("header.php");
 <div class="advertDescriptionChapterHeader">
     Мебель и бытовая техника
 </div>
-<div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
+<div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
     <div class="objectDescriptionItemLabel">
         Мебель в жилой зоне:
     </div>
     <div class="objectDescriptionBody">
         <ul>
         <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="sofa"
+            <input type="checkbox" name="furnitureInLivingArea[]" value="диван раскладной"
                 <?php foreach ($furnitureInLivingArea as $value) {
-                        if ($value == "sofa") {echo "checked"; break;}
+                        if ($value == "диван раскладной") {echo "checked"; break;}
                       }
                 ?>> диван раскладной
         </li>
         <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="sofaNeraskladnoy" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "sofaNeraskladnoy") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInLivingArea[]" value="диван нераскладной" <?php foreach ($furnitureInLivingArea as $value) {
+                if ($value == "диван нераскладной") {echo "checked"; break;}
             }
                 ?>> диван нераскладной
         </li>
         <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="singleBed" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "singleBed") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInLivingArea[]" value="кровать одноместная" <?php foreach ($furnitureInLivingArea as $value) {
+                if ($value == "кровать одноместная") {echo "checked"; break;}
             }
                 ?>> кровать одноместная
         </li>
         <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="doubleBed" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "doubleBed") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInLivingArea[]" value="кровать двухместная" <?php foreach ($furnitureInLivingArea as $value) {
+                if ($value == "кровать двухместная") {echo "checked"; break;}
             }
                 ?>> кровать двухместная
         </li>
         <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="babyBed" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "babyBed") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInLivingArea[]" value="кровать детская" <?php foreach ($furnitureInLivingArea as $value) {
+                if ($value == "кровать детская") {echo "checked"; break;}
             }
                 ?>> кровать детская
         </li>
         <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="writingDesk" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "writingDesk") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInLivingArea[]" value="стол письменный" <?php foreach ($furnitureInLivingArea as $value) {
+                if ($value == "стол письменный") {echo "checked"; break;}
             }
                 ?>> стол письменный
         </li>
         <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="computerTable" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "computerTable") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInLivingArea[]" value="стол компьютерный" <?php foreach ($furnitureInLivingArea as $value) {
+                if ($value == "стол компьютерный") {echo "checked"; break;}
             }
                 ?>> стол компьютерный
         </li>
         <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="coffeeTable" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "coffeeTable") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInLivingArea[]" value="стол журнальный" <?php foreach ($furnitureInLivingArea as $value) {
+                if ($value == "стол журнальный") {echo "checked"; break;}
             }
                 ?>> стол журнальный
         </li>
         <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="foldingTable" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "foldingTable") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInLivingArea[]" value="стол раскладной" <?php foreach ($furnitureInLivingArea as $value) {
+                if ($value == "стол раскладной") {echo "checked"; break;}
             }
                 ?>> стол раскладной
         </li>
         <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="foldingChair" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "foldingChair") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInLivingArea[]" value="кресло раскладное" <?php foreach ($furnitureInLivingArea as $value) {
+                if ($value == "кресло раскладное") {echo "checked"; break;}
             }
                 ?>> кресло раскладное
         </li>
         <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="nonFoldingChair" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "nonFoldingChair") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInLivingArea[]" value="кресло нераскладное" <?php foreach ($furnitureInLivingArea as $value) {
+                if ($value == "кресло нераскладное") {echo "checked"; break;}
             }
                 ?>> кресло нераскладное
         </li>
         <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="chairsAndStools" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "chairsAndStools") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInLivingArea[]" value="стулья и табуретки" <?php foreach ($furnitureInLivingArea as $value) {
+                if ($value == "стулья и табуретки") {echo "checked"; break;}
             }
                 ?>> стулья и табуретки
         </li>
         <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="wall" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "wall") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInLivingArea[]" value="стенка" <?php foreach ($furnitureInLivingArea as $value) {
+                if ($value == "стенка") {echo "checked"; break;}
             }
                 ?>> стенка
         </li>
         <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="wardrobe" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "wardrobe") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInLivingArea[]" value="шкаф для одежды" <?php foreach ($furnitureInLivingArea as $value) {
+                if ($value == "шкаф для одежды") {echo "checked"; break;}
             }
                 ?>> шкаф для одежды
         </li>
         <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="shkafKupe" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "shkafKupe") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInLivingArea[]" value="шкаф-купе" <?php foreach ($furnitureInLivingArea as $value) {
+                if ($value == "шкаф-купе") {echo "checked"; break;}
             }
                 ?>> шкаф-купе
         </li>
         <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="komod" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "komod") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInLivingArea[]" value="комод" <?php foreach ($furnitureInLivingArea as $value) {
+                if ($value == "комод") {echo "checked"; break;}
             }
                 ?>> комод
         </li>
@@ -1019,45 +1028,45 @@ include("header.php");
             </ul>
     </div>
 </div>
-<div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
+<div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
     <div class="objectDescriptionItemLabel">
         Мебель на кухне:
     </div>
     <div class="objectDescriptionBody">
         <ul>
         <li>
-            <input type="checkbox" name="furnitureInKitchen[]" value="diningTable" <?php foreach ($furnitureInKitchen as $value) {
-                if ($value == "diningTable") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInKitchen[]" value="стол обеденный" <?php foreach ($furnitureInKitchen as $value) {
+                if ($value == "стол обеденный") {echo "checked"; break;}
             }
                 ?>> стол обеденный
         </li>
         <li>
-            <input type="checkbox" name="furnitureInKitchen[]" value="chairsAndStools" <?php foreach ($furnitureInKitchen as $value) {
-                if ($value == "chairsAndStools") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInKitchen[]" value="стулья, табуретки" <?php foreach ($furnitureInKitchen as $value) {
+                if ($value == "стулья, табуретки") {echo "checked"; break;}
             }
                 ?>> стулья, табуретки
         </li>
         <li>
-            <input type="checkbox" name="furnitureInKitchen[]" value="sofa" <?php foreach ($furnitureInKitchen as $value) {
-                if ($value == "sofa") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInKitchen[]" value="диван" <?php foreach ($furnitureInKitchen as $value) {
+                if ($value == "диван") {echo "checked"; break;}
             }
                 ?>> диван
         </li>
         <li>
-            <input type="checkbox" name="furnitureInKitchen[]" value="kitchenSet" <?php foreach ($furnitureInKitchen as $value) {
-                if ($value == "kitchenSet") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInKitchen[]" value="кухонный гарнитур" <?php foreach ($furnitureInKitchen as $value) {
+                if ($value == "кухонный гарнитур") {echo "checked"; break;}
             }
                 ?>> кухонный гарнитур
         </li>
         <li>
-            <input type="checkbox" name="furnitureInKitchen[]" value="mountedCabinets" <?php foreach ($furnitureInKitchen as $value) {
-                if ($value == "mountedCabinets") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInKitchen[]" value="шкафчики навесные" <?php foreach ($furnitureInKitchen as $value) {
+                if ($value == "шкафчики навесные") {echo "checked"; break;}
             }
                 ?>> шкафчики навесные
         </li>
         <li>
-            <input type="checkbox" name="furnitureInKitchen[]" value="lockersFloor" <?php foreach ($furnitureInKitchen as $value) {
-                if ($value == "lockersFloor") {echo "checked"; break;}
+            <input type="checkbox" name="furnitureInKitchen[]" value="шкафчики напольные" <?php foreach ($furnitureInKitchen as $value) {
+                if ($value == "шкафчики напольные") {echo "checked"; break;}
             }
                 ?>> шкафчики напольные
         </li>
@@ -1067,63 +1076,63 @@ include("header.php");
             </ul>
     </div>
 </div>
-<div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
+<div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
     <div class="objectDescriptionItemLabel">
         Бытовая техника:
     </div>
     <div class="objectDescriptionBody">
         <ul>
         <li>
-            <input type="checkbox" name="appliances[]" value="refrigerator" <?php foreach ($appliances as $value) {
-                if ($value == "refrigerator") {echo "checked"; break;}
+            <input type="checkbox" name="appliances[]" value="холодильник" <?php foreach ($appliances as $value) {
+                if ($value == "холодильник") {echo "checked"; break;}
             }
                 ?>> холодильник
         </li>
         <li>
-            <input type="checkbox" name="appliances[]" value="microwave" <?php foreach ($appliances as $value) {
-                if ($value == "microwave") {echo "checked"; break;}
+            <input type="checkbox" name="appliances[]" value="микроволновая печь" <?php foreach ($appliances as $value) {
+                if ($value == "микроволновая печь") {echo "checked"; break;}
             }
                 ?>> микроволновая печь
         </li>
         <li>
-            <input type="checkbox" name="appliances[]" value="televisor" <?php foreach ($appliances as $value) {
-                if ($value == "televisor") {echo "checked"; break;}
+            <input type="checkbox" name="appliances[]" value="телевизор" <?php foreach ($appliances as $value) {
+                if ($value == "телевизор") {echo "checked"; break;}
             }
                 ?>> телевизор
         </li>
         <li>
-            <input type="checkbox" name="appliances[]" value="washingMachineAutomatic" <?php foreach ($appliances as $value) {
-                if ($value == "washingMachineAutomatic") {echo "checked"; break;}
+            <input type="checkbox" name="appliances[]" value="стиральная машина (автомат)" <?php foreach ($appliances as $value) {
+                if ($value == "стиральная машина (автомат)") {echo "checked"; break;}
             }
                 ?>> стиральная машина (автомат)
         </li>
         <li>
-            <input type="checkbox" name="appliances[]" value="washingMachineNonAutomatic" <?php foreach ($appliances as $value) {
-                if ($value == "washingMachineNonAutomatic") {echo "checked"; break;}
+            <input type="checkbox" name="appliances[]" value="стиральная машина (не автомат)" <?php foreach ($appliances as $value) {
+                if ($value == "стиральная машина (не автомат)") {echo "checked"; break;}
             }
                 ?>> стиральная машина (не автомат)
         </li>
         <li>
-            <input type="checkbox" name="appliances[]" value="waterHeater" <?php foreach ($appliances as $value) {
-                if ($value == "waterHeater") {echo "checked"; break;}
+            <input type="checkbox" name="appliances[]" value="нагреватель воды" <?php foreach ($appliances as $value) {
+                if ($value == "нагреватель воды") {echo "checked"; break;}
             }
                 ?>> нагреватель воды
         </li>
         <li>
-            <input type="checkbox" name="appliances[]" value="vacuumCleaner" <?php foreach ($appliances as $value) {
-                if ($value == "vacuumCleaner") {echo "checked"; break;}
+            <input type="checkbox" name="appliances[]" value="пылесос" <?php foreach ($appliances as $value) {
+                if ($value == "пылесос") {echo "checked"; break;}
             }
                 ?>> пылесос
         </li>
         <li>
-            <input type="checkbox" name="appliances[]" value="airConditioning" <?php foreach ($appliances as $value) {
-                if ($value == "airConditioning") {echo "checked"; break;}
+            <input type="checkbox" name="appliances[]" value="кондиционер" <?php foreach ($appliances as $value) {
+                if ($value == "кондиционер") {echo "checked"; break;}
             }
                 ?>> кондиционер
         </li>
         <li>
-            <input type="checkbox" name="appliances[]" value="alarm" <?php foreach ($appliances as $value) {
-                if ($value == "alarm") {echo "checked"; break;}
+            <input type="checkbox" name="appliances[]" value="охранная сигнализация" <?php foreach ($appliances as $value) {
+                if ($value == "охранная сигнализация") {echo "checked"; break;}
             }
                 ?>> охранная сигнализация
         </li>
@@ -1139,76 +1148,76 @@ include("header.php");
     <div class="advertDescriptionChapterHeader">
         Требования к арендатору
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Пол:
         </div>
         <div class="objectDescriptionBody">
-            <input type="checkbox" name="sexOfTenant[]" value="man" <?php foreach ($sexOfTenant as $value) {
-                if ($value == "man") {echo "checked"; break;}
+            <input type="checkbox" name="sexOfTenant[]" value="мужчина" <?php foreach ($sexOfTenant as $value) {
+                if ($value == "мужчина") {echo "checked"; break;}
             }
                 ?>>
             мужчина
             <br>
-            <input type="checkbox" name="sexOfTenant[]" value="woman" <?php foreach ($sexOfTenant as $value) {
-                if ($value == "woman") {echo "checked"; break;}
+            <input type="checkbox" name="sexOfTenant[]" value="женщина" <?php foreach ($sexOfTenant as $value) {
+                if ($value == "женщина") {echo "checked"; break;}
             }
                 ?>>
             женщина
         </div>
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Отношения между арендаторами:
         </div>
         <div class="objectDescriptionBody">
-            <input type="checkbox" name="relations[]" value="family" <?php foreach ($relations as $value) {
-                if ($value == "family") {echo "checked"; break;}
+            <input type="checkbox" name="relations[]" value="семейная пара" <?php foreach ($relations as $value) {
+                if ($value == "семейная пара") {echo "checked"; break;}
             }
                 ?>>
             семейная пара
             <br>
-            <input type="checkbox" name="relations[]" value="notFamily" <?php foreach ($relations as $value) {
-                if ($value == "notFamily") {echo "checked"; break;}
+            <input type="checkbox" name="relations[]" value="несемейная пара" <?php foreach ($relations as $value) {
+                if ($value == "несемейная пара") {echo "checked"; break;}
             }
                 ?>>
             несемейная пара
             <br>
-            <input type="checkbox" name="relations[]" value="alone" <?php foreach ($relations as $value) {
-                if ($value == "alone") {echo "checked"; break;}
+            <input type="checkbox" name="relations[]" value="один человек" <?php foreach ($relations as $value) {
+                if ($value == "один человек") {echo "checked"; break;}
             }
                 ?>>
             один человек
             <br>
-            <input type="checkbox" name="relations[]" value="group" <?php foreach ($relations as $value) {
-                if ($value == "group") {echo "checked"; break;}
+            <input type="checkbox" name="relations[]" value="группа людей" <?php foreach ($relations as $value) {
+                if ($value == "группа людей") {echo "checked"; break;}
             }
                 ?>>
             группа людей
         </div>
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Дети:
         </div>
         <div class="objectDescriptionBody">
             <select name="children">
                 <option value="0" <?php if ($children == "0") echo "selected";?>></option>
-                <option value="any" <?php if ($children == "any") echo "selected";?>>не имеет значения</option>
-                <option value="older4" <?php if ($children == "older4") echo "selected";?>>с детьми старше 4-х лет</option>
-                <option value="without" <?php if ($children == "without") echo "selected";?>>только без детей</option>
+                <option value="не имеет значения" <?php if ($children == "не имеет значения") echo "selected";?>>не имеет значения</option>
+                <option value="с детьми старше 4-х лет" <?php if ($children == "с детьми старше 4-х лет") echo "selected";?>>с детьми старше 4-х лет</option>
+                <option value="только без детей" <?php if ($children == "только без детей") echo "selected";?>>только без детей</option>
             </select>
         </div>
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0 typeOfObject_garage">
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Животные:
         </div>
         <div class="objectDescriptionBody">
             <select name="animals">
                 <option value="0" <?php if ($animals == "0") echo "selected";?>></option>
-                <option value="any" <?php if ($animals == "any") echo "selected";?>>не имеет значения</option>
-                <option value="without" <?php if ($animals == "without") echo "selected";?>>только без животных</option>
+                <option value="не имеет значения" <?php if ($animals == "не имеет значения") echo "selected";?>>не имеет значения</option>
+                <option value="только без животных" <?php if ($animals == "только без животных") echo "selected";?>>только без животных</option>
             </select>
         </div>
     </div>
@@ -1234,48 +1243,48 @@ include("header.php");
             с
             <select name="timeForRingBegin">
                 <option value="0" <?php if ($timeForRingBegin == "0") echo "selected";?>></option>
-                <option value="6" <?php if ($timeForRingBegin == "6") echo "selected";?>>6:00</option>
-                <option value="7" <?php if ($timeForRingBegin == "7") echo "selected";?>>7:00</option>
-                <option value="8" <?php if ($timeForRingBegin == "8") echo "selected";?>>8:00</option>
-                <option value="9" <?php if ($timeForRingBegin == "9") echo "selected";?>>9:00</option>
-                <option value="10" <?php if ($timeForRingBegin == "10") echo "selected";?>>10:00</option>
-                <option value="11" <?php if ($timeForRingBegin == "11") echo "selected";?>>11:00</option>
-                <option value="12" <?php if ($timeForRingBegin == "12") echo "selected";?>>12:00</option>
-                <option value="13" <?php if ($timeForRingBegin == "13") echo "selected";?>>13:00</option>
-                <option value="14" <?php if ($timeForRingBegin == "14") echo "selected";?>>14:00</option>
-                <option value="15" <?php if ($timeForRingBegin == "15") echo "selected";?>>15:00</option>
-                <option value="16" <?php if ($timeForRingBegin == "16") echo "selected";?>>16:00</option>
-                <option value="17" <?php if ($timeForRingBegin == "17") echo "selected";?>>17:00</option>
-                <option value="18" <?php if ($timeForRingBegin == "18") echo "selected";?>>18:00</option>
-                <option value="19" <?php if ($timeForRingBegin == "19") echo "selected";?>>19:00</option>
-                <option value="20" <?php if ($timeForRingBegin == "20") echo "selected";?>>20:00</option>
-                <option value="21" <?php if ($timeForRingBegin == "21") echo "selected";?>>21:00</option>
-                <option value="22" <?php if ($timeForRingBegin == "22") echo "selected";?>>22:00</option>
-                <option value="23" <?php if ($timeForRingBegin == "23") echo "selected";?>>23:00</option>
-                <option value="24" <?php if ($timeForRingBegin == "24") echo "selected";?>>24:00</option>
+                <option value="6:00" <?php if ($timeForRingBegin == "6:00") echo "selected";?>>6:00</option>
+                <option value="7:00" <?php if ($timeForRingBegin == "7:00") echo "selected";?>>7:00</option>
+                <option value="8:00" <?php if ($timeForRingBegin == "8:00") echo "selected";?>>8:00</option>
+                <option value="9:00" <?php if ($timeForRingBegin == "9:00") echo "selected";?>>9:00</option>
+                <option value="10:00" <?php if ($timeForRingBegin == "10:00") echo "selected";?>>10:00</option>
+                <option value="11:00" <?php if ($timeForRingBegin == "11:00") echo "selected";?>>11:00</option>
+                <option value="12:00" <?php if ($timeForRingBegin == "12:00") echo "selected";?>>12:00</option>
+                <option value="13:00" <?php if ($timeForRingBegin == "13:00") echo "selected";?>>13:00</option>
+                <option value="14:00" <?php if ($timeForRingBegin == "14:00") echo "selected";?>>14:00</option>
+                <option value="15:00" <?php if ($timeForRingBegin == "15:00") echo "selected";?>>15:00</option>
+                <option value="16:00" <?php if ($timeForRingBegin == "16:00") echo "selected";?>>16:00</option>
+                <option value="17:00" <?php if ($timeForRingBegin == "17:00") echo "selected";?>>17:00</option>
+                <option value="18:00" <?php if ($timeForRingBegin == "18:00") echo "selected";?>>18:00</option>
+                <option value="19:00" <?php if ($timeForRingBegin == "19:00") echo "selected";?>>19:00</option>
+                <option value="20:00" <?php if ($timeForRingBegin == "20:00") echo "selected";?>>20:00</option>
+                <option value="21:00" <?php if ($timeForRingBegin == "21:00") echo "selected";?>>21:00</option>
+                <option value="22:00" <?php if ($timeForRingBegin == "22:00") echo "selected";?>>22:00</option>
+                <option value="23:00" <?php if ($timeForRingBegin == "23:00") echo "selected";?>>23:00</option>
+                <option value="24:00" <?php if ($timeForRingBegin == "24:00") echo "selected";?>>24:00</option>
             </select>
             до
             <select name="timeForRingEnd">
                 <option value="0" <?php if ($timeForRingEnd == "0") echo "selected";?>></option>
-                <option value="6" <?php if ($timeForRingEnd == "6") echo "selected";?>>6:00</option>
-                <option value="7" <?php if ($timeForRingEnd == "7") echo "selected";?>>7:00</option>
-                <option value="8" <?php if ($timeForRingEnd == "8") echo "selected";?>>8:00</option>
-                <option value="9" <?php if ($timeForRingEnd == "9") echo "selected";?>>9:00</option>
-                <option value="10" <?php if ($timeForRingEnd == "10") echo "selected";?>>10:00</option>
-                <option value="11" <?php if ($timeForRingEnd == "11") echo "selected";?>>11:00</option>
-                <option value="12" <?php if ($timeForRingEnd == "12") echo "selected";?>>12:00</option>
-                <option value="13" <?php if ($timeForRingEnd == "13") echo "selected";?>>13:00</option>
-                <option value="14" <?php if ($timeForRingEnd == "14") echo "selected";?>>14:00</option>
-                <option value="15" <?php if ($timeForRingEnd == "15") echo "selected";?>>15:00</option>
-                <option value="16" <?php if ($timeForRingEnd == "16") echo "selected";?>>16:00</option>
-                <option value="17" <?php if ($timeForRingEnd == "17") echo "selected";?>>17:00</option>
-                <option value="18" <?php if ($timeForRingEnd == "18") echo "selected";?>>18:00</option>
-                <option value="19" <?php if ($timeForRingEnd == "19") echo "selected";?>>19:00</option>
-                <option value="20" <?php if ($timeForRingEnd == "20") echo "selected";?>>20:00</option>
-                <option value="21" <?php if ($timeForRingEnd == "21") echo "selected";?>>21:00</option>
-                <option value="22" <?php if ($timeForRingEnd == "22") echo "selected";?>>22:00</option>
-                <option value="23" <?php if ($timeForRingEnd == "23") echo "selected";?>>23:00</option>
-                <option value="24" <?php if ($timeForRingEnd == "24") echo "selected";?>>24:00</option>
+                <option value="6:00" <?php if ($timeForRingEnd == "6:00") echo "selected";?>>6:00</option>
+                <option value="7:00" <?php if ($timeForRingEnd == "7:00") echo "selected";?>>7:00</option>
+                <option value="8:00" <?php if ($timeForRingEnd == "8:00") echo "selected";?>>8:00</option>
+                <option value="9:00" <?php if ($timeForRingEnd == "9:00") echo "selected";?>>9:00</option>
+                <option value="10:00" <?php if ($timeForRingEnd == "10:00") echo "selected";?>>10:00</option>
+                <option value="11:00" <?php if ($timeForRingEnd == "11:00") echo "selected";?>>11:00</option>
+                <option value="12:00" <?php if ($timeForRingEnd == "12:00") echo "selected";?>>12:00</option>
+                <option value="13:00" <?php if ($timeForRingEnd == "13:00") echo "selected";?>>13:00</option>
+                <option value="14:00" <?php if ($timeForRingEnd == "14:00") echo "selected";?>>14:00</option>
+                <option value="15:00" <?php if ($timeForRingEnd == "15:00") echo "selected";?>>15:00</option>
+                <option value="16:00" <?php if ($timeForRingEnd == "16:00") echo "selected";?>>16:00</option>
+                <option value="17:00" <?php if ($timeForRingEnd == "17:00") echo "selected";?>>17:00</option>
+                <option value="18:00" <?php if ($timeForRingEnd == "18:00") echo "selected";?>>18:00</option>
+                <option value="19:00" <?php if ($timeForRingEnd == "19:00") echo "selected";?>>19:00</option>
+                <option value="20:00" <?php if ($timeForRingEnd == "20:00") echo "selected";?>>20:00</option>
+                <option value="21:00" <?php if ($timeForRingEnd == "21:00") echo "selected";?>>21:00</option>
+                <option value="22:00" <?php if ($timeForRingEnd == "22:00") echo "selected";?>>22:00</option>
+                <option value="23:00" <?php if ($timeForRingEnd == "23:00") echo "selected";?>>23:00</option>
+                <option value="24:00" <?php if ($timeForRingEnd == "24:00") echo "selected";?>>24:00</option>
             </select>
         </div>
     </div>
@@ -1286,10 +1295,10 @@ include("header.php");
         <div class="objectDescriptionBody" style="min-width: 330px">
             <select name="checking">
                 <option value="0"  <?php if ($checking == "0") echo "selected";?>></option>
-                <option value="never" <?php if ($checking == "never") echo "selected";?>>Никогда (проживает в другом городе)</option>
-                <option value="1" <?php if ($checking == "1") echo "selected";?>>1 раз в месяц (при получении оплаты)</option>
-                <option value="more1" <?php if ($checking == "more1") echo "selected";?>>Периодически (чаще 1 раза в месяц)</option>
-                <option value="constantly" <?php if ($checking == "constantly") echo "selected";?>>Постоянно (проживает в этой же квартире)</option>
+                <option value="Никогда (проживает в другом городе)" <?php if ($checking == "Никогда (проживает в другом городе)") echo "selected";?>>Никогда (проживает в другом городе)</option>
+                <option value="1 раз в месяц (при получении оплаты)" <?php if ($checking == "1 раз в месяц (при получении оплаты)") echo "selected";?>>1 раз в месяц (при получении оплаты)</option>
+                <option value="Периодически (чаще 1 раза в месяц)" <?php if ($checking == "Периодически (чаще 1 раза в месяц)") echo "selected";?>>Периодически (чаще 1 раза в месяц)</option>
+                <option value="Постоянно (проживает на этой же площади)" <?php if ($checking == "Постоянно (проживает на этой же площади)") echo "selected";?>>Постоянно (проживает на этой же площади)</option>
             </select>
         </div>
     </div>

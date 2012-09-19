@@ -13,7 +13,7 @@ function notavailability() {
         var notSelectorsOfElem = $(this).attr("notavailability");
 
         // Получаем массив, каждый элемент которого = условию недоступности
-        var arrNotSelectorsOfElem = notSelectorsOfElem.split(' ');
+        var arrNotSelectorsOfElem = notSelectorsOfElem.split('&');
 
         // Презумпция доступности элемента, если одно из его условий недоступности выполнится ниже, то он станет недоступным
         $(currentElem).show();
@@ -238,14 +238,8 @@ $(document).ready(currencyChanged);
 $("#currency").change(currencyChanged);
 
 function currencyChanged() {
-    var valueEng = $("#currency").val(); // текущее значение валюты
-
-    if (valueEng == "0") var valueRus = "";
-    if (valueEng == "rubl") var valueRus = "руб.";
-    if (valueEng == "dollar") var valueRus = "дол. США";
-    if (valueEng == "euro") var valueRus = "евро";
-
-    $(".currency").html(valueRus);
+    var value = $("#currency").val(); // текущее значение валюты
+    $(".currency").html(value);
 }
 
 /********************************************************************
