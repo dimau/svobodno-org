@@ -97,14 +97,14 @@ function createUploader(){
 }
 $(document).ready(createUploader);
 
-// Активируем кнопку сохранения параметров нового объявления
-$(function() {
-	$("#saveAdvertButton").button({
-		icons : {
-			primary : "ui-icon-disk"
-		}
-	});
-});
+// Деактивируем кнопку проверки адреса, если это форма для РЕДАКТИРОВАНИЯ
+if ( (window.location + '').indexOf("editadvert.php") != -1 ) {
+    $(function() {
+        $("#checkAddressButton").button({
+            disabled: true
+        });
+    });
+}
 
 /* Как только будет загружен API и готов DOM, выполняем инициализацию карты от Яндекса*/
 ymaps.ready(init);
@@ -112,16 +112,37 @@ ymaps.ready(init);
 function init() {
     // Создание экземпляра карты для Нового объявления и его привязка к контейнеру с
     // заданным id ("mapForNewAdvert")
-    var map = new ymaps.Map('mapForNewAdvert', {
-        // При инициализации карты, обязательно нужно указать
-        // ее центр и коэффициент масштабирования
-        center : [56.829748, 60.617435], // Екатеринбург
-        zoom : 11,
-        // Включим поведения по умолчанию (default) и,
-        // дополнительно, масштабирование колесом мыши.
-        // дополнительно включаем измеритель расстояний по клику левой кнопки мыши
-        behaviors : ['default', 'scrollZoom']
-    });
+    // Если пользователь уже указал месторасположение объекта - центрируем карту относительно него, иначе - относительно центра города
+    var coordX = $("#coordX").val();
+    var coordY = $("#coordY").val();
+    if (coordX != "" && coordY != "") {
+        var map = new ymaps.Map('mapForNewAdvert', {
+            // При инициализации карты, обязательно нужно указать
+            // ее центр и коэффициент масштабирования
+            center : [$("#coordX").val(), $("#coordY").val()],
+            zoom : 16,
+            // Включим поведения по умолчанию (default) и,
+            // дополнительно, масштабирование колесом мыши.
+            // дополнительно включаем измеритель расстояний по клику левой кнопки мыши
+            behaviors : ['default', 'scrollZoom']
+        });
+
+        // Добавляем на карту метку объекта недвижимости
+        currentPlacemark = new ymaps.Placemark([coordX, coordY]);
+        map.geoObjects.add(currentPlacemark);
+
+    } else {
+        var map = new ymaps.Map('mapForNewAdvert', {
+            // При инициализации карты, обязательно нужно указать
+            // ее центр и коэффициент масштабирования
+            center : [56.829748, 60.617435], // Екатеринбург
+            zoom : 11,
+            // Включим поведения по умолчанию (default) и,
+            // дополнительно, масштабирование колесом мыши.
+            // дополнительно включаем измеритель расстояний по клику левой кнопки мыши
+            behaviors : ['default', 'scrollZoom']
+        });
+    }
 
     /***** Добавляем элементы управления на карту *****/
         // Для добавления элемента управления на карту используется поле controls, ссылающееся на
@@ -182,39 +203,42 @@ function init() {
     });
 
     // Если пользователь кликнит левой кнопкой по дому - то адресная строка заполнится автоматически
-    map.events.add('click', function(e) {
-        var coords = e.get('coordPosition');
+    // Работает только, если пользователь работает с новым объявлением. При редактировании - не выполняется
+    if ((window.location + '').indexOf("editadvert.php") == -1) {
+        map.events.add('click', function(e) {
+            var coords = e.get('coordPosition');
 
-        // Отправим запрос на геокодирование, берем только 1 результат - это будетт название улицы и номер дома (так у них в Яндексе настроено).
-        ymaps.geocode(coords, {
-            results : 1
-        }).then(function(res) {
-                var names = [];
+            // Отправим запрос на геокодирование, берем только 1 результат - это будетт название улицы и номер дома (так у них в Яндексе настроено).
+            ymaps.geocode(coords, {
+                results : 1
+            }).then(function(res) {
+                    var names = [];
 
-                // Переберём все найденные результаты и
-                // запишем имена найденный объектов в массив names.
-                // Этот код остался от того момента, когда geocode был ограничен не одним результатом, а несколькими, возможно, для повышения эффективности его можно сократить
-                res.geoObjects.each(function(obj) {
-                    names.push(obj.properties.get('name'));
+                    // Переберём все найденные результаты и
+                    // запишем имена найденный объектов в массив names.
+                    // Этот код остался от того момента, когда geocode был ограничен не одним результатом, а несколькими, возможно, для повышения эффективности его можно сократить
+                    res.geoObjects.each(function(obj) {
+                        names.push(obj.properties.get('name'));
+                    });
+
+                    // Если на карте уже есть метки - удаляем, записываем новую метку в точку, по координатам которой запрашивали обратное геокодирование
+                    searchObjectCollection.removeAll();
+                    searchObjectCollection = res.geoObjects;
+                    map.geoObjects.add(searchObjectCollection);
+
+                    // В центр карты поместим полученный объект
+                    var point = res.geoObjects.get(0);
+                    map.setCenter(point.geometry.getCoordinates(), 16);
+
+                    // Укажем адрес данного объекта в строке ввода
+                    // Поле для ввода адреса располагается первым в форме!
+                    document.getElementById('addressTextBox').value = point.properties.get('name');
+
+                    // Сохраняем координаты в скрытые инпуты для передачи на сервер вместе с адресом объекта
+                    saveCoord(point);
                 });
-
-                // Если на карте уже есть метки - удаляем, записываем новую метку в точку, по координатам которой запрашивали обратное геокодирование
-                searchObjectCollection.removeAll();
-                searchObjectCollection = res.geoObjects;
-                map.geoObjects.add(searchObjectCollection);
-
-                // В центр карты поместим полученный объект
-                var point = res.geoObjects.get(0);
-                map.setCenter(point.geometry.getCoordinates(), 16);
-
-                // Укажем адрес данного объекта в строке ввода
-                // Поле для ввода адреса располагается первым в форме!
-                document.getElementById('addressTextBox').value = point.properties.get('name');
-
-                // Сохраняем координаты в скрытые инпуты для передачи на сервер вместе с адресом объекта
-                saveCoord(point);
-            });
-    });
+        });
+    }
 
     function saveCoord(point) {
         // Полученные координаты точки сохраним в input hidden для передачи на сервер
@@ -308,3 +332,12 @@ function costOfRentingChanged() {
     $("#compensationMoney").val(compensationMoney);
     $("#compensationPercent").val(compensationPercent);
 }
+
+// Активируем кнопку сохранения параметров объявления
+$(function() {
+    $("#saveAdvertButton").button({
+        icons : {
+            primary : "ui-icon-disk"
+        }
+    });
+});

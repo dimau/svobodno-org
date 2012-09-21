@@ -450,18 +450,14 @@ $tmpl_MyAdvert = "
         </div>
     </div>
     <ul class='setOfInstructions'>
+        {instructionPublish}
         <li>
-            <a href='#'>удалить</a>
-    </li>
-        <li>
-            <a href='#'>редактировать</a>
+            <a href='editadvert.php?propertyId={propertyId}'>редактировать</a>
         </li>
         <li>
-            <a href='#'>подробнее</a>
+            <a href='objdescription.php?propertyId={propertyId}'>подробнее</a>
         </li>
-        <li>
-            <a href='#'>опубликовать</a>
-        </li>
+        {instructionDelete}
     </ul>
     <ul class='listDescription'>
         <li>
@@ -563,7 +559,7 @@ if (count($rowPropertyArr) > 1) {
     foreach ($unpublishedArr as $value) $rowPropertyArr[] = $value;
 }
 
-// Создаем бриф объявления на основе шаблона для вкладки МОИ ОБЪЯВЛЕНИЯ.
+// Создаем бриф для каждого объявления пользователя на основе шаблона (для вкладки МОИ ОБЪЯВЛЕНИЯ), и в цикле объединяем их в один HTML блок - $briefOfAdverts.
 // Если объявлений у пользователя несколько, то в переменную, содержащую весь HTML - $briefOfAdverts, записываем каждое из них последовательно
 $briefOfAdverts = "";
 for ($i = 0; $i < count($rowPropertyArr); $i++) {
@@ -577,12 +573,7 @@ for ($i = 0; $i < count($rowPropertyArr); $i++) {
     $currentAdvert = str_replace("{statusEng}", $str, $currentAdvert);
 
     // В заголовке блока отображаем тип недвижимости, для красоты первую букву типа сделаем в верхнем регистре
-    $str = $rowPropertyArr[$i]['typeOfObject'];
-    $firstChar = mb_substr($str, 0, 1, 'UTF-8'); // Первая буква
-    $lastStr = mb_substr($str, 1); // Все кроме первой буквы
-    $firstChar = mb_strtoupper($firstChar, 'UTF-8');
-    $lastStr = mb_strtolower($lastStr, 'UTF-8');
-    $str = $firstChar . $lastStr;
+    $str = getFirstCharUpper($rowPropertyArr[$i]['typeOfObject']);
     $currentAdvert = str_replace("{typeOfObject}", $str, $currentAdvert);
 
     // Адрес и номер квартиры, если он есть
@@ -598,6 +589,22 @@ for ($i = 0; $i < count($rowPropertyArr); $i++) {
     // Фотографию
     $str = "uploaded_files/" . $rowPropertyFotosArr[$i]['id'] . "." . $rowPropertyFotosArr[$i]['extension'];
     $currentAdvert = str_replace("{urlFoto}", $str, $currentAdvert);
+
+    // Корректируем список инструкций, доступных пользователю
+    $strInstructionPublish = "";
+    $strInstructionDelete = "";
+    if ($rowPropertyArr[$i]['status'] == "опубликовано") {
+        $strInstructionPublish = "<li><a href='#'>снять с публикации</a></li>";
+        $strInstructionDelete = "";
+    }
+    if ($rowPropertyArr[$i]['status'] == "не опубликовано") {
+        $strInstructionPublish = "<li><a href='#'>опубликовать</a></li>";
+        $strInstructionDelete = "<li><a href='#'>удалить</a></li>";
+    }
+    $currentAdvert = str_replace("{instructionPublish}", $strInstructionPublish, $currentAdvert);
+    $currentAdvert = str_replace("{instructionDelete}", $strInstructionDelete, $currentAdvert);
+    $str = $rowPropertyArr[$i]['id'];
+    $currentAdvert = str_replace("{propertyId}", $str, $currentAdvert);
 
     // TODO: обязательно доделать вывод арендаторов
     $str = "А никооооого нету ещеееее";
@@ -659,7 +666,7 @@ for ($i = 0; $i < count($rowPropertyArr); $i++) {
     // Площади помещений
     $strAreaNames = "";
     $strAreaValues = "";
-    if ($rowPropertyArr[$i]['typeOfObject'] != "квартира" && $rowPropertyArr[$i]['typeOfObject'] != "дом, коттедж" && $rowPropertyArr[$i]['typeOfObject'] != "таунхаус" && $rowPropertyArr[$i]['typeOfObject'] != "дача" && $rowPropertyArr[$i]['typeOfObject'] != "гараж") { $strAreaNames .= "комнаты"; $strAreaValues .= $rowPropertyArr[$i]['roomSpace']; }
+    if ($rowPropertyArr[$i]['typeOfObject'] != "квартира" && $rowPropertyArr[$i]['typeOfObject'] != "дом" && $rowPropertyArr[$i]['typeOfObject'] != "таунхаус" && $rowPropertyArr[$i]['typeOfObject'] != "дача" && $rowPropertyArr[$i]['typeOfObject'] != "гараж") { $strAreaNames .= "комнаты"; $strAreaValues .= $rowPropertyArr[$i]['roomSpace']; }
     if ($rowPropertyArr[$i]['typeOfObject'] != "комната") { $strAreaNames .= "общая"; $strAreaValues .= $rowPropertyArr[$i]['totalArea']; }
     if ($rowPropertyArr[$i]['typeOfObject'] != "комната" && $rowPropertyArr[$i]['typeOfObject'] != "гараж") { $strAreaNames .= "/жилая"; $strAreaValues .= " / " . $rowPropertyArr[$i]['livingSpace']; }
     if ($rowPropertyArr[$i]['typeOfObject'] != "дача" && $rowPropertyArr[$i]['typeOfObject'] != "гараж") { $strAreaNames .= "/кухни"; $strAreaValues .= " / " . $rowPropertyArr[$i]['kitchenSpace']; }
@@ -724,8 +731,7 @@ for ($i = 0; $i < count($rowPropertyArr); $i++) {
     $str = $rowPropertyArr[$i]['timeForRingEnd'];
     $currentAdvert = str_replace("{timeForRingEnd}", $str, $currentAdvert);
 
-    // TODO: address и currency повторяются
-
+    // Сформированный блок с описанием объявления добавляем в общую копилку. На вкладке tabs-3 (Мои объявления) полученный HTML всех блоков вставим в страницу.
     $briefOfAdverts .= $currentAdvert; // Добавим html-текст еще одного объявления. Готовим html-текст к добавлению на вкладку tabs-3 в Мои объявления
 }
 
@@ -2303,7 +2309,7 @@ include("header.php");
     </td>
     <td>ул. Ленина 13
         <div class="linkToDescriptionBlock">
-            <a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
+            <a class="linkToDescription" href="objdescription.php">Подробнее</a>
         </div>
     </td>
     <td> 15000</td>
@@ -2327,7 +2333,7 @@ include("header.php");
     </td>
     <td>ул. Репина 105
         <div class="linkToDescriptionBlock">
-            <a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
+            <a class="linkToDescription" href="objdescription.php">Подробнее</a>
         </div>
     </td>
     <td> 35000</td>
@@ -2351,7 +2357,7 @@ include("header.php");
     </td>
     <td>ул. Шаумяна 107
         <div class="linkToDescriptionBlock">
-            <a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
+            <a class="linkToDescription" href="objdescription.php">Подробнее</a>
         </div>
     </td>
     <td> 150000</td>
@@ -2375,7 +2381,7 @@ include("header.php");
     </td>
     <td>ул. Гурзуфская 38
         <div class="linkToDescriptionBlock">
-            <a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
+            <a class="linkToDescription" href="objdescription.php">Подробнее</a>
         </div>
     </td>
     <td> 6000</td>
@@ -2399,7 +2405,7 @@ include("header.php");
     </td>
     <td>ул. Серафимы Дерябиной 17
         <div class="linkToDescriptionBlock">
-            <a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
+            <a class="linkToDescription" href="objdescription.php">Подробнее</a>
         </div>
     </td>
     <td> 2000</td>
@@ -2423,7 +2429,7 @@ include("header.php");
     </td>
     <td>ул. Серафимы Дерябиной 17
         <div class="linkToDescriptionBlock">
-            <a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
+            <a class="linkToDescription" href="objdescription.php">Подробнее</a>
         </div>
     </td>
     <td> 350000</td>
@@ -2446,7 +2452,7 @@ include("header.php");
     </td>
     <td>улица Сибирский тракт 50 летия 107
         <div class="linkToDescriptionBlock">
-            <a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
+            <a class="linkToDescription" href="objdescription.php">Подробнее</a>
         </div>
     </td>
     <td> 15000</td>
@@ -2469,7 +2475,7 @@ include("header.php");
     </td>
     <td>ул. Сумасранка 4
         <div class="linkToDescriptionBlock">
-            <a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
+            <a class="linkToDescription" href="objdescription.php">Подробнее</a>
         </div>
     </td>
     <td> 35000</td>
@@ -2489,7 +2495,7 @@ include("header.php");
     </td>
     <td>ул. Серафимы Дерябиной 154
         <div class="linkToDescriptionBlock">
-            <a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
+            <a class="linkToDescription" href="objdescription.php">Подробнее</a>
         </div>
     </td>
     <td> 150000</td>
@@ -2509,7 +2515,7 @@ include("header.php");
     </td>
     <td>ул. Белореченская 24
         <div class="linkToDescriptionBlock">
-            <a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
+            <a class="linkToDescription" href="objdescription.php">Подробнее</a>
         </div>
     </td>
     <td> 6000</td>
@@ -2529,7 +2535,7 @@ include("header.php");
     </td>
     <td>ул. Маврода 2012
         <div class="linkToDescriptionBlock">
-            <a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
+            <a class="linkToDescription" href="objdescription.php">Подробнее</a>
         </div>
     </td>
     <td> 2000</td>
@@ -2549,7 +2555,7 @@ include("header.php");
     </td>
     <td>ул. Пискуна 1
         <div class="linkToDescriptionBlock">
-            <a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
+            <a class="linkToDescription" href="objdescription.php">Подробнее</a>
         </div>
     </td>
     <td> 350000</td>
@@ -2569,7 +2575,7 @@ include("header.php");
     </td>
     <td>улица Сибирский тракт 50 летия 107
         <div class="linkToDescriptionBlock">
-            <a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
+            <a class="linkToDescription" href="objdescription.php">Подробнее</a>
         </div>
     </td>
     <td> 15000</td>
@@ -2589,7 +2595,7 @@ include("header.php");
     </td>
     <td>ул. Сумасранка 4
         <div class="linkToDescriptionBlock">
-            <a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
+            <a class="linkToDescription" href="objdescription.php">Подробнее</a>
         </div>
     </td>
     <td> 35000</td>
@@ -2609,7 +2615,7 @@ include("header.php");
     </td>
     <td>ул. Серафимы Дерябиной 154
         <div class="linkToDescriptionBlock">
-            <a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
+            <a class="linkToDescription" href="objdescription.php">Подробнее</a>
         </div>
     </td>
     <td> 150000</td>
@@ -2629,7 +2635,7 @@ include("header.php");
     </td>
     <td>ул. Белореченская 24
         <div class="linkToDescriptionBlock">
-            <a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
+            <a class="linkToDescription" href="objdescription.php">Подробнее</a>
         </div>
     </td>
     <td> 6000</td>
@@ -2649,7 +2655,7 @@ include("header.php");
     </td>
     <td>ул. Маврода 2012
         <div class="linkToDescriptionBlock">
-            <a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
+            <a class="linkToDescription" href="objdescription.php">Подробнее</a>
         </div>
     </td>
     <td> 2000</td>
@@ -2669,7 +2675,7 @@ include("header.php");
     </td>
     <td>ул. Пискуна 1
         <div class="linkToDescriptionBlock">
-            <a class="linkToDescription" href="descriptionOfObject.php">Подробнее</a>
+            <a class="linkToDescription" href="objdescription.php">Подробнее</a>
         </div>
     </td>
     <td> 350000</td>

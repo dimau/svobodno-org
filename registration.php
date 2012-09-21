@@ -1327,7 +1327,7 @@ include("header.php");
 
 <!-- scripts concatenated and minified via build script -->
 <script src="js/main.js"></script>
-<script src="js/registrationForm.js"></script>
+<script src="js/registration.js"></script>
 
 <!-- end scripts -->
 

@@ -5,87 +5,126 @@ include_once 'lib/function_global.php'; //подключаем файл с гл�
 /*************************************************************************************
  * Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
  ************************************************************************************/
+
 $userId = login();
 if (!$userId) {
     header('Location: login.php');
 }
 
 /*************************************************************************************
- * Присваиваем всем переменным значения по умолчанию
+ * Если в строке не указан идентификатор объявления для редактирования, то пересылаем пользователя в личный кабинет
  ************************************************************************************/
-$typeOfObject = "0";
-$dateOfEntry = "";
-$termOfLease = "0";
-$dateOfCheckOut = "";
-$amountOfRooms = "0";
-$adjacentRooms = "0";
-$amountOfAdjacentRooms = "0";
-$typeOfBathrooms = "0";
-$typeOfBalcony = "0";
-$balconyGlazed = "0";
-$roomSpace = "";
-$totalArea = "";
-$livingSpace = "";
-$kitchenSpace = "";
-$floor = "";
-$totalAmountFloor = "";
-$numberOfFloor = "";
-$concierge = "0";
-$intercom = "0";
-$parking = "0";
-$city = "Екатеринбург";
-$district = "0";
-$coordX = "";
-$coordY = "";
-$address = "";
-$apartmentNumber = "";
-$subwayStation = "0";
-$distanceToMetroStation = "";
-$currency = "0";
-$costOfRenting = "";
-$utilities = "0";
-$costInSummer = "";
-$costInWinter = "";
-$electricPower = "0";
-$bail = "0";
-$bailCost = "";
-$prepayment = "0";
-$compensationMoney = "";
-$compensationPercent = "";
-$repair = "0";
-$furnish = "0";
-$windows = "0";
-$internet = "0";
-$telephoneLine = "0";
-$cableTV = "0";
-$furnitureInLivingArea = array();
-$furnitureInLivingAreaExtra = "";
-$furnitureInKitchen = array();
-$furnitureInKitchenExtra = "";
-$appliances = array();
-$appliancesExtra = "";
-$sexOfTenant = array();
-$relations = array();
-$children = "0";
-$animals = "0";
-$contactTelephonNumber = "";
-$timeForRingBegin = "0";
-$timeForRingEnd = "0";
-$checking = "0";
-$responsibility = "";
-$comment = "";
-$fileUploadId = generateCode(7);
+$propertyId = "0";
+if (isset($_GET['propertyId'])) {
+    $propertyId = $_GET['propertyId']; // Получаем идентификатор объявления для редактирования из строки запроса
+} else {
+    header('Location: personal.php?tabsId=3'); // Если в запросе не указан идентификатор объявления для редактирования, то пересылаем пользователя в личный кабинет к списку его объявлений
+}
 
-// Готовим массив со списком районов в городе пользователя
+/*************************************************************************************
+ * Получаем объявление пользователя для редактирования, а также другие данные из БД
+ ************************************************************************************/
+
+// Получаем информацию о нужном объекте недвижимости
+$rezProperty = mysql_query("SELECT * FROM property WHERE id = '" . $propertyId . "'");
+$rowProperty = mysql_fetch_assoc($rezProperty);
+
+// Получаем информацию о фотографиях объекта недвижимости пользователя
+// Массив $rowPropertyFotosArr представляет собой массив массивов, каждый из которых содержит информацию об одной фотографии объекта недвижимости
+$rezPropertyFotos = mysql_query("SELECT * FROM propertyFotos WHERE propertyId = '" . $propertyId . "'");
+for ($i = 0; $i < mysql_num_rows($rezPropertyFotos); $i++) {
+    $rowPropertyFotosArr[] = mysql_fetch_assoc($rezPropertyFotos);
+}
+
+// Готовим массив со списком районов в городе, в котором находится данный объект недвижимости
 $rezDistricts = mysql_query("SELECT * FROM districts WHERE city = '" . "Екатеринбург" . "'");
 for ($i = 0; $i < mysql_num_rows($rezDistricts); $i++) {
     $rowDistricts = mysql_fetch_assoc($rezDistricts);
     $allDistrictsInCity[$rowDistricts['id']] = $rowDistricts['name'];
 }
 
+// Инициализируем переменную корректности
+$correct = "null";
+
+/**************************************************************************************************************
+ * Проверяем, что пользователь имеет право редактировать данное объявление - он является собственником данного объекта недвижимости
+ **************************************************************************************************************/
+if ($rowProperty['userId'] != $userId) header('Location: personal.php?tabsId=3');
+
+/**************************************************************************************************************
+ * Инициализируем переменные, содержащиеся в описании объекта недвижимости, в зависимости от ситуации
+ **************************************************************************************************************/
+
+// Если данные по пользователю есть в БД, присваиваем их соответствующим переменным, иначе - значения по умолчанию.
+if (isset($rowProperty['typeOfObject'])) $typeOfObject = $rowProperty['typeOfObject']; else $typeOfObject = "0";
+if (isset($rowProperty['dateOfEntry']) && $rowProperty['dateOfEntry'] != "0000-00-00") $dateOfEntry = dateFromDBToView($rowProperty['dateOfEntry']); else $dateOfEntry = "";
+if (isset($rowProperty['termOfLease'])) $termOfLease = $rowProperty['termOfLease']; else $termOfLease = "0";
+if (isset($rowProperty['dateOfCheckOut']) && $rowProperty['dateOfCheckOut'] != "0000-00-00") $dateOfCheckOut = dateFromDBToView($rowProperty['dateOfCheckOut']); else $dateOfCheckOut = "";
+if (isset($rowProperty['amountOfRooms'])) $amountOfRooms = $rowProperty['amountOfRooms']; else $amountOfRooms = "0";
+if (isset($rowProperty['adjacentRooms'])) $adjacentRooms = $rowProperty['adjacentRooms']; else $adjacentRooms = "0";
+if (isset($rowProperty['amountOfAdjacentRooms'])) $amountOfAdjacentRooms = $rowProperty['amountOfAdjacentRooms']; else $amountOfAdjacentRooms = "0";
+if (isset($rowProperty['typeOfBathrooms'])) $typeOfBathrooms = $rowProperty['typeOfBathrooms']; else $typeOfBathrooms = "0";
+if (isset($rowProperty['typeOfBalcony'])) $typeOfBalcony = $rowProperty['typeOfBalcony']; else $typeOfBalcony = "0";
+if (isset($rowProperty['balconyGlazed'])) $balconyGlazed = $rowProperty['balconyGlazed']; else $balconyGlazed = "0";
+if (isset($rowProperty['roomSpace'])) $roomSpace = $rowProperty['roomSpace']; else $roomSpace = "";
+if (isset($rowProperty['totalArea'])) $totalArea = $rowProperty['totalArea']; else $totalArea = "";
+if (isset($rowProperty['livingSpace'])) $livingSpace = $rowProperty['livingSpace']; else $livingSpace = "";
+if (isset($rowProperty['kitchenSpace'])) $kitchenSpace = $rowProperty['kitchenSpace']; else $kitchenSpace = "";
+if (isset($rowProperty['floor'])) $floor = $rowProperty['floor']; else $floor = "";
+if (isset($rowProperty['totalAmountFloor'])) $totalAmountFloor = $rowProperty['totalAmountFloor']; else $totalAmountFloor = "";
+if (isset($rowProperty['numberOfFloor'])) $numberOfFloor = $rowProperty['numberOfFloor']; else $numberOfFloor = "";
+if (isset($rowProperty['concierge'])) $concierge = $rowProperty['concierge']; else $concierge = "0";
+if (isset($rowProperty['intercom'])) $intercom = $rowProperty['intercom']; else $intercom = "0";
+if (isset($rowProperty['parking'])) $parking = $rowProperty['parking']; else $parking = "0";
+if (isset($rowProperty['city'])) $city = $rowProperty['city']; else $city = "Екатеринбург";
+if (isset($rowProperty['district'])) $district = $rowProperty['district']; else $district = "0";
+if (isset($rowProperty['coordX'])) $coordX = $rowProperty['coordX']; else $coordX = "";
+if (isset($rowProperty['coordY'])) $coordY = $rowProperty['coordY']; else $coordY = "";
+if (isset($rowProperty['address'])) $address = $rowProperty['address']; else $address = "";
+if (isset($rowProperty['apartmentNumber'])) $apartmentNumber = $rowProperty['apartmentNumber']; else $apartmentNumber = "";
+if (isset($rowProperty['subwayStation'])) $subwayStation = $rowProperty['subwayStation']; else $subwayStation = "0";
+if (isset($rowProperty['distanceToMetroStation'])) $distanceToMetroStation = $rowProperty['distanceToMetroStation']; else $distanceToMetroStation = "";
+if (isset($rowProperty['currency'])) $currency = $rowProperty['currency']; else $currency = "0";
+if (isset($rowProperty['costOfRenting'])) $costOfRenting = $rowProperty['costOfRenting']; else $costOfRenting = "";
+if (isset($rowProperty['utilities'])) $utilities = $rowProperty['utilities']; else $utilities = "0";
+if (isset($rowProperty['costInSummer'])) $costInSummer = $rowProperty['costInSummer']; else $costInSummer = "";
+if (isset($rowProperty['costInWinter'])) $costInWinter = $rowProperty['costInWinter']; else $costInWinter = "";
+if (isset($rowProperty['electricPower'])) $electricPower = $rowProperty['electricPower']; else $electricPower = "0";
+if (isset($rowProperty['bail'])) $bail = $rowProperty['bail']; else $bail = "0";
+if (isset($rowProperty['bailCost'])) $bailCost = $rowProperty['bailCost']; else $bailCost = "";
+if (isset($rowProperty['prepayment'])) $prepayment = $rowProperty['prepayment']; else $prepayment = "0";
+if (isset($rowProperty['compensationMoney'])) $compensationMoney = $rowProperty['compensationMoney']; else $compensationMoney = "";
+if (isset($rowProperty['compensationPercent'])) $compensationPercent = $rowProperty['compensationPercent']; else $compensationPercent = "";
+if (isset($rowProperty['repair'])) $repair = $rowProperty['repair']; else $repair = "0";
+if (isset($rowProperty['furnish'])) $furnish = $rowProperty['furnish']; else $furnish = "0";
+if (isset($rowProperty['windows'])) $windows = $rowProperty['windows']; else $windows = "0";
+if (isset($rowProperty['internet'])) $internet = $rowProperty['internet']; else $internet = "0";
+if (isset($rowProperty['telephoneLine'])) $telephoneLine = $rowProperty['telephoneLine']; else $telephoneLine = "0";
+if (isset($rowProperty['cableTV'])) $cableTV = $rowProperty['cableTV']; else $cableTV = "0";
+if (isset($rowProperty['furnitureInLivingArea'])) $furnitureInLivingArea = unserialize($rowProperty['furnitureInLivingArea']); else $furnitureInLivingArea = array();
+if (isset($rowProperty['furnitureInLivingAreaExtra'])) $furnitureInLivingAreaExtra = $rowProperty['furnitureInLivingAreaExtra']; else $furnitureInLivingAreaExtra = "";
+if (isset($rowProperty['furnitureInKitchen'])) $furnitureInKitchen = unserialize($rowProperty['furnitureInKitchen']); else $furnitureInKitchen = array();
+if (isset($rowProperty['furnitureInKitchenExtra'])) $furnitureInKitchenExtra = $rowProperty['furnitureInKitchenExtra']; else $furnitureInKitchenExtra = "";
+if (isset($rowProperty['appliances'])) $appliances = unserialize($rowProperty['appliances']); else $appliances = array();
+if (isset($rowProperty['appliancesExtra'])) $appliancesExtra = $rowProperty['appliancesExtra']; else $appliancesExtra = "";
+if (isset($rowProperty['sexOfTenant'])) $sexOfTenant = unserialize($rowProperty['sexOfTenant']); else $sexOfTenant = array();
+if (isset($rowProperty['relations'])) $relations = unserialize($rowProperty['relations']); else $relations = array();
+if (isset($rowProperty['children'])) $children = $rowProperty['children']; else $children = "0";
+if (isset($rowProperty['animals'])) $animals = $rowProperty['animals']; else $animals = "0";
+if (isset($rowProperty['contactTelephonNumber'])) $contactTelephonNumber = $rowProperty['contactTelephonNumber']; else $contactTelephonNumber = "";
+if (isset($rowProperty['timeForRingBegin'])) $timeForRingBegin = $rowProperty['timeForRingBegin']; else $timeForRingBegin = "0";
+if (isset($rowProperty['timeForRingEnd'])) $timeForRingEnd = $rowProperty['timeForRingEnd']; else $timeForRingEnd = "0";
+if (isset($rowProperty['checking'])) $checking = $rowProperty['checking']; else $checking = "0";
+if (isset($rowProperty['responsibility'])) $responsibility = $rowProperty['responsibility']; else $responsibility = "";
+if (isset($rowProperty['comment'])) $comment = $rowProperty['comment']; else $comment = "";
+$fileUploadId = generateCode(7);
+
+/*************************************************************************************
+ * Если пользователь заполнил и отослал форму - проверяем ее
+ ************************************************************************************/
+
 // Если была нажата кнопка Сохранить, проверим данные на корректность и, если данные введены и введены правильно, добавим запись с новым объектом недвижмости в БД
 if (isset($_POST['saveAdvertButton'])) {
-
     // Формируем набор переменных для сохранения в базу данных, либо для возвращения вместе с формой при их некорректности
     if (isset($_POST['typeOfObject'])) $typeOfObject = htmlspecialchars($_POST['typeOfObject']);
     if (isset($_POST['dateOfEntry'])) $dateOfEntry = htmlspecialchars($_POST['dateOfEntry']);
@@ -149,8 +188,8 @@ if (isset($_POST['saveAdvertButton'])) {
     if (isset($_POST['comment'])) $comment = htmlspecialchars($_POST['comment']);
     $fileUploadId = $_POST['fileUploadId'];
 
-    // Проверяем корректность данных нового объявления. Функции isAdvertCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
-    $errors = isAdvertCorrect("newAdvert");
+    // Проверяем корректность данных объявления. Функции isAdvertCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
+    $errors = isAdvertCorrect("editAdvert");
     if (count($errors) == 0) $correct = true; else $correct = false; // Считаем ошибки, если 0, то можно будет записать данные в БД
 
     // Если данные, указанные пользователем, корректны, запишем объявление в базу данных
@@ -170,7 +209,7 @@ if (isset($_POST['saveAdvertButton'])) {
         $last_act = $tm; // время последнего редактирования объявления
         $reg_date = $tm; // время регистрации ("рождения") объявления
 
-        if (mysql_query("INSERT INTO property SET
+        if (mysql_query("UPDATE property SET
                             userId='" . $userId ."',
                             typeOfObject='" . $typeOfObject ."',
                             dateOfEntry='" . $dateOfEntryForDB ."',
@@ -234,17 +273,15 @@ if (isset($_POST['saveAdvertButton'])) {
                             responsibility='" . $responsibility ."',
                             comment='" . $comment ."',
                             last_act='" . $last_act ."',
-                            reg_date='" . $reg_date ."'"))
+                            reg_date='" . $reg_date ."'
+                            WHERE id = '" . $propertyId . "'"))
         {
             /******* Переносим информацию о фотографиях объекта недвижимости в таблицу для постоянного хранения *******/
-            // Узнаем id объявления - необходимо при сохранении информации о фотке в постоянную базу
-            $rezId = mysql_query("SELECT id FROM property WHERE address='".$address."' AND coordX='".$coordX."' AND coordY='".$coordY."' AND apartmentNumber='".$apartmentNumber."'");
-            $rowId = mysql_fetch_assoc($rezId);
             // Получим информацию о всех фотках, соответствующих текущему fileUploadId
             $rezTempFotos = mysql_query("SELECT id, filename, extension, filesizeMb FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'");
             for ($i = 0; $i < mysql_num_rows($rezTempFotos); $i++) {
                 $rowTempFotos = mysql_fetch_assoc($rezTempFotos);
-                mysql_query("INSERT INTO propertyFotos (id, filename, extension, filesizeMb, propertyId) VALUES ('" . $rowTempFotos['id'] . "','" . $rowTempFotos['filename'] . "','" . $rowTempFotos['extension'] . "','" . $rowTempFotos['filesizeMb'] . "','" . $rowId['id'] . "')"); // Переносим информацию о фотографиях на постоянное хранение
+                mysql_query("INSERT INTO propertyFotos (id, filename, extension, filesizeMb, propertyId) VALUES ('" . $rowTempFotos['id'] . "','" . $rowTempFotos['filename'] . "','" . $rowTempFotos['extension'] . "','" . $rowTempFotos['filesizeMb'] . "','" . $propertyId . "')"); // Переносим информацию о фотографиях на постоянное хранение
             }
             // Удаляем записи о фотках в таблице для временного хранения данных
             mysql_query("DELETE FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'");
@@ -272,8 +309,8 @@ if (isset($_POST['saveAdvertButton'])) {
          More info: h5bp.com/i/378 -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    <title>Новое объявление</title>
-    <meta name="description" content="Новое объявление">
+    <title>Редактирование объявления</title>
+    <meta name="description" content="Редактирование объявления">
 
     <!-- Mobile viewport optimized: h5bp.com/viewport -->
     <meta name="viewport" content="initialscale=1.0, width=device-width">
@@ -364,7 +401,11 @@ include("header.php");
 
 <div class="wrapperOfTabs">
 <div class="headerOfPage">
-    Новое объявление
+    Редактирование объявления.
+    <?php
+    if ($apartmentNumber != "") $apartmentNumberInHeader = ", № " . $apartmentNumber; else $apartmentNumberInHeader = "";
+    echo getFirstCharUpper($typeOfObject) . " по адресу: " . $address . $apartmentNumberInHeader;
+    ?>
 </div>
 
 <form method="post" name="newAdvert" class="advertDescriptionEdit">
@@ -377,15 +418,10 @@ include("header.php");
             Тип объекта:
         </div>
         <div class="objectDescriptionBody">
-            <select name="typeOfObject" id="typeOfObject">
-                <option value="0" <?php if ($typeOfObject == "0") echo "selected";?>></option>
-                <option value="квартира" <?php if ($typeOfObject == "квартира") echo "selected";?>>квартира</option>
-                <option value="комната" <?php if ($typeOfObject == "комната") echo "selected";?>>комната</option>
-                <option value="дом" <?php if ($typeOfObject == "дом") echo "selected";?>>дом, коттедж</option>
-                <option value="таунхаус" <?php if ($typeOfObject == "таунхаус") echo "selected";?>>таунхаус</option>
-                <option value="дача" <?php if ($typeOfObject == "дача") echo "selected";?>>дача</option>
-                <option value="гараж" <?php if ($typeOfObject == "гараж") echo "selected";?>>гараж</option>
-            </select>
+            <input type="hidden" name="typeOfObject" id="typeOfObject" <?php echo "value='$typeOfObject'"; ?>> <!-- Значение поля необходимо сохранить, так как JS в зависимости от него будет делать некоторые элементы недоступными для редактирования -->
+            <?php
+                echo $typeOfObject;
+            ?>
         </div>
     </div>
     <div class="objectDescriptionItem">
@@ -424,6 +460,14 @@ include("header.php");
             <input type="hidden" name="fileUploadId" id="fileUploadId" <?php echo "value='$fileUploadId'"; ?>>
             <?php
             // Получаем информацию о всех загруженных фото и формируем для каждого свой input type hidden для передачи данных в обработчик яваскрипта
+            if ($rez = mysql_query("SELECT * FROM propertyFotos WHERE propertyId = '" . $propertyId . "'")) // ищем уже загруженные пользователем фотки
+            {
+                $numUploadedFiles = mysql_num_rows($rez);
+                for ($i = 0; $i < $numUploadedFiles; $i++) {
+                    $row = mysql_fetch_assoc($rez);
+                    echo "<input type='hidden' class='uploadedFoto' filename='" . $row['filename'] . "' filesizeMb='" . $row['filesizeMb'] . "'>";
+                }
+            }
             if ($rez = mysql_query("SELECT * FROM tempFotos WHERE fileuploadid = '" . $fileUploadId . "'")) // ищем уже загруженные пользователем фотки
             {
                 $numUploadedFiles = mysql_num_rows($rez);
@@ -582,9 +626,11 @@ include("header.php");
             Этаж:
         </div>
         <div class="objectDescriptionBody">
-            <input type="text" size="3" name="floor" <?php echo "value='$floor'";?>>
+            <input type="hidden" name="floor" <?php echo "value='$floor'";?>>
+            <?php echo $floor;?>
             из
-            <input type="text" size="3" name="totalAmountFloor" <?php echo "value='$totalAmountFloor'";?>>
+            <input type="hidden" name="totalAmountFloor" <?php echo "value='$totalAmountFloor'";?>>
+            <?php echo $totalAmountFloor;?>
         </div>
     </div>
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_квартира&typeOfObject_комната&typeOfObject_гараж">
@@ -592,7 +638,8 @@ include("header.php");
             Этажность дома:
         </div>
         <div class="objectDescriptionBody">
-            <input type="text" size="3" name="numberOfFloor" <?php echo "value='$numberOfFloor'";?>>
+            <input type="hidden" name="numberOfFloor" <?php echo "value='$numberOfFloor'";?>>
+            <?php echo $numberOfFloor;?>
         </div>
     </div>
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_дом&typeOfObject_таунхаус&typeOfObject_дача&typeOfObject_гараж">
@@ -652,22 +699,18 @@ include("header.php");
             Район:
         </div>
         <div class="objectDescriptionBody">
-            <select name="district">
-                <option value="0"></option>
+            <input type="hidden" name="district" <?php echo "value='$district'";?>"> <!-- Значение поля необходимо сохранить, так как JS в зависимости от него будет делать некоторые элементы недоступными для редактирования -->
             <?php
             if (isset($allDistrictsInCity)) {
-                foreach ($allDistrictsInCity as $key => $value) { // Для каждого идентификатора района и названия формируем пункт селекта
-                    echo "<option value='" . $key . "'";
-                    if ($key == $district) echo "selected";
-                    echo ">" . $value . "</option>";
+                foreach ($allDistrictsInCity as $key => $value) {
+                    if ($key == $district) { echo $value; break; }
                 }
             }
             ?>
-            </select>
         </div>
     </div>
     <div class="objectDescriptionItem">
-        <div class="objectDescriptionItemLabel" style="line-height: 2em;">
+        <div class="objectDescriptionItemLabel" style="line-height: 2.3em;">
             Улица и номер дома:
         </div>
         <div class="objectDescriptionBody" style="min-width: 470px">
@@ -677,7 +720,8 @@ include("header.php");
                 <tbody>
                 <tr>
                     <td>
-                        <input type="text" name="address" id="addressTextBox" size="30" <?php echo "value='$address'";?>>
+                        <input type="hidden" name="address" id="addressTextBox" <?php echo "value='$address'";?>"> <!-- Значение поля необходимо сохранить, так как JS в зависимости от него будет делать некоторые элементы недоступными для редактирования -->
+                        <?php echo $address; ?>
                         <button id="checkAddressButton">Проверить адрес</button>
                     </td>
                 </tr>
@@ -695,7 +739,8 @@ include("header.php");
             Номер квартиры:
         </div>
         <div class="objectDescriptionBody">
-            <input type="text" name="apartmentNumber" size="7" maxlength="20" <?php echo "value='$apartmentNumber'";?>>
+            <input type="hidden" name="apartmentNumber" <?php echo "value='$apartmentNumber'";?>> <!-- Значение поля необходимо сохранить, так как JS в зависимости от него будет делать некоторые элементы недоступными для редактирования -->
+            <?php if ($apartmentNumber != "") echo $apartmentNumber; ?>
         </div>
     </div>
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_дача&typeOfObject_гараж">
@@ -763,7 +808,8 @@ include("header.php");
             <span notavailability="utilities_0&utilities_нет">
             Летом
             <input type="text" name="costInSummer" size="7" <?php echo "value='$costInSummer'";?>>
-            <span class="currency"></span> Зимой
+            <span class="currency"></span>
+            Зимой
             <input type="text" name="costInWinter" size="7" <?php echo "value='$costInWinter'";?>>
             <span class="currency"></span>
             </span>

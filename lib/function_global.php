@@ -132,7 +132,7 @@ function isAdvertCorrect($typeOfValidation)
     $errors = array();
 
     // Получаем переменные, содержащие данные пользователя, для проверки
-    global $typeOfObject, $dateOfEntry, $termOfLease, $dateOfCheckOut, $amountOfRooms, $adjacentRooms, $amountOfAdjacentRooms, $typeOfBathrooms, $typeOfBalcony, $balconyGlazed, $roomSpace, $totalArea, $livingSpace, $kitchenSpace, $floor, $totalAmountFloor, $numberOfFloor, $concierge, $intercom, $parking, $city, $district, $coordX, $coordY, $address, $apartmentNumber, $subwayStation, $distanceToMetroStation, $currency, $costOfRenting, $utilities, $costInSummer, $costInWinter, $electricPower, $bail, $bailCost, $prepayment, $compensationMoney, $compensationPercent, $repair, $furnish, $windows, $internet, $telephoneLine, $cableTV, $furnitureInLivingArea, $furnitureInLivingAreaExtra, $furnitureInKitchen, $furnitureInKitchenExtra, $appliances, $appliancesExtra, $sexOfTenant, $relations, $children, $animals, $contactTelephonNumber, $timeForRingBegin, $timeForRingEnd, $checking, $responsibility, $comment, $fileUploadId;
+    global $propertyId, $typeOfObject, $dateOfEntry, $termOfLease, $dateOfCheckOut, $amountOfRooms, $adjacentRooms, $amountOfAdjacentRooms, $typeOfBathrooms, $typeOfBalcony, $balconyGlazed, $roomSpace, $totalArea, $livingSpace, $kitchenSpace, $floor, $totalAmountFloor, $numberOfFloor, $concierge, $intercom, $parking, $city, $district, $coordX, $coordY, $address, $apartmentNumber, $subwayStation, $distanceToMetroStation, $currency, $costOfRenting, $utilities, $costInSummer, $costInWinter, $electricPower, $bail, $bailCost, $prepayment, $compensationMoney, $compensationPercent, $repair, $furnish, $windows, $internet, $telephoneLine, $cableTV, $furnitureInLivingArea, $furnitureInLivingAreaExtra, $furnitureInKitchen, $furnitureInKitchenExtra, $appliances, $appliancesExtra, $sexOfTenant, $relations, $children, $animals, $contactTelephonNumber, $timeForRingBegin, $timeForRingEnd, $checking, $responsibility, $comment, $fileUploadId;
 
     // Проверяем переменные
     if ($typeOfObject == "0") $errors[] = 'Укажите тип объекта';
@@ -153,10 +153,16 @@ function isAdvertCorrect($typeOfValidation)
     }
 
     // Проверяем наличие хотя бы 1 фотографии объекта недвижимости
-    if ($fileUploadId != "")
+    if ($typeOfValidation == "newAdvert" && $fileUploadId != "")
     {
         $rez = mysql_query("SELECT * FROM tempFotos WHERE fileuploadid='".$fileUploadId."'");
         if (mysql_num_rows($rez) == 0) $errors[] = 'Загрузите несколько фотографий вашего объекта недвижимости, представив каждое из помещений';
+    }
+    if ($typeOfValidation == "editAdvert") // Эта ветка выполняется, если валидации производятся при попытке редактирования параметров объекта недвижимости
+    {
+        $rez1 = mysql_query("SELECT * FROM propertyFotos WHERE propertyId='". $propertyId ."'");
+        $rez2 = mysql_query("SELECT * FROM tempFotos WHERE fileuploadid='".$fileUploadId."'");
+        if (mysql_num_rows($rez1) == 0 && mysql_num_rows($rez2) == 0) $errors[] = 'Загрузите несколько фотографий вашего объекта недвижимости, представив каждое из помещений'; // проверка на хотя бы 1 фотку
     }
     if ($fileUploadId == "") $errors[] = 'Перезагрузите браузер, пожалуйста: возникла ошибка при формировании формы для загрузки фотографий';
 
@@ -166,7 +172,7 @@ function isAdvertCorrect($typeOfValidation)
     if ($typeOfBathrooms == "0" && $typeOfObject != "0" && $typeOfObject != "гараж") $errors[] = 'Укажите тип санузла';
     if ($typeOfBalcony == "0" && $typeOfObject != "0" && $typeOfObject != "гараж") $errors[] = 'Укажите: есть ли балкон, лоджия или эркер в сдаваемом объекте недвижимости';
     if ($balconyGlazed == "0" && $typeOfBalcony != "0" && $typeOfBalcony != "нет" && $typeOfBalcony != "эркер" && $typeOfBalcony != "2 эркера и более") $errors[] = 'Укажите остекление балкона/лоджии';
-    if ($roomSpace == "" && $typeOfObject != "0" && $typeOfObject != "квартира" && $typeOfObject != "дом, коттедж" && $typeOfObject != "таунхаус" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите площадь комнаты';
+    if ($roomSpace == "" && $typeOfObject != "0" && $typeOfObject != "квартира" && $typeOfObject != "дом" && $typeOfObject != "таунхаус" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите площадь комнаты';
     if ($roomSpace != "") {
         if (!preg_match('/^\d{0,5}\.{0,1}\d{0,2}$/', $roomSpace)) $errors[] = 'Неправильный формат для площади комнаты, используйте только цифры и точку, например: 16.55';
     }
@@ -182,11 +188,11 @@ function isAdvertCorrect($typeOfValidation)
     if ($kitchenSpace != "") {
         if (!preg_match('/^\d{0,5}\.{0,1}\d{0,2}$/', $kitchenSpace)) $errors[] = 'Неправильный формат для площади кухни, используйте только цифры и точку, например: 86.55';
     }
-    if ($floor == "" && $typeOfObject != "0" && $typeOfObject != "дом, коттедж" && $typeOfObject != "таунхаус" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите этаж, на котором расположена квартира, комната';
+    if ($floor == "" && $typeOfObject != "0" && $typeOfObject != "дом" && $typeOfObject != "таунхаус" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите этаж, на котором расположена квартира, комната';
     if ($floor != "") {
         if (!preg_match('/^\d{0,3}$/', $floor)) $errors[] = 'Неправильный формат для этажа, на котором расположена квартира, комната: должно быть не более 3 цифр';
     }
-    if ($totalAmountFloor == "" && $typeOfObject != "0" && $typeOfObject != "дом, коттедж" && $typeOfObject != "таунхаус" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите количество этажей в доме';
+    if ($totalAmountFloor == "" && $typeOfObject != "0" && $typeOfObject != "дом" && $typeOfObject != "таунхаус" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите количество этажей в доме';
     if ($totalAmountFloor != "") {
         if (!preg_match('/^\d{0,3}$/', $totalAmountFloor)) $errors[] = 'Неправильный формат для количества этажей: должно быть не более 3 цифр';
     }
@@ -194,7 +200,7 @@ function isAdvertCorrect($typeOfValidation)
     if ($numberOfFloor != "") {
         if (!preg_match('/^\d{0,2}$/', $numberOfFloor)) $errors[] = 'Неправильный формат для количества этажей: должно быть не более 2 цифр';
     }
-    if ($concierge == "0" && $typeOfObject != "0" && $typeOfObject != "дом, коттедж" && $typeOfObject != "таунхаус" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите: есть ли в доме консьерж';
+    if ($concierge == "0" && $typeOfObject != "0" && $typeOfObject != "дом" && $typeOfObject != "таунхаус" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите: есть ли в доме консьерж';
     if ($intercom == "0" && $typeOfObject != "0" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите наличие домофона';
     if ($parking == "0" && $typeOfObject != "0" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите наличие и тип парковки во дворе';
 
@@ -206,15 +212,17 @@ function isAdvertCorrect($typeOfValidation)
     }
     if ($address == "") $errors[] = 'Укажите улицу и номер дома';
     if (strlen($address) > 60) $errors[] = 'Указан слишком длинный адрес (используйте не более 60 символов)';
-    if ($apartmentNumber == "" && $typeOfObject != "0" && $typeOfObject != "дом, коттедж" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите номер квартиры';
+    if ($apartmentNumber == "" && $typeOfObject != "0" && $typeOfObject != "дом" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите номер квартиры';
     if (strlen($apartmentNumber) > 20) $errors[] = 'Указан слишком длинный номер квартиры (используйте не более 20 символов)';
 
     // Убеждаемся что данный пользователь еще не публиковал объявлений по этому адресу. Не стоит позволять публиковать несколько разных объявлений одному человеку с привязкой к одному и тому же адресу
-    $rez = mysql_query("SELECT * FROM property WHERE (address='".$address."' OR (coordX='".$coordX."' AND coordY='".$coordY."')) AND apartmentNumber='".$apartmentNumber."'");
-    if ($rez != false && mysql_num_rows($rez) != 0) {
-        $row = mysql_fetch_assoc($rez);
-        if ($row['apartmentNumber'] != "") $errors[] = 'Вы уже завели ранее объявление по данному адресу с таким же номером квартиры. Пожалуйста, воспользуйтесь ранее сформированным Вами объявлением в личном кабинете';
-        if ($row['apartmentNumber'] == "") $errors[] = 'Вы уже завели ранее объявление по данному адресу. Пожалуйста, воспользуйтесь ранее сформированным Вами объявлением в личном кабинете';
+    if ($typeOfValidation == "newAdvert") {
+        $rez = mysql_query("SELECT * FROM property WHERE (address='".$address."' OR (coordX='".$coordX."' AND coordY='".$coordY."')) AND apartmentNumber='".$apartmentNumber."'");
+        if ($rez != false && mysql_num_rows($rez) != 0) {
+            $row = mysql_fetch_assoc($rez);
+            if ($row['apartmentNumber'] != "") $errors[] = 'Вы уже завели ранее объявление по данному адресу с таким же номером квартиры. Пожалуйста, воспользуйтесь ранее сформированным Вами объявлением в личном кабинете';
+            if ($row['apartmentNumber'] == "") $errors[] = 'Вы уже завели ранее объявление по данному адресу. Пожалуйста, воспользуйтесь ранее сформированным Вами объявлением в личном кабинете';
+        }
     }
 
     if ($subwayStation == "0" && $typeOfObject != "0" && $typeOfObject != "дача" && $typeOfObject != "гараж") $errors[] = 'Укажите станцию метро рядом';
@@ -275,6 +283,16 @@ function isAdvertCorrect($typeOfValidation)
     if ($responsibility == "") $errors[] = 'Укажите: какую ответственность за состояние и ремонт объекта Вы берете на себя, а какую арендатор';
 
     return $errors; // Возвращаем список ошибок, если все в порядке, то он будет пуст
+}
+
+// Функция делает первый символ строки в верхнем регистре
+function getFirstCharUpper($str) {
+    $firstChar = mb_substr($str, 0, 1, 'UTF-8'); // Первая буква
+    $lastStr = mb_substr($str, 1); // Все кроме первой буквы
+    $firstChar = mb_strtoupper($firstChar, 'UTF-8');
+    $lastStr = mb_strtolower($lastStr, 'UTF-8');
+    $str = $firstChar . $lastStr;
+    return $str;
 }
 
 //Функция для генерации случайной строки
