@@ -57,7 +57,7 @@ $odnoklassniki = "";
 $facebook = "";
 $twitter = "";
 
-$typeOfObject = "flat";
+$typeOfObject = "квартира";
 $amountOfRooms1 = "";
 $amountOfRooms2 = "";
 $amountOfRooms3 = "";
@@ -65,9 +65,9 @@ $amountOfRooms4 = "";
 $amountOfRooms5 = "";
 $amountOfRooms6 = "";
 
-$adjacentRooms = "yes";
-$floor = "any";
-$furniture = "any";
+$adjacentRooms = "не имеет значения";
+$floor = "любой";
+$furniture = "не имеет значения";
 $minCost = "";
 $maxCost = "";
 $pledge = "";
@@ -118,11 +118,11 @@ $district44 = "";
 $district45 = "";
 $district46 = "";
 
-$withWho = "alone";
+$withWho = "один";
 $linksToFriends = "";
-$children = "without";
+$children = "без детей";
 $howManyChildren = "";
-$animals = "without";
+$animals = "без животных";
 $howManyAnimals = "";
 $period = "";
 $additionalDescriptionOfSearch = "";
@@ -368,6 +368,19 @@ if (isset($_POST['readyButton'])) {
         }
 
     </style>
+
+    <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <!-- Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера -->
+    <!-- jQuery UI с моей темой оформления -->
+    <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
+    <!-- Русификатор виджета календарь -->
+    <script src="js/vendor/jquery.ui.datepicker-ru.js"></script>
+    <!-- Скрипт для валидации на лету полей формы -->
+    <script src="js/vendor/jquery.validationEngine.js"></script>
+    <!-- Загрузчик фотографий на AJAX -->
+    <script src="js/vendor/fileuploader.js" type="text/javascript"></script>
+
 </head>
 
 <body>
@@ -476,8 +489,8 @@ include("header.php");
                 <div class="searchItemBody">
                     <select name="sex" validations="validate[required]">
                         <option value="0" <?php if ($sex == "0") echo "selected";?>></option>
-                        <option value="man" <?php if ($sex == "man") echo "selected";?>>мужской</option>
-                        <option value="woman" <?php if ($sex == "woman") echo "selected";?>>женский</option>
+                        <option value="мужчина" <?php if ($sex == "мужчина") echo "selected";?>>мужской</option>
+                        <option value="женщина" <?php if ($sex == "женщина") echo "selected";?>>женский</option>
                     </select>
                 </div>
             </div>
@@ -623,14 +636,14 @@ include("header.php");
                 } ?>>
                     <option value="0" <?php if ($currentStatusEducation == "0") echo "selected";?>></option>
                     <option
-                        value="withoutEducation" <?php if ($currentStatusEducation == "withoutEducation") echo "selected";?>>
+                        value="нет" <?php if ($currentStatusEducation == "нет") echo "selected";?>>
                         Нигде не учился
                     </option>
-                    <option value="learningNow" <?php if ($currentStatusEducation == "learningNow") echo "selected";?>>
+                    <option value="сейчас учусь" <?php if ($currentStatusEducation == "сейчас учусь") echo "selected";?>>
                         Сейчас учусь
                     </option>
                     <option
-                        value="finishedEducation" <?php if ($currentStatusEducation == "finishedEducation") echo "selected";?>>
+                        value="закончил" <?php if ($currentStatusEducation == "закончил") echo "selected";?>>
                         Закончил
                     </option>
                 </select>
@@ -672,8 +685,8 @@ include("header.php");
             <div class="searchItemBody">
                 <select name="ochnoZaochno" class="ifLearned">
                     <option value="0" <?php if ($ochnoZaochno == "0") echo "selected";?>></option>
-                    <option value="ochno" <?php if ($ochnoZaochno == "ochno") echo "selected";?>>Очно</option>
-                    <option value="zaochno" <?php if ($ochnoZaochno == "zaochno") echo "selected";?>>Заочно</option>
+                    <option value="очно" <?php if ($ochnoZaochno == "очно") echo "selected";?>>Очно</option>
+                    <option value="заочно" <?php if ($ochnoZaochno == "заочно") echo "selected";?>>Заочно</option>
                 </select>
             </div>
         </div>
@@ -693,8 +706,8 @@ include("header.php");
             Работа
         </legend>
         <div>
-            <input type="checkbox" name="notWorkCheckbox" value="isNotWorking"
-                   id="notWorkCheckbox" <?php if ($notWorkCheckbox == "isNotWorking") echo "checked";?>>
+            <input type="checkbox" name="notWorkCheckbox" value="не работаю"
+                   id="notWorkCheckbox" <?php if ($notWorkCheckbox == "не работаю") echo "checked";?>>
             Я не работаю
         </div>
         <div class="searchItem ifWorked">
@@ -831,14 +844,14 @@ include("header.php");
             <span class="searchItemLabel"> Тип: </span>
 
             <div class="searchItemBody">
-                <select name="typeOfObject">
-                    <option value="flat" <?php if ($typeOfObject == "flat") echo "selected";?>>квартира</option>
-                    <option value="room" <?php if ($typeOfObject == "room") echo "selected";?>>комната</option>
-                    <option value="house" <?php if ($typeOfObject == "house") echo "selected";?>>дом, коттедж</option>
-                    <option value="townhouse" <?php if ($typeOfObject == "townhouse") echo "selected";?>>таунхаус
-                    </option>
-                    <option value="dacha" <?php if ($typeOfObject == "dacha") echo "selected";?>>дача</option>
-                    <option value="garage" <?php if ($typeOfObject == "garage") echo "selected";?>>гараж</option>
+                <select name="typeOfObject" id="typeOfObject">
+                    <option value="0" <?php if ($typeOfObject == "0") echo "selected";?>></option>
+                    <option value="квартира" <?php if ($typeOfObject == "квартира") echo "selected";?>>квартира</option>
+                    <option value="комната" <?php if ($typeOfObject == "комната") echo "selected";?>>комната</option>
+                    <option value="дом" <?php if ($typeOfObject == "дом") echo "selected";?>>дом, коттедж</option>
+                    <option value="таунхаус" <?php if ($typeOfObject == "таунхаус") echo "selected";?>>таунхаус</option>
+                    <option value="дача" <?php if ($typeOfObject == "дача") echo "selected";?>>дача</option>
+                    <option value="гараж" <?php if ($typeOfObject == "гараж") echo "selected";?>>гараж</option>
                 </select>
             </div>
         </div>
@@ -871,8 +884,8 @@ include("header.php");
 
             <div class="searchItemBody">
                 <select name="adjacentRooms">
-                    <option value="yes" <?php if ($adjacentRooms == "yes") echo "selected";?>>не имеет значения</option>
-                    <option value="no" <?php if ($adjacentRooms == "no") echo "selected";?>>только изолированные
+                    <option value="не имеет значения" <?php if ($adjacentRooms == "не имеет значения") echo "selected";?>>не имеет значения</option>
+                    <option value="только изолированные" <?php if ($adjacentRooms == "только изолированные") echo "selected";?>>только изолированные
                     </option>
                 </select>
             </div>
@@ -882,9 +895,9 @@ include("header.php");
 
             <div class="searchItemBody">
                 <select name="floor">
-                    <option value="any" <?php if ($floor == "any") echo "selected";?>>любой</option>
-                    <option value="not1" <?php if ($floor == "not1") echo "selected";?>>не первый</option>
-                    <option value="not1notLasted" <?php if ($floor == "not1notLasted") echo "selected";?>>не первый и не
+                    <option value="любой" <?php if ($floor == "любой") echo "selected";?>>любой</option>
+                    <option value="не первый" <?php if ($floor == "не первый") echo "selected";?>>не первый</option>
+                    <option value="не первый и не последний" <?php if ($floor == "не первый и не последний") echo "selected";?>>не первый и не
                         последний
                     </option>
                 </select>
@@ -895,9 +908,9 @@ include("header.php");
 
             <div class="searchItemBody">
                 <select name="furniture">
-                    <option value="any" <?php if ($furniture == "any") echo "selected";?>>не имеет значения</option>
-                    <option value="with" <?php if ($furniture == "with") echo "selected";?>>с мебелью и быт. техникой</option>
-                    <option value="without" <?php if ($furniture == "without") echo "selected";?>>без мебели</option>
+                    <option value="не имеет значения" <?php if ($furniture == "не имеет значения") echo "selected";?>>не имеет значения</option>
+                    <option value="с мебелью и быт. техникой" <?php if ($furniture == "с мебелью и быт. техникой") echo "selected";?>>с мебелью и быт. техникой</option>
+                    <option value="без мебели" <?php if ($furniture == "без мебели") echo "selected";?>>без мебели</option>
                 </select>
             </div>
         </div>
@@ -1184,12 +1197,12 @@ include("header.php");
 
         <div class="searchItemBody">
             <select name="withWho" id="withWho">
-                <option value="alone" <?php if ($withWho == "alone") echo "selected";?>>один</option>
-                <option value="couple" <?php if ($withWho == "couple") echo "selected";?>>семейная пара</option>
-                <option value="nonFamilyPair" <?php if ($withWho == "nonFamilyPair") echo "selected";?>>несемейная
+                <option value="один" <?php if ($withWho == "один") echo "selected";?>>один</option>
+                <option value="семейная пара" <?php if ($withWho == "семейная пара") echo "selected";?>>семейная пара</option>
+                <option value="несемейная пара" <?php if ($withWho == "несемейная пара") echo "selected";?>>несемейная
                     пара
                 </option>
-                <option value="withFriends" <?php if ($withWho == "withFriends") echo "selected";?>>со знакомыми
+                <option value="со знакомыми" <?php if ($withWho == "со знакомыми") echo "selected";?>>со знакомыми
                 </option>
             </select>
         </div>
@@ -1207,11 +1220,11 @@ include("header.php");
 
         <div class="searchItemBody">
             <select name="children" id="children">
-                <option value="without" <?php if ($children == "without") echo "selected";?>>без детей</option>
-                <option value="childrenUnder4" <?php if ($children == "childrenUnder4") echo "selected";?>>с детьми
+                <option value="без детей" <?php if ($children == "без детей") echo "selected";?>>без детей</option>
+                <option value="с детьми младше 4-х лет" <?php if ($children == "с детьми младше 4-х лет") echo "selected";?>>с детьми
                     младше 4-х лет
                 </option>
-                <option value="childrenOlder4" <?php if ($children == "childrenOlder4") echo "selected";?>>с детьми
+                <option value="с детьми старше 4-х лет" <?php if ($children == "с детьми старше 4-х лет") echo "selected";?>>с детьми
                     старше 4-х лет
                 </option>
             </select>
@@ -1230,8 +1243,8 @@ include("header.php");
 
         <div class="searchItemBody">
             <select name="animals" id="animals">
-                <option value="without" <?php if ($animals == "without") echo "selected";?>>без животных</option>
-                <option value="with" <?php if ($animals == "with") echo "selected";?>>с животным(ми)</option>
+                <option value="без животных" <?php if ($animals == "без животных") echo "selected";?>>без животных</option>
+                <option value="с животным(ми)" <?php if ($animals == "с животным(ми)") echo "selected";?>>с животным(ми)</option>
             </select>
         </div>
     </div>
@@ -1308,27 +1321,8 @@ include("header.php");
 <!-- /end.footer -->
 
 <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
-
-<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<!-- Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера -->
-
-<!-- jQuery UI с моей темой оформления -->
-<script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
-
-<!-- Русификатор виджета календарь -->
-<script src="js/vendor/jquery.ui.datepicker-ru.js"></script>
-
-<!-- Скрипт для валидации на лету полей формы -->
-<script src="js/vendor/jquery.validationEngine.js"></script>
-
-<!-- Загрузчик фотографий на AJAX -->
-<script src="js/vendor/fileuploader.js" type="text/javascript"></script>
-
-<!-- scripts concatenated and minified via build script -->
 <script src="js/main.js"></script>
 <script src="js/registration.js"></script>
-
 <!-- end scripts -->
 
 <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.

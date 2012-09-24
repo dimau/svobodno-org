@@ -117,11 +117,11 @@ function currentStatusEducation() {
             $("div.searchItem.ifLearned div.required").text("");
         }
     }
-    if (currentValue == "withoutEducation") {
+    if (currentValue == "нет") {
         $("input.ifLearned, select.ifLearned").attr('disabled', 'disabled').css('color', 'grey');
         $("div.searchItem.ifLearned div.required").text("");
     }
-    if (currentValue == "learningNow") {
+    if (currentValue == "сейчас учусь") {
         $("input.ifLearned, select.ifLearned").removeAttr('disabled').css('color', '');
         $('#kurs').css('display', '');
         $('#yearOfEnd').css('display', 'none');
@@ -132,7 +132,7 @@ function currentStatusEducation() {
             $("div.searchItem.ifLearned div.required").text("");
         }
     }
-    if (currentValue == "finishedEducation") {
+    if (currentValue == "закончил") {
         $("input.ifLearned, select.ifLearned").removeAttr('disabled').css('color', '');
         $('#kurs').css('display', 'none');
         $('#yearOfEnd').css('display', '');
@@ -185,7 +185,7 @@ if (document.getElementById('rightBlockOfSearchParameters')) {
 
 /* Сценарии для появления блока с подробным описанием сожителей */
 $("#withWho").on('change', function(event) {
-    if ($("#withWho").attr('value') != 1) {
+    if ($("#withWho").attr('value') != "один") {
         $("#withWhoDescription").css('display', '');
     } else {
         $("#withWhoDescription").css('display', 'none');
@@ -194,7 +194,7 @@ $("#withWho").on('change', function(event) {
 
 /* Сценарии для появления блока с подробным описанием детей */
 $("#children").on('change', function(event) {
-    if ($("#children").attr('value') != 0) {
+    if ($("#children").attr('value') != "без детей") {
         $("#childrenDescription").css('display', '');
     } else {
         $("#childrenDescription").css('display', 'none');
@@ -203,7 +203,7 @@ $("#children").on('change', function(event) {
 
 /* Сценарии для появления блока с подробным описанием животных */
 $("#animals").on('change', function(event) {
-    if ($("#animals").attr('value') != 0) {
+    if ($("#animals").attr('value') != "без животных") {
         $("#animalsDescription").css('display', '');
     } else {
         $("#animalsDescription").css('display', 'none');

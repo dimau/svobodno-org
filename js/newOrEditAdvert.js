@@ -160,8 +160,6 @@ function init() {
     var myToolbar = new ymaps.control.MapTools(['drag', 'magnifier']);
     map.controls.add(myToolbar);
 
-    /***** Настраиваем возможность указания адреса в форме *****/
-
     // Создаем пустой массив маркеров - в него будет класть маркер, соответствующий адресу, введеному пользователем
     searchObjectCollection = new ymaps.GeoObjectCollection();
 

@@ -85,17 +85,24 @@ $strHeaderOfPage = getFirstCharUpper($rowProperty['typeOfObject']) . " по ад
 				cursor: pointer;
 			}
 		</style>
+
+        <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <!-- jQuery UI с моей темой оформления -->
+        <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
+        <!-- Загружаем библиотеку для работы с картой от Яндекса -->
+        <script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
+
 	</head>
 
 	<body>
 		<div class="page_without_footer">
         <!-- Сформируем и вставим заголовок страницы -->
         <?php
-                include("header.php");
-            ?>
+            include("header.php");
+        ?>
 
 			<div class="page_main_content">
-
 				<div class="wrapperOfTabs">
 					<div class="headerOfPage">
                         <?php echo $strHeaderOfPage; ?>
@@ -403,18 +410,16 @@ $strHeaderOfPage = getFirstCharUpper($rowProperty['typeOfObject']) . " по ад
 									<table>
 										<tbody>
 											<tr>
-												<td class="objectDescriptionItemLabel">Частота проверки недвижимости собственником:</td>
-												<td class="objectDescriptionBody"><span>1 раз в месяц (при получении оплаты)</span></td>
+												<td class="objectDescriptionItemLabel">Как часто собственник проверяет сдаваемую недвижимость:</td>
+												<td class="objectDescriptionBody"><span><?php echo $rowProperty['checking']; ?></span></td>
 											</tr>
 											<tr>
-												<td class="objectDescriptionItemLabel">Ответственность собственника за состояние и ремонт объекта:</td>
-												<td class="objectDescriptionBody"><span>Возмещает затраты на ремонт сантехники и бытовой техники, а также на ремонт телевизора и обоев</span></td>
+												<td class="objectDescriptionItemLabel">Ответственность за состояние и ремонт недвижимости:</td>
+												<td class="objectDescriptionBody"><span><?php echo $rowProperty['responsibility']; ?></span></td>
 											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">Другие условия:</td>
-												<td class="objectDescriptionBody"><span>Чтоб не пили, не курили и баб не водили. Нельзя проводить Дни рождения и другие пьянки так, чтобы соседи приходили и ходили в милицию полицию</td>
-												</span></td>
-											</tr>
+                                            <?php
+                                            if ($rowProperty['comment'] != "") echo "<tr><td class='objectDescriptionItemLabel'>Дополнительный комментарий:</td><td class='objectDescriptionBody'><span>" . $rowProperty['comment'] . "</span></td></tr>";
+                                            ?>
 										</tbody>
 									</table>
 								</fieldset>
@@ -442,30 +447,40 @@ $strHeaderOfPage = getFirstCharUpper($rowProperty['typeOfObject']) . " по ад
 						<div id="tabs-2">
 							<!-- Описание метоположения объекта -->
 
-							<fieldset class="notEdited" style="float: left;">
+							<fieldset class="notEdited" style="float: left; margin: 0 20px 20px 0;">
+                                <input type="hidden" name="coordX" id="coordX" <?php echo "value='" . $rowProperty['coordX'] . "'";?>>
+                                <input type="hidden" name="coordY" id="coordY" <?php echo "value='" . $rowProperty['coordY'] . "'";?>>
 								<table>
 									<tbody>
 										<tr>
 											<td class="objectDescriptionItemLabel">Город:</td>
-											<td class="objectDescriptionBody"><span>Екатеринбург</span></td>
+											<td class="objectDescriptionBody"><span><?php echo $rowProperty['city'];?></span></td>
 										</tr>
 										<tr>
 											<td class="objectDescriptionItemLabel">Район:</td>
-											<td class="objectDescriptionBody"><span>ВИЗ</span></td>
+											<td class="objectDescriptionBody"><span>
+                                                <?php
+                                                if (isset($allDistrictsInCity)) {
+                                                    foreach ($allDistrictsInCity as $key => $value) {
+                                                        if ($key == $rowProperty['district']) { echo $value; break; }
+                                                    }
+                                                }
+                                                ?>
+                                            </span></td>
 										</tr>
 										<tr>
 											<td class="objectDescriptionItemLabel">Адрес:</td>
-											<td class="objectDescriptionBody"><span>улица Гурзуфская 38</span></td>
+											<td class="objectDescriptionBody"><span><?php echo $rowProperty['address'];?></span></td>
 										</tr>
-										<tr>
-											<td class="objectDescriptionItemLabel">Станция метро рядом:</td>
-											<td class="objectDescriptionBody"><span>Уралмаш</span>, <span>20</span> мин. ходьбы</td>
-										</tr>
+                                        <?php
+                                        if ($rowProperty['subwayStation'] != "0" && $rowProperty['subwayStation'] != "нет") echo "<tr><td class='objectDescriptionItemLabel'>Станция метро рядом:</td><td class='objectDescriptionBody'><span>" . $rowProperty['subwayStation'] . ",<br>" . $rowProperty['distanceToMetroStation'] . " мин. ходьбы" . "</span></td></tr>";
+                                        ?>
 									</tbody>
 								</table>
 							</fieldset>
-							<!-- Карта Яндекса --><div id="map" style="width: 500px; height: 500px; float: left;"></div>
-							<div style="clear: both;"></div>
+							<!-- Карта Яндекса -->
+                            <div id="mapForAdvertView" style="width: 50%; min-width: 300px; height: 400px; float: left;"></div>
+							<div class="clearBoth"></div>
 						</div>
 					</div>
 				</div>
@@ -479,20 +494,8 @@ $strHeaderOfPage = getFirstCharUpper($rowProperty['typeOfObject']) . " по ад
 		</div><!-- /end.footer -->
 
 		<!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
-
-		<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-
-		<!-- jQuery UI с моей темой оформления -->
-		<script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
-
-		<!-- Загружаем библиотеку для работы с картой от Яндекса -->
-		<script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
-
-		<!-- scripts concatenated and minified via build script -->
 		<script src="js/main.js"></script>
 		<script src="js/objdescription.js"></script>
-
 		<!-- end scripts -->
 
 		<!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.
