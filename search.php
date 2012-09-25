@@ -2,9 +2,30 @@
 include_once 'lib/connect.php'; //подключаемся к БД
 include_once 'lib/function_global.php'; //подключаем файл с глобальными функциями
 
-/***************************************************************************************************************
- * Получаем get параметры запроса или присваиваем им значения по умолчанию
- **************************************************************************************************************/
+/*************************************************************************************
+ * Если пользователь авторизован - получим его id
+ ************************************************************************************/
+
+$userId = login();
+
+/*************************************************************************************
+ * Присваиваем поисковым переменным значения по умолчанию
+ ************************************************************************************/
+
+$typeOfObject = "0";
+$amountOfRooms = array();
+$adjacentRooms = "0";
+$floor = "0";
+$furniture = "0";
+$minCost = "";
+$maxCost = "";
+$pledge = "";
+$prepayment = "12";
+$district = array();
+$withWho = "0";
+$children = "0";
+$animals = "0";
+$termOfLease = "0";
 
 // Готовим массив со списком районов в городе пользователя
 $allDistrictsInCity = array();
@@ -14,14 +35,175 @@ for ($i = 0; $i < mysql_num_rows($rezDistricts); $i++) {
     $allDistrictsInCity[] = $rowDistricts['name'];
 }
 
-// TODO: тест Присваиваем тестовые значения переменным
-$district = 12;
-$typeOfObject = "дача";
+/***************************************************************************************************************
+ * Если пользователь нажал на кнопку Поиск
+ **************************************************************************************************************/
 
-if (isset($_GET['typeOfObject'])) $typeOfObject = htmlspecialchars($_POST['typeOfObject']);
+if (isset($_POST['fastSearchButton'])) {
+    if (isset($_POST['typeOfObjectFast'])) $typeOfObject = htmlspecialchars($_POST['typeOfObjectFast']);
+    if (isset($_POST['districtFast'])) $district = array($_POST['districtFast']);
+    if (isset($_POST['minCostFast']) && preg_match("/^\d{0,8}$/", $_POST['minCostFast'])) $minCost = htmlspecialchars($_POST['minCostFast']); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
+    if (isset($_POST['maxCostFast'])&& preg_match("/^\d{0,8}$/", $_POST['maxCostFast'])) $maxCost = htmlspecialchars($_POST['maxCostFast']); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
+}
+
+if (isset($_POST['extendedSearchButton'])) {
+    if (isset($_POST['typeOfObject'])) $typeOfObject = htmlspecialchars($_POST['typeOfObject']);
+    if (isset($_POST['amountOfRooms']) && is_array($_POST['amountOfRooms'])) $amountOfRooms = $_POST['amountOfRooms'];
+    if (isset($_POST['adjacentRooms'])) $adjacentRooms = htmlspecialchars($_POST['adjacentRooms']);
+    if (isset($_POST['floor'])) $floor = htmlspecialchars($_POST['floor']);
+    if (isset($_POST['furniture'])) $furniture = htmlspecialchars($_POST['furniture']);
+    if (isset($_POST['minCost']) && preg_match("/^\d{0,8}$/", $_POST['minCost'])) $minCost = htmlspecialchars($_POST['minCost']); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
+    if (isset($_POST['maxCost']) && preg_match("/^\d{0,8}$/", $_POST['maxCost'])) $maxCost = htmlspecialchars($_POST['maxCost']); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
+    if (isset($_POST['pledge']) && preg_match("/^\d{0,8}$/", $_POST['pledge'])) $pledge = htmlspecialchars($_POST['pledge']); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
+    if (isset($_POST['prepayment'])) $prepayment = htmlspecialchars($_POST['prepayment']);
+    if (isset($_POST['district']) && is_array($_POST['district'])) $district = $_POST['district'];
+    if (isset($_POST['withWho'])) $withWho = htmlspecialchars($_POST['withWho']);
+    if (isset($_POST['children'])) $children = htmlspecialchars($_POST['children']);
+    if (isset($_POST['animals'])) $animals = htmlspecialchars($_POST['animals']);
+    if (isset($_POST['termOfLease'])) $termOfLease = htmlspecialchars($_POST['termOfLease']);
+}
 
 /***************************************************************************************************************
- * Формируем список всех объявлений недвижимости, которые соответствуют запросу и имеют статус "опубликовано"
+ * Если пользователь залогинен и указал в личном кабинете параметры поиска
+ **************************************************************************************************************/
+
+if (!isset($_POST['fastSearchButton']) && !isset($_POST['extendedSearchButton']) && $userId != false) {
+    // Получаем данные поискового запроса данного пользователя из БД, если они конечно там есть
+    $rezSearchRequests = mysql_query("SELECT * FROM searchrequests WHERE userId = '" . $userId . "'");
+    $rowSearchRequests = mysql_fetch_assoc($rezSearchRequests);
+
+    // Выполняем только если есть в БД у данного пользователя поисковый запрос
+    if ($rowSearchRequests != false) {
+        if (isset($rowSearchRequests['typeOfObject'])) $typeOfObject = htmlspecialchars($rowSearchRequests['typeOfObject']);
+        if (isset($rowSearchRequests['amountOfRooms'])) $amountOfRooms = unserialize($rowSearchRequests['amountOfRooms']);
+        if (isset($rowSearchRequests['adjacentRooms'])) $adjacentRooms = htmlspecialchars($rowSearchRequests['adjacentRooms']);
+        if (isset($rowSearchRequests['floor'])) $floor = htmlspecialchars($rowSearchRequests['floor']);
+        if (isset($rowSearchRequests['furniture'])) $furniture = htmlspecialchars($rowSearchRequests['furniture']);
+        if (isset($rowSearchRequests['minCost'])) $minCost = htmlspecialchars($rowSearchRequests['minCost']);
+        if (isset($rowSearchRequests['maxCost'])) $maxCost = htmlspecialchars($rowSearchRequests['maxCost']);
+        if (isset($rowSearchRequests['pledge'])) $pledge = htmlspecialchars($rowSearchRequests['pledge']);
+        if (isset($rowSearchRequests['prepayment'])) $prepayment = htmlspecialchars($rowSearchRequests['prepayment']);
+        if (isset($rowSearchRequests['district'])) $district = unserialize($rowSearchRequests['district']);
+        if (isset($rowSearchRequests['withWho'])) $withWho = htmlspecialchars($rowSearchRequests['withWho']);
+        if (isset($rowSearchRequests['children'])) $children = htmlspecialchars($rowSearchRequests['children']);
+        if (isset($rowSearchRequests['animals'])) $animals = htmlspecialchars($rowSearchRequests['animals']);
+        if (isset($rowSearchRequests['termOfLease'])) $termOfLease = htmlspecialchars($rowSearchRequests['termOfLease']);
+    }
+}
+
+/***************************************************************************************************************
+ * Составляем поисковый запрос и получаем данные по соответствующим объектам недвижимости из БД
+ **************************************************************************************************************/
+
+// Ограничение на тип объекта
+$strTypeOfObject = "";
+if ($typeOfObject == "0") $strTypeOfObject = "";
+if ($typeOfObject == "квартира" || $typeOfObject == "комната" || $typeOfObject == "дом" || $typeOfObject == "таунхаус" || $typeOfObject == "дача" || $typeOfObject == "гараж") {
+    $strTypeOfObject = " (typeOfObject = '" . $typeOfObject . "')"; // Думаю, что с точки зрения безопасности (чтобы нельзя было подсунуть в запрос левые SQL подобные строки), нужно перечислять все доступные варианты
+}
+
+// Ограничение на количество комнат
+$strAmountOfRooms = "";
+if (count($amountOfRooms) != "0") {
+    $strAmountOfRooms = " (";
+    for ($i = 0; $i < count($amountOfRooms); $i++) {
+        $strAmountOfRooms .= " amountOfRooms = '" . $amountOfRooms[$i] . "'";
+        if ($i < count($amountOfRooms) - 1) $strAmountOfRooms .= " OR";
+    }
+    $strAmountOfRooms = " )";
+}
+
+// Ограничение на смежность комнат
+$strAdjacentRooms = "";
+if ($adjacentRooms == "0") $strAdjacentRooms = "";
+if ($adjacentRooms == "не имеет значения") $strAdjacentRooms = "";
+if ($adjacentRooms == "только изолированные") $strAdjacentRooms = " (adjacentRooms != 'да')";
+
+// Ограничение на этаж
+$strFloor = "";
+if ($floor == "0") $strFloor = "";
+if ($floor == "любой") $strFloor = "";
+if ($floor == "не первый") $strFloor = " (floor != '1')";
+if ($floor == "не первый и не последний") $strFloor = " (floor != '1' AND floor != totalAmountFloor)";
+
+// Ограничение на мебель
+/*Работает только после извлечения и получения данных, так как в БД данные содержатся в BLOB нечитаемом формате!!!!!!!!!!!!!!!!!!!!!
+$strFurniture = "";
+if ($furniture == "0") $strFurniture = "";
+if ($furniture == "не имеет значения") $strFurniture = "";
+if ($furniture == "с мебелью и быт. техникой") $strFurniture = ;
+if ($furniture == "без мебели") $strFurniture = ;*/
+
+// Ограничение на минимальную сумму арендной платы
+$strMinCost = "";
+if ($minCost == "") $strMinCost = "";
+if ($minCost != "") $strMinCost =  " (costOfRenting >= '" . $minCost . "')";
+
+// Ограничение на максимальную сумму арендной платы
+$strMaxCost = "";
+if ($maxCost == "") $strMaxCost = "";
+if ($maxCost != "") $strMaxCost =  " (costOfRenting <= '" . $maxCost . "')";
+
+// Ограничение на максимальный залог
+$strPledge = "";
+if ($pledge == "") $strPledge = "";
+if ($pledge != "") $strPledge =  " (bailCost <= '" . $pledge . "')";
+
+// Ограничение на предоплату
+/*Нужно менять формат указания предоплаты при формировании объявлений, чтобы их можно было численно сравнивать!!!!!!!!!!!!!!!!!!!!!
+prepayment
+prepayment
+prepayment
+prepayment
+*/
+
+// Ограничение на район
+/*Работает только после извлечения и получения данных, так как в БД данные содержатся в BLOB нечитаемом формате!!!!!!!!!!!!!!!!!!!!!
+district
+district
+district
+district
+district*/
+
+// Ограничение на формат проживания (с кем собираетесь проживать)
+/*Работает только после извлечения и получения данных, так как в БД данные содержатся в BLOB нечитаемом формате!!!!!!!!!!!!!!!!!!!!!
+Кроме того, если проживать = Один, то нужно смотреть еще не совпадение полов!!!!!!!!!!!!!!!!!!!!!
+withWho
+withWho
+withWho
+withWho
+withWho
+*/
+
+// Ограничение на проживание с детьми
+$strChildren = "";
+if ($children == "0" || $children == "без детей") $strChildren = "";
+if ($children == "с детьми старше 4-х лет") $strChildren = " (children != 'только без детей')";
+if ($children == "с детьми младше 4-х лет") $strChildren = " (children != 'только без детей' AND children != 'с детьми старше 4-х лет')";
+
+// Ограничение на проживание с животными
+$strAnimals = "";
+if ($animals == "0" || $animals == "без животных") $strAnimals = "";
+if ($animals == "с животным(ми)") $strAnimals = " (animals != 'только без животных')";
+
+// Ограничение на длительность аренды
+$strTermOfLease = "";
+if ($termOfLease == "0") $strTermOfLease = "";
+if ($termOfLease == "длительный срок") $strTermOfLease = " (termOfLease == 'длительный срок')";
+if ($termOfLease == "несколько месяцев") $strTermOfLease = " (termOfLease == 'несколько месяцев')";
+
+// Собираем поисковый запрос
+$rowPropertyArr = array(); // в итоге получаем массив, каждый элемент которого представляет собой еще один массив значений конкретного объявления по недвижимости
+$rezProperty = mysql_query("SELECT * FROM property WHERE" . . " (status = 'опубликовано') ORDER BY costOfRenting";
+"userId = '" . $rowUsers['id'] . "'");
+
+for ($i = 0; $i < mysql_num_rows($rezProperty); $i++) {
+    $rowPropertyArr[] = mysql_fetch_assoc($rezProperty);
+}
+
+
+/***************************************************************************************************************
+ * Формируем список всех объявлений по недвижимости, которые соответствуют запросу и имеют статус "опубликовано"
  **************************************************************************************************************/
 
 // Шаблон для всплывающего баллуна с описанием объекта недвижимости на карте Яндекса
@@ -183,7 +365,6 @@ $tmpl_MyAdvert = "
 							</li>
 						</ul>
 						<div id="tabs-1">
-							<!-- Раздел для параметров поиска -->
                             <form name="fastSearch" method="post">
 							<span id="fastSearchInput"> Я хочу арендовать
 								<select name="typeOfObjectFast" id="typeOfObjectFast">
@@ -196,30 +377,32 @@ $tmpl_MyAdvert = "
                                     <option value="гараж" <?php if ($typeOfObject == "гараж") echo "selected";?>>гараж</option>
                                 </select>
                                 в районе
-                                <select name="districtFast">
+                                <select name="districtFast" id="districtFast">
                                     <option value="0"></option>
                                     <?php
                                     if (isset($allDistrictsInCity)) {
-                                        foreach ($allDistrictsInCity as $key => $value) { // Для каждого идентификатора района и названия формируем пункт селекта
-                                            echo "<option value='" . $key . "'";
-                                            if ($key == $district[0]) echo "selected"; // В качестве выбранного подставляем первый район в списке
+                                        foreach ($allDistrictsInCity as $value) { // Для каждого названия района формируем option в селекте
+                                            echo "<option value='" . $value . "'";
+                                            if (isset($district[0]) && $value == $district[0]) echo "selected"; // В качестве выбранного в селекте назначаем первый район из списка выбранных пользователем
                                             echo ">" . $value . "</option>";
                                         }
                                     }
                                     ?>
                                 </select>
 								стоимостью от
-								<input type="text" name="minCost" size="10" maxlength="8" <?php echo "value='$minCost'";?>>
+								<input type="text" name="minCostFast" size="10" maxlength="8" <?php echo "value='$minCost'";?>>
 								до
-								<input type="text" name="maxCost" size="10" maxlength="8" <?php echo "value='$maxCost'";?>>
+								<input type="text" name="maxCostFast" size="10" maxlength="8" <?php echo "value='$maxCost'";?>>
 								руб./мес.
 								&nbsp;
-								<button id="fastSearchButton">
+								<button type="submit" name="fastSearchButton" id="fastSearchButton">
 									Найти
 								</button>
                             </span>
+                            </form>
 						</div>
 						<div id="tabs-2">
+                        <form name="extendedSearch" method="post">
                         <div id="leftBlockOfSearchParameters" style="display: inline-block;">
                             <fieldset class="edited">
                                 <legend>
@@ -227,40 +410,62 @@ $tmpl_MyAdvert = "
                                 </legend>
                                 <div class="searchItem">
                                     <span class="searchItemLabel"> Тип: </span>
-
                                     <div class="searchItemBody">
-                                        <select name="typeOfObject">
-                                            <option value="flat" <?php if ($typeOfObject == "flat") echo "selected";?>>квартира</option>
-                                            <option value="room" <?php if ($typeOfObject == "room") echo "selected";?>>комната</option>
-                                            <option value="house" <?php if ($typeOfObject == "house") echo "selected";?>>дом, коттедж</option>
-                                            <option value="townhouse" <?php if ($typeOfObject == "townhouse") echo "selected";?>>таунхаус
-                                            </option>
-                                            <option value="dacha" <?php if ($typeOfObject == "dacha") echo "selected";?>>дача</option>
-                                            <option value="garage" <?php if ($typeOfObject == "garage") echo "selected";?>>гараж</option>
+                                        <select name="typeOfObject" id="typeOfObject">
+                                            <option value="0" <?php if ($typeOfObject == "0") echo "selected";?>></option>
+                                            <option value="квартира" <?php if ($typeOfObject == "квартира") echo "selected";?>>квартира</option>
+                                            <option value="комната" <?php if ($typeOfObject == "комната") echo "selected";?>>комната</option>
+                                            <option value="дом" <?php if ($typeOfObject == "дом") echo "selected";?>>дом, коттедж</option>
+                                            <option value="таунхаус" <?php if ($typeOfObject == "таунхаус") echo "selected";?>>таунхаус</option>
+                                            <option value="дача" <?php if ($typeOfObject == "дача") echo "selected";?>>дача</option>
+                                            <option value="гараж" <?php if ($typeOfObject == "гараж") echo "selected";?>>гараж</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="searchItem">
                                     <span class="searchItemLabel"> Количество комнат: </span>
-
                                     <div class="searchItemBody">
-                                        <input type="checkbox" value="1"
-                                               name="amountOfRooms[]" <?php if ($amountOfRooms1 == "1") echo "checked";?>>
+                                        <input type="checkbox" value="1" name="amountOfRooms[]"
+                                            <?php
+                                            foreach ($amountOfRooms as $value) {
+                                                if ($value == "1") { echo "checked"; break; }
+                                            }
+                                            ?>>
                                         1
                                         <input type="checkbox" value="2"
-                                               name="amountOfRooms[]" <?php if ($amountOfRooms2 == "2") echo "checked";?>>
+                                               name="amountOfRooms[]" <?php
+                                            foreach ($amountOfRooms as $value) {
+                                                if ($value == "2") { echo "checked"; break; }
+                                            }
+                                            ?>>
                                         2
                                         <input type="checkbox" value="3"
-                                               name="amountOfRooms[]" <?php if ($amountOfRooms3 == "3") echo "checked";?>>
+                                               name="amountOfRooms[]" <?php
+                                            foreach ($amountOfRooms as $value) {
+                                                if ($value == "3") { echo "checked"; break; }
+                                            }
+                                            ?>>
                                         3
                                         <input type="checkbox" value="4"
-                                               name="amountOfRooms[]" <?php if ($amountOfRooms4 == "4") echo "checked";?>>
+                                               name="amountOfRooms[]" <?php
+                                            foreach ($amountOfRooms as $value) {
+                                                if ($value == "4") { echo "checked"; break; }
+                                            }
+                                            ?>>
                                         4
                                         <input type="checkbox" value="5"
-                                               name="amountOfRooms[]" <?php if ($amountOfRooms5 == "5") echo "checked";?>>
+                                               name="amountOfRooms[]" <?php
+                                            foreach ($amountOfRooms as $value) {
+                                                if ($value == "5") { echo "checked"; break; }
+                                            }
+                                            ?>>
                                         5
                                         <input type="checkbox" value="6"
-                                               name="amountOfRooms[]" <?php if ($amountOfRooms6 == "6") echo "checked";?>>
+                                               name="amountOfRooms[]" <?php
+                                            foreach ($amountOfRooms as $value) {
+                                                if ($value == "6") { echo "checked"; break; }
+                                            }
+                                            ?>>
                                         6...
                                     </div>
                                 </div>
@@ -269,8 +474,9 @@ $tmpl_MyAdvert = "
 
                                     <div class="searchItemBody">
                                         <select name="adjacentRooms">
-                                            <option value="yes" <?php if ($adjacentRooms == "yes") echo "selected";?>>не имеет значения</option>
-                                            <option value="no" <?php if ($adjacentRooms == "no") echo "selected";?>>только изолированные
+                                            <option value="0" <?php if ($adjacentRooms == "0") echo "selected";?>></option>
+                                            <option value="не имеет значения" <?php if ($adjacentRooms == "не имеет значения") echo "selected";?>>не имеет значения</option>
+                                            <option value="только изолированные" <?php if ($adjacentRooms == "только изолированные") echo "selected";?>>только изолированные
                                             </option>
                                         </select>
                                     </div>
@@ -280,9 +486,10 @@ $tmpl_MyAdvert = "
 
                                     <div class="searchItemBody">
                                         <select name="floor">
-                                            <option value="any" <?php if ($floor == "any") echo "selected";?>>любой</option>
-                                            <option value="not1" <?php if ($floor == "not1") echo "selected";?>>не первый</option>
-                                            <option value="not1notLasted" <?php if ($floor == "not1notLasted") echo "selected";?>>не первый и не
+                                            <option value="0" <?php if ($floor == "0") echo "selected";?>></option>
+                                            <option value="любой" <?php if ($floor == "любой") echo "selected";?>>любой</option>
+                                            <option value="не первый" <?php if ($floor == "не первый") echo "selected";?>>не первый</option>
+                                            <option value="не первый и не последний" <?php if ($floor == "не первый и не последний") echo "selected";?>>не первый и не
                                                 последний
                                             </option>
                                         </select>
@@ -293,9 +500,10 @@ $tmpl_MyAdvert = "
 
                                     <div class="searchItemBody">
                                         <select name="furniture">
-                                            <option value="any" <?php if ($furniture == "any") echo "selected";?>>не имеет значения</option>
-                                            <option value="with" <?php if ($furniture == "with") echo "selected";?>>с мебелью и быт. техникой</option>
-                                            <option value="without" <?php if ($furniture == "without") echo "selected";?>>без мебели</option>
+                                            <option value="0" <?php if ($furniture == "0") echo "selected";?>></option>
+                                            <option value="не имеет значения" <?php if ($furniture == "не имеет значения") echo "selected";?>>не имеет значения</option>
+                                            <option value="с мебелью и быт. техникой" <?php if ($furniture == "с мебелью и быт. техникой") echo "selected";?>>с мебелью и быт. техникой</option>
+                                            <option value="без мебели" <?php if ($furniture == "без мебели") echo "selected";?>>без мебели</option>
                                         </select>
                                     </div>
                                 </div>
@@ -317,7 +525,7 @@ $tmpl_MyAdvert = "
                                     </div>
                                 </div>
                                 <div class="searchItem"
-                                     title="Какую сумму Вы готовы передать собственнику в качестве возвращаемого гарантийного депозита, а также предоплаты за проживание, кроме арендной платы за первый месяц">
+                                     title="Какую сумму Вы готовы передать собственнику в качестве возвращаемого гарантийного депозита">
                                     <span class="searchItemLabel"> Залог </span>
 
                                     <div class="searchItemBody">
@@ -326,339 +534,112 @@ $tmpl_MyAdvert = "
                                         руб.
                                     </div>
                                 </div>
+                                <div class="searchItem"
+                                     title="Какую предоплату за проживание Вы готовы внести">
+                                    <span class="searchItemLabel"> Максимальная предоплата: </span>
+                                    <div class="searchItemBody">
+                                        <select name="prepayment">
+                                            <option value="12" <?php if ($prepayment == "12") echo "selected";?>></option>
+                                            <option value="0" <?php if ($prepayment == "0") echo "selected";?>>нет</option>
+                                            <option value="1" <?php if ($prepayment == "1") echo "selected";?>>1 месяц</option>
+                                            <option value="2" <?php if ($prepayment == "2") echo "selected";?>>2 месяца</option>
+                                            <option value="3" <?php if ($prepayment == "3") echo "selected";?>>3 месяца</option>
+                                            <option value="4" <?php if ($prepayment == "4") echo "selected";?>>4 месяца</option>
+                                            <option value="5" <?php if ($prepayment == "5") echo "selected";?>>5 месяцев</option>
+                                            <option value="6" <?php if ($prepayment == "6") echo "selected";?>>6 месяцев</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </fieldset>
                         </div>
                         <div id="rightBlockOfSearchParameters">
-                        <fieldset>
-                        <legend>
-                            Район
-                        </legend>
-                        <div class="searchItem">
-                        <div class="searchItemBody">
-                        <ul>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="1" <?php if ($district1 == "1") echo "checked";?>>
-                            Автовокзал (южный)
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="2" <?php if ($district2 == "2") echo "checked";?>>
-                            Академический
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="3" <?php if ($district3 == "3") echo "checked";?>>
-                            Ботанический
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="4" <?php if ($district4 == "4") echo "checked";?>>
-                            ВИЗ
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="5" <?php if ($district5 == "5") echo "checked";?>>
-                            Вокзальный
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="6" <?php if ($district6 == "6") echo "checked";?>>
-                            Втузгородок
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="7" <?php if ($district7 == "7") echo "checked";?>>
-                            Горный щит
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="8" <?php if ($district8 == "8") echo "checked";?>>
-                            Елизавет
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="9" <?php if ($district9 == "9") echo "checked";?>>
-                            ЖБИ
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="10" <?php if ($district10 == "10") echo "checked";?>>
-                            Завокзальный
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="11" <?php if ($district11 == "11") echo "checked";?>>
-                            Заречный
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="12" <?php if ($district12 == "12") echo "checked";?>>
-                            Изоплит
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="13" <?php if ($district13 == "13") echo "checked";?>>
-                            Исток
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="14" <?php if ($district14 == "14") echo "checked";?>>
-                            Калиновский
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="15" <?php if ($district15 == "15") echo "checked";?>>
-                            Кольцово
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="16" <?php if ($district16 == "16") echo "checked";?>>
-                            Компрессорный
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="17" <?php if ($district17 == "17") echo "checked";?>>
-                            Лечебный
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="18" <?php if ($district18 == "18") echo "checked";?>>
-                            Малый исток
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="19" <?php if ($district19 == "19") echo "checked";?>>
-                            Нижнеисетский
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="20" <?php if ($district20 == "20") echo "checked";?>>
-                            Парковый
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="21" <?php if ($district21 == "21") echo "checked";?>>
-                            Пионерский
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="22" <?php if ($district22 == "22") echo "checked";?>>
-                            Птицефабрика
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="23" <?php if ($district23 == "23") echo "checked";?>>
-                            Рудный
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="24" <?php if ($district24 == "24") echo "checked";?>>
-                            Садовый
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="25" <?php if ($district25 == "25") echo "checked";?>>
-                            Северка
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="26" <?php if ($district26 == "26") echo "checked";?>>
-                            Семь ключей
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="27" <?php if ($district27 == "27") echo "checked";?>>
-                            Сибирский тракт
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="28" <?php if ($district28 == "28") echo "checked";?>>
-                            Синие камни
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="29" <?php if ($district29 == "29") echo "checked";?>>
-                            Совхозный
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="30" <?php if ($district30 == "30") echo "checked";?>>
-                            Сортировка новая
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="31" <?php if ($district31 == "31") echo "checked";?>>
-                            Сортировка старая
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="32" <?php if ($district32 == "32") echo "checked";?>>
-                            Уктус
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="33" <?php if ($district33 == "33") echo "checked";?>>
-                            УНЦ
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="34" <?php if ($district34 == "34") echo "checked";?>>
-                            Уралмаш
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="35" <?php if ($district35 == "35") echo "checked";?>>
-                            Химмаш
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="36" <?php if ($district36 == "36") echo "checked";?>>
-                            Центр
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="37" <?php if ($district37 == "37") echo "checked";?>>
-                            Чермет
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="38" <?php if ($district38 == "38") echo "checked";?>>
-                            Чусовское озеро
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="39" <?php if ($district39 == "39") echo "checked";?>>
-                            Шабровский
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="40" <?php if ($district40 == "40") echo "checked";?>>
-                            Шарташ
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="41" <?php if ($district41 == "41") echo "checked";?>>
-                            Шарташский рынок
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="42" <?php if ($district42 == "42") echo "checked";?>>
-                            Широкая речка
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="43" <?php if ($district43 == "43") echo "checked";?>>
-                            Шувакиш
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="44" <?php if ($district44 == "44") echo "checked";?>>
-                            Эльмаш
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="45" <?php if ($district45 == "45") echo "checked";?>>
-                            Юго-запад
-                        </li>
-                        <li>
-                            <input type="checkbox" name="district[]"
-                                   value="46" <?php if ($district46 == "46") echo "checked";?>>
-                            За городом
-                        </li>
-                        </ul>
-                        </div>
-                        </div>
-                        </fieldset>
+                            <fieldset>
+                                <legend>
+                                    Район
+                                </legend>
+                                <div class="searchItem">
+                                    <div class="searchItemBody">
+                                        <ul>
+                                            <?php
+                                            if (isset($allDistrictsInCity)) {
+                                                foreach ($allDistrictsInCity as $value) { // Для каждого идентификатора района и названия формируем чекбокс
+                                                    echo "<li><input type='checkbox' name='district[]' value='" . $value . "'";
+                                                    foreach ($district as $valueDistrict) {
+                                                        if ($valueDistrict == $value) { echo "checked"; break; }
+                                                    }
+                                                    echo "> " . $value . "</li>";
+                                                }
+                                            }
+                                            ?>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </fieldset>
                         </div>
                         <!-- /end.rightBlockOfSearchParameters -->
-
                         <fieldset class="edited private">
                             <legend>
                                 Особые параметры поиска
                             </legend>
                             <div class="searchItem">
                                 <span class="searchItemLabel">Как собираетесь проживать: </span>
-
                                 <div class="searchItemBody">
                                     <select name="withWho" id="withWho">
-                                        <option value="alone" <?php if ($withWho == "alone") echo "selected";?>>один</option>
-                                        <option value="couple" <?php if ($withWho == "couple") echo "selected";?>>семейная пара</option>
-                                        <option value="nonFamilyPair" <?php if ($withWho == "nonFamilyPair") echo "selected";?>>несемейная
+                                        <option value="0" <?php if ($withWho == "0") echo "selected";?>></option>
+                                        <option value="один" <?php if ($withWho == "один") echo "selected";?>>один</option>
+                                        <option value="семейная пара" <?php if ($withWho == "семейная пара") echo "selected";?>>семейная пара</option>
+                                        <option value="несемейная пара" <?php if ($withWho == "несемейная пара") echo "selected";?>>несемейная
                                             пара
                                         </option>
-                                        <option value="withFriends" <?php if ($withWho == "withFriends") echo "selected";?>>со знакомыми
+                                        <option value="со знакомыми" <?php if ($withWho == "со знакомыми") echo "selected";?>>со знакомыми
                                         </option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="searchItem" id="withWhoDescription" style="display: none;">
-                                <div class="searchItemLabel">
-                                    Ссылки на страницы сожителей:
-                                </div>
-                                <div class="searchItemBody">
-                                    <textarea name="linksToFriends" cols="40" rows="3"><?php echo $linksToFriends;?></textarea>
-                                </div>
-                            </div>
                             <div class="searchItem">
                                 <span class="searchItemLabel">Дети: </span>
-
                                 <div class="searchItemBody">
                                     <select name="children" id="children">
-                                        <option value="without" <?php if ($children == "without") echo "selected";?>>без детей</option>
-                                        <option value="childrenUnder4" <?php if ($children == "childrenUnder4") echo "selected";?>>с детьми
+                                        <option value="0" <?php if ($children == "0") echo "selected";?>></option>
+                                        <option value="без детей" <?php if ($children == "без детей") echo "selected";?>>без детей</option>
+                                        <option value="с детьми младше 4-х лет" <?php if ($children == "с детьми младше 4-х лет") echo "selected";?>>с детьми
                                             младше 4-х лет
                                         </option>
-                                        <option value="childrenOlder4" <?php if ($children == "childrenOlder4") echo "selected";?>>с детьми
+                                        <option value="с детьми старше 4-х лет" <?php if ($children == "с детьми старше 4-х лет") echo "selected";?>>с детьми
                                             старше 4-х лет
                                         </option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="searchItem" id="childrenDescription" style="display: none;">
-                                <div class="searchItemLabel">
-                                    Сколько у Вас детей и какого возраста:
-                                </div>
-                                <div class="searchItemBody">
-                                    <textarea name="howManyChildren" cols="40" rows="3"><?php echo $howManyChildren;?></textarea>
-                                </div>
-                            </div>
                             <div class="searchItem">
                                 <span class="searchItemLabel">Животные: </span>
-
                                 <div class="searchItemBody">
                                     <select name="animals" id="animals">
-                                        <option value="without" <?php if ($animals == "without") echo "selected";?>>без животных</option>
-                                        <option value="with" <?php if ($animals == "with") echo "selected";?>>с животным(ми)</option>
+                                        <option value="0" <?php if ($animals == "0") echo "selected";?>></option>
+                                        <option value="без животных" <?php if ($animals == "без животных") echo "selected";?>>без животных</option>
+                                        <option value="с животным(ми)" <?php if ($animals == "с животным(ми)") echo "selected";?>>с животным(ми)</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="searchItem" id="animalsDescription" style="display: none;">
-                                <div class="searchItemLabel">
-                                    Сколько у Вас животных и какого вида:
-                                </div>
-                                <div class="searchItemBody">
-                                    <textarea name="howManyAnimals" cols="40" rows="3"><?php echo $howManyAnimals;?></textarea>
-                                </div>
-                            </div>
                             <div class="searchItem">
-                                <span class="searchItemLabel">Предполагаемый срок аренды:</span>
-
+                                <span class="searchItemLabel">Срок аренды:</span>
                                 <div class="searchItemBody">
-                                    <input type="text" name="period" size="18" maxlength="80"
-                                           validations="validate[required]" <?php echo "value='$period'";?>>
-                                </div>
-                            </div>
-                            <div class="searchItem">
-                                <div class="searchItemLabel">
-                                    Дополнительные условия поиска:
-                                </div>
-                                <div class="searchItemBody">
-                                    <textarea name="additionalDescriptionOfSearch" cols="50"
-                                              rows="4"><?php echo $additionalDescriptionOfSearch;?></textarea>
+                                    <select name="termOfLease" id="termOfLease">
+                                        <option value="0" <?php if ($termOfLease == "0") echo "selected";?>></option>
+                                        <option value="длительный срок" <?php if ($termOfLease == "длительный срок") echo "selected";?>>длительный срок (от года)</option>
+                                        <option value="несколько месяцев" <?php if ($termOfLease == "несколько месяцев") echo "selected";?>>несколько месяцев (до года)</option>
+                                    </select>
                                 </div>
                             </div>
                         </fieldset>
+                        <div class="actionsOnSearch">
+                            <a href="#">Запомнить условия поиска</a>
+                            <button type="submit" name="extendedSearchButton" id="extendedSearchButton">
+                                Найти
+                            </button>
+                        </div>
+                        <div class="clearBoth"></div>
+                        </form>
 						</div><!-- /end.tabs-2 -->
 					</div><!-- /end.tabs -->
 				</div><!-- /end.wrapperOfTabs -->

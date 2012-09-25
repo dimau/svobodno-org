@@ -36,14 +36,6 @@ for ($i = 0; $i < mysql_num_rows($rezPropertyFotos); $i++) {
     $rowPropertyFotosArr[] = mysql_fetch_assoc($rezPropertyFotos);
 }
 
-// Готовим массив со списком районов в городе пользователя
-$allDistrictsInCity = array();
-$rezDistricts = mysql_query("SELECT name FROM districts WHERE city = '" . "Екатеринбург" . "' ORDER BY name ASC");
-for ($i = 0; $i < mysql_num_rows($rezDistricts); $i++) {
-    $rowDistricts = mysql_fetch_assoc($rezDistricts);
-    $allDistrictsInCity[] = $rowDistricts['name'];
-}
-
 // Инициализируем переменную корректности
 $correct = "null";
 

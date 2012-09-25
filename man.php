@@ -217,7 +217,7 @@
 												<td class="objectDescriptionBody"><span>1 кошка</span></td>
 											</tr>
 											<tr>
-												<td class="objectDescriptionItemLabel">Предполагаемый срок аренды:</td>
+												<td class="objectDescriptionItemLabel">Срок аренды:</td>
 												<td class="objectDescriptionBody"><span>долгосрочно</span></td>
 											</tr>
 											<tr>

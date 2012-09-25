@@ -70,22 +70,23 @@ echo "Статус создания таблицы userFotos: " . $rez . "\n";
 // Создаем таблицу для хранения информации о ПОИСКОВЫХ ЗАПРОСАХ пользователей
 $rez = mysql_query("CREATE TABLE searchRequests (
         userId INT(11) NOT NULL PRIMARY KEY COMMENT 'Идентификатор пользователя, которому принадлежит данный поисковый запрос. Так как я считаю, что каждый пользователь может иметь только 1 поисковый запрос, то данное поле является ключом таблицы',
-        typeOfObject VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип объекта, который ищет пользователь',
+        typeOfObject VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип объекта, который ищет пользователь',
         amountOfRooms BLOB,
-        adjacentRooms VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
-        floor VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
-        furniture VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        adjacentRooms VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        floor VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        furniture VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
         minCost INT NOT NULL,
         maxCost INT NOT NULL,
         pledge INT NOT NULL,
+        prepayment INT COMMENT 'Максимальная предоплата, которую готов внести арендатор, указана в месяцах',
         district BLOB COMMENT 'Список районов, в которых пользователь ищет недвижимость. Представляет собой сериализованный массив',
-        withWho VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        withWho VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
         linksToFriends TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
-        children VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        children VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
         howManyChildren TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
-        animals VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        animals VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
         howManyAnimals TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
-        period VARCHAR(80) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        termOfLease VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
         additionalDescriptionOfSearch TEXT CHARACTER SET utf8 COLLATE utf8_general_ci
 )");
 

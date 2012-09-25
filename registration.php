@@ -75,7 +75,7 @@ $children = "без детей";
 $howManyChildren = "";
 $animals = "без животных";
 $howManyAnimals = "";
-$period = "";
+$termOfLease = "0";
 $additionalDescriptionOfSearch = "";
 
 $lic = "";
@@ -141,7 +141,7 @@ if (isset($_POST['readyButton'])) {
     if (isset($_POST['howManyChildren'])) $howManyChildren = htmlspecialchars($_POST['howManyChildren']);
     if (isset($_POST['animals'])) $animals = htmlspecialchars($_POST['animals']);
     if (isset($_POST['howManyAnimals'])) $howManyAnimals = htmlspecialchars($_POST['howManyAnimals']);
-    if (isset($_POST['period'])) $period = htmlspecialchars($_POST['period']);
+    if (isset($_POST['termOfLease'])) $termOfLease = htmlspecialchars($_POST['termOfLease']);
     if (isset($_POST['additionalDescriptionOfSearch'])) $additionalDescriptionOfSearch = htmlspecialchars($_POST['additionalDescriptionOfSearch']);
 
     if (isset($_POST['lic'])) $lic = htmlspecialchars($_POST['lic']);
@@ -188,7 +188,7 @@ if (isset($_POST['readyButton'])) {
             $districtSerialized = serialize($district);
             // Непосредственное сохранение данных о поисковом запросе
             if ($typeTenant == "true") {
-                $rez = mysql_query("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, furniture, minCost, maxCost, pledge, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, period, additionalDescriptionOfSearch) VALUES ('" . $rowId['id'] . "','" . $typeOfObject . "','" . $amountOfRoomsSerialized . "','" . $adjacentRooms . "','" . $floor . "','" . $furniture . "','" . $minCost . "','" . $maxCost . "','" . $pledge . "','" . $districtSerialized . "','" . $withWho . "','" . $linksToFriends . "','" . $children . "','" . $howManyChildren . "','" . $animals . "','" . $howManyAnimals . "','" . $period . "','" . $additionalDescriptionOfSearch . "')"); // Поисковый запрос пользователя сохраняется в специальной таблице
+                $rez = mysql_query("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, furniture, minCost, maxCost, pledge, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch) VALUES ('" . $rowId['id'] . "','" . $typeOfObject . "','" . $amountOfRoomsSerialized . "','" . $adjacentRooms . "','" . $floor . "','" . $furniture . "','" . $minCost . "','" . $maxCost . "','" . $pledge . "','" . $districtSerialized . "','" . $withWho . "','" . $linksToFriends . "','" . $children . "','" . $howManyChildren . "','" . $animals . "','" . $howManyAnimals . "','" . $termOfLease . "','" . $additionalDescriptionOfSearch . "')"); // Поисковый запрос пользователя сохраняется в специальной таблице
             }
 
 
@@ -885,7 +885,6 @@ include("header.php");
 </fieldset>
 </div>
 <!-- /end.rightBlockOfSearchParameters -->
-
 <fieldset class="edited private">
     <legend>
         Особые параметры поиска
@@ -955,11 +954,14 @@ include("header.php");
         </div>
     </div>
     <div class="searchItem">
-        <span class="searchItemLabel">Предполагаемый срок аренды:</span>
+        <span class="searchItemLabel">Срок аренды:</span>
 
         <div class="searchItemBody">
-            <input type="text" name="period" size="18" maxlength="80"
-                   validations="validate[required]" <?php echo "value='$period'";?>>
+            <select name="termOfLease" id="termOfLease" validations="validate[required]">
+                <option value="0" <?php if ($termOfLease == "0") echo "selected";?>></option>
+                <option value="длительный срок" <?php if ($termOfLease == "длительный срок") echo "selected";?>>длительный срок (от года)</option>
+                <option value="несколько месяцев" <?php if ($termOfLease == "несколько месяцев") echo "selected";?>>несколько месяцев (до года)</option>
+            </select>
         </div>
     </div>
     <div class="searchItem">
