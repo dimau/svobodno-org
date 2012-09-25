@@ -6,6 +6,14 @@ include_once 'lib/function_global.php'; //подключаем файл с гл�
  * Получаем get параметры запроса или присваиваем им значения по умолчанию
  **************************************************************************************************************/
 
+// Готовим массив со списком районов в городе пользователя
+$allDistrictsInCity = array();
+$rezDistricts = mysql_query("SELECT name FROM districts WHERE city = '" . "Екатеринбург" . "' ORDER BY name ASC");
+for ($i = 0; $i < mysql_num_rows($rezDistricts); $i++) {
+    $rowDistricts = mysql_fetch_assoc($rezDistricts);
+    $allDistrictsInCity[] = $rowDistricts['name'];
+}
+
 // TODO: тест Присваиваем тестовые значения переменным
 $district = 12;
 $typeOfObject = "дача";
@@ -176,33 +184,34 @@ $tmpl_MyAdvert = "
 						</ul>
 						<div id="tabs-1">
 							<!-- Раздел для параметров поиска -->
+                            <form name="fastSearch" method="post">
 							<span id="fastSearchInput"> Я хочу арендовать
-								<select name="typeOfObject">
+								<select name="typeOfObjectFast" id="typeOfObjectFast">
+                                    <option value="0" <?php if ($typeOfObject == "0") echo "selected";?>></option>
                                     <option value="квартира" <?php if ($typeOfObject == "квартира") echo "selected";?>>квартира</option>
                                     <option value="комната" <?php if ($typeOfObject == "комната") echo "selected";?>>комната</option>
                                     <option value="дом" <?php if ($typeOfObject == "дом") echo "selected";?>>дом, коттедж</option>
-                                    <option value="таунхаус" <?php if ($typeOfObject == "таунхаус") echo "selected";?>>таунхаус
-                                    </option>
+                                    <option value="таунхаус" <?php if ($typeOfObject == "таунхаус") echo "selected";?>>таунхаус</option>
                                     <option value="дача" <?php if ($typeOfObject == "дача") echo "selected";?>>дача</option>
                                     <option value="гараж" <?php if ($typeOfObject == "гараж") echo "selected";?>>гараж</option>
                                 </select>
                                 в районе
-                                <select name="districtFastSearchInput">
+                                <select name="districtFast">
                                     <option value="0"></option>
                                     <?php
                                     if (isset($allDistrictsInCity)) {
                                         foreach ($allDistrictsInCity as $key => $value) { // Для каждого идентификатора района и названия формируем пункт селекта
                                             echo "<option value='" . $key . "'";
-                                            if ($key == $district[0]) echo "selected";
+                                            if ($key == $district[0]) echo "selected"; // В качестве выбранного подставляем первый район в списке
                                             echo ">" . $value . "</option>";
                                         }
                                     }
                                     ?>
                                 </select>
 								стоимостью от
-								<input type="text" size="10" value="0">
+								<input type="text" name="minCost" size="10" maxlength="8" <?php echo "value='$minCost'";?>>
 								до
-								<input type="text" size="10">
+								<input type="text" name="maxCost" size="10" maxlength="8" <?php echo "value='$maxCost'";?>>
 								руб./мес.
 								&nbsp;
 								<button id="fastSearchButton">

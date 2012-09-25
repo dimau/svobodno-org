@@ -77,10 +77,11 @@ $comment = "";
 $fileUploadId = generateCode(7);
 
 // Готовим массив со списком районов в городе пользователя
-$rezDistricts = mysql_query("SELECT * FROM districts WHERE city = '" . "Екатеринбург" . "'");
+$allDistrictsInCity = array();
+$rezDistricts = mysql_query("SELECT name FROM districts WHERE city = '" . "Екатеринбург" . "' ORDER BY name ASC");
 for ($i = 0; $i < mysql_num_rows($rezDistricts); $i++) {
     $rowDistricts = mysql_fetch_assoc($rezDistricts);
-    $allDistrictsInCity[$rowDistricts['id']] = $rowDistricts['name'];
+    $allDistrictsInCity[] = $rowDistricts['name'];
 }
 
 // Если была нажата кнопка Сохранить, проверим данные на корректность и, если данные введены и введены правильно, добавим запись с новым объектом недвижмости в БД
@@ -655,13 +656,13 @@ include("header.php");
             <select name="district">
                 <option value="0"></option>
             <?php
-            if (isset($allDistrictsInCity)) {
-                foreach ($allDistrictsInCity as $key => $value) { // Для каждого идентификатора района и названия формируем пункт селекта
-                    echo "<option value='" . $key . "'";
-                    if ($key == $district) echo "selected";
-                    echo ">" . $value . "</option>";
+                if (isset($allDistrictsInCity)) {
+                    foreach ($allDistrictsInCity as $value) { // Для каждого названия района формируем option в селекте
+                        echo "<option value='" . $value . "'";
+                        if ($value == $district) echo "selected";
+                        echo ">" . $value . "</option>";
+                    }
                 }
-            }
             ?>
             </select>
         </div>

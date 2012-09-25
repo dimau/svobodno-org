@@ -64,34 +64,30 @@ $rez = mysql_query("CREATE TABLE userFotos (
         filesizeMb FLOAT(1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой',
         userId INT(11) COMMENT 'Идентификатор пользователя, которому соответствует данная фотография'
 )");
-// userId - содержит идентификатор пользователя, к которому относится фотография
 
 echo "Статус создания таблицы userFotos: " . $rez . "\n";
 
 // Создаем таблицу для хранения информации о ПОИСКОВЫХ ЗАПРОСАХ пользователей
 $rez = mysql_query("CREATE TABLE searchRequests (
-        userId INT(11) NOT NULL PRIMARY KEY COMMENT 'Идентификатор пользователя, которому принадлежит данный поисковый запрос',
-        typeOfObject VARCHAR(20) COMMENT 'Тип объекта, который ищет пользователь',
+        userId INT(11) NOT NULL PRIMARY KEY COMMENT 'Идентификатор пользователя, которому принадлежит данный поисковый запрос. Так как я считаю, что каждый пользователь может иметь только 1 поисковый запрос, то данное поле является ключом таблицы',
+        typeOfObject VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип объекта, который ищет пользователь',
         amountOfRooms BLOB,
-        adjacentRooms VARCHAR(20),
-        floor VARCHAR(20),
-        furniture VARCHAR(20),
+        adjacentRooms VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        floor VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        furniture VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
         minCost INT NOT NULL,
         maxCost INT NOT NULL,
         pledge INT NOT NULL,
         district BLOB COMMENT 'Список районов, в которых пользователь ищет недвижимость. Представляет собой сериализованный массив',
-        withWho VARCHAR(20),
-        linksToFriends TEXT,
-        children VARCHAR(20),
-        howManyChildren TEXT,
-        animals VARCHAR(20),
-        howManyAnimals TEXT,
-        period VARCHAR(80),
-        additionalDescriptionOfSearch TEXT
+        withWho VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        linksToFriends TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+        children VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        howManyChildren TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+        animals VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        howManyAnimals TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+        period VARCHAR(80) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        additionalDescriptionOfSearch TEXT CHARACTER SET utf8 COLLATE utf8_general_ci
 )");
-// в поле userId указывается идентификатор пользователя, к которому привязан данный поисковый запрос. Так как я считаю, что каждый пользователь может иметь только 1 поисковый запрос, то данное поле является ключом таблицы
-// amountOfRooms храним в виде 001011, где каждый разряд соответствует количеству комнат (1 разряд - 1 комната, 2-ой разряд - 2 комнаты и т.д.), а 0 - не отмечено, 1 - отмечено
-// district храним в виде последовательности идентификаторов районов, выбранных пользователем, разделенных знаком ","
 
 echo "Статус создания таблицы searchRequests: " . $rez . "\n";
 
@@ -99,16 +95,16 @@ echo "Статус создания таблицы searchRequests: " . $rez . "\
 $rez = mysql_query("CREATE TABLE property (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор объекта недвижимости или объявления - можно его называть и так, и так',
         userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя (собственника), который указал данное объявление в системе и который сдает данный объект',
-        typeOfObject VARCHAR(20),
+        typeOfObject VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
         dateOfEntry DATE,
-        termOfLease VARCHAR(20),
+        termOfLease VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
         dateOfCheckOut DATE,
-        amountOfRooms VARCHAR(20),
-        adjacentRooms VARCHAR(20),
-        amountOfAdjacentRooms VARCHAR(20),
-        typeOfBathrooms VARCHAR(20),
-        typeOfBalcony VARCHAR(20),
-        balconyGlazed VARCHAR(20),
+        amountOfRooms VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        adjacentRooms VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        amountOfAdjacentRooms VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        typeOfBathrooms VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        typeOfBalcony VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        balconyGlazed VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
         roomSpace FLOAT(2),
         totalArea FLOAT(2),
         livingSpace FLOAT(2),
@@ -116,55 +112,54 @@ $rez = mysql_query("CREATE TABLE property (
         floor INT,
         totalAmountFloor INT,
         numberOfFloor INT,
-        concierge VARCHAR(20),
-        intercom VARCHAR(20),
-        parking VARCHAR(20),
-        city VARCHAR(50),
-        district VARCHAR(50),
+        concierge VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        intercom VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        parking VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        city VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        district VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci,
         coordX VARCHAR(30),
         coordY VARCHAR(30),
-        address VARCHAR(60),
-        apartmentNumber VARCHAR(20),
-        subwayStation VARCHAR(50),
+        address VARCHAR(60) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        apartmentNumber VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        subwayStation VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci,
         distanceToMetroStation INT,
-        currency VARCHAR(20),
+        currency VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
         costOfRenting FLOAT(2),
-        utilities VARCHAR(20),
+        utilities VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
         costInSummer FLOAT(2),
         costInWinter FLOAT(2),
-        electricPower VARCHAR(20),
-        bail VARCHAR(20),
+        electricPower VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        bail VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
         bailCost FLOAT(2),
-        prepayment VARCHAR(20),
+        prepayment VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
         compensationMoney FLOAT(2),
         compensationPercent FLOAT(2),
-        repair VARCHAR(50),
-        furnish VARCHAR(50),
-        windows VARCHAR(20),
-        internet VARCHAR(20),
-        telephoneLine VARCHAR(20),
-        cableTV VARCHAR(20),
+        repair VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        furnish VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        windows VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        internet VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        telephoneLine VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        cableTV VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
         furnitureInLivingArea BLOB,
-        furnitureInLivingAreaExtra VARCHAR(255),
+        furnitureInLivingAreaExtra VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci,
         furnitureInKitchen BLOB,
-        furnitureInKitchenExtra VARCHAR(255),
+        furnitureInKitchenExtra VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci,
         appliances BLOB,
-        appliancesExtra VARCHAR(255),
+        appliancesExtra VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci,
         sexOfTenant BLOB,
         relations BLOB,
-        children VARCHAR(50),
-        animals VARCHAR(50),
+        children VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        animals VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci,
         contactTelephonNumber VARCHAR(20),
         timeForRingBegin VARCHAR(20),
         timeForRingEnd VARCHAR(20),
-        checking VARCHAR(50),
-        responsibility TEXT,
-        comment TEXT,
+        checking VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        responsibility TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+        comment TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
         last_act INT(11) COMMENT 'Время последнего изменения объявления - будь-то время создания или время последнего редактирования. Используется для сортировки объявлений в разделе Мои объявления личного кабинета',
         reg_date INT(11) COMMENT 'Время создания объявления',
-        status VARCHAR(20) DEFAULT  'не опубликовано' COMMENT 'Статус объявления: опубликовано или неопубликовано. Сразу после создания объявление становится неопубликованным'
+        status VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не опубликовано' COMMENT 'Статус объявления: опубликовано или неопубликовано. Сразу после создания объявление становится неопубликованным'
 )");
-// userId - содержит идентификатор пользователя, к которому относится объект недвижимости (собственник)
 
 echo "Статус создания таблицы property: " . $rez . "\n";
 
@@ -176,67 +171,64 @@ $rez = mysql_query("CREATE TABLE propertyFotos (
         filesizeMb FLOAT(1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой',
         propertyId INT(11) COMMENT 'Идентификатор объекта недвижимости (или иначе объявления), к которому относится данная фотография'
 )");
-// propertyId - содержит идентификатор объявления недвижимости, к которому относится фотография
 
-echo "Статус создания таблицы propertyFotos: " . $rez . "\n";
+echo "Статус создания таблицы propertyFotos: " . $rez . " \n ";
 
-// Создаем таблицу для хранения информации о соотношении названия района его идентификатора и города нахождения
+// Создаем таблицу для хранения списка районов каждого города присутствия сервиса
 $rez = mysql_query("CREATE TABLE districts (
-        keyOfDistricts INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Ключ для района. Данное поле используется для сортировки районов по порядку - первые по алфавиту заведены первыми в эту базу данных',
-        id VARCHAR(20) NOT NULL,
-        name VARCHAR(50) COMMENT 'Название района, которое отображается пользователю',
-        city VARCHAR(50) COMMENT 'Город, в котором расположен данный район'
+        name VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Название района, которое отображается пользователю',
+        city VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Город, в котором расположен данный район'
 )");
 
-echo "Статус создания таблицы districts: " . $rez . "\n";
+echo "Статус создания таблицы districts: " . $rez . " \n ";
 
 // Записываем в таблицу с районами инфу о районах
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('1', 'Автовокзал (южный)', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('2', 'Академический', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('3', 'Ботанический', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('4', 'ВИЗ', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('5', 'Вокзальный', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('6', 'Втузгородок', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('7', 'Горный щит', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('8', 'Елизавет', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('9', 'ЖБИ', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('10', 'Завокзальный', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('11', 'Заречный', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('12', 'Изоплит', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('13', 'Исток', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('14', 'Калиновский', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('15', 'Кольцово', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('16', 'Компрессорный', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('17', 'Лечебный', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('18', 'Малый исток', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('19', 'Нижнеисетский', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('20', 'Парковый', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('21', 'Пионерский', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('22', 'Птицефабрика', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('23', 'Рудный', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('24', 'Садовый', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('25', 'Северка', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('26', 'Семь ключей', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('27', 'Сибирский тракт', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('28', 'Синие камни', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('29', 'Совхозный', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('30', 'Сортировка новая', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('31', 'Сортировка старая', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('32', 'Уктус', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('33', 'УНЦ', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('34', 'Уралмаш', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('35', 'Химмаш', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('36', 'Центр', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('37', 'Чермет', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('38', 'Чусовское озеро', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('39', 'Шабровский', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('40', 'Шарташ', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('41', 'Шарташский рынок', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('42', 'Широкая речка', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('43', 'Шувакиш', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('44', 'Эльмаш', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('45', 'Юго-запад', 'Екатеринбург')");
-$rezDistricts[] = mysql_query("INSERT INTO districts (id, name, city) VALUES ('46', 'За городом', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Автовокзал (южный)', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Академический', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Ботанический', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('ВИЗ', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Вокзальный', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Втузгородок', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Горный щит', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Елизавет', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('ЖБИ', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Завокзальный', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Заречный', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Изоплит', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Исток', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Калиновский', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Кольцово', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Компрессорный', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Лечебный', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Малый исток', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Нижнеисетский', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Парковый', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Пионерский', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Птицефабрика', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Рудный', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Садовый', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Северка', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Семь ключей', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Сибирский тракт', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Синие камни', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Совхозный', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Сортировка новая', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Сортировка старая', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Уктус', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('УНЦ', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Уралмаш', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Химмаш', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Центр', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Чермет', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Чусовское озеро', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Шабровский', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Шарташ', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Шарташский рынок', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Широкая речка', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Шувакиш', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Эльмаш', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Юго-запад', 'Екатеринбург')");
+$rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('За городом', 'Екатеринбург')");
 
 echo "Статус записи инфы о районах в таблицу districts: ";
 foreach ($rezDistricts as $value) {

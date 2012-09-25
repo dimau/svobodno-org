@@ -36,11 +36,12 @@ for ($i = 0; $i < mysql_num_rows($rezPropertyFotos); $i++) {
     $rowPropertyFotosArr[] = mysql_fetch_assoc($rezPropertyFotos);
 }
 
-// Готовим массив со списком районов в городе, в котором находится данный объект недвижимости
-$rezDistricts = mysql_query("SELECT * FROM districts WHERE city = '" . "Екатеринбург" . "'");
+// Готовим массив со списком районов в городе пользователя
+$allDistrictsInCity = array();
+$rezDistricts = mysql_query("SELECT name FROM districts WHERE city = '" . "Екатеринбург" . "' ORDER BY name ASC");
 for ($i = 0; $i < mysql_num_rows($rezDistricts); $i++) {
     $rowDistricts = mysql_fetch_assoc($rezDistricts);
-    $allDistrictsInCity[$rowDistricts['id']] = $rowDistricts['name'];
+    $allDistrictsInCity[] = $rowDistricts['name'];
 }
 
 // Инициализируем переменную корректности
@@ -701,11 +702,7 @@ include("header.php");
         <div class="objectDescriptionBody">
             <input type="hidden" name="district" <?php echo "value='$district'";?>"> <!-- Значение поля необходимо сохранить, так как JS в зависимости от него будет делать некоторые элементы недоступными для редактирования -->
             <?php
-            if (isset($allDistrictsInCity)) {
-                foreach ($allDistrictsInCity as $key => $value) {
-                    if ($key == $district) { echo $value; break; }
-                }
-            }
+            if (isset($district)) echo $district;
             ?>
         </div>
     </div>

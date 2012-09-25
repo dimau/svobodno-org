@@ -28,13 +28,6 @@ for ($i = 0; $i < mysql_num_rows($rezPropertyFotos); $i++) {
     $rowPropertyFotosArr[] = mysql_fetch_assoc($rezPropertyFotos);
 }
 
-// Готовим массив со списком районов в городе, в котором находится данный объект недвижимости
-$rezDistricts = mysql_query("SELECT * FROM districts WHERE city = '" . "Екатеринбург" . "'");
-for ($i = 0; $i < mysql_num_rows($rezDistricts); $i++) {
-    $rowDistricts = mysql_fetch_assoc($rezDistricts);
-    $allDistrictsInCity[$rowDistricts['id']] = $rowDistricts['name'];
-}
-
 /*************************************************************************************
  * Проверяем - может ли данный пользователь просматривать данное объявление
  ************************************************************************************/
@@ -460,11 +453,7 @@ $strHeaderOfPage = getFirstCharUpper($rowProperty['typeOfObject']) . " по ад
 											<td class="objectDescriptionItemLabel">Район:</td>
 											<td class="objectDescriptionBody"><span>
                                                 <?php
-                                                if (isset($allDistrictsInCity)) {
-                                                    foreach ($allDistrictsInCity as $key => $value) {
-                                                        if ($key == $rowProperty['district']) { echo $value; break; }
-                                                    }
-                                                }
+                                                if (isset($rowProperty['district'])) echo $rowProperty['district'];
                                                 ?>
                                             </span></td>
 										</tr>

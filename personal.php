@@ -48,10 +48,11 @@ for ($i = 0; $i < count($rowPropertyArr); $i++) {
 }
 
 // Готовим массив со списком районов в городе пользователя
-$rezDistricts = mysql_query("SELECT * FROM districts WHERE city = '" . "Екатеринбург" . "'");
+$allDistrictsInCity = array();
+$rezDistricts = mysql_query("SELECT name FROM districts WHERE city = '" . "Екатеринбург" . "' ORDER BY name ASC");
 for ($i = 0; $i < mysql_num_rows($rezDistricts); $i++) {
     $rowDistricts = mysql_fetch_assoc($rezDistricts);
-    $allDistrictsInCity[$rowDistricts['id']] = $rowDistricts['name'];
+    $allDistrictsInCity[] = $rowDistricts['name'];
 }
 
 // Инициализируем переменную корректности - используется при формировании нового Запроса на поиск
@@ -95,86 +96,14 @@ if (isset($rowUsers['facebook'])) $facebook = $rowUsers['facebook']; else $faceb
 if (isset($rowUsers['twitter'])) $twitter = $rowUsers['twitter']; else $twitter = "";
 
 if (isset($rowSearchRequests['typeOfObject'])) $typeOfObject = $rowSearchRequests['typeOfObject']; else $typeOfObject = "квартира";
-// Инициализируем переменные для отображения количества комнат
-$amountOfRooms1 = ""; $amountOfRooms2 = ""; $amountOfRooms3 = ""; $amountOfRooms4 = ""; $amountOfRooms5 = ""; $amountOfRooms6 = "";
-if (isset($rowSearchRequests['amountOfRooms']))
-{
-    $amountOfRooms = unserialize($rowSearchRequests['amountOfRooms']);
-    foreach ($amountOfRooms as $value) {
-        if ($value == "1") $amountOfRooms1 = "1";
-        if ($value == "2") $amountOfRooms2 = "2";
-        if ($value == "3") $amountOfRooms3 = "3";
-        if ($value == "4") $amountOfRooms4 = "4";
-        if ($value == "5") $amountOfRooms5 = "5";
-        if ($value == "6") $amountOfRooms6 = "6";
-    }
-}
-else {
-    $amountOfRooms = array("1", "2", "3", "4", "5", "6");
-}
+if (isset($rowSearchRequests['amountOfRooms'])) $amountOfRooms = unserialize($rowSearchRequests['amountOfRooms']); else $amountOfRooms = array();
 if (isset($rowSearchRequests['adjacentRooms'])) $adjacentRooms = $rowSearchRequests['adjacentRooms']; else $adjacentRooms = "не имеет значения";
 if (isset($rowSearchRequests['floor'])) $floor = $rowSearchRequests['floor']; else $floor = "любой";
 if (isset($rowSearchRequests['furniture'])) $furniture = $rowSearchRequests['furniture']; else $furniture = "не имеет значения";
 if (isset($rowSearchRequests['minCost'])) $minCost = $rowSearchRequests['minCost']; else $minCost = "";
 if (isset($rowSearchRequests['maxCost'])) $maxCost = $rowSearchRequests['maxCost']; else $maxCost = "";
 if (isset($rowSearchRequests['pledge'])) $pledge = $rowSearchRequests['pledge']; else $pledge = "";
-// Инициализируем переменные для отображения районов
-$district1 = ""; $district2 = ""; $district3 = ""; $district4 = ""; $district5 = ""; $district6 = ""; $district7 = ""; $district8 = ""; $district9 = ""; $district10 = ""; $district11 = ""; $district12 = ""; $district13 = ""; $district14 = ""; $district15 = ""; $district16 = ""; $district17 = ""; $district18 = ""; $district19 = ""; $district20 = ""; $district21 = ""; $district22 = ""; $district23 = ""; $district24 = ""; $district25 = ""; $district26 = ""; $district27 = ""; $district28 = ""; $district29 = ""; $district30 = ""; $district31 = ""; $district32 = ""; $district33 = ""; $district34 = ""; $district35 = ""; $district36 = ""; $district37 = ""; $district38 = ""; $district39 = ""; $district40 = ""; $district41 = ""; $district42 = ""; $district43 = ""; $district44 = ""; $district45 = ""; $district46 = "";
-if (isset($rowSearchRequests['district']))
-{
-    $district = unserialize($rowSearchRequests['district']);
-    foreach ($district as $value) {
-        if ($value == "1") $district1 = "1";
-        if ($value == "2") $district2 = "2";
-        if ($value == "3") $district3 = "3";
-        if ($value == "4") $district4 = "4";
-        if ($value == "5") $district5 = "5";
-        if ($value == "6") $district6 = "6";
-        if ($value == "7") $district7 = "7";
-        if ($value == "8") $district8 = "8";
-        if ($value == "9") $district9 = "9";
-        if ($value == "10") $district10 = "10";
-        if ($value == "11") $district11 = "11";
-        if ($value == "12") $district12 = "12";
-        if ($value == "13") $district13 = "13";
-        if ($value == "14") $district14 = "14";
-        if ($value == "15") $district15 = "15";
-        if ($value == "16") $district16 = "16";
-        if ($value == "17") $district17 = "17";
-        if ($value == "18") $district18 = "18";
-        if ($value == "19") $district19 = "19";
-        if ($value == "20") $district20 = "20";
-        if ($value == "21") $district21 = "21";
-        if ($value == "22") $district22 = "22";
-        if ($value == "23") $district23 = "23";
-        if ($value == "24") $district24 = "24";
-        if ($value == "25") $district25 = "25";
-        if ($value == "26") $district26 = "26";
-        if ($value == "27") $district27 = "27";
-        if ($value == "28") $district28 = "28";
-        if ($value == "29") $district29 = "29";
-        if ($value == "30") $district30 = "30";
-        if ($value == "31") $district31 = "31";
-        if ($value == "32") $district32 = "32";
-        if ($value == "33") $district33 = "33";
-        if ($value == "34") $district34 = "34";
-        if ($value == "35") $district35 = "35";
-        if ($value == "36") $district36 = "36";
-        if ($value == "37") $district37 = "37";
-        if ($value == "38") $district38 = "38";
-        if ($value == "39") $district39 = "39";
-        if ($value == "40") $district40 = "40";
-        if ($value == "41") $district41 = "41";
-        if ($value == "42") $district42 = "42";
-        if ($value == "43") $district43 = "43";
-        if ($value == "44") $district44 = "44";
-        if ($value == "45") $district45 = "45";
-        if ($value == "46") $district46 = "46";
-    }
-}
-else {
-    $district = array("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46");
-}
+if (isset($rowSearchRequests['district'])) $district = unserialize($rowSearchRequests['district']); else $district = array();
 if (isset($rowSearchRequests['withWho'])) $withWho = $rowSearchRequests['withWho']; else $withWho = "один";
 if (isset($rowSearchRequests['linksToFriends'])) $linksToFriends = $rowSearchRequests['linksToFriends']; else $linksToFriends = "";
 if (isset($rowSearchRequests['children'])) $children = $rowSearchRequests['children']; else $children = "без детей";
@@ -279,76 +208,8 @@ if (isset($_POST['saveProfileParameters'])) {
 if (isset($_POST['saveSearchParametersButton'])) {
     // Формируем набор переменных для сохранения в базу данных, либо для возвращения вместе с формой при их некорректности
     if (isset($_POST['typeOfObject'])) $typeOfObject = htmlspecialchars($_POST['typeOfObject']);
-    if (isset($_POST['amountOfRooms']) && is_array($_POST['amountOfRooms'])) // Проверяем, передан ли массив значений
-    {
-        $amountOfRooms = $_POST['amountOfRooms']; // Будем использовать переменную при записи данных в таблицу в виде массива
-        foreach ($_POST['amountOfRooms'] as $value) {
-            if ($value == "1") $amountOfRooms1 = "1";
-            if ($value == "2") $amountOfRooms2 = "2";
-            if ($value == "3") $amountOfRooms3 = "3";
-            if ($value == "4") $amountOfRooms4 = "4";
-            if ($value == "5") $amountOfRooms5 = "5";
-            if ($value == "6") $amountOfRooms6 = "6";
-        }
-    }
-    else {
-        $amountOfRooms = array("1", "2", "3", "4", "5", "6");
-    }
-    if (isset($_POST['district']) && is_array($_POST['district'])) // Проверяем, передан ли массив значений
-    {
-        $district = $_POST['district']; // Будем использовать переменную при записи данных в таблицу в виде массива
-        foreach ($_POST['district'] as $value) {
-            if ($value == "1") $district1 = "1";
-            if ($value == "2") $district2 = "2";
-            if ($value == "3") $district3 = "3";
-            if ($value == "4") $district4 = "4";
-            if ($value == "5") $district5 = "5";
-            if ($value == "6") $district6 = "6";
-            if ($value == "7") $district7 = "7";
-            if ($value == "8") $district8 = "8";
-            if ($value == "9") $district9 = "9";
-            if ($value == "10") $district10 = "10";
-            if ($value == "11") $district11 = "11";
-            if ($value == "12") $district12 = "12";
-            if ($value == "13") $district13 = "13";
-            if ($value == "14") $district14 = "14";
-            if ($value == "15") $district15 = "15";
-            if ($value == "16") $district16 = "16";
-            if ($value == "17") $district17 = "17";
-            if ($value == "18") $district18 = "18";
-            if ($value == "19") $district19 = "19";
-            if ($value == "20") $district20 = "20";
-            if ($value == "21") $district21 = "21";
-            if ($value == "22") $district22 = "22";
-            if ($value == "23") $district23 = "23";
-            if ($value == "24") $district24 = "24";
-            if ($value == "25") $district25 = "25";
-            if ($value == "26") $district26 = "26";
-            if ($value == "27") $district27 = "27";
-            if ($value == "28") $district28 = "28";
-            if ($value == "29") $district29 = "29";
-            if ($value == "30") $district30 = "30";
-            if ($value == "31") $district31 = "31";
-            if ($value == "32") $district32 = "32";
-            if ($value == "33") $district33 = "33";
-            if ($value == "34") $district34 = "34";
-            if ($value == "35") $district35 = "35";
-            if ($value == "36") $district36 = "36";
-            if ($value == "37") $district37 = "37";
-            if ($value == "38") $district38 = "38";
-            if ($value == "39") $district39 = "39";
-            if ($value == "40") $district40 = "40";
-            if ($value == "41") $district41 = "41";
-            if ($value == "42") $district42 = "42";
-            if ($value == "43") $district43 = "43";
-            if ($value == "44") $district44 = "44";
-            if ($value == "45") $district45 = "45";
-            if ($value == "46") $district46 = "46";
-        }
-    }
-    else {
-        $district = array("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46");
-    }
+    if (isset($_POST['amountOfRooms']) && is_array($_POST['amountOfRooms'])) $amountOfRooms = $_POST['amountOfRooms']; // Будем использовать переменную при записи данных в таблицу в виде массива
+    if (isset($_POST['district']) && is_array($_POST['district'])) $district = $_POST['district']; // Будем использовать переменную при записи данных в таблицу в виде массива
     if (isset($_POST['adjacentRooms'])) $adjacentRooms = htmlspecialchars($_POST['adjacentRooms']);
     if (isset($_POST['floor'])) $floor = htmlspecialchars($_POST['floor']);
     if (isset($_POST['furniture'])) $furniture = htmlspecialchars($_POST['furniture']);
@@ -370,6 +231,10 @@ if (isset($_POST['saveSearchParametersButton'])) {
 
     // Если данные верны, сохраним их в БД
     if ($correctNewSearchRequest == "true") {
+        // Если пользователь не выбрал нужное ему количество комнат, то записываем в БД все варианты, аналогично с районами поиска недвижимости
+        if (count($amountOfRooms) == 0) $amountOfRooms = array("1", "2", "3", "4", "5", "6");
+        if (count($district) == 0) $district = $allDistrictsInCity;
+
         $amountOfRoomsSerialized = serialize($amountOfRooms);
         $districtSerialized = serialize($district);
 
@@ -637,8 +502,8 @@ for ($i = 0; $i < count($rowPropertyArr); $i++) {
     if ($rowPropertyArr[$i]['dateOfCheckOut'] != "0000-00-00") $str = " по " . dateFromDBToView($rowPropertyArr[$i]['dateOfCheckOut']); else $str = "";
     $currentAdvert = str_replace("{dateOfCheckOut}", $str, $currentAdvert);
 
-    // Вычисляем человеческое название района по его идентификатору
-    $str = mysql_result(mysql_query("SELECT name FROM districts WHERE city = '" . "Екатеринбург" . "' AND id = '" . $rowPropertyArr[$i]['district'] . "'"), 0, "name");
+    // Подставляем название района для данного объекта недвижимости
+    $str = $rowPropertyArr[$i]['district'];
     $currentAdvert = str_replace("{district}", $str, $currentAdvert);
 
     // Комнаты
@@ -661,7 +526,6 @@ for ($i = 0; $i < count($rowPropertyArr); $i++) {
         $str = "";
     }
     $currentAdvert = str_replace("{adjacentRooms}", $str, $currentAdvert);
-    if ($rowPropertyArr[$i]['amountOfRooms'] != "0") $str = $rowPropertyArr[$i]['amountOfRooms']; else $str = "-";
 
     // Площади помещений
     $strAreaNames = "";
@@ -1039,8 +903,8 @@ include("header.php");
             <div class="searchItemBody">
                 <select name="sex" validations="validate[required]">
                     <option value="0" <?php if ($sex == "0") echo "selected";?>></option>
-                    <option value="мужчина" <?php if ($sex == "мужчина") echo "selected";?>>мужской</option>
-                    <option value="женщина" <?php if ($sex == "женщина") echo "selected";?>>женский</option>
+                    <option value="мужской" <?php if ($sex == "мужской") echo "selected";?>>мужской</option>
+                    <option value="женский" <?php if ($sex == "женский") echo "selected";?>>женский</option>
                 </select>
             </div>
         </div>
@@ -1755,9 +1619,9 @@ include("header.php");
     <table>
         <tbody>
             <?php
-            if (isset($district) && isset($allDistrictsInCity)) { // Если район указан пользователем
-                foreach ($district as $value) { // Для каждого идентификатора района подбираем название из таблицы
-                    echo "<tr><td class='objectDescriptionItemLabel'>" . $allDistrictsInCity[$value] . "</td></tr>";
+            if (isset($district)) { // Если район указан пользователем
+                foreach ($district as $value) { // Выводим названия всех районов, в которых ищет недвижимость пользователь
+                    echo "<tr><td class='objectDescriptionItemLabel'>" . $value . "</td></tr>";
                 }
             }
             ?>
@@ -1793,22 +1657,46 @@ include("header.php");
 
             <div class="searchItemBody">
                 <input type="checkbox" value="1"
-                       name="amountOfRooms[]" <?php if ($amountOfRooms1 == "1") echo "checked";?>>
+                       name="amountOfRooms[]" <?php
+                    foreach ($amountOfRooms as $value) {
+                        if ($value == "1") { echo "checked"; break; }
+                    }
+                    ?>>
                 1
                 <input type="checkbox" value="2"
-                       name="amountOfRooms[]" <?php if ($amountOfRooms2 == "2") echo "checked";?>>
+                       name="amountOfRooms[]" <?php
+                    foreach ($amountOfRooms as $value) {
+                        if ($value == "2") { echo "checked"; break; }
+                    }
+                    ?>>
                 2
                 <input type="checkbox" value="3"
-                       name="amountOfRooms[]" <?php if ($amountOfRooms3 == "3") echo "checked";?>>
+                       name="amountOfRooms[]" <?php
+                    foreach ($amountOfRooms as $value) {
+                        if ($value == "3") { echo "checked"; break; }
+                    }
+                    ?>>
                 3
                 <input type="checkbox" value="4"
-                       name="amountOfRooms[]" <?php if ($amountOfRooms4 == "4") echo "checked";?>>
+                       name="amountOfRooms[]" <?php
+                    foreach ($amountOfRooms as $value) {
+                        if ($value == "4") { echo "checked"; break; }
+                    }
+                    ?>>
                 4
                 <input type="checkbox" value="5"
-                       name="amountOfRooms[]" <?php if ($amountOfRooms5 == "5") echo "checked";?>>
+                       name="amountOfRooms[]" <?php
+                    foreach ($amountOfRooms as $value) {
+                        if ($value == "5") { echo "checked"; break; }
+                    }
+                    ?>>
                 5
                 <input type="checkbox" value="6"
-                       name="amountOfRooms[]" <?php if ($amountOfRooms6 == "6") echo "checked";?>>
+                       name="amountOfRooms[]" <?php
+                    foreach ($amountOfRooms as $value) {
+                        if ($value == "6") { echo "checked"; break; }
+                    }
+                    ?>>
                 6...
             </div>
         </div>
@@ -1884,236 +1772,17 @@ include("header.php");
 <div class="searchItem">
 <div class="searchItemBody">
 <ul>
-<li>
-    <input type="checkbox" name="district[]"
-           value="1" <?php if ($district1 == "1") echo "checked";?>>
-    Автовокзал (южный)
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="2" <?php if ($district2 == "2") echo "checked";?>>
-    Академический
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="3" <?php if ($district3 == "3") echo "checked";?>>
-    Ботанический
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="4" <?php if ($district4 == "4") echo "checked";?>>
-    ВИЗ
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="5" <?php if ($district5 == "5") echo "checked";?>>
-    Вокзальный
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="6" <?php if ($district6 == "6") echo "checked";?>>
-    Втузгородок
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="7" <?php if ($district7 == "7") echo "checked";?>>
-    Горный щит
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="8" <?php if ($district8 == "8") echo "checked";?>>
-    Елизавет
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="9" <?php if ($district9 == "9") echo "checked";?>>
-    ЖБИ
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="10" <?php if ($district10 == "10") echo "checked";?>>
-    Завокзальный
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="11" <?php if ($district11 == "11") echo "checked";?>>
-    Заречный
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="12" <?php if ($district12 == "12") echo "checked";?>>
-    Изоплит
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="13" <?php if ($district13 == "13") echo "checked";?>>
-    Исток
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="14" <?php if ($district14 == "14") echo "checked";?>>
-    Калиновский
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="15" <?php if ($district15 == "15") echo "checked";?>>
-    Кольцово
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="16" <?php if ($district16 == "16") echo "checked";?>>
-    Компрессорный
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="17" <?php if ($district17 == "17") echo "checked";?>>
-    Лечебный
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="18" <?php if ($district18 == "18") echo "checked";?>>
-    Малый исток
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="19" <?php if ($district19 == "19") echo "checked";?>>
-    Нижнеисетский
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="20" <?php if ($district20 == "20") echo "checked";?>>
-    Парковый
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="21" <?php if ($district21 == "21") echo "checked";?>>
-    Пионерский
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="22" <?php if ($district22 == "22") echo "checked";?>>
-    Птицефабрика
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="23" <?php if ($district23 == "23") echo "checked";?>>
-    Рудный
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="24" <?php if ($district24 == "24") echo "checked";?>>
-    Садовый
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="25" <?php if ($district25 == "25") echo "checked";?>>
-    Северка
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="26" <?php if ($district26 == "26") echo "checked";?>>
-    Семь ключей
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="27" <?php if ($district27 == "27") echo "checked";?>>
-    Сибирский тракт
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="28" <?php if ($district28 == "28") echo "checked";?>>
-    Синие камни
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="29" <?php if ($district29 == "29") echo "checked";?>>
-    Совхозный
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="30" <?php if ($district30 == "30") echo "checked";?>>
-    Сортировка новая
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="31" <?php if ($district31 == "31") echo "checked";?>>
-    Сортировка старая
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="32" <?php if ($district32 == "32") echo "checked";?>>
-    Уктус
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="33" <?php if ($district33 == "33") echo "checked";?>>
-    УНЦ
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="34" <?php if ($district34 == "34") echo "checked";?>>
-    Уралмаш
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="35" <?php if ($district35 == "35") echo "checked";?>>
-    Химмаш
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="36" <?php if ($district36 == "36") echo "checked";?>>
-    Центр
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="37" <?php if ($district37 == "37") echo "checked";?>>
-    Чермет
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="38" <?php if ($district38 == "38") echo "checked";?>>
-    Чусовское озеро
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="39" <?php if ($district39 == "39") echo "checked";?>>
-    Шабровский
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="40" <?php if ($district40 == "40") echo "checked";?>>
-    Шарташ
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="41" <?php if ($district41 == "41") echo "checked";?>>
-    Шарташский рынок
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="42" <?php if ($district42 == "42") echo "checked";?>>
-    Широкая речка
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="43" <?php if ($district43 == "43") echo "checked";?>>
-    Шувакиш
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="44" <?php if ($district44 == "44") echo "checked";?>>
-    Эльмаш
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="45" <?php if ($district45 == "45") echo "checked";?>>
-    Юго-запад
-</li>
-<li>
-    <input type="checkbox" name="district[]"
-           value="46" <?php if ($district46 == "46") echo "checked";?>>
-    За городом
-</li>
+    <?php
+    if (isset($allDistrictsInCity)) {
+        foreach ($allDistrictsInCity as $value) { // Для каждого идентификатора района и названия формируем чекбокс
+            echo "<li><input type='checkbox' name='district[]' value='" . $value . "'";
+            foreach ($district as $valueDistrict) {
+                if ($valueDistrict == $value) { echo "checked"; break; }
+            }
+            echo "> " . $value . "</li>";
+        }
+    }
+    ?>
 </ul>
 </div>
 </div>
