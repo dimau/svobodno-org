@@ -168,6 +168,7 @@ function isAdvertCorrect($typeOfValidation)
     if ($amountOfRooms == "0" && $typeOfObject != "0" && $typeOfObject != "гараж") $errors[] = 'Укажите количество комнат в квартире, доме';
     if ($adjacentRooms == "0" && $amountOfRooms != "0" && $amountOfRooms != "1") $errors[] = 'Укажите: есть ли смежные комнаты в сдаваемом объекте недвижимости';
     if ($amountOfAdjacentRooms == "0" && $typeOfObject != "0" && $typeOfObject != "комната" && $typeOfObject != "гараж" && $adjacentRooms != "0" && $adjacentRooms != "нет" && $amountOfRooms != "0" && $amountOfRooms != "1" && $amountOfRooms != "2") $errors[] = 'Укажите количество смежных комнат';
+    if ($amountOfAdjacentRooms > $amountOfRooms && $typeOfObject != "0" && $typeOfObject != "комната" && $typeOfObject != "гараж" && $adjacentRooms != "0" && $adjacentRooms != "нет" && $amountOfRooms != "0" && $amountOfRooms != "1" && $amountOfRooms != "2") $errors[] = 'Исправьте: количество смежных комнат не может быть больше общего количества комнат';
     if ($typeOfBathrooms == "0" && $typeOfObject != "0" && $typeOfObject != "гараж") $errors[] = 'Укажите тип санузла';
     if ($typeOfBalcony == "0" && $typeOfObject != "0" && $typeOfObject != "гараж") $errors[] = 'Укажите: есть ли балкон, лоджия или эркер в сдаваемом объекте недвижимости';
     if ($balconyGlazed == "0" && $typeOfBalcony != "0" && $typeOfBalcony != "нет" && $typeOfBalcony != "эркер" && $typeOfBalcony != "2 эркера и более") $errors[] = 'Укажите остекление балкона/лоджии';
@@ -278,6 +279,7 @@ function isAdvertCorrect($typeOfValidation)
         $errors[] = 'Укажите контактный номер телефона для арендаторов по этому объявлению';
     }
     if ($timeForRingBegin == "0" || $timeForRingEnd == "0") $errors[] = 'Укажите время, в которое Вы готовы принимать звонки от арендаторов';
+    if ($timeForRingBegin + 0 > $timeForRingEnd + 0 && $timeForRingBegin != "0" && $timeForRingEnd != "0") $errors[] = 'Исправьте: время начала приема звонков не может быть больше, чем время окончания приема звонков';
     if ($checking == "0") $errors[] = 'Укажите: как часто Вы собираетесь проверять сдаваемую недвижимость';
     if ($responsibility == "") $errors[] = 'Укажите: какую ответственность за состояние и ремонт объекта Вы берете на себя, а какую арендатор';
 

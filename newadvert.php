@@ -1291,7 +1291,7 @@ include("header.php");
     </div>
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
-            Как часто собственник проверяет сдаваемую недвижимость:
+            Как часто собственник проверяет недвижимость:
         </div>
         <div class="objectDescriptionBody" style="min-width: 330px">
             <select name="checking">

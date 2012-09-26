@@ -42,8 +42,7 @@ if ( $rowProperty['status'] == "не опубликовано" && $rowProperty['
 /*************************************************************************************
  * Получаем заголовок страницы
  ************************************************************************************/
-if ($rowProperty['apartmentNumber'] != "") $apartmentNumberInHeader = ", № " . $rowProperty['apartmentNumber']; else $apartmentNumberInHeader = "";
-$strHeaderOfPage = getFirstCharUpper($rowProperty['typeOfObject']) . " по адресу: " . $rowProperty['address'] . $apartmentNumberInHeader;
+$strHeaderOfPage = getFirstCharUpper($rowProperty['typeOfObject']) . " по адресу: " . $rowProperty['address'];
 
 ?>
 
@@ -403,7 +402,7 @@ $strHeaderOfPage = getFirstCharUpper($rowProperty['typeOfObject']) . " по ад
 									<table>
 										<tbody>
 											<tr>
-												<td class="objectDescriptionItemLabel">Как часто собственник проверяет сдаваемую недвижимость:</td>
+												<td class="objectDescriptionItemLabel">Как часто собственник проверяет недвижимость:</td>
 												<td class="objectDescriptionBody"><span><?php echo $rowProperty['checking']; ?></span></td>
 											</tr>
 											<tr>
