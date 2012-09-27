@@ -100,8 +100,8 @@ if (isset($rowProperty['furnitureInKitchen'])) $furnitureInKitchen = unserialize
 if (isset($rowProperty['furnitureInKitchenExtra'])) $furnitureInKitchenExtra = $rowProperty['furnitureInKitchenExtra']; else $furnitureInKitchenExtra = "";
 if (isset($rowProperty['appliances'])) $appliances = unserialize($rowProperty['appliances']); else $appliances = array();
 if (isset($rowProperty['appliancesExtra'])) $appliancesExtra = $rowProperty['appliancesExtra']; else $appliancesExtra = "";
-if (isset($rowProperty['sexOfTenant'])) $sexOfTenant = unserialize($rowProperty['sexOfTenant']); else $sexOfTenant = array();
-if (isset($rowProperty['relations'])) $relations = unserialize($rowProperty['relations']); else $relations = array();
+if (isset($rowProperty['sexOfTenant'])) $sexOfTenant = explode("_", $rowProperty['sexOfTenant']); else $sexOfTenant = array();
+if (isset($rowProperty['relations'])) $relations = explode("_", $rowProperty['relations']); else $relations = array();
 if (isset($rowProperty['children'])) $children = $rowProperty['children']; else $children = "0";
 if (isset($rowProperty['animals'])) $animals = $rowProperty['animals']; else $animals = "0";
 if (isset($rowProperty['contactTelephonNumber'])) $contactTelephonNumber = $rowProperty['contactTelephonNumber']; else $contactTelephonNumber = "";
@@ -163,14 +163,14 @@ if (isset($_POST['saveAdvertButton'])) {
     if (isset($_POST['internet'])) $internet = htmlspecialchars($_POST['internet']);
     if (isset($_POST['telephoneLine'])) $telephoneLine = htmlspecialchars($_POST['telephoneLine']);
     if (isset($_POST['cableTV'])) $cableTV = htmlspecialchars($_POST['cableTV']);
-    if (isset($_POST['furnitureInLivingArea'])) $furnitureInLivingArea = $_POST['furnitureInLivingArea'];
+    if (isset($_POST['furnitureInLivingArea'])) $furnitureInLivingArea = $_POST['furnitureInLivingArea']; else $furnitureInLivingArea = array(); // Если пользователь отправил форму и не отметил ни одного предмета мебели, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
     if (isset($_POST['furnitureInLivingAreaExtra'])) $furnitureInLivingAreaExtra = htmlspecialchars($_POST['furnitureInLivingAreaExtra']);
-    if (isset($_POST['furnitureInKitchen'])) $furnitureInKitchen = $_POST['furnitureInKitchen'];
+    if (isset($_POST['furnitureInKitchen'])) $furnitureInKitchen = $_POST['furnitureInKitchen']; else $furnitureInKitchen = array(); // Если пользователь отправил форму и не отметил ни одного предмета мебели, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
     if (isset($_POST['furnitureInKitchenExtra'])) $furnitureInKitchenExtra = htmlspecialchars($_POST['furnitureInKitchenExtra']);
-    if (isset($_POST['appliances'])) $appliances = $_POST['appliances'];
+    if (isset($_POST['appliances'])) $appliances = $_POST['appliances']; else $appliances = array(); // Если пользователь отправил форму и не отметил ни одного предмета бытовой техники, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
     if (isset($_POST['appliancesExtra'])) $appliancesExtra = htmlspecialchars($_POST['appliancesExtra']);
-    if (isset($_POST['sexOfTenant'])) $sexOfTenant = $_POST['sexOfTenant'];
-    if (isset($_POST['relations'])) $relations = $_POST['relations'];
+    if (isset($_POST['sexOfTenant'])) $sexOfTenant = $_POST['sexOfTenant']; else $sexOfTenant = array(); // Если пользователь отправил форму и не отметил ни одного пола, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
+    if (isset($_POST['relations'])) $relations = $_POST['relations']; else $relations = array(); // Если пользователь отправил форму и не отметил ни одной формы отношений между арендаторами, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
     if (isset($_POST['children'])) $children = htmlspecialchars($_POST['children']);
     if (isset($_POST['animals'])) $animals = htmlspecialchars($_POST['animals']);
     if (isset($_POST['contactTelephonNumber'])) $contactTelephonNumber = htmlspecialchars($_POST['contactTelephonNumber']);
@@ -195,8 +195,16 @@ if (isset($_POST['saveAdvertButton'])) {
         $furnitureInLivingAreaSerialized = serialize($furnitureInLivingArea);
         $furnitureInKitchenSerialized = serialize($furnitureInKitchen);
         $appliancesSerialized = serialize($appliances);
-        $sexOfTenantSerialized = serialize($sexOfTenant);
-        $relationsSerialized = serialize($relations);
+        $sexOfTenantImploded = implode("_", $sexOfTenant);
+        $relationsImploded = implode("_", $relations);
+
+        // Проверяем в какой валюте сохраняется стоимость аренды, формируем переменную realCostOfRenting
+        if ($currency == 'руб.') $realCostOfRenting = $costOfRenting;
+        if ($currency != 'руб.') {
+            $rezCurrency = mysql_query("SELECT value FROM currencies WHERE name = '" . $currency . "'");
+            $rowCurrency = mysql_fetch_assoc($rezCurrency);
+            if ($rowCurrency != false) $realCostOfRenting = $costOfRenting * $rowCurrency['value']; else $realCostOfRenting = 0;
+        }
 
         $tm = time();
         $last_act = $tm; // время последнего редактирования объявления
@@ -234,6 +242,7 @@ if (isset($_POST['saveAdvertButton'])) {
                             distanceToMetroStation='" . $distanceToMetroStation ."',
                             currency='" . $currency ."',
                             costOfRenting='" . $costOfRenting ."',
+                            realCostOfRenting='" . $realCostOfRenting ."',
                             utilities='" . $utilities ."',
                             costInSummer='" . $costInSummer ."',
                             costInWinter='" . $costInWinter ."',
@@ -255,8 +264,8 @@ if (isset($_POST['saveAdvertButton'])) {
                             furnitureInKitchenExtra='" . $furnitureInKitchenExtra ."',
                             appliances='" . $appliancesSerialized ."',
                             appliancesExtra='" . $appliancesExtra ."',
-                            sexOfTenant='" . $sexOfTenantSerialized ."',
-                            relations='" . $relationsSerialized ."',
+                            sexOfTenant='" . $sexOfTenantImploded ."',
+                            relations='" . $relationsImploded ."',
                             children='" . $children ."',
                             animals='" . $animals ."',
                             contactTelephonNumber='" . $contactTelephonNumber ."',
@@ -294,7 +303,7 @@ if (isset($_POST['saveAdvertButton'])) {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8">
 
@@ -361,6 +370,22 @@ if (isset($_POST['saveAdvertButton'])) {
             margin: 10px 10px 10px 10px;
         }
     </style>
+
+    <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <!-- Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера -->
+    <script>
+        if (typeof jQuery === 'undefined') document.write("<scr"+"ipt src='js/vendor/jquery-1.7.2.min.js'></scr"+"ipt>");
+    </script>
+    <!-- jQuery UI с моей темой оформления -->
+    <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
+    <!-- Русификатор виджета календарь -->
+    <script src="js/vendor/jquery.ui.datepicker-ru.js"></script>
+    <!-- Загрузчик фотографий на AJAX -->
+    <script src="js/vendor/fileuploader.js" type="text/javascript"></script>
+    <!-- Загружаем библиотеку для работы с картой от Яндекса -->
+    <script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
+
 </head>
 
 <body>
@@ -1058,7 +1083,7 @@ include("header.php");
                 ?>> комод
         </li>
         <li>
-            <input type="text" name="furnitureInLivingAreaExtra" maxlength="254" <?php echo "value='$furnitureInLivingAreaExtra'";?>>
+            <input type="text" name="furnitureInLivingAreaExtra" maxlength="254" title='Перечислите через запятую те предметы мебели в жилой зоне, что предоставляются вместе с арендуемой недвижимостью и не были указаны в списке выше. Например: "трюмо, тумбочка под телевизор"' <?php echo "value='$furnitureInLivingAreaExtra'";?>>
         </li>
             </ul>
     </div>
@@ -1106,7 +1131,7 @@ include("header.php");
                 ?>> шкафчики напольные
         </li>
         <li>
-            <input type="text" name="furnitureInKitchenExtra" maxlength="254" <?php echo "value='$furnitureInKitchenExtra'";?>>
+            <input type="text" name="furnitureInKitchenExtra" maxlength="254" title='Перечислите через запятую те предметы мебели на кухне, что предоставляются вместе с арендуемой недвижимостью и не были указаны в списке выше. Например: "трюмо, тумбочка под телевизор"' <?php echo "value='$furnitureInKitchenExtra'";?>>
         </li>
             </ul>
     </div>
@@ -1172,7 +1197,7 @@ include("header.php");
                 ?>> охранная сигнализация
         </li>
         <li>
-            <input type="text" name="appliancesExtra" maxlength="254" <?php echo "value='$appliancesExtra'";?>>
+            <input type="text" name="appliancesExtra" maxlength="254" title='Перечислите через запятую ту бытовую технику, что предоставляется вместе с арендуемой недвижимостью и не была указана в списке выше. Например: "кухонный комбайн, компьютер"' <?php echo "value='$appliancesExtra'";?>>
         </li>
             </ul>
     </div>
@@ -1206,23 +1231,35 @@ include("header.php");
             Отношения между арендаторами:
         </div>
         <div class="objectDescriptionBody">
-            <input type="checkbox" name="relations[]" value="семейная пара" <?php foreach ($relations as $value) {
-                if ($value == "семейная пара") {echo "checked"; break;}
-            }
-                ?>>
-            семейная пара
-            <br>
-            <input type="checkbox" name="relations[]" value="несемейная пара" <?php foreach ($relations as $value) {
-                if ($value == "несемейная пара") {echo "checked"; break;}
-            }
-                ?>>
-            несемейная пара
-            <br>
             <input type="checkbox" name="relations[]" value="один человек" <?php foreach ($relations as $value) {
                 if ($value == "один человек") {echo "checked"; break;}
             }
                 ?>>
             один человек
+            <br>
+            <input type="checkbox" name="relations[]" value="семья" <?php foreach ($relations as $value) {
+                if ($value == "семья") {echo "checked"; break;}
+            }
+                ?>>
+            семья
+            <br>
+            <input type="checkbox" name="relations[]" value="пара" <?php foreach ($relations as $value) {
+                if ($value == "пара") {echo "checked"; break;}
+            }
+                ?>>
+            пара
+            <br>
+            <input type="checkbox" name="relations[]" value="2 мальчика" <?php foreach ($relations as $value) {
+                if ($value == "2 мальчика") {echo "checked"; break;}
+            }
+                ?>>
+            2 мальчика
+            <br>
+            <input type="checkbox" name="relations[]" value="2 девочки" <?php foreach ($relations as $value) {
+                if ($value == "2 девочки") {echo "checked"; break;}
+            }
+                ?>>
+            2 девочки
             <br>
             <input type="checkbox" name="relations[]" value="группа людей" <?php foreach ($relations as $value) {
                 if ($value == "группа людей") {echo "checked"; break;}
@@ -1378,26 +1415,8 @@ include("header.php");
 <!-- /end.footer -->
 
 <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
-
-<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-
-<!-- jQuery UI с моей темой оформления -->
-<script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
-
-<!-- Русификатор виджета календарь -->
-<script src="js/vendor/jquery.ui.datepicker-ru.js"></script>
-
-<!-- Загрузчик фотографий на AJAX -->
-<script src="js/vendor/fileuploader.js" type="text/javascript"></script>
-
-<!-- Загружаем библиотеку для работы с картой от Яндекса -->
-<script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
-
-<!-- scripts concatenated and minified via build script -->
 <script src="js/main.js"></script>
 <script src="js/newOrEditAdvert.js"></script>
-
 <!-- end scripts -->
 
 <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.

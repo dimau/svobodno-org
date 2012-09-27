@@ -69,7 +69,7 @@ $pledge = "";
 $district = array();
 
 
-$withWho = "один";
+$withWho = "0";
 $linksToFriends = "";
 $children = "без детей";
 $howManyChildren = "";
@@ -264,6 +264,10 @@ if (isset($_POST['readyButton'])) {
 
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <!-- Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера -->
+    <script>
+        if (typeof jQuery === 'undefined') document.write("<scr"+"ipt src='js/vendor/jquery-1.7.2.min.js'></scr"+"ipt>");
+    </script>
     <!-- Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера -->
     <!-- jQuery UI с моей темой оформления -->
     <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>

@@ -78,7 +78,7 @@ $rez = mysql_query("CREATE TABLE searchRequests (
         minCost INT NOT NULL,
         maxCost INT NOT NULL,
         pledge INT NOT NULL,
-        prepayment INT COMMENT 'Максимальная предоплата, которую готов внести арендатор, указана в месяцах',
+        prepayment VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Максимальная предоплата, которую готов внести арендатор, указана строкой в месяцах',
         district BLOB COMMENT 'Список районов, в которых пользователь ищет недвижимость. Представляет собой сериализованный массив',
         withWho VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
         linksToFriends TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
@@ -125,14 +125,15 @@ $rez = mysql_query("CREATE TABLE property (
         subwayStation VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Название станции метро рядом',
         distanceToMetroStation INT COMMENT 'Расстояние в минутах ходьбы до ближайшего метро',
         currency VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Валюта для рассчетов',
-        costOfRenting FLOAT(2) COMMENT 'Стоимость аренды в месяц',
+        costOfRenting FLOAT(2) COMMENT 'Стоимость аренды в месяц в валюте, выбранной собственником',
+        realCostOfRenting FLOAT(2) COMMENT 'Стоимость аренды в месяц в рублях (при сохранении в БД стоимость аренды конвертируется в рубли, если она была указана в другой валюте). Это позволяет делать правильные выборки и сортировки из БД.',
         utilities VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Коммунальные услуги оплачиваются арендатором дополнительно: да или нет',
         costInSummer FLOAT(2) COMMENT 'Стоимость комм. услуг летом',
         costInWinter FLOAT(2) COMMENT 'Стоимость комм. услуг зимой',
         electricPower VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Электроэнергия оплачивается дополнительно: да или нет',
         bail VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Залог: есть или нет',
         bailCost FLOAT(2) COMMENT 'Величина залога в валюте для расчетов',
-        prepayment VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Предоплата в количестве месяцев',
+        prepayment VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Предоплата в количестве месяцев - указывается строкой (например, 1 месяц) для простоты отображения и возможности числового сравнения',
         compensationMoney FLOAT(2) COMMENT 'Единоразовая комиссия собственника в валюте для расчетов',
         compensationPercent FLOAT(2) COMMENT 'Единоразовая комиссия собственника в процентах от месячной стоимости аренды',
         repair VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Текущее состояние ремонта',
@@ -147,8 +148,8 @@ $rez = mysql_query("CREATE TABLE property (
         furnitureInKitchenExtra VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Дополнительный пользовательский список мебели (указывается через запятую с пробелом)',
         appliances BLOB COMMENT 'Список быт. техники - из предложенного в сервисе',
         appliancesExtra VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Дополнительный пользовательский список быт. техники (указывается через запятую с пробелом)',
-        sexOfTenant BLOB COMMENT 'Допустимый пол арендатора (если он будет жить один)',
-        relations BLOB COMMENT 'Отношения между арендаторами (если можно проживать не только одному, но и с кем-то)',
+        sexOfTenant VARCHAR(30) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Допустимый пол арендатора (если он будет жить один)',
+        relations VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Отношения между арендаторами (если можно проживать не только одному, но и с кем-то). Представляет собой строку, состоящую из названий допустимых отношений, соединенных между собой знаком _',
         children VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Возможность заселения арендаторов с детьми',
         animals VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Возможность заселения арендаторов с животными',
         contactTelephonNumber VARCHAR(20) COMMENT 'Контактный телефон собственника именно по аренде данного объявления, который будет болтаться на сайте',
@@ -233,6 +234,23 @@ $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('За 
 
 echo "Статус записи инфы о районах в таблицу districts: ";
 foreach ($rezDistricts as $value) {
+    echo $value;
+}
+
+// Создаем таблицу для хранения курсов валют: доллара США и евро к рублю
+$rez = mysql_query("CREATE TABLE currencies (
+        name VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Название валюты',
+        value FLOAT(2) COMMENT 'Текущий курс обмена данной валюты на рубли'
+)");
+
+echo "Статус создания таблицы currencies: " . $rez . " \n ";
+
+// Записываем в таблицу с валютами текущие курсы
+$rezCurrencies[] = mysql_query("INSERT INTO currencies (name, value) VALUES ('дол. США', 31.22)");
+$rezCurrencies[] = mysql_query("INSERT INTO currencies (name, value) VALUES ('евро', 40.17)");
+
+echo "Статус записи инфы о валютах: ";
+foreach ($rezCurrencies as $value) {
     echo $value;
 }
 

@@ -34,7 +34,7 @@ $rowUserFotos = mysql_fetch_assoc($rezUserFotos); // TODO: сделать ото
 
 // Получаем информацию о всех объектах пользователя (возможно он является собственником)
 $rowPropertyArr = array(); // в итоге получаем массив, каждый элемент которого представляет собой еще один массив значений конкретного объявления данного пользователя
-$rezProperty = mysql_query("SELECT * FROM property WHERE userId = '" . $rowUsers['id'] . "'");
+$rezProperty = mysql_query("SELECT * FROM property WHERE userId = '" . $rowUsers['id'] . "' ORDER BY status DESC, last_act DESC");
 for ($i = 0; $i < mysql_num_rows($rezProperty); $i++) {
     $rowPropertyArr[] = mysql_fetch_assoc($rezProperty);
 }
@@ -44,7 +44,8 @@ for ($i = 0; $i < mysql_num_rows($rezProperty); $i++) {
 $rowPropertyFotosArr = array();
 for ($i = 0; $i < count($rowPropertyArr); $i++) {
     $rezPropertyFotos = mysql_query("SELECT * FROM propertyFotos WHERE propertyId = '" . $rowPropertyArr[$i]['id'] . "'");
-    $rowPropertyFotosArr[] = mysql_fetch_assoc($rezPropertyFotos);
+    $rowTemp = mysql_fetch_assoc($rezPropertyFotos);
+    if ($rowTemp != false) $rowPropertyFotosArr[$i] = $rowTemp; else $rowPropertyFotosArr[$i] = array(); // Кажется, текущее решение не позволит перепутать фотографии от разных объявлений
 }
 
 // Готовим массив со списком районов в городе пользователя
@@ -208,8 +209,8 @@ if (isset($_POST['saveProfileParameters'])) {
 if (isset($_POST['saveSearchParametersButton'])) {
     // Формируем набор переменных для сохранения в базу данных, либо для возвращения вместе с формой при их некорректности
     if (isset($_POST['typeOfObject'])) $typeOfObject = htmlspecialchars($_POST['typeOfObject']);
-    if (isset($_POST['amountOfRooms']) && is_array($_POST['amountOfRooms'])) $amountOfRooms = $_POST['amountOfRooms']; // Будем использовать переменную при записи данных в таблицу в виде массива
-    if (isset($_POST['district']) && is_array($_POST['district'])) $district = $_POST['district']; // Будем использовать переменную при записи данных в таблицу в виде массива
+    if (isset($_POST['amountOfRooms']) && is_array($_POST['amountOfRooms'])) $amountOfRooms = $_POST['amountOfRooms']; else $amountOfRooms = array(); // Если пользователь отправил форму submit, и в параметрах нет значения amountOfRooms, значит пользователь не отметил ни один чекбокс из группы, чему соответствует пустой массив
+    if (isset($_POST['district']) && is_array($_POST['district'])) $district = $_POST['district']; else $district = array(); // Если пользователь отправил форму submit, и в параметрах нет значения district, значит пользователь не отметил ни один чекбокс из группы, чему соответствует пустой массив
     if (isset($_POST['adjacentRooms'])) $adjacentRooms = htmlspecialchars($_POST['adjacentRooms']);
     if (isset($_POST['floor'])) $floor = htmlspecialchars($_POST['floor']);
     if (isset($_POST['furniture'])) $furniture = htmlspecialchars($_POST['furniture']);
@@ -380,50 +381,6 @@ $tmpl_MyAdvert = "
 </div>
 ";
 
-// Сортируем объявления, если их несколько
-if (count($rowPropertyArr) > 1) {
-    // Делим на 2 массива - для опубликованных и для неопубликованных объявлений, каждый из которых отсортируем позже
-    $unpublishedArr = array();
-    $publishedArr = array();
-    foreach ($rowPropertyArr as $value) {
-        if ($value['status'] == "не опубликовано") $unpublishedArr[] = $value;
-        if ($value['status'] == "опубликовано") $publishedArr[] = $value;
-    }
-
-    // Сортируем неопубликованные объявления - сверху те, которые пользователь редактировал позже
-    for ($i = 0; $i < count($unpublishedArr) - 1; $i++) {
-        $max = $unpublishedArr[$i]['last_act'];
-        $pos = $i;
-        for ($j = $i + 1; $j < count($unpublishedArr); $j++) {
-            if ($unpublishedArr[$j]['last_act'] > $max) {
-                $max = $unpublishedArr[$j]['last_act'];
-                $pos = $j;
-            }
-        $temp = $unpublishedArr[$i];
-        $unpublishedArr[$i] = $unpublishedArr[$pos];
-        $unpublishedArr[$pos] = $temp;
-        }
-    }
-    // Сортируем опубликованные объявления - сверху те, которые пользователь редактировал позже
-    for ($i = 0; $i < count($publishedArr) - 1; $i++) {
-        $max = $publishedArr[$i]['last_act'];
-        $pos = $i;
-        for ($j = $i + 1; $j < count($publishedArr); $j++) {
-            if ($publishedArr[$j]['last_act'] > $max) {
-                $max = $publishedArr[$j]['last_act'];
-                $pos = $j;
-            }
-            $temp = $publishedArr[$i];
-            $publishedArr[$i] = $publishedArr[$pos];
-            $publishedArr[$pos] = $temp;
-        }
-    }
-    // Объединяем отсортированные массивы в один
-    $rowPropertyArr = array();
-    foreach ($publishedArr as $value) $rowPropertyArr[] = $value;
-    foreach ($unpublishedArr as $value) $rowPropertyArr[] = $value;
-}
-
 // Создаем бриф для каждого объявления пользователя на основе шаблона (для вкладки МОИ ОБЪЯВЛЕНИЯ), и в цикле объединяем их в один HTML блок - $briefOfAdverts.
 // Если объявлений у пользователя несколько, то в переменную, содержащую весь HTML - $briefOfAdverts, записываем каждое из них последовательно
 $briefOfAdverts = "";
@@ -452,7 +409,8 @@ for ($i = 0; $i < count($rowPropertyArr); $i++) {
     $currentAdvert = str_replace("{status}", $str, $currentAdvert);
 
     // Фотографию
-    $str = "uploaded_files/" . $rowPropertyFotosArr[$i]['id'] . "." . $rowPropertyFotosArr[$i]['extension'];
+    $str = "";
+    if (isset($rowPropertyFotosArr[$i]['id']) && isset($rowPropertyFotosArr[$i]['extension'])) $str = "uploaded_files/" . $rowPropertyFotosArr[$i]['id'] . "." . $rowPropertyFotosArr[$i]['extension'];
     $currentAdvert = str_replace("{urlFoto}", $str, $currentAdvert);
 
     // Корректируем список инструкций, доступных пользователю
@@ -554,10 +512,13 @@ for ($i = 0; $i < count($rowPropertyArr); $i++) {
     // Мебель
     $strFurnitureName = "";
     $strFurniture = "";
-    if (count(unserialize($rowPropertyArr[$i]['furnitureInLivingArea'])) != 0 || $rowPropertyArr[$i]['furnitureInLivingAreaExtra'] != "") $strFurniture = "есть в жилой зоне";
-    if (count(unserialize($rowPropertyArr[$i]['furnitureInKitchen'])) != 0 || $rowPropertyArr[$i]['furnitureInKitchenExtra'] != "") if ($strFurniture == "") $strFurniture = "есть на кухне"; else $strFurniture .= ", есть на кухне";
-    if (count(unserialize($rowPropertyArr[$i]['appliances'])) != 0 || $rowPropertyArr[$i]['appliancesExtra'] != "") if ($strFurniture == "") $strFurniture = "есть бытовая техника"; else $strFurniture .= ", есть бытовая техника";
-    if ($strFurniture != "") $strFurnitureName = "Мебель:";
+    if ($rowPropertyArr[$i]['typeOfObject'] != "0" && $rowPropertyArr[$i]['typeOfObject'] != "гараж") {
+        $strFurnitureName = "Мебель:";
+        if (count(unserialize($rowPropertyArr[$i]['furnitureInLivingArea'])) != 0 || $rowPropertyArr[$i]['furnitureInLivingAreaExtra'] != "") $strFurniture = "есть в жилой зоне";
+        if (count(unserialize($rowPropertyArr[$i]['furnitureInKitchen'])) != 0 || $rowPropertyArr[$i]['furnitureInKitchenExtra'] != "") if ($strFurniture == "") $strFurniture = "есть на кухне"; else $strFurniture .= ", есть на кухне";
+        if (count(unserialize($rowPropertyArr[$i]['appliances'])) != 0 || $rowPropertyArr[$i]['appliancesExtra'] != "") if ($strFurniture == "") $strFurniture = "есть бытовая техника"; else $strFurniture .= ", есть бытовая техника";
+        if ($strFurniture == "") $strFurniture = "нет";
+    }
     $currentAdvert = str_replace("{furnitureName}", $strFurnitureName, $currentAdvert);
     $currentAdvert = str_replace("{furniture}", $strFurniture, $currentAdvert);
 
@@ -629,6 +590,10 @@ for ($i = 0; $i < count($rowPropertyArr); $i++) {
 
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <!-- Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера -->
+    <script>
+        if (typeof jQuery === 'undefined') document.write("<scr"+"ipt src='js/vendor/jquery-1.7.2.min.js'></scr"+"ipt>");
+    </script>
     <!-- jQuery UI с моей темой оформления -->
     <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
     <!-- Русификатор виджета календарь -->

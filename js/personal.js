@@ -185,7 +185,7 @@ if (document.getElementById('rightBlockOfSearchParameters')) {
 
 /* Сценарии для появления блока с подробным описанием сожителей */
 $("#withWho").on('change', function(event) {
-    if ($("#withWho").attr('value') != "один") {
+    if ($("#withWho").attr('value') != "самостоятельно") {
         $("#withWhoDescription").css('display', '');
     } else {
         $("#withWhoDescription").css('display', 'none');

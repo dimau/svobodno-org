@@ -80,6 +80,10 @@ $strHeaderOfPage = getFirstCharUpper($rowProperty['typeOfObject']) . " по ад
 
         <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <!-- Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера -->
+        <script>
+            if (typeof jQuery === 'undefined') document.write("<scr"+"ipt src='js/vendor/jquery-1.7.2.min.js'></scr"+"ipt>");
+        </script>
         <!-- jQuery UI с моей темой оформления -->
         <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
         <!-- Загружаем библиотеку для работы с картой от Яндекса -->
@@ -360,7 +364,7 @@ $strHeaderOfPage = getFirstCharUpper($rowProperty['typeOfObject']) . " по ад
 												<td class="objectDescriptionItemLabel">Пол:</td>
 												<td class="objectDescriptionBody"><span>
                                                     <?php
-                                                    $sexOfTenantArr = unserialize($rowProperty['sexOfTenant']);
+                                                    $sexOfTenantArr = explode("_", $rowProperty['sexOfTenant']);
 
                                                     // Если собственник указал только один пол в качестве предпочтительного, то выводим его на страницу
                                                     if (count($sexOfTenantArr) == 1) echo $sexOfTenantArr[0];
@@ -374,7 +378,7 @@ $strHeaderOfPage = getFirstCharUpper($rowProperty['typeOfObject']) . " по ад
 												<td class="objectDescriptionItemLabel">Отношения между арендаторами:</td>
 												<td class="objectDescriptionBody"><span>
                                                     <?php
-                                                    $relations = unserialize($rowProperty['relations']);
+                                                    $relations = explode("_", $rowProperty['relations']);
                                                     for ($i = 0; $i < count($relations); $i++) {
                                                         echo $relations[$i];
                                                         if ($i < count($relations) - 1) echo ",<br>"; // Если элемент в массиве не последний - добавляем запятую

@@ -2,6 +2,32 @@
  * @author dimau
  */
 
+/* Навешиваем обработчик на переключение вкладок с режимами поиска */
+$('#tabs').bind('tabsshow', function(event, ui) {
+    newTabId = ui.panel.id; // Определяем идентификатор вновь открытой вкладки
+    if (newTabId == "tabs-1") {
+        // Переносим тип объекта
+        $("#typeOfObjectFast").val($("#typeOfObject").val());
+
+        // Так как между районами при расширенном поиске и районом при быстром поиске невозможно построить взаимнооднозначную конвертацию, не будем этого делать, дабы не запутать пользователя
+
+        // Переносим стоимости
+        $("#minCostFast").val($("#minCost").val());
+        $("#maxCostFast").val($("#maxCost").val());
+    }
+    if (newTabId == "tabs-2") {
+        // Переносим тип объекта
+        $("#typeOfObject").val($("#typeOfObjectFast").val());
+
+        // Переносим стоимости
+        $("#minCost").val($("#minCostFast").val());
+        $("#maxCost").val($("#maxCostFast").val());
+    }
+});
+
+// Подгонка размера правого блока параметров (районы) расширенного поиска под размер левого блока параметров. 19 пикселей - на padding у fieldset
+document.getElementById('rightBlockOfSearchParameters').style.height = document.getElementById('leftBlockOfSearchParameters').offsetHeight - 22 + 'px';
+
 /* Считаем высоту видимой части экрана - чтобы задать ее высоте блока с картой */
 $('#map').css('height', document.documentElement.clientHeight + 'px');
 $('#resultOnSearchPage').css('min-height', document.documentElement.clientHeight + 'px');
@@ -139,41 +165,38 @@ $('#fullParametersListOfRealtyObjects').on('click', function(event) {
 		}
 })
 
-// Подгонка размера правого блока параметров (районы) расширенного поиска под размер левого блока параметров. 19 пикселей - на padding у fieldset
-document.getElementById('rightBlockOfSearchParameters').style.height = document.getElementById('leftBlockOfSearchParameters').offsetHeight - 22 + 'px';
-
 /* Событие клика по ссылке развернуть список*/
 $('#expandList').on('click', function() {
-	$('#shortListOfRealtyObjects').css('display', 'none');
-	$('#map').css('display', 'none');
-	$('#fullParametersListOfRealtyObjects').css('display', '');
-	//$('#listPlusMap').css('display', '');
-	//$('#expandMap').css('display', '');
-	//$('#expandList').css('display', 'none');
-	return false;
+    $('#shortListOfRealtyObjects').css('display', 'none');
+    $('#map').css('display', 'none');
+    $('#fullParametersListOfRealtyObjects').css('display', '');
+    //$('#listPlusMap').css('display', '');
+    //$('#expandMap').css('display', '');
+    //$('#expandList').css('display', 'none');
+    return false;
 });
 
 /* Событие клика по ссылке список + карта*/
 $('#listPlusMap').on('click', function() {
-	$('#shortListOfRealtyObjects').css('display', '');
-	$('#map').css('display', '');
-	$('#map').css('width', '49%');
-	$('#fullParametersListOfRealtyObjects').css('display', 'none');
-	//$('#expandList').css('display', '');
-	//$('#expandMap').css('display', '');
-	//$('#listPlusMap').css('display', 'none');
-	return false;
+    $('#shortListOfRealtyObjects').css('display', '');
+    $('#map').css('display', '');
+    $('#map').css('width', '49%');
+    $('#fullParametersListOfRealtyObjects').css('display', 'none');
+    //$('#expandList').css('display', '');
+    //$('#expandMap').css('display', '');
+    //$('#listPlusMap').css('display', 'none');
+    return false;
 });
 
 /* Событие клика по ссылке развернуть карту*/
 $('#expandMap').on('click', function() {
-	$('#shortListOfRealtyObjects').css('display', 'none');
-	$('#map').css('display', '');
-	$('#map').css('width', '100%');
-	$('#fullParametersListOfRealtyObjects').css('display', 'none');
-	//$('#expandList').css('display', '');
-	//$('#listPlusMap').css('display', '');
-	//$('#expandMap').css('display', 'none');
-	return false;
+    $('#shortListOfRealtyObjects').css('display', 'none');
+    $('#map').css('display', '');
+    $('#map').css('width', '100%');
+    $('#fullParametersListOfRealtyObjects').css('display', 'none');
+    //$('#expandList').css('display', '');
+    //$('#listPlusMap').css('display', '');
+    //$('#expandMap').css('display', 'none');
+    return false;
 });
 

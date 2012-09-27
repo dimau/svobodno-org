@@ -119,7 +119,7 @@ if (document.getElementById("tabs-4")) {
     $("#withWho").on('change', withWho);
     $(document).ready(withWho);
     function withWho() {
-        if ($("#withWho").attr('value') != "один") {
+        if ($("#withWho").attr('value') != "самостоятельно") {
             $("#withWhoDescription").css('display', '');
         } else {
             $("#withWhoDescription").css('display', 'none');

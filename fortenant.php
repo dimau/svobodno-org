@@ -55,6 +55,16 @@
 			}
 
 		</style>
+
+        <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <!-- Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера -->
+        <script>
+            if (typeof jQuery === 'undefined') document.write("<scr"+"ipt src='js/vendor/jquery-1.7.2.min.js'></scr"+"ipt>");
+        </script>
+        <!-- jQuery UI с моей темой оформления -->
+        <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
+
 	</head>
 
 	<body>
@@ -191,14 +201,6 @@
 		</div><!-- /end.footer -->
 
 		<!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
-
-		<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-
-		<!-- jQuery UI с моей темой оформления -->
-		<script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
-
-		<!-- scripts concatenated and minified via build script -->
 		<script src="js/main.js"></script>
 		<script src="js/fortenant.js"></script>
 		<script>
@@ -206,7 +208,6 @@
 				window.open('registrationForm.html?type=tenant');
 			});
 		</script>
-
 		<!-- end scripts -->
 
 		<!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.

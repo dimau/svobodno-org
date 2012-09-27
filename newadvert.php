@@ -164,8 +164,16 @@ if (isset($_POST['saveAdvertButton'])) {
         $furnitureInLivingAreaSerialized = serialize($furnitureInLivingArea);
         $furnitureInKitchenSerialized = serialize($furnitureInKitchen);
         $appliancesSerialized = serialize($appliances);
-        $sexOfTenantSerialized = serialize($sexOfTenant);
-        $relationsSerialized = serialize($relations);
+        $sexOfTenantImploded = implode("_", $sexOfTenant);
+        $relationsImploded = implode("_", $relations);
+
+        // Проверяем в какой валюте сохраняется стоимость аренды, формируем переменную realCostOfRenting
+        if ($currency == 'руб.') $realCostOfRenting = $costOfRenting;
+        if ($currency != 'руб.') {
+            $rezCurrency = mysql_query("SELECT value FROM currencies WHERE name = '" . $currency . "'");
+            $rowCurrency = mysql_fetch_assoc($rezCurrency);
+            if ($rowCurrency != false) $realCostOfRenting = $costOfRenting * $rowCurrency['value']; else $realCostOfRenting = 0;
+        }
 
         $tm = time();
         $last_act = $tm; // время последнего редактирования объявления
@@ -203,6 +211,7 @@ if (isset($_POST['saveAdvertButton'])) {
                             distanceToMetroStation='" . $distanceToMetroStation ."',
                             currency='" . $currency ."',
                             costOfRenting='" . $costOfRenting ."',
+                            realCostOfRenting='" . $realCostOfRenting ."',
                             utilities='" . $utilities ."',
                             costInSummer='" . $costInSummer ."',
                             costInWinter='" . $costInWinter ."',
@@ -224,8 +233,8 @@ if (isset($_POST['saveAdvertButton'])) {
                             furnitureInKitchenExtra='" . $furnitureInKitchenExtra ."',
                             appliances='" . $appliancesSerialized ."',
                             appliancesExtra='" . $appliancesExtra ."',
-                            sexOfTenant='" . $sexOfTenantSerialized ."',
-                            relations='" . $relationsSerialized ."',
+                            sexOfTenant='" . $sexOfTenantImploded ."',
+                            relations='" . $relationsImploded ."',
                             children='" . $children ."',
                             animals='" . $animals ."',
                             contactTelephonNumber='" . $contactTelephonNumber ."',
@@ -332,6 +341,22 @@ if (isset($_POST['saveAdvertButton'])) {
             margin: 10px 10px 10px 10px;
         }
     </style>
+
+    <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <!-- Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера -->
+    <script>
+        if (typeof jQuery === 'undefined') document.write("<scr"+"ipt src='js/vendor/jquery-1.7.2.min.js'></scr"+"ipt>");
+    </script>
+    <!-- jQuery UI с моей темой оформления -->
+    <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
+    <!-- Русификатор виджета календарь -->
+    <script src="js/vendor/jquery.ui.datepicker-ru.js"></script>
+    <!-- Загрузчик фотографий на AJAX -->
+    <script src="js/vendor/fileuploader.js" type="text/javascript"></script>
+    <!-- Загружаем библиотеку для работы с картой от Яндекса -->
+    <script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
+
 </head>
 
 <body>
@@ -1024,7 +1049,7 @@ include("header.php");
                 ?>> комод
         </li>
         <li>
-            <input type="text" name="furnitureInLivingAreaExtra" maxlength="254" <?php echo "value='$furnitureInLivingAreaExtra'";?>>
+            <input type="text" name="furnitureInLivingAreaExtra" maxlength="254" title='Перечислите через запятую те предметы мебели в жилой зоне, что предоставляются вместе с арендуемой недвижимостью и не были указаны в списке выше. Например: "трюмо, тумбочка под телевизор"' <?php echo "value='$furnitureInLivingAreaExtra'";?>>
         </li>
             </ul>
     </div>
@@ -1072,7 +1097,7 @@ include("header.php");
                 ?>> шкафчики напольные
         </li>
         <li>
-            <input type="text" name="furnitureInKitchenExtra" maxlength="254" <?php echo "value='$furnitureInKitchenExtra'";?>>
+            <input type="text" name="furnitureInKitchenExtra" maxlength="254" title='Перечислите через запятую те предметы мебели на кухне, что предоставляются вместе с арендуемой недвижимостью и не были указаны в списке выше. Например: "трюмо, тумбочка под телевизор"' <?php echo "value='$furnitureInKitchenExtra'";?>>
         </li>
             </ul>
     </div>
@@ -1138,7 +1163,7 @@ include("header.php");
                 ?>> охранная сигнализация
         </li>
         <li>
-            <input type="text" name="appliancesExtra" maxlength="254" <?php echo "value='$appliancesExtra'";?>>
+            <input type="text" name="appliancesExtra" maxlength="254" title='Перечислите через запятую ту бытовую технику, что предоставляется вместе с арендуемой недвижимостью и не была указана в списке выше. Например: "кухонный комбайн, компьютер"' <?php echo "value='$appliancesExtra'";?>>
         </li>
             </ul>
     </div>
@@ -1172,23 +1197,35 @@ include("header.php");
             Отношения между арендаторами:
         </div>
         <div class="objectDescriptionBody">
-            <input type="checkbox" name="relations[]" value="семейная пара" <?php foreach ($relations as $value) {
-                if ($value == "семейная пара") {echo "checked"; break;}
-            }
-                ?>>
-            семейная пара
-            <br>
-            <input type="checkbox" name="relations[]" value="несемейная пара" <?php foreach ($relations as $value) {
-                if ($value == "несемейная пара") {echo "checked"; break;}
-            }
-                ?>>
-            несемейная пара
-            <br>
             <input type="checkbox" name="relations[]" value="один человек" <?php foreach ($relations as $value) {
                 if ($value == "один человек") {echo "checked"; break;}
             }
                 ?>>
             один человек
+            <br>
+            <input type="checkbox" name="relations[]" value="семья" <?php foreach ($relations as $value) {
+                if ($value == "семья") {echo "checked"; break;}
+            }
+                ?>>
+            семья
+            <br>
+            <input type="checkbox" name="relations[]" value="пара" <?php foreach ($relations as $value) {
+                if ($value == "пара") {echo "checked"; break;}
+            }
+                ?>>
+            пара
+            <br>
+            <input type="checkbox" name="relations[]" value="2 мальчика" <?php foreach ($relations as $value) {
+                if ($value == "2 мальчика") {echo "checked"; break;}
+            }
+                ?>>
+            2 мальчика
+            <br>
+            <input type="checkbox" name="relations[]" value="2 девочки" <?php foreach ($relations as $value) {
+                if ($value == "2 девочки") {echo "checked"; break;}
+            }
+                ?>>
+            2 девочки
             <br>
             <input type="checkbox" name="relations[]" value="группа людей" <?php foreach ($relations as $value) {
                 if ($value == "группа людей") {echo "checked"; break;}
@@ -1344,26 +1381,8 @@ include("header.php");
 <!-- /end.footer -->
 
 <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
-
-<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-
-<!-- jQuery UI с моей темой оформления -->
-<script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
-
-<!-- Русификатор виджета календарь -->
-<script src="js/vendor/jquery.ui.datepicker-ru.js"></script>
-
-<!-- Загрузчик фотографий на AJAX -->
-<script src="js/vendor/fileuploader.js" type="text/javascript"></script>
-
-<!-- Загружаем библиотеку для работы с картой от Яндекса -->
-<script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
-
-<!-- scripts concatenated and minified via build script -->
 <script src="js/main.js"></script>
 <script src="js/newOrEditAdvert.js"></script>
-
 <!-- end scripts -->
 
 <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.
