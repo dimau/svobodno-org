@@ -602,15 +602,6 @@ include("header.php");
 </div>
 <!-- /end.wrapperOfTabs -->
 
-<div class="choiceViewSearchResult">
-    <span id="expandList"><a href="#">Список</a>&nbsp;&nbsp;&nbsp;</span><span id="listPlusMap"><a href="#">Список +
-    карта</a>&nbsp;&nbsp;&nbsp;</span><span id="expandMap"><a href="#">Карта</a></span>
-</div>
-<div id="resultOnSearchPage" style="height: 100%;">
-
-<!-- Информация об объектах, подходящих условиям поиска -->
-<table class="listOfRealtyObjects" id="shortListOfRealtyObjects">
-<tbody>
 <?php
 // Для целей ускорения загрузки перенес блок php кода сюда - это позволит браузеру грузить нужные библиотеки в то время, как сервер будет готовить представление для таблиц с данными об объектах недвижимости
 
@@ -692,6 +683,34 @@ $tmpl_shortAdvert = "
 </tr>
 ";
 
+// Шаблон для блока с подробным описанием объекта недвижимости в таблице
+$tmpl_extendedAdvert = "
+<tr class='realtyObject' linkToDescription='{urlProperty}'>
+            <td>
+                <div class='numberOfRealtyObject'>{number}</div>
+                <div class='blockOfIcon'>
+                    <a><img class='icon' title='Добавить в избранное' src='img/blue_star.png'></a>
+                </div>
+            </td>
+            <td>
+                <div class='fotosWrapper resultSearchFoto'>
+                    <div class='middleFotoWrapper'>
+                        <img class='middleFoto' src='{urlFoto1}'>
+                    </div>
+                    <div class='middleFotoWrapper'>
+                        <img class='middleFoto' src='{urlFoto2}'>
+                    </div>
+                </div>
+            </td>
+            <td>{typeOfObject}{district}{address}</td>
+            <td>{amountOfRooms}{adjacentRooms}</td>
+            <td>{areaValues}</td>
+            <td>{floor}</td>
+            <td>{furniture}</td>
+            <td>{costOfRenting}{utilities}{compensationMoney} ({compensationPercent}%)</td>
+</tr>
+";
+
 // Инициализируем переменные, в которые сложим HTML блоки каждого из объявлений, именно эти блоки в нужном месте страницы мы и вставим для передачи в браузер
 $matterOfShortList = "";
 $matterOfFullParametersList = "";
@@ -705,7 +724,7 @@ foreach ($rowPropertyArr as $oneProperty) {
     // Увеличиваем счетчик объявлений при каждом проходе
     $number++;
 
-/* Готовим баллун */
+    /* Готовим баллун */
 
     // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне баллуна
     $arrBalloonReplace = array();
@@ -756,7 +775,7 @@ foreach ($rowPropertyArr as $oneProperty) {
         $arrBalloonReplace['amountOfRooms'] = "";
     }
     if (isset($oneProperty['adjacentRooms']) && $oneProperty['adjacentRooms'] == "да") {
-        if ($oneProperty['amountOfAdjacentRooms'] != "0") {
+        if (isset($oneProperty['amountOfAdjacentRooms']) && $oneProperty['amountOfAdjacentRooms'] != "0") {
             $arrBalloonReplace['adjacentRooms'] = ", из них смежных: " . $oneProperty['amountOfAdjacentRooms'];
         } else {
             $arrBalloonReplace['adjacentRooms'] = ", смежные";
@@ -809,6 +828,7 @@ foreach ($rowPropertyArr as $oneProperty) {
     }
 
     // Ссылка "Подробно"
+    $arrBalloonReplace['urlProperty'] = "";
     if (isset($oneProperty['id'])) $arrBalloonReplace['urlProperty'] = "objdescription.php?propertyId=" . $oneProperty['id'];
 
     // Производим заполнение шаблона баллуна
@@ -817,7 +837,7 @@ foreach ($rowPropertyArr as $oneProperty) {
     // Копируем html-текст шаблона баллуна
     $currentAdvertBalloon = str_replace($arrBalloonTemplVar, $arrBalloonReplace, $tmpl_balloonContentBody);
 
-/* Готовим блок shortList таблицы для данного объекта недвижимости */
+    /* Готовим блок shortList таблицы для данного объекта недвижимости */
 
     // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне shortList строки таблицы
     $arrShortListReplace = array();
@@ -850,31 +870,142 @@ foreach ($rowPropertyArr as $oneProperty) {
     // Производим заполнение шаблона строки (блока) shortList таблицы по данному объекту недвижимости
     // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне баллуна
     $arrShortListTemplVar = array('{coordX}', '{coordY}', '{balloonContentBody}', '{number}', '{urlFoto1}', '{address}', '{urlProperty}', '{costOfRenting}', '{currency}');
-    // Копируем html-текст шаблона баллуна
+    // Копируем html-текст шаблона блока (строки таблицы)
     $currentAdvertShortList = str_replace($arrShortListTemplVar, $arrShortListReplace, $tmpl_shortAdvert);
-
     // Полученный HTML текст складываем в "копилочку"
     $matterOfShortList .= $currentAdvertShortList;
 
-}
+/* Готовим блок fullParametersList таблицы для данного объекта недвижимости */
 
+    // Инициализируем массив, в который будут сохранены значения, используемые для замены констант в шаблоне
+    $arrExtendedListReplace = array();
+
+    // Ссылка "Подробно"
+    $arrExtendedListReplace['urlProperty'] = "";
+    if (isset($oneProperty['id'])) $arrExtendedListReplace['urlProperty'] = "objdescription.php?propertyId=" . $oneProperty['id'];
+
+    // Номер объявления
+    $arrExtendedListReplace['number'] = $number;
+
+    // Фото
+    $arrExtendedListReplace['urlFoto1'] = "";
+    $arrExtendedListReplace['urlFoto2'] = ""; //TODO: решить, нужно ли в широкой таблице показывать 2 фотки, если да - реализовать
+    if (isset($rowPropertyFotosArr[0]['id']) && isset($rowPropertyFotosArr[0]['extension'])) $arrExtendedListReplace['urlFoto1'] = "uploaded_files/" . $rowPropertyFotosArr[0]['id'] . "." . $rowPropertyFotosArr[0]['extension'];
+
+    // Тип
+    $arrExtendedListReplace['typeOfObject'] = "<br><br>";
+    if (isset($oneProperty['typeOfObject'])) $arrExtendedListReplace['typeOfObject'] = getFirstCharUpper($oneProperty['typeOfObject']) . "<br><br>";
+
+    // Район
+    $arrExtendedListReplace['district'] = "";
+    if (isset($oneProperty['district'])) $arrExtendedListReplace['district'] = $oneProperty['district'] . "<br>";
+
+    // Адрес
+    $arrExtendedListReplace['address'] = "";
+    if (isset($oneProperty['address'])) $arrExtendedListReplace['address'] = $oneProperty['address'];
+
+    // Комнаты
+    if (isset($oneProperty['amountOfRooms']) && $oneProperty['amountOfRooms'] != "0") {
+        $arrExtendedListReplace['amountOfRooms'] = "<span title='количество комнат'>" . $oneProperty['amountOfRooms'] . "</span><br>";
+    } else {
+        $arrExtendedListReplace['amountOfRooms'] = "<span title='количество комнат'>-</span><br>";
+    }
+    if (isset($oneProperty['adjacentRooms']) && $oneProperty['adjacentRooms'] == "да") {
+        if (isset($oneProperty['amountOfAdjacentRooms']) && $oneProperty['amountOfAdjacentRooms'] != "0") {
+            $arrExtendedListReplace['adjacentRooms'] = "смежных: " . $oneProperty['amountOfAdjacentRooms'];
+        } else {
+            $arrExtendedListReplace['adjacentRooms'] = "смежные";
+        }
+    } else {
+        $arrExtendedListReplace['adjacentRooms'] = "";
+    }
+
+    // Площади помещений
+    $arrExtendedListReplace['areaValues'] = "";
+    if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "квартира" && $oneProperty['typeOfObject'] != "дом" && $oneProperty['typeOfObject'] != "таунхаус" && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж") {
+        $arrExtendedListReplace['areaValues'] .= "<span title='площадь комнаты'>" . $oneProperty['roomSpace'] . " м²</span><br>";
+    }
+    if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната") {
+        $arrExtendedListReplace['areaValues'] .= "<span title='общая площадь'>" . $oneProperty['totalArea'] . " м²</span><br>";
+    }
+    if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната" && $oneProperty['typeOfObject'] != "гараж") {
+        $arrExtendedListReplace['areaValues'] .= "<span title='жилая площадь'>" . $oneProperty['livingSpace'] . " м²</span><br>";
+    }
+    if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж") {
+        $arrExtendedListReplace['areaValues'] .= "<span title='площадь кухни'>" . $oneProperty['kitchenSpace'] . " м²</span><br>";
+    }
+
+    // Этаж
+    $arrExtendedListReplace['floor'] = "";
+    if (isset($oneProperty['floor']) && isset($oneProperty['totalAmountFloor']) && $oneProperty['floor'] != "0" && $oneProperty['totalAmountFloor'] != "0") {
+        $arrExtendedListReplace['floor'] = "<span title='этаж'>" . $oneProperty['floor'] . "</span><br><span title='общее количество этажей в доме'>из " . $oneProperty['totalAmountFloor'] . "</span>";
+    }
+    if (isset($oneProperty['numberOfFloor']) && $oneProperty['numberOfFloor'] != "0") {
+        $arrExtendedListReplace['floor'] = "<span title='этажность дома'>" . $oneProperty['numberOfFloor'] . "</span>";
+    }
+    if ($arrExtendedListReplace['floor'] == "") $arrExtendedListReplace['floor'] = "<span title='этаж'>-</span>";
+
+    // Мебель
+    $arrExtendedListReplace['furniture'] = "";
+    if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "0" && $oneProperty['typeOfObject'] != "гараж") {
+        if ((isset($oneProperty['furnitureInLivingArea']) && count(unserialize($oneProperty['furnitureInLivingArea'])) != 0) || (isset($oneProperty['furnitureInLivingAreaExtra']) && $oneProperty['furnitureInLivingAreaExtra'] != "")) $arrExtendedListReplace['furniture'] .= "<span title='наличие мебели в жилой зоне'>+</span><br>"; else $arrExtendedListReplace['furniture'] .= "<span title='наличие мебели в жилой зоне'>-</span><br>";
+        if ((isset($oneProperty['furnitureInKitchen']) && count(unserialize($oneProperty['furnitureInKitchen'])) != 0) || (isset($oneProperty['furnitureInKitchenExtra']) && $oneProperty['furnitureInKitchenExtra'] != "")) $arrExtendedListReplace['furniture'] .= "<span title='наличие мебели на кухне'>+</span><br>"; else $arrExtendedListReplace['furniture'] .= "<span title='наличие мебели на кухне'>-</span><br>";
+        if ((isset($oneProperty['appliances']) && count(unserialize($oneProperty['appliances'])) != 0) || (isset($oneProperty['appliancesExtra']) && $oneProperty['appliancesExtra'] != "")) $arrExtendedListReplace['furniture'] .= "<span title='наличие бытовой техники'>+</span><br>"; else $arrExtendedListReplace['furniture'] .= "<span title='наличие бытовой техники'>-</span><br>";
+    } else {
+        $arrExtendedListReplace['furniture'] = "<span title='наличие мебели и бытовой техники'>-<br>-<br>-</span>";
+    }
+
+    // Все, что касается СТОИМОСТИ АРЕНДЫ
+    $arrExtendedListReplace['costOfRenting'] = "";
+    if (isset($oneProperty['costOfRenting']) && isset($oneProperty['currency'])) $arrExtendedListReplace['costOfRenting'] = "<span title='стоимость аренды в месяц'>" . $oneProperty['costOfRenting'] . " " . $oneProperty['currency'] . "</span><br>";
+    $arrExtendedListReplace['utilities'] = "";
+    if (isset($oneProperty['utilities']) && $oneProperty['utilities'] == "да") $arrExtendedListReplace['utilities'] = "<span title='коммунальные услуги оплачиваются дополнительно'>+ ком. усл.</span><br>";
+    $arrExtendedListReplace['compensationMoney'] = "";
+    $arrExtendedListReplace['compensationPercent'] = "";
+    if (isset($oneProperty['compensationMoney']) && isset($oneProperty['compensationPercent']) && isset($oneProperty['currency'])) {
+        $arrExtendedListReplace['compensationMoney'] = "<span title='единоразовая комиссия при заключении договора'>" . $oneProperty['compensationMoney'] . " " . $oneProperty['currency'];
+        $arrExtendedListReplace['compensationPercent'] = $oneProperty['compensationPercent'] . "</span>";
+    }
+
+
+    // Производим заполнение шаблона строки (блока) fullParametersList таблицы по данному объекту недвижимости
+    // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне баллуна
+    $arrExtendedListTemplVar = array('{urlProperty}', '{number}', '{urlFoto1}', '{urlFoto2}', '{typeOfObject}', '{district}', '{address}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{floor}', '{furniture}', '{costOfRenting}', '{utilities}', '{compensationMoney}', '{compensationPercent}');
+    // Копируем html-текст шаблона блока (строки таблицы)
+    $currentAdvertExtendedList = str_replace($arrExtendedListTemplVar, $arrExtendedListReplace, $tmpl_extendedAdvert);
+    // Полученный HTML текст складываем в "копилочку"
+    $matterOfFullParametersList .= $currentAdvertExtendedList;
+}
+?>
+
+<div class="choiceViewSearchResult">
+    <span id="expandList"><a href="#">Список</a>&nbsp;&nbsp;&nbsp;</span><span id="listPlusMap"><a href="#">Список +
+    карта</a>&nbsp;&nbsp;&nbsp;</span><span id="expandMap"><a href="#">Карта</a></span>
+</div>
+<div id="resultOnSearchPage" style="height: 100%;">
+
+<!-- Информация об объектах, подходящих условиям поиска -->
+<table class="listOfRealtyObjects" id="shortListOfRealtyObjects">
+<tbody>
+
+<?php
 echo $matterOfShortList; // Вставляем HTML-текст объявлений по недвижимости с короткими данными и данными для баллуной на Яндекс карте
 
 // Если ничего не нашли
 if ($matterOfShortList == "") {
 
     // Считаем общее количество опубликованных объявлений
+    $allAmountAdverts = "";
     $rez = mysql_query("SELECT COUNT(*) FROM property WHERE status = 'опубликовано'");
     $row = mysql_fetch_assoc($rez);
-    $allAmountAdverts = $row['COUNT(*)'];
+    if ($row != false) $allAmountAdverts = $row['COUNT(*)'];
 
     // Выдаем вместо пустого результата:
-    echo "<div style='margin-top: 2em; margin-left: 1em;'>
+    echo "<tr><td><div style='margin-top: 2em; margin-left: 1em;'>
     К сожалению, поиск не дал результатов.<br>
     Попробуйте изменить условия поиска.<br><br>
-    Еще <a href='search.php?fastSearchButton='>$allAmountAdverts объявлений</a> ждут своих арендаторов</div>";
+    Еще <a href='search.php?fastSearchButton='>$allAmountAdverts объявлений</a> ждут своих арендаторов</div></td></tr>";
 }
-
 ?>
 
 </tbody>
@@ -888,146 +1019,31 @@ if ($matterOfShortList == "") {
 <!-- Первоначально скрытый раздел с подробным списком объявлений-->
 <div id="fullParametersListOfRealtyObjects" style="display: none;">
     <table class="listOfRealtyObjects" style="width: 100%; float:none;">
-        <thead>
+        <thead id="headOfBigTable" style="background-color: #ffffff; line-height: 2em; border-bottom: 1px solid #000000;">
         <tr class="listOfRealtyObjectsHeader">
             <th class="top left"></th>
-            <th> Фото</th>
-            <th> Адрес</th>
-            <th> Район</th>
-            <th> Комнат</th>
-            <th> Площадь</th>
-            <th> Этаж</th>
-            <th class="top right"> Цена, руб.</th>
+            <th>Фото</th>
+            <th>Адрес</th>
+            <th>Комнаты</th>
+            <th>Площадь</th>
+            <th>Этаж</th>
+            <th>Мебель</th>
+            <th class="top right">Цена</th>
         </tr>
         </thead>
         <tbody>
-        <tr class="realtyObject" linkToDescription="descriptionOfObject.html">
-            <td>
-                <div class="numberOfRealtyObject">
-                    15
-                </div>
-                <div class="blockOfIcon">
-                    <a><img class="icon" title="Добавить в избранное" src="img/blue_star.png"></a>
-                </div>
-            </td>
-            <td>
-                <div class="fotosWrapper resultSearchFoto">
-                    <div class="middleFotoWrapper">
-                        <img class="middleFoto" src="">
-                    </div>
-                    <div class="middleFotoWrapper">
-                        <img class="middleFoto" src="">
-                    </div>
-                </div>
-            </td>
-            <td>ул. Серафимы Дерябиной 17</td>
-            <td> ВИЗ</td>
-            <td> 2</td>
-            <td> 22.4/34</td>
-            <td> 2/13</td>
-            <td> 15000</td>
-        </tr>
-        <tr class="realtyObject" linkToDescription="descriptionOfObject.html">
-            <td>
-                <div class="numberOfRealtyObject">
-                    15
-                </div>
-                <div class="blockOfIcon">
-                    <a><img class="icon" title="Добавить в избранное" src="img/blue_star.png"></a>
-                </div>
-            </td>
-            <td>
-                <div class="fotosWrapper resultSearchFoto">
-                    <div class="middleFotoWrapper">
-                        <img class="middleFoto" src="">
-                    </div>
-                    <div class="middleFotoWrapper">
-                        <img class="middleFoto" src="">
-                    </div>
-                </div>
-            </td>
-            <td>ул. Гурзуфская 38</td>
-            <td> ВИЗ</td>
-            <td> 2</td>
-            <td> 22.4/34</td>
-            <td> 2/13</td>
-            <td> 15000</td>
-        </tr>
-        <tr class="realtyObject" linkToDescription="descriptionOfObject.html">
-            <td>
-                <div class="numberOfRealtyObject">
-                    15
-                </div>
-                <div class="blockOfIcon">
-                    <a><img class="icon" title="Добавить в избранное" src="img/blue_star.png"></a>
-                </div>
-            </td>
-            <td>
-                <div class="fotosWrapper resultSearchFoto">
-                    <div class="middleFotoWrapper">
-                        <img class="middleFoto" src="">
-                    </div>
-                    <div class="middleFotoWrapper">
-                        <img class="middleFoto" src="">
-                    </div>
-                </div>
-            </td>
-            <td>ул. Шаумяна 107</td>
-            <td> ВИЗ</td>
-            <td> 2</td>
-            <td> 22.4/34</td>
-            <td> 2/13</td>
-            <td> 15000</td>
-        </tr>
-        <tr class="realtyObject" linkToDescription="descriptionOfObject.html">
-            <td>
-                <div class="numberOfRealtyObject">
-                    15
-                </div>
-                <div class="blockOfIcon">
-                    <a><img class="icon" title="Добавить в избранное" src="img/blue_star.png"></a>
-                </div>
-            </td>
-            <td>
-                <div class="fotosWrapper resultSearchFoto">
-                    <div class="middleFotoWrapper">
-                        <img class="middleFoto" src="">
-                    </div>
-                    <div class="middleFotoWrapper">
-                        <img class="middleFoto" src="">
-                    </div>
-                </div>
-            </td>
-            <td>ул. Репина 105</td>
-            <td> ВИЗ</td>
-            <td> 2</td>
-            <td> 22.4/34</td>
-            <td> 2/13</td>
-            <td> 15000</td>
-        </tr>
-        <tr class="realtyObject" linkToDescription="descriptionOfObject.html">
-            <td>
-                <div class="blockOfIcon">
-                    <a><img class="icon" title="Добавить в избранное" src="img/blue_star.png"></a>
-                </div>
-            </td>
-            <td>
-                <div class="fotosWrapper resultSearchFoto">
-                    <div class="middleFotoWrapper">
-                        <img class="middleFoto" src="">
-                    </div>
-                    <div class="middleFotoWrapper">
-                        <img class="middleFoto" src="">
-                    </div>
-                </div>
-            </td>
-            <td>ул. Ленина 13</td>
-            <td> ВИЗ</td>
-            <td> 2</td>
-            <td> 22.4/34</td>
-            <td> 2/13</td>
-            <td> 15000</td>
-        </tr>
+<?php
+echo $matterOfFullParametersList; // Формируем содержимое таблицы со списком объявлений и расширенными данными по ним
+
+// Если ничего не нашли
+if ($matterOfFullParametersList == "") {
+    // Выдаем вместо пустого результата:
+    echo "<tr><td><div style='margin-top: 2em; margin-left: 1em;'>
+    К сожалению, поиск не дал результатов.<br>
+    Попробуйте изменить условия поиска.<br><br>
+    Еще <a href='search.php?fastSearchButton='>$allAmountAdverts объявлений</a> ждут своих арендаторов</div></td></tr>";
+}
+?>
         </tbody>
     </table>
 </div>
