@@ -147,6 +147,7 @@ fieldset.edited {
 /* Стили для НЕредактируемых блоков fieldset*/
 fieldset.notEdited {
 	display: inline-block;
+    max-width: 32em;
 }
 
 fieldset.notEdited table td {
@@ -218,9 +219,14 @@ button,
 input[type="button"],
 input[type="reset"],
 input[type="submit"] {
+    white-space: nowrap;
     cursor: pointer;
     -webkit-appearance: button;
     overflow: visible;
+}
+
+button span {
+    white-space: nowrap;
 }
 
 /*
@@ -660,14 +666,17 @@ body {
 }
 
 #rightBlockOfSearchParameters fieldset {
-	height: 100%;
+    box-sizing: border-box;
+    height: 100%;
 }
+
 #rightBlockOfSearchParameters .searchItem {
 	height: 100%;
+    line-height: 1.4em;
 }
 
 #rightBlockOfSearchParameters .searchItemBody {
-	height: 95%; 
+	height: 100%;
 	width: 200px; 
 	overflow-y: auto;
 }
@@ -693,19 +702,6 @@ body {
 .private {
 	display: inline-block;
 }
-
-/* =============================================================================
-   Стили для НЕредактируемых блоков с параметрами поиска - в режиме просмотра
-   ========================================================================== */
-  
-  #additionalSearchDescription {
-				max-width: 70%;
-				min-width: 32em;
-			}
-
-			#firstTableColumnSpecial {
-				min-width: 16em;
-			}
 
 /* =============================================================================
    Стили для результатов поиска (таблица, карта, ьаблица + карта) и избранных объявлений

@@ -25,8 +25,47 @@ $('#tabs').bind('tabsshow', function(event, ui) {
     }
 });
 
-// Подгонка размера правого блока параметров (районы) расширенного поиска под размер левого блока параметров. 19 пикселей - на padding у fieldset
-document.getElementById('rightBlockOfSearchParameters').style.height = document.getElementById('leftBlockOfSearchParameters').offsetHeight - 22 + 'px';
+// Подгонка размера правого блока параметров (районы) расширенного поиска под размер левого блока параметров. 10 пикселей - на компенсацию margin у fieldset
+document.getElementById('rightBlockOfSearchParameters').style.height = document.getElementById('leftBlockOfSearchParameters').offsetHeight - 10 + 'px';
+$('#rightBlockOfSearchParameters .searchItem').css('height', parseFloat($('#rightBlockOfSearchParameters fieldset').css('height')) - parseFloat($('#rightBlockOfSearchParameters fieldset legend').css('height')));
+
+/* Активируем механизм скрытия ненужных полей в зависимости от заполнения формы */
+// При изменении перечисленных здесь полей алгоритм пробегает форму с целью показать нужные элементы и скрыть ненужные
+$(document).ready(notavailability);
+$("#typeOfObject").change(notavailability);
+// Пробегает все элементы и изменяет в соответствии с текущей ситуацией их доступность/недоступность для пользователя
+function notavailability() {
+    // Перебираем все элементы, доступность которых зависит от каких-либо условий
+    $("[notavailability]").each(function () {
+        // Получаем текущий элемент из перебираемых и набор условий его недоступности
+        var currentElem = this;
+        var notSelectorsOfElem = $(this).attr("notavailability");
+
+        // Получаем массив, каждый элемент которого = условию недоступности
+        var arrNotSelectorsOfElem = notSelectorsOfElem.split('&');
+
+        // Презумпция доступности элемента, если одно из его условий недоступности выполнится ниже, то он станет недоступным
+        $("select, input", currentElem).removeAttr("disabled");
+        $(currentElem).css('color', '');
+
+        // Проверяем верность каждого условия недоступности
+        for (var i = 0; i < arrNotSelectorsOfElem.length; i++) {
+            // Выделяем Селект условия недоступности и его значение, при котором условие выполняется и элемент должен стать недоступным
+            var selectAndValue = arrNotSelectorsOfElem[i].split('_');
+            var currentSelectId = selectAndValue[0];
+            var currentNotSelectValue = selectAndValue[1];
+
+            // Проверяем текущее значение селекта
+            var currentSelectValue = $("#" + currentSelectId).val();
+            var isCurrentSelectDisabled = $("#" + currentSelectId).attr("disabled");
+            if (currentSelectValue == currentNotSelectValue || isCurrentSelectDisabled) { // Если текущее значение селекта совпало с тем значением, при котором данный элемент должен быть недоступен, либо селект, от значения которого зависит судьба данного недоступен, то выполняем скрытие элемента и его селектов
+                $("select, input", currentElem).attr("disabled", "disabled");
+                $(currentElem).css('color', '#e6e6e6');
+                break; // Прерываем цикл, так как проверка остальных условий по данному элементу уже не нужна
+            }
+        }
+    });
+}
 
 /* Считаем высоту видимой части экрана - чтобы задать ее высоте блока с картой */
 $('#map').css('height', document.documentElement.clientHeight + 'px');

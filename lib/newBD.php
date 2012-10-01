@@ -74,7 +74,6 @@ $rez = mysql_query("CREATE TABLE searchRequests (
         amountOfRooms BLOB,
         adjacentRooms VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
         floor VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
-        furniture VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
         minCost INT NOT NULL,
         maxCost INT NOT NULL,
         pledge INT NOT NULL,

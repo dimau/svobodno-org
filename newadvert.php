@@ -704,11 +704,13 @@ include("header.php");
                 <tr>
                     <td>
                         <input type="text" name="address" id="addressTextBox" size="30" <?php echo "value='$address'";?>>
-                        <button id="checkAddressButton">Проверить адрес</button>
+                    </td>
+                    <td>
+                        <button id="checkAddressButton" style='margin-left: 0.7em;'>Проверить адрес</button>
                     </td>
                 </tr>
                 <tr>
-                    <td><!-- Карта Яндекса -->
+                    <td colspan='2'><!-- Карта Яндекса -->
                         <div id="mapForNewAdvert" style="width: 100%; height: 400px; margin-top: 15px;"></div>
                     </td>
                 </tr>

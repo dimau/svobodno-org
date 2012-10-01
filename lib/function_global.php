@@ -10,7 +10,7 @@ function userDataCorrect($typeOfValidation)
     $errors = array();
 
     // Получаем переменные, содержащие данные пользователя, для проверки
-    global $typeTenant, $typeOwner, $name, $secondName, $surname, $sex, $nationality, $birthday, $login, $oldLogin, $password, $telephon, $email, $fileUploadId, $currentStatusEducation, $almamater, $speciality, $kurs, $ochnoZaochno, $yearOfEnd, $notWorkCheckbox, $placeOfWork, $workPosition, $regionOfBorn, $cityOfBorn, $vkontakte, $odnoklassniki, $facebook, $twitter, $minCost, $maxCost, $pledge, $termOfLease, $lic;
+    global $typeTenant, $typeOwner, $name, $secondName, $surname, $sex, $nationality, $birthday, $login, $oldLogin, $password, $telephon, $email, $fileUploadId, $currentStatusEducation, $almamater, $speciality, $kurs, $ochnoZaochno, $yearOfEnd, $notWorkCheckbox, $placeOfWork, $workPosition, $regionOfBorn, $cityOfBorn, $vkontakte, $odnoklassniki, $facebook, $twitter, $typeOfObject, $minCost, $maxCost, $pledge, $withWho, $children, $animals, $termOfLease, $lic;
 
     // Проверки для блока "Личные данные"
     if ($name == "") $errors[] = 'Укажите имя';
@@ -115,7 +115,10 @@ function userDataCorrect($typeOfValidation)
     if ((($typeOfValidation == "registration" && $typeTenant == "true")  || $typeOfValidation == "validateSearchRequest") && !preg_match("/^\d{0,8}$/", $maxCost)) $errors[] = 'Неправильный формат числа в поле максимальной величины арендной платы (проверьте: только числа, не более 8 символов)';
     if ((($typeOfValidation == "registration" && $typeTenant == "true")  || $typeOfValidation == "validateSearchRequest") && !preg_match("/^\d{0,8}$/", $pledge)) $errors[] = 'Неправильный формат числа в поле максимальной величины залога (проверьте: только числа, не более 8 символов)';
     if ((($typeOfValidation == "registration" && $typeTenant == "true")  || $typeOfValidation == "validateSearchRequest") && $minCost > $maxCost) $errors[] = 'Минимальная стоимость аренды не может быть больше, чем максимальная. Исправьте поля, в которых указаны Ваши требования к диапазону стоимости аренды';
-    if ((($typeOfValidation == "registration" && $typeTenant == "true")  || $typeOfValidation == "validateSearchRequest") && $termOfLease == "0") $errors[] = 'Укажите предполагаемый срок аренды';
+    if ($withWho == "0" && $typeOfObject != "гараж" && (($typeOfValidation == "registration" && $typeTenant == "true")  || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите, как Вы собираетесь проживать в арендуемой недвижимости (с кем)';
+    if ($children == "0" && $typeOfObject != "гараж" && (($typeOfValidation == "registration" && $typeTenant == "true")  || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите, собираетесь ли Вы проживать вместе с детьми или без них';
+    if ($animals == "0" && $typeOfObject != "гараж" && (($typeOfValidation == "registration" && $typeTenant == "true")  || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите, собираетесь ли Вы проживать вместе с животными или без них';
+    if ($termOfLease == "0" && (($typeOfValidation == "registration" && $typeTenant == "true")  || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите предполагаемый срок аренды';
 
     // Проверка согласия пользователя с лицензией
     if ($typeOfValidation == "registration" && $lic != "yes") $errors[] = 'Регистрация возможна только при согласии с условиями лицензионного соглашения'; //приняты ли правила
@@ -196,6 +199,7 @@ function isAdvertCorrect($typeOfValidation)
     if ($totalAmountFloor != "") {
         if (!preg_match('/^\d{0,3}$/', $totalAmountFloor)) $errors[] = 'Неправильный формат для количества этажей: должно быть не более 3 цифр';
     }
+    if ($totalAmountFloor != "" && $floor != "" && $floor > $totalAmountFloor) $errors[] = 'Общее количество этажей в доме не может быть меньше этажа, на котором расположена Ваше недвижимость';
     if ($numberOfFloor == "" && $typeOfObject != "0" && $typeOfObject != "квартира" && $typeOfObject != "комната" && $typeOfObject != "гараж") $errors[] = 'Укажите количество этажей в доме';
     if ($numberOfFloor != "") {
         if (!preg_match('/^\d{0,2}$/', $numberOfFloor)) $errors[] = 'Неправильный формат для количества этажей: должно быть не более 2 цифр';

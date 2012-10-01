@@ -122,19 +122,19 @@ if ($adjacentRooms == "только изолированные") $searchLimits['
 // Ограничение на этаж
 $searchLimits['floor'] = "";
 if ($floor == "0") $searchLimits['floor'] = "";
-if ($floor == "любой") $searchLimits['floor'] = "";
-if ($floor == "не первый") $searchLimits['floor'] = " (floor != '1')";
-if ($floor == "не первый и не последний") $searchLimits['floor'] = " (floor != '1' AND floor != totalAmountFloor)";
+if ($floor == "любой") $searchLimits['floor'] = " (floor != 0)";
+if ($floor == "не первый") $searchLimits['floor'] = " (floor != 0 AND floor != 1)";
+if ($floor == "не первый и не последний") $searchLimits['floor'] = " (floor != 0 AND floor != 1 AND floor != totalAmountFloor)";
 
 // Ограничение на минимальную сумму арендной платы
 $searchLimits['minCost'] = "";
 if ($minCost == "") $searchLimits['minCost'] = "";
-if ($minCost != "") $searchLimits['minCost'] = " (realCostOfRenting >= " . $minCost . ")";
+if ($minCost != "") $searchLimits['minCost'] = " (realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting >= " . $minCost . ")";
 
 // Ограничение на максимальную сумму арендной платы
 $searchLimits['maxCost'] = "";
 if ($maxCost == "") $searchLimits['maxCost'] = "";
-if ($maxCost != "") $searchLimits['maxCost'] = " (realCostOfRenting <= " . $maxCost . ")";
+if ($maxCost != "") $searchLimits['maxCost'] = " (realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting <= " . $maxCost . ")";
 
 // Ограничение на максимальный залог
 $searchLimits['pledge'] = "";
@@ -197,7 +197,7 @@ foreach ($searchLimits as $value) {
 
 // Собираем и выполняем поисковый запрос
 $rowPropertyArr = array(); // в итоге получим массив, каждый элемент которого представляет собой еще один массив значений конкретного объявления по недвижимости
-$rezProperty = mysql_query("SELECT * FROM property WHERE" . $strWHERE . " ORDER BY realCostOfRenting LIMIT 100"); // Сортируем по стоимости аренды и ограничиваем количество 100 объявлениями
+$rezProperty = mysql_query("SELECT * FROM property WHERE" . $strWHERE . " ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting  LIMIT 100"); // Сортируем по стоимости аренды и ограничиваем количество 100 объявлениями
 if ($rezProperty != false) {
     for ($i = 0; $i < mysql_num_rows($rezProperty); $i++) {
         $rowPropertyArr[] = mysql_fetch_assoc($rezProperty);
@@ -345,7 +345,7 @@ include("header.php");
                 </select>
             </div>
         </div>
-        <div class="searchItem">
+        <div class="searchItem" notavailability="typeOfObject_гараж">
             <span class="searchItemLabel"> Количество комнат: </span>
             <div class="searchItemBody">
                 <input type="checkbox" value="1" name="amountOfRooms[]"
@@ -410,7 +410,7 @@ include("header.php");
                 6...
             </div>
         </div>
-        <div class="searchItem">
+        <div class="searchItem" notavailability="typeOfObject_гараж">
             <span class="searchItemLabel"> Комнаты смежные: </span>
             <div class="searchItemBody">
                 <select name="adjacentRooms">
@@ -426,7 +426,7 @@ include("header.php");
                 </select>
             </div>
         </div>
-        <div class="searchItem">
+        <div class="searchItem" notavailability="typeOfObject_дом&typeOfObject_таунхаус&typeOfObject_дача&typeOfObject_гараж">
             <span class="searchItemLabel"> Этаж: </span>
             <div class="searchItemBody">
                 <select name="floor">
@@ -447,8 +447,8 @@ include("header.php");
             Стоимость
         </legend>
         <div class="searchItem">
-            <div class="searchItemLabel">
-                Арендная плата (в месяц с учетом к.у.)
+            <div class="searchItemLabel" title="Укажите, сколько Вы готовы платить в месяц за аренду недвижимости с учетом стоимости коммунальных услуг (если они оплачиваются дополнительно)">
+                Арендная плата (в месяц с учетом ком. усл.)
             </div>
             <div class="searchItemBody">
                 от
@@ -486,7 +486,7 @@ include("header.php");
     </fieldset>
 </div>
 <div id="rightBlockOfSearchParameters">
-    <fieldset>
+    <fieldset class="edited">
         <legend>
             Район
         </legend>
@@ -517,7 +517,7 @@ include("header.php");
     <legend>
         Особые параметры поиска
     </legend>
-    <div class="searchItem">
+    <div class="searchItem" notavailability="typeOfObject_гараж">
         <span class="searchItemLabel">Как собираетесь проживать: </span>
         <div class="searchItemBody">
             <select name="withWho" id="withWho">
@@ -536,9 +536,8 @@ include("header.php");
             </select>
         </div>
     </div>
-    <div class="searchItem">
+    <div class="searchItem" notavailability="typeOfObject_гараж">
         <span class="searchItemLabel">Дети: </span>
-
         <div class="searchItemBody">
             <select name="children" id="children">
                 <option value="0" <?php if ($children == "0") echo "selected";?>></option>
@@ -556,9 +555,8 @@ include("header.php");
             </select>
         </div>
     </div>
-    <div class="searchItem">
+    <div class="searchItem" notavailability="typeOfObject_гараж">
         <span class="searchItemLabel">Животные: </span>
-
         <div class="searchItemBody">
             <select name="animals" id="animals">
                 <option value="0" <?php if ($animals == "0") echo "selected";?>></option>
@@ -572,7 +570,6 @@ include("header.php");
     </div>
     <div class="searchItem">
         <span class="searchItemLabel">Срок аренды:</span>
-
         <div class="searchItemBody">
             <select name="termOfLease" id="termOfLease">
                 <option value="0" <?php if ($termOfLease == "0") echo "selected";?>></option>
