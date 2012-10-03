@@ -246,6 +246,8 @@ if (isset($_POST['saveAdvertButton'])) {
                             last_act='" . $last_act ."',
                             reg_date='" . $reg_date ."'"))
         {
+            // Присваиваем пользователю статус Собственник, так как теперь он имеет как минимум 1 объявление (и не важно опубликованное оно или нет)
+            $rez = mysql_query("UPDATE users SET typeOwner='true' WHERE userId = '" . $userId . "'");
             /******* Переносим информацию о фотографиях объекта недвижимости в таблицу для постоянного хранения *******/
             // Узнаем id объявления - необходимо при сохранении информации о фотке в постоянную базу
             $rezId = mysql_query("SELECT id FROM property WHERE address='".$address."' AND coordX='".$coordX."' AND coordY='".$coordY."' AND apartmentNumber='".$apartmentNumber."'");

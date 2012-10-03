@@ -17,3 +17,21 @@ $("#tabs").on('click', function(event) {
 	var idOfTab = $(target.children[0]).attr('href');
 	$("#tabs").tabs("select", idOfTab);
 })
+
+
+/* Скрытие и отображение вариантов работы: классический, улучшенный и идеальный */
+
+$("#tarif1").on('click', function() {
+    if ($('#text1').css('display') == 'none') $('#text1').css('display', 'block'); else $('#text1').css('display', 'none');
+    return false;
+});
+
+$("#tarif2").on('click', function() {
+    if ($('#text2').css('display') == 'none') $('#text2').css('display', 'block'); else $('#text2').css('display', 'none');
+    return false;
+});
+
+$("#tarif3").on('click', function() {
+    if ($('#text3').css('display') == 'none') $('#text3').css('display', 'block'); else $('#text3').css('display', 'none');
+    return false;
+});

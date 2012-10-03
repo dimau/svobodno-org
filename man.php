@@ -1,3 +1,116 @@
+<?php
+include_once 'lib/connect.php'; //подключаемся к БД
+include_once 'lib/function_global.php'; //подключаем файл с глобальными функциями
+
+/*************************************************************************************
+ * Если в строке не указан идентификатор интересующего (целевого) пользователя, то пересылаем нашего пользователя на спец. страницу
+ ************************************************************************************/
+$targetUserId = "0";
+if (isset($_GET['compId'])) {
+    $targetUserId = ($_GET['compId'] - 2) / 5; // Получаем идентификатор пользователя для показа его страницы из строки запроса
+} else {
+    header('Location: 404.html'); // Если в запросе не указан идентификатор объявления для редактирования, то пересылаем пользователя в личный кабинет к списку его объявлений
+}
+
+/*************************************************************************************
+ * Проверяем, имеет ли право даннй пользователь смотреть анкету целевого пользователя
+ *
+ * Правила следующие:
+ *
+ * Неавторизованный пользователь не имеет права смотреть чью-либо анкету
+ *
+ * Арендатор может смотреть анкеты собственников тех объектов недвижимости, у которых он нажал на кнопку "Получить контакты собственника" и получил их.
+ * Если собственник снял с публикации объект недвижимости, которым интересовался арендатор, то арендатор теряет право смотреть анкету этого собственника
+ * Если арендатор удалил поисковый запрос (то есть перестал быть арендатором), то он теряет право смотреть любые анкеты собственников, к которым имел доступ ранее
+ *
+ * Собственник может смотреть анкеты арендаторов, которые заинтересовались его объектом недвижимости (нажали на кнопку "Получить контакты собственника").
+ * Собственник теряет право смотреть анкету арендатора, если тот удалил свой поисковый запрос (то есть перестал быть арендатором)
+ * Если собственник снял с публикации свое объявление, то информация о всех арендаторах, интересовавшихся этим объектом удаляется через некоторое время (предположительно - 10 дней), таким образом собственник, в том числе, и теряет право смотреть их анкеты
+ ************************************************************************************/
+
+// Если пользователь не авторизован, то он не сможет посмотреть ни одной анкеты
+$userId = login();
+if ($userId == false) {
+    header('Location: 404.html'); //TODO: реализовать страницу Отказано в доступе
+}
+
+// Получаем список пользователей, чьей недвижимостью интересовался наш пользователь ($userId) в качестве арендатора, и чьи анкеты он имеет право смотреть
+$visibleUsersIdOwners = array();
+if ($rez = mysql_query("SELECT interestingPropertysId FROM searchrequests WHERE userId = '" . $userId . "'")) {
+    if ($row = mysql_fetch_assoc($rez)) {
+        $interestingPropertysId = unserialize($row['interestingPropertysId']);
+
+        // По каждому объекту недвижимости выясняем статус и собственника. Если статус = опубликовано, то собственника добавляем в массив ($visibleUsersIdOwners)
+        if ($interestingPropertysId != false && count($interestingPropertysId) != 0) {
+            // Составляем условие запроса к БД, указывая интересующие нас id объявлений
+            $selectValue = "";
+            for ($i = 0; $i < count($interestingPropertysId); $i++) {
+                $selectValue .= " id = '" . $interestingPropertysId[$i] . "'";
+                if ($i < count($interestingPropertysId) - 1) $selectValue .= " OR";
+            }
+            // Перебираем полученные строки из таблицы, каждая из которых соответствует 1 объявлению
+            if ($rez = mysql_query("SELECT userId, status FROM property WHERE " . $selectValue)) {
+                for ($i = 0; $i < mysql_num_rows($rez); $i++) {
+                    if ($row = mysql_fetch_assoc($rez) && $row['status'] == "опубликовано") {
+                        $visibleUsersIdOwners[] = $row['userId'];
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Получаем список пользователей, которые интересовались недвижимостью нашего пользователя ($userId), теперь он выступает в качестве собственника
+// Проверяем, является ли еще целевой пользователь арендатором, если нет, то собственник не имеет права смотреть его анкету. Таким образом реализуется правило: собственник может видеть только анкеты тех пользователей, которые заинтересовались его недвижимостью и в текущий момент времени являются арендаторами (= имеют поисковый запрос)
+$visibleUsersIdTenants = array();
+if ($rez = mysql_query("SELECT typeTenant FROM users WHERE userId = '" . $targetUserId . "'")) {
+    if ($row = mysql_fetch_assoc($rez)) {
+        // Формировать список имеет смысл только, если целевой пользователь на текущий момент времени является арендатором. В ином случае, доступ к анкете целевого пользователя для собственников - закрыт
+        if ($row['typeTenant'] == "true") {
+            if ($rez = mysql_query("SELECT visibleUsersId FROM property WHERE userId = '" . $userId . "'")) {
+                for ($i = 0; $i < mysql_num_rows($rez); $i++) {
+                    if ($row = mysql_fetch_assoc($rez)) $visibleUsersIdTenants = $visibleUsersIdTenants + unserialize($row['visibleUsersId']);
+                }
+            }
+        }
+    }
+}
+
+// Проверяем, есть ли среди этого списка текущий целевой пользователь ($targetUserId)
+if (!in_array($visibleUsersIdOwners, $targetUserId) && !in_array($visibleUsersIdTenants, $targetUserId)) {
+    header('Location: 404.html'); //TODO: реализовать страницу Отказано в доступе
+}
+
+/*************************************************************************************
+ * Получаем информацию о пользователе по его идентификатору, указанному в GET запросе
+ ************************************************************************************/
+
+// Данные профиля пользователя
+$rowTargetUser = array();
+$rezTargetUser = mysql_query("SELECT * FROM users WHERE id = '" . $targetUserId . "'");
+if ($rezTargetUser != false) $rowTargetUser = mysql_fetch_assoc($rezTargetUser);
+
+// Получаем информацию о фотографиях пользователя
+$rowUserFotos = array();
+$rezUserFotos = mysql_query("SELECT * FROM userfotos WHERE userId = '" . $targetUserId . "'");
+if ($rezUserFotos != false) $rowUserFotos = mysql_fetch_assoc($rezUserFotos); // TODO: сделать отображение нескольких фоток, если пользователь загрузит не одну
+
+// Получаем информацию о поисковом запросе пользователя, если он есть
+$rowSearchRequests = array();
+$rezSearchRequests = mysql_query("SELECT * FROM searchrequests WHERE userId = '" . $targetUserId . "'");
+if ($rezSearchRequests != false) $rowSearchRequests = mysql_fetch_assoc($rezSearchRequests);
+// Преобразование сериализованных массивов к виду, удобному для обработки
+if (isset($rowSearchRequests['amountOfRooms'])) $rowSearchRequests['amountOfRooms'] = unserialize($rowSearchRequests['amountOfRooms']);
+if (isset($rowSearchRequests['district'])) $rowSearchRequests['district'] = unserialize($rowSearchRequests['district']);
+
+
+/*************************************************************************************
+ * Получаем заголовок страницы
+ ************************************************************************************/
+$strHeaderOfPage = $rowTargetUser['surname'] . " " . $rowTargetUser['name'] . " " . $rowTargetUser['secondName'] ;
+
+?>
+
 <!DOCTYPE html>
 <html>
 	<head>
@@ -7,8 +120,8 @@
 		More info: h5bp.com/i/378 -->
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-		<title>Пользователь</title>
-		<meta name="description" content="Описание пользователя портала">
+		<title><?php echo $strHeaderOfPage; ?></title>
+		<meta name="description" content="<?php echo $strHeaderOfPage; ?>">
 
 		<!-- Mobile viewport optimized: h5bp.com/viewport -->
 		<meta name="viewport" content="initialscale=1.0, width=device-width">
@@ -17,6 +130,16 @@
 
 		<link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
 		<link rel="stylesheet" href="css/main.css">
+
+        <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <!-- Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера -->
+        <script>
+            if (typeof jQuery === 'undefined') document.write("<scr"+"ipt src='js/vendor/jquery-1.7.2.min.js'></scr"+"ipt>");
+        </script>
+        <!-- jQuery UI с моей темой оформления -->
+        <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
+
 	</head>
 
 	<body>
@@ -29,7 +152,7 @@
 			<div class="page_main_content">
 				<div class="wrapperOfTabs">
 					<div class="headerOfPage">
-						Личная страница пользователя: <span>Ушаков Дмитрий Владимирович</span>
+                        Характеристика пользователя
 					</div>
 					<div id="tabs">
 						<ul>
@@ -39,280 +162,328 @@
 							<li>
 								<a href="#tabs-2">Условия поиска</a>
 							</li>
-							<li>
-								<a href="#tabs-3">Объявления</a>
-							</li>
 						</ul>
 						<div id="tabs-1">
-							<div class="fotosWrapper">
-								<div class="bigFotoWrapper">
-									<img class="bigFoto">
-								</div>
-								<div class="bigFotoWrapper">
-									<img class="bigFoto">
-								</div>
-							</div>
-							<div class="profileInformation">
-								<ul class="listDescription">
-									<li>
-										<span class="FIO">Ушаков Дмитрий Владимирович</span>
-									</li>
-									<li>
-										<br>
-									</li>
-									<li>
-										<span class="headOfString">Образование:</span> УГТУ-УПИ, инженер автоматики и управления в информационных системах, закончил в 2009 г. причем с отличием
-									</li>
-									<li>
-										<span class="headOfString">Работа:</span> СКБ Контур, менеджер проектов
-									</li>
-									<li>
-										<span class="headOfString">Национальность:</span> русский
-									</li>
-									<li>
-										<span class="headOfString">Пол:</span> мужской
-									</li>
-									<li>
-										<span class="headOfString">День рождения:</span> 27.01.1987
-									</li>
-									<li>
-										<span class="headOfString">Возраст:</span> 25
-									</li>
-									<li>
-										<br>
-									</li>
-									<li>
-										<span style="font-weight: bold;">Контакты:</span>
-									</li>
-									<li>
-										<a href="#" id="showNumber">показать номер</a>
-									</li>
-									<li>
-										<br>
-									</li>
-									<li>
-										<span style="font-weight: bold;">Малая Родина:</span>
-									</li>
-									<li>
-										<span class="headOfString">Город (населенный пункт):</span> Лысьва
-									</li>
-									<li>
-										<span class="headOfString">Регион:</span> Пермский край
-									</li>
-									<li>
-										<br>
-									</li>
-									<li>
-										<span style="font-weight: bold;">Коротко о себе и своих интересах:</span>
-									</li>
-									<li>
-										Я немного замкнутый перфекционист и вообще неадекватный человек, возьмите меня замуж или в жены, ха-ха-ха
-									</li>
-									<li>
-										<br>
-									</li>
-									<li>
-										<span style="font-weight: bold;">Страницы в социальных сетях:</span>
-									</li>
-									<li>
-										<ul class="linksToAccounts">
-											<li>
-												<a href="http://vk.com/ushakovd">http://vk.com/ushakovd</a>
-											</li>
-											<li>
-												<a href="http://vk.com/ushakovd">http://vk.com/ushakovd</a>
-											</li>
-											<li>
-												<a href="http://vk.com/ushakovd">http://vk.com/ushakovd</a>
-											</li>
-										</ul>
-									</li>
-								</ul>
-							</div>
+                        <div id="notEditingProfileParametersBlock">
+                            <div class="fotosWrapper">
+                                <?php
+                                if (isset($rowUserFotos['id']) && isset($rowUserFotos['extension'])) echo "<div class='bigFotoWrapper'><img class='bigFoto' src='uploaded_files/" . $rowUserFotos['id'] . "." . $rowUserFotos['extension'] . "'></div>";
+                                ?>
+                            </div>
+                            <div class="profileInformation">
+                                <ul class="listDescription">
+                                    <li>
+                                        <span class="FIO"><?php echo $strHeaderOfPage; ?></span>
+                                    </li>
+                                    <li>
+                                        <br>
+                                    </li>
+                                    <li>
+                                        <span class="headOfString">Образование:</span> <?php
+                                        if ($rowTargetUser['currentStatusEducation'] == "0") {
+                                            echo "";
+                                        }
+                                        if ($rowTargetUser['currentStatusEducation'] == "нет") {
+                                            echo "нет";
+                                        }
+                                        if ($rowTargetUser['currentStatusEducation'] == "сейчас учусь") {
+                                            if (isset($rowTargetUser['almamater'])) echo $rowTargetUser['almamater'] . ", ";
+                                            if (isset($rowTargetUser['speciality'])) echo $rowTargetUser['speciality'] . ", ";
+                                            if (isset($rowTargetUser['ochnoZaochno'])) echo $rowTargetUser['ochnoZaochno'] . ", ";
+                                            if (isset($rowTargetUser['kurs'])) echo "курс: " . $rowTargetUser['kurs'];
+                                        }
+                                        if ($rowTargetUser['currentStatusEducation'] == "закончил") {
+                                            if (isset($rowTargetUser['almamater'])) echo $rowTargetUser['almamater'] . ", ";
+                                            if (isset($rowTargetUser['speciality'])) echo $rowTargetUser['speciality'] . ", ";
+                                            if (isset($rowTargetUser['ochnoZaochno'])) echo $rowTargetUser['ochnoZaochno'] . ", ";
+                                            if (isset($rowTargetUser['yearOfEnd'])) echo "<span style='white-space: nowrap;'>закончил в " . $rowTargetUser['yearOfEnd'] . " году</span>";
+                                        }
+                                        ?>
+                                    </li>
+                                    <li>
+                                        <span class="headOfString">Работа:</span> <?php
+                                        if ($rowTargetUser['notWorkCheckbox'] == "не работаю") {
+                                            echo "не работаю";
+                                        }
+                                        else {
+                                            if (isset($rowTargetUser['placeOfWork']) && $rowTargetUser['placeOfWork'] != "") {
+                                                echo $rowTargetUser['placeOfWork'] . ", ";
+                                            }
+                                            if (isset($rowTargetUser['workPosition'])) {
+                                                echo $rowTargetUser['workPosition'];
+                                            }
+                                        }
+                                        ?>
+                                    </li>
+                                    <li>
+                                        <span class="headOfString">Национальность:</span> <?php
+                                        if (isset($rowTargetUser['nationality'])) echo "<span style='white-space: nowrap;'>" . $rowTargetUser['nationality'] . "</span>";
+                                        ?>
+                                    </li>
+                                    <li>
+                                        <span class="headOfString">Пол:</span> <?php
+                                        if (isset($rowTargetUser['sex'])) echo $rowTargetUser['sex'];
+                                        ?>
+                                    </li>
+                                    <li>
+                                        <span class="headOfString">День рождения:</span> <?php
+                                        if (isset($rowTargetUser['birthday'])) echo $rowTargetUser['birthday'];
+                                        ?>
+                                    </li>
+                                    <li>
+                                        <span class="headOfString">Возраст:</span> <?php
+                                        $date = substr($rowTargetUser['birthday'], 7, 2);
+                                        $month = substr($rowTargetUser['birthday'], 5, 2);
+                                        $year = substr($rowTargetUser['birthday'], 0, 4);
+                                        $birthdayForAge = mktime(0, 0, 0, $month, $date, $year);
+                                        $currentDate = time();
+                                        echo date_interval_format(date_diff(new DateTime("@{$currentDate}"), new DateTime("@{$birthdayForAge}")), '%y');
+                                        ?>
+                                    </li>
+                                    <li>
+                                        <br>
+                                    </li>
+                                    <li>
+                                        <span style="font-weight: bold;">Контакты:</span>
+                                    </li>
+                                    <li>
+                                        <span class="headOfString">E-mail:</span> <?php
+                                        if (isset($rowTargetUser['email'])) echo $rowTargetUser['email'];
+                                        ?>
+                                    </li>
+                                    <li>
+                                        <span class="headOfString">Телефон:</span> <?php
+                                        if (isset($rowTargetUser['telephon'])) echo $rowTargetUser['telephon'];
+                                        ?>
+                                    </li>
+                                    <li>
+                                        <br>
+                                    </li>
+                                    <li>
+                                        <span style="font-weight: bold;">Малая Родина:</span>
+                                    </li>
+                                    <li>
+                                        <span class="headOfString">Город (населенный пункт):</span> <?php
+                                        if (isset($rowTargetUser['cityOfBorn'])) echo $rowTargetUser['cityOfBorn'];
+                                        ?>
+                                    </li>
+                                    <li>
+                                        <span class="headOfString">Регион:</span> <?php
+                                        if (isset($rowTargetUser['regionOfBorn'])) echo $rowTargetUser['regionOfBorn'];
+                                        ?>
+                                    </li>
+                                    <li>
+                                        <br>
+                                    </li>
+                                    <li>
+                                        <span style="font-weight: bold;">Коротко о себе и своих интересах:</span>
+                                    </li>
+                                    <li>
+                                        <?php
+                                        if (isset($rowTargetUser['shortlyAboutMe'])) echo $rowTargetUser['shortlyAboutMe'];
+                                        ?>
+                                    </li>
+                                    <li>
+                                        <br>
+                                    </li>
+                                    <li>
+                                        <span style="font-weight: bold;">Страницы в социальных сетях:</span>
+                                    </li>
+                                    <li>
+                                        <ul class="linksToAccounts">
+                                            <?php
+                                            if (isset($rowTargetUser['vkontakte'])) echo "<li><a href='" . $rowTargetUser['vkontakte'] . "'>" . $rowTargetUser['vkontakte'] . "</a></li>";
+                                            ?>
+                                            <?php
+                                            if (isset($rowTargetUser['odnoklassniki'])) echo "<li><a href='" . $rowTargetUser['odnoklassniki'] . "'>" . $rowTargetUser['odnoklassniki'] . "</a></li>";
+                                            ?>
+                                            <?php
+                                            if (isset($rowTargetUser['facebook'])) echo "<li><a href='" . $rowTargetUser['facebook'] . "'>" . $rowTargetUser['facebook'] . "</a></li>";
+                                            ?>
+                                            <?php
+                                            if (isset($rowTargetUser['twitter'])) echo "<li><a href='" . $rowTargetUser['twitter'] . "'>" . $rowTargetUser['twitter'] . "</a></li>";
+                                            ?>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
 							<div class="clearBoth"></div>
 						</div><!-- /end.tabs-1 -->
 						<div id="tabs-2">
+                            <?php if ($rowSearchRequests == false || count($rowSearchRequests) == 0): ?>
+                                 <div class="shadowText">
+                                     Пользователь не ищет недвижимость в данный момент
+                                 </div>
+                            <?php endif;?>
+                            <?php if ($rowSearchRequests != false && count($rowSearchRequests) != 0): ?>
 							<div class="shadowText">
 								Какого рода недвижимость ищет данный пользователь
 							</div>
-							<div id="notEditingSearchParametersBlock" class="objectDescription">
-								<fieldset class="notEdited">
-									<legend>
-										Характеристика объекта
-									</legend>
-									<table>
-										<tbody>
-											<tr>
-												<td class="objectDescriptionItemLabel">Тип:</td>
-												<td class="objectDescriptionBody"><span>квартира</span></td>
-											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">Количество комнат:</td>
-												<td class="objectDescriptionBody"><span>1, 2</span></td>
-											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">Комнаты смежные:</td>
-												<td class="objectDescriptionBody"><span>только изолированные</span></td>
-											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">Этаж:</td>
-												<td class="objectDescriptionBody"><span>не первый</span></td>
-											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">С мебелью и бытовой техникой:</td>
-												<td class="objectDescriptionBody"><span>нет</span></td>
-											</tr>
-										</tbody>
-									</table>
-								</fieldset>
-								<fieldset class="notEdited">
-									<legend>
-										Стоимость
-									</legend>
-									<table>
-										<tbody>
-											<tr>
-												<td class="objectDescriptionItemLabel">Арендная плата в месяц от:</td>
-												<td class="objectDescriptionBody"><span>0</span> руб.</td>
-											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">Арендная плата в месяц до:</td>
-												<td class="objectDescriptionBody"><span>20000</span> руб.</td>
-											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">Залог до:</td>
-												<td class="objectDescriptionBody"><span>25000</span> руб.</td>
-											</tr>
-										</tbody>
-									</table>
-								</fieldset>
-								<fieldset class="notEdited" id="additionalSearchDescription">
-									<legend>
-										Особые параметры поиска
-									</legend>
-									<table>
-										<tbody>
-											<tr>
-												<td class="objectDescriptionItemLabel" id="firstTableColumnSpecial">Как собирается проживать:</td>
-												<td class="objectDescriptionBody"><span>семейная пара</span></td>
-											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">Ссылки на страницы сожителей:</td>
-												<td class="objectDescriptionBody"><span><a href="#">http://vk.com/audio</a></span></td>
-											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">Дети:</td>
-												<td class="objectDescriptionBody"><span>С детьми младше 4-х лет</span></td>
-											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">Количество детей и их возраст:</td>
-												<td class="objectDescriptionBody"><span>2 ребенка по 2 и 6 лет</span></td>
-											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">Животные:</td>
-												<td class="objectDescriptionBody"><span>С животным(ми)</span></td>
-											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">Количество животных и их вид:</td>
-												<td class="objectDescriptionBody"><span>1 кошка</span></td>
-											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">Срок аренды:</td>
-												<td class="objectDescriptionBody"><span>долгосрочно</span></td>
-											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">Дополнительные условия поиска:</td>
-												<td class="objectDescriptionBody"><span>Хотелось бы жить рядом с парком: Зеленая роща или 50 лет ВЛКСМ, чтобы можно было по утрам бегать и заниматься спортом. У меня уже несколько олимпийских медалей и я хочу получить еще одну</span></td>
-											</tr>
-										</tbody>
-									</table>
-								</fieldset>
-								<fieldset class="notEdited">
-									<legend>
-										Район
-									</legend>
-									<table>
-										<tbody>
-											<tr>
-												<td class="objectDescriptionItemLabel">Академический</td>
-											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">Юго-Западный</td>
-											</tr>
-											<tr>
-												<td class="objectDescriptionItemLabel">ВИЗ</td>
-											</tr>
-										</tbody>
-									</table>
-								</fieldset>
-							</div>
+                            <div id="notEditingSearchParametersBlock" class="objectDescription">
+                                <fieldset class="notEdited">
+                                    <legend>
+                                        Характеристика объекта
+                                    </legend>
+                                    <table>
+                                        <tbody>
+                                        <tr>
+                                            <td class="objectDescriptionItemLabel">Тип:</td>
+                                            <td class="objectDescriptionBody">
+                                                <span>
+                                                <?php
+                                                    if (isset($rowSearchRequests['typeOfObject']) && $rowSearchRequests['typeOfObject'] != "0") echo $rowSearchRequests['typeOfObject']; else echo "любой";
+                                                ?>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="objectDescriptionItemLabel">Количество комнат:</td>
+                                            <td class="objectDescriptionBody"><span><?php
+                                                if (isset($rowSearchRequests['amountOfRooms']) && count($rowSearchRequests['amountOfRooms']) != "0")
+                                                    for ($i = 0; $i < count($rowSearchRequests['amountOfRooms']); $i++) {
+                                                        echo $rowSearchRequests['amountOfRooms'][$i];
+                                                        if ($i < count($rowSearchRequests['amountOfRooms']) - 1) echo ", ";
+                                                    }
+                                                else echo "любое";
+                                                ?></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="objectDescriptionItemLabel">Комнаты смежные:</td>
+                                            <td class="objectDescriptionBody"><span><?php
+                                                if (isset($rowSearchRequests['adjacentRooms']) && $rowSearchRequests['adjacentRooms'] != "0") echo $rowSearchRequests['adjacentRooms']; else echo "любые";
+                                                ?></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="objectDescriptionItemLabel">Этаж:</td>
+                                            <td class="objectDescriptionBody"><span><?php
+                                                if (isset($rowSearchRequests['floor']) && $rowSearchRequests['floor'] != "0") echo $rowSearchRequests['floor']; else echo "любой";
+                                                ?></span></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </fieldset>
+                                <fieldset class="notEdited">
+                                    <legend>
+                                        Стоимость
+                                    </legend>
+                                    <table>
+                                        <tbody>
+                                        <tr>
+                                            <td class="objectDescriptionItemLabel">Арендная плата в месяц от:</td>
+                                            <td class="objectDescriptionBody"><?php
+                                                if (isset($rowSearchRequests['minCost']) && $rowSearchRequests['minCost'] != "0") echo "<span>" . $rowSearchRequests['minCost'] . "</span> руб."; else echo "любая";
+                                                ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="objectDescriptionItemLabel">Арендная плата в месяц до:</td>
+                                            <td class="objectDescriptionBody"><?php
+                                                if (isset($rowSearchRequests['maxCost']) && $rowSearchRequests['maxCost'] != "0") echo "<span>" . $rowSearchRequests['maxCost'] . "</span> руб."; else echo "любая";
+                                                ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="objectDescriptionItemLabel">Залог до:</td>
+                                            <td class="objectDescriptionBody"><?php
+                                                if (isset($rowSearchRequests['pledge']) && $rowSearchRequests['pledge'] != "0") echo "<span>" . $rowSearchRequests['pledge'] . "</span> руб."; else echo "любой";
+                                                ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="objectDescriptionItemLabel">Максимальная предоплата:</td>
+                                            <td class="objectDescriptionBody"><?php
+                                                if (isset($rowSearchRequests['prepayment']) && $rowSearchRequests['prepayment'] != "0") echo "<span>" . $rowSearchRequests['prepayment'] . "</span>"; else echo "любая";
+                                                ?></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </fieldset>
+                                <fieldset class="notEdited">
+                                    <legend>
+                                        Район
+                                    </legend>
+                                    <table>
+                                        <tbody>
+                                        <?php
+                                        if (isset($rowSearchRequests['district']) && count($rowSearchRequests['district']) != 0) { // Если район указан пользователем
+                                            echo "<tr><td>";
+                                            for ($i = 0; $i < count($rowSearchRequests['district']); $i++) { // Выводим названия всех районов, в которых ищет недвижимость пользователь
+                                                echo $rowSearchRequests['district'][$i];
+                                                if ($i < count($rowSearchRequests['district']) - 1) echo ", ";
+                                            }
+                                            echo  "</td></tr>";
+                                        } else {
+                                            echo "<tr><td>" . "любой" . "</td></tr>";
+                                        }
+                                        ?>
+                                        </tbody>
+                                    </table>
+                                </fieldset>
+                                <div class="clearBoth"></div>
+                                <fieldset class="notEdited">
+                                    <legend>
+                                        Особые параметры поиска
+                                    </legend>
+                                    <table>
+                                        <tbody>
+                                        <tr>
+                                            <td class="objectDescriptionItemLabel">Как собираетесь проживать:</td>
+                                            <td class="objectDescriptionBody"><span><?php
+                                                if (isset($rowSearchRequests['withWho']) && $rowSearchRequests['withWho'] != "0") echo $rowSearchRequests['withWho']; else echo "не указано";
+                                                ?></span></td>
+                                        </tr>
+                                        <?php
+                                        if (isset($rowSearchRequests['withWho']) && $rowSearchRequests['withWho'] != "самостоятельно" && $rowSearchRequests['withWho'] != "0") {
+                                            echo "<tr><td class='objectDescriptionItemLabel'>Информация о сожителях:</td><td class='objectDescriptionBody''><span>";
+                                            if (isset($rowSearchRequests['linksToFriends'])) echo $rowSearchRequests['linksToFriends'];
+                                            echo "</span></td></tr>";
+                                        }
+                                        ?>
+                                        <tr>
+                                            <td class="objectDescriptionItemLabel">Дети:</td>
+                                            <td class="objectDescriptionBody"><span><?php
+                                                if (isset($rowSearchRequests['children']) && $rowSearchRequests['children'] != "0") echo $rowSearchRequests['children']; else echo "не указано";
+                                                ?></span></td>
+                                        </tr>
+                                        <?php
+                                        if (isset($rowSearchRequests['children']) && $rowSearchRequests['children'] != "без детей" && $rowSearchRequests['children'] != "0") {
+                                            echo "<tr><td class='objectDescriptionItemLabel'>Количество детей и их возраст:</td><td class='objectDescriptionBody''><span>";
+                                            if (isset($rowSearchRequests['howManyChildren'])) echo $rowSearchRequests['howManyChildren'];
+                                            echo "</span></td></tr>";
+                                        }
+                                        ?>
+                                        <tr>
+                                            <td class="objectDescriptionItemLabel">Животные:</td>
+                                            <td class="objectDescriptionBody"><span><?php
+                                                if (isset($rowSearchRequests['animals']) && $rowSearchRequests['animals'] != "0") echo $rowSearchRequests['animals']; else echo "не указано";
+                                                ?></span></td>
+                                        </tr>
+                                        <?php
+                                        if (isset($rowSearchRequests['animals']) && $rowSearchRequests['animals'] != "без животных" && $rowSearchRequests['animals'] != "0") {
+                                            echo "<tr><td class='objectDescriptionItemLabel'>Количество животных и их вид:</td><td class='objectDescriptionBody''><span>";
+                                            if (isset($rowSearchRequests['howManyAnimals'])) echo $rowSearchRequests['howManyAnimals'];
+                                            echo "</span></td></tr>";
+                                        }
+                                        ?>
+                                        <tr>
+                                            <td class="objectDescriptionItemLabel">Срок аренды:</td>
+                                            <td class="objectDescriptionBody"><span><?php
+                                                if (isset($rowSearchRequests['termOfLease']) && $rowSearchRequests['termOfLease'] != "0") echo $rowSearchRequests['termOfLease']; else echo "не указан";
+                                                ?></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="objectDescriptionItemLabel">Дополнительные условия поиска:</td>
+                                            <td class="objectDescriptionBody"><span><?php
+                                                if (isset($rowSearchRequests['additionalDescriptionOfSearch'])) echo $rowSearchRequests['additionalDescriptionOfSearch'];
+                                                ?></span></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </fieldset>
+                            </div>
+                            <?php endif;?>
 						</div><!-- /end.tabs-2 -->
-						<div id="tabs-3">
-							<div class="news advertForPersonalPage published">
-								<div class="newsHeader">
-									<span class="advertHeaderAddress">Квартира по улице Кирова 15, №3</span>
-								</div>
-								<div class="fotosWrapper">
-									<div class="middleFotoWrapper">
-										<img class="middleFoto" src="">
-									</div>
-								</div>
-								<ul class="setOfInstructions">
-									<li>
-										<a href="#">подробнее</a>
-									</li>
-								</ul>
-								<ul class="listDescription">
-									<li>
-										<span class="headOfString">Тип:</span> Квартира
-									</li>
-									<li>
-										<span class="headOfString">Плата за аренду:</span> 15000 + коммунальные услуги от 1500 до 2500 руб.
-									</li>
-									<li>
-										<span class="headOfString">Единовременная комиссия:</span>
-										<a href="#"> 3000 руб. (40%) собственнику</a>
-									</li>
-									<li>
-										<span class="headOfString">Адрес:</span>
-										улица Посадская 51
-									</li>
-									<li>
-										<span class="headOfString">Количество комнат:</span>
-										2, смежные
-									</li>
-									<li>
-										<span class="headOfString">Площадь (жилая/общая):</span>
-										22.4/34 м²
-									</li>
-									<li>
-										<span class="headOfString">Этаж:</span>
-										3 из 10
-									</li>
-									<li>
-										<span class="headOfString">Срок сдачи:</span>
-										долгосрочно
-									</li>
-									<li>
-										<span class="headOfString">Мебель:</span>
-										есть
-									</li>
-									<li>
-										<span class="headOfString">Район:</span>
-										Центр
-									</li>
-									<li>
-										<span class="headOfString">Телефон собственника:</span>
-										89221431615, <a href="#">Алексей Иванович</a>
-									</li>
-								</ul>
-								<div class="clearBoth"></div>
-							</div>
-						</div><!-- /end.tabs-3 -->
 					</div>
 				</div>
 			</div><!-- /end.page_main_content -->
-
 			<!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
 			<div class="page-buffer"></div>
 		</div><!-- /end.page_without_footer -->
@@ -321,16 +492,7 @@
 		</div><!-- /end.footer -->
 
 		<!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
-
-		<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-
-		<!-- jQuery UI с моей темой оформления -->
-		<script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
-
-		<!-- scripts concatenated and minified via build script -->
 		<script src="js/main.js"></script>
-
 		<!-- end scripts -->
 
 		<!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.

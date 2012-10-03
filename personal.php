@@ -236,6 +236,10 @@ if (isset($_POST['saveSearchParametersButton'])) {
         $amountOfRoomsSerialized = serialize($amountOfRooms);
         $districtSerialized = serialize($district);
 
+        // Готовим пустой массив с идентификаторами объектов, которыми заинтересовался пользователь. Нужны только, если пользователь сформировал новый поисковый запрос, а не отредактировал уже имеющийся
+        $interestingPropertysId = array();
+        $interestingPropertysId = serialize($interestingPropertysId);
+
         if ($typeTenant == "true") {
             $rez = mysql_query("UPDATE searchrequests SET
             typeOfObject='" . $typeOfObject ."',
@@ -275,7 +279,8 @@ if (isset($_POST['saveSearchParametersButton'])) {
             animals='" . $animals ."',
             howManyAnimals='" . $howManyAnimals ."',
             termOfLease='" . $termOfLease ."',
-            additionalDescriptionOfSearch='" . $additionalDescriptionOfSearch ."'");
+            additionalDescriptionOfSearch='" . $additionalDescriptionOfSearch ."',
+            interestingPropertysId='" . $interestingPropertysId ."'");
         }
 
         $rez = mysql_query("UPDATE users SET typeTenant='true' WHERE login = '" . $login . "'");

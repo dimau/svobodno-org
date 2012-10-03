@@ -86,7 +86,8 @@ $rez = mysql_query("CREATE TABLE searchRequests (
         animals VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
         howManyAnimals TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
         termOfLease VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
-        additionalDescriptionOfSearch TEXT CHARACTER SET utf8 COLLATE utf8_general_ci
+        additionalDescriptionOfSearch TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+        interestingPropertysId BLOB COMMENT 'Список id объектов недвижимости, которыми заинтересовался пользователь в ходе поиска жилья. К просмотру анкет собственников данных объектов недвижимости пользователь имеет доступ в качестве потенциального арендатора'
 )");
 
 echo "Статус создания таблицы searchRequests: " . $rez . "\n";
@@ -159,7 +160,8 @@ $rez = mysql_query("CREATE TABLE property (
         comment TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Свободный комментарий собственника',
         last_act INT(11) COMMENT 'Время последнего изменения объявления - будь-то время создания или время последнего редактирования. Используется для сортировки объявлений в разделе Мои объявления личного кабинета',
         reg_date INT(11) COMMENT 'Время создания объявления',
-        status VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не опубликовано' COMMENT 'Статус объявления: опубликовано или неопубликовано. Сразу после создания объявление становится неопубликованным'
+        status VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не опубликовано' COMMENT 'Статус объявления: опубликовано или неопубликовано. Сразу после создания объявление становится неопубликованным',
+        visibleUsersId BLOB COMMENT 'Список id пользователей, которые заинтересовались данным объектом недвижимости при его текущей публикации. После того, как объявление снято с публикации, данный список сохраняется лишь в течение некоторого срока (что-то около 10 дней), после чего его восстановить уже нельзя'
 )");
 
 echo "Статус создания таблицы property: " . $rez . "\n";

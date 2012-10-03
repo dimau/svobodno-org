@@ -7,8 +7,8 @@ include_once 'connect.php'; //подключаемся к БД
 
 // Создаем пользователей
 $rez = mysql_query("INSERT INTO users (id, typeTenant, typeOwner, name, secondName, surname, sex, nationality, birthday, login, password, telephon, emailReg, email, currentStatusEducation, almamater, speciality, kurs, ochnoZaochno, yearOfEnd, notWorkCheckbox, placeOfWork, workPosition, regionOfBorn, cityOfBorn, shortlyAboutMe, vkontakte, odnoklassniki, facebook, twitter, lic, user_hash, last_act, reg_date) VALUES
-(1, 'false', 'true', 'Ольга', 'Леонидовна', 'Андреева', 'женский', 'немка', '1992-08-16', 'owner', 'owner', '9831541618', '', '', '0', '', '', '', '0', '', '', '', '', '', '', '', '', '', '', '', 'yes', '84fae0ea32a834378531e9b0e7c63e11', 1348563523, 1348563523),
-(2, 'true', 'false', 'Максим', 'Леонидович', 'Андреев', 'мужской', 'русский', '1987-01-27', 'tenant', 'tenant', '9221431615', 'dimau777@gmail.com', 'maxim@ya.ru', 'закончил', 'УГТУ-УПИ', 'Менеджмент в спорте', '', 'очно', '2011', '', 'Банк ПромИмпериал', 'менеджер проектов', 'Свердловская область', 'Екатеринбург', 'Немного люблю спорт, бегаю по утрам.', 'http://vk.com/maxim', '', '', '', 'yes', '9c9cdf2a467b90d5d5f8135af3543882', 1348590806, 1348590806)
+(1, 'false', 'true', 'Ирина', 'Леонидовна', 'Пупкина', 'женский', 'немка', '1992-08-16', 'owner', 'owner', '9831541618', '', '', '0', '', '', '', '0', '', '', '', '', '', '', '', '', '', '', '', 'yes', '84fae0ea32a834378531e9b0e7c63e11', 1348563523, 1348563523),
+(2, 'true', 'false', 'Андрей', 'Евстигнеевич', 'Комаров', 'мужской', 'русский', '1987-01-27', 'tenant', 'tenant', '9221431615', 'dimau777@gmail.com', 'maxim@ya.ru', 'закончил', 'УГТУ-УПИ', 'Менеджмент в спорте', '', 'очно', '2011', '', 'Банк ПромИмпериал', 'менеджер проектов', 'Свердловская область', 'Екатеринбург', 'Немного люблю спорт, бегаю по утрам.', 'http://vk.com/maxim', '', '', '', 'yes', '9c9cdf2a467b90d5d5f8135af3543882', 1348590806, 1348590806)
 ");
 
 echo "Статус регистрации пользователей: " . $rez . "\n";

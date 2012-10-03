@@ -179,9 +179,14 @@ if (isset($_POST['readyButton'])) {
             // Преобразование формата инфы об искомом кол-ве комнат и районах, так как MySQL не умеет хранить массивы
             $amountOfRoomsSerialized = serialize($amountOfRooms);
             $districtSerialized = serialize($district);
+
+            // Готовим пустой массив с идентификаторами объектов, которыми заинтересовался пользователь - на будущее
+            $interestingPropertysId = array();
+            $interestingPropertysId = serialize($interestingPropertysId);
+
             // Непосредственное сохранение данных о поисковом запросе
             if ($typeTenant == "true") {
-                $rez = mysql_query("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch) VALUES ('" . $rowId['id'] . "','" . $typeOfObject . "','" . $amountOfRoomsSerialized . "','" . $adjacentRooms . "','" . $floor . "','" . $minCost . "','" . $maxCost . "','" . $pledge . "','" . $prepayment . "','" . $districtSerialized . "','" . $withWho . "','" . $linksToFriends . "','" . $children . "','" . $howManyChildren . "','" . $animals . "','" . $howManyAnimals . "','" . $termOfLease . "','" . $additionalDescriptionOfSearch . "')"); // Поисковый запрос пользователя сохраняется в специальной таблице
+                $rez = mysql_query("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, interestingPropertysId) VALUES ('" . $rowId['id'] . "','" . $typeOfObject . "','" . $amountOfRoomsSerialized . "','" . $adjacentRooms . "','" . $floor . "','" . $minCost . "','" . $maxCost . "','" . $pledge . "','" . $prepayment . "','" . $districtSerialized . "','" . $withWho . "','" . $linksToFriends . "','" . $children . "','" . $howManyChildren . "','" . $animals . "','" . $howManyAnimals . "','" . $termOfLease . "','" . $additionalDescriptionOfSearch . "','" . $interestingPropertysId . "')"); // Поисковый запрос пользователя сохраняется в специальной таблице
             }
 
 
@@ -341,8 +346,17 @@ include("header.php");
                 <div class="required">
                     *
                 </div>
+                <span class="searchItemLabel">Фамилия: </span>
+                <div class="searchItemBody">
+                    <input name="surname" type="text" size="33"
+                           validations="validate[required]" <?php echo "value='$surname'";?>>
+                </div>
+            </div>
+            <div class="searchItem">
+                <div class="required">
+                    *
+                </div>
                 <span class="searchItemLabel">Имя: </span>
-
                 <div class="searchItemBody">
                     <input name="name" type="text" size="38" autofocus
                            validations="validate[required]" <?php echo "value='$name'";?>>
@@ -353,20 +367,9 @@ include("header.php");
                     *
                 </div>
                 <span class="searchItemLabel">Отчество: </span>
-
                 <div class="searchItemBody">
                     <input name="secondName" type="text" size="33"
                            validations="validate[required]" <?php echo "value='$secondName'";?>>
-                </div>
-            </div>
-            <div class="searchItem">
-                <div class="required">
-                    *
-                </div>
-                <span class="searchItemLabel">Фамилия: </span>
-                <div class="searchItemBody">
-                    <input name="surname" type="text" size="33"
-                           validations="validate[required]" <?php echo "value='$surname'";?>>
                 </div>
             </div>
             <div class="searchItem">
