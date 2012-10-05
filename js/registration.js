@@ -1,30 +1,30 @@
 // Вставляем календарь для выбора дня рождения
-$(function() {
-    $( "#datepicker" ).datepicker({
-        changeMonth: true,
-        changeYear: true,
-        minDate: new Date(1900, 0, 1),
-        maxDate: new Date(2004, 11, 31),
-        defaultDate: new Date(1987, 0, 27),
-        yearRange: "1900:2004",
+$(function () {
+    $("#datepicker").datepicker({
+        changeMonth:true,
+        changeYear:true,
+        minDate:new Date(1900, 0, 1),
+        maxDate:new Date(2004, 11, 31),
+        defaultDate:new Date(1987, 0, 27),
+        yearRange:"1900:2004",
     });
-    $( "#datepicker" ).datepicker($.datepicker.regional["ru"]);
+    $("#datepicker").datepicker($.datepicker.regional["ru"]);
 
 });
 
 // Подготовим возможность загрузки фотографий
-function createUploader(){
+function createUploader() {
     var uploader = new qq.FileUploader({
-        element: document.getElementById('file-uploader'),
-        action: '../lib/uploader.php',
-        allowedExtensions: ["jpeg", "jpg", "img", "bmp", "png", "gif"], //Также расширения нужно менять в файле uploader.php
-        sizeLimit: 10 * 1024 * 1024,
-        debug: false,
+        element:document.getElementById('file-uploader'),
+        action:'../lib/uploader.php',
+        allowedExtensions:["jpeg", "jpg", "img", "bmp", "png", "gif"], //Также расширения нужно менять в файле uploader.php
+        sizeLimit:10 * 1024 * 1024,
+        debug:false,
         // О каждом загруженном файле информацию передаем на сервер через переменные - для сохранения в БД
-        onSubmit: function(id, fileName){
+        onSubmit:function (id, fileName) {
             uploader.setParams({
-                fileuploadid: $("#fileUploadId").val(),
-                sourcefilename: fileName,
+                fileuploadid:$("#fileUploadId").val(),
+                sourcefilename:fileName,
             });
         },
         //extraDropzones: [qq.getByClass(document, 'qq-upload-extra-drop-area')[0]]
@@ -33,7 +33,7 @@ function createUploader(){
     // Важно, что в конце файла uploader.php располагается функция handleUpload, в которой есть и мой код, работающий на сервере при получении файла
 
     // Сформируем зеленые блоки для уже загруженных фотографий руками, чтобы пользователя не путать
-    var rezult = {success: true};
+    var rezult = {success:true};
     var uploadedFoto = document.getElementsByClassName('uploadedFoto');
     for (var i = 0; i < uploadedFoto.length; i++) {
         var uploadedFotoName = $(uploadedFoto[i]).attr('filename');
@@ -43,8 +43,8 @@ function createUploader(){
         uploader._onComplete(i + 100, uploadedFotoName, rezult);
     }
 
-   // Чтобы обмануть загрузчик файлов и он не выдавал при отправке страницы сообщение о том, что мол есть еще не загруженные фотографии, ориентируясь на сформированные вручную зеленые блоки
-   uploader._filesInProgress = 0;
+    // Чтобы обмануть загрузчик файлов и он не выдавал при отправке страницы сообщение о том, что мол есть еще не загруженные фотографии, ориентируясь на сформированные вручную зеленые блоки
+    uploader._filesInProgress = 0;
 }
 $(document).ready(createUploader);
 
@@ -193,7 +193,7 @@ if (document.getElementById("tabs-4")) {
 
 // Отображение результатов обработки формы на PHP
 if ($('#userMistakesBlock ol').html() != "") {
-    $('#userMistakesBlock').on('click', function() {
+    $('#userMistakesBlock').on('click', function () {
         $(this).slideUp(800);
     });
     $('#userMistakesBlock').css('display', 'block');
@@ -201,13 +201,13 @@ if ($('#userMistakesBlock ol').html() != "") {
 
 
 // Подключение и настройка динамической проверки формы на JS
-$('#tabs').bind('tabsshow', function(event, ui) {
+$('#tabs').bind('tabsshow', function (event, ui) {
     newTabId = ui.panel.id; // Определяем идентификатор вновь открытой вкладки
     $(".formError." + newTabId).css("display", ""); // Показываем все ошибки к полям на этой вкладке
     $(".formError").not("." + newTabId).css('display', "none"); // Скрываем все ошибки полей на других вкладках
 
     // Перепозиционируем подсказки по валидации при открытии вкладки - это важно при проверке формы перед отправкой, когда появляются все подсказки на всех вкладках (даже невидимых)
-    $(".formError." + newTabId).each(function() {
+    $(".formError." + newTabId).each(function () {
         var validatedElemName = $(this).attr("class").split(" ")[1];
         var validatedElem = document.body.querySelector("[name=" + validatedElemName + "]");
         rePosition(validatedElem, this);
@@ -225,7 +225,7 @@ function rePosition(caller, divFormError) { // Соответствует дей
     callerTopPosition = callerTopPosition - inputHeight - 10;
 
     $(divFormError).css({
-        top: callerTopPosition,
-        left: callerleftPosition,
+        top:callerTopPosition,
+        left:callerleftPosition,
     });
 }

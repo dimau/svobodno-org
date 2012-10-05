@@ -1,278 +1,277 @@
 <?php
-include_once 'lib/connect.php'; //подключаемся к БД
-include_once 'lib/function_global.php'; //подключаем файл с глобальными функциями
+    include_once 'lib/connect.php'; //подключаемся к БД
+    include_once 'lib/function_global.php'; //подключаем файл с глобальными функциями
 
-/*************************************************************************************
- * Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
- ************************************************************************************/
-$userId = login();
-if (!$userId) {
-    header('Location: login.php');
-}
+    /*************************************************************************************
+     * Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
+     ************************************************************************************/
+    $userId = login();
+    if (!$userId) {
+        header('Location: login.php');
+    }
 
-/*************************************************************************************
- * Присваиваем всем переменным значения по умолчанию
- ************************************************************************************/
-$typeOfObject = "0";
-$dateOfEntry = "";
-$termOfLease = "0";
-$dateOfCheckOut = "";
-$amountOfRooms = "0";
-$adjacentRooms = "0";
-$amountOfAdjacentRooms = "0";
-$typeOfBathrooms = "0";
-$typeOfBalcony = "0";
-$balconyGlazed = "0";
-$roomSpace = "";
-$totalArea = "";
-$livingSpace = "";
-$kitchenSpace = "";
-$floor = "";
-$totalAmountFloor = "";
-$numberOfFloor = "";
-$concierge = "0";
-$intercom = "0";
-$parking = "0";
-$city = "Екатеринбург";
-$district = "0";
-$coordX = "";
-$coordY = "";
-$address = "";
-$apartmentNumber = "";
-$subwayStation = "0";
-$distanceToMetroStation = "";
-$currency = "0";
-$costOfRenting = "";
-$utilities = "0";
-$costInSummer = "";
-$costInWinter = "";
-$electricPower = "0";
-$bail = "0";
-$bailCost = "";
-$prepayment = "0";
-$compensationMoney = "";
-$compensationPercent = "";
-$repair = "0";
-$furnish = "0";
-$windows = "0";
-$internet = "0";
-$telephoneLine = "0";
-$cableTV = "0";
-$furnitureInLivingArea = array();
-$furnitureInLivingAreaExtra = "";
-$furnitureInKitchen = array();
-$furnitureInKitchenExtra = "";
-$appliances = array();
-$appliancesExtra = "";
-$sexOfTenant = array();
-$relations = array();
-$children = "0";
-$animals = "0";
-$contactTelephonNumber = "";
-$timeForRingBegin = "0";
-$timeForRingEnd = "0";
-$checking = "0";
-$responsibility = "";
-$comment = "";
-$fileUploadId = generateCode(7);
+    /*************************************************************************************
+     * Присваиваем всем переменным значения по умолчанию
+     ************************************************************************************/
+    $typeOfObject = "0";
+    $dateOfEntry = "";
+    $termOfLease = "0";
+    $dateOfCheckOut = "";
+    $amountOfRooms = "0";
+    $adjacentRooms = "0";
+    $amountOfAdjacentRooms = "0";
+    $typeOfBathrooms = "0";
+    $typeOfBalcony = "0";
+    $balconyGlazed = "0";
+    $roomSpace = "";
+    $totalArea = "";
+    $livingSpace = "";
+    $kitchenSpace = "";
+    $floor = "";
+    $totalAmountFloor = "";
+    $numberOfFloor = "";
+    $concierge = "0";
+    $intercom = "0";
+    $parking = "0";
+    $city = "Екатеринбург";
+    $district = "0";
+    $coordX = "";
+    $coordY = "";
+    $address = "";
+    $apartmentNumber = "";
+    $subwayStation = "0";
+    $distanceToMetroStation = "";
+    $currency = "0";
+    $costOfRenting = "";
+    $utilities = "0";
+    $costInSummer = "";
+    $costInWinter = "";
+    $electricPower = "0";
+    $bail = "0";
+    $bailCost = "";
+    $prepayment = "0";
+    $compensationMoney = "";
+    $compensationPercent = "";
+    $repair = "0";
+    $furnish = "0";
+    $windows = "0";
+    $internet = "0";
+    $telephoneLine = "0";
+    $cableTV = "0";
+    $furnitureInLivingArea = array();
+    $furnitureInLivingAreaExtra = "";
+    $furnitureInKitchen = array();
+    $furnitureInKitchenExtra = "";
+    $appliances = array();
+    $appliancesExtra = "";
+    $sexOfTenant = array();
+    $relations = array();
+    $children = "0";
+    $animals = "0";
+    $contactTelephonNumber = "";
+    $timeForRingBegin = "0";
+    $timeForRingEnd = "0";
+    $checking = "0";
+    $responsibility = "";
+    $comment = "";
+    $fileUploadId = generateCode(7);
 
-// Готовим массив со списком районов в городе пользователя
-$allDistrictsInCity = array();
-$rezDistricts = mysql_query("SELECT name FROM districts WHERE city = '" . "Екатеринбург" . "' ORDER BY name ASC");
-for ($i = 0; $i < mysql_num_rows($rezDistricts); $i++) {
-    $rowDistricts = mysql_fetch_assoc($rezDistricts);
-    $allDistrictsInCity[] = $rowDistricts['name'];
-}
+    // Готовим массив со списком районов в городе пользователя
+    $allDistrictsInCity = array();
+    $rezDistricts = mysql_query("SELECT name FROM districts WHERE city = '" . "Екатеринбург" . "' ORDER BY name ASC");
+    for ($i = 0; $i < mysql_num_rows($rezDistricts); $i++) {
+        $rowDistricts = mysql_fetch_assoc($rezDistricts);
+        $allDistrictsInCity[] = $rowDistricts['name'];
+    }
 
-// Если была нажата кнопка Сохранить, проверим данные на корректность и, если данные введены и введены правильно, добавим запись с новым объектом недвижмости в БД
-if (isset($_POST['saveAdvertButton'])) {
+    // Если была нажата кнопка Сохранить, проверим данные на корректность и, если данные введены и введены правильно, добавим запись с новым объектом недвижмости в БД
+    if (isset($_POST['saveAdvertButton'])) {
 
-    // Формируем набор переменных для сохранения в базу данных, либо для возвращения вместе с формой при их некорректности
-    if (isset($_POST['typeOfObject'])) $typeOfObject = htmlspecialchars($_POST['typeOfObject']);
-    if (isset($_POST['dateOfEntry'])) $dateOfEntry = htmlspecialchars($_POST['dateOfEntry']);
-    if (isset($_POST['termOfLease'])) $termOfLease = htmlspecialchars($_POST['termOfLease']);
-    if (isset($_POST['dateOfCheckOut'])) $dateOfCheckOut = htmlspecialchars($_POST['dateOfCheckOut']);
-    if (isset($_POST['amountOfRooms'])) $amountOfRooms = htmlspecialchars($_POST['amountOfRooms']);
-    if (isset($_POST['adjacentRooms'])) $adjacentRooms = htmlspecialchars($_POST['adjacentRooms']);
-    if (isset($_POST['amountOfAdjacentRooms'])) $amountOfAdjacentRooms = htmlspecialchars($_POST['amountOfAdjacentRooms']);
-    if (isset($_POST['typeOfBathrooms'])) $typeOfBathrooms = htmlspecialchars($_POST['typeOfBathrooms']);
-    if (isset($_POST['typeOfBalcony'])) $typeOfBalcony = htmlspecialchars($_POST['typeOfBalcony']);
-    if (isset($_POST['balconyGlazed'])) $balconyGlazed = htmlspecialchars($_POST['balconyGlazed']);
-    if (isset($_POST['roomSpace'])) $roomSpace = htmlspecialchars($_POST['roomSpace']);
-    if (isset($_POST['totalArea'])) $totalArea = htmlspecialchars($_POST['totalArea']);
-    if (isset($_POST['livingSpace'])) $livingSpace = htmlspecialchars($_POST['livingSpace']);
-    if (isset($_POST['kitchenSpace'])) $kitchenSpace = htmlspecialchars($_POST['kitchenSpace']);
-    if (isset($_POST['floor'])) $floor = htmlspecialchars($_POST['floor']);
-    if (isset($_POST['totalAmountFloor'])) $totalAmountFloor = htmlspecialchars($_POST['totalAmountFloor']);
-    if (isset($_POST['numberOfFloor'])) $numberOfFloor = htmlspecialchars($_POST['numberOfFloor']);
-    if (isset($_POST['concierge'])) $concierge = htmlspecialchars($_POST['concierge']);
-    if (isset($_POST['intercom'])) $intercom = htmlspecialchars($_POST['intercom']);
-    if (isset($_POST['parking'])) $parking = htmlspecialchars($_POST['parking']);
-    if (isset($_POST['district'])) $district = htmlspecialchars($_POST['district']);
-    if (isset($_POST['coordX'])) $coordX = htmlspecialchars($_POST['coordX']);
-    if (isset($_POST['coordY'])) $coordY = htmlspecialchars($_POST['coordY']);
-    if (isset($_POST['address'])) $address = htmlspecialchars($_POST['address']);
-    if (isset($_POST['apartmentNumber'])) $apartmentNumber = htmlspecialchars($_POST['apartmentNumber']);
-    if (isset($_POST['subwayStation'])) $subwayStation = htmlspecialchars($_POST['subwayStation']);
-    if (isset($_POST['distanceToMetroStation'])) $distanceToMetroStation = htmlspecialchars($_POST['distanceToMetroStation']);
-    if (isset($_POST['currency'])) $currency = htmlspecialchars($_POST['currency']);
-    if (isset($_POST['costOfRenting'])) $costOfRenting = htmlspecialchars($_POST['costOfRenting']);
-    if (isset($_POST['utilities'])) $utilities = htmlspecialchars($_POST['utilities']);
-    if (isset($_POST['costInSummer'])) $costInSummer = htmlspecialchars($_POST['costInSummer']);
-    if (isset($_POST['costInWinter'])) $costInWinter = htmlspecialchars($_POST['costInWinter']);
-    if (isset($_POST['electricPower'])) $electricPower = htmlspecialchars($_POST['electricPower']);
-    if (isset($_POST['bail'])) $bail = htmlspecialchars($_POST['bail']);
-    if (isset($_POST['bailCost'])) $bailCost = htmlspecialchars($_POST['bailCost']);
-    if (isset($_POST['prepayment'])) $prepayment = htmlspecialchars($_POST['prepayment']);
-    if (isset($_POST['compensationMoney'])) $compensationMoney = htmlspecialchars($_POST['compensationMoney']);
-    if (isset($_POST['compensationPercent'])) $compensationPercent = htmlspecialchars($_POST['compensationPercent']);
-    if (isset($_POST['repair'])) $repair = htmlspecialchars($_POST['repair']);
-    if (isset($_POST['furnish'])) $furnish = htmlspecialchars($_POST['furnish']);
-    if (isset($_POST['windows'])) $windows = htmlspecialchars($_POST['windows']);
-    if (isset($_POST['internet'])) $internet = htmlspecialchars($_POST['internet']);
-    if (isset($_POST['telephoneLine'])) $telephoneLine = htmlspecialchars($_POST['telephoneLine']);
-    if (isset($_POST['cableTV'])) $cableTV = htmlspecialchars($_POST['cableTV']);
-    if (isset($_POST['furnitureInLivingArea'])) $furnitureInLivingArea = $_POST['furnitureInLivingArea'];
-    if (isset($_POST['furnitureInLivingAreaExtra'])) $furnitureInLivingAreaExtra = htmlspecialchars($_POST['furnitureInLivingAreaExtra']);
-    if (isset($_POST['furnitureInKitchen'])) $furnitureInKitchen = $_POST['furnitureInKitchen'];
-    if (isset($_POST['furnitureInKitchenExtra'])) $furnitureInKitchenExtra = htmlspecialchars($_POST['furnitureInKitchenExtra']);
-    if (isset($_POST['appliances'])) $appliances = $_POST['appliances'];
-    if (isset($_POST['appliancesExtra'])) $appliancesExtra = htmlspecialchars($_POST['appliancesExtra']);
-    if (isset($_POST['sexOfTenant'])) $sexOfTenant = $_POST['sexOfTenant'];
-    if (isset($_POST['relations'])) $relations = $_POST['relations'];
-    if (isset($_POST['children'])) $children = htmlspecialchars($_POST['children']);
-    if (isset($_POST['animals'])) $animals = htmlspecialchars($_POST['animals']);
-    if (isset($_POST['contactTelephonNumber'])) $contactTelephonNumber = htmlspecialchars($_POST['contactTelephonNumber']);
-    if (isset($_POST['timeForRingBegin'])) $timeForRingBegin = htmlspecialchars($_POST['timeForRingBegin']);
-    if (isset($_POST['timeForRingEnd'])) $timeForRingEnd = htmlspecialchars($_POST['timeForRingEnd']);
-    if (isset($_POST['checking'])) $checking = htmlspecialchars($_POST['checking']);
-    if (isset($_POST['responsibility'])) $responsibility = htmlspecialchars($_POST['responsibility']);
-    if (isset($_POST['comment'])) $comment = htmlspecialchars($_POST['comment']);
-    $fileUploadId = $_POST['fileUploadId'];
+        // Формируем набор переменных для сохранения в базу данных, либо для возвращения вместе с формой при их некорректности
+        if (isset($_POST['typeOfObject'])) $typeOfObject = htmlspecialchars($_POST['typeOfObject']);
+        if (isset($_POST['dateOfEntry'])) $dateOfEntry = htmlspecialchars($_POST['dateOfEntry']);
+        if (isset($_POST['termOfLease'])) $termOfLease = htmlspecialchars($_POST['termOfLease']);
+        if (isset($_POST['dateOfCheckOut'])) $dateOfCheckOut = htmlspecialchars($_POST['dateOfCheckOut']);
+        if (isset($_POST['amountOfRooms'])) $amountOfRooms = htmlspecialchars($_POST['amountOfRooms']);
+        if (isset($_POST['adjacentRooms'])) $adjacentRooms = htmlspecialchars($_POST['adjacentRooms']);
+        if (isset($_POST['amountOfAdjacentRooms'])) $amountOfAdjacentRooms = htmlspecialchars($_POST['amountOfAdjacentRooms']);
+        if (isset($_POST['typeOfBathrooms'])) $typeOfBathrooms = htmlspecialchars($_POST['typeOfBathrooms']);
+        if (isset($_POST['typeOfBalcony'])) $typeOfBalcony = htmlspecialchars($_POST['typeOfBalcony']);
+        if (isset($_POST['balconyGlazed'])) $balconyGlazed = htmlspecialchars($_POST['balconyGlazed']);
+        if (isset($_POST['roomSpace'])) $roomSpace = htmlspecialchars($_POST['roomSpace']);
+        if (isset($_POST['totalArea'])) $totalArea = htmlspecialchars($_POST['totalArea']);
+        if (isset($_POST['livingSpace'])) $livingSpace = htmlspecialchars($_POST['livingSpace']);
+        if (isset($_POST['kitchenSpace'])) $kitchenSpace = htmlspecialchars($_POST['kitchenSpace']);
+        if (isset($_POST['floor'])) $floor = htmlspecialchars($_POST['floor']);
+        if (isset($_POST['totalAmountFloor'])) $totalAmountFloor = htmlspecialchars($_POST['totalAmountFloor']);
+        if (isset($_POST['numberOfFloor'])) $numberOfFloor = htmlspecialchars($_POST['numberOfFloor']);
+        if (isset($_POST['concierge'])) $concierge = htmlspecialchars($_POST['concierge']);
+        if (isset($_POST['intercom'])) $intercom = htmlspecialchars($_POST['intercom']);
+        if (isset($_POST['parking'])) $parking = htmlspecialchars($_POST['parking']);
+        if (isset($_POST['district'])) $district = htmlspecialchars($_POST['district']);
+        if (isset($_POST['coordX'])) $coordX = htmlspecialchars($_POST['coordX']);
+        if (isset($_POST['coordY'])) $coordY = htmlspecialchars($_POST['coordY']);
+        if (isset($_POST['address'])) $address = htmlspecialchars($_POST['address']);
+        if (isset($_POST['apartmentNumber'])) $apartmentNumber = htmlspecialchars($_POST['apartmentNumber']);
+        if (isset($_POST['subwayStation'])) $subwayStation = htmlspecialchars($_POST['subwayStation']);
+        if (isset($_POST['distanceToMetroStation'])) $distanceToMetroStation = htmlspecialchars($_POST['distanceToMetroStation']);
+        if (isset($_POST['currency'])) $currency = htmlspecialchars($_POST['currency']);
+        if (isset($_POST['costOfRenting'])) $costOfRenting = htmlspecialchars($_POST['costOfRenting']);
+        if (isset($_POST['utilities'])) $utilities = htmlspecialchars($_POST['utilities']);
+        if (isset($_POST['costInSummer'])) $costInSummer = htmlspecialchars($_POST['costInSummer']);
+        if (isset($_POST['costInWinter'])) $costInWinter = htmlspecialchars($_POST['costInWinter']);
+        if (isset($_POST['electricPower'])) $electricPower = htmlspecialchars($_POST['electricPower']);
+        if (isset($_POST['bail'])) $bail = htmlspecialchars($_POST['bail']);
+        if (isset($_POST['bailCost'])) $bailCost = htmlspecialchars($_POST['bailCost']);
+        if (isset($_POST['prepayment'])) $prepayment = htmlspecialchars($_POST['prepayment']);
+        if (isset($_POST['compensationMoney'])) $compensationMoney = htmlspecialchars($_POST['compensationMoney']);
+        if (isset($_POST['compensationPercent'])) $compensationPercent = htmlspecialchars($_POST['compensationPercent']);
+        if (isset($_POST['repair'])) $repair = htmlspecialchars($_POST['repair']);
+        if (isset($_POST['furnish'])) $furnish = htmlspecialchars($_POST['furnish']);
+        if (isset($_POST['windows'])) $windows = htmlspecialchars($_POST['windows']);
+        if (isset($_POST['internet'])) $internet = htmlspecialchars($_POST['internet']);
+        if (isset($_POST['telephoneLine'])) $telephoneLine = htmlspecialchars($_POST['telephoneLine']);
+        if (isset($_POST['cableTV'])) $cableTV = htmlspecialchars($_POST['cableTV']);
+        if (isset($_POST['furnitureInLivingArea'])) $furnitureInLivingArea = $_POST['furnitureInLivingArea'];
+        if (isset($_POST['furnitureInLivingAreaExtra'])) $furnitureInLivingAreaExtra = htmlspecialchars($_POST['furnitureInLivingAreaExtra']);
+        if (isset($_POST['furnitureInKitchen'])) $furnitureInKitchen = $_POST['furnitureInKitchen'];
+        if (isset($_POST['furnitureInKitchenExtra'])) $furnitureInKitchenExtra = htmlspecialchars($_POST['furnitureInKitchenExtra']);
+        if (isset($_POST['appliances'])) $appliances = $_POST['appliances'];
+        if (isset($_POST['appliancesExtra'])) $appliancesExtra = htmlspecialchars($_POST['appliancesExtra']);
+        if (isset($_POST['sexOfTenant'])) $sexOfTenant = $_POST['sexOfTenant'];
+        if (isset($_POST['relations'])) $relations = $_POST['relations'];
+        if (isset($_POST['children'])) $children = htmlspecialchars($_POST['children']);
+        if (isset($_POST['animals'])) $animals = htmlspecialchars($_POST['animals']);
+        if (isset($_POST['contactTelephonNumber'])) $contactTelephonNumber = htmlspecialchars($_POST['contactTelephonNumber']);
+        if (isset($_POST['timeForRingBegin'])) $timeForRingBegin = htmlspecialchars($_POST['timeForRingBegin']);
+        if (isset($_POST['timeForRingEnd'])) $timeForRingEnd = htmlspecialchars($_POST['timeForRingEnd']);
+        if (isset($_POST['checking'])) $checking = htmlspecialchars($_POST['checking']);
+        if (isset($_POST['responsibility'])) $responsibility = htmlspecialchars($_POST['responsibility']);
+        if (isset($_POST['comment'])) $comment = htmlspecialchars($_POST['comment']);
+        $fileUploadId = $_POST['fileUploadId'];
 
-    // Проверяем корректность данных нового объявления. Функции isAdvertCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
-    $errors = isAdvertCorrect("newAdvert");
-    if (count($errors) == 0) $correct = true; else $correct = false; // Считаем ошибки, если 0, то можно будет записать данные в БД
+        // Проверяем корректность данных нового объявления. Функции isAdvertCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
+        $errors = isAdvertCorrect("newAdvert");
+        if (count($errors) == 0) $correct = TRUE; else $correct = FALSE; // Считаем ошибки, если 0, то можно будет записать данные в БД
 
-    // Если данные, указанные пользователем, корректны, запишем объявление в базу данных
-    if ($correct) {
-        // Корректируем даты для того, чтобы сделать их пригодными для сохранения в базу данных
-        $dateOfEntryForDB = dateFromViewToDB($dateOfEntry);
-        $dateOfCheckOutForDB = dateFromViewToDB($dateOfCheckOut);
+        // Если данные, указанные пользователем, корректны, запишем объявление в базу данных
+        if ($correct) {
+            // Корректируем даты для того, чтобы сделать их пригодными для сохранения в базу данных
+            $dateOfEntryForDB = dateFromViewToDB($dateOfEntry);
+            $dateOfCheckOutForDB = dateFromViewToDB($dateOfCheckOut);
 
-        // Для хранения массивов в БД, их необходимо сериализовать
-        $furnitureInLivingAreaSerialized = serialize($furnitureInLivingArea);
-        $furnitureInKitchenSerialized = serialize($furnitureInKitchen);
-        $appliancesSerialized = serialize($appliances);
-        $sexOfTenantImploded = implode("_", $sexOfTenant);
-        $relationsImploded = implode("_", $relations);
+            // Для хранения массивов в БД, их необходимо сериализовать
+            $furnitureInLivingAreaSerialized = serialize($furnitureInLivingArea);
+            $furnitureInKitchenSerialized = serialize($furnitureInKitchen);
+            $appliancesSerialized = serialize($appliances);
+            $sexOfTenantImploded = implode("_", $sexOfTenant);
+            $relationsImploded = implode("_", $relations);
 
-        // Проверяем в какой валюте сохраняется стоимость аренды, формируем переменную realCostOfRenting
-        if ($currency == 'руб.') $realCostOfRenting = $costOfRenting;
-        if ($currency != 'руб.') {
-            $rezCurrency = mysql_query("SELECT value FROM currencies WHERE name = '" . $currency . "'");
-            $rowCurrency = mysql_fetch_assoc($rezCurrency);
-            if ($rowCurrency != false) $realCostOfRenting = $costOfRenting * $rowCurrency['value']; else $realCostOfRenting = 0;
-        }
-
-        $tm = time();
-        $last_act = $tm; // время последнего редактирования объявления
-        $reg_date = $tm; // время регистрации ("рождения") объявления
-
-        if (mysql_query("INSERT INTO property SET
-                            userId='" . $userId ."',
-                            typeOfObject='" . $typeOfObject ."',
-                            dateOfEntry='" . $dateOfEntryForDB ."',
-                            termOfLease='" . $termOfLease ."',
-                            dateOfCheckOut='" . $dateOfCheckOutForDB ."',
-                            amountOfRooms='" . $amountOfRooms ."',
-                            adjacentRooms='" . $adjacentRooms ."',
-                            amountOfAdjacentRooms='" . $amountOfAdjacentRooms ."',
-                            typeOfBathrooms='" . $typeOfBathrooms ."',
-                            typeOfBalcony='" . $typeOfBalcony ."',
-                            balconyGlazed='" . $balconyGlazed ."',
-                            roomSpace='" . $roomSpace ."',
-                            totalArea='" . $totalArea ."',
-                            livingSpace='" . $livingSpace ."',
-                            kitchenSpace='" . $kitchenSpace ."',
-                            floor='" . $floor ."',
-                            totalAmountFloor='" . $totalAmountFloor ."',
-                            numberOfFloor='" . $numberOfFloor ."',
-                            concierge='" . $concierge ."',
-                            intercom='" . $intercom ."',
-                            parking='" . $parking ."',
-                            city='" . $city ."',
-                            district='" . $district ."',
-                            coordX='" . $coordX ."',
-                            coordY='" . $coordY ."',
-                            address='" . $address ."',
-                            apartmentNumber='" . $apartmentNumber ."',
-                            subwayStation='" . $subwayStation ."',
-                            distanceToMetroStation='" . $distanceToMetroStation ."',
-                            currency='" . $currency ."',
-                            costOfRenting='" . $costOfRenting ."',
-                            realCostOfRenting='" . $realCostOfRenting ."',
-                            utilities='" . $utilities ."',
-                            costInSummer='" . $costInSummer ."',
-                            costInWinter='" . $costInWinter ."',
-                            electricPower='" . $electricPower ."',
-                            bail='" . $bail ."',
-                            bailCost='" . $bailCost ."',
-                            prepayment='" . $prepayment ."',
-                            compensationMoney='" . $compensationMoney ."',
-                            compensationPercent='" . $compensationPercent ."',
-                            repair='" . $repair ."',
-                            furnish='" . $furnish ."',
-                            windows='" . $windows ."',
-                            internet='" . $internet ."',
-                            telephoneLine='" . $telephoneLine ."',
-                            cableTV='" . $cableTV ."',
-                            furnitureInLivingArea='" . $furnitureInLivingAreaSerialized ."',
-                            furnitureInLivingAreaExtra='" . $furnitureInLivingAreaExtra ."',
-                            furnitureInKitchen='" . $furnitureInKitchenSerialized ."',
-                            furnitureInKitchenExtra='" . $furnitureInKitchenExtra ."',
-                            appliances='" . $appliancesSerialized ."',
-                            appliancesExtra='" . $appliancesExtra ."',
-                            sexOfTenant='" . $sexOfTenantImploded ."',
-                            relations='" . $relationsImploded ."',
-                            children='" . $children ."',
-                            animals='" . $animals ."',
-                            contactTelephonNumber='" . $contactTelephonNumber ."',
-                            timeForRingBegin='" . $timeForRingBegin ."',
-                            timeForRingEnd='" . $timeForRingEnd ."',
-                            checking='" . $checking ."',
-                            responsibility='" . $responsibility ."',
-                            comment='" . $comment ."',
-                            last_act='" . $last_act ."',
-                            reg_date='" . $reg_date ."'"))
-        {
-            // Присваиваем пользователю статус Собственник, так как теперь он имеет как минимум 1 объявление (и не важно опубликованное оно или нет)
-            $rez = mysql_query("UPDATE users SET typeOwner='true' WHERE userId = '" . $userId . "'");
-            /******* Переносим информацию о фотографиях объекта недвижимости в таблицу для постоянного хранения *******/
-            // Узнаем id объявления - необходимо при сохранении информации о фотке в постоянную базу
-            $rezId = mysql_query("SELECT id FROM property WHERE address='".$address."' AND coordX='".$coordX."' AND coordY='".$coordY."' AND apartmentNumber='".$apartmentNumber."'");
-            $rowId = mysql_fetch_assoc($rezId);
-            // Получим информацию о всех фотках, соответствующих текущему fileUploadId
-            $rezTempFotos = mysql_query("SELECT id, filename, extension, filesizeMb FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'");
-            for ($i = 0; $i < mysql_num_rows($rezTempFotos); $i++) {
-                $rowTempFotos = mysql_fetch_assoc($rezTempFotos);
-                mysql_query("INSERT INTO propertyFotos (id, filename, extension, filesizeMb, propertyId) VALUES ('" . $rowTempFotos['id'] . "','" . $rowTempFotos['filename'] . "','" . $rowTempFotos['extension'] . "','" . $rowTempFotos['filesizeMb'] . "','" . $rowId['id'] . "')"); // Переносим информацию о фотографиях на постоянное хранение
+            // Проверяем в какой валюте сохраняется стоимость аренды, формируем переменную realCostOfRenting
+            if ($currency == 'руб.') $realCostOfRenting = $costOfRenting;
+            if ($currency != 'руб.') {
+                $rezCurrency = mysql_query("SELECT value FROM currencies WHERE name = '" . $currency . "'");
+                $rowCurrency = mysql_fetch_assoc($rezCurrency);
+                if ($rowCurrency != FALSE) $realCostOfRenting = $costOfRenting * $rowCurrency['value']; else $realCostOfRenting = 0;
             }
-            // Удаляем записи о фотках в таблице для временного хранения данных
-            mysql_query("DELETE FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'");
 
-            // Пересылаем пользователя в личный кабинет на вкладку Мои объявления
-            header('Location: personal.php?tabsId=3');
-        }
-        else {
-            $correct = false;
-            $errors[] = 'Не прошел запрос к БД. К сожалению, при сохранении данных произошла ошибка: проверьте, пожалуйста, еще раз корректность Вашей информации и повторите попытку';
-            // Сохранении данных в БД не прошло - объявление не сохранено
+            $tm = time();
+            $last_act = $tm; // время последнего редактирования объявления
+            $reg_date = $tm; // время регистрации ("рождения") объявления
+
+            if (mysql_query("INSERT INTO property SET
+                            userId='" . $userId . "',
+                            typeOfObject='" . $typeOfObject . "',
+                            dateOfEntry='" . $dateOfEntryForDB . "',
+                            termOfLease='" . $termOfLease . "',
+                            dateOfCheckOut='" . $dateOfCheckOutForDB . "',
+                            amountOfRooms='" . $amountOfRooms . "',
+                            adjacentRooms='" . $adjacentRooms . "',
+                            amountOfAdjacentRooms='" . $amountOfAdjacentRooms . "',
+                            typeOfBathrooms='" . $typeOfBathrooms . "',
+                            typeOfBalcony='" . $typeOfBalcony . "',
+                            balconyGlazed='" . $balconyGlazed . "',
+                            roomSpace='" . $roomSpace . "',
+                            totalArea='" . $totalArea . "',
+                            livingSpace='" . $livingSpace . "',
+                            kitchenSpace='" . $kitchenSpace . "',
+                            floor='" . $floor . "',
+                            totalAmountFloor='" . $totalAmountFloor . "',
+                            numberOfFloor='" . $numberOfFloor . "',
+                            concierge='" . $concierge . "',
+                            intercom='" . $intercom . "',
+                            parking='" . $parking . "',
+                            city='" . $city . "',
+                            district='" . $district . "',
+                            coordX='" . $coordX . "',
+                            coordY='" . $coordY . "',
+                            address='" . $address . "',
+                            apartmentNumber='" . $apartmentNumber . "',
+                            subwayStation='" . $subwayStation . "',
+                            distanceToMetroStation='" . $distanceToMetroStation . "',
+                            currency='" . $currency . "',
+                            costOfRenting='" . $costOfRenting . "',
+                            realCostOfRenting='" . $realCostOfRenting . "',
+                            utilities='" . $utilities . "',
+                            costInSummer='" . $costInSummer . "',
+                            costInWinter='" . $costInWinter . "',
+                            electricPower='" . $electricPower . "',
+                            bail='" . $bail . "',
+                            bailCost='" . $bailCost . "',
+                            prepayment='" . $prepayment . "',
+                            compensationMoney='" . $compensationMoney . "',
+                            compensationPercent='" . $compensationPercent . "',
+                            repair='" . $repair . "',
+                            furnish='" . $furnish . "',
+                            windows='" . $windows . "',
+                            internet='" . $internet . "',
+                            telephoneLine='" . $telephoneLine . "',
+                            cableTV='" . $cableTV . "',
+                            furnitureInLivingArea='" . $furnitureInLivingAreaSerialized . "',
+                            furnitureInLivingAreaExtra='" . $furnitureInLivingAreaExtra . "',
+                            furnitureInKitchen='" . $furnitureInKitchenSerialized . "',
+                            furnitureInKitchenExtra='" . $furnitureInKitchenExtra . "',
+                            appliances='" . $appliancesSerialized . "',
+                            appliancesExtra='" . $appliancesExtra . "',
+                            sexOfTenant='" . $sexOfTenantImploded . "',
+                            relations='" . $relationsImploded . "',
+                            children='" . $children . "',
+                            animals='" . $animals . "',
+                            contactTelephonNumber='" . $contactTelephonNumber . "',
+                            timeForRingBegin='" . $timeForRingBegin . "',
+                            timeForRingEnd='" . $timeForRingEnd . "',
+                            checking='" . $checking . "',
+                            responsibility='" . $responsibility . "',
+                            comment='" . $comment . "',
+                            last_act='" . $last_act . "',
+                            reg_date='" . $reg_date . "'")
+            ) {
+                // Присваиваем пользователю статус Собственник, так как теперь он имеет как минимум 1 объявление (и не важно опубликованное оно или нет)
+                $rez = mysql_query("UPDATE users SET typeOwner='true' WHERE userId = '" . $userId . "'");
+                /******* Переносим информацию о фотографиях объекта недвижимости в таблицу для постоянного хранения *******/
+                // Узнаем id объявления - необходимо при сохранении информации о фотке в постоянную базу
+                $rezId = mysql_query("SELECT id FROM property WHERE address='" . $address . "' AND coordX='" . $coordX . "' AND coordY='" . $coordY . "' AND apartmentNumber='" . $apartmentNumber . "'");
+                $rowId = mysql_fetch_assoc($rezId);
+                // Получим информацию о всех фотках, соответствующих текущему fileUploadId
+                $rezTempFotos = mysql_query("SELECT id, filename, extension, filesizeMb FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'");
+                for ($i = 0; $i < mysql_num_rows($rezTempFotos); $i++) {
+                    $rowTempFotos = mysql_fetch_assoc($rezTempFotos);
+                    mysql_query("INSERT INTO propertyFotos (id, filename, extension, filesizeMb, propertyId) VALUES ('" . $rowTempFotos['id'] . "','" . $rowTempFotos['filename'] . "','" . $rowTempFotos['extension'] . "','" . $rowTempFotos['filesizeMb'] . "','" . $rowId['id'] . "')"); // Переносим информацию о фотографиях на постоянное хранение
+                }
+                // Удаляем записи о фотках в таблице для временного хранения данных
+                mysql_query("DELETE FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'");
+
+                // Пересылаем пользователя в личный кабинет на вкладку Мои объявления
+                header('Location: personal.php?tabsId=3');
+            } else {
+                $correct = FALSE;
+                $errors[] = 'Не прошел запрос к БД. К сожалению, при сохранении данных произошла ошибка: проверьте, пожалуйста, еще раз корректность Вашей информации и повторите попытку';
+                // Сохранении данных в БД не прошло - объявление не сохранено
+            }
         }
     }
-}
 
-// В будущем необходимо будет проверять личные данные пользователя на полноту для его работы в качестве собственника, если у него typeOwner != "true"
+    // В будущем необходимо будет проверять личные данные пользователя на полноту для его работы в качестве собственника, если у него typeOwner != "true"
 ?>
 
 <!DOCTYPE html>
@@ -296,7 +295,7 @@ if (isset($_POST['saveAdvertButton'])) {
     <link rel="stylesheet" href="css/fileuploader.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
-        /* Стили для создания нового Объявления*/
+            /* Стили для создания нового Объявления*/
 
         .objectDescriptionItem .objectDescriptionItemLabel {
             min-width: 150px;
@@ -348,7 +347,7 @@ if (isset($_POST['saveAdvertButton'])) {
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <!-- Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера -->
     <script>
-        if (typeof jQuery === 'undefined') document.write("<scr"+"ipt src='js/vendor/jquery-1.7.2.min.js'></scr"+"ipt>");
+        if (typeof jQuery === 'undefined') document.write("<scr" + "ipt src='js/vendor/jquery-1.7.2.min.js'></scr" + "ipt>");
     </script>
     <!-- jQuery UI с моей темой оформления -->
     <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
@@ -370,7 +369,8 @@ if (isset($_POST['saveAdvertButton'])) {
         <div>
             <p>
                 <span class="icon-mistake ui-icon ui-icon-info"></span>
-                <span id="userMistakesText">Для продолжения, пожалуйста, дополните или исправьте следующие данные:</span>
+                <span
+                    id="userMistakesText">Для продолжения, пожалуйста, дополните или исправьте следующие данные:</span>
             </p>
             <ol><?php
                 if (isset($errors) && count($errors) != 0) {
@@ -385,7 +385,7 @@ if (isset($_POST['saveAdvertButton'])) {
 
 <!-- Сформируем и вставим заголовок страницы -->
 <?php
-include("header.php");
+    include("header.php");
 ?>
 
 <div class="page_main_content">
@@ -421,7 +421,8 @@ include("header.php");
             С какого числа можно въезжать:
         </div>
         <div class="objectDescriptionBody">
-            <input name="dateOfEntry" type="text" id="datepicker1" size="15" placeholder="дд.мм.гггг" <?php echo "value='$dateOfEntry'";?>>
+            <input name="dateOfEntry" type="text" id="datepicker1" size="15"
+                   placeholder="дд.мм.гггг" <?php echo "value='$dateOfEntry'";?>>
         </div>
     </div>
     <div class="objectDescriptionItem">
@@ -431,8 +432,12 @@ include("header.php");
         <div class="objectDescriptionBody">
             <select name="termOfLease" id="termOfLease">
                 <option value="0" <?php if ($termOfLease == "0") echo "selected";?>></option>
-                <option value="длительный срок" <?php if ($termOfLease == "длительный срок") echo "selected";?>>длительный срок (от года)</option>
-                <option value="несколько месяцев" <?php if ($termOfLease == "несколько месяцев") echo "selected";?>>несколько месяцев (до года)</option>
+                <option value="длительный срок" <?php if ($termOfLease == "длительный срок") echo "selected";?>>
+                    длительный срок (от года)
+                </option>
+                <option value="несколько месяцев" <?php if ($termOfLease == "несколько месяцев") echo "selected";?>>
+                    несколько месяцев (до года)
+                </option>
             </select>
         </div>
     </div>
@@ -441,7 +446,8 @@ include("header.php");
             Крайний срок выезда арендатора(ов):
         </div>
         <div class="objectDescriptionBody">
-            <input name="dateOfCheckOut" type="text" id="datepicker2" size="15" placeholder="дд.мм.гггг" <?php echo "value='$dateOfCheckOut'";?>>
+            <input name="dateOfCheckOut" type="text" id="datepicker2" size="15"
+                   placeholder="дд.мм.гггг" <?php echo "value='$dateOfCheckOut'";?>>
         </div>
     </div>
     <div class="objectDescriptionItem">
@@ -503,7 +509,8 @@ include("header.php");
             </select>
         </div>
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_комната&typeOfObject_гараж&adjacentRooms_0&adjacentRooms_нет&amountOfRooms_0&amountOfRooms_1&amountOfRooms_2">
+    <div class="objectDescriptionItem"
+         notavailability="typeOfObject_0&typeOfObject_комната&typeOfObject_гараж&adjacentRooms_0&adjacentRooms_нет&amountOfRooms_0&amountOfRooms_1&amountOfRooms_2">
         <div class="objectDescriptionItemLabel">
             Количество смежных комнат:
         </div>
@@ -525,8 +532,11 @@ include("header.php");
         <div class="objectDescriptionBody">
             <select name="typeOfBathrooms">
                 <option value="0" <?php if ($typeOfBathrooms == "0") echo "selected";?>></option>
-                <option value="раздельный" <?php if ($typeOfBathrooms == "раздельный") echo "selected";?>>раздельный</option>
-                <option value="совмещенный" <?php if ($typeOfBathrooms == "совмещенный") echo "selected";?>>совмещенный</option>
+                <option value="раздельный" <?php if ($typeOfBathrooms == "раздельный") echo "selected";?>>раздельный
+                </option>
+                <option value="совмещенный" <?php if ($typeOfBathrooms == "совмещенный") echo "selected";?>>
+                    совмещенный
+                </option>
                 <option value="2 шт." <?php if ($typeOfBathrooms == "2 шт.") echo "selected";?>>2</option>
                 <option value="3 шт." <?php if ($typeOfBathrooms == "3 шт.") echo "selected";?>>3</option>
             </select>
@@ -543,15 +553,26 @@ include("header.php");
                 <option value="балкон" <?php if ($typeOfBalcony == "балкон") echo "selected";?>>балкон</option>
                 <option value="лоджия" <?php if ($typeOfBalcony == "лоджия") echo "selected";?>>лоджия</option>
                 <option value="эркер" <?php if ($typeOfBalcony == "эркер") echo "selected";?>>эркер</option>
-                <option value="балкон и лоджия" <?php if ($typeOfBalcony == "балкон и лоджия") echo "selected";?>>балкон и лоджия</option>
-                <option value="балкон и эркер" <?php if ($typeOfBalcony == "балкон и эркер") echo "selected";?>>балкон и эркер</option>
-                <option value="2 балкона и более" <?php if ($typeOfBalcony == "2 балкона и более") echo "selected";?>>2 балкона и более</option>
-                <option value="2 лоджии и более" <?php if ($typeOfBalcony == "2 лоджии и более") echo "selected";?>>2 лоджии и более</option>
-                <option value="2 эркера и более" <?php if ($typeOfBalcony == "2 эркера и более") echo "selected";?>>2 эркера и более</option>
+                <option value="балкон и лоджия" <?php if ($typeOfBalcony == "балкон и лоджия") echo "selected";?>>балкон
+                    и лоджия
+                </option>
+                <option value="балкон и эркер" <?php if ($typeOfBalcony == "балкон и эркер") echo "selected";?>>балкон и
+                    эркер
+                </option>
+                <option value="2 балкона и более" <?php if ($typeOfBalcony == "2 балкона и более") echo "selected";?>>2
+                    балкона и более
+                </option>
+                <option value="2 лоджии и более" <?php if ($typeOfBalcony == "2 лоджии и более") echo "selected";?>>2
+                    лоджии и более
+                </option>
+                <option value="2 эркера и более" <?php if ($typeOfBalcony == "2 эркера и более") echo "selected";?>>2
+                    эркера и более
+                </option>
             </select>
         </div>
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfBalcony_0&typeOfBalcony_нет&typeOfBalcony_эркер&typeOfBalcony_2 эркера и более">
+    <div class="objectDescriptionItem"
+         notavailability="typeOfBalcony_0&typeOfBalcony_нет&typeOfBalcony_эркер&typeOfBalcony_2 эркера и более">
         <div class="objectDescriptionItemLabel">
             Остекление балкона/лоджии:
         </div>
@@ -563,7 +584,8 @@ include("header.php");
             </select>
         </div>
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_квартира&typeOfObject_дом&typeOfObject_таунхаус&typeOfObject_дача&typeOfObject_гараж">
+    <div class="objectDescriptionItem"
+         notavailability="typeOfObject_0&typeOfObject_квартира&typeOfObject_дом&typeOfObject_таунхаус&typeOfObject_дача&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Площадь комнаты:
         </div>
@@ -605,7 +627,8 @@ include("header.php");
     <div class="advertDescriptionChapterHeader">
         Этаж и подъезд
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_дом&typeOfObject_таунхаус&typeOfObject_дача&typeOfObject_гараж">
+    <div class="objectDescriptionItem"
+         notavailability="typeOfObject_0&typeOfObject_дом&typeOfObject_таунхаус&typeOfObject_дача&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Этаж:
         </div>
@@ -615,7 +638,8 @@ include("header.php");
             <input type="text" size="3" name="totalAmountFloor" <?php echo "value='$totalAmountFloor'";?>>
         </div>
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_квартира&typeOfObject_комната&typeOfObject_гараж">
+    <div class="objectDescriptionItem"
+         notavailability="typeOfObject_0&typeOfObject_квартира&typeOfObject_комната&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Этажность дома:
         </div>
@@ -623,7 +647,8 @@ include("header.php");
             <input type="text" size="3" name="numberOfFloor" <?php echo "value='$numberOfFloor'";?>>
         </div>
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_дом&typeOfObject_таунхаус&typeOfObject_дача&typeOfObject_гараж">
+    <div class="objectDescriptionItem"
+         notavailability="typeOfObject_0&typeOfObject_дом&typeOfObject_таунхаус&typeOfObject_дача&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Консьерж:
         </div>
@@ -655,7 +680,8 @@ include("header.php");
             <select name="parking">
                 <option value="0" <?php if ($parking == "0") echo "selected";?>></option>
                 <option value="охраняемая" <?php if ($parking == "охраняемая") echo "selected";?>>охраняемая</option>
-                <option value="неохраняемая" <?php if ($parking == "неохраняемая") echo "selected";?>>неохраняемая</option>
+                <option value="неохраняемая" <?php if ($parking == "неохраняемая") echo "selected";?>>неохраняемая
+                </option>
                 <option value="подземная" <?php if ($parking == "подземная") echo "selected";?>>подземная</option>
                 <option value="отсутствует" <?php if ($parking == "отсутствует") echo "selected";?>>отсутствует</option>
             </select>
@@ -682,7 +708,7 @@ include("header.php");
         <div class="objectDescriptionBody">
             <select name="district">
                 <option value="0"></option>
-            <?php
+                <?php
                 if (isset($allDistrictsInCity)) {
                     foreach ($allDistrictsInCity as $value) { // Для каждого названия района формируем option в селекте
                         echo "<option value='" . $value . "'";
@@ -690,7 +716,7 @@ include("header.php");
                         echo ">" . $value . "</option>";
                     }
                 }
-            ?>
+                ?>
             </select>
         </div>
     </div>
@@ -703,24 +729,26 @@ include("header.php");
             <input type="hidden" name="coordY" id="coordY" <?php echo "value='$coordY'";?>>
             <table class="tableForMap">
                 <tbody>
-                <tr>
-                    <td>
-                        <input type="text" name="address" id="addressTextBox" size="30" <?php echo "value='$address'";?>>
-                    </td>
-                    <td>
-                        <button id="checkAddressButton" style='margin-left: 0.7em;'>Проверить адрес</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan='2'><!-- Карта Яндекса -->
-                        <div id="mapForNewAdvert" style="width: 100%; height: 400px; margin-top: 15px;"></div>
-                    </td>
-                </tr>
+                    <tr>
+                        <td>
+                            <input type="text" name="address" id="addressTextBox"
+                                   size="30" <?php echo "value='$address'";?>>
+                        </td>
+                        <td>
+                            <button id="checkAddressButton" style='margin-left: 0.7em;'>Проверить адрес</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan='2'><!-- Карта Яндекса -->
+                            <div id="mapForNewAdvert" style="width: 100%; height: 400px; margin-top: 15px;"></div>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_дом&typeOfObject_дача&typeOfObject_гараж">
+    <div class="objectDescriptionItem"
+         notavailability="typeOfObject_0&typeOfObject_дом&typeOfObject_дача&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Номер квартиры:
         </div>
@@ -736,15 +764,27 @@ include("header.php");
             <select name="subwayStation" id="subwayStation">
                 <option value="0" <?php if ($subwayStation == "0") echo "selected";?>></option>
                 <option value="нет" <?php if ($subwayStation == "нет") echo "selected";?>>Нет</option>
-                <option value="Проспект Космонавтов" <?php if ($subwayStation == "Проспект Космонавтов") echo "selected";?>>Проспект Космонавтов</option>
+                <option
+                    value="Проспект Космонавтов" <?php if ($subwayStation == "Проспект Космонавтов") echo "selected";?>>
+                    Проспект Космонавтов
+                </option>
                 <option value="Уралмаш" <?php if ($subwayStation == "Уралмаш") echo "selected";?>>Уралмаш</option>
-                <option value="Машиностроителей" <?php if ($subwayStation == "Машиностроителей") echo "selected";?>>Машиностроителей</option>
+                <option value="Машиностроителей" <?php if ($subwayStation == "Машиностроителей") echo "selected";?>>
+                    Машиностроителей
+                </option>
                 <option value="Уральская" <?php if ($subwayStation == "Уральская") echo "selected";?>>Уральская</option>
                 <option value="Динамо" <?php if ($subwayStation == "Динамо") echo "selected";?>>Динамо</option>
-                <option value="Площадь 1905 г." <?php if ($subwayStation == "Площадь 1905 г.") echo "selected";?>>Площадь 1905 г.</option>
-                <option value="Геологическая" <?php if ($subwayStation == "Геологическая") echo "selected";?>>Геологическая</option>
-                <option value="Чкаловская" <?php if ($subwayStation == "Чкаловская") echo "selected";?>>Чкаловская</option>
-                <option value="Ботаническая" <?php if ($subwayStation == "Ботаническая") echo "selected";?>>Ботаническая</option>
+                <option value="Площадь 1905 г." <?php if ($subwayStation == "Площадь 1905 г.") echo "selected";?>>
+                    Площадь 1905 г.
+                </option>
+                <option value="Геологическая" <?php if ($subwayStation == "Геологическая") echo "selected";?>>
+                    Геологическая
+                </option>
+                <option value="Чкаловская" <?php if ($subwayStation == "Чкаловская") echo "selected";?>>Чкаловская
+                </option>
+                <option value="Ботаническая" <?php if ($subwayStation == "Ботаническая") echo "selected";?>>
+                    Ботаническая
+                </option>
             </select>
             <span notavailability="subwayStation_0&subwayStation_нет">
             <input type="text" name="distanceToMetroStation" size="7" <?php echo "value='$distanceToMetroStation'";?>>
@@ -844,13 +884,17 @@ include("header.php");
             </select>
         </div>
     </div>
-    <div class="objectDescriptionItem" title="Предназначена для компенсации затрат собственника на публикацию объявления и поиск арендатора">
+    <div class="objectDescriptionItem"
+         title="Предназначена для компенсации затрат собственника на публикацию объявления и поиск арендатора">
         <div class="objectDescriptionItemLabel">
             Единоразовая комиссия собственника:
         </div>
         <div class="objectDescriptionBody">
-            <input type="text" size="7" name="compensationMoney" id="compensationMoney" <?php echo "value='$compensationMoney'";?>>
-            <span class="currency"></span> или <input type="text" size="7" name="compensationPercent" id="compensationPercent" <?php echo "value='$compensationPercent'";?>> % от стоимости аренды
+            <input type="text" size="7" name="compensationMoney"
+                   id="compensationMoney" <?php echo "value='$compensationMoney'";?>>
+            <span class="currency"></span> или <input type="text" size="7" name="compensationPercent"
+                                                      id="compensationPercent" <?php echo "value='$compensationPercent'";?>>
+            % от стоимости аренды
         </div>
     </div>
 </div>
@@ -866,11 +910,22 @@ include("header.php");
         <div class="objectDescriptionBody">
             <select name="repair">
                 <option value="0" <?php if ($repair == "0") echo "selected";?>></option>
-                <option value="не выполнялся (новый дом)" <?php if ($repair == "не выполнялся (новый дом)") echo "selected";?>>не выполнялся (новый дом)</option>
-                <option value="сделан только что" <?php if ($repair == "сделан только что") echo "selected";?>>сделан только что</option>
-                <option value="меньше 1 года назад" <?php if ($repair == "меньше 1 года назад") echo "selected";?>>меньше 1 года назад</option>
-                <option value="больше года назад" <?php if ($repair == "больше года назад") echo "selected";?>>больше года назад</option>
-                <option value="выполнялся давно" <?php if ($repair == "выполнялся давно") echo "selected";?>>выполнялся давно</option>
+                <option
+                    value="не выполнялся (новый дом)" <?php if ($repair == "не выполнялся (новый дом)") echo "selected";?>>
+                    не выполнялся (новый дом)
+                </option>
+                <option value="сделан только что" <?php if ($repair == "сделан только что") echo "selected";?>>сделан
+                    только что
+                </option>
+                <option value="меньше 1 года назад" <?php if ($repair == "меньше 1 года назад") echo "selected";?>>
+                    меньше 1 года назад
+                </option>
+                <option value="больше года назад" <?php if ($repair == "больше года назад") echo "selected";?>>больше
+                    года назад
+                </option>
+                <option value="выполнялся давно" <?php if ($repair == "выполнялся давно") echo "selected";?>>выполнялся
+                    давно
+                </option>
             </select>
         </div>
     </div>
@@ -881,10 +936,18 @@ include("header.php");
         <div class="objectDescriptionBody" style="min-width: 400px">
             <select name="furnish">
                 <option value="0" <?php if ($furnish == "0") echo "selected";?>></option>
-                <option value="евростандарт" <?php if ($furnish == "евростандарт") echo "selected";?>>евростандарт</option>
-                <option value="свежая (новые обои, побелка потолков)" <?php if ($furnish == "свежая (новые обои, побелка потолков)") echo "selected";?>>свежая (новые обои, побелка потолков)</option>
-                <option value="бабушкин вариант" <?php if ($furnish == "бабушкин вариант") echo "selected";?>>бабушкин вариант</option>
-                <option value="требует обновления" <?php if ($furnish == "требует обновления") echo "selected";?>>требует обновления</option>
+                <option value="евростандарт" <?php if ($furnish == "евростандарт") echo "selected";?>>евростандарт
+                </option>
+                <option
+                    value="свежая (новые обои, побелка потолков)" <?php if ($furnish == "свежая (новые обои, побелка потолков)") echo "selected";?>>
+                    свежая (новые обои, побелка потолков)
+                </option>
+                <option value="бабушкин вариант" <?php if ($furnish == "бабушкин вариант") echo "selected";?>>бабушкин
+                    вариант
+                </option>
+                <option value="требует обновления" <?php if ($furnish == "требует обновления") echo "selected";?>>
+                    требует обновления
+                </option>
             </select>
         </div>
     </div>
@@ -915,7 +978,8 @@ include("header.php");
             <select name="internet">
                 <option value="0" <?php if ($internet == "0") echo "selected";?>></option>
                 <option value="проведен" <?php if ($internet == "проведен") echo "selected";?>>проведен</option>
-                <option value="не проведен" <?php if ($internet == "не проведен") echo "selected";?>>не проведен</option>
+                <option value="не проведен" <?php if ($internet == "не проведен") echo "selected";?>>не проведен
+                </option>
             </select>
         </div>
     </div>
@@ -927,7 +991,8 @@ include("header.php");
             <select name="telephoneLine">
                 <option value="0" <?php if ($telephoneLine == "0") echo "selected";?>></option>
                 <option value="проведен" <?php if ($telephoneLine == "проведен") echo "selected";?>>проведен</option>
-                <option value="не проведен" <?php if ($telephoneLine == "не проведен") echo "selected";?>>не проведен</option>
+                <option value="не проведен" <?php if ($telephoneLine == "не проведен") echo "selected";?>>не проведен
+                </option>
             </select>
         </div>
     </div>
@@ -939,239 +1004,364 @@ include("header.php");
             <select name="cableTV">
                 <option value="0" <?php if ($cableTV == "0") echo "selected";?>></option>
                 <option value="проведено" <?php if ($cableTV == "проведено") echo "selected";?>>проведено</option>
-                <option value="не проведено" <?php if ($cableTV == "не проведено") echo "selected";?>>не проведено</option>
+                <option value="не проведено" <?php if ($cableTV == "не проведено") echo "selected";?>>не проведено
+                </option>
             </select>
         </div>
     </div>
 </div>
 
 <div class="advertDescriptionChapter" id="furniture">
-<div class="advertDescriptionChapterHeader">
-    Мебель и бытовая техника
-</div>
-<div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
-    <div class="objectDescriptionItemLabel">
-        Мебель в жилой зоне:
+    <div class="advertDescriptionChapterHeader">
+        Мебель и бытовая техника
     </div>
-    <div class="objectDescriptionBody">
-        <ul>
-        <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="диван раскладной"
-                <?php foreach ($furnitureInLivingArea as $value) {
-                        if ($value == "диван раскладной") {echo "checked"; break;}
-                      }
-                ?>> диван раскладной
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="диван нераскладной" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "диван нераскладной") {echo "checked"; break;}
-            }
-                ?>> диван нераскладной
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="кровать одноместная" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "кровать одноместная") {echo "checked"; break;}
-            }
-                ?>> кровать одноместная
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="кровать двухместная" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "кровать двухместная") {echo "checked"; break;}
-            }
-                ?>> кровать двухместная
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="кровать детская" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "кровать детская") {echo "checked"; break;}
-            }
-                ?>> кровать детская
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="стол письменный" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "стол письменный") {echo "checked"; break;}
-            }
-                ?>> стол письменный
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="стол компьютерный" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "стол компьютерный") {echo "checked"; break;}
-            }
-                ?>> стол компьютерный
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="стол журнальный" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "стол журнальный") {echo "checked"; break;}
-            }
-                ?>> стол журнальный
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="стол раскладной" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "стол раскладной") {echo "checked"; break;}
-            }
-                ?>> стол раскладной
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="кресло раскладное" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "кресло раскладное") {echo "checked"; break;}
-            }
-                ?>> кресло раскладное
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="кресло нераскладное" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "кресло нераскладное") {echo "checked"; break;}
-            }
-                ?>> кресло нераскладное
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="стулья и табуретки" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "стулья и табуретки") {echo "checked"; break;}
-            }
-                ?>> стулья и табуретки
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="стенка" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "стенка") {echo "checked"; break;}
-            }
-                ?>> стенка
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="шкаф для одежды" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "шкаф для одежды") {echo "checked"; break;}
-            }
-                ?>> шкаф для одежды
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="шкаф-купе" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "шкаф-купе") {echo "checked"; break;}
-            }
-                ?>> шкаф-купе
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInLivingArea[]" value="комод" <?php foreach ($furnitureInLivingArea as $value) {
-                if ($value == "комод") {echo "checked"; break;}
-            }
-                ?>> комод
-        </li>
-        <li>
-            <input type="text" name="furnitureInLivingAreaExtra" maxlength="254" title='Перечислите через запятую те предметы мебели в жилой зоне, что предоставляются вместе с арендуемой недвижимостью и не были указаны в списке выше. Например: "трюмо, тумбочка под телевизор"' <?php echo "value='$furnitureInLivingAreaExtra'";?>>
-        </li>
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
+        <div class="objectDescriptionItemLabel">
+            Мебель в жилой зоне:
+        </div>
+        <div class="objectDescriptionBody">
+            <ul>
+                <li>
+                    <input type="checkbox" name="furnitureInLivingArea[]" value="диван раскладной"
+                        <?php foreach ($furnitureInLivingArea as $value) {
+                        if ($value == "диван раскладной") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> диван раскладной
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInLivingArea[]"
+                           value="диван нераскладной" <?php foreach ($furnitureInLivingArea as $value) {
+                        if ($value == "диван нераскладной") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> диван нераскладной
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInLivingArea[]"
+                           value="кровать одноместная" <?php foreach ($furnitureInLivingArea as $value) {
+                        if ($value == "кровать одноместная") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> кровать одноместная
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInLivingArea[]"
+                           value="кровать двухместная" <?php foreach ($furnitureInLivingArea as $value) {
+                        if ($value == "кровать двухместная") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> кровать двухместная
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInLivingArea[]"
+                           value="кровать детская" <?php foreach ($furnitureInLivingArea as $value) {
+                        if ($value == "кровать детская") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> кровать детская
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInLivingArea[]"
+                           value="стол письменный" <?php foreach ($furnitureInLivingArea as $value) {
+                        if ($value == "стол письменный") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> стол письменный
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInLivingArea[]"
+                           value="стол компьютерный" <?php foreach ($furnitureInLivingArea as $value) {
+                        if ($value == "стол компьютерный") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> стол компьютерный
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInLivingArea[]"
+                           value="стол журнальный" <?php foreach ($furnitureInLivingArea as $value) {
+                        if ($value == "стол журнальный") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> стол журнальный
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInLivingArea[]"
+                           value="стол раскладной" <?php foreach ($furnitureInLivingArea as $value) {
+                        if ($value == "стол раскладной") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> стол раскладной
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInLivingArea[]"
+                           value="кресло раскладное" <?php foreach ($furnitureInLivingArea as $value) {
+                        if ($value == "кресло раскладное") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> кресло раскладное
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInLivingArea[]"
+                           value="кресло нераскладное" <?php foreach ($furnitureInLivingArea as $value) {
+                        if ($value == "кресло нераскладное") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> кресло нераскладное
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInLivingArea[]"
+                           value="стулья и табуретки" <?php foreach ($furnitureInLivingArea as $value) {
+                        if ($value == "стулья и табуретки") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> стулья и табуретки
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInLivingArea[]"
+                           value="стенка" <?php foreach ($furnitureInLivingArea as $value) {
+                        if ($value == "стенка") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> стенка
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInLivingArea[]"
+                           value="шкаф для одежды" <?php foreach ($furnitureInLivingArea as $value) {
+                        if ($value == "шкаф для одежды") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> шкаф для одежды
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInLivingArea[]"
+                           value="шкаф-купе" <?php foreach ($furnitureInLivingArea as $value) {
+                        if ($value == "шкаф-купе") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> шкаф-купе
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInLivingArea[]"
+                           value="комод" <?php foreach ($furnitureInLivingArea as $value) {
+                        if ($value == "комод") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> комод
+                </li>
+                <li>
+                    <input type="text" name="furnitureInLivingAreaExtra" maxlength="254"
+                           title='Перечислите через запятую те предметы мебели в жилой зоне, что предоставляются вместе с арендуемой недвижимостью и не были указаны в списке выше. Например: "трюмо, тумбочка под телевизор"' <?php echo "value='$furnitureInLivingAreaExtra'";?>>
+                </li>
             </ul>
+        </div>
     </div>
-</div>
-<div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
-    <div class="objectDescriptionItemLabel">
-        Мебель на кухне:
-    </div>
-    <div class="objectDescriptionBody">
-        <ul>
-        <li>
-            <input type="checkbox" name="furnitureInKitchen[]" value="стол обеденный" <?php foreach ($furnitureInKitchen as $value) {
-                if ($value == "стол обеденный") {echo "checked"; break;}
-            }
-                ?>> стол обеденный
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInKitchen[]" value="стулья, табуретки" <?php foreach ($furnitureInKitchen as $value) {
-                if ($value == "стулья, табуретки") {echo "checked"; break;}
-            }
-                ?>> стулья, табуретки
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInKitchen[]" value="диван" <?php foreach ($furnitureInKitchen as $value) {
-                if ($value == "диван") {echo "checked"; break;}
-            }
-                ?>> диван
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInKitchen[]" value="кухонный гарнитур" <?php foreach ($furnitureInKitchen as $value) {
-                if ($value == "кухонный гарнитур") {echo "checked"; break;}
-            }
-                ?>> кухонный гарнитур
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInKitchen[]" value="шкафчики навесные" <?php foreach ($furnitureInKitchen as $value) {
-                if ($value == "шкафчики навесные") {echo "checked"; break;}
-            }
-                ?>> шкафчики навесные
-        </li>
-        <li>
-            <input type="checkbox" name="furnitureInKitchen[]" value="шкафчики напольные" <?php foreach ($furnitureInKitchen as $value) {
-                if ($value == "шкафчики напольные") {echo "checked"; break;}
-            }
-                ?>> шкафчики напольные
-        </li>
-        <li>
-            <input type="text" name="furnitureInKitchenExtra" maxlength="254" title='Перечислите через запятую те предметы мебели на кухне, что предоставляются вместе с арендуемой недвижимостью и не были указаны в списке выше. Например: "трюмо, тумбочка под телевизор"' <?php echo "value='$furnitureInKitchenExtra'";?>>
-        </li>
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
+        <div class="objectDescriptionItemLabel">
+            Мебель на кухне:
+        </div>
+        <div class="objectDescriptionBody">
+            <ul>
+                <li>
+                    <input type="checkbox" name="furnitureInKitchen[]"
+                           value="стол обеденный" <?php foreach ($furnitureInKitchen as $value) {
+                        if ($value == "стол обеденный") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> стол обеденный
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInKitchen[]"
+                           value="стулья, табуретки" <?php foreach ($furnitureInKitchen as $value) {
+                        if ($value == "стулья, табуретки") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> стулья, табуретки
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInKitchen[]"
+                           value="диван" <?php foreach ($furnitureInKitchen as $value) {
+                        if ($value == "диван") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> диван
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInKitchen[]"
+                           value="кухонный гарнитур" <?php foreach ($furnitureInKitchen as $value) {
+                        if ($value == "кухонный гарнитур") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> кухонный гарнитур
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInKitchen[]"
+                           value="шкафчики навесные" <?php foreach ($furnitureInKitchen as $value) {
+                        if ($value == "шкафчики навесные") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> шкафчики навесные
+                </li>
+                <li>
+                    <input type="checkbox" name="furnitureInKitchen[]"
+                           value="шкафчики напольные" <?php foreach ($furnitureInKitchen as $value) {
+                        if ($value == "шкафчики напольные") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> шкафчики напольные
+                </li>
+                <li>
+                    <input type="text" name="furnitureInKitchenExtra" maxlength="254"
+                           title='Перечислите через запятую те предметы мебели на кухне, что предоставляются вместе с арендуемой недвижимостью и не были указаны в списке выше. Например: "трюмо, тумбочка под телевизор"' <?php echo "value='$furnitureInKitchenExtra'";?>>
+                </li>
             </ul>
+        </div>
     </div>
-</div>
-<div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
-    <div class="objectDescriptionItemLabel">
-        Бытовая техника:
-    </div>
-    <div class="objectDescriptionBody">
-        <ul>
-        <li>
-            <input type="checkbox" name="appliances[]" value="холодильник" <?php foreach ($appliances as $value) {
-                if ($value == "холодильник") {echo "checked"; break;}
-            }
-                ?>> холодильник
-        </li>
-        <li>
-            <input type="checkbox" name="appliances[]" value="микроволновая печь" <?php foreach ($appliances as $value) {
-                if ($value == "микроволновая печь") {echo "checked"; break;}
-            }
-                ?>> микроволновая печь
-        </li>
-        <li>
-            <input type="checkbox" name="appliances[]" value="телевизор" <?php foreach ($appliances as $value) {
-                if ($value == "телевизор") {echo "checked"; break;}
-            }
-                ?>> телевизор
-        </li>
-        <li>
-            <input type="checkbox" name="appliances[]" value="стиральная машина (автомат)" <?php foreach ($appliances as $value) {
-                if ($value == "стиральная машина (автомат)") {echo "checked"; break;}
-            }
-                ?>> стиральная машина (автомат)
-        </li>
-        <li>
-            <input type="checkbox" name="appliances[]" value="стиральная машина (не автомат)" <?php foreach ($appliances as $value) {
-                if ($value == "стиральная машина (не автомат)") {echo "checked"; break;}
-            }
-                ?>> стиральная машина (не автомат)
-        </li>
-        <li>
-            <input type="checkbox" name="appliances[]" value="нагреватель воды" <?php foreach ($appliances as $value) {
-                if ($value == "нагреватель воды") {echo "checked"; break;}
-            }
-                ?>> нагреватель воды
-        </li>
-        <li>
-            <input type="checkbox" name="appliances[]" value="пылесос" <?php foreach ($appliances as $value) {
-                if ($value == "пылесос") {echo "checked"; break;}
-            }
-                ?>> пылесос
-        </li>
-        <li>
-            <input type="checkbox" name="appliances[]" value="кондиционер" <?php foreach ($appliances as $value) {
-                if ($value == "кондиционер") {echo "checked"; break;}
-            }
-                ?>> кондиционер
-        </li>
-        <li>
-            <input type="checkbox" name="appliances[]" value="охранная сигнализация" <?php foreach ($appliances as $value) {
-                if ($value == "охранная сигнализация") {echo "checked"; break;}
-            }
-                ?>> охранная сигнализация
-        </li>
-        <li>
-            <input type="text" name="appliancesExtra" maxlength="254" title='Перечислите через запятую ту бытовую технику, что предоставляется вместе с арендуемой недвижимостью и не была указана в списке выше. Например: "кухонный комбайн, компьютер"' <?php echo "value='$appliancesExtra'";?>>
-        </li>
+    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
+        <div class="objectDescriptionItemLabel">
+            Бытовая техника:
+        </div>
+        <div class="objectDescriptionBody">
+            <ul>
+                <li>
+                    <input type="checkbox" name="appliances[]"
+                           value="холодильник" <?php foreach ($appliances as $value) {
+                        if ($value == "холодильник") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> холодильник
+                </li>
+                <li>
+                    <input type="checkbox" name="appliances[]"
+                           value="микроволновая печь" <?php foreach ($appliances as $value) {
+                        if ($value == "микроволновая печь") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> микроволновая печь
+                </li>
+                <li>
+                    <input type="checkbox" name="appliances[]" value="телевизор" <?php foreach ($appliances as $value) {
+                        if ($value == "телевизор") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> телевизор
+                </li>
+                <li>
+                    <input type="checkbox" name="appliances[]"
+                           value="стиральная машина (автомат)" <?php foreach ($appliances as $value) {
+                        if ($value == "стиральная машина (автомат)") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> стиральная машина (автомат)
+                </li>
+                <li>
+                    <input type="checkbox" name="appliances[]"
+                           value="стиральная машина (не автомат)" <?php foreach ($appliances as $value) {
+                        if ($value == "стиральная машина (не автомат)") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> стиральная машина (не автомат)
+                </li>
+                <li>
+                    <input type="checkbox" name="appliances[]"
+                           value="нагреватель воды" <?php foreach ($appliances as $value) {
+                        if ($value == "нагреватель воды") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> нагреватель воды
+                </li>
+                <li>
+                    <input type="checkbox" name="appliances[]" value="пылесос" <?php foreach ($appliances as $value) {
+                        if ($value == "пылесос") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> пылесос
+                </li>
+                <li>
+                    <input type="checkbox" name="appliances[]"
+                           value="кондиционер" <?php foreach ($appliances as $value) {
+                        if ($value == "кондиционер") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> кондиционер
+                </li>
+                <li>
+                    <input type="checkbox" name="appliances[]"
+                           value="охранная сигнализация" <?php foreach ($appliances as $value) {
+                        if ($value == "охранная сигнализация") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                        ?>> охранная сигнализация
+                </li>
+                <li>
+                    <input type="text" name="appliancesExtra" maxlength="254"
+                           title='Перечислите через запятую ту бытовую технику, что предоставляется вместе с арендуемой недвижимостью и не была указана в списке выше. Например: "кухонный комбайн, компьютер"' <?php echo "value='$appliancesExtra'";?>>
+                </li>
             </ul>
+        </div>
     </div>
-</div>
 </div>
 
 <div class="advertDescriptionChapter" id="requirementsForTenant">
@@ -1184,13 +1374,19 @@ include("header.php");
         </div>
         <div class="objectDescriptionBody">
             <input type="checkbox" name="sexOfTenant[]" value="мужчина" <?php foreach ($sexOfTenant as $value) {
-                if ($value == "мужчина") {echo "checked"; break;}
+                if ($value == "мужчина") {
+                    echo "checked";
+                    break;
+                }
             }
                 ?>>
             мужчина
             <br>
             <input type="checkbox" name="sexOfTenant[]" value="женщина" <?php foreach ($sexOfTenant as $value) {
-                if ($value == "женщина") {echo "checked"; break;}
+                if ($value == "женщина") {
+                    echo "checked";
+                    break;
+                }
             }
                 ?>>
             женщина
@@ -1202,37 +1398,55 @@ include("header.php");
         </div>
         <div class="objectDescriptionBody">
             <input type="checkbox" name="relations[]" value="один человек" <?php foreach ($relations as $value) {
-                if ($value == "один человек") {echo "checked"; break;}
+                if ($value == "один человек") {
+                    echo "checked";
+                    break;
+                }
             }
                 ?>>
             один человек
             <br>
             <input type="checkbox" name="relations[]" value="семья" <?php foreach ($relations as $value) {
-                if ($value == "семья") {echo "checked"; break;}
+                if ($value == "семья") {
+                    echo "checked";
+                    break;
+                }
             }
                 ?>>
             семья
             <br>
             <input type="checkbox" name="relations[]" value="пара" <?php foreach ($relations as $value) {
-                if ($value == "пара") {echo "checked"; break;}
+                if ($value == "пара") {
+                    echo "checked";
+                    break;
+                }
             }
                 ?>>
             пара
             <br>
             <input type="checkbox" name="relations[]" value="2 мальчика" <?php foreach ($relations as $value) {
-                if ($value == "2 мальчика") {echo "checked"; break;}
+                if ($value == "2 мальчика") {
+                    echo "checked";
+                    break;
+                }
             }
                 ?>>
             2 мальчика
             <br>
             <input type="checkbox" name="relations[]" value="2 девочки" <?php foreach ($relations as $value) {
-                if ($value == "2 девочки") {echo "checked"; break;}
+                if ($value == "2 девочки") {
+                    echo "checked";
+                    break;
+                }
             }
                 ?>>
             2 девочки
             <br>
             <input type="checkbox" name="relations[]" value="группа людей" <?php foreach ($relations as $value) {
-                if ($value == "группа людей") {echo "checked"; break;}
+                if ($value == "группа людей") {
+                    echo "checked";
+                    break;
+                }
             }
                 ?>>
             группа людей
@@ -1245,9 +1459,16 @@ include("header.php");
         <div class="objectDescriptionBody">
             <select name="children">
                 <option value="0" <?php if ($children == "0") echo "selected";?>></option>
-                <option value="не имеет значения" <?php if ($children == "не имеет значения") echo "selected";?>>не имеет значения</option>
-                <option value="с детьми старше 4-х лет" <?php if ($children == "с детьми старше 4-х лет") echo "selected";?>>с детьми старше 4-х лет</option>
-                <option value="только без детей" <?php if ($children == "только без детей") echo "selected";?>>только без детей</option>
+                <option value="не имеет значения" <?php if ($children == "не имеет значения") echo "selected";?>>не
+                    имеет значения
+                </option>
+                <option
+                    value="с детьми старше 4-х лет" <?php if ($children == "с детьми старше 4-х лет") echo "selected";?>>
+                    с детьми старше 4-х лет
+                </option>
+                <option value="только без детей" <?php if ($children == "только без детей") echo "selected";?>>только
+                    без детей
+                </option>
             </select>
         </div>
     </div>
@@ -1258,8 +1479,12 @@ include("header.php");
         <div class="objectDescriptionBody">
             <select name="animals">
                 <option value="0" <?php if ($animals == "0") echo "selected";?>></option>
-                <option value="не имеет значения" <?php if ($animals == "не имеет значения") echo "selected";?>>не имеет значения</option>
-                <option value="только без животных" <?php if ($animals == "только без животных") echo "selected";?>>только без животных</option>
+                <option value="не имеет значения" <?php if ($animals == "не имеет значения") echo "selected";?>>не имеет
+                    значения
+                </option>
+                <option value="только без животных" <?php if ($animals == "только без животных") echo "selected";?>>
+                    только без животных
+                </option>
             </select>
         </div>
     </div>
@@ -1337,14 +1562,27 @@ include("header.php");
         <div class="objectDescriptionBody" style="min-width: 330px">
             <select name="checking">
                 <option value="0"  <?php if ($checking == "0") echo "selected";?>></option>
-                <option value="Никогда (проживает в другом городе)" <?php if ($checking == "Никогда (проживает в другом городе)") echo "selected";?>>Никогда (проживает в другом городе)</option>
-                <option value="1 раз в месяц (при получении оплаты)" <?php if ($checking == "1 раз в месяц (при получении оплаты)") echo "selected";?>>1 раз в месяц (при получении оплаты)</option>
-                <option value="Периодически (чаще 1 раза в месяц)" <?php if ($checking == "Периодически (чаще 1 раза в месяц)") echo "selected";?>>Периодически (чаще 1 раза в месяц)</option>
-                <option value="Постоянно (проживает на этой же площади)" <?php if ($checking == "Постоянно (проживает на этой же площади)") echo "selected";?>>Постоянно (проживает на этой же площади)</option>
+                <option
+                    value="Никогда (проживает в другом городе)" <?php if ($checking == "Никогда (проживает в другом городе)") echo "selected";?>>
+                    Никогда (проживает в другом городе)
+                </option>
+                <option
+                    value="1 раз в месяц (при получении оплаты)" <?php if ($checking == "1 раз в месяц (при получении оплаты)") echo "selected";?>>
+                    1 раз в месяц (при получении оплаты)
+                </option>
+                <option
+                    value="Периодически (чаще 1 раза в месяц)" <?php if ($checking == "Периодически (чаще 1 раза в месяц)") echo "selected";?>>
+                    Периодически (чаще 1 раза в месяц)
+                </option>
+                <option
+                    value="Постоянно (проживает на этой же площади)" <?php if ($checking == "Постоянно (проживает на этой же площади)") echo "selected";?>>
+                    Постоянно (проживает на этой же площади)
+                </option>
             </select>
         </div>
     </div>
-    <div class="objectDescriptionItem" title="Какую ответственность за состояние и ремонт объекта берет на себя собственник">
+    <div class="objectDescriptionItem"
+         title="Какую ответственность за состояние и ремонт объекта берет на себя собственник">
         <div class="objectDescriptionItemLabel">
             Ответственность за состояние и ремонт недвижимости:
         </div>

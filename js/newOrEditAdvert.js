@@ -40,40 +40,40 @@ function notavailability() {
 
 // Отображение результатов обработки формы на PHP - найденных ошибок при заполнении форм на этой странице
 if ($('#userMistakesBlock ol').html() != "") {
-    $('#userMistakesBlock').on('click', function() {
+    $('#userMistakesBlock').on('click', function () {
         $(this).slideUp(800);
     });
     $('#userMistakesBlock').css('display', 'block');
 }
 
 // Вставляем календарь для выбора даты для начала аренды объекта
-$(function() {
+$(function () {
     var now = new Date();
-    var twoYearsAfterNow = new Date(now.getFullYear()+2, now.getMonth(), now.getDate());
-    $( "#datepicker1, #datepicker2" ).datepicker({
-        changeMonth: true,
-        changeYear: true,
-        minDate: now,
-        maxDate: twoYearsAfterNow,
-        defaultDate: new Date(),
+    var twoYearsAfterNow = new Date(now.getFullYear() + 2, now.getMonth(), now.getDate());
+    $("#datepicker1, #datepicker2").datepicker({
+        changeMonth:true,
+        changeYear:true,
+        minDate:now,
+        maxDate:twoYearsAfterNow,
+        defaultDate:new Date(),
     });
-    $( "#datepicker" ).datepicker($.datepicker.regional["ru"]);
+    $("#datepicker").datepicker($.datepicker.regional["ru"]);
 
 });
 
 // Подготовим возможность загрузки фотографий
-function createUploader(){
+function createUploader() {
     var uploader = new qq.FileUploader({
-        element: document.getElementById('file-uploader'),
-        action: '../lib/uploader.php',
-        allowedExtensions: ["jpeg", "jpg", "img", "bmp", "png", "gif"], //Также расширения нужно менять в файле uploader.php
-        sizeLimit: 10 * 1024 * 1024,
-        debug: false,
+        element:document.getElementById('file-uploader'),
+        action:'../lib/uploader.php',
+        allowedExtensions:["jpeg", "jpg", "img", "bmp", "png", "gif"], //Также расширения нужно менять в файле uploader.php
+        sizeLimit:10 * 1024 * 1024,
+        debug:false,
         // О каждом загруженном файле информацию передаем на сервер через переменные - для сохранения в БД
-        onSubmit: function(id, fileName){
+        onSubmit:function (id, fileName) {
             uploader.setParams({
-                fileuploadid: $("#fileUploadId").val(),
-                sourcefilename: fileName,
+                fileuploadid:$("#fileUploadId").val(),
+                sourcefilename:fileName,
             });
         },
         //extraDropzones: [qq.getByClass(document, 'qq-upload-extra-drop-area')[0]]
@@ -82,7 +82,7 @@ function createUploader(){
     // Важно, что в конце файла uploader.php располагается функция handleUpload, в которой есть и мой код, работающий на сервере при получении файла
 
     // Сформируем зеленые блоки для уже загруженных фотографий руками, чтобы пользователя не путать
-    var rezult = {success: true};
+    var rezult = {success:true};
     var uploadedFoto = document.getElementsByClassName('uploadedFoto');
     for (var i = 0; i < uploadedFoto.length; i++) {
         var uploadedFotoName = $(uploadedFoto[i]).attr('filename');
@@ -98,10 +98,10 @@ function createUploader(){
 $(document).ready(createUploader);
 
 // Деактивируем кнопку проверки адреса, если это форма для РЕДАКТИРОВАНИЯ
-if ( (window.location + '').indexOf("editadvert.php") != -1 ) {
-    $(function() {
+if ((window.location + '').indexOf("editadvert.php") != -1) {
+    $(function () {
         $("#checkAddressButton").button({
-            disabled: true
+            disabled:true
         });
     });
 }
@@ -119,12 +119,12 @@ function init() {
         var map = new ymaps.Map('mapForNewAdvert', {
             // При инициализации карты, обязательно нужно указать
             // ее центр и коэффициент масштабирования
-            center : [$("#coordX").val(), $("#coordY").val()],
-            zoom : 16,
+            center:[$("#coordX").val(), $("#coordY").val()],
+            zoom:16,
             // Включим поведения по умолчанию (default) и,
             // дополнительно, масштабирование колесом мыши.
             // дополнительно включаем измеритель расстояний по клику левой кнопки мыши
-            behaviors : ['default', 'scrollZoom']
+            behaviors:['default', 'scrollZoom']
         });
 
         // Добавляем на карту метку объекта недвижимости
@@ -135,12 +135,12 @@ function init() {
         var map = new ymaps.Map('mapForNewAdvert', {
             // При инициализации карты, обязательно нужно указать
             // ее центр и коэффициент масштабирования
-            center : [56.829748, 60.617435], // Екатеринбург
-            zoom : 11,
+            center:[56.829748, 60.617435], // Екатеринбург
+            zoom:11,
             // Включим поведения по умолчанию (default) и,
             // дополнительно, масштабирование колесом мыши.
             // дополнительно включаем измеритель расстояний по клику левой кнопки мыши
-            behaviors : ['default', 'scrollZoom']
+            behaviors:['default', 'scrollZoom']
         });
     }
 
@@ -153,8 +153,8 @@ function init() {
     // Кнопка изменения масштаба - компактный вариант
     // Расположим её ниже и левее левого верхнего угла
     map.controls.add('smallZoomControl', {
-        left : 5,
-        top : 55
+        left:5,
+        top:55
     });
     // Стандартный набор кнопок, кроме линейки
     var myToolbar = new ymaps.control.MapTools(['drag', 'magnifier']);
@@ -164,19 +164,22 @@ function init() {
     searchObjectCollection = new ymaps.GeoObjectCollection();
 
     // При вводе адреса в строку и нажатии энтера ставим метку на карте города
-    $('#checkAddressButton').on('click', function() {
+    $('#checkAddressButton').on('click', function () {
         // Записываем в переменную что конкретно ввел пользователь.
         var search_query = $('#addressTextBox').val();
 
         // Получаем набор координат объектов, соответствующих строке пользователя на карте -
         // Ограничиваем набор только первым объектом и поиск объекта ограничиваем только пригородом Екатеринбурга (параметр boundedBy [юго-западный угол, северов-восточный угол границы поиска])
         var geoObjectsOfsearch_query = ymaps.geocode(search_query, {
-            results : 1,
-            boundedBy : [[55, 59], [58, 62]],
-            strictBounds : true
+            results:1,
+            boundedBy:[
+                [55, 59],
+                [58, 62]
+            ],
+            strictBounds:true
         });
 
-        geoObjectsOfsearch_query.then(function(res) {
+        geoObjectsOfsearch_query.then(function (res) {
                 searchObjectCollection.removeAll();
                 searchObjectCollection = res.geoObjects;
                 map.geoObjects.add(searchObjectCollection);
@@ -193,7 +196,7 @@ function init() {
                 saveCoord(point);
             },
             // Обработка ошибки
-            function(error) {
+            function (error) {
                 if (!search_query) alert("Сначала укажите улицу и номер дома"); else alert("К сожалению, мы не смогли распознать указанную Вами улицу и номер дома. \nЕсли эта ошибка буде повторяться, пожалуйста, обратитесь в тех. поддержку. \nТекст ошибки для тех. поддержки: " + error.message);
             });
 
@@ -203,19 +206,19 @@ function init() {
     // Если пользователь кликнит левой кнопкой по дому - то адресная строка заполнится автоматически
     // Работает только, если пользователь работает с новым объявлением. При редактировании - не выполняется
     if ((window.location + '').indexOf("editadvert.php") == -1) {
-        map.events.add('click', function(e) {
+        map.events.add('click', function (e) {
             var coords = e.get('coordPosition');
 
             // Отправим запрос на геокодирование, берем только 1 результат - это будетт название улицы и номер дома (так у них в Яндексе настроено).
             ymaps.geocode(coords, {
-                results : 1
-            }).then(function(res) {
+                results:1
+            }).then(function (res) {
                     var names = [];
 
                     // Переберём все найденные результаты и
                     // запишем имена найденный объектов в массив names.
                     // Этот код остался от того момента, когда geocode был ограничен не одним результатом, а несколькими, возможно, для повышения эффективности его можно сократить
-                    res.geoObjects.each(function(obj) {
+                    res.geoObjects.each(function (obj) {
                         names.push(obj.properties.get('name'));
                     });
 
@@ -250,9 +253,9 @@ function init() {
     // Чтобы карта отображалась при открытии вкладки, ее нужно перестраивать по событию - открытие вкладки
     // Чтобы карта отображалась при открытии вкладки - нужно $('#tabs').bind('tabsshow', function(event, ui) {
     /*$('#newAdvertButton').bind('click', function(event, ui) {
-        map.setCenter([56.829748, 60.617435]);
-        map.container.fitToViewport();
-    });*/
+     map.setCenter([56.829748, 60.617435]);
+     map.container.fitToViewport();
+     });*/
 }
 
 // При изменении валюты пользователем, подставляем новое значение в блок с рассчетами
@@ -332,10 +335,10 @@ function costOfRentingChanged() {
 }
 
 // Активируем кнопку сохранения параметров объявления
-$(function() {
+$(function () {
     $("#saveAdvertButton").button({
-        icons : {
-            primary : "ui-icon-disk"
+        icons:{
+            primary:"ui-icon-disk"
         }
     });
 });

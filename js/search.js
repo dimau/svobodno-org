@@ -3,7 +3,7 @@
  */
 
 /* Навешиваем обработчик на переключение вкладок с режимами поиска */
-$('#tabs').bind('tabsshow', function(event, ui) {
+$('#tabs').bind('tabsshow', function (event, ui) {
     newTabId = ui.panel.id; // Определяем идентификатор вновь открытой вкладки
     if (newTabId == "tabs-1") {
         // Переносим тип объекта
@@ -75,137 +75,137 @@ $('#resultOnSearchPage').css('min-height', document.documentElement.clientHeight
 var map = document.getElementById("map");
 var mapWrapper = document.getElementById("resultOnSearchPage");
 
-window.onscroll = function() {
-	// Если экран опустился ниже верхней границы карты, но карта не дошла до футера, то fixedTopBlock
-	if (getPageScroll().top <= getCoords(mapWrapper).top) {
-		$(map).css('top', 0 + 'px');
-	} else {
-		if (getPageScroll().top + map.offsetHeight >= getCoords(mapWrapper).top + mapWrapper.offsetHeight) {
-			$(map).css('top', 'auto');
-			$(map).css('bottom', 0 + 'px');
-		} else {
-			$(map).css('top', getPageScroll().top - getCoords(mapWrapper).top + 'px');
-		}
-	}
+window.onscroll = function () {
+    // Если экран опустился ниже верхней границы карты, но карта не дошла до футера, то fixedTopBlock
+    if (getPageScroll().top <= getCoords(mapWrapper).top) {
+        $(map).css('top', 0 + 'px');
+    } else {
+        if (getPageScroll().top + map.offsetHeight >= getCoords(mapWrapper).top + mapWrapper.offsetHeight) {
+            $(map).css('top', 'auto');
+            $(map).css('bottom', 0 + 'px');
+        } else {
+            $(map).css('top', getPageScroll().top - getCoords(mapWrapper).top + 'px');
+        }
+    }
 };
 
 /* Как только будет загружен API и готов DOM, выполняем инициализацию карты*/
 ymaps.ready(init);
 
 function init() {
-	// Создание экземпляра карты и его привязка к контейнеру с
-	// заданным id ("map")
-	var map = new ymaps.Map('map', {
-		// При инициализации карты, обязательно нужно указать
-		// ее центр и коэффициент масштабирования
-		center : [56.829748, 60.617435], // Екатеринбург
-		zoom : 11,
-		// Включим поведения по умолчанию (default) и,
-		// дополнительно, масштабирование колесом мыши.
-		// дополнительно включаем измеритель расстояний по клику левой кнопки мыши
-		behaviors : ['default', 'scrollZoom', 'ruler']
-	});
+    // Создание экземпляра карты и его привязка к контейнеру с
+    // заданным id ("map")
+    var map = new ymaps.Map('map', {
+        // При инициализации карты, обязательно нужно указать
+        // ее центр и коэффициент масштабирования
+        center:[56.829748, 60.617435], // Екатеринбург
+        zoom:11,
+        // Включим поведения по умолчанию (default) и,
+        // дополнительно, масштабирование колесом мыши.
+        // дополнительно включаем измеритель расстояний по клику левой кнопки мыши
+        behaviors:['default', 'scrollZoom', 'ruler']
+    });
 
-	/***** Добавляем элементы управления на карту *****/
-	// Для добавления элемента управления на карту используется поле controls, ссылающееся на
-	// коллекцию элементов управления картой. Добавление элемента в коллекцию производится с помощью метода add().
-	// В метод add можно передать строковый идентификатор элемента управления и его параметры.
-	// Список типов карты
-	map.controls.add('typeSelector');
-	// Кнопка изменения масштаба - компактный вариант
-	// Расположим её ниже и левее левого верхнего угла
-	map.controls.add('smallZoomControl', {
-		left : 5,
-		top : 55
-	});
-	// Стандартный набор кнопок
-	map.controls.add('mapTools');
+    /***** Добавляем элементы управления на карту *****/
+        // Для добавления элемента управления на карту используется поле controls, ссылающееся на
+        // коллекцию элементов управления картой. Добавление элемента в коллекцию производится с помощью метода add().
+        // В метод add можно передать строковый идентификатор элемента управления и его параметры.
+        // Список типов карты
+    map.controls.add('typeSelector');
+    // Кнопка изменения масштаба - компактный вариант
+    // Расположим её ниже и левее левого верхнего угла
+    map.controls.add('smallZoomControl', {
+        left:5,
+        top:55
+    });
+    // Стандартный набор кнопок
+    map.controls.add('mapTools');
 
-	/***** Рисуем на карте маркеры объектов недвижимости, соответствующих запросу *****/
-	placeMarkers();
+    /***** Рисуем на карте маркеры объектов недвижимости, соответствующих запросу *****/
+    placeMarkers();
 
-	$('#expandMap').bind('click', reDrawMap);
-	$('#listPlusMap').bind('click', reDrawMap);
+    $('#expandMap').bind('click', reDrawMap);
+    $('#listPlusMap').bind('click', reDrawMap);
 
-	/***** Функция перестроения карты - используется при изменении размеров блока *****/
-	function reDrawMap() {
-		//map.setCenter([56.829748, 60.617435]);
-		map.container.fitToViewport();
-	}
+    /***** Функция перестроения карты - используется при изменении размеров блока *****/
+    function reDrawMap() {
+        //map.setCenter([56.829748, 60.617435]);
+        map.container.fitToViewport();
+    }
 
-	function placeMarkers() {
-		var realtyObjects = getElementsByClass('realtyObject', document.getElementById("shortListOfRealtyObjects"));
+    function placeMarkers() {
+        var realtyObjects = getElementsByClass('realtyObject', document.getElementById("shortListOfRealtyObjects"));
 
-		for (var i = 0; i < realtyObjects.length; i++) {
-			// Получаем описание и координаты очередного объекта недвижимости из атрибутов html объекта
-			var balloonContentBodyVar = $(realtyObjects[i]).attr('balloonContentBody');
-			var realtyObjCoordX = $(realtyObjects[i]).attr('coordX');
-			var realtyObjCoordY = $(realtyObjects[i]).attr('coordY');
+        for (var i = 0; i < realtyObjects.length; i++) {
+            // Получаем описание и координаты очередного объекта недвижимости из атрибутов html объекта
+            var balloonContentBodyVar = $(realtyObjects[i]).attr('balloonContentBody');
+            var realtyObjCoordX = $(realtyObjects[i]).attr('coordX');
+            var realtyObjCoordY = $(realtyObjects[i]).attr('coordY');
 
-			// Создаем метку на основе координат
-			myPlacemark = new ymaps.Placemark([realtyObjCoordX, realtyObjCoordY], {
-				//iconContent: 'Щелкни по мне',
-				//balloonContentHeader : 
-				balloonContentBody : balloonContentBodyVar,
-				/*balloonContentFooter : */
-			});
+            // Создаем метку на основе координат
+            myPlacemark = new ymaps.Placemark([realtyObjCoordX, realtyObjCoordY], {
+                //iconContent: 'Щелкни по мне',
+                //balloonContentHeader :
+                balloonContentBody:balloonContentBodyVar,
+                /*balloonContentFooter : */
+            });
 
-			// Добавляем метку на карту
-			map.geoObjects.add(myPlacemark);
-		}
-	}
+            // Добавляем метку на карту
+            map.geoObjects.add(myPlacemark);
+        }
+    }
 
-	/* Вешаем обработчик на клик по строчке краткого списка - чтобы отобразить инфу в виде баллуна на карте */
-	$('#shortListOfRealtyObjects').on('click', function(event) {
-		var target = event.target;
-		
-		if (target.nodeName == 'A' && $(target).hasClass('linkToDescription')) {
-			var linkToDescription = $(target).attr('href');
-			window.open(linkToDescription);
-			return false;
-		}
+    /* Вешаем обработчик на клик по строчке краткого списка - чтобы отобразить инфу в виде баллуна на карте */
+    $('#shortListOfRealtyObjects').on('click', function (event) {
+        var target = event.target;
 
-		while (target != this) {// пока target не поднялся до уровня table #shortListOfRealtyObjects ищем tr
-			if (target.nodeName == 'TR' && $(target).hasClass('realtyObject')) {
+        if (target.nodeName == 'A' && $(target).hasClass('linkToDescription')) {
+            var linkToDescription = $(target).attr('href');
+            window.open(linkToDescription);
+            return false;
+        }
 
-				var balloonContentBodyVar = $(target).attr('balloonContentBody');
-				var realtyObjCoordX = $(target).attr('coordX');
-				var realtyObjCoordY = $(target).attr('coordY');
+        while (target != this) {// пока target не поднялся до уровня table #shortListOfRealtyObjects ищем tr
+            if (target.nodeName == 'TR' && $(target).hasClass('realtyObject')) {
 
-				map.balloon.open(
-				// Позиция балуна
-				[realtyObjCoordX, realtyObjCoordY], {
-					// Свойства балуна
-					contentBody : balloonContentBodyVar,
-				});
+                var balloonContentBodyVar = $(target).attr('balloonContentBody');
+                var realtyObjCoordX = $(target).attr('coordX');
+                var realtyObjCoordY = $(target).attr('coordY');
 
-				return false;
-			}
+                map.balloon.open(
+                    // Позиция балуна
+                    [realtyObjCoordX, realtyObjCoordY], {
+                        // Свойства балуна
+                        contentBody:balloonContentBodyVar,
+                    });
 
-			target = target.parentNode;
-		}
-	})
+                return false;
+            }
+
+            target = target.parentNode;
+        }
+    })
 }
 
 /* Навешиваем обработчик клика на подробный список объектов недвижимости в результатах выполнения запроса */
-$('#fullParametersListOfRealtyObjects').on('click', function(event) {
-		var target = event.target;
+$('#fullParametersListOfRealtyObjects').on('click', function (event) {
+    var target = event.target;
 
-		while (target != this) {// пока target не поднялся до уровня table #fullParametersListOfRealtyObjects ищем tr
-			if (target.nodeName == 'TR' && $(target).hasClass('realtyObject')) {
+    while (target != this) {// пока target не поднялся до уровня table #fullParametersListOfRealtyObjects ищем tr
+        if (target.nodeName == 'TR' && $(target).hasClass('realtyObject')) {
 
-				var linkToDescription = $(target).attr('linkToDescription');
-				window.open(linkToDescription);
+            var linkToDescription = $(target).attr('linkToDescription');
+            window.open(linkToDescription);
 
-				return false;
-			}
+            return false;
+        }
 
-			target = target.parentNode;
-		}
+        target = target.parentNode;
+    }
 })
 
 /* Событие клика по ссылке развернуть список*/
-$('#expandList').on('click', function() {
+$('#expandList').on('click', function () {
     $('#shortListOfRealtyObjects').css('display', 'none');
     $('#map').css('display', 'none');
     $('#fullParametersListOfRealtyObjects').css('display', '');
@@ -216,7 +216,7 @@ $('#expandList').on('click', function() {
 });
 
 /* Событие клика по ссылке список + карта*/
-$('#listPlusMap').on('click', function() {
+$('#listPlusMap').on('click', function () {
     $('#shortListOfRealtyObjects').css('display', '');
     $('#map').css('display', '');
     $('#map').css('width', '49%');
@@ -228,7 +228,7 @@ $('#listPlusMap').on('click', function() {
 });
 
 /* Событие клика по ссылке развернуть карту*/
-$('#expandMap').on('click', function() {
+$('#expandMap').on('click', function () {
     $('#shortListOfRealtyObjects').css('display', 'none');
     $('#map').css('display', '');
     $('#map').css('width', '100%');

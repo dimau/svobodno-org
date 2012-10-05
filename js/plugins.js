@@ -10,7 +10,7 @@ window.log = function f() {
 
         try {
             args.callee = f.caller;
-        } catch(e) {
+        } catch (e) {
 
         }
 
@@ -26,18 +26,20 @@ window.log = function f() {
 
 // make it safe to use console.log always
 
-(function(a) {
-    function b() {}
+(function (a) {
+    function b() {
+    }
+
     var c = "assert,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,time,timeEnd,trace,warn";
     var d;
     for (c = c.split(","); !!(d = c.pop());) {
         a[d] = a[d] || b;
     }
-})(function() {
+})(function () {
     try {
         console.log();
         return window.console;
-    } catch(a) {
+    } catch (a) {
         return (window.console = {});
     }
 }());

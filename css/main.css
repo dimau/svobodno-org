@@ -41,10 +41,9 @@ body {
     text-shadow: none;
 }
 
-
 /* =============================================================================
-   Links
-   ========================================================================== */
+Links
+========================================================================== */
 
 a {
     color: #1A238B;
@@ -81,18 +80,19 @@ ol {
     padding: 0 0 0 40px;
 }
 
-ul.listDescription {    /* Используется для блоков с описанием человека, объекта и др в виде списка параметров*/
-	list-style: none;
-	padding: 0;
-	margin-top: 0;
-	margin-left: 1%;
-	float: left;
-	line-height: 1.6em;
-	max-width: 40em;
+ul.listDescription {
+    /* Используется для блоков с описанием человека, объекта и др в виде списка параметров*/
+    list-style: none;
+    padding: 0;
+    margin-top: 0;
+    margin-left: 1%;
+    float: left;
+    line-height: 1.6em;
+    max-width: 40em;
 }
 
 ul.listDescription .headOfString {
-	border-bottom: 1px dotted black;
+    border-bottom: 1px dotted black;
 }
 
 /* =============================================================================
@@ -127,40 +127,40 @@ form {
 }
 
 fieldset {
-   margin: 5px;
-   border-radius: 5px;
-   border: 1px solid #336784;
-   text-align: left;
-   vertical-align: top;
+    margin: 5px;
+    border-radius: 5px;
+    border: 1px solid #336784;
+    text-align: left;
+    vertical-align: top;
 }
 
 fieldset legend {
-	font-weight: bold;
-	color: #336784;
+    font-weight: bold;
+    color: #336784;
 }
 
 /* Стили для редактируемых блоков fieldset*/
 fieldset.edited {
-	line-height: 2.4;
+    line-height: 2.4;
 }
 
 /* Стили для НЕредактируемых блоков fieldset*/
 fieldset.notEdited {
-	display: inline-block;
+    display: inline-block;
     max-width: 32em;
 }
 
 fieldset.notEdited table td {
-	vertical-align: middle;
-	padding: 5px;
+    vertical-align: middle;
+    padding: 5px;
 }
 
 fieldset.notEdited tr {
-	border-bottom: 1px dotted #336784;
+    border-bottom: 1px dotted #336784;
 }
 
 .highlighted {
-	background-color: #33CEC3;
+    background-color: #33CEC3;
 }
 
 /*
@@ -286,19 +286,19 @@ td, th {
 }
 
 td.top.left, th.top.left {
-	border-top-left-radius: 5px;
+    border-top-left-radius: 5px;
 }
 
 td.bottom.left, th.bottom.left {
-	border-bottom-left-radius: 5px;
+    border-bottom-left-radius: 5px;
 }
 
 td.top.right, th.top.right {
-	border-top-right-radius: 5px;
+    border-top-right-radius: 5px;
 }
 
 td.bottom.right, th.bottom.right {
-	border-bottom-right-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 /* =============================================================================
@@ -312,29 +312,28 @@ td.bottom.right, th.bottom.right {
     padding: 0.2em 0;
 }
 
-
 /* ==|== primary styles =====================================================
-   
-   
-   Author: Ushakov Dmitrii
-   
-   
-   ========================================================================== */
+
+
+Author: Ushakov Dmitrii
+
+
+========================================================================== */
 
 html {
-	margin: 0;
-	padding: 0;
-	height: 100%; /* эта строчка для прижатия подвала к низу страницы*/
+    margin: 0;
+    padding: 0;
+    height: 100%; /* эта строчка для прижатия подвала к низу страницы*/
 }
 
 body {
-	margin: 0;
-	padding: 0;
-	font-family: 'Trebuchet MS', Tahoma, Verdana, Arial, sans-serif;
-	font-size: 100%;
-	height: 100%; /* эта строчка для прижатия подвала к низу страницы*/
-	width: 100%;
-	background: #A7A4A1 url('bg_white.jpg');
+    margin: 0;
+    padding: 0;
+    font-family: 'Trebuchet MS', Tahoma, Verdana, Arial, sans-serif;
+    font-size: 100%;
+    height: 100%; /* эта строчка для прижатия подвала к низу страницы*/
+    width: 100%;
+    background: #A7A4A1 url('bg_white.jpg');
 }
 
 /* =============================================================================
@@ -342,37 +341,37 @@ body {
    ========================================================================== */
 
 .fotosWrapper {
-	float: left;
+    float: left;
 }
 
 .resultSearchFoto {
-	float: none !important;
+    float: none !important;
 }
 
 .bigFotoWrapper {
-	display: inline-block;
-	max-width: 300px;
-	max-height: 300px;
-	margin: 5px;
+    display: inline-block;
+    max-width: 300px;
+    max-height: 300px;
+    margin: 5px;
 }
 
 .bigFoto {
     max-width: 300px;
     max-height: 300px;
-	vertical-align: top;
+    vertical-align: top;
 }
 
 .middleFotoWrapper {
-	display: inline-block;
-	max-width: 120px;
-	max-height: 120px;
-	margin: 5px;
+    display: inline-block;
+    max-width: 120px;
+    max-height: 120px;
+    margin: 5px;
 }
 
 .middleFoto {
     max-width: 120px;
     max-height: 120px;
-	vertical-align: top;
+    vertical-align: top;
 }
 
 /* =============================================================================
@@ -380,18 +379,18 @@ body {
    ========================================================================== */
 
 .clearBoth {
-	clear: both;
+    clear: both;
 }
 
 .shadowText {
-	font-size: 0.8em; 
-	color: #666666;
+    font-size: 0.8em;
+    color: #666666;
 }
 
 .bottomButton {
-	float: right;
-	margin: 7px 0px 0px 7px;
-	text-align: center;
+    float: right;
+    margin: 7px 0px 0px 7px;
+    text-align: center;
 }
 
 /* =============================================================================
@@ -399,120 +398,120 @@ body {
    ========================================================================== */
 
 .header {
-	font-family: Georgia, "Times New Roman", Times, serif;
-	position: relative;
-	width: 98%;
-	min-width: 765px; /*Исходим из того, что миним. ширина всей страницы - 780 px, а значит 96% = 749px */
-	margin: 0px auto 0px auto; /* верхний отступ должен быть = 0, пояснения в padding-top*/
-	padding-top: 10px; /* Используем вместо margin-top 10px padding-top=10px, так как это позволяет прижать футер к низу страницы без появления полосы прокрутки */
+    font-family: Georgia, "Times New Roman", Times, serif;
+    position: relative;
+    width: 98%;
+    min-width: 765px; /*Исходим из того, что миним. ширина всей страницы - 780 px, а значит 96% = 749px */
+    margin: 0px auto 0px auto; /* верхний отступ должен быть = 0, пояснения в padding-top*/
+    padding-top: 10px; /* Используем вместо margin-top 10px padding-top=10px, так как это позволяет прижать футер к низу страницы без появления полосы прокрутки */
 }
 
 .iconBox {
-	background-image: url('brand.png');
-	width: 94px;
-	height: 94px;
-	/*float: left;*/
-	position: absolute;
-	left: 0px;
-	top: 0px;
+    background-image: url('brand.png');
+    width: 94px;
+    height: 94px;
+    /*float: left;*/
+    position: absolute;
+    left: 0px;
+    top: 0px;
 }
 
 .nameOfServiceBox {
-	min-width: 370px;
-	margin-left: 100px;
-	margin-right: 130px;
-	text-align: center;
+    min-width: 370px;
+    margin-left: 100px;
+    margin-right: 130px;
+    text-align: center;
 }
 
 .slogan {
-	font-size: 1.5em; /* 24px / 16 px */
+    font-size: 1.5em; /* 24px / 16 px */
 }
 
 .underslogan {
-	font-size: 1em; /* 16px / 16 px */
+    font-size: 1em; /* 16px / 16 px */
 }
 
 /* Стили для минималистской формы входа */
 .enter {
-	position: absolute;
-	right: 0px;
-	top: 0px;
-	text-align: right;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    text-align: right;
 }
 
 .amountOfNewsInEnter {
-	color: red;
+    color: red;
 }
 
 /* =============================================================================
    Стили для главного меню
    ========================================================================== */
-  
+
 .menu {
-	margin: 15px 100px 0px 100px;
-	min-width: 500px;
-	text-align: center;
+    margin: 15px 100px 0px 100px;
+    min-width: 500px;
+    text-align: center;
 }
 
 .menu ul {
-	list-style: none;
-	width: 100%;
-	padding: 0;
-	margin: 0;
+    list-style: none;
+    width: 100%;
+    padding: 0;
+    margin: 0;
 }
 
 .menu ul li {
-	float: left;
-	height: 3em;
-	line-height: 3em;
-	background: #336784 url('bg_blue.jpg');
-	width: 25%;
-	text-align: center;
-	vertical-align: middle;
+    float: left;
+    height: 3em;
+    line-height: 3em;
+    background: #336784 url('bg_blue.jpg');
+    width: 25%;
+    text-align: center;
+    vertical-align: middle;
 }
 
 .menu ul li.left {
-	border-top-left-radius: 5px;
-	border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
 }
 
 .menu ul li.right {
-	border-top-right-radius: 5px;
-	border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 .menu ul li.selected span {
-	white-space: nowrap;
-	font-size: 1.2em;
-	color: #a4a3a3;
+    white-space: nowrap;
+    font-size: 1.2em;
+    color: #a4a3a3;
 }
 
 .menu ul li a {
-	display: block;
-	text-decoration: none;
-	white-space: nowrap;
-	font-size: 1.2em;
-	color: white;
+    display: block;
+    text-decoration: none;
+    white-space: nowrap;
+    font-size: 1.2em;
+    color: white;
 }
 
 .menu ul li a:hover {
-	color: #cccccb;
+    color: #cccccb;
 }
 
 .enter a {
-	text-decoration: none;
-	border-bottom: 1px dotted;
+    text-decoration: none;
+    border-bottom: 1px dotted;
 }
 
 /* =============================================================================
    Стили для основного содержимого страницы
    ========================================================================== */
-  
+
 .page_without_footer {
-	min-height: 100%;
-	margin: 0px auto -34px auto;
-	min-width: 780px;
-	max-width: 1400px;
+    min-height: 100%;
+    margin: 0px auto -34px auto;
+    min-width: 780px;
+    max-width: 1400px;
 }
 
 .page_main_content {
@@ -521,87 +520,87 @@ body {
 }
 
 .headerOfPage {
-	font-family: Georgia, "Times New Roman", Times, serif;
-	font-size: 1.3em;
-	text-align: left;
-	padding: 6px 0px 6px 0px;
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size: 1.3em;
+    text-align: left;
+    padding: 6px 0px 6px 0px;
 }
 
-.wrapperOfTabs{
-	width: 100%;
+.wrapperOfTabs {
+    width: 100%;
 }
 
 #tabs {
-	font-size: 1em;
+    font-size: 1em;
 }
 
 .page-buffer {
-	height: 34px;
-	clear: both;
+    height: 34px;
+    clear: both;
 }
 
 .footer {
-	font-size: 13px;
-	color: #666666;
-	text-align: center;
-	padding: 7px;
-	min-width: 780px;
-	max-width: 1400px;
-	margin: 0px auto 0px auto;
+    font-size: 13px;
+    color: #666666;
+    text-align: center;
+    padding: 7px;
+    min-width: 780px;
+    max-width: 1400px;
+    margin: 0px auto 0px auto;
 }
 
 /* =============================================================================
    Стили для мини блока - используется при входе в сервис, при выборе роли на регистрации
    ========================================================================== */
-  
+
 .miniBlock {
-	width: 600px;
-	margin: 80px auto 0% auto;
-	line-height: 2em;
-	border: 1px solid #336784;
-	border-radius: 5px;
-	text-align: center;
-	background-color: white;
+    width: 600px;
+    margin: 80px auto 0% auto;
+    line-height: 2em;
+    border: 1px solid #336784;
+    border-radius: 5px;
+    text-align: center;
+    background-color: white;
 }
 
 .miniBlockHeader {
-	background-color: #6A9D02;
-	color: white;
-	text-align: center;
+    background-color: #6A9D02;
+    color: white;
+    text-align: center;
 }
 
 .miniBlockContent {
-	display: block;
-	margin: 20px auto 20px auto;
-	text-align: left;
+    display: block;
+    margin: 20px auto 20px auto;
+    text-align: left;
 }
 
 .miniBlock ul {
-	list-style: none;
-	padding: 0;
+    list-style: none;
+    padding: 0;
 }
 
 .miniBlockContent form {
-	text-align: center;
+    text-align: center;
 }
 
 .miniBlockContent table, .miniBlockContent ul {
-	display: inline-block;
-	margin: auto;
-	text-align: left;
+    display: inline-block;
+    margin: auto;
+    text-align: left;
 }
 
 #buttonSubmit {
-	clear: both;
-	float: right;
-	margin-bottom: 20px;
-	margin-right: 20px;
+    clear: both;
+    float: right;
+    margin-bottom: 20px;
+    margin-right: 20px;
 }
 
 .buttonRegistration {
-	float: left;
-	margin-bottom: 20px;
-	margin-left: 20px;
+    float: left;
+    margin-bottom: 20px;
+    margin-left: 20px;
 }
 
 /* =============================================================================
@@ -640,15 +639,15 @@ body {
 /* =============================================================================
    Стили для блока добавления и удаления из избранного
    ========================================================================== */
-  
+
 .blockOfIcon {
-	display: inline-block; 
-	width: 1.2em;
+    display: inline-block;
+    width: 1.2em;
 }
 
 .icon {
-	width: 100%; 
-	margin-top: -0.3em;
+    width: 100%;
+    margin-top: -0.3em;
 }
 
 /* =============================================================================
@@ -656,13 +655,13 @@ body {
    ========================================================================== */
 
 #leftBlockOfSearchParameters {
-	display: inline-block;
-	vertical-align: top;
+    display: inline-block;
+    vertical-align: top;
 }
 
 #rightBlockOfSearchParameters {
-	display: inline-block;
-	height: 345px;
+    display: inline-block;
+    height: 345px;
 }
 
 #rightBlockOfSearchParameters fieldset {
@@ -671,36 +670,36 @@ body {
 }
 
 #rightBlockOfSearchParameters .searchItem {
-	height: 100%;
+    height: 100%;
     line-height: 1.4em;
 }
 
 #rightBlockOfSearchParameters .searchItemBody {
-	height: 100%;
-	width: 200px; 
-	overflow-y: auto;
+    height: 100%;
+    width: 200px;
+    overflow-y: auto;
 }
 
 #rightBlockOfSearchParameters ul {
-	list-style: none;
-	margin: 0;
-	padding: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
 .extendedSearchParametersBlock {
-	display: inline-block;
+    display: inline-block;
 }
 
 .searchChapter {
-	display: inline-block;
+    display: inline-block;
 }
 
 .searchItemBody {
-	display: inline-block;
+    display: inline-block;
 }
 
 .private {
-	display: inline-block;
+    display: inline-block;
 }
 
 /* =============================================================================
@@ -709,199 +708,201 @@ body {
 
 /* Стили для список + карта */
 .choiceViewSearchResult {
-	margin: 6px 0px 6px 0px;
+    margin: 6px 0px 6px 0px;
 }
 
 #resultOnSearchPage {
-	width: 100%;
-	margin: 10px auto;
-	position: relative;
+    width: 100%;
+    margin: 10px auto;
+    position: relative;
 }
 
 .numberOfRealtyObject {
-	position: absolute; 
-	top: 4px; 
-	left: 0px; 
-	text-align: center; 
-	width: 100%; 
-	font-size: 1em;
+    position: absolute;
+    top: 4px;
+    left: 0px;
+    text-align: center;
+    width: 100%;
+    font-size: 1em;
 }
 
 /* Стили для чистого списка объявлений - без карты */
 .listOfRealtyObjects {
-	width: 50%;
-	float: left;
+    width: 50%;
+    float: left;
 }
 
 .realtyObject {
-	height: 50px;
-	text-align: center;
-	border-bottom: 1px solid grey;
-	background-color: white;
+    height: 50px;
+    text-align: center;
+    border-bottom: 1px solid grey;
+    background-color: white;
 }
 
 .realtyObject:hover {
-	background-color: #6A9D02;
-	cursor: pointer;
+    background-color: #6A9D02;
+    cursor: pointer;
 }
 
 .realtyObject td {
-	position: relative; /* Чтобы абсолютно позиционированная ссылка Подробнее не уезжала из ячейки */
+    position: relative; /* Чтобы абсолютно позиционированная ссылка Подробнее не уезжала из ячейки */
 }
 
-.linkToDescriptionBlock { /* Блок для ссылки подробнее под каждым объявлением в списке */
-	position: absolute; 
-	bottom: 4px; 
-	right: 4px;
+.linkToDescriptionBlock {
+    /* Блок для ссылки подробнее под каждым объявлением в списке */
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
 }
 
-.linkToDescriptionBlock a { /* Белый цвет для ссылки дает иллюзию невидимости ссылки на белом фоне, пока не будет наведен указатель мыши */
-	color: white;
+.linkToDescriptionBlock a {
+    /* Белый цвет для ссылки дает иллюзию невидимости ссылки на белом фоне, пока не будет наведен указатель мыши */
+    color: white;
 }
 
 .linkToDescriptionBlock a:hover {
-	color: #7BDED9;
+    color: #7BDED9;
 }
 
 /* Режим только карты */
 #map {
-	width: 50%;
-	position: absolute;
-	top: 0px;
-	right: 0px;
+    width: 50%;
+    position: absolute;
+    top: 0px;
+    right: 0px;
 }
 
 .headOfBalloon {
-	text-align: center; 
-	font-size: 1.2em;
+    text-align: center;
+    font-size: 1.2em;
 }
 
 /* =============================================================================================================
    Стили для блоков краткого описания объявлений о недвижимости (Мои объявления) и новостей
    ========================================================================================================== */
-  
+
 .news {
-	border: 1px solid #336784;
-	border-radius: 5px;
-	padding: 5px;
-	margin: 5px;
+    border: 1px solid #336784;
+    border-radius: 5px;
+    padding: 5px;
+    margin: 5px;
 }
 
 .newsHeader {
-	border: 0px solid #B5B5B5;
-	border-radius: 5px;
-	background-color: #B5B5B5; 
-	padding-left: 1em;
-	margin-bottom: 5px;
-	font-weight: normal;
+    border: 0px solid #B5B5B5;
+    border-radius: 5px;
+    background-color: #B5B5B5;
+    padding-left: 1em;
+    margin-bottom: 5px;
+    font-weight: normal;
     line-height: 2em;
 }
 
 .advertForPersonalPage.published .newsHeader {
-	background-color: #009D91;
+    background-color: #009D91;
 }
 
 .advertForPersonalPage.published .advertHeaderStatus {
-	color: white;
+    color: white;
     display: inline-block;
     margin-left: 1em;
 }
 
 .advertForPersonalPage.unpublished .newsHeader {
-	background-color: #B5B5B5;
+    background-color: #B5B5B5;
 }
 
 .advertForPersonalPage.unpublished .advertHeaderStatus {
-	color: white;
+    color: white;
     display: inline-block;
     margin-left: 1em;
 }
 
 .setOfInstructions {
-	text-align: right; 
-	float: right;
-	list-style: none;
-	margin: 0;
-	padding: 0;
+    text-align: right;
+    float: right;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
 /* Стили для вкладки Новости личного кабинета */
 .actionReaded {
-	float: right; 
-	margin-top: -3px; 
-	margin-right: 4px; 
-	font-weight: normal;
+    float: right;
+    margin-top: -3px;
+    margin-right: 4px;
+    font-weight: normal;
 }
 
 div.unread > div.newsHeader {
-	background-color: #FF9340;
+    background-color: #FF9340;
 }
 
 /* =======================================================================
    Стили для НЕредактируемого описания человека - вкладки Профайл личного кабинета и страничек пользователей
    ====================================================================== */
-  
+
 .profileInformation {
-	float: left;
-	margin: 10px 10px 0px 10px;
-	max-width: 40em;
+    float: left;
+    margin: 10px 10px 0px 10px;
+    max-width: 40em;
     min-width: 20em;
 }
 
 .FIO {
-	font-size: 1.1em;
-	font-weight: bold;
+    font-size: 1.1em;
+    font-weight: bold;
 }
 
 .linksToAccounts {
-	list-style: none;
-	padding: 0;
-	margin: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 /* ======================================================================
    Стили для РЕДАКТИРОВАНИЯ описания человека (Профайл личного кабинета и форма регистрации)
    ====================================================================== */
-  
+
 .required {
-	display: inline-block;
-	color: red;
-	width: 5px;
+    display: inline-block;
+    color: red;
+    width: 5px;
 }
 
 .private {
-	display: inline-block;
+    display: inline-block;
 }
 
 #addressForm {
-	clear: both;
+    clear: both;
 }
 
 .objectDescriptionItem {
-	margin: 7px;
+    margin: 7px;
     width: 100%;
 }
 
 .inputItem .label, .objectDescriptionItem .objectDescriptionLabel {
-	width: 300px;
-	text-align: right;
-	display: inline-block;
-	vertical-align: top;
-	margin-right: 7px;
+    width: 300px;
+    text-align: right;
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 7px;
 }
 
 table td {
-	vertical-align: middle;
-	padding: 5px;
+    vertical-align: middle;
+    padding: 5px;
 }
 
 /* =======================================================================
    Стили для закрытых контактов, предоставляемых по требованию
    ====================================================================== */
-  
-  #showName {
-	color: #1A238B;
-	cursor: pointer;
+
+#showName {
+    color: #1A238B;
+    cursor: pointer;
 }
 
 /* ==|== media queries ======================================================
@@ -914,11 +915,9 @@ table td {
     /* Style adjustments for viewports that meet the condition */
 }
 
-
-
 /* ==|== non-semantic helper classes ========================================
-   Please define your styles before this section.
-   ========================================================================== */
+Please define your styles before this section.
+========================================================================== */
 
 /*
  * Image replacement
@@ -997,18 +996,16 @@ table td {
     *zoom: 1;
 }
 
-
-
 /* ==|== print styles =======================================================
-   Print styles.
-   Inlined to avoid required HTTP connection: h5bp.com/r
-   ========================================================================== */
+Print styles.
+Inlined to avoid required HTTP connection: h5bp.com/r
+========================================================================== */
 
 @media print {
     * {
         background: transparent !important;
         color: #000 !important; /* Black prints faster: h5bp.com/s */
-        box-shadow:none !important;
+        box-shadow: none !important;
         text-shadow: none !important;
     }
 
