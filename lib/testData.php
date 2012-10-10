@@ -5,34 +5,43 @@
      */
     include_once 'connect.php'; //подключаемся к БД
 
+    // Функция возвращает "1", если операция над БД была выполнена успешно и "false" с расшифровкой ошибки, если выполнить ее не удалось
+    // $typeRes = "1" - выдача результата по отдельной операции с базой данных, крезультат по каждой из которых выводится в отдельную строку
+    // $typeRes = "2" - выдача результата по набору однотипных операций с БД - в одну строку!
+    function returnResultMySql($rez) {
+        if ($rez == false) {
+            echo " <span style='color: red;'>false(" . mysql_error() . ")</span> ";
+        } else {
+            echo $rez;
+        }
+        echo "<br>";
+    }
+
     // Создаем пользователей
-    $rez = mysql_query("INSERT INTO users (id, typeTenant, typeOwner, name, secondName, surname, sex, nationality, birthday, login, password, telephon, emailReg, email, currentStatusEducation, almamater, speciality, kurs, ochnoZaochno, yearOfEnd, notWorkCheckbox, placeOfWork, workPosition, regionOfBorn, cityOfBorn, shortlyAboutMe, vkontakte, odnoklassniki, facebook, twitter, lic, user_hash, last_act, reg_date) VALUES
-(1, 'false', 'true', 'Ирина', 'Леонидовна', 'Пупкина', 'женский', 'немка', '1992-08-16', 'owner', 'owner', '9831541618', '', '', '0', '', '', '', '0', '', '', '', '', '', '', '', '', '', '', '', 'yes', '84fae0ea32a834378531e9b0e7c63e11', 1348563523, 1348563523),
-(2, 'true', 'false', 'Андрей', 'Евстигнеевич', 'Комаров', 'мужской', 'русский', '1987-01-27', 'tenant', 'tenant', '9221431615', 'dimau777@gmail.com', 'maxim@ya.ru', 'закончил', 'УГТУ-УПИ', 'Менеджмент в спорте', '', 'очно', '2011', '', 'Банк ПромИмпериал', 'менеджер проектов', 'Свердловская область', 'Екатеринбург', 'Немного люблю спорт, бегаю по утрам.', 'http://vk.com/maxim', '', '', '', 'yes', '9c9cdf2a467b90d5d5f8135af3543882', 1348590806, 1348590806)
+    $rez = mysql_query("INSERT INTO users (id, typeTenant, typeOwner, name, secondName, surname, sex, nationality, birthday, login, password, telephon, emailReg, email, currentStatusEducation, almamater, speciality, kurs, ochnoZaochno, yearOfEnd, statusWork, placeOfWork, workPosition, regionOfBorn, cityOfBorn, shortlyAboutMe, vkontakte, odnoklassniki, facebook, twitter, lic, user_hash, last_act, reg_date) VALUES
+(1, 'false', 'true', 'Ирина', 'Леонидовна', 'Пупкина', 'женский', 'европейская', '1992-08-16', 'owner', 'owner', '9831541618', '', '', '0', '', '', '', '0', '', '', '', '', '', '', '', '', '', '', '', 'yes', '84fae0ea32a834378531e9b0e7c63e11', 1348563523, 1348563523),
+(2, 'true', 'false', 'Андрей', 'Евстигнеевич', 'Комаров', 'мужской', 'славянская', '1987-01-27', 'tenant', 'tenant', '9221431615', 'dimau777@gmail.com', 'maxim@ya.ru', 'закончил', 'УГТУ-УПИ', 'Менеджмент в спорте', '', 'очно', '2011', 'работаю', 'Банк ПромИмпериал', 'менеджер проектов', 'Свердловская область', 'Екатеринбург', 'Немного люблю спорт, бегаю по утрам.', 'http://vk.com/maxim', '', '', '', 'yes', '9c9cdf2a467b90d5d5f8135af3543882', 1348590806, 1348590806)
 ");
 
     echo "Статус регистрации пользователей: ";
-    if ($rez != false) echo $rez; else echo " false ";
-    echo "<br>";
+    returnResultMySql($rez);
 
     // Заполняем таблицу о поисковых запросах пользователей
-    $rez = mysql_query("INSERT INTO searchrequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, interestingPropertysId) VALUES
+    $rez = mysql_query("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, interestingPropertysId) VALUES
 (2, 'квартира', 0x613a323a7b693a303b733a313a2231223b693a313b733a313a2232223b7d, 'не имеет значения', 'не первый и не последний', 11000, 20000, 15000, 'нет', 0x613a333a7b693a303b733a32343a22d091d0bed182d0b0d0bdd0b8d187d0b5d181d0bad0b8d0b9223b693a313b733a363a22d092d098d097223b693a323b733a31373a22d0aed0b3d0be2dd0b7d0b0d0bfd0b0d0b4223b7d, 'пара', 'Анна Дрей', 'без детей', '', 'без животных', '', 'длительный срок', 'Рядом с парком, чтобы бегать утром можно было на свежем воздухе.', 0x613a303a7b7d)
 ");
 
     echo "Статус регистрации поисковых запросов пользователей: ";
-    if ($rez != false) echo $rez; else echo " false ";
-    echo "<br>";
+    returnResultMySql($rez);
 
     // Регистрируем данные о фотках пользователей
-    $rez = mysql_query("INSERT INTO userfotos (id, filename, extension, filesizeMb, userId) VALUES
+    $rez = mysql_query("INSERT INTO userFotos (id, filename, extension, filesizeMb, userId) VALUES
 ('1aa240c376365dd8c4a38493a8dcff64', 'DSCN0319.JPG', 'JPG', 6.7, 2),
 ('8e26607a95ae215bd4831d2b9b0be1b0', 'Ольга Андреева.jpg', 'jpg', 0.1, 1)
 ");
 
     echo "Статус регистрации фотографий пользователей: ";
-    if ($rez != false) echo $rez; else echo " false ";
-    echo "<br>";
+    returnResultMySql($rez);
 
     // Создаем несколько объектов недвижимости
     $rez = mysql_query("INSERT INTO property (id, userId, typeOfObject, dateOfEntry, termOfLease, dateOfCheckOut, amountOfRooms, adjacentRooms, amountOfAdjacentRooms, typeOfBathrooms, typeOfBalcony, balconyGlazed, roomSpace, totalArea, livingSpace, kitchenSpace, floor, totalAmountFloor, numberOfFloor, concierge, intercom, parking, city, district, coordX, coordY, address, apartmentNumber, subwayStation, distanceToMetroStation, currency, costOfRenting, realCostOfRenting, utilities, costInSummer, costInWinter, electricPower, bail, bailCost, prepayment, compensationMoney, compensationPercent, repair, furnish, windows, internet, telephoneLine, cableTV, furnitureInLivingArea, furnitureInLivingAreaExtra, furnitureInKitchen, furnitureInKitchenExtra, appliances, appliancesExtra, sexOfTenant, relations, children, animals, contactTelephonNumber, timeForRingBegin, timeForRingEnd, checking, responsibility, comment, last_act, reg_date, status, visibleUsersId, schemeOfWork) VALUES
@@ -47,11 +56,10 @@
 ");
 
     echo "Статус регистрации объектов недвижимости: ";
-    if ($rez != false) echo $rez; else echo " false ";
-    echo "<br>";
+    returnResultMySql($rez);
 
     // Создаем таблицу для постоянного хранения информации о ФОТОГРАФИЯХ объектов недвижимости
-    $rez = mysql_query("INSERT INTO propertyfotos (id, filename, extension, filesizeMb, propertyId) VALUES
+    $rez = mysql_query("INSERT INTO propertyFotos (id, filename, extension, filesizeMb, propertyId) VALUES
 ('03b141bbb26e42040b96fb9176ae28c4', 'Квартира4.jpg', 'jpg', 0.1, 1),
 ('08c1da5a4849d70e2e109219382c9dfc', '291.JPG', 'JPG', 0.1, 1),
 ('11d92a3d33d510ecb02f9ad89ba842df', 'Квартира2.jpg', 'jpg', 0, 4),
@@ -71,7 +79,6 @@
 ");
 
     echo "Статус регистрации фотографий недвижимости: ";
-    if ($rez != false) echo $rez; else echo " false ";
-    echo "<br>";
+    returnResultMySql($rez);
 
 ?>

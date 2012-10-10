@@ -2,6 +2,36 @@
  * @author dimau
  */
 
+/* Делаем красивые (равномерные) отступы внутри плашки меню */
+function changeMenuSeparatorWidth() {
+    // Выясняем ширину области меню
+    var menuWidth = $(".menu").width();
+
+    // Приводим ширину пунктов меню к естественному виду
+    $(".menu .choice").each(function() {
+        $(this).css("width", "");
+    });
+
+    // Считаем остаток ширины на сепараторы
+    $(".menu .choice").each(function() {
+        menuWidth = menuWidth - $(this).width();
+    });
+
+    var separatorWidth = 0;
+    if ($(".menu .choice").length == 3) { // Отрабатываем в случае неавторизованного пользователя с 3 пунктами в меню
+        separatorWidth = (menuWidth - 5) / 4;
+    } else { // Отрабатываем в случае авторизованного пользователя, у которого больше 3 пунктов в меню
+        separatorWidth = (menuWidth - 5) / 5;
+    }
+
+    // Применяем вычисленную ширину ко всем сепараторам
+    $(".menu .separator").each(function() {
+        $(this).width(separatorWidth);
+    })
+}
+$(document).ready(changeMenuSeparatorWidth);
+$(window).resize(changeMenuSeparatorWidth);
+
 /* Инициализируем отображение вкладок при помощи jQuery UI */
 $(function () {
     $("#tabs").tabs();

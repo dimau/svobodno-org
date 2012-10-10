@@ -204,7 +204,7 @@
                                 </li>
                                 <li>
                                     <span class="headOfString">Работа:</span> <?php
-                                    if ($rowTargetUser['notWorkCheckbox'] == "не работаю") {
+                                    if ($rowTargetUser['statusWork'] == "не работаю") {
                                         echo "не работаю";
                                     } else {
                                         if (isset($rowTargetUser['placeOfWork']) && $rowTargetUser['placeOfWork'] != "") {
@@ -217,8 +217,8 @@
                                     ?>
                                 </li>
                                 <li>
-                                    <span class="headOfString">Национальность:</span> <?php
-                                    if (isset($rowTargetUser['nationality'])) echo "<span style='white-space: nowrap;'>" . $rowTargetUser['nationality'] . "</span>";
+                                    <span class="headOfString">Внешность:</span> <?php
+                                    if (isset($rowTargetUser['nationality']) && $rowTargetUser['nationality'] != "0") echo "<span style='white-space: nowrap;'>" . $rowTargetUser['nationality'] . "</span>";
                                     ?>
                                 </li>
                                 <li>

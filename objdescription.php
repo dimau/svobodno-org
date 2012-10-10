@@ -595,6 +595,7 @@
 
                         <?php endif; // Конец обработки, если схема работы по данному объявлению = улучшенный или оптимальный ?>
                     </div>
+                    <a href="search.php">Найти похожие объявления</a>
                 </div>
                 <div id="tabs-2">
                     <!-- Описание метоположения объекта -->
@@ -632,6 +633,7 @@
                     </fieldset>
                     <!-- Карта Яндекса -->
                     <div id="mapForAdvertView" style="width: 50%; min-width: 300px; height: 400px; float: left;"></div>
+                    <a href="search.php">Найти похожие объявления</a>
                     <div class="clearBoth"></div>
                 </div>
             </div>

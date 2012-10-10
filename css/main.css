@@ -3,13 +3,21 @@
  */
 
 /* =============================================================================
-   Base
+   ОСНОВЫ
    ========================================================================== */
+
+/* Для удобства указания размеров блокам - вводим для всего документа свойство box-sizing */
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
 
 /*
  * 1. Correct text resizing oddly in IE6/7 when body font-size is set using em units
  * 2. Prevent iOS text size adjust on device orientation change, without disabling user zoom: h5bp.com/g
  */
+
 html {
     font-size: 100%;
     -webkit-text-size-adjust: 100%;
@@ -42,11 +50,13 @@ body {
 }
 
 /* =============================================================================
-Links
-========================================================================== */
+   ССЫЛКИ
+   ========================================================================== */
 
 a {
     color: #1A238B;
+    text-decoration: none;
+    border-bottom: 1px dotted;
 }
 
 a:visited {
@@ -54,7 +64,8 @@ a:visited {
 }
 
 a:hover {
-    color: #06e;
+    color: #1A238B;
+    border-bottom: 1px solid;
 }
 
 a:focus {
@@ -63,6 +74,7 @@ a:focus {
 
 /*
  * Improve readability when focused and hovered in all browsers: h5bp.com/h
+ * На всякий случай, убеждаемся, что св-во outline, задающее внешнюю границу элемента, обнулено
  */
 
 a:hover,
@@ -439,16 +451,16 @@ body {
     text-align: right;
 }
 
-.amountOfNewsInEnter {
+.amountOfNewMessages {
     color: red;
 }
 
 /* =============================================================================
-   Стили для главного меню
+   ГЛАВНОЕ МЕНЮ
    ========================================================================== */
 
 .menu {
-    margin: 15px 100px 0px 100px;
+    margin: 15px 0px 0px 100px;
     min-width: 500px;
     text-align: center;
 }
@@ -458,14 +470,14 @@ body {
     width: 100%;
     padding: 0;
     margin: 0;
+    white-space: nowrap;
 }
 
 .menu ul li {
-    float: left;
+    display: inline-block;
     height: 3em;
     line-height: 3em;
     background: #336784 url('bg_blue.jpg');
-    width: 25%;
     text-align: center;
     vertical-align: middle;
 }
@@ -482,25 +494,21 @@ body {
 
 .menu ul li.selected span {
     white-space: nowrap;
-    font-size: 1.2em;
+    font-size: 1.1em;
     color: #a4a3a3;
 }
 
 .menu ul li a {
     display: block;
     text-decoration: none;
+    border-bottom: none;
     white-space: nowrap;
-    font-size: 1.2em;
+    font-size: 1.1em;
     color: white;
 }
 
 .menu ul li a:hover {
     color: #cccccb;
-}
-
-.enter a {
-    text-decoration: none;
-    border-bottom: 1px dotted;
 }
 
 /* =============================================================================
@@ -703,7 +711,7 @@ body {
 }
 
 /* =============================================================================
-   Стили для результатов поиска (таблица, карта, ьаблица + карта) и избранных объявлений
+   Стили для результатов поиска (таблица, карта, таблица + карта) и избранных объявлений
    ========================================================================== */
 
 /* Стили для список + карта */
@@ -903,6 +911,20 @@ table td {
 #showName {
     color: #1A238B;
     cursor: pointer;
+}
+
+/* =======================================================================
+   Исправление jQuery UI проблем
+   ====================================================================== */
+
+/* Не рисуем нижнюю границу у вкладок (как это происходит для обычных ссылок) */
+.ui-tabs .ui-tabs-nav li a {
+    border-bottom: none;
+}
+
+/* Не рисуем нижнюю границу у заголовкой аккордеона (как это происходит для обычных ссылок) */
+.ui-accordion-header a {
+    border-bottom: none;
 }
 
 /* ==|== media queries ======================================================

@@ -83,21 +83,22 @@ function createUploader() {
 $(document).ready(createUploader);
 
 
-/* Если в форме Работа указан чекбокс - не работаю, то блокировать заполнение остальных инпутов */
-$("#notWorkCheckbox").on('change', notWorkCheckbox);
-$(document).ready(notWorkCheckbox);
-function notWorkCheckbox() {
+/* Если в форме Работа указано, что пользователь не работает или ничего не выбрано, то блокировать заполнение остальных инпутов */
+$("#statusWork").on('change', statusWork);
+$(document).ready(statusWork);
+function statusWork() {
     var userTypeTenant = $(".userType").attr('typeTenant') == "true";
-    if ($("#notWorkCheckbox").is(':checked')) {
+    var currentValue = $("#statusWork option:selected").attr('value');
+    if (currentValue == "не работаю") {
         $("input.ifWorked").attr('disabled', 'disabled').css('color', 'grey');
-        $("div.searchItem.ifWorked div.required").text("");
+        $("div.ifWorked div.required").text("");
     } else {
         $("input.ifWorked").removeAttr('disabled').css('color', '');
         // Отметим звездочкой обязательность заполнения полей для арендаторов
         if (userTypeTenant) {
-            $("div.searchItem.ifWorked div.required").text("*");
+            $("div.ifWorked div.required").text("*");
         } else {
-            $("div.searchItem.ifWorked div.required").text("");
+            $("div.ifWorked div.required").text("");
         }
     }
 }

@@ -5,24 +5,35 @@
      */
     include_once 'connect.php'; //подключаемся к БД
 
+    // Функция возвращает "1", если операция над БД была выполнена успешно и "false" с расшифровкой ошибки, если выполнить ее не удалось
+    // $typeRes = "1" - выдача результата по отдельной операции с базой данных, крезультат по каждой из которых выводится в отдельную строку
+    // $typeRes = "2" - выдача результата по набору однотипных операций с БД - в одну строку!
+    function returnResultMySql($rez) {
+        if ($rez == false) {
+            echo " <span style='color: red;'>false(" . mysql_error() . ")</span> ";
+        } else {
+            echo $rez;
+        }
+        echo "<br>";
+    }
+
     /***************************************************************************
      * Чистим базу данных перед закачкой исходных данных
      ***************************************************************************/
 
-    $rezDropTables[] = mysql_query("DROP TABLE users");
-    $rezDropTables[] = mysql_query("DROP TABLE tempFotos");
-    $rezDropTables[] = mysql_query("DROP TABLE userFotos");
-    $rezDropTables[] = mysql_query("DROP TABLE searchRequests");
-    $rezDropTables[] = mysql_query("DROP TABLE property");
-    $rezDropTables[] = mysql_query("DROP TABLE propertyFotos");
-    $rezDropTables[] = mysql_query("DROP TABLE districts");
-    $rezDropTables[] = mysql_query("DROP TABLE currencies");
+    $rez = mysql_query("DROP TABLE IF EXISTS
+    users,
+    tempFotos,
+    userFotos,
+    searchRequests,
+    property,
+    propertyFotos,
+    districts,
+    currencies
+    ");
 
     echo "Статус удаления старых таблиц: ";
-    foreach ($rezDropTables as $value) {
-        if ($value != false) echo $value; else echo " false ";
-    }
-    echo "<br>";
+    returnResultMySql($rez);
 
     /****************************************************************************
      * Создаем таблицу для хранения информации о ПОЛЬЗОВАТЕЛЯХ
@@ -35,7 +46,7 @@
         secondName VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Отчество пользователя',
         surname VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Фамилия пользователя',
         sex VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Пол пользователя',
-        nationality VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        nationality VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Внешность пользователя',
         birthday DATE,
         login VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci,
         password VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci,
@@ -48,7 +59,7 @@
         kurs VARCHAR(30) CHARACTER SET utf8 COLLATE utf8_general_ci,
         ochnoZaochno VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
         yearOfEnd VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Год окончания учебного заведения, указанного выше в форме',
-        notWorkCheckbox VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Если в поле что-то записано, значит пользователь сейчас не работает, если поле пустое, значит пользователь указал, что он работает',
+        statusWork VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Работает или не работает пользователь',
         placeOfWork VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci,
         workPosition VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci,
         regionOfBorn VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Регион РФ, в котором пользователь родился. Это важно, чтобы, например, он смог найти собственников-земляков и легче получить недвижимость в аренду',
@@ -65,8 +76,7 @@
 )");
 
     echo "Статус создания таблицы users: ";
-    if ($rez != false) echo $rez; else echo " false ";
-    echo "<br>";
+    returnResultMySql($rez);
 
     /****************************************************************************
      * Создаем таблицу для временного хранения информации о ЗАГРУЖЕННЫХ при регистрации ФОТОГРАФИЯХ пользователей
@@ -81,8 +91,7 @@
 )");
 
     echo "Статус создания таблицы tempFotos: ";
-    if ($rez != false) echo $rez; else echo " false ";
-    echo "<br>";
+    returnResultMySql($rez);
 
     /****************************************************************************
      * Создаем таблицу для постоянного хранения информации о ФОТОГРАФИЯХ пользователей (только личные)
@@ -97,8 +106,7 @@
 )");
 
     echo "Статус создания таблицы userFotos: ";
-    if ($rez != false) echo $rez; else echo " false ";
-    echo "<br>";
+    returnResultMySql($rez);
 
     /****************************************************************************
      * Создаем таблицу для хранения информации о ПОИСКОВЫХ ЗАПРОСАХ пользователей
@@ -127,8 +135,7 @@
 )");
 
     echo "Статус создания таблицы searchRequests: ";
-    if ($rez != false) echo $rez; else echo " false ";
-    echo "<br>";
+    returnResultMySql($rez);
 
     /****************************************************************************
      * Создаем таблицу для хранения информации об ОБЪЕКТАХ НЕДВИЖИМОСТИ пользователей
@@ -207,8 +214,7 @@
 )");
 
     echo "Статус создания таблицы property: ";
-    if ($rez != false) echo $rez; else echo " false ";
-    echo "<br>";
+    returnResultMySql($rez);
 
     /****************************************************************************
      * Создаем таблицу для постоянного хранения информации о ФОТОГРАФИЯХ объектов недвижимости
@@ -223,14 +229,13 @@
 )");
 
     echo "Статус создания таблицы propertyFotos: ";
-    if ($rez != false) echo $rez; else echo " false ";
-    echo "<br>";
+    returnResultMySql($rez);
 
     /****************************************************************************
      * Создаем таблицу для хранения информации о заявках на просмотр
      ***************************************************************************/
 //TODO: доделать!!!!!!!!!!!!!
-    $rez = mysql_query("CREATE TABLE requestReview (
+ /*   $rez = mysql_query("CREATE TABLE requestReview (
         id VARCHAR(32) NOT NULL PRIMARY KEY,
         filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
         extension VARCHAR(5) NOT NULL COMMENT 'Расширение у файла фотографии',
@@ -239,8 +244,7 @@
 )");
 
     echo "Статус создания таблицы requestReview: ";
-    if ($rez != false) echo $rez; else echo " false ";
-    echo "<br>";
+    returnResultMySql($rez); */
 
     /****************************************************************************
      * Создаем таблицу для хранения списка районов каждого города присутствия сервиса
@@ -252,65 +256,63 @@
 )");
 
     echo "Статус создания таблицы districts: ";
-    if ($rez != false) echo $rez; else echo " false ";
-    echo "<br>";
+    returnResultMySql($rez);
 
     /****************************************************************************
      * Записываем в таблицу с районами инфу о районах
      ***************************************************************************/
 
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Автовокзал (южный)', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Академический', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Ботанический', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('ВИЗ', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Вокзальный', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Втузгородок', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Горный щит', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Елизавет', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('ЖБИ', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Завокзальный', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Заречный', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Изоплит', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Исток', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Калиновский', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Кольцово', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Компрессорный', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Лечебный', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Малый исток', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Нижнеисетский', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Парковый', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Пионерский', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Птицефабрика', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Рудный', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Садовый', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Северка', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Семь ключей', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Сибирский тракт', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Синие камни', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Совхозный', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Сортировка новая', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Сортировка старая', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Уктус', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('УНЦ', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Уралмаш', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Химмаш', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Центр', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Чермет', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Чусовское озеро', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Шабровский', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Шарташ', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Шарташский рынок', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Широкая речка', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Шувакиш', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Эльмаш', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('Юго-запад', 'Екатеринбург')");
-    $rezDistricts[] = mysql_query("INSERT INTO districts (name, city) VALUES ('За городом', 'Екатеринбург')");
+    $rez = mysql_query("INSERT INTO districts (name, city) VALUES
+    ('Автовокзал (южный)', 'Екатеринбург'),
+    ('Академический', 'Екатеринбург'),
+    ('Ботанический', 'Екатеринбург'),
+    ('ВИЗ', 'Екатеринбург'),
+    ('Вокзальный', 'Екатеринбург'),
+    ('Втузгородок', 'Екатеринбург'),
+    ('Горный щит', 'Екатеринбург'),
+    ('Елизавет', 'Екатеринбург'),
+    ('ЖБИ', 'Екатеринбург'),
+    ('Завокзальный', 'Екатеринбург'),
+    ('Заречный', 'Екатеринбург'),
+    ('Изоплит', 'Екатеринбург'),
+    ('Исток', 'Екатеринбург'),
+    ('Калиновский', 'Екатеринбург'),
+    ('Кольцово', 'Екатеринбург'),
+    ('Компрессорный', 'Екатеринбург'),
+    ('Лечебный', 'Екатеринбург'),
+    ('Малый исток', 'Екатеринбург'),
+    ('Нижнеисетский', 'Екатеринбург'),
+    ('Парковый', 'Екатеринбург'),
+    ('Пионерский', 'Екатеринбург'),
+    ('Птицефабрика', 'Екатеринбург'),
+    ('Рудный', 'Екатеринбург'),
+    ('Садовый', 'Екатеринбург'),
+    ('Северка', 'Екатеринбург'),
+    ('Семь ключей', 'Екатеринбург'),
+    ('Сибирский тракт', 'Екатеринбург'),
+    ('Синие камни', 'Екатеринбург'),
+    ('Совхозный', 'Екатеринбург'),
+    ('Сортировка новая', 'Екатеринбург'),
+    ('Сортировка старая', 'Екатеринбург'),
+    ('Уктус', 'Екатеринбург'),
+    ('УНЦ', 'Екатеринбург'),
+    ('Уралмаш', 'Екатеринбург'),
+    ('Химмаш', 'Екатеринбург'),
+    ('Центр', 'Екатеринбург'),
+    ('Чермет', 'Екатеринбург'),
+    ('Чусовское озеро', 'Екатеринбург'),
+    ('Шабровский', 'Екатеринбург'),
+    ('Шарташ', 'Екатеринбург'),
+    ('Шарташский рынок', 'Екатеринбург'),
+    ('Широкая речка', 'Екатеринбург'),
+    ('Шувакиш', 'Екатеринбург'),
+    ('Эльмаш', 'Екатеринбург'),
+    ('Юго-запад', 'Екатеринбург'),
+    ('За городом', 'Екатеринбург')
+");
 
     echo "Статус записи инфы о районах в таблицу districts: ";
-    foreach ($rezDistricts as $value) {
-        if ($value != false) echo $value; else echo " false ";
-    }
-    echo "<br>";
+    returnResultMySql($rez);
 
     /****************************************************************************
      * Создаем таблицу для хранения курсов валют: доллара США и евро к рублю
@@ -322,21 +324,19 @@
 )");
 
     echo "Статус создания таблицы currencies: ";
-    if ($rez != false) echo $rez; else echo " false ";
-    echo "<br>";
+    returnResultMySql($rez);
 
     /****************************************************************************
      * Записываем в таблицу с валютами текущие курсы
      ***************************************************************************/
 
-    $rezCurrencies[] = mysql_query("INSERT INTO currencies (name, value) VALUES ('дол. США', 31.22)");
-    $rezCurrencies[] = mysql_query("INSERT INTO currencies (name, value) VALUES ('евро', 40.17)");
+    $rezCurrencies[] = mysql_query("INSERT INTO currencies (name, value) VALUES
+    ('дол. США', 31.22),
+    ('евро', 40.17)
+    ");
 
     echo "Статус записи инфы о валютах: ";
-    foreach ($rezCurrencies as $value) {
-        if ($value != false) echo $value; else echo " false ";
-    }
-    echo "<br>";
+    returnResultMySql($rez);
 
     /**
      * Проверяем настройки PHP сервера

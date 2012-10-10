@@ -1,3 +1,11 @@
+<?php
+    include_once 'lib/connect.php'; //подключаемся к БД
+    include_once 'lib/function_global.php'; //подключаем файл с глобальными функциями
+
+    //TODO: ограничить доступ только администраторами
+    //TODO: вкладками решать проблемы контроля доступа
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,8 +15,8 @@
          More info: h5bp.com/i/378 -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    <title>Выбор роли пользователя</title>
-    <meta name="description" content="Выбор роли пользователя">
+    <title>Админка</title>
+    <meta name="description" content="Админка">
 
     <!-- Mobile viewport optimized: h5bp.com/viewport -->
     <meta name="viewport" content="initialscale=1.0, width=device-width">
@@ -37,32 +45,33 @@
     ?>
 
     <div class="page_main_content">
-        <div class="miniBlock">
-            <div class="miniBlockHeader">
-                Укажите, пожалуйста, что Вы собираетесь сделать на этом ресурсе?
+        <div class="wrapperOfTabs">
+            <div class="headerOfPage">
+                Панель администратора
             </div>
-            <div class="miniBlockContent">
-                <form name="whoIsOurUser" method="get" action="registration.php">
-                    <ul>
-                        <li>
-                            <input type="checkbox" name="typeTenant" value="true" checked>
-                            Найти и снять недвижимость
-                        </li>
-                        <li>
-                            <input type="checkbox" name="typeOwner" value="true">
-                            Сдать свою недвижимость
-                        </li>
-                    </ul>
-                    <br>
-                    <button type="submit" id="buttonSubmit">Готово</button>
-                </form>
+            <div id="tabs">
+                <ul>
+                    <li>
+                        <a href="#tabs-1">Новый собственник</a>
+                    </li>
+                    <li>
+                        <a href="#tabs-2">Поиск</a>
+                    </li>
+                </ul>
+                <div id="tabs-1">
+                    <a href="registration.php?typeOwner=true">Зарегистрировать нового пользователя</a>
+                    <a href="newadvert.php">Создать новое объявление</a>
+                    <div class="clearBoth"></div>
+                </div>
+                <!-- /end.tabs-1 -->
+                <div id="tabs-2">
+                    А здесь форма поиска по БД
+                </div>
+                <!-- /end.tabs-2 -->
             </div>
-            <div class="clearBoth"></div>
         </div>
-
     </div>
     <!-- /end.page_main_content -->
-
     <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
     <div class="page-buffer"></div>
 </div>

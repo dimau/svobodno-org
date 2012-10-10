@@ -72,7 +72,7 @@
     if (isset($rowUsers['secondName'])) $secondName = $rowUsers['secondName']; else $secondName = "";
     if (isset($rowUsers['surname'])) $surname = $rowUsers['surname']; else $surname = "";
     if (isset($rowUsers['sex'])) $sex = $rowUsers['sex']; else $sex = "0";
-    if (isset($rowUsers['nationality'])) $nationality = $rowUsers['nationality']; else $nationality = "";
+    if (isset($rowUsers['nationality'])) $nationality = $rowUsers['nationality']; else $nationality = "0";
     if (isset($rowUsers['birthday'])) $birthday = dateFromDBToView($rowUsers['birthday']); else $birthday = "";
     if (isset($rowUsers['login'])) $login = $rowUsers['login']; else $login = "";
     if (isset($rowUsers['password'])) $password = $rowUsers['password']; else $password = "";
@@ -85,7 +85,7 @@
     if (isset($rowUsers['kurs'])) $kurs = $rowUsers['kurs']; else $kurs = "";
     if (isset($rowUsers['ochnoZaochno'])) $ochnoZaochno = $rowUsers['ochnoZaochno']; else $ochnoZaochno = "0";
     if (isset($rowUsers['yearOfEnd'])) $yearOfEnd = $rowUsers['yearOfEnd']; else $yearOfEnd = "";
-    if (isset($rowUsers['notWorkCheckbox'])) $notWorkCheckbox = $rowUsers['notWorkCheckbox']; else $notWorkCheckbox = "";
+    if (isset($rowUsers['statusWork'])) $statusWork = $rowUsers['statusWork']; else $statusWork = "";
     if (isset($rowUsers['placeOfWork'])) $placeOfWork = $rowUsers['placeOfWork']; else $placeOfWork = "";
     if (isset($rowUsers['workPosition'])) $workPosition = $rowUsers['workPosition']; else $workPosition = "";
     if (isset($rowUsers['regionOfBorn'])) $regionOfBorn = $rowUsers['regionOfBorn']; else $regionOfBorn = "";
@@ -125,10 +125,6 @@
         if (isset($_POST['sex'])) $sex = htmlspecialchars($_POST['sex']);
         if (isset($_POST['nationality'])) $nationality = htmlspecialchars($_POST['nationality']);
         if (isset($_POST['birthday'])) $birthday = htmlspecialchars($_POST['birthday']);
-        if (isset($_POST['login'])) {
-            $oldLogin = $login;
-            $login = htmlspecialchars($_POST['login']);
-        }
         if (isset($_POST['password'])) $password = htmlspecialchars($_POST['password']);
         if (isset($_POST['telephon'])) $telephon = htmlspecialchars($_POST['telephon']);
         if (isset($_POST['email'])) $email = htmlspecialchars($_POST['email']);
@@ -140,7 +136,7 @@
         if (isset($_POST['kurs'])) $kurs = htmlspecialchars($_POST['kurs']);
         if (isset($_POST['ochnoZaochno'])) $ochnoZaochno = htmlspecialchars($_POST['ochnoZaochno']);
         if (isset($_POST['yearOfEnd'])) $yearOfEnd = htmlspecialchars($_POST['yearOfEnd']);
-        if (isset($_POST['notWorkCheckbox'])) $notWorkCheckbox = htmlspecialchars($_POST['notWorkCheckbox']); else $notWorkCheckbox = ""; // Если пользователь отправил форму submit, и в параметрах нет значения notWorkCheckbox, значит пользователь не отметил этот чекбокс, чему соответствует пустая строка
+        if (isset($_POST['statusWork'])) $statusWork = htmlspecialchars($_POST['statusWork']);
         if (isset($_POST['placeOfWork'])) $placeOfWork = htmlspecialchars($_POST['placeOfWork']);
         if (isset($_POST['workPosition'])) $workPosition = htmlspecialchars($_POST['workPosition']);
         if (isset($_POST['regionOfBorn'])) $regionOfBorn = htmlspecialchars($_POST['regionOfBorn']);
@@ -170,7 +166,6 @@
             sex='" . $sex . "',
             nationality='" . $nationality . "',
             birthday='" . $birthdayDB . "',
-            login='" . $login . "',
             password='" . $password . "',
             telephon='" . $telephon . "',
             email='" . $email . "',
@@ -180,7 +175,7 @@
             kurs='" . $kurs . "',
             ochnoZaochno='" . $ochnoZaochno . "',
             yearOfEnd='" . $yearOfEnd . "',
-            notWorkCheckbox='" . $notWorkCheckbox . "',
+            statusWork='" . $statusWork . "',
             placeOfWork='" . $placeOfWork . "',
             workPosition='" . $workPosition . "',
             regionOfBorn='" . $regionOfBorn . "',
@@ -697,7 +692,7 @@
         <a href="#tabs-1">Профиль</a>
     </li>
     <li>
-        <a href="#tabs-2">Новости (<span id="amountUnreadNews">12</span>)</a>
+        <a href="#tabs-2">Сообщения (<span class='amountOfNewMessages' id="amountUnreadNews">15</span>)</a>
     </li>
     <li>
         <a href="#tabs-3">Мои объявления</a>
@@ -755,7 +750,7 @@
             </li>
             <li>
                 <span class="headOfString">Работа:</span> <?php
-                if ($notWorkCheckbox == "не работаю") {
+                if ($statusWork == "не работаю") {
                     echo "не работаю";
                 } else {
                     if (isset($placeOfWork) && $placeOfWork != "") {
@@ -768,8 +763,8 @@
                 ?>
             </li>
             <li>
-                <span class="headOfString">Национальность:</span> <?php
-                if (isset($nationality)) echo "<span style='white-space: nowrap;'>" . $nationality . "</span>";
+                <span class="headOfString">Внешность:</span> <?php
+                if (isset($nationality) && $nationality != "0") echo "<span style='white-space: nowrap;'>" . $nationality . "</span>";
                 ?>
             </li>
             <li>
@@ -919,11 +914,32 @@
                 <div class="required">
                     *
                 </div>
-                <span class="searchItemLabel">Национальность: </span>
+                <span class="searchItemLabel">Внешность: </span>
 
                 <div class="searchItemBody">
-                    <input type="text" name="nationality" id="nationality" size="15"
-                           maxlength="50" <?php echo "value='$nationality'";?>>
+                    <select name="nationality" id="nationality" validations='validate[required]'>
+                        <option value="0" <?php if ($nationality == "0") echo "selected";?>></option>
+                        <option
+                            value="славянская" <?php if ($nationality == "славянская") echo "selected";?>>
+                            славянская
+                        </option>
+                        <option
+                            value="европейская" <?php if ($nationality == "европейская") echo "selected";?>>
+                            европейская
+                        </option>
+                        <option
+                            value="азиатская" <?php if ($nationality == "азиатская") echo "selected";?>>
+                            азиатская
+                        </option>
+                        <option
+                            value="кавказская" <?php if ($nationality == "кавказская") echo "selected";?>>
+                            кавказская
+                        </option>
+                        <option
+                            value="африканская" <?php if ($nationality == "африканская") echo "selected";?>>
+                            африканская
+                        </option>
+                    </select>
                 </div>
             </div>
             <div class="searchItem">
@@ -946,13 +962,11 @@
                 </legend>
                 <div class="searchItem" title="Используйте в качестве логина ваш e-mail или телефон">
                     <div class="required">
-                        *
                     </div>
                     <span class="searchItemLabel">Логин: </span>
 
                     <div class="searchItemBody">
-                        <input type="text" size="30" maxlength="50" name="login" placeholder="e-mail или номер телефона"
-                               validations="validate[required]" <?php echo "value='$login'";?>>
+                        <?php echo $login;?>
                     </div>
                 </div>
                 <div class="searchItem">
@@ -1125,12 +1139,14 @@
 
     <fieldset class="edited private">
         <legend>
-            Работа
+            Статус занятости:
         </legend>
         <div>
-            <input type="checkbox" name="notWorkCheckbox" value="не работаю"
-                   id="notWorkCheckbox" <?php if ($notWorkCheckbox == "не работаю") echo "checked";?>>
-            Я не работаю
+            <select name="statusWork" id="statusWork">
+                <option value="0" <?php if ($statusWork == "0") echo "selected";?>></option>
+                <option value="работаю" <?php if ($statusWork == "работаю") echo "selected";?>>работаю</option>
+                <option value="не работаю" <?php if ($statusWork == "не работаю") echo "selected";?>>не работаю</option>
+            </select>
         </div>
         <div class="searchItem ifWorked">
             <div class="required">
