@@ -21,7 +21,7 @@
     }
     if (!isset($_GET['typeTenant']) && !isset($_GET['typeOwner'])) {
         $typeTenant = "true";
-        $typeOwner = "false";
+        $typeOwner = "true";
     }
 
     // Присваиваем всем переменным значения по умолчанию
@@ -225,21 +225,63 @@
 
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
 
-    <link type="text/css" rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
-    <link type="text/css" rel="stylesheet" href="css/fileuploader.css">
-    <link type="text/css" rel="stylesheet" href="css/rhinoslider-1.05.css" />
+    <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
+    <link rel="stylesheet" href="css/fileuploader.css">
     <!-- Стили для оформления валидационных комментариев к полям при их заполнении -->
     <link rel="stylesheet" href="css/validationEngine.jquery.css" type="text/css" media="screen" title="no title"
           charset="utf-8"/>
     <link rel="stylesheet" href="css/main.css">
     <style>
-            /* Стили для капчи и для Готово */
+        /* Основные стили для формы */
+        table tr td {
+            text-align: right;
+            padding: 0;
+            margin: 0;
+        }
+
+        .itemLabel {
+            padding-right: 6px;
+            text-align: right
+        }
+
+        .itemRequired {
+            color: red;
+        }
+
+        .itemBody {
+            padding-left: 6px;
+            margin-left: 10px;
+        }
+
+        input[type=text], input[type=password], select {
+            width: 150px;
+            border: 1px solid #CFCFCF;
+            border-radius: 4px 4px 4px 4px;
+        }
+
+        .bottomControls {
+            padding: 10px 0px 0px 0px;
+        }
+
+        .backButton {
+            float: left;
+        }
+
+        .forwardButton, .submitButton {
+            float: right;
+        }
+
+        .errorMessageBlock {
+
+        }
+
+        /* Стили для Готово */
         .readyButton {
             float: right;
             margin: 10px 0px 0px 10px;
         }
 
-            /* Стили для страницы социальных сетей*/
+        /* Стили для страницы социальных сетей*/
         #tabs-3 .searchItem {
             line-height: 2.8;
         }
@@ -252,148 +294,115 @@
             vertical-align: middle;
         }
 
-        /* Стили для слайдера с регистрационными полями */
-        #wrapperRegSlider
-        {
-            margin-top: 10px;
-            width: 100%;
-            height: 1000px;
-            border: 1px solid #DCDADA;
-            border-radius: 5px 5px 5px 5px;
-            box-shadow: 2px 2px 2px #E1E1E1;
-            background: #fff;
-        }
+        /* Стили для сообщений об ошибках */
 
-        #slider
-        {
-            background: #fff;
-            /*IE bugfix*/
-            padding:0;
-            margin:0;
-            color: #000;
-            font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif;
-            font-size:12px;
-        }
-
-        #slider li { list-style:none; }
-
-        .form-step
-        {
-            padding: 6em 5em;
-        }
-
-        .form-submit
-        {
-            cursor: pointer;
-            display: block;
+        .errorBlock {
             position: absolute;
-            right: 0;
-            bottom: 0;
-            -moz-user-select: none;
-            background: none repeat scroll 0 0 #6F95DC;
-            border-radius: 5px 5px 5px 5px;
-            color: #FFFFFF;
+            top: 300px;
+            left: 300px;
+            max-width: 250px;
+            padding-bottom: 15px;
             display: block;
-            margin: 0 20px 20px;
-            padding: 10px;
-            text-align: center;
-            width: 125px;
-            z-index: 10;
-            font-weight: bold;
-            text-decoration: none;
-            background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#94b9e9), to(#4870d2));
-            background-image: -moz-linear-gradient(#94b9e9, #4870d2);
-            background-image: -webkit-linear-gradient(#94b9e9, #4870d2);
-            background-image: -o-linear-gradient(#94b9e9, #4870d2);
-            filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#94b9e9, endColorstr=#4870d2)";
-            -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#94b9e9, endColorstr=#4870d2)";
-            font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif;
+            z-index: 5000;
         }
 
-        .errorDisplay
-        {
-            border:2px solid red;
+.errorContent {
+    width: 100%;
+    background: #FFE45C;
+    color: #000000;
+    font-family: tahoma;
+    font-size: 10px;
+    box-shadow: 1px 1px 6px #FFE45C;
+    -moz-box-shadow: 1px 1px 6px #FFE45C;
+    -webkit-box-shadow: 1px 1px 6px #FFE45C;
+    padding: 4px 10px 4px 10px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-color: #FED22F;
+}
+
+        .errorArrow {
+            position: absolute;
+            bottom: 0;
+            left: 20px;
+            width: 15px;
+            height: 15px;
         }
 
-        .form-left
-        {
-            color: #000000;
-            float: left;
-            font-size: 13px;
-            padding: 5px;
-            width: 200px;
-            text-align: right;
+        .errorBlock .errorArrow div {
+            box-shadow: 1px 4px 5px #FFE45C;
+            -moz-box-shadow: 1px 4px 5px #FFE45C;
+            -webkit-box-shadow: 1px 1px 5px #FFE45C;
+            font-size: 0px;
+
         }
 
-        .form-right
-        {
-            float: left;
-            width: 214px;
+        .errorBlock .errorArrow .line10 {
+            width: 15px;
+            height: 1px;
+            background: #FFE45C;
+            margin: 0 auto;
+            font-size: 0px;
+            display: block;
         }
 
-        .row
-        {
-            float: left;
-            margin: 5px 0;
-            width: 100%;
+        .errorBlock .errorArrow .line9 {
+            width: 13px;
+            height: 1px;
+            background: #FFE45C;
+            margin: 0 auto;
+            display: block;
         }
 
-        .form-step input[type='text']
-        {
-            border: 1px solid #CFCFCF;
-            border-radius: 4px 4px 4px 4px;
-            height: 25px;
-            padding: 3px;
-            width: 200px;
+        .errorBlock .errorArrow .line8 {
+            width: 11px;
+            height: 1px;
+            background: #FFE45C;
+            margin: 0 auto;
+            display: block;
         }
 
-        select
-        {
-            border-radius: 4px;
-            border: 1px solid #CFCFCF;
-            -webkit-border-radius: 4px;
-            -moz-border-radius: 4px;
-            background: #FFF;
-            padding: 2px;
-            height: 30px;
-            width:205px;
-            font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif;
-            font-size:12px;
-            background:#f4f4f4;
+        .errorBlock .errorArrow .line7 {
+            width: 9px;
+            height: 1px;
+            background: #FFE45C;
+            margin: 0 auto;
+            display: block;
         }
 
-        select option
-        {
-            font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif;
-            font-size:12px;
-            background:#f4f4f4;
-            color:#717171;
+        .errorBlock .errorArrow .line6 {
+            width: 7px;
+            height: 1px;
+            background: #FFE45C;
+            margin: 0 auto;
+            display: block;
         }
 
-        .form-error
-        {
-            color: red;
-            font-size: 12px;
-            padding: 5px;
+        .errorBlock .errorArrow .line5 {
+            width: 5px;
+            height: 1px;
+            background: #FFE45C;
+            margin: 0 auto;
+            display: block;
         }
 
-        .step-error
-        {
-            background:#f5715f !important;
-            color:#FFF !important;
-            -moz-box-shadow:1px 1px 4px #C6C4C4
-            -webkit-box-shadow:1px 1px 4px #C6C4C4
-            box-shadow:1px 1px 4px #C6C4C4
+        .errorBlock .errorArrow .line4 {
+            width: 3px;
+            height: 1px;
+            background: #FFE45C;
+            margin: 0 auto;
+            display: block;
         }
 
-        .step-success
-        {
-            background:#72e487 !important;
-            color:#FFF !important;
-            -moz-box-shadow:1px 1px 1px 4px #C6C4C4
-            -webkit-box-shadow:1px 1px 1px 4px #C6C4C4
-            box-shadow:1px 1px 1px 4px #C6C4C4
+        .errorBlock .errorArrow .line3 {
+            width: 1px;
+            height: 1px;
+            background: #FFE45C;
+            margin: 0 auto;
+            display: block;
         }
+
     </style>
 
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -405,8 +414,6 @@
     <!-- Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера -->
     <!-- jQuery UI с моей темой оформления -->
     <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
-    <!-- Скрипт слайдера, в котором размещены регистрационные поля -->
-    <script type="text/javascript" src="js/vendor/rhinoslider-1.05.min.js"></script>
     <!-- Русификатор виджета календарь -->
     <script src="js/vendor/jquery.ui.datepicker-ru.js"></script>
     <!-- Скрипт для валидации на лету полей формы -->
@@ -445,75 +452,124 @@
 ?>
 
 <div class="page_main_content">
+
 <div class="commentForPageBlock" style="position: relative;">
     <div class="headerOfPage" style="position: absolute; bottom: -4px; padding: 0;">
         Зарегистрируйтесь
     </div>
-<div class="why" style="border-radius: 5px; background-color: #ffffff; padding: 5px; float: right; min-width: 100px; text-align: left; margin-left: 250px;">
-    <div class="whyHeader">
-        Регистрация позволит:
-    </div>
-    <ul>
+    <div class="why"
+         style="border-radius: 5px; background-color: #ffffff; padding: 5px; float: right; min-width: 100px; text-align: left; margin-left: 250px;">
+        <div class="whyHeader">
+            Регистрация позволит:
+        </div>
         <ul>
-            <li>
-                Записаться на просмотр любой недвижимости
-            </li>
-            <li>
-                Получать уведомления о появлении подходящих вариантов недвижимости
-            </li>
-            <li>
-                Добавлять объявления в избранные и в любой момент просматривать их
-            </li>
-            <li>
-                Не указывать повторно условия поиска - система запомнит их
-            </li>
+            <ul>
+                <li>
+                    Записаться на просмотр любой недвижимости
+                </li>
+                <li>
+                    Получать уведомления о появлении подходящих вариантов недвижимости
+                </li>
+                <li>
+                    Добавлять объявления в избранные и в любой момент просматривать их
+                </li>
+                <li>
+                    Не указывать повторно условия поиска - система запомнит их
+                </li>
+            </ul>
         </ul>
-    </ul>
+    </div>
+    <div class="clearBoth"></div>
 </div>
-<div class="clearBoth"></div>
-</div>
 
-
-
-<div id="wrapperRegSlider">
-    <form action="">
-        <div id="slider">
-            <div class="form-step">
-
-                <div class="row">
-                    <div class="form-left">Фамилия *</div>
-                    <div class="form-right"><input type="text" name="surname" id="surname" size="33" class="form-input" autofocus <?php echo "value='$surname'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left">Имя *</div>
-                    <div class="form-right"><input type="text" name="name" id="name" size="33" class="form-input" <?php echo "value='$name'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left">Отчество *</div>
-                    <div class="form-right"><input type="text" name="secondName" id="secondName" size="33" class="form-input" <?php echo "value='$secondName'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left"></div>
-                    <div class="form-right"></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left">Пол *</div>
-                    <div class="form-right">
+<form name="personalInformation" method="post" enctype="multipart/form-data" style="margin-top: 10px;">
+<div id="tabs">
+<ul>
+    <li>
+        <a href="#tabs-1">Личные данные</a>
+    </li>
+    <li>
+        <a href="#tabs-2">Образование / Работа</a>
+    </li>
+    <li>
+        <a href="#tabs-3">Социальные сети</a>
+    </li>
+    <?php if ($typeTenant == "true"): ?>
+    <li>
+        <a href="#tabs-4">Что ищете?</a>
+    </li>
+    <?php endif; ?>
+</ul>
+<div id="tabs-1">
+    <div class="shadowText">
+        Информация, указаннная при регистрации, необходима для того, чтобы представить Вас собственникам тех объектов,
+        которыми Вы заинтересутесь.
+        <br>
+        <span class="required">* </span> - обязательное для заполнения поле
+    </div>
+    <div class="descriptionFieldsetsWrapper">
+        <fieldset class="edited private">
+            <legend>
+                ФИО
+            </legend>
+            <table>
+            <tbody>
+                <tr>
+                    <td class="itemLabel">
+                        Фамилия
+                    </td>
+                    <td class="itemRequired">
+                        *
+                    </td>
+                    <td class="itemBody">
+                            <input name="surname" id="surname" type="text" autofocus <?php echo "value='$surname'";?>>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="itemLabel">
+                        Имя
+                    </td>
+                    <td class="itemRequired">
+                        *
+                    </td>
+                    <td class="itemBody">
+                            <input name="name" id="name" type="text" <?php echo "value='$name'";?>>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="itemLabel">
+                        Отчество
+                    </td>
+                    <td class="itemRequired">
+                        *
+                    </td>
+                    <td class="itemBody">
+                            <input name="secondName" id="secondName" type="text" <?php echo "value='$secondName'";?>>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="itemLabel">
+                        Пол
+                    </td>
+                    <td class="itemRequired">
+                        *
+                    </td>
+                    <td class="itemBody">
                         <select name="sex" id="sex">
                             <option value="0" <?php if ($sex == "0") echo "selected";?>></option>
                             <option value="мужской" <?php if ($sex == "мужской") echo "selected";?>>мужской</option>
                             <option value="женский" <?php if ($sex == "женский") echo "selected";?>>женский</option>
                         </select>
-                    </div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left">Внешность *</div>
-                    <div class="form-right">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="itemLabel">
+                        Внешность
+                    </td>
+                    <td class="itemRequired">
+                        *
+                    </td>
+                    <td class="itemBody">
                         <select name="nationality" id="nationality">
                             <option value="0" <?php if ($nationality == "0") echo "selected";?>></option>
                             <option
@@ -537,605 +593,23 @@
                                 африканская
                             </option>
                         </select>
-                    </div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left">День рождения *</div>
-                    <div class="form-right"><input type="text" name="birthday" id="birthday" size="33" class="form-input" placeholder="дд.мм.гггг" <?php echo "value='$birthday'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left"></div>
-                    <div class="form-right"></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left">Логин *</div>
-                    <div class="form-right"><input type="text" name="login" id="login" size="33" class="form-input" maxlength="50" placeholder="номер телефона или e-mail" <?php echo "value='$login'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left">Пароль *</div>
-                    <div class="form-right"><input type="password" name="password" id="password" size="33" class="form-input" maxlength="50" <?php echo "value='$password'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left"></div>
-                    <div class="form-right"></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left">Телефон *</div>
-                    <div class="form-right"><input type="text" name="telephon" id="telephon" size="33" class="form-input" maxlength="10" <?php echo "value='$telephon'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left">E-mail *</div>
-                    <div class="form-right"><input type="text" name="email" id="email" size="33" class="form-input" <?php echo "value='$email'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left">Фотографии *</div>
-                    <div class="form-right"></div>
-                    <div class="form-error"></div>
-                </div>
-            </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="itemLabel">
+                        День рождения
+                    </td>
+                    <td class="itemRequired">
+                        *
+                    </td>
+                    <td class="itemBody">
+                            <input name="birthday" id="birthday" type="text"
+                                   placeholder="дд.мм.гггг" <?php echo "value='$birthday'";?>>
+                    </td>
+                </tr>
+            </tbody>
+            </table>
 
-            <div class="form-step">
-                <div class="row">
-                    <div class="form-left">Статус обучения *</div>
-                    <div class="form-right">
-                        <select name="currentStatusEducation" id="currentStatusEducation">
-                            <option value="0" <?php if ($currentStatusEducation == "0") echo "selected";?>></option>
-                            <option
-                                value="нет" <?php if ($currentStatusEducation == "нет") echo "selected";?>>
-                                Нигде не учился
-                            </option>
-                            <option
-                                value="сейчас учусь" <?php if ($currentStatusEducation == "сейчас учусь") echo "selected";?>>
-                                Сейчас учусь
-                            </option>
-                            <option
-                                value="закончил" <?php if ($currentStatusEducation == "закончил") echo "selected";?>>
-                                Закончил
-                            </option>
-                        </select>
-                    </div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row ifLearned" title="Укажите учебное заведение, в котором учитесь сейчас, либо последнее из тех, что заканчивали">
-                    <div class="form-left">Учебное заведение *</div>
-                    <div class="form-right"><input type="text" name="almamater" id="almamater" size="33" class="form-input ifLearned" <?php echo "value='$almamater'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row ifLearned">
-                    <div class="form-left">Специальность *</div>
-                    <div class="form-right"><input type="text" name="speciality" id="speciality" size="33" class="form-input ifLearned" <?php echo "value='$speciality'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row ifLearned" title="Укажите курс, на котором учитесь">
-                    <div class="form-left">Курс *</div>
-                    <div class="form-right"><input type="text" name="kurs" id="kurs" size="33" class="form-input ifLearned" <?php echo "value='$kurs'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row ifLearned" title="Укажите форму обучения">
-                    <div class="form-left">Форма обучения *</div>
-                    <div class="form-right">
-                    <select name="ochnoZaochno" id="ochnoZaochno" class="ifLearned">
-                        <option value="0" <?php if ($ochnoZaochno == "0") echo "selected";?>></option>
-                        <option value="очно" <?php if ($ochnoZaochno == "очно") echo "selected";?>>Очно</option>
-                        <option value="заочно" <?php if ($ochnoZaochno == "заочно") echo "selected";?>>Заочно</option>
-                    </select>
-                    </div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row ifLearned" title="Укажите год окончания учебного заведения">
-                    <div class="form-left">Год окончания *</div>
-                    <div class="form-right"><input type="text" name="yearOfEnd" id="yearOfEnd" size="33" class="form-input ifLearned" <?php echo "value='$yearOfEnd'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left"></div>
-                    <div class="form-right"></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left">Статус занятости *</div>
-                    <div class="form-right">
-                        <select name="statusWork" id="statusWork">
-                            <option value="0" <?php if ($statusWork == "0") echo "selected";?>></option>
-                            <option value="работаю" <?php if ($statusWork == "работаю") echo "selected";?>>работаю</option>
-                            <option value="не работаю" <?php if ($statusWork == "не работаю") echo "selected";?>>не работаю</option>
-                        </select>
-                    </div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row ifWorked">
-                    <div class="form-left">Место работы *</div>
-                    <div class="form-right"><input type="text" name="placeOfWork" id="placeOfWork" size="33" class="form-input ifWorked" <?php echo "value='$placeOfWork'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row ifWorked">
-                    <div class="form-left">Должность *</div>
-                    <div class="form-right"><input type="text" name="workPosition" id="workPosition" size="33" class="form-input ifWorked" <?php echo "value='$workPosition'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left"></div>
-                    <div class="form-right"></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left">В каком регионе родились *</div>
-                    <div class="form-right"><input type="text" name="regionOfBorn" id="regionOfBorn" size="33" class="form-input" <?php echo "value='$regionOfBorn'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left">Родной город, населенный пункт *</div>
-                    <div class="form-right"><input type="text" name="cityOfBorn" id="cityOfBorn" size="33" class="form-input" <?php echo "value='$cityOfBorn'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left">Коротко о себе и своих интересах *</div>
-                    <div class="form-right"><textarea name="shortlyAboutMe" id="shortlyAboutMe" cols="33" rows="4"><?php echo $shortlyAboutMe;?></textarea></div>
-                    <div class="form-error"></div>
-                </div>
-            </div>
-
-            <div class="form-step">
-                <div class="row" title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
-                    <div class="form-left"><img src="img/vkontakte.jpg"></div>
-                    <div class="form-right" style="height: 35px; line-height: 35px; padding: 5px;"><input type="text" name="vkontakte" id="vkontakte" size="100" class="form-input" placeholder="http://vk.com/..." <?php echo "value='$vkontakte'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row" title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
-                    <div class="form-left"><img src="img/odnoklassniki.png"></div>
-                    <div class="form-right" style="height: 35px; line-height: 35px; padding: 5px;"><input type="text" name="odnoklassniki" id="odnoklassniki" size="100" class="form-input" placeholder="http://www.odnoklassniki.ru/profile/..." <?php echo "value='$odnoklassniki'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row" title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
-                    <div class="form-left"><img src="img/facebook.jpg"></div>
-                    <div class="form-right" style="height: 35px; line-height: 35px; padding: 5px;"><input type="text" name="facebook" id="facebook" size="100" class="form-input" placeholder="https://www.facebook.com/profile.php?..." <?php echo "value='$facebook'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row" title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
-                    <div class="form-left"><img src="img/twitter.png"></div>
-                    <div class="form-right" style="height: 35px; line-height: 35px; padding: 5px;"><input type="text" name="twitter" id="twitter" size="100" class="form-input" placeholder="https://twitter.com/..." <?php echo "value='$twitter'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-            </div>
-
-            <div class="form-step">
-                <div class="row">
-                    <div class="form-left">Тип объекта *</div>
-                    <div class="form-right">
-                        <select name="typeOfObject" id="typeOfObject">
-                            <option value="0" <?php if ($typeOfObject == "0") echo "selected";?>></option>
-                            <option value="квартира" <?php if ($typeOfObject == "квартира") echo "selected";?>>
-                                квартира
-                            </option>
-                            <option value="комната" <?php if ($typeOfObject == "комната") echo "selected";?>>комната
-                            </option>
-                            <option value="дом" <?php if ($typeOfObject == "дом") echo "selected";?>>дом, коттедж
-                            </option>
-                            <option value="таунхаус" <?php if ($typeOfObject == "таунхаус") echo "selected";?>>
-                                таунхаус
-                            </option>
-                            <option value="дача" <?php if ($typeOfObject == "дача") echo "selected";?>>дача</option>
-                            <option value="гараж" <?php if ($typeOfObject == "гараж") echo "selected";?>>гараж</option>
-                        </select>
-                    </div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row" notavailability="typeOfObject_гараж">
-                    <div class="form-left">Количество комнат *</div>
-                    <div class="form-right" style="padding: 5px;">
-                        <input type="checkbox" value="1" name="amountOfRooms[]"
-                            <?php
-                            foreach ($amountOfRooms as $value) {
-                                if ($value == "1") {
-                                    echo "checked";
-                                    break;
-                                }
-                            }
-                            ?>>
-                        1
-                        <input type="checkbox" value="2"
-                               name="amountOfRooms[]" <?php
-                            foreach ($amountOfRooms as $value) {
-                                if ($value == "2") {
-                                    echo "checked";
-                                    break;
-                                }
-                            }
-                            ?>>
-                        2
-                        <input type="checkbox" value="3"
-                               name="amountOfRooms[]" <?php
-                            foreach ($amountOfRooms as $value) {
-                                if ($value == "3") {
-                                    echo "checked";
-                                    break;
-                                }
-                            }
-                            ?>>
-                        3
-                        <input type="checkbox" value="4"
-                               name="amountOfRooms[]" <?php
-                            foreach ($amountOfRooms as $value) {
-                                if ($value == "4") {
-                                    echo "checked";
-                                    break;
-                                }
-                            }
-                            ?>>
-                        4
-                        <input type="checkbox" value="5"
-                               name="amountOfRooms[]" <?php
-                            foreach ($amountOfRooms as $value) {
-                                if ($value == "5") {
-                                    echo "checked";
-                                    break;
-                                }
-                            }
-                            ?>>
-                        5
-                        <input type="checkbox" value="6"
-                               name="amountOfRooms[]" <?php
-                            foreach ($amountOfRooms as $value) {
-                                if ($value == "6") {
-                                    echo "checked";
-                                    break;
-                                }
-                            }
-                            ?>>
-                        6...
-                    </div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row" notavailability="typeOfObject_гараж">
-                    <div class="form-left">Комнаты смежные *</div>
-                    <div class="form-right">
-                        <select name="adjacentRooms" id="adjacentRooms">
-                            <option value="0" <?php if ($adjacentRooms == "0") echo "selected";?>></option>
-                            <option
-                                value="не имеет значения" <?php if ($adjacentRooms == "не имеет значения") echo "selected";?>>
-                                не имеет значения
-                            </option>
-                            <option
-                                value="только изолированные" <?php if ($adjacentRooms == "только изолированные") echo "selected";?>>
-                                только изолированные
-                            </option>
-                        </select>
-                    </div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row" notavailability="typeOfObject_дом&typeOfObject_таунхаус&typeOfObject_дача&typeOfObject_гараж">
-                    <div class="form-left">Этаж *</div>
-                    <div class="form-right">
-                        <select name="floor" id="floor">
-                            <option value="0" <?php if ($floor == "0") echo "selected";?>></option>
-                            <option value="любой" <?php if ($floor == "любой") echo "selected";?>>любой</option>
-                            <option value="не первый" <?php if ($floor == "не первый") echo "selected";?>>не первый
-                            </option>
-                            <option
-                                value="не первый и не последний" <?php if ($floor == "не первый и не последний") echo "selected";?>>
-                                не первый и не
-                                последний
-                            </option>
-                        </select>
-                    </div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left"></div>
-                    <div class="form-right"></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row" title="Укажите, сколько Вы готовы платить в месяц за аренду недвижимости с учетом стоимости коммунальных услуг (если они оплачиваются дополнительно)">
-                    <div class="form-left">Арендная плата от, руб.</div>
-                    <div class="form-right"><input type="text" name="minCost" id="minCost" size="33" class="form-input" maxlength="8" <?php echo "value='$minCost'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row" title="Укажите, сколько Вы готовы платить в месяц за аренду недвижимости с учетом стоимости коммунальных услуг (если они оплачиваются дополнительно)">
-                    <div class="form-left">Арендная плата до, руб.</div>
-                    <div class="form-right"><input type="text" name="maxCost" id="maxCost" size="33" class="form-input" maxlength="8" <?php echo "value='$maxCost'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row" title="Какую сумму Вы готовы передать собственнику в качестве возвращаемого гарантийного депозита">
-                    <div class="form-left">Залог до, руб.</div>
-                    <div class="form-right"><input type="text" name="pledge" id="pledge" size="33" class="form-input" maxlength="8" <?php echo "value='$pledge'";?>/></div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row" title="Какую предоплату за проживание Вы готовы внести">
-                    <div class="form-left">Максимальная предоплата</div>
-                    <div class="form-right">
-                        <select name="prepayment" id="prepayment">
-                            <option value="0" <?php if ($prepayment == "0") echo "selected";?>></option>
-                            <option value="нет" <?php if ($prepayment == "нет") echo "selected";?>>нет</option>
-                            <option value="1 месяц" <?php if ($prepayment == "1 месяц") echo "selected";?>>1 месяц
-                            </option>
-                            <option value="2 месяца" <?php if ($prepayment == "2 месяца") echo "selected";?>>2 месяца
-                            </option>
-                            <option value="3 месяца" <?php if ($prepayment == "3 месяца") echo "selected";?>>3 месяца
-                            </option>
-                            <option value="4 месяца" <?php if ($prepayment == "4 месяца") echo "selected";?>>4 месяца
-                            </option>
-                            <option value="5 месяцев" <?php if ($prepayment == "5 месяцев") echo "selected";?>>5
-                                месяцев
-                            </option>
-                            <option value="6 месяцев" <?php if ($prepayment == "6 месяцев") echo "selected";?>>6
-                                месяцев
-                            </option>
-                        </select>
-                    </div>
-                    <div class="form-error"></div>
-                </div>
-                    <div class="row">
-                        <div class="form-left"></div>
-                        <div class="form-right"></div>
-                        <div class="form-error"></div>
-                    </div>
-                    <div class="row">
-                        <div class="form-left">Район</div>
-                        <div class="form-right">
-                            <ul style="padding: 0px 0px 0px 5px; margin: 0; height: 150px; overflow-x: auto;">
-                                <?php
-                                if (isset($allDistrictsInCity)) {
-                                    foreach ($allDistrictsInCity as $value) { // Для каждого идентификатора района и названия формируем чекбокс
-                                        echo "<li><input type='checkbox' name='district[]' value='" . $value . "'";
-                                        foreach ($district as $valueDistrict) {
-                                            if ($valueDistrict == $value) {
-                                                echo "checked";
-                                                break;
-                                            }
-                                        }
-                                        echo "> " . $value . "</li>";
-                                    }
-                                }
-                                ?>
-                            </ul>
-                        </div>
-                        <div class="form-error"></div>
-                    </div>
-                        <div class="row">
-                            <div class="form-left"></div>
-                            <div class="form-right"></div>
-                            <div class="form-error"></div>
-                        </div>
-                        <div class="row" notavailability="typeOfObject_гараж">
-                            <div class="form-left">Как собираетесь проживать *</div>
-                            <div class="form-right">
-                                <select name="withWho" id="withWho">
-                                    <option value="0" <?php if ($withWho == "0") echo "selected";?>></option>
-                                    <option value="самостоятельно" <?php if ($withWho == "самостоятельно") echo "selected";?>>
-                                        самостоятельно
-                                    </option>
-                                    <option value="семья" <?php if ($withWho == "семья") echo "selected";?>>семьей
-                                    </option>
-                                    <option value="пара" <?php if ($withWho == "пара") echo "selected";?>>парой
-                                    </option>
-                                    <option value="2 мальчика" <?php if ($withWho == "2 мальчика") echo "selected";?>>2 мальчика
-                                    </option>
-                                    <option value="2 девочки" <?php if ($withWho == "2 девочки") echo "selected";?>>2 девочки
-                                    </option>
-                                    <option value="со знакомыми" <?php if ($withWho == "со знакомыми") echo "selected";?>>со
-                                        знакомыми
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="form-error"></div>
-                        </div>
-                        <div class="row" id="withWhoDescription" style="display: none;">
-                            <div class="form-left">Информация о сожителях</div>
-                            <div class="form-right">
-                                <textarea name="linksToFriends" id="linksToFriends" cols="33" rows="3"><?php echo $linksToFriends;?></textarea>
-                            </div>
-                            <div class="form-error"></div>
-                        </div>
-                <div class="row" notavailability="typeOfObject_гараж">
-                    <div class="form-left">Дети *</div>
-                    <div class="form-right">
-                        <select name="children" id="children">
-                            <option value="0" <?php if ($children == "0") echo "selected";?>></option>
-                            <option value="без детей" <?php if ($children == "без детей") echo "selected";?>>без детей
-                            </option>
-                            <option
-                                value="с детьми младше 4-х лет" <?php if ($children == "с детьми младше 4-х лет") echo "selected";?>>
-                                с детьми
-                                младше 4-х лет
-                            </option>
-                            <option
-                                value="с детьми старше 4-х лет" <?php if ($children == "с детьми старше 4-х лет") echo "selected";?>>
-                                с детьми
-                                старше 4-х лет
-                            </option>
-                        </select>
-                    </div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row" id="childrenDescription" style="display: none;">
-                    <div class="form-left">Сколько у Вас детей и какого возраста</div>
-                    <div class="form-right">
-                        <textarea name="howManyChildren" id="howManyChildren" cols="33" rows="3"><?php echo $howManyChildren;?></textarea>
-                    </div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row" notavailability="typeOfObject_гараж">
-                    <div class="form-left">Животные *</div>
-                    <div class="form-right">
-                        <select name="animals" id="animals">
-                            <option value="0" <?php if ($animals == "0") echo "selected";?>></option>
-                            <option value="без животных" <?php if ($animals == "без животных") echo "selected";?>>без
-                                животных
-                            </option>
-                            <option value="с животным(ми)" <?php if ($animals == "с животным(ми)") echo "selected";?>>с
-                                животным(ми)
-                            </option>
-                        </select>
-                    </div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row" id="animalsDescription" style="display: none;">
-                    <div class="form-left">Сколько у Вас животных и какого вида</div>
-                    <div class="form-right">
-                        <textarea name="howManyAnimals" id="howManyAnimals" cols="33" rows="3"><?php echo $howManyAnimals;?></textarea>
-                    </div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left">Срок аренды *</div>
-                    <div class="form-right">
-                        <select name="termOfLease" id="termOfLease">
-                            <option value="0" <?php if ($termOfLease == "0") echo "selected";?>></option>
-                            <option value="длительный срок" <?php if ($termOfLease == "длительный срок") echo "selected";?>>
-                                длительный срок (от года)
-                            </option>
-                            <option
-                                value="несколько месяцев" <?php if ($termOfLease == "несколько месяцев") echo "selected";?>>
-                                несколько месяцев (до года)
-                            </option>
-                        </select>
-                    </div>
-                    <div class="form-error"></div>
-                </div>
-                <div class="row">
-                    <div class="form-left">Дополнительные условия поиска</div>
-                    <div class="form-right">
-                        <textarea name="additionalDescriptionOfSearch" id="additionalDescriptionOfSearch" cols="33" rows="3"><?php echo $additionalDescriptionOfSearch;?></textarea>
-                    </div>
-                    <div class="form-error"></div>
-                </div>
-            </div>
-        </div>
-    </form>
-</div>
-
-<div class="clearBoth"></div>
-
-<div class="wrapperOfTabs" style="margin-top: 30px;">
-<form name="personalInformation" method="post" enctype="multipart/form-data">
-
-<div id="tabs">
-<ul>
-    <li>
-        <a href="#tabs-1">Личные данные</a>
-    </li>
-    <li>
-        <a href="#tabs-2">Образование / Работа</a>
-    </li>
-    <li>
-        <a href="#tabs-3">Социальные сети</a>
-    </li>
-    <?php if ($typeTenant == "true"): ?>
-    <li>
-        <a href="#tabs-4">Что ищете?</a>
-    </li>
-    <?php endif; ?>
-</ul>
-<div id="tabs-1">
-    <div class="shadowText">
-        Информация, указаннная при регистрации, необходима для того, чтобы представить Вас собственникам тех объектов,
-        которыми Вы заинтересутесь. Заполните форму на этой и следующих вкладках как можно подробнее.
-        <br>
-        <span class="required">* </span> - обязательное для заполнения поле
-    </div>
-    <div class="descriptionFieldsetsWrapper">
-        <fieldset class="edited private">
-            <legend>
-                ФИО
-            </legend>
-            <div class="searchItem">
-                <div class="required">
-                    *
-                </div>
-                <span class="searchItemLabel">Фамилия: </span>
-
-                <div class="searchItemBody">
-                    <input name="surname" type="text" size="33"
-                           validations="validate[required]" <?php echo "value='$surname'";?>>
-                </div>
-            </div>
-            <div class="searchItem">
-                <div class="required">
-                    *
-                </div>
-                <span class="searchItemLabel">Имя: </span>
-
-                <div class="searchItemBody">
-                    <input name="name" type="text" size="38" autofocus
-                           validations="validate[required]" <?php echo "value='$name'";?>>
-                </div>
-            </div>
-            <div class="searchItem">
-                <div class="required">
-                    *
-                </div>
-                <span class="searchItemLabel">Отчество: </span>
-
-                <div class="searchItemBody">
-                    <input name="secondName" type="text" size="33"
-                           validations="validate[required]" <?php echo "value='$secondName'";?>>
-                </div>
-            </div>
-            <div class="searchItem">
-                <div class="required">
-                    *
-                </div>
-                <span class="searchItemLabel">Пол: </span>
-
-                <div class="searchItemBody">
-                    <select name="sex" validations="validate[required]">
-                        <option value="0" <?php if ($sex == "0") echo "selected";?>></option>
-                        <option value="мужской" <?php if ($sex == "мужской") echo "selected";?>>мужской</option>
-                        <option value="женский" <?php if ($sex == "женский") echo "selected";?>>женский</option>
-                    </select>
-                </div>
-            </div>
-            <div class="searchItem">
-                <div class="required">
-                    *
-                </div>
-                <span class="searchItemLabel">Внешность: </span>
-
-                <div class="searchItemBody">
-                    <select name="nationality" id="nationality" validations='validate[required]'>
-                        <option value="0" <?php if ($nationality == "0") echo "selected";?>></option>
-                        <option
-                            value="славянская" <?php if ($nationality == "славянская") echo "selected";?>>
-                            славянская
-                        </option>
-                        <option
-                            value="европейская" <?php if ($nationality == "европейская") echo "selected";?>>
-                            европейская
-                        </option>
-                        <option
-                            value="азиатская" <?php if ($nationality == "азиатская") echo "selected";?>>
-                            азиатская
-                        </option>
-                        <option
-                            value="кавказская" <?php if ($nationality == "кавказская") echo "selected";?>>
-                            кавказская
-                        </option>
-                        <option
-                            value="африканская" <?php if ($nationality == "африканская") echo "selected";?>>
-                            африканская
-                        </option>
-                    </select>
-                </div>
-            </div>
-            <div class="searchItem">
-                <div class="required">
-                    *
-                </div>
-                <span class="searchItemLabel">День рождения: </span>
-
-                <div class="searchItemBody">
-                    <input name="birthday" type="text" id="datepicker" size="15"
-                           placeholder="дд.мм.гггг" <?php echo "value='$birthday'";?>>
-                </div>
-            </div>
         </fieldset>
 
         <div style="display: inline-block; vertical-align: top;">
@@ -1143,59 +617,66 @@
                 <legend>
                     Логин и пароль
                 </legend>
-                <div class="searchItem" title="Используйте в качестве логина ваш e-mail или телефон">
-                    <div class="required">
-                        *
-                    </div>
-                    <span class="searchItemLabel">Логин: </span>
-
-                    <div class="searchItemBody">
-                        <input type="text" size="30" maxlength="50" name="login" placeholder="e-mail или номер телефона"
-                               validations="validate[required]" <?php echo "value='$login'";?>>
-                    </div>
-                </div>
-                <div class="searchItem">
-                    <div class="required">
-                        *
-                    </div>
-                    <span class="searchItemLabel">Пароль: </span>
-
-                    <div class="searchItemBody">
-                        <input type="password" size="29" maxlength="50"
-                               name="password" validations="validate[required]" <?php echo "value='$password'";?>>
-                    </div>
-                </div>
+                <table>
+                    <tbody>
+                        <tr title="Используйте в качестве логина ваш e-mail или телефон">
+                            <td class="itemLabel">
+                                Логин
+                            </td>
+                            <td class="itemRequired">
+                                *
+                            </td>
+                            <td class="itemBody">
+                                <input type="text" name="login" id="login" maxlength="50"  placeholder="e-mail или номер телефона" <?php echo "value='$login'";?>>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="itemLabel">
+                                Пароль
+                            </td>
+                            <td class="itemRequired">
+                                *
+                            </td>
+                            <td class="itemBody">
+                                <input type="password" name="password" id="password" maxlength="50" <?php echo "value='$password'";?>>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </fieldset>
 
             <fieldset class="edited private" style="display: block;">
                 <legend>
                     Контакты
                 </legend>
-                <div class="searchItem">
-                    <div class="required">
-                        *
-                    </div>
-                    <span class="searchItemLabel">Телефон: </span>
-
-                    <div class="searchItemBody">
-                        <input name="telephon" type="text" size="27"
-                               validations="validate[required,custom[telephone]]" <?php echo "value='$telephon'";?>>
-                    </div>
-                </div>
-                <div class="searchItem">
-                    <div class="required">
-                        <?php if ($typeTenant == "true") {
-                        echo "*";
-                    } ?>
-                    </div>
-                    <span class="searchItemLabel">E-mail: </span>
-
-                    <div class="searchItemBody">
-                        <input name="email" type="text" size="30" <?php if ($typeTenant == "true") {
-                            echo "validations='validate[required,custom[email]]'";
-                        } echo "value='$email'"; ?>>
-                    </div>
-                </div>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td class="itemLabel">
+                                Телефон
+                            </td>
+                            <td class="itemRequired">
+                                *
+                            </td>
+                            <td class="itemBody">
+                                <input type="text" name="telephon" id="telephon" <?php echo "value='$telephon'";?>>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="itemLabel">
+                                E-mail
+                            </td>
+                            <td class="itemRequired">
+                                <?php if ($typeTenant == "true") {
+                                echo "*";
+                            } ?>
+                            </td>
+                            <td class="itemBody">
+                                <input type="text" name="email" id="email" <?php echo "value='$email'"; ?>>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </fieldset>
         </div>
 
@@ -1230,8 +711,9 @@
 
     </div>
     <!-- /end.descriptionFieldsetsWrapper -->
-    <div class="shadowText" style="margin-top: 7px;">
-        По окончании заполнения полей на всех вкладках введите текст капчи и нажмите кнопку "Готово" справа внизу
+    <div class="bottomControls">
+        <button class="forwardButton">Далее</button>
+        <div class="clearBoth"></div>
     </div>
 </div>
 <div id="tabs-2">
@@ -1243,158 +725,197 @@
         <legend>
             Образование
         </legend>
-        <div class="searchItem">
-            <div class="required">
-                <?php if ($typeTenant == "true") {
-                echo "*";
-            } ?>
-            </div>
-            <span class="searchItemLabel">Текущий статус: </span>
-
-            <div class="searchItemBody">
-                <select name="currentStatusEducation" id="currentStatusEducation" <?php if ($typeTenant == "true") {
-                    echo "validations='validate[required]'";
-                } ?>>
-                    <option value="0" <?php if ($currentStatusEducation == "0") echo "selected";?>></option>
-                    <option
-                        value="нет" <?php if ($currentStatusEducation == "нет") echo "selected";?>>
-                        Нигде не учился
-                    </option>
-                    <option
-                        value="сейчас учусь" <?php if ($currentStatusEducation == "сейчас учусь") echo "selected";?>>
-                        Сейчас учусь
-                    </option>
-                    <option
-                        value="закончил" <?php if ($currentStatusEducation == "закончил") echo "selected";?>>
-                        Закончил
-                    </option>
-                </select>
-            </div>
-        </div>
-        <div id="almamater" class="searchItem ifLearned"
-             title="Укажите учебное заведение, в котором учитесь сейчас, либо последнее из тех, что заканчивали">
-            <div class="required">
-            </div>
-            <span class="searchItemLabel">Учебное заведение: </span>
-
-            <div class="searchItemBody">
-                <input name="almamater" class="ifLearned" type="text" size="50" <?php echo "value='$almamater'";?>>
-            </div>
-        </div>
-        <div id="speciality" class="searchItem ifLearned">
-            <div class="required">
-            </div>
-            <span class="searchItemLabel">Специальность: </span>
-
-            <div class="searchItemBody">
-                <input name="speciality" class="ifLearned" type="text" size="55" <?php echo "value='$speciality'";?>>
-            </div>
-        </div>
-        <div id="kurs" class="searchItem ifLearned" title="Укажите курс, на котором учитесь">
-            <div class="required">
-            </div>
-            <span class="searchItemLabel">Курс: </span>
-
-            <div class="searchItemBody">
-                <input name="kurs" class="ifLearned" type="text" size="19" <?php echo "value='$kurs'";?>>
-            </div>
-        </div>
-        <div id="formatEducation" class="searchItem ifLearned" title="Укажите форму обучения">
-            <div class="required">
-            </div>
-            <span class="searchItemLabel">Очно / Заочно: </span>
-
-            <div class="searchItemBody">
-                <select name="ochnoZaochno" class="ifLearned">
-                    <option value="0" <?php if ($ochnoZaochno == "0") echo "selected";?>></option>
-                    <option value="очно" <?php if ($ochnoZaochno == "очно") echo "selected";?>>Очно</option>
-                    <option value="заочно" <?php if ($ochnoZaochno == "заочно") echo "selected";?>>Заочно</option>
-                </select>
-            </div>
-        </div>
-        <div id="yearOfEnd" class="searchItem ifLearned" title="Укажите год окончания учебного заведения">
-            <div class="required">
-            </div>
-            <span class="searchItemLabel">Год окончания: </span>
-
-            <div class="searchItemBody">
-                <input name="yearOfEnd" class="ifLearned" type="text" size="9" <?php echo "value='$yearOfEnd'";?>>
-            </div>
-        </div>
+        <table>
+            <tbody>
+                <tr>
+                    <td class="itemLabel">
+                        Текущий статус
+                    </td>
+                    <td class="itemRequired">
+                        <?php if ($typeTenant == "true") {
+                        echo "*";
+                    } ?>
+                    </td>
+                    <td class="itemBody">
+                        <select name="currentStatusEducation" id="currentStatusEducation">
+                            <option value="0" <?php if ($currentStatusEducation == "0") echo "selected";?>></option>
+                            <option
+                                value="нет" <?php if ($currentStatusEducation == "нет") echo "selected";?>>
+                                Нигде не учился
+                            </option>
+                            <option
+                                value="сейчас учусь" <?php if ($currentStatusEducation == "сейчас учусь") echo "selected";?>>
+                                Сейчас учусь
+                            </option>
+                            <option
+                                value="закончил" <?php if ($currentStatusEducation == "закончил") echo "selected";?>>
+                                Закончил
+                            </option>
+                        </select>
+                    </td>
+                </tr>
+                <tr id="almamaterBlock" class="ifLearned" title="Укажите учебное заведение, в котором учитесь сейчас, либо последнее из тех, что заканчивали">
+                    <td class="itemLabel">
+                        Учебное заведение
+                    </td>
+                    <td class="itemRequired">
+                    </td>
+                    <td class="itemBody">
+                        <input type="text" name="almamater" id="almamater" class="ifLearned" <?php echo "value='$almamater'";?>>
+                    </td>
+                </tr>
+                <tr id="specialityBlock" class="ifLearned">
+                    <td class="itemLabel">
+                        Специальность
+                    </td>
+                    <td class="itemRequired">
+                    </td>
+                    <td class="itemBody">
+                        <input type="text" name="speciality" id="speciality" class="ifLearned" <?php echo "value='$speciality'";?>>
+                    </td>
+                </tr>
+                <tr id="kursBlock" class="ifLearned" title="Укажите курс, на котором учитесь">
+                    <td class="itemLabel">
+                        Курс
+                    </td>
+                    <td class="itemRequired">
+                    </td>
+                    <td class="itemBody">
+                        <input type="text" name="kurs" id="kurs" class="ifLearned" <?php echo "value='$kurs'";?>>
+                    </td>
+                </tr>
+                <tr id="formatEducation" class="ifLearned" title="Укажите форму обучения">
+                    <td class="itemLabel">
+                        Очно / Заочно
+                    </td>
+                    <td class="itemRequired">
+                    </td>
+                    <td class="itemBody">
+                        <select name="ochnoZaochno" id="ochnoZaochno" class="ifLearned">
+                            <option value="0" <?php if ($ochnoZaochno == "0") echo "selected";?>></option>
+                            <option value="очно" <?php if ($ochnoZaochno == "очно") echo "selected";?>>Очно</option>
+                            <option value="заочно" <?php if ($ochnoZaochno == "заочно") echo "selected";?>>Заочно</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr id="yearOfEndBlock" class="ifLearned" title="Укажите год окончания учебного заведения">
+                    <td class="itemLabel">
+                        Год окончания
+                    </td>
+                    <td class="itemRequired">
+                    </td>
+                    <td class="itemBody">
+                        <input type="text" name="yearOfEnd" id="yearOfEnd" class="ifLearned" <?php echo "value='$yearOfEnd'";?>>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </fieldset>
+
 
     <fieldset class="edited private">
         <legend>
             Работа
         </legend>
-        <div>
-
-        </div>
-        <div class="searchItem ifWorked">
-            <div class="required">
-            </div>
-            <span class="searchItemLabel">Место работы: </span>
-
-            <div class="searchItemBody">
-                <input name="placeOfWork" class="ifWorked" type="text" size="30" <?php echo "value='$placeOfWork'";?>>
-            </div>
-        </div>
-        <div class="searchItem ifWorked">
-            <div class="required">
-            </div>
-            <span class="searchItemLabel">Должность: </span>
-
-            <div class="searchItemBody">
-                <input name="workPosition" class="ifWorked" type="text" size="33" <?php echo "value='$workPosition'";?>>
-            </div>
-        </div>
+        <table>
+            <tbody>
+                <tr>
+                    <td class="itemLabel">
+                        Статус занятости
+                    </td>
+                    <td class="itemRequired">
+                        <?php if ($typeTenant == "true") {
+                        echo "*";
+                    } ?>
+                    </td>
+                    <td class="itemBody">
+                        <select name="statusWork" id="statusWork">
+                            <option value="0" <?php if ($statusWork == "0") echo "selected";?>></option>
+                            <option value="работаю" <?php if ($statusWork == "работаю") echo "selected";?>>работаю</option>
+                            <option value="не работаю" <?php if ($statusWork == "не работаю") echo "selected";?>>не работаю</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr class="ifWorked">
+                    <td class="itemLabel">
+                        Место работы
+                    </td>
+                    <td class="itemRequired">
+                    </td>
+                    <td class="itemBody">
+                        <input type="text" name="placeOfWork" id="placeOfWork" class="ifWorked" <?php echo "value='$placeOfWork'";?>>
+                    </td>
+                </tr>
+                <tr class="ifWorked">
+                    <td class="itemLabel">
+                        Должность
+                    </td>
+                    <td class="itemRequired">
+                    </td>
+                    <td class="itemBody">
+                        <input type="text" name="workPosition" id="workPosition" class="ifWorked" <?php echo "value='$workPosition'";?>>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </fieldset>
+
 
     <fieldset class="edited private">
         <legend>
             Коротко о себе
         </legend>
-        <div class="searchItem">
-            <div class="required">
-                <?php if ($typeTenant == "true") {
-                echo "*";
-            } ?>
-            </div>
-            <span class="searchItemLabel">В каком регионе родились: </span>
-
-            <div class="searchItemBody">
-                <input name="regionOfBorn" type="text" size="42" <?php if ($typeTenant == "true") {
-                    echo "validations='validate[required]'";
-                } echo "value='$regionOfBorn'";?>>
-            </div>
-        </div>
-        <div class="searchItem">
-            <div class="required">
-                <?php if ($typeTenant == "true") {
-                echo "*";
-            } ?>
-            </div>
-            <span class="searchItemLabel">Родной город, населенный пункт: </span>
-
-            <div class="searchItemBody">
-                <input name="cityOfBorn" type="text" size="36" <?php if ($typeTenant == "true") {
-                    echo "validations='validate[required]'";
-                } echo "value='$cityOfBorn'";?>>
-            </div>
-        </div>
-        <div class="searchItem">
-            <div class="required"></div>
-            <span class="searchItemLabel">Коротко о себе и своих интересах: </span>
-        </div>
-        <div class="searchItem">
-            <div class="required"></div>
-            <textarea name="shortlyAboutMe" cols="71" rows="4"><?php echo $shortlyAboutMe;?></textarea>
-        </div>
+        <table>
+            <tbody>
+                <tr>
+                    <td class="itemLabel">
+                        В каком регионе родились
+                    </td>
+                    <td class="itemRequired">
+                        <?php if ($typeTenant == "true") {
+                        echo "*";
+                    } ?>
+                    </td>
+                    <td class="itemBody">
+                        <input type="text" name="regionOfBorn" id="regionOfBorn" <?php echo "value='$regionOfBorn'";?>>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="itemLabel">
+                        Родной город, населенный пункт
+                    </td>
+                    <td class="itemRequired">
+                        <?php if ($typeTenant == "true") {
+                        echo "*";
+                    } ?>
+                    </td>
+                    <td class="itemBody">
+                        <input type="text" name="cityOfBorn" id="cityOfBorn" <?php echo "value='$cityOfBorn'";?>>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="itemLabel">
+                        Коротко о себе и своих интересах
+                    </td>
+                    <td class="itemRequired">
+                    </td>
+                    <td class="itemBody">
+                        <div class="required"></div>
+                        <textarea name="shortlyAboutMe" id="shortlyAboutMe" cols="71" rows="4"><?php echo $shortlyAboutMe;?></textarea>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </fieldset>
-    <div class="shadowText" style="margin-top: 7px;">
-        По окончании заполнения полей на всех вкладках введите текст капчи и нажмите кнопку "Готово" справа внизу
+
+    <div class="bottomControls">
+        <button class="backButton">Назад</button>
+        <button class="forwardButton">Далее</button>
+        <div class="clearBoth"></div>
     </div>
+
 </div>
+
 <div id="tabs-3">
     <div class="shadowText">
         Укажите, пожалуйста, адрес Вашей личной страницы минимум в одной социальной сети. Это позволит системе
@@ -1404,13 +925,25 @@
         <legend>
             Страницы в социальных сетях
         </legend>
+        <table>
+            <tbody>
+                <tr>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
         <div class="searchItem"
              title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
             <div class="required"></div>
             <img src="img/vkontakte.jpg">
 
             <div class="searchItemBody">
-                <input type="text" name="vkontakte" size="62"
+                <input type="text" name="vkontakte" id="vkontakte" size="62"
                        placeholder="http://vk.com/..." <?php echo "value='$vkontakte'";?>>
             </div>
         </div>
@@ -1420,7 +953,7 @@
             <img src="img/odnoklassniki.png">
 
             <div class="searchItemBody">
-                <input type="text" name="odnoklassniki" size="68"
+                <input type="text" name="odnoklassniki" id="odnoklassniki" size="68"
                        placeholder="http://www.odnoklassniki.ru/profile/..." <?php echo "value='$odnoklassniki'";?>>
             </div>
         </div>
@@ -1430,7 +963,7 @@
             <img src="img/facebook.jpg">
 
             <div class="searchItemBody">
-                <input type="text" name="facebook" size="71"
+                <input type="text" name="facebook" id="facebook" size="71"
                        placeholder="https://www.facebook.com/profile.php?..." <?php echo "value='$facebook'";?>>
             </div>
         </div>
@@ -1440,14 +973,27 @@
             <img src="img/twitter.png">
 
             <div class="searchItemBody">
-                <input type="text" name="twitter" size="62"
+                <input type="text" name="twitter" id="twitter" size="62"
                        placeholder="https://twitter.com/..." <?php echo "value='$twitter'";?>>
             </div>
         </div>
     </fieldset>
-    <div class="shadowText" style="margin-top: 7px;">
-        По окончании заполнения полей на всех вкладках введите текст капчи и нажмите кнопку "Готово" справа внизу
+
+    <?php if ($typeTenant == "true"): ?>
+    <div class="bottomControls">
+        <button class="backButton">Назад</button>
+        <button class="forwardButton">Далее</button>
+        <div class="clearBoth"></div>
     </div>
+    <?php endif; ?>
+    <?php if ($typeTenant != "true"): ?>
+    <div class="bottomControls">
+        <button class="backButton">Назад</button>
+        <button type="submit" class="submitButton">Отправить</button>
+        <div class="clearBoth"></div>
+    </div>
+    <?php endif; ?>
+
 </div>
 <?php if ($typeTenant == "true"): ?>
 <div id="tabs-4">
@@ -1460,6 +1006,18 @@
                 <legend>
                     Характеристика объекта
                 </legend>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
                 <div class="searchItem">
                     <span class="searchItemLabel"> Тип: </span>
 
@@ -1551,7 +1109,7 @@
                     <span class="searchItemLabel"> Комнаты смежные: </span>
 
                     <div class="searchItemBody">
-                        <select name="adjacentRooms">
+                        <select name="adjacentRooms" id="adjacentRooms">
                             <option value="0" <?php if ($adjacentRooms == "0") echo "selected";?>></option>
                             <option
                                 value="не имеет значения" <?php if ($adjacentRooms == "не имеет значения") echo "selected";?>>
@@ -1570,7 +1128,7 @@
                     <span class="searchItemLabel"> Этаж: </span>
 
                     <div class="searchItemBody">
-                        <select name="floor">
+                        <select name="floor" id="floor">
                             <option value="0" <?php if ($floor == "0") echo "selected";?>></option>
                             <option value="любой" <?php if ($floor == "любой") echo "selected";?>>любой</option>
                             <option value="не первый" <?php if ($floor == "не первый") echo "selected";?>>не первый
@@ -1588,6 +1146,18 @@
                 <legend>
                     Стоимость
                 </legend>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
                 <div class="searchItem">
                     <div class="searchItemLabel"
                          title="Укажите, сколько Вы готовы платить в месяц за аренду недвижимости с учетом стоимости коммунальных услуг (если они оплачиваются дополнительно)">
@@ -1609,7 +1179,7 @@
 
                     <div class="searchItemBody">
                         до
-                        <input type="text" name="pledge" size="10" maxlength="8" <?php echo "value='$pledge'";?>>
+                        <input type="text" name="pledge" id="pledge" size="10" maxlength="8" <?php echo "value='$pledge'";?>>
                         руб.
                     </div>
                 </div>
@@ -1618,7 +1188,7 @@
                     <span class="searchItemLabel"> Максимальная предоплата: </span>
 
                     <div class="searchItemBody">
-                        <select name="prepayment">
+                        <select name="prepayment" id="prepayment">
                             <option value="0" <?php if ($prepayment == "0") echo "selected";?>></option>
                             <option value="нет" <?php if ($prepayment == "нет") echo "selected";?>>нет</option>
                             <option value="1 месяц" <?php if ($prepayment == "1 месяц") echo "selected";?>>1 месяц
@@ -1672,6 +1242,18 @@
             <legend>
                 Особые параметры поиска
             </legend>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                        </td>
+                        <td>
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
             <div class="searchItem" notavailability="typeOfObject_гараж">
                 <div class="required">
                     *
@@ -1703,7 +1285,7 @@
                     Информация о сожителях:
                 </div>
                 <div class="searchItemBody">
-                    <textarea name="linksToFriends" cols="40" rows="3"><?php echo $linksToFriends;?></textarea>
+                    <textarea name="linksToFriends" id="linksToFriends" cols="40" rows="3"><?php echo $linksToFriends;?></textarea>
                 </div>
             </div>
             <div class="searchItem" notavailability="typeOfObject_гараж">
@@ -1735,7 +1317,7 @@
                     Сколько у Вас детей и какого возраста:
                 </div>
                 <div class="searchItemBody">
-                    <textarea name="howManyChildren" cols="40" rows="3"><?php echo $howManyChildren;?></textarea>
+                    <textarea name="howManyChildren" id="howManyChildren" cols="40" rows="3"><?php echo $howManyChildren;?></textarea>
                 </div>
             </div>
             <div class="searchItem" notavailability="typeOfObject_гараж">
@@ -1761,7 +1343,7 @@
                     Сколько у Вас животных и какого вида:
                 </div>
                 <div class="searchItemBody">
-                    <textarea name="howManyAnimals" cols="40" rows="3"><?php echo $howManyAnimals;?></textarea>
+                    <textarea name="howManyAnimals" id="howManyAnimals" cols="40" rows="3"><?php echo $howManyAnimals;?></textarea>
                 </div>
             </div>
             <div class="searchItem">
@@ -1792,14 +1374,17 @@
             <div class="searchItem">
                 <div class="required"></div>
                 <div class="searchItemBody">
-                    <textarea name="additionalDescriptionOfSearch" cols="50"
+                    <textarea name="additionalDescriptionOfSearch" id="additionalDescriptionOfSearch" cols="50"
                               rows="4"><?php echo $additionalDescriptionOfSearch;?></textarea>
                 </div>
             </div>
         </fieldset>
     </div>
-    <div class="shadowText" style="margin-top: 7px;">
-        По окончании заполнения полей на всех вкладках введите текст капчи и нажмите кнопку "Готово" справа внизу
+
+    <div class="bottomControls">
+        <button class="backButton">Назад</button>
+        <button type="submit" class="submitButton">Отправить</button>
+        <div class="clearBoth"></div>
     </div>
 </div>
 <!-- /end.tabs-4 -->
@@ -1811,18 +1396,12 @@
         <input type="checkbox" name="lic" value="yes" <?php if ($lic == "yes") echo "checked";?>> Я принимаю условия <a
         href="#">лицензионного соглашения</a>
     </div>
-    <div class="readyButton">
-        <button type="submit" name="readyButton" id="readyButton">
-            Готово
-        </button>
-    </div>
 </div>
 <!-- Добавялем невидимый input для того, чтобы передать тип пользователя (собственник/арендатор) - это используется в JS для простановки обязательности полей для заполнения -->
 <?php echo "<input type='hidden' class='userType' typeTenant='" . $typeTenant . "' typeOwner='" . $typeOwner . "'>"; ?>
 </form>
 </div>
-<!-- /end.wrapperOfTabs-->
-</div>
+
 <!-- /end.page_main_content -->
 <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
 <div class="page-buffer"></div>

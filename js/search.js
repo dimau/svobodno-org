@@ -204,14 +204,19 @@ $('#fullParametersListOfRealtyObjects').on('click', function (event) {
     }
 })
 
-/* Событие клика по ссылке развернуть список*/
+/* Устанавливаем режим просмотра объявлений по умолчанию */
+$('#expandList a').removeClass('inUse');
+$('#listPlusMap a').addClass('inUse');
+$('#expandMap a').removeClass('inUse');
+
+/* Событие клика по ссылке развернуть список */
 $('#expandList').on('click', function () {
     $('#shortListOfRealtyObjects').css('display', 'none');
     $('#map').css('display', 'none');
     $('#fullParametersListOfRealtyObjects').css('display', '');
-    //$('#listPlusMap').css('display', '');
-    //$('#expandMap').css('display', '');
-    //$('#expandList').css('display', 'none');
+    $('#expandList a').addClass('inUse');
+    $('#listPlusMap a').removeClass('inUse');
+    $('#expandMap a').removeClass('inUse');
     return false;
 });
 
@@ -221,9 +226,9 @@ $('#listPlusMap').on('click', function () {
     $('#map').css('display', '');
     $('#map').css('width', '49%');
     $('#fullParametersListOfRealtyObjects').css('display', 'none');
-    //$('#expandList').css('display', '');
-    //$('#expandMap').css('display', '');
-    //$('#listPlusMap').css('display', 'none');
+    $('#expandList a').removeClass('inUse');
+    $('#listPlusMap a').addClass('inUse');
+    $('#expandMap a').removeClass('inUse');
     return false;
 });
 
@@ -233,9 +238,9 @@ $('#expandMap').on('click', function () {
     $('#map').css('display', '');
     $('#map').css('width', '100%');
     $('#fullParametersListOfRealtyObjects').css('display', 'none');
-    //$('#expandList').css('display', '');
-    //$('#listPlusMap').css('display', '');
-    //$('#expandMap').css('display', 'none');
+    $('#expandList a').removeClass('inUse');
+    $('#listPlusMap a').removeClass('inUse');
+    $('#expandMap a').addClass('inUse');
     return false;
 });
 

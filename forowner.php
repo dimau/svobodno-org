@@ -49,7 +49,8 @@
             <div class="headerOfPage" style="position: absolute; bottom: -4px; padding: 0;">
                 Подайте объявление
             </div>
-            <div class="why" style="border-radius: 5px; background-color: #ffffff; padding: 5px; float: right; min-width: 100px; text-align: left; margin-left: 250px;">
+            <div class="why"
+                 style="border-radius: 5px; background-color: #ffffff; padding: 5px; float: right; min-width: 100px; text-align: left; margin-left: 250px;">
                 <div class="whyHeader">
                     Что будет дальше?
                 </div>
@@ -68,7 +69,8 @@
                             Заинтересовавшиеся арендаторы заполнят анкету, которая попадет к Вам в личный кабинет
                         </li>
                         <li>
-                            Понравившийся Вам арендатор приедет вместе с нашим специалистом на просмотр и заключение договора
+                            Понравившийся Вам арендатор приедет вместе с нашим специалистом на просмотр и заключение
+                            договора
                         </li>
                         <li>
                             В итоге: ваша недвижмость сдана порядочным людям!
@@ -80,24 +82,24 @@
         </div>
 
         <form name="requestNewOwner" method="post">
-                Как к Вам обращаться?
-                <input type="text" size="30" name="Name">
-                <br>
-                На какой номер Вам перезвонить?
-                <input type="text" size="15" name="telNumber">
-                <br>
-                По какому адресу собираетесь сдать объект?
-                <input type="text" size="40" name="address">
-                <br>
-                Комментарии (например, в какое время Вам будет удобно принять наш звонок)?
-                <br>
-                <textarea rows="3" cols="90" name="comment"></textarea>
+            Как к Вам обращаться?
+            <input type="text" size="30" name="Name">
+            <br>
+            На какой номер Вам перезвонить?
+            <input type="text" size="15" name="telNumber">
+            <br>
+            По какому адресу собираетесь сдать объект?
+            <input type="text" size="40" name="address">
+            <br>
+            Комментарии (например, в какое время Вам будет удобно принять наш звонок)?
+            <br>
+            <textarea rows="3" cols="90" name="comment"></textarea>
 
-                <div class="clearBoth"></div>
-                <button type="submit" style="float: right; margin-top: 10px;">
-                    Отправить заявку
-                </button>
-                <div class="clearBoth"></div>
+            <div class="clearBoth"></div>
+            <button type="submit" style="float: right; margin-top: 10px;">
+                Отправить заявку
+            </button>
+            <div class="clearBoth"></div>
         </form>
     </div>
     <!-- /end.page_main_content -->

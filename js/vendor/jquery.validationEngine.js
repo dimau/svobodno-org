@@ -11,6 +11,7 @@
 $(document).ready(function () {
 
     // SUCCESS AJAX CALL, replace "success: false," by:     success : function() { callSuccessFunction() },
+    // После загрузки страницы происходит инициализация алгоритма
     $("[validations^=validate]").validationEngine({
         success:false,
         failure:function () {

@@ -1,313 +1,7 @@
-
-// Активируем и настраиваем слайдер, содержащий регистрационные поля
-$(document).ready(function() {
-    $('#slider').rhinoslider({
-        controlsPlayPause: false,
-        showControls: 'always',
-        showBullets: 'always',
-        controlsMousewheel: false,
-        prevText: 'Назад',
-        nextText:'Далее',
-        slidePrevDirection: 'toRight',
-        slideNextDirection: 'toLeft'
-    });
-
-    $(".rhino-prev").hide();
-    $('.rhino-next').after('<a class="form-submit" href="javascript:void(0);" >Далее</a>');
-    $(".rhino-next").hide();
-
-    var info = ["Шаг 1<br>Личные данные","Шаг 2<br>Образование / Работа","Шаг 3<br>Социальные сети","Шаг 4<br>Что ищете?"];
-    $('.rhino-bullet').each(function(index){
-        $(this).html(info[index]);
-    });
-
+// Блокируем вкладки, начиная со второй
+$(function () {
+    $("#tabs").tabs("option", "disabled", [1, 2, 3]);
 });
-
-$('.form-submit').live("click",function(){
-
-    $('.form-error').html("");
-
-    var current_tab = $('#slider').find('.rhino-active').attr("id");
-
-    switch(current_tab){
-        case 'rhino-item0':
-            step1_validation();
-            break;
-        case 'rhino-item1':
-            step2_validation();
-            break;
-        case 'rhino-item2':
-            step3_validation();
-            break;
-        case 'rhino-item3':
-            step4_validation();
-            break;
-    }
-});
-
-var step1_validation = function(){
-
-    var err = 0;
-
-    // ФИО
-    if($('#surname').val() == ''){
-        $('#surname').parent().parent().find('.form-error').html("Укажите фамилию");
-        err++;
-    }
-    if($('#surname').val().length > 50){
-        $('#surname').parent().parent().find('.form-error').html("Слишком длинная фамилия. Можно указать не более 50-ти символов");
-        err++;
-    }
-    if($('#name').val() == ''){
-        $('#name').parent().parent().find('.form-error').html("Укажите имя");
-        err++;
-    }
-    if($('#name').val().length > 50){
-        $('#name').parent().parent().find('.form-error').html("Слишком длинное имя. Можно указать не более 50-ти символов");
-        err++;
-    }
-    if($('#secondName').val() == ''){
-        $('#secondName').parent().parent().find('.form-error').html("Укажите отчество");
-        err++;
-    }
-    if($('#secondName').val().length > 50){
-        $('#secondName').parent().parent().find('.form-error').html("Слишком длинное отчество. Можно указать не более 50-ти символов");
-        err++;
-    }
-
-    // Пол, внешность, ДР
-    if($('#sex').val() == '0'){
-        $('#sex').parent().parent().find('.form-error').html("Укажите пол");
-        err++;
-    }
-    if($('#nationality').val() == '0'){
-        $('#nationality').parent().parent().find('.form-error').html("Укажите внешность");
-        err++;
-    }
-    if($('#birthday').val() == ''){
-        $('#birthday').parent().parent().find('.form-error').html("Укажите дату рождения");
-        err++;
-    } else {
-        if( !/^\d\d.\d\d.\d\d\d\d$/.test( $('#birthday').val() ) ){
-            $('#birthday').parent().parent().find('.form-error').html("Неправильный формат даты рождения, должен быть: дд.мм.гггг, например: 01.01.1980");
-            err++;
-        } else {
-            if ($('#birthday').val().slice(0, 2) < "01" || $('#birthday').val().slice(0, 2) > "31") {
-                $('#birthday').parent().parent().find('.form-error').html("Проверьте дату Дня рождения (допустимо от 01 до 31)");
-                err++;
-            }
-            if ($('#birthday').val().slice(3, 5) < "01" || $('#birthday').val().slice(3, 5) > "12") {
-                $('#birthday').parent().parent().find('.form-error').html("Проверьте месяц Дня рождения (допустимо от 01 до 12)");
-                err++;
-            }
-            if ($('#birthday').val().slice(6) < "1800" || $('#birthday').val().slice(6) > "2100") {
-                $('#birthday').parent().parent().find('.form-error').html("Проверьте год Дня рождения (допустимо от 1800 до 2100)");
-                err++;
-            }
-        }
-    }
-
-    // Логин и пароль
-    if($('#login').val() == ''){
-        $('#login').parent().parent().find('.form-error').html("Укажите логин");
-        err++;
-    }
-    if($('#login').val().length > 50){
-        $('#login').parent().parent().find('.form-error').html("Слишком длинный логин. Можно указать не более 50-ти символов");
-        err++;
-    }
-    if($('#password').val() == ''){
-        $('#password').parent().parent().find('.form-error').html("Укажите пароль");
-        err++;
-    }
-
-    // Телефон и e-mail
-    if($('#telephon').val() == ''){
-        $('#telephon').parent().parent().find('.form-error').html("Укажите контактный (мобильный) телефон");
-        err++;
-    } else {
-        if ( !/^[0-9]{10}$/.test( $('#telephon').val() ) ) {
-            $('#telephon').parent().parent().find('.form-error').html("Укажите, пожалуйста, Ваш мобильный номер без 8-ки, например: 9226470019");
-            err++;
-        }
-    }
-    if ( $('#email').val() == '' && $(".userType").attr('typeTenant') == 'true'  ) {
-        $('#email').parent().parent().find('.form-error').html("Укажите e-mail");
-        err++;
-    }
-    if ( $('#email').val() != '' &&  !/^(([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+\.)*([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]{2,5}$/.test($('#email').val()) ) {
-        $('#email').parent().parent().find('.form-error').html("Попробуйте ввести e-mail еще раз или указать другой электронный адрес (e-mail не прошел проверку формата)");
-        err++;
-    }
-
-    if(err == 0){
-        $(".rhino-active-bullet").removeClass("step-error").addClass("step-success");
-        $(".rhino-next").show();
-        $('.form-submit').hide();
-        $('.rhino-next').trigger('click');
-    }else{
-        $(".rhino-active-bullet").removeClass("step-success").addClass("step-error");
-    }
-
-};
-
-var step2_validation = function(){
-    var err = 0;
-
-    if ( $('#currentStatusEducation').val() == '0' && $(".userType").attr('typeTenant') == 'true'  ) {
-        $('#currentStatusEducation').parent().parent().find('.form-error').html("Укажите Ваше образование (текущий статус)");
-        err++;
-    } else {
-        // Образование
-        if ( $('#almamater').val() == '' && $(".userType").attr('typeTenant') == 'true' && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  ) ) {
-            $('#almamater').parent().parent().find('.form-error').html("Укажите учебное заведение");
-            err++;
-        }
-        if ( $('#almamater').val().length > 100 ) {
-            $('#almamater').parent().parent().find('.form-error').html("Слишком длинное название учебного заведения (используйте не более 100 символов)");
-            err++;
-        }
-        if ( $('#speciality').val() == '' && $(".userType").attr('typeTenant') == 'true' && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  ) ) {
-            $('#speciality').parent().parent().find('.form-error').html("Укажите специальность");
-            err++;
-        }
-        if ( $('#speciality').val().length > 100 ) {
-            $('#speciality').parent().parent().find('.form-error').html("Слишком длинное название специальности (используйте не более 100 символов)");
-            err++;
-        }
-        if ( $('#kurs').val() == '' && $(".userType").attr('typeTenant') == 'true' && $('#currentStatusEducation').val() == 'сейчас учусь' ) {
-            $('#kurs').parent().parent().find('.form-error').html("Укажите курс обучения");
-            err++;
-        }
-        if ( $('#kurs').val().length > 30 ) {
-            $('#kurs').parent().parent().find('.form-error').html("Курс. Указана слишком длинная строка (используйте не более 30 символов)");
-            err++;
-        }
-        if ( $('#ochnoZaochno').val() == '0' && $(".userType").attr('typeTenant') == 'true' && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  ) ) {
-            $('#ochnoZaochno').parent().parent().find('.form-error').html("Укажите форму обучения (очная, заочная)");
-            err++;
-        }
-        if ( $('#yearOfEnd').val() == '' && $(".userType").attr('typeTenant') == 'true' && $('#currentStatusEducation').val() == 'закончил' ) {
-            $('#yearOfEnd').parent().parent().find('.form-error').html("Укажите год окончания учебного заведения");
-            err++;
-        }
-        if ( $('#yearOfEnd').val() != '' &&  !/^[12]{1}[0-9]{3}$/.test($('#yearOfEnd').val()) ) {
-            $('#yearOfEnd').parent().parent().find('.form-error').html("Укажите год окончания учебного заведения в формате: \"гггг\". Например: 2007");
-            err++;
-        }
-    }
-
-        // Работа
-        if ( $('#statusWork').val() == '0' && $(".userType").attr('typeTenant') == 'true'  ) {
-            $('#statusWork').parent().parent().find('.form-error').html("Укажите статус занятости");
-            err++;
-        } else {
-            if ( $('#placeOfWork').val() == '' && $("#statusWork").val() == 'работаю' &&  $(".userType").attr('typeTenant') == 'true') {
-                $('#placeOfWork').parent().parent().find('.form-error').html("Укажите Ваше место работы (название организации)");
-                err++;
-            }
-            if ( $('#placeOfWork').val().length > 100 ) {
-                $('#placeOfWork').parent().parent().find('.form-error').html("Слишком длинное наименование места работы (используйте не более 100 символов)");
-                err++;
-            }
-            if ( $('#workPosition').val() == '' && $("#statusWork").val() == 'работаю' &&  $(".userType").attr('typeTenant') == 'true') {
-                $('#workPosition').parent().parent().find('.form-error').html("Укажите Вашу должность");
-                err++;
-            }
-            if ( $('#workPosition').val().length > 100 ) {
-                $('#workPosition').parent().parent().find('.form-error').html("Слишком длинное название должности (используйте не более 100 символов)");
-                err++;
-            }
-        }
-
-        // Коротко о себе
-        if ( $('#regionOfBorn').val() == '' &&  $(".userType").attr('typeTenant') == 'true') {
-            $('#regionOfBorn').parent().parent().find('.form-error').html("Укажите регион, в котором Вы родились");
-            err++;
-        }
-        if ( $('#regionOfBorn').val().length > 50 ) {
-            $('#regionOfBorn').parent().parent().find('.form-error').html("Слишком длинное наименование региона, в котором Вы родились (используйте не более 50 символов)");
-            err++;
-        }
-        if ( $('#cityOfBorn').val() == '' &&  $(".userType").attr('typeTenant') == 'true') {
-            $('#cityOfBorn').parent().parent().find('.form-error').html("Укажите город (населенный пункт), в котором Вы родились");
-            err++;
-        }
-        if ( $('#cityOfBorn').val().length > 50 ) {
-            $('#cityOfBorn').parent().parent().find('.form-error').html("Слишком длинное наименование города, в котором Вы родились (используйте не более 50 символов)");
-            err++;
-        }
-
-    if(err == 0){
-        $(".rhino-active-bullet").removeClass("step-error").addClass("step-success");
-        $(".rhino-next").show();
-        $('.form-submit').hide();
-        $('.rhino-next').trigger('click');
-    }else{
-        $(".rhino-active-bullet").removeClass("step-success").addClass("step-error");
-    }
-};
-
-var step3_validation = function(){
-    var err = 0;
-
-    if ( $('#vkontakte').val().length > 100 ) {
-        $('#vkontakte').parent().parent().find('.form-error').html("Указана слишком длинная ссылка на личную страницу Вконтакте (используйте не более 100 символов)");
-        err++;
-    }
-    if ( $('#vkontakte').val() != '' &&  !/vk\.com/.test($('#vkontakte').val()) ) {
-        $('#vkontakte').parent().parent().find('.form-error').html("Укажите, пожалуйста, Вашу настоящую личную страницу Вконтакте, либо оставьте поле пустым (ссылка должна содержать строчку \"vk.com\")");
-        err++;
-    }
-    if ( $('#odnoklassniki').val().length > 100 ) {
-        $('#odnoklassniki').parent().parent().find('.form-error').html("Указана слишком длинная ссылка на личную страницу в Одноклассниках (используйте не более 100 символов)");
-        err++;
-    }
-    if ( $('#odnoklassniki').val() != '' &&  !/www\.odnoklassniki\.ru\/profile\//.test($('#odnoklassniki').val()) ) {
-        $('#odnoklassniki').parent().parent().find('.form-error').html("Укажите, пожалуйста, Вашу настоящую личную страницу в Одноклассниках, либо оставьте поле пустым (ссылка должна содержать строчку \"www.odnoklassniki.ru/profile/\")");
-        err++;
-    }
-    if ( $('#facebook').val().length > 100 ) {
-        $('#facebook').parent().parent().find('.form-error').html("Указана слишком длинная ссылка на личную страницу на Facebook (используйте не более 100 символов)");
-        err++;
-    }
-    if ( $('#facebook').val() != '' &&  !/www\.facebook\.com\/profile\.php/.test($('#facebook').val()) ) {
-        $('#facebook').parent().parent().find('.form-error').html("Укажите, пожалуйста, Вашу настоящую личную страницу на Facebook, либо оставьте поле пустым (ссылка должна содержать строчку с \"www.facebook.com/profile.php\")");
-        err++;
-    }
-    if ( $('#twitter').val().length > 100 ) {
-        $('#twitter').parent().parent().find('.form-error').html("Указана слишком длинная ссылка на личную страницу в Twitter (используйте не более 100 символов)");
-        err++;
-    }
-    if ( $('#twitter').val() != '' &&  !/twitter\.com/.test($('#twitter').val()) ) {
-        $('#twitter').parent().parent().find('.form-error').html("Укажите, пожалуйста, Вашу настоящую личную страницу в Twitter, либо оставьте поле пустым (ссылка должна содержать строчку \"twitter.com\")");
-        err++;
-    }
-
-    if(err == 0){
-        $(".rhino-active-bullet").removeClass("step-error").addClass("step-success");
-        $(".rhino-next").show();
-        $('.form-submit').hide();
-        $('.rhino-next').trigger('click');
-    }else{
-        $(".rhino-active-bullet").removeClass("step-success").addClass("step-error");
-    }
-};
-
-var step4_validation = function(){
-    var err = 0;
-
-
-    if(err == 0){
-        $(".rhino-active-bullet").removeClass("step-error").addClass("step-success");
-        $(".rhino-next").hide();
-        $('.form-submit').show();
-        $('.rhino-next').trigger('click');
-    }else{
-        $(".rhino-active-bullet").removeClass("step-success").addClass("step-error");
-    }
-};
-
 
 // Вставляем календарь для выбора дня рождения
 $(function () {
@@ -359,8 +53,7 @@ function createUploader() {
 }
 $(document).ready(createUploader);
 
-
-/* Если в форме Работа указано, что пользователь не работает или ничего не выбрано, то блокировать заполнение остальных инпутов */
+/* Если в форме Работа указано, что пользователь не работает, то блокировать заполнение остальных инпутов */
 $("#statusWork").on('change', statusWork);
 $(document).ready(statusWork);
 function statusWork() {
@@ -401,8 +94,8 @@ function currentStatusEducation() {
     }
     if (currentValue == "сейчас учусь") {
         $("input.ifLearned, select.ifLearned").removeAttr('disabled').css('color', '');
-        $('#kurs').css('display', '');
-        $('#yearOfEnd').css('display', 'none');
+        $('#kursBlock').css('display', '');
+        $('#yearOfEndBlock').css('display', 'none');
         // Отметим звездочкой обязательность заполнения полей только для арендаторов
         if (userTypeTenant) {
             $("div.searchItem.ifLearned div.required").text("*");
@@ -412,8 +105,8 @@ function currentStatusEducation() {
     }
     if (currentValue == "закончил") {
         $("input.ifLearned, select.ifLearned").removeAttr('disabled').css('color', '');
-        $('#kurs').css('display', 'none');
-        $('#yearOfEnd').css('display', '');
+        $('#kursBlock').css('display', 'none');
+        $('#yearOfEndBlock').css('display', '');
         // Отметим звездочкой обязательность заполнения полей для арендаторов
         if (userTypeTenant) {
             $("div.searchItem.ifLearned div.required").text("*");
@@ -512,7 +205,7 @@ if ($('#userMistakesBlock ol').html() != "") {
 }
 
 
-// Подключение и настройка динамической проверки формы на JS
+/*// Подключение и настройка динамической проверки формы на JS
 $('#tabs').bind('tabsshow', function (event, ui) {
     newTabId = ui.panel.id; // Определяем идентификатор вновь открытой вкладки
     $(".formError." + newTabId).css("display", ""); // Показываем все ошибки к полям на этой вкладке
@@ -540,4 +233,475 @@ function rePosition(caller, divFormError) { // Соответствует дей
         top:callerTopPosition,
         left:callerleftPosition,
     });
+}
+*/
+
+/*****************************************************************
+ * Блок с валидациями и выдачей ошибок
+ *****************************************************************/
+
+// Делаем свой движок для отображения ошибок
+function buildErrorMessageBlock (inputId, errorText) {
+    var divErrorBlock = document.createElement('div');
+    var divErrorContent = document.createElement('div');
+    var errorArrow = document.createElement('div');
+
+    $(divErrorBlock).addClass("errorBlock");
+    $(divErrorContent).addClass("errorContent");
+    $(errorArrow).addClass("errorArrow");
+
+    $("body").append(divErrorBlock);
+    $(divErrorBlock).append(errorArrow);
+    $(divErrorBlock).append(divErrorContent);
+    $(errorArrow).html('<div class="line10"></div><div class="line9"></div><div class="line8"></div><div class="line7"></div><div class="line6"></div><div class="line5"></div><div class="line4"></div><div class="line3"></div><div class="line2"></div><div class="line1"></div>');
+    $(divErrorContent).html(errorText);
+
+    inputTopPosition = $("#" + inputId).offset().top;
+    inputleftPosition = $("#" + inputId).offset().left;
+    inputWidth = $("#" + inputId).width();
+    inputHeight = $("#" + inputId).height();
+    divErrorBlockHeight = $(divErrorBlock).height();
+
+    inputleftPosition = inputleftPosition + inputWidth - 30;
+    inputTopPosition = inputTopPosition - divErrorBlockHeight - 10;
+
+    $(divErrorBlock).css({
+        top: inputTopPosition,
+        left: inputleftPosition,
+        opacity: 0
+    });
+    $(divErrorBlock).fadeTo("fast", 0.8);
+}
+
+var validationIsNeeded = false;
+
+// Отображение ошибок при клике на вкладку
+$('#tabs ul li a').click(function (event) {
+    // Получаем номер кликнутой вкладки
+    currentTabId = $(this).attr("href").slice(-1) - 1;
+
+    // Получаем список всех недоступных вкладок
+    var disabled = $("#tabs").tabs("option", "disabled");
+
+    // Если кликнутая вкладка недоступна - ничего не делаем
+    if (disabled.indexOf(currentTabId) != -1) {
+        // Значит кликнутая вкладка относится к недоступным - ничего не делаем
+        return false;
+    }
+
+    // Если кликнутая вкладка совпадает с текущей отображаемой, то ничего не делаем
+    if (currentTabId == $("#tabs").tabs().tabs('option', 'selected')) {
+        return false;
+    }
+
+    // Удаляем все блоки с ошибками
+    $(".errorBlock").remove();
+
+    // Взводим флаг - требуется валидация при показе новой вкладки
+    validationIsNeeded = true;
+
+});
+
+// Так как
+$('#tabs').bind('tabsshow', function () {
+    if (validationIsNeeded) {
+        // Получаем номер текущей вкладки
+        currentTabId = $("#tabs").tabs().tabs('option', 'selected');
+
+        // Проводим валидацию вновь открытой вкладки, чтобы отобразить имеющиеся на ней ошибки
+        var errOnTab = 0;
+        switch (currentTabId) {
+            case 0:
+                errOnTab = step1_validation();
+                break;
+            case 1:
+                errOnTab = step2_validation();
+                break;
+            case 2:
+                errOnTab = step3_validation();
+                break;
+            case 3:
+                errOnTab = step4_validation();
+                break;
+        }
+
+        // Снимаем флаг о том, что требуется валидация при показе новой вкладки
+        validationIsNeeded = false;
+    }
+});
+
+// Обработка клика по кнопке Назад
+$(".backButton").click(function() {
+    // Удаляем все блоки с ошибками
+    $(".errorBlock").remove();
+
+    // Получаем номер текущей вкладки
+    currentTabId = $("#tabs").tabs().tabs('option', 'selected');
+
+    // Взводим флаг - требуется валидация при показе новой вкладки
+    validationIsNeeded = true;
+
+    // Меняем выбранную вкладку
+    $("#tabs").tabs().tabs('select', currentTabId - 1);
+
+    return false;
+
+});
+
+// Обработка клика по кнопке Далее
+$(".forwardButton").click(function() {
+    // Удаляем все блоки с ошибками
+    $(".errorBlock").remove();
+
+    // Получаем номер текущей вкладки
+    currentTabId = $("#tabs").tabs().tabs('option', 'selected');
+
+   // Вызываем функцию валидации для этой вкладки
+    var errOnTab = 0;
+    switch (currentTabId) {
+        case 0:
+            errOnTab = step1_validation();
+            break;
+        case 1:
+            errOnTab = step2_validation();
+            break;
+        case 2:
+            errOnTab = step3_validation();
+            break;
+    }
+
+    // Проверяем, есть ли ошибки на этой вкладке
+    // Если ошибок нет, то открываем следующую вкладку
+    if (errOnTab == 0) {
+        $("#tabs").tabs().tabs('enable', currentTabId + 1);
+        $("#tabs").tabs().tabs('select', currentTabId + 1);
+    }
+
+    return false;
+
+});
+
+// Обработка клика по кнопке Отправить (submitButton)
+$(".submitButton").click(function() {
+    // Удаляем все блоки с ошибками
+    $(".errorBlock").remove();
+
+    // Получаем номер текущей вкладки
+    currentTabId = $("#tabs").tabs().tabs('option', 'selected');
+
+    // Вызываем функцию валидации для всех вкладок по очереди, если на какой-то обнаружим ошибки, то останавливаем валидацию и оставляем пользователя на этой вкладке
+    var errOnTab = 0;
+    switch (currentTabId) {
+        case 2:
+            $("#tabs").tabs().tabs('select', 0);
+            errOnTab = step1_validation();
+            if (errOnTab != 0)  break;
+
+            $("#tabs").tabs().tabs('select', 1);
+            errOnTab = step2_validation();
+            if (errOnTab != 0)  break;
+
+            $("#tabs").tabs().tabs('select', 2);
+            errOnTab = step3_validation();
+
+            break;
+        case 3:
+            $("#tabs").tabs().tabs('select', 0);
+            errOnTab = step1_validation();
+            if (errOnTab != 0)  break;
+
+            $("#tabs").tabs().tabs('select', 1);
+            errOnTab = step2_validation();
+            if (errOnTab != 0)  break;
+
+            $("#tabs").tabs().tabs('select', 2);
+            errOnTab = step3_validation();
+            if (errOnTab != 0)  break;
+
+            $("#tabs").tabs().tabs('select', 3);
+            errOnTab = step4_validation();
+            break;
+    }
+
+    // Проверяем, есть ли ошибки на какой-либо вкладке
+    // Если ошибок нет, то отправляем данные на сервер. Если ошибки есть хотя бы на одной из вкладок - открываем ее и отображаем ошибки
+    if (errOnTab != 0) {
+        return false;
+    }
+
+});
+
+// Функции валидации для каждой вкладки
+function step1_validation() {
+
+    var err = 0;
+
+    // ФИО
+    if ($('#surname').val() == '') {
+        buildErrorMessageBlock ("surname", "Укажите фамилию");
+        err++;
+    }
+    if ($('#surname').val().length > 50) {
+        buildErrorMessageBlock ("surname", "Слишком длинная фамилия. Можно указать не более 50-ти символов");
+        err++;
+    }
+    if ($('#name').val() == '') {
+        buildErrorMessageBlock ("name", "Укажите имя");
+        err++;
+    }
+    if ($('#name').val().length > 50) {
+        buildErrorMessageBlock ("name", "Слишком длинное имя. Можно указать не более 50-ти символов");
+        err++;
+    }
+    if ($('#secondName').val() == '') {
+        buildErrorMessageBlock ("secondName", "Укажите отчество");
+        err++;
+    }
+    if ($('#secondName').val().length > 50) {
+        buildErrorMessageBlock ("secondName", "Слишком длинное отчество. Можно указать не более 50-ти символов");
+        err++;
+    }
+
+    // Пол, внешность, ДР
+    if ($('#sex').val() == '0') {
+        buildErrorMessageBlock ("sex", "Укажите пол");
+        err++;
+    }
+    if ($('#nationality').val() == '0') {
+        buildErrorMessageBlock ("nationality", "Укажите внешность");
+        err++;
+    }
+    if ($('#birthday').val() == '') {
+        buildErrorMessageBlock ("birthday", "Укажите дату рождения");
+        err++;
+    } else {
+        if (!/^\d\d.\d\d.\d\d\d\d$/.test($('#birthday').val())) {
+            buildErrorMessageBlock ("birthday", "Неправильный формат даты рождения, должен быть: дд.мм.гггг, например: 01.01.1980");
+            err++;
+        } else {
+            if ($('#birthday').val().slice(0, 2) < "01" || $('#birthday').val().slice(0, 2) > "31") {
+                buildErrorMessageBlock ("birthday", "Проверьте дату Дня рождения (допустимо от 01 до 31)");
+                err++;
+            }
+            if ($('#birthday').val().slice(3, 5) < "01" || $('#birthday').val().slice(3, 5) > "12") {
+                buildErrorMessageBlock ("birthday", "Проверьте месяц Дня рождения (допустимо от 01 до 12)");
+                err++;
+            }
+            if ($('#birthday').val().slice(6) < "1800" || $('#birthday').val().slice(6) > "2100") {
+                buildErrorMessageBlock ("birthday", "Проверьте год Дня рождения (допустимо от 1800 до 2100)");
+                err++;
+            }
+        }
+    }
+
+    // Логин и пароль
+    if ($('#login').val() == '') {
+        buildErrorMessageBlock ("login", "Укажите логин");
+        err++;
+    }
+    if ($('#login').val().length > 50) {
+        buildErrorMessageBlock ("login", "Слишком длинный логин. Можно указать не более 50-ти символов");
+        err++;
+    }
+    if ($('#password').val() == '') {
+        buildErrorMessageBlock ("password", "Укажите пароль");
+        err++;
+    }
+
+    // Телефон и e-mail
+    if ($('#telephon').val() == '') {
+        buildErrorMessageBlock ("telephon", "Укажите контактный (мобильный) телефон");
+        err++;
+    } else {
+        if (!/^[0-9]{10}$/.test($('#telephon').val())) {
+            buildErrorMessageBlock ("telephon", "Укажите, пожалуйста, Ваш мобильный номер без 8-ки, например: 9226470019");
+            err++;
+        }
+    }
+    if ($('#email').val() == '' && $(".userType").attr('typeTenant') == 'true') {
+        buildErrorMessageBlock ("email", "Укажите e-mail");
+        err++;
+    }
+    if ($('#email').val() != '' && !/^(([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+\.)*([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]{2,5}$/.test($('#email').val())) {
+        buildErrorMessageBlock ("email", "Попробуйте ввести e-mail еще раз или указать другой электронный адрес (e-mail не прошел проверку формата)");
+        err++;
+    }
+
+    return err;
+
+}
+
+function step2_validation() {
+    var err = 0;
+
+    if ($('#currentStatusEducation').val() == '0' && $(".userType").attr('typeTenant') == 'true') {
+        buildErrorMessageBlock ("currentStatusEducation", "Укажите Ваше образование (текущий статус)");
+        err++;
+    } else {
+        // Образование
+        if ($('#almamater').val() == '' && $(".userType").attr('typeTenant') == 'true' && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  )) {
+            buildErrorMessageBlock ("almamater", "Укажите учебное заведение");
+            err++;
+        }
+        if ($('#almamater').val().length > 100) {
+            buildErrorMessageBlock ("almamater", "Слишком длинное название учебного заведения (используйте не более 100 символов)");
+            err++;
+        }
+        if ($('#speciality').val() == '' && $(".userType").attr('typeTenant') == 'true' && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  )) {
+            buildErrorMessageBlock ("speciality", "Укажите специальность");
+            err++;
+        }
+        if ($('#speciality').val().length > 100) {
+            buildErrorMessageBlock ("speciality", "Слишком длинное название специальности (используйте не более 100 символов)");
+            err++;
+        }
+        if ($('#kurs').val() == '' && $(".userType").attr('typeTenant') == 'true' && $('#currentStatusEducation').val() == 'сейчас учусь') {
+            buildErrorMessageBlock ("kurs", "Укажите курс обучения");
+            err++;
+        }
+        if ($('#kurs').val().length > 30) {
+            buildErrorMessageBlock ("kurs", "Указана слишком длинная строка (используйте не более 30 символов)");
+            err++;
+        }
+        if ($('#ochnoZaochno').val() == '0' && $(".userType").attr('typeTenant') == 'true' && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  )) {
+            buildErrorMessageBlock ("ochnoZaochno", "Укажите форму обучения (очная, заочная)");
+            err++;
+        }
+        if ($('#yearOfEnd').val() == '' && $(".userType").attr('typeTenant') == 'true' && $('#currentStatusEducation').val() == 'закончил') {
+            buildErrorMessageBlock ("yearOfEnd", "Укажите год окончания учебного заведения");
+            err++;
+        }
+        if ($('#yearOfEnd').val() != '' && !/^[12]{1}[0-9]{3}$/.test($('#yearOfEnd').val())) {
+            buildErrorMessageBlock ("yearOfEnd", "Укажите год окончания учебного заведения в формате: \"гггг\". Например: 2007");
+            err++;
+        }
+    }
+
+    // Работа
+    if ($('#statusWork').val() == '0' && $(".userType").attr('typeTenant') == 'true') {
+        buildErrorMessageBlock ("statusWork", "Укажите статус занятости");
+        err++;
+    } else {
+        if ($('#placeOfWork').val() == '' && $("#statusWork").val() == 'работаю' && $(".userType").attr('typeTenant') == 'true') {
+            buildErrorMessageBlock ("placeOfWork", "Укажите Ваше место работы (название организации)");
+            err++;
+        }
+        if ($('#placeOfWork').val().length > 100) {
+            buildErrorMessageBlock ("placeOfWork", "Слишком длинное наименование места работы (используйте не более 100 символов)");
+            err++;
+        }
+        if ($('#workPosition').val() == '' && $("#statusWork").val() == 'работаю' && $(".userType").attr('typeTenant') == 'true') {
+            buildErrorMessageBlock ("workPosition", "Укажите Вашу должность");
+            err++;
+        }
+        if ($('#workPosition').val().length > 100) {
+            buildErrorMessageBlock ("workPosition", "Слишком длинное название должности (используйте не более 100 символов)");
+            err++;
+        }
+    }
+
+    // Коротко о себе
+    if ($('#regionOfBorn').val() == '' && $(".userType").attr('typeTenant') == 'true') {
+        buildErrorMessageBlock ("regionOfBorn", "Укажите регион, в котором Вы родились");
+        err++;
+    }
+    if ($('#regionOfBorn').val().length > 50) {
+        buildErrorMessageBlock ("regionOfBorn", "Слишком длинное наименование региона, в котором Вы родились (используйте не более 50 символов)");
+        err++;
+    }
+    if ($('#cityOfBorn').val() == '' && $(".userType").attr('typeTenant') == 'true') {
+        buildErrorMessageBlock ("cityOfBorn", "Укажите город (населенный пункт), в котором Вы родились");
+        err++;
+    }
+    if ($('#cityOfBorn').val().length > 50) {
+        buildErrorMessageBlock ("cityOfBorn", "Слишком длинное наименование города, в котором Вы родились (используйте не более 50 символов)");
+        err++;
+    }
+
+    return err;
+}
+
+function step3_validation() {
+    var err = 0;
+
+    if ($('#vkontakte').val().length > 100) {
+        buildErrorMessageBlock ("vkontakte", "Указана слишком длинная ссылка на личную страницу Вконтакте (используйте не более 100 символов)");
+        err++;
+    }
+    if ($('#vkontakte').val() != '' && !/vk\.com/.test($('#vkontakte').val())) {
+        buildErrorMessageBlock ("vkontakte", "Укажите, пожалуйста, Вашу настоящую личную страницу Вконтакте, либо оставьте поле пустым (ссылка должна содержать строчку \"vk.com\")");
+        err++;
+    }
+    if ($('#odnoklassniki').val().length > 100) {
+        buildErrorMessageBlock ("odnoklassniki", "Указана слишком длинная ссылка на личную страницу в Одноклассниках (используйте не более 100 символов)");
+        err++;
+    }
+    if ($('#odnoklassniki').val() != '' && !/www\.odnoklassniki\.ru\/profile\//.test($('#odnoklassniki').val())) {
+        buildErrorMessageBlock ("odnoklassniki", "Укажите, пожалуйста, Вашу настоящую личную страницу в Одноклассниках, либо оставьте поле пустым (ссылка должна содержать строчку \"www.odnoklassniki.ru/profile/\")");
+        err++;
+    }
+    if ($('#facebook').val().length > 100) {
+        buildErrorMessageBlock ("facebook", "Указана слишком длинная ссылка на личную страницу на Facebook (используйте не более 100 символов)");
+        err++;
+    }
+    if ($('#facebook').val() != '' && !/www\.facebook\.com\/profile\.php/.test($('#facebook').val())) {
+        buildErrorMessageBlock ("facebook", "Укажите, пожалуйста, Вашу настоящую личную страницу на Facebook, либо оставьте поле пустым (ссылка должна содержать строчку с \"www.facebook.com/profile.php\")");
+        err++;
+    }
+    if ($('#twitter').val().length > 100) {
+        buildErrorMessageBlock ("twitter", "Указана слишком длинная ссылка на личную страницу в Twitter (используйте не более 100 символов)");
+        err++;
+    }
+    if ($('#twitter').val() != '' && !/twitter\.com/.test($('#twitter').val())) {
+        buildErrorMessageBlock ("twitter", "Укажите, пожалуйста, Вашу настоящую личную страницу в Twitter, либо оставьте поле пустым (ссылка должна содержать строчку \"twitter.com\")");
+        err++;
+    }
+
+    return err;
+}
+
+function step4_validation() {
+    var err = 0;
+
+    if (!/^\d{0,8}$/.test($('#minCost').val())) {
+        buildErrorMessageBlock ("minCost", "Неправильный формат числа в поле минимальной величины арендной платы (проверьте: только числа, не более 8 символов)");
+        err++;
+    }
+    if (!/^\d{0,8}$/.test($('#maxCost').val())) {
+        buildErrorMessageBlock ("maxCost", "Неправильный формат числа в поле максимальной величины арендной платы (проверьте: только числа, не более 8 символов)");
+        err++;
+    }
+    if (!/^\d{0,8}$/.test($('#pledge').val())) {
+        buildErrorMessageBlock ("pledge", "Неправильный формат числа в поле максимальной величины залога (проверьте: только числа, не более 8 символов)");
+        err++;
+    }
+
+    if ($('#minCost').val() > $('#maxCost').val()) {
+        buildErrorMessageBlock ("#minCost", "Минимальная стоимость аренды не может быть больше, чем максимальная. Исправьте поля, в которых указаны Ваши требования к диапазону стоимости аренды");
+        err++;
+    }
+
+    if ($('#withWho').val() == "0" && $('#typeOfObject').val() != "гараж") {
+        buildErrorMessageBlock ("withWho", "Укажите, как Вы собираетесь проживать в арендуемой недвижимости (с кем)");
+        err++;
+    }
+    if ($('#children').val() == "0" && $('#typeOfObject').val() != "гараж") {
+        buildErrorMessageBlock ("children", "Укажите, собираетесь ли Вы проживать вместе с детьми или без них");
+        err++;
+    }
+    if ($('#animals').val() == "0" && $('#typeOfObject').val() != "гараж") {
+        buildErrorMessageBlock ("animals", "Укажите, собираетесь ли Вы проживать вместе с животными или без них");
+        err++;
+    }
+    if ($('#termOfLease').val() == "0") {
+        buildErrorMessageBlock ("termOfLease", "Укажите предполагаемый срок аренды");
+        err++;
+    }
+
+    /*if ($('#lic').val() != "yes") {
+        buildErrorMessageBlock ("lic", "Регистрация возможна только при согласии с условиями лицензионного соглашения");
+        err++;
+    }*/
+
+    return err;
 }

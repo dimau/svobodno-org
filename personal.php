@@ -445,9 +445,9 @@
             for ($j = 0; $j < mysql_num_rows($rez); $j++) {
                 if ($row = mysql_fetch_assoc($rez)) {
                     // Формируем из имен и отчеств строку гиперссылок с ссылками на страницы арендаторов
-                    if ($row['typeTenant'] == "true"){ // Если данный пользователь (арендатор) еще ищет недвижимость
+                    if ($row['typeTenant'] == "true") { // Если данный пользователь (арендатор) еще ищет недвижимость
                         $compId = $row['id'] * 5 + 2;
-                        $str .= "<a href='man.php?compId=" . $compId  . "'>" . $row['name'] . " " . $row['secondName'] . "</a>";
+                        $str .= "<a href='man.php?compId=" . $compId . "'>" . $row['name'] . " " . $row['secondName'] . "</a>";
                     } else {
                         $str .= "<span title='Пользователь уже нашел недвижимость'>" . $row['name'] . " " . $row['secondName'] . "</span>";
                     }
@@ -682,7 +682,6 @@
 ?>
 
 <div class="page_main_content">
-<div class="wrapperOfTabs">
 <div class="headerOfPage">
     Личный кабинет
 </div>
@@ -1488,544 +1487,544 @@
 </div>
 
 <div id="tabs-4">
-    <div class="shadowText">
-        На этой вкладке Вы можете задать параметры, в соответствии с которыми ресурс Хани Хом будет осуществлять
-        автоматический поиск объявлений на портале и будет оповещать Вас о появлении новых объектов по указанному в
-        профиле
-        e-mail
-    </div>
-    <?php if ($typeTenant != "true" && $correct != "true" && $correctNewSearchRequest == "null"): ?>
-    <!-- Если пользователь еще не сформировал поисковый запрос (а значит не является арендатором) и он либо не нажимал на кнопку формирования запроса, либо нажимал, но не прошел проверку на полноту информации о пользователи, то ему доступна только кнопка формирования нового запроса. В ином случае будет отображаться сам поисковый запрос пользователя, либо форма для его заполнения -->
-    <form name="createSearchRequest" method="post">
-        <button type="submit" name="createSearchRequestButton" id='createSearchRequestButton' class='left-bottom'>
-            Запрос на поиск
-        </button>
-    </form>
+<div class="shadowText">
+    На этой вкладке Вы можете задать параметры, в соответствии с которыми ресурс Хани Хом будет осуществлять
+    автоматический поиск объявлений на портале и будет оповещать Вас о появлении новых объектов по указанному в
+    профиле
+    e-mail
+</div>
+<?php if ($typeTenant != "true" && $correct != "true" && $correctNewSearchRequest == "null"): ?>
+<!-- Если пользователь еще не сформировал поисковый запрос (а значит не является арендатором) и он либо не нажимал на кнопку формирования запроса, либо нажимал, но не прошел проверку на полноту информации о пользователи, то ему доступна только кнопка формирования нового запроса. В ином случае будет отображаться сам поисковый запрос пользователя, либо форма для его заполнения -->
+<form name="createSearchRequest" method="post">
+    <button type="submit" name="createSearchRequestButton" id='createSearchRequestButton' class='left-bottom'>
+        Запрос на поиск
+    </button>
+</form>
     <?php endif;?>
-    <?php if ($typeTenant == "true" && $correctNewSearchRequest != "false"): ?>
-    <!-- Если пользователь является арендатором и (если он редактировал пар-ры поиска) после редактирования параметров поиска ошибок не обнаружено, то у пользователя уже сформирован корректный поисковый запрос, который мы и показываем на этой вкладке -->
-    <div id="notEditingSearchParametersBlock" class="objectDescription">
-        <div class="setOfInstructions">
-            <li><a href="#">редактировать</a></li>
-            <li><a href="personal.php?action=deleteSearchRequest&tabsId=4"
-                   title="Удаляет запрос на поиск - кликните по этой ссылке, когда Вы найдете недвижимость">удалить</a>
-            </li>
-            <br>
-        </div>
-        <fieldset class="notEdited">
-            <legend>
-                Характеристика объекта
-            </legend>
-            <table>
-                <tbody>
-                    <tr>
-                        <td class="objectDescriptionItemLabel">Тип:</td>
-                        <td class="objectDescriptionBody">
+<?php if ($typeTenant == "true" && $correctNewSearchRequest != "false"): ?>
+<!-- Если пользователь является арендатором и (если он редактировал пар-ры поиска) после редактирования параметров поиска ошибок не обнаружено, то у пользователя уже сформирован корректный поисковый запрос, который мы и показываем на этой вкладке -->
+<div id="notEditingSearchParametersBlock" class="objectDescription">
+    <div class="setOfInstructions">
+        <li><a href="#">редактировать</a></li>
+        <li><a href="personal.php?action=deleteSearchRequest&tabsId=4"
+               title="Удаляет запрос на поиск - кликните по этой ссылке, когда Вы найдете недвижимость">удалить</a>
+        </li>
+        <br>
+    </div>
+    <fieldset class="notEdited">
+        <legend>
+            Характеристика объекта
+        </legend>
+        <table>
+            <tbody>
+                <tr>
+                    <td class="objectDescriptionItemLabel">Тип:</td>
+                    <td class="objectDescriptionBody">
             <span>
             <?php
                 if (isset($typeOfObject) && $typeOfObject != "0") echo $typeOfObject; else echo "любой";
                 ?>
             </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="objectDescriptionItemLabel">Количество комнат:</td>
-                        <td class="objectDescriptionBody"><span><?php
-                            if (isset($amountOfRooms) && count($amountOfRooms) != "0") for ($i = 0; $i < count($amountOfRooms); $i++) {
-                                echo $amountOfRooms[$i];
-                                if ($i < count($amountOfRooms) - 1) echo ", ";
-                            } else echo "любое";
-                            ?></span></td>
-                    </tr>
-                    <tr>
-                        <td class="objectDescriptionItemLabel">Комнаты смежные:</td>
-                        <td class="objectDescriptionBody"><span><?php
-                            if (isset($adjacentRooms) && $adjacentRooms != "0") echo $adjacentRooms; else echo "любые";
-                            ?></span></td>
-                    </tr>
-                    <tr>
-                        <td class="objectDescriptionItemLabel">Этаж:</td>
-                        <td class="objectDescriptionBody"><span><?php
-                            if (isset($floor) && $floor != "0") echo $floor; else echo "любой";
-                            ?></span></td>
-                    </tr>
-                </tbody>
-            </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="objectDescriptionItemLabel">Количество комнат:</td>
+                    <td class="objectDescriptionBody"><span><?php
+                        if (isset($amountOfRooms) && count($amountOfRooms) != "0") for ($i = 0; $i < count($amountOfRooms); $i++) {
+                            echo $amountOfRooms[$i];
+                            if ($i < count($amountOfRooms) - 1) echo ", ";
+                        } else echo "любое";
+                        ?></span></td>
+                </tr>
+                <tr>
+                    <td class="objectDescriptionItemLabel">Комнаты смежные:</td>
+                    <td class="objectDescriptionBody"><span><?php
+                        if (isset($adjacentRooms) && $adjacentRooms != "0") echo $adjacentRooms; else echo "любые";
+                        ?></span></td>
+                </tr>
+                <tr>
+                    <td class="objectDescriptionItemLabel">Этаж:</td>
+                    <td class="objectDescriptionBody"><span><?php
+                        if (isset($floor) && $floor != "0") echo $floor; else echo "любой";
+                        ?></span></td>
+                </tr>
+            </tbody>
+        </table>
+    </fieldset>
+    <fieldset class="notEdited">
+        <legend>
+            Стоимость
+        </legend>
+        <table>
+            <tbody>
+                <tr>
+                    <td class="objectDescriptionItemLabel">Арендная плата в месяц от:</td>
+                    <td class="objectDescriptionBody"><?php
+                        if (isset($minCost) && $minCost != "0") echo "<span>" . $minCost . "</span> руб."; else echo "любая";
+                        ?></td>
+                </tr>
+                <tr>
+                    <td class="objectDescriptionItemLabel">Арендная плата в месяц до:</td>
+                    <td class="objectDescriptionBody"><?php
+                        if (isset($maxCost) && $maxCost != "0") echo "<span>" . $maxCost . "</span> руб."; else echo "любая";
+                        ?></td>
+                </tr>
+                <tr>
+                    <td class="objectDescriptionItemLabel">Залог до:</td>
+                    <td class="objectDescriptionBody"><?php
+                        if (isset($pledge) && $pledge != "0") echo "<span>" . $pledge . "</span> руб."; else echo "любой";
+                        ?></td>
+                </tr>
+                <tr>
+                    <td class="objectDescriptionItemLabel">Максимальная предоплата:</td>
+                    <td class="objectDescriptionBody"><?php
+                        if (isset($prepayment) && $prepayment != "0") echo "<span>" . $prepayment . "</span>"; else echo "любая";
+                        ?></td>
+                </tr>
+            </tbody>
+        </table>
+    </fieldset>
+    <fieldset class="notEdited">
+        <legend>
+            Район
+        </legend>
+        <table>
+            <tbody>
+                <?php
+                if (isset($district) && count($district) != 0) { // Если район указан пользователем
+                    echo "<tr><td>";
+                    for ($i = 0; $i < count($district); $i++) { // Выводим названия всех районов, в которых ищет недвижимость пользователь
+                        echo $district[$i];
+                        if ($i < count($district) - 1) echo ", ";
+                    }
+                    echo  "</td></tr>";
+                } else {
+                    echo "<tr><td>" . "любой" . "</td></tr>";
+                }
+                ?>
+            </tbody>
+        </table>
+    </fieldset>
+    <div class="clearBoth"></div>
+    <fieldset class="notEdited">
+        <legend>
+            Особые параметры поиска
+        </legend>
+        <table>
+            <tbody>
+                <tr>
+                    <td class="objectDescriptionItemLabel">Как собираетесь проживать:</td>
+                    <td class="objectDescriptionBody"><span><?php
+                        if (isset($withWho) && $withWho != "0") echo $withWho; else echo "не указано";
+                        ?></span></td>
+                </tr>
+                <?php
+                if ($withWho != "самостоятельно" && $withWho != "0") {
+                    echo "<tr><td class='objectDescriptionItemLabel'>Информация о сожителях:</td><td class='objectDescriptionBody''><span>";
+                    if (isset($linksToFriends)) echo $linksToFriends;
+                    echo "</span></td></tr>";
+                }
+                ?>
+                <tr>
+                    <td class="objectDescriptionItemLabel">Дети:</td>
+                    <td class="objectDescriptionBody"><span><?php
+                        if (isset($children) && $children != "0") echo $children; else echo "не указано";
+                        ?></span></td>
+                </tr>
+                <?php
+                if ($children != "без детей" && $children != "0") {
+                    echo "<tr><td class='objectDescriptionItemLabel'>Количество детей и их возраст:</td><td class='objectDescriptionBody''><span>";
+                    if (isset($howManyChildren)) echo $howManyChildren;
+                    echo "</span></td></tr>";
+                }
+                ?>
+                <tr>
+                    <td class="objectDescriptionItemLabel">Животные:</td>
+                    <td class="objectDescriptionBody"><span><?php
+                        if (isset($animals) && $animals != "0") echo $animals; else echo "не указано";
+                        ?></span></td>
+                </tr>
+                <?php
+                if ($animals != "без животных" && $animals != "0") {
+                    echo "<tr><td class='objectDescriptionItemLabel'>Количество животных и их вид:</td><td class='objectDescriptionBody''><span>";
+                    if (isset($howManyAnimals)) echo $howManyAnimals;
+                    echo "</span></td></tr>";
+                }
+                ?>
+                <tr>
+                    <td class="objectDescriptionItemLabel">Срок аренды:</td>
+                    <td class="objectDescriptionBody"><span><?php
+                        if (isset($termOfLease) && $termOfLease != "0") echo $termOfLease; else echo "не указан";
+                        ?></span></td>
+                </tr>
+                <tr>
+                    <td class="objectDescriptionItemLabel">Дополнительные условия поиска:</td>
+                    <td class="objectDescriptionBody"><span><?php
+                        if (isset($additionalDescriptionOfSearch)) echo $additionalDescriptionOfSearch;
+                        ?></span></td>
+                </tr>
+            </tbody>
+        </table>
+    </fieldset>
+</div>
+    <?php endif;?>
+<?php if ($typeTenant == "true" || $correct == "true" || $correctNewSearchRequest == "false"): ?>
+<!-- Если пользователь является арендатором, то вместе с отображением текущих параметров поискового запроса мы выдаем скрытую форму для их редактирования, также мы выдаем видимую форму для редактирования параметров поиска в случае, если пользователь нажал на кнопку Нового поискового запроса и проверка на корректность его данных Профиля профла успешно, а также в случае если пользователь корректировал данные поискового запроса, но они не прошли проверку -->
+<form method="post" name="searchParameters" id="extendedSearchParametersBlock">
+    <div id="leftBlockOfSearchParameters" style="display: inline-block;">
+        <fieldset class="edited">
+            <legend>
+                Характеристика объекта
+            </legend>
+            <div class="searchItem">
+                <span class="searchItemLabel"> Тип: </span>
+
+                <div class="searchItemBody">
+                    <select name="typeOfObject" id="typeOfObject">
+                        <option value="0" <?php if ($typeOfObject == "0") echo "selected";?>></option>
+                        <option value="квартира" <?php if ($typeOfObject == "квартира") echo "selected";?>>
+                            квартира
+                        </option>
+                        <option value="комната" <?php if ($typeOfObject == "комната") echo "selected";?>>комната
+                        </option>
+                        <option value="дом" <?php if ($typeOfObject == "дом") echo "selected";?>>дом, коттедж
+                        </option>
+                        <option value="таунхаус" <?php if ($typeOfObject == "таунхаус") echo "selected";?>>
+                            таунхаус
+                        </option>
+                        <option value="дача" <?php if ($typeOfObject == "дача") echo "selected";?>>дача</option>
+                        <option value="гараж" <?php if ($typeOfObject == "гараж") echo "selected";?>>гараж</option>
+                    </select>
+                </div>
+            </div>
+            <div class="searchItem" notavailability="typeOfObject_гараж">
+                <span class="searchItemLabel"> Количество комнат: </span>
+
+                <div class="searchItemBody">
+                    <input type="checkbox" value="1" name="amountOfRooms[]"
+                        <?php
+                        foreach ($amountOfRooms as $value) {
+                            if ($value == "1") {
+                                echo "checked";
+                                break;
+                            }
+                        }
+                        ?>>
+                    1
+                    <input type="checkbox" value="2"
+                           name="amountOfRooms[]" <?php
+                        foreach ($amountOfRooms as $value) {
+                            if ($value == "2") {
+                                echo "checked";
+                                break;
+                            }
+                        }
+                        ?>>
+                    2
+                    <input type="checkbox" value="3"
+                           name="amountOfRooms[]" <?php
+                        foreach ($amountOfRooms as $value) {
+                            if ($value == "3") {
+                                echo "checked";
+                                break;
+                            }
+                        }
+                        ?>>
+                    3
+                    <input type="checkbox" value="4"
+                           name="amountOfRooms[]" <?php
+                        foreach ($amountOfRooms as $value) {
+                            if ($value == "4") {
+                                echo "checked";
+                                break;
+                            }
+                        }
+                        ?>>
+                    4
+                    <input type="checkbox" value="5"
+                           name="amountOfRooms[]" <?php
+                        foreach ($amountOfRooms as $value) {
+                            if ($value == "5") {
+                                echo "checked";
+                                break;
+                            }
+                        }
+                        ?>>
+                    5
+                    <input type="checkbox" value="6"
+                           name="amountOfRooms[]" <?php
+                        foreach ($amountOfRooms as $value) {
+                            if ($value == "6") {
+                                echo "checked";
+                                break;
+                            }
+                        }
+                        ?>>
+                    6...
+                </div>
+            </div>
+            <div class="searchItem" notavailability="typeOfObject_гараж">
+                <span class="searchItemLabel"> Комнаты смежные: </span>
+
+                <div class="searchItemBody">
+                    <select name="adjacentRooms">
+                        <option value="0" <?php if ($adjacentRooms == "0") echo "selected";?>></option>
+                        <option
+                            value="не имеет значения" <?php if ($adjacentRooms == "не имеет значения") echo "selected";?>>
+                            не
+                            имеет значения
+                        </option>
+                        <option
+                            value="только изолированные" <?php if ($adjacentRooms == "только изолированные") echo "selected";?>>
+                            только изолированные
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="searchItem"
+                 notavailability="typeOfObject_дом&typeOfObject_таунхаус&typeOfObject_дача&typeOfObject_гараж">
+                <span class="searchItemLabel"> Этаж: </span>
+
+                <div class="searchItemBody">
+                    <select name="floor">
+                        <option value="0" <?php if ($floor == "0") echo "selected";?>></option>
+                        <option value="любой" <?php if ($floor == "любой") echo "selected";?>>любой</option>
+                        <option value="не первый" <?php if ($floor == "не первый") echo "selected";?>>не первый
+                        </option>
+                        <option
+                            value="не первый и не последний" <?php if ($floor == "не первый и не последний") echo "selected";?>>
+                            не первый и не
+                            последний
+                        </option>
+                    </select>
+                </div>
+            </div>
         </fieldset>
-        <fieldset class="notEdited">
+        <fieldset class="edited">
             <legend>
                 Стоимость
             </legend>
-            <table>
-                <tbody>
-                    <tr>
-                        <td class="objectDescriptionItemLabel">Арендная плата в месяц от:</td>
-                        <td class="objectDescriptionBody"><?php
-                            if (isset($minCost) && $minCost != "0") echo "<span>" . $minCost . "</span> руб."; else echo "любая";
-                            ?></td>
-                    </tr>
-                    <tr>
-                        <td class="objectDescriptionItemLabel">Арендная плата в месяц до:</td>
-                        <td class="objectDescriptionBody"><?php
-                            if (isset($maxCost) && $maxCost != "0") echo "<span>" . $maxCost . "</span> руб."; else echo "любая";
-                            ?></td>
-                    </tr>
-                    <tr>
-                        <td class="objectDescriptionItemLabel">Залог до:</td>
-                        <td class="objectDescriptionBody"><?php
-                            if (isset($pledge) && $pledge != "0") echo "<span>" . $pledge . "</span> руб."; else echo "любой";
-                            ?></td>
-                    </tr>
-                    <tr>
-                        <td class="objectDescriptionItemLabel">Максимальная предоплата:</td>
-                        <td class="objectDescriptionBody"><?php
-                            if (isset($prepayment) && $prepayment != "0") echo "<span>" . $prepayment . "</span>"; else echo "любая";
-                            ?></td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="searchItem">
+                <div class="searchItemLabel"
+                     title="Укажите, сколько Вы готовы платить в месяц за аренду недвижимости с учетом стоимости коммунальных услуг (если они оплачиваются дополнительно)">
+                    Арендная плата (в месяц с учетом ком. усл.)
+                </div>
+                <div class="searchItemBody">
+                    от
+                    <input type="text" name="minCost" id="minCost" size="10"
+                           maxlength="8" <?php echo "value='$minCost'";?>>
+                    руб., до
+                    <input type="text" name="maxCost" id="maxCost" size="10"
+                           maxlength="8" <?php echo "value='$maxCost'";?>>
+                    руб.
+                </div>
+            </div>
+            <div class="searchItem"
+                 title="Какую сумму Вы готовы передать собственнику в качестве возвращаемого гарантийного депозита">
+                <span class="searchItemLabel"> Залог </span>
+
+                <div class="searchItemBody">
+                    до
+                    <input type="text" name="pledge" size="10" maxlength="8" <?php echo "value='$pledge'";?>>
+                    руб.
+                </div>
+            </div>
+            <div class="searchItem"
+                 title="Какую предоплату за проживание Вы готовы внести">
+                <span class="searchItemLabel"> Максимальная предоплата: </span>
+
+                <div class="searchItemBody">
+                    <select name="prepayment">
+                        <option value="0" <?php if ($prepayment == "0") echo "selected";?>></option>
+                        <option value="нет" <?php if ($prepayment == "нет") echo "selected";?>>нет</option>
+                        <option value="1 месяц" <?php if ($prepayment == "1 месяц") echo "selected";?>>1 месяц
+                        </option>
+                        <option value="2 месяца" <?php if ($prepayment == "2 месяца") echo "selected";?>>2 месяца
+                        </option>
+                        <option value="3 месяца" <?php if ($prepayment == "3 месяца") echo "selected";?>>3 месяца
+                        </option>
+                        <option value="4 месяца" <?php if ($prepayment == "4 месяца") echo "selected";?>>4 месяца
+                        </option>
+                        <option value="5 месяцев" <?php if ($prepayment == "5 месяцев") echo "selected";?>>5
+                            месяцев
+                        </option>
+                        <option value="6 месяцев" <?php if ($prepayment == "6 месяцев") echo "selected";?>>6
+                            месяцев
+                        </option>
+                    </select>
+                </div>
+            </div>
         </fieldset>
-        <fieldset class="notEdited">
+    </div>
+    <div id="rightBlockOfSearchParameters">
+        <fieldset class="edited">
             <legend>
                 Район
             </legend>
-            <table>
-                <tbody>
-                    <?php
-                    if (isset($district) && count($district) != 0) { // Если район указан пользователем
-                        echo "<tr><td>";
-                        for ($i = 0; $i < count($district); $i++) { // Выводим названия всех районов, в которых ищет недвижимость пользователь
-                            echo $district[$i];
-                            if ($i < count($district) - 1) echo ", ";
+            <div class="searchItem">
+                <div class="searchItemBody">
+                    <ul>
+                        <?php
+                        if (isset($allDistrictsInCity)) {
+                            foreach ($allDistrictsInCity as $value) { // Для каждого идентификатора района и названия формируем чекбокс
+                                echo "<li><input type='checkbox' name='district[]' value='" . $value . "'";
+                                foreach ($district as $valueDistrict) {
+                                    if ($valueDistrict == $value) {
+                                        echo "checked";
+                                        break;
+                                    }
+                                }
+                                echo "> " . $value . "</li>";
+                            }
                         }
-                        echo  "</td></tr>";
-                    } else {
-                        echo "<tr><td>" . "любой" . "</td></tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
-        </fieldset>
-        <div class="clearBoth"></div>
-        <fieldset class="notEdited">
-            <legend>
-                Особые параметры поиска
-            </legend>
-            <table>
-                <tbody>
-                    <tr>
-                        <td class="objectDescriptionItemLabel">Как собираетесь проживать:</td>
-                        <td class="objectDescriptionBody"><span><?php
-                            if (isset($withWho) && $withWho != "0") echo $withWho; else echo "не указано";
-                            ?></span></td>
-                    </tr>
-                    <?php
-                    if ($withWho != "самостоятельно" && $withWho != "0") {
-                        echo "<tr><td class='objectDescriptionItemLabel'>Информация о сожителях:</td><td class='objectDescriptionBody''><span>";
-                        if (isset($linksToFriends)) echo $linksToFriends;
-                        echo "</span></td></tr>";
-                    }
-                    ?>
-                    <tr>
-                        <td class="objectDescriptionItemLabel">Дети:</td>
-                        <td class="objectDescriptionBody"><span><?php
-                            if (isset($children) && $children != "0") echo $children; else echo "не указано";
-                            ?></span></td>
-                    </tr>
-                    <?php
-                    if ($children != "без детей" && $children != "0") {
-                        echo "<tr><td class='objectDescriptionItemLabel'>Количество детей и их возраст:</td><td class='objectDescriptionBody''><span>";
-                        if (isset($howManyChildren)) echo $howManyChildren;
-                        echo "</span></td></tr>";
-                    }
-                    ?>
-                    <tr>
-                        <td class="objectDescriptionItemLabel">Животные:</td>
-                        <td class="objectDescriptionBody"><span><?php
-                            if (isset($animals) && $animals != "0") echo $animals; else echo "не указано";
-                            ?></span></td>
-                    </tr>
-                    <?php
-                    if ($animals != "без животных" && $animals != "0") {
-                        echo "<tr><td class='objectDescriptionItemLabel'>Количество животных и их вид:</td><td class='objectDescriptionBody''><span>";
-                        if (isset($howManyAnimals)) echo $howManyAnimals;
-                        echo "</span></td></tr>";
-                    }
-                    ?>
-                    <tr>
-                        <td class="objectDescriptionItemLabel">Срок аренды:</td>
-                        <td class="objectDescriptionBody"><span><?php
-                            if (isset($termOfLease) && $termOfLease != "0") echo $termOfLease; else echo "не указан";
-                            ?></span></td>
-                    </tr>
-                    <tr>
-                        <td class="objectDescriptionItemLabel">Дополнительные условия поиска:</td>
-                        <td class="objectDescriptionBody"><span><?php
-                            if (isset($additionalDescriptionOfSearch)) echo $additionalDescriptionOfSearch;
-                            ?></span></td>
-                    </tr>
-                </tbody>
-            </table>
+                        ?>
+                    </ul>
+                </div>
+            </div>
         </fieldset>
     </div>
-    <?php endif;?>
-    <?php if ($typeTenant == "true" || $correct == "true" || $correctNewSearchRequest == "false"): ?>
-    <!-- Если пользователь является арендатором, то вместе с отображением текущих параметров поискового запроса мы выдаем скрытую форму для их редактирования, также мы выдаем видимую форму для редактирования параметров поиска в случае, если пользователь нажал на кнопку Нового поискового запроса и проверка на корректность его данных Профиля профла успешно, а также в случае если пользователь корректировал данные поискового запроса, но они не прошли проверку -->
-    <form method="post" name="searchParameters" id="extendedSearchParametersBlock">
-        <div id="leftBlockOfSearchParameters" style="display: inline-block;">
-            <fieldset class="edited">
-                <legend>
-                    Характеристика объекта
-                </legend>
-                <div class="searchItem">
-                    <span class="searchItemLabel"> Тип: </span>
+    <!-- /end.rightBlockOfSearchParameters -->
+    <fieldset class="edited private">
+        <legend>
+            Особые параметры поиска
+        </legend>
+        <div class="searchItem" notavailability="typeOfObject_гараж">
+            <div class="required">
+                *
+            </div>
+            <span class="searchItemLabel">Как собираетесь проживать: </span>
 
-                    <div class="searchItemBody">
-                        <select name="typeOfObject" id="typeOfObject">
-                            <option value="0" <?php if ($typeOfObject == "0") echo "selected";?>></option>
-                            <option value="квартира" <?php if ($typeOfObject == "квартира") echo "selected";?>>
-                                квартира
-                            </option>
-                            <option value="комната" <?php if ($typeOfObject == "комната") echo "selected";?>>комната
-                            </option>
-                            <option value="дом" <?php if ($typeOfObject == "дом") echo "selected";?>>дом, коттедж
-                            </option>
-                            <option value="таунхаус" <?php if ($typeOfObject == "таунхаус") echo "selected";?>>
-                                таунхаус
-                            </option>
-                            <option value="дача" <?php if ($typeOfObject == "дача") echo "selected";?>>дача</option>
-                            <option value="гараж" <?php if ($typeOfObject == "гараж") echo "selected";?>>гараж</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="searchItem" notavailability="typeOfObject_гараж">
-                    <span class="searchItemLabel"> Количество комнат: </span>
-
-                    <div class="searchItemBody">
-                        <input type="checkbox" value="1" name="amountOfRooms[]"
-                            <?php
-                            foreach ($amountOfRooms as $value) {
-                                if ($value == "1") {
-                                    echo "checked";
-                                    break;
-                                }
-                            }
-                            ?>>
-                        1
-                        <input type="checkbox" value="2"
-                               name="amountOfRooms[]" <?php
-                            foreach ($amountOfRooms as $value) {
-                                if ($value == "2") {
-                                    echo "checked";
-                                    break;
-                                }
-                            }
-                            ?>>
-                        2
-                        <input type="checkbox" value="3"
-                               name="amountOfRooms[]" <?php
-                            foreach ($amountOfRooms as $value) {
-                                if ($value == "3") {
-                                    echo "checked";
-                                    break;
-                                }
-                            }
-                            ?>>
-                        3
-                        <input type="checkbox" value="4"
-                               name="amountOfRooms[]" <?php
-                            foreach ($amountOfRooms as $value) {
-                                if ($value == "4") {
-                                    echo "checked";
-                                    break;
-                                }
-                            }
-                            ?>>
-                        4
-                        <input type="checkbox" value="5"
-                               name="amountOfRooms[]" <?php
-                            foreach ($amountOfRooms as $value) {
-                                if ($value == "5") {
-                                    echo "checked";
-                                    break;
-                                }
-                            }
-                            ?>>
-                        5
-                        <input type="checkbox" value="6"
-                               name="amountOfRooms[]" <?php
-                            foreach ($amountOfRooms as $value) {
-                                if ($value == "6") {
-                                    echo "checked";
-                                    break;
-                                }
-                            }
-                            ?>>
-                        6...
-                    </div>
-                </div>
-                <div class="searchItem" notavailability="typeOfObject_гараж">
-                    <span class="searchItemLabel"> Комнаты смежные: </span>
-
-                    <div class="searchItemBody">
-                        <select name="adjacentRooms">
-                            <option value="0" <?php if ($adjacentRooms == "0") echo "selected";?>></option>
-                            <option
-                                value="не имеет значения" <?php if ($adjacentRooms == "не имеет значения") echo "selected";?>>
-                                не
-                                имеет значения
-                            </option>
-                            <option
-                                value="только изолированные" <?php if ($adjacentRooms == "только изолированные") echo "selected";?>>
-                                только изолированные
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="searchItem"
-                     notavailability="typeOfObject_дом&typeOfObject_таунхаус&typeOfObject_дача&typeOfObject_гараж">
-                    <span class="searchItemLabel"> Этаж: </span>
-
-                    <div class="searchItemBody">
-                        <select name="floor">
-                            <option value="0" <?php if ($floor == "0") echo "selected";?>></option>
-                            <option value="любой" <?php if ($floor == "любой") echo "selected";?>>любой</option>
-                            <option value="не первый" <?php if ($floor == "не первый") echo "selected";?>>не первый
-                            </option>
-                            <option
-                                value="не первый и не последний" <?php if ($floor == "не первый и не последний") echo "selected";?>>
-                                не первый и не
-                                последний
-                            </option>
-                        </select>
-                    </div>
-                </div>
-            </fieldset>
-            <fieldset class="edited">
-                <legend>
-                    Стоимость
-                </legend>
-                <div class="searchItem">
-                    <div class="searchItemLabel"
-                         title="Укажите, сколько Вы готовы платить в месяц за аренду недвижимости с учетом стоимости коммунальных услуг (если они оплачиваются дополнительно)">
-                        Арендная плата (в месяц с учетом ком. усл.)
-                    </div>
-                    <div class="searchItemBody">
-                        от
-                        <input type="text" name="minCost" id="minCost" size="10"
-                               maxlength="8" <?php echo "value='$minCost'";?>>
-                        руб., до
-                        <input type="text" name="maxCost" id="maxCost" size="10"
-                               maxlength="8" <?php echo "value='$maxCost'";?>>
-                        руб.
-                    </div>
-                </div>
-                <div class="searchItem"
-                     title="Какую сумму Вы готовы передать собственнику в качестве возвращаемого гарантийного депозита">
-                    <span class="searchItemLabel"> Залог </span>
-
-                    <div class="searchItemBody">
-                        до
-                        <input type="text" name="pledge" size="10" maxlength="8" <?php echo "value='$pledge'";?>>
-                        руб.
-                    </div>
-                </div>
-                <div class="searchItem"
-                     title="Какую предоплату за проживание Вы готовы внести">
-                    <span class="searchItemLabel"> Максимальная предоплата: </span>
-
-                    <div class="searchItemBody">
-                        <select name="prepayment">
-                            <option value="0" <?php if ($prepayment == "0") echo "selected";?>></option>
-                            <option value="нет" <?php if ($prepayment == "нет") echo "selected";?>>нет</option>
-                            <option value="1 месяц" <?php if ($prepayment == "1 месяц") echo "selected";?>>1 месяц
-                            </option>
-                            <option value="2 месяца" <?php if ($prepayment == "2 месяца") echo "selected";?>>2 месяца
-                            </option>
-                            <option value="3 месяца" <?php if ($prepayment == "3 месяца") echo "selected";?>>3 месяца
-                            </option>
-                            <option value="4 месяца" <?php if ($prepayment == "4 месяца") echo "selected";?>>4 месяца
-                            </option>
-                            <option value="5 месяцев" <?php if ($prepayment == "5 месяцев") echo "selected";?>>5
-                                месяцев
-                            </option>
-                            <option value="6 месяцев" <?php if ($prepayment == "6 месяцев") echo "selected";?>>6
-                                месяцев
-                            </option>
-                        </select>
-                    </div>
-                </div>
-            </fieldset>
+            <div class="searchItemBody">
+                <select name="withWho" id="withWho">
+                    <option value="0" <?php if ($withWho == "0") echo "selected";?>></option>
+                    <option value="самостоятельно" <?php if ($withWho == "самостоятельно") echo "selected";?>>
+                        самостоятельно
+                    </option>
+                    <option value="семья" <?php if ($withWho == "семья") echo "selected";?>>семьей
+                    </option>
+                    <option value="пара" <?php if ($withWho == "пара") echo "selected";?>>парой
+                    </option>
+                    <option value="2 мальчика" <?php if ($withWho == "2 мальчика") echo "selected";?>>2 мальчика
+                    </option>
+                    <option value="2 девочки" <?php if ($withWho == "2 девочки") echo "selected";?>>2 девочки
+                    </option>
+                    <option value="со знакомыми" <?php if ($withWho == "со знакомыми") echo "selected";?>>со
+                        знакомыми
+                    </option>
+                </select>
+            </div>
         </div>
-        <div id="rightBlockOfSearchParameters">
-            <fieldset class="edited">
-                <legend>
-                    Район
-                </legend>
-                <div class="searchItem">
-                    <div class="searchItemBody">
-                        <ul>
-                            <?php
-                            if (isset($allDistrictsInCity)) {
-                                foreach ($allDistrictsInCity as $value) { // Для каждого идентификатора района и названия формируем чекбокс
-                                    echo "<li><input type='checkbox' name='district[]' value='" . $value . "'";
-                                    foreach ($district as $valueDistrict) {
-                                        if ($valueDistrict == $value) {
-                                            echo "checked";
-                                            break;
-                                        }
-                                    }
-                                    echo "> " . $value . "</li>";
-                                }
-                            }
-                            ?>
-                        </ul>
-                    </div>
-                </div>
-            </fieldset>
+        <div class="searchItem" id="withWhoDescription" style="display: none;">
+            <div class="searchItemLabel">
+                Информация о сожителях:
+            </div>
+            <div class="searchItemBody">
+                <textarea name="linksToFriends" cols="40" rows="3"><?php echo $linksToFriends;?></textarea>
+            </div>
         </div>
-        <!-- /end.rightBlockOfSearchParameters -->
-        <fieldset class="edited private">
-            <legend>
-                Особые параметры поиска
-            </legend>
-            <div class="searchItem" notavailability="typeOfObject_гараж">
-                <div class="required">
-                    *
-                </div>
-                <span class="searchItemLabel">Как собираетесь проживать: </span>
+        <div class="searchItem" notavailability="typeOfObject_гараж">
+            <div class="required">
+                *
+            </div>
+            <span class="searchItemLabel">Дети: </span>
 
-                <div class="searchItemBody">
-                    <select name="withWho" id="withWho">
-                        <option value="0" <?php if ($withWho == "0") echo "selected";?>></option>
-                        <option value="самостоятельно" <?php if ($withWho == "самостоятельно") echo "selected";?>>
-                            самостоятельно
-                        </option>
-                        <option value="семья" <?php if ($withWho == "семья") echo "selected";?>>семьей
-                        </option>
-                        <option value="пара" <?php if ($withWho == "пара") echo "selected";?>>парой
-                        </option>
-                        <option value="2 мальчика" <?php if ($withWho == "2 мальчика") echo "selected";?>>2 мальчика
-                        </option>
-                        <option value="2 девочки" <?php if ($withWho == "2 девочки") echo "selected";?>>2 девочки
-                        </option>
-                        <option value="со знакомыми" <?php if ($withWho == "со знакомыми") echo "selected";?>>со
-                            знакомыми
-                        </option>
-                    </select>
-                </div>
+            <div class="searchItemBody">
+                <select name="children" id="children">
+                    <option value="0" <?php if ($children == "0") echo "selected";?>></option>
+                    <option value="без детей" <?php if ($children == "без детей") echo "selected";?>>без детей
+                    </option>
+                    <option
+                        value="с детьми младше 4-х лет" <?php if ($children == "с детьми младше 4-х лет") echo "selected";?>>
+                        с детьми
+                        младше 4-х лет
+                    </option>
+                    <option
+                        value="с детьми старше 4-х лет" <?php if ($children == "с детьми старше 4-х лет") echo "selected";?>>
+                        с детьми
+                        старше 4-х лет
+                    </option>
+                </select>
             </div>
-            <div class="searchItem" id="withWhoDescription" style="display: none;">
-                <div class="searchItemLabel">
-                    Информация о сожителях:
-                </div>
-                <div class="searchItemBody">
-                    <textarea name="linksToFriends" cols="40" rows="3"><?php echo $linksToFriends;?></textarea>
-                </div>
+        </div>
+        <div class="searchItem" id="childrenDescription" style="display: none;">
+            <div class="searchItemLabel">
+                Сколько у Вас детей и какого возраста:
             </div>
-            <div class="searchItem" notavailability="typeOfObject_гараж">
-                <div class="required">
-                    *
-                </div>
-                <span class="searchItemLabel">Дети: </span>
+            <div class="searchItemBody">
+                <textarea name="howManyChildren" cols="40" rows="3"><?php echo $howManyChildren;?></textarea>
+            </div>
+        </div>
+        <div class="searchItem" notavailability="typeOfObject_гараж">
+            <div class="required">
+                *
+            </div>
+            <span class="searchItemLabel">Животные: </span>
 
-                <div class="searchItemBody">
-                    <select name="children" id="children">
-                        <option value="0" <?php if ($children == "0") echo "selected";?>></option>
-                        <option value="без детей" <?php if ($children == "без детей") echo "selected";?>>без детей
-                        </option>
-                        <option
-                            value="с детьми младше 4-х лет" <?php if ($children == "с детьми младше 4-х лет") echo "selected";?>>
-                            с детьми
-                            младше 4-х лет
-                        </option>
-                        <option
-                            value="с детьми старше 4-х лет" <?php if ($children == "с детьми старше 4-х лет") echo "selected";?>>
-                            с детьми
-                            старше 4-х лет
-                        </option>
-                    </select>
-                </div>
+            <div class="searchItemBody">
+                <select name="animals" id="animals">
+                    <option value="0" <?php if ($animals == "0") echo "selected";?>></option>
+                    <option value="без животных" <?php if ($animals == "без животных") echo "selected";?>>без
+                        животных
+                    </option>
+                    <option value="с животным(ми)" <?php if ($animals == "с животным(ми)") echo "selected";?>>с
+                        животным(ми)
+                    </option>
+                </select>
             </div>
-            <div class="searchItem" id="childrenDescription" style="display: none;">
-                <div class="searchItemLabel">
-                    Сколько у Вас детей и какого возраста:
-                </div>
-                <div class="searchItemBody">
-                    <textarea name="howManyChildren" cols="40" rows="3"><?php echo $howManyChildren;?></textarea>
-                </div>
+        </div>
+        <div class="searchItem" id="animalsDescription" style="display: none;">
+            <div class="searchItemLabel">
+                Сколько у Вас животных и какого вида:
             </div>
-            <div class="searchItem" notavailability="typeOfObject_гараж">
-                <div class="required">
-                    *
-                </div>
-                <span class="searchItemLabel">Животные: </span>
+            <div class="searchItemBody">
+                <textarea name="howManyAnimals" cols="40" rows="3"><?php echo $howManyAnimals;?></textarea>
+            </div>
+        </div>
+        <div class="searchItem">
+            <div class="required">
+                *
+            </div>
+            <span class="searchItemLabel">Срок аренды:</span>
 
-                <div class="searchItemBody">
-                    <select name="animals" id="animals">
-                        <option value="0" <?php if ($animals == "0") echo "selected";?>></option>
-                        <option value="без животных" <?php if ($animals == "без животных") echo "selected";?>>без
-                            животных
-                        </option>
-                        <option value="с животным(ми)" <?php if ($animals == "с животным(ми)") echo "selected";?>>с
-                            животным(ми)
-                        </option>
-                    </select>
-                </div>
+            <div class="searchItemBody">
+                <select name="termOfLease" id="termOfLease">
+                    <option value="0" <?php if ($termOfLease == "0") echo "selected";?>></option>
+                    <option value="длительный срок" <?php if ($termOfLease == "длительный срок") echo "selected";?>>
+                        длительный срок (от года)
+                    </option>
+                    <option
+                        value="несколько месяцев" <?php if ($termOfLease == "несколько месяцев") echo "selected";?>>
+                        несколько месяцев (до года)
+                    </option>
+                </select>
             </div>
-            <div class="searchItem" id="animalsDescription" style="display: none;">
-                <div class="searchItemLabel">
-                    Сколько у Вас животных и какого вида:
-                </div>
-                <div class="searchItemBody">
-                    <textarea name="howManyAnimals" cols="40" rows="3"><?php echo $howManyAnimals;?></textarea>
-                </div>
-            </div>
-            <div class="searchItem">
-                <div class="required">
-                    *
-                </div>
-                <span class="searchItemLabel">Срок аренды:</span>
-
-                <div class="searchItemBody">
-                    <select name="termOfLease" id="termOfLease">
-                        <option value="0" <?php if ($termOfLease == "0") echo "selected";?>></option>
-                        <option value="длительный срок" <?php if ($termOfLease == "длительный срок") echo "selected";?>>
-                            длительный срок (от года)
-                        </option>
-                        <option
-                            value="несколько месяцев" <?php if ($termOfLease == "несколько месяцев") echo "selected";?>>
-                            несколько месяцев (до года)
-                        </option>
-                    </select>
-                </div>
-            </div>
-            <div class="searchItem">
-                <div class="required"></div>
+        </div>
+        <div class="searchItem">
+            <div class="required"></div>
         <span class="searchItemLabel">
             Дополнительные условия поиска:
         </span>
-            </div>
-            <div class="searchItem">
-                <div class="required"></div>
-                <div class="searchItemBody">
-                    <textarea name="additionalDescriptionOfSearch" cols="50"
-                              rows="4"><?php echo $additionalDescriptionOfSearch;?></textarea>
-                </div>
-            </div>
-        </fieldset>
-
-        <div class="clearBoth"></div>
-        <div class="bottomButton">
-            <a href="personal.php?tabsId=4" style="margin-right: 10px;">Отмена</a>
-            <button type="submit" name="saveSearchParametersButton" id="saveSearchParametersButton" class="button">
-                Сохранить
-            </button>
         </div>
+        <div class="searchItem">
+            <div class="required"></div>
+            <div class="searchItemBody">
+                <textarea name="additionalDescriptionOfSearch" cols="50"
+                          rows="4"><?php echo $additionalDescriptionOfSearch;?></textarea>
+            </div>
+        </div>
+    </fieldset>
 
-        <div class="clearBoth"></div>
-    </form>
-    <!-- /end.extendedSearchParametersBlock -->
+    <div class="clearBoth"></div>
+    <div class="bottomButton">
+        <a href="personal.php?tabsId=4" style="margin-right: 10px;">Отмена</a>
+        <button type="submit" name="saveSearchParametersButton" id="saveSearchParametersButton" class="button">
+            Сохранить
+        </button>
+    </div>
+
+    <div class="clearBoth"></div>
+</form>
+<!-- /end.extendedSearchParametersBlock -->
     <?php endif;?>
 </div>
 <!-- /end.tabs-4 -->
@@ -2588,7 +2587,6 @@
 </div>
 </div>
 <!-- /end.resultOnSearchPage -->
-</div>
 </div>
 </div>
 

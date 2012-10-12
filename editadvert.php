@@ -417,7 +417,6 @@
 
 <div class="page_main_content">
 
-<div class="wrapperOfTabs">
 <div class="headerOfPage">
     Редактирование объявления.
     <?php
@@ -1644,7 +1643,6 @@
 <div class="clearBoth"></div>
 
 </form>
-</div>
 
 </div>
 <!-- /end.page_main_content -->

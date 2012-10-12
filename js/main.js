@@ -8,12 +8,12 @@ function changeMenuSeparatorWidth() {
     var menuWidth = $(".menu").width();
 
     // Приводим ширину пунктов меню к естественному виду
-    $(".menu .choice").each(function() {
+    $(".menu .choice").each(function () {
         $(this).css("width", "");
     });
 
     // Считаем остаток ширины на сепараторы
-    $(".menu .choice").each(function() {
+    $(".menu .choice").each(function () {
         menuWidth = menuWidth - $(this).width();
     });
 
@@ -25,7 +25,7 @@ function changeMenuSeparatorWidth() {
     }
 
     // Применяем вычисленную ширину ко всем сепараторам
-    $(".menu .separator").each(function() {
+    $(".menu .separator").each(function () {
         $(this).width(separatorWidth);
     })
 }

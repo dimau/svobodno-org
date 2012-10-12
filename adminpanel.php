@@ -45,30 +45,29 @@
     ?>
 
     <div class="page_main_content">
-        <div class="wrapperOfTabs">
-            <div class="headerOfPage">
-                Панель администратора
+        <div class="headerOfPage">
+            Панель администратора
+        </div>
+        <div id="tabs">
+            <ul>
+                <li>
+                    <a href="#tabs-1">Новый собственник</a>
+                </li>
+                <li>
+                    <a href="#tabs-2">Поиск</a>
+                </li>
+            </ul>
+            <div id="tabs-1">
+                <a href="registration.php?typeOwner=true">Зарегистрировать нового пользователя</a>
+                <a href="newadvert.php">Создать новое объявление</a>
+
+                <div class="clearBoth"></div>
             </div>
-            <div id="tabs">
-                <ul>
-                    <li>
-                        <a href="#tabs-1">Новый собственник</a>
-                    </li>
-                    <li>
-                        <a href="#tabs-2">Поиск</a>
-                    </li>
-                </ul>
-                <div id="tabs-1">
-                    <a href="registration.php?typeOwner=true">Зарегистрировать нового пользователя</a>
-                    <a href="newadvert.php">Создать новое объявление</a>
-                    <div class="clearBoth"></div>
-                </div>
-                <!-- /end.tabs-1 -->
-                <div id="tabs-2">
-                    А здесь форма поиска по БД
-                </div>
-                <!-- /end.tabs-2 -->
+            <!-- /end.tabs-1 -->
+            <div id="tabs-2">
+                А здесь форма поиска по БД
             </div>
+            <!-- /end.tabs-2 -->
         </div>
     </div>
     <!-- /end.page_main_content -->

@@ -390,7 +390,6 @@
 
 <div class="page_main_content">
 
-<div class="wrapperOfTabs">
 <div class="headerOfPage">
     Новое объявление
 </div>
@@ -1609,7 +1608,6 @@
 <div class="clearBoth"></div>
 
 </form>
-</div>
 
 </div>
 <!-- /end.page_main_content -->
