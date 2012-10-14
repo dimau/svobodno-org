@@ -19,6 +19,9 @@
  */
 
 html {
+    margin: 0;
+    padding: 0;
+    height: 100%; /* эта строчка для прижатия подвала к низу страницы*/
     font-size: 100%;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
@@ -27,10 +30,14 @@ html {
 }
 
 body {
+    height: 100%; /* эта строчка для прижатия подвала к низу страницы*/
+    width: 100%;
     margin: 0;
     padding: 0;
+    font-family: 'Trebuchet MS', Tahoma, Verdana, Arial, sans-serif;
     font-size: 1em;
     line-height: 1.4;
+    background: #A7A4A1 url('../img/bg_white.jpg');
 }
 
 /*
@@ -47,6 +54,17 @@ body {
 ::selection {
     background: #FFE45C;
     text-shadow: none;
+}
+
+/*
+ * 1. Improve image quality when scaled in IE7: h5bp.com/d
+ * 2. Remove the gap between images and borders on image containers: h5bp.com/i/440
+ */
+
+img {
+    border: 0;
+    vertical-align: middle;
+    -ms-interpolation-mode: bicubic;
 }
 
 /* =============================================================================
@@ -73,7 +91,6 @@ a:focus {
 }
 
 /*
- * Improve readability when focused and hovered in all browsers: h5bp.com/h
  * На всякий случай, убеждаемся, что св-во outline, задающее внешнюю границу элемента, обнулено
  */
 
@@ -83,7 +100,7 @@ a:active {
 }
 
 /* =============================================================================
-   Lists
+   СПИСКИ
    ========================================================================== */
 
 ul,
@@ -108,29 +125,6 @@ ul.listDescription .headOfString {
 }
 
 /* =============================================================================
-   Embedded content
-   ========================================================================== */
-
-/*
- * 1. Improve image quality when scaled in IE7: h5bp.com/d
- * 2. Remove the gap between images and borders on image containers: h5bp.com/i/440
- */
-
-img {
-    border: 0;
-    vertical-align: middle;
-    -ms-interpolation-mode: bicubic;
-}
-
-/*
- * Correct overflow not hidden in IE9
- */
-
-svg:not(:root) {
-    overflow: hidden;
-}
-
-/* =============================================================================
    Forms
    ========================================================================== */
 
@@ -149,11 +143,6 @@ fieldset {
 fieldset legend {
     font-weight: bold;
     color: #336784;
-}
-
-/* Стили для редактируемых блоков fieldset*/
-fieldset.edited {
-    line-height: 2.4;
 }
 
 /* Стили для НЕредактируемых блоков fieldset*/
@@ -256,7 +245,6 @@ input[disabled] {
 
 input[type="checkbox"],
 input[type="radio"] {
-    box-sizing: border-box;
     padding: 0;
 }
 
@@ -279,11 +267,21 @@ textarea {
     overflow: auto;
     vertical-align: top;
     resize: vertical;
-    margin-bottom: 3px;
+}
+
+input[type=text], input[type=password], select {
+    width: 220px;
+    border: 1px solid #CFCFCF;
+    border-radius: 4px 4px 4px 4px;
+}
+
+/* Внутри таблицы занимает все отведенное пространство */
+textarea {
+    width: 100%;
 }
 
 /* =============================================================================
-   Tables
+   ТАБЛИЦЫ
    ========================================================================== */
 
 table {
@@ -324,32 +322,8 @@ td.bottom.right, th.bottom.right {
     padding: 0.2em 0;
 }
 
-/* ==|== primary styles =====================================================
-
-
-Author: Ushakov Dmitrii
-
-
-========================================================================== */
-
-html {
-    margin: 0;
-    padding: 0;
-    height: 100%; /* эта строчка для прижатия подвала к низу страницы*/
-}
-
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Trebuchet MS', Tahoma, Verdana, Arial, sans-serif;
-    font-size: 100%;
-    height: 100%; /* эта строчка для прижатия подвала к низу страницы*/
-    width: 100%;
-    background: #A7A4A1 url('bg_white.jpg');
-}
-
 /* =============================================================================
-   Foto
+   ФОТОГРАФИИ
    ========================================================================== */
 
 .fotosWrapper {
@@ -406,7 +380,7 @@ body {
 }
 
 /* =============================================================================
-   Стили для шапки страницы
+   ШАПКА СТРАНИЦЫ
    ========================================================================== */
 
 .header {
@@ -419,7 +393,7 @@ body {
 }
 
 .iconBox {
-    background-image: url('brand.png');
+    background-image: url('../img/brand.png');
     width: 94px;
     height: 94px;
     /*float: left;*/
@@ -477,7 +451,7 @@ body {
     display: inline-block;
     height: 3em;
     line-height: 3em;
-    background: #336784 url('bg_blue.jpg');
+    background: #336784 url('../img/bg_blue.jpg');
     text-align: center;
     vertical-align: middle;
 }
@@ -512,7 +486,7 @@ body {
 }
 
 /* =============================================================================
-   Стили для основного содержимого страницы
+   ОСНОВНОЕ СОДЕРЖИМОЕ СТРАНИЦЫ
    ========================================================================== */
 
 .page_without_footer {
@@ -534,10 +508,6 @@ body {
     padding: 6px 0px 6px 0px;
 }
 
-#tabs {
-    font-size: 1em;
-}
-
 .page-buffer {
     height: 34px;
     clear: both;
@@ -554,7 +524,7 @@ body {
 }
 
 /* =============================================================================
-   Стили для мини блока - используется при входе в сервис, при выборе роли на регистрации
+   ДИАЛОГОВОЕ ОКНО НА ОТДЕЛЬНОЙ СТРАНИЦЕ
    ========================================================================== */
 
 .miniBlock {
@@ -608,7 +578,7 @@ body {
 }
 
 /* =============================================================================
-   Стили для блока отображения ошибок - используется при входе в сервис и при регистрации
+   ВЫПЛЫВАЮЩАЯ ПЛАШКА С ОШИБКАМИ
    ========================================================================== */
 
 #userMistakesBlock {
@@ -641,7 +611,118 @@ body {
 }
 
 /* =============================================================================
-   Стили для блока добавления и удаления из избранного
+   СООБЩЕНИЯ ОБ ОШИБКАХ НАД ПОЛЯМИ ВВОДА
+   ========================================================================== */
+
+.errorBlock {
+    position: absolute;
+    top: 300px;
+    left: 300px;
+    max-width: 250px;
+    padding-bottom: 15px;
+    display: block;
+    z-index: 5000;
+}
+
+.errorContent {
+    width: 100%;
+    background: #FFE45C;
+    color: #000000;
+    font-family: tahoma;
+    font-size: 10px;
+    box-shadow: 1px 1px 6px #FFE45C;
+    -moz-box-shadow: 1px 1px 6px #FFE45C;
+    -webkit-box-shadow: 1px 1px 6px #FFE45C;
+    padding: 4px 10px 4px 10px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-color: #FED22F;
+}
+
+.errorArrow {
+    position: absolute;
+    bottom: 0;
+    left: 20px;
+    width: 15px;
+    height: 15px;
+}
+
+.errorBlock .errorArrow div {
+    box-shadow: 1px 4px 5px #FFE45C;
+    -moz-box-shadow: 1px 4px 5px #FFE45C;
+    -webkit-box-shadow: 1px 1px 5px #FFE45C;
+    font-size: 0px;
+
+}
+
+.errorBlock .errorArrow .line10 {
+    width: 15px;
+    height: 1px;
+    background: #FFE45C;
+    margin: 0 auto;
+    font-size: 0px;
+    display: block;
+}
+
+.errorBlock .errorArrow .line9 {
+    width: 13px;
+    height: 1px;
+    background: #FFE45C;
+    margin: 0 auto;
+    display: block;
+}
+
+.errorBlock .errorArrow .line8 {
+    width: 11px;
+    height: 1px;
+    background: #FFE45C;
+    margin: 0 auto;
+    display: block;
+}
+
+.errorBlock .errorArrow .line7 {
+    width: 9px;
+    height: 1px;
+    background: #FFE45C;
+    margin: 0 auto;
+    display: block;
+}
+
+.errorBlock .errorArrow .line6 {
+    width: 7px;
+    height: 1px;
+    background: #FFE45C;
+    margin: 0 auto;
+    display: block;
+}
+
+.errorBlock .errorArrow .line5 {
+    width: 5px;
+    height: 1px;
+    background: #FFE45C;
+    margin: 0 auto;
+    display: block;
+}
+
+.errorBlock .errorArrow .line4 {
+    width: 3px;
+    height: 1px;
+    background: #FFE45C;
+    margin: 0 auto;
+    display: block;
+}
+
+.errorBlock .errorArrow .line3 {
+    width: 1px;
+    height: 1px;
+    background: #FFE45C;
+    margin: 0 auto;
+    display: block;
+}
+
+/* =============================================================================
+   ИЗБРАННОЕ
    ========================================================================== */
 
 .blockOfIcon {
@@ -655,7 +736,7 @@ body {
 }
 
 /* =============================================================================
-   Стили для редактируемых блоков с параметрами поиска
+   ПАРАМЕТРЫ ПОИСКА
    ========================================================================== */
 
 #leftBlockOfSearchParameters {
@@ -669,25 +750,18 @@ body {
 }
 
 #rightBlockOfSearchParameters fieldset {
-    box-sizing: border-box;
     height: 100%;
-}
-
-#rightBlockOfSearchParameters .searchItem {
-    height: 100%;
-    line-height: 1.4em;
-}
-
-#rightBlockOfSearchParameters .searchItemBody {
-    height: 100%;
-    width: 200px;
-    overflow-y: auto;
 }
 
 #rightBlockOfSearchParameters ul {
+    display: inline-block;
+    height: 100%;
+    line-height: 1.4em;
     list-style: none;
     margin: 0;
     padding: 0;
+    width: 200px;
+    overflow-y: auto;
 }
 
 .extendedSearchParametersBlock {
@@ -698,9 +772,9 @@ body {
     display: inline-block;
 }
 
-.searchItemBody {
+/*.searchItemBody {
     display: inline-block;
-}
+}  */
 
 .private {
     display: inline-block;
@@ -866,10 +940,10 @@ div.unread > div.newsHeader {
 }
 
 /* ======================================================================
-   Стили для РЕДАКТИРОВАНИЯ описания человека (Профайл личного кабинета и форма регистрации)
+   БЛОКИ Fieldset с полями ввода для ВВОДА И РЕДАКТИРОВАНИЯ ПАРАМЕТРОВ. Стили для РЕДАКТИРОВАНИЯ описания человека (Профайл личного кабинета и форма регистрации)
    ====================================================================== */
 
-.required {
+/*.required {
     display: inline-block;
     color: red;
     width: 5px;
@@ -894,11 +968,29 @@ div.unread > div.newsHeader {
     display: inline-block;
     vertical-align: top;
     margin-right: 7px;
+} */
+
+.edited table td {
+    vertical-align: middle;
+    padding: 3px 0px 3px 0px;
 }
 
-table td {
-    vertical-align: middle;
-    padding: 5px;
+.edited table td.itemLabel {
+    padding-right: 6px;
+    text-align: right
+}
+
+.edited table td.itemRequired {
+    color: red;
+}
+
+.edited table td.itemBody {
+    padding-left: 6px;
+    text-align: left;
+}
+
+.edited table .withWhoDescription td.itemLabel, .edited table .childrenDescription td.itemLabel, .edited table .animalsDescription td.itemLabel {
+    text-align: left;
 }
 
 /* =======================================================================
@@ -913,10 +1005,12 @@ table td {
 /* =======================================================================
    Исправление jQuery UI проблем
    ====================================================================== */
+
 /* Красивая внешняя граница у блоков с вкладками */
 #tabs {
     border-color: #6A9D02;
     border-width: 2px;
+    font-size: 1em;
 }
 
 /* Не рисуем нижнюю границу у вкладок (как это происходит для обычных ссылок) */
@@ -926,5 +1020,13 @@ table td {
 
 /* Не рисуем нижнюю границу у заголовкой аккордеона (как это происходит для обычных ссылок) */
 .ui-accordion-header a {
+    border-bottom: none;
+}
+
+/* Календарь - всегда на самом верху страницы, чтобы его ничего не закрывало, а также ссылки без подчеркивания (в отличие от оформления ссылок по умолчанию) */
+.ui-datepicker {
+    z-index: 5001 !important;
+}
+.ui-datepicker a {
     border-bottom: none;
 }

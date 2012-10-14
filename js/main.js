@@ -1,7 +1,3 @@
-/**
- * @author dimau
- */
-
 /* Делаем красивые (равномерные) отступы внутри плашки меню */
 function changeMenuSeparatorWidth() {
     // Выясняем ширину области меню
@@ -108,6 +104,109 @@ function getCoords(elem) {
         left:Math.round(left)
     };
 }
+
+/**********************************************************************************
+ * Функция для БЛОКИРОВКИ / РАЗБЛОКИРОВКИ ЭЛЕМЕНТОВ ВВОДА при изменении уже введенных значений.
+ *
+ * Пробегает все элементы и изменяет в соответствии с текущей ситуацией их доступность/недоступность для пользователя
+ * Для использования необходимо подключить запуск функции к соответствующему селекту:
+ * $("#typeOfObject").change(notavailability);
+ *
+ * Используется на странице регистрации пользователя
+ **********************************************************************************/
+
+function notavailability() {
+
+    // Понимаем роль пользователя, так как некоторые поля обязательны для арендатора, но необязательны для собственника
+    var userTypeTenant = $(".userType").attr('typeTenant') == "true";
+
+    // Перебираем все элементы, доступность которых зависит от каких-либо условий
+    $("[notavailability]").each(function () {
+        // Получаем текущий элемент из перебираемых и набор условий его недоступности
+        var currentElem = this;
+        var notSelectorsOfElem = $(this).attr("notavailability");
+
+        // Получаем массив, каждый элемент которого = условию недоступности
+        var arrNotSelectorsOfElem = notSelectorsOfElem.split('&');
+
+        // Презумпция доступности элемента, если одно из его условий недоступности выполнится ниже, то он станет недоступным
+        $("select, input", currentElem).removeAttr("disabled");
+        $(currentElem).css('color', '');
+        $("select, input", currentElem).css("background-color", '');
+        if (userTypeTenant) $(".itemRequired.typeTenantRequired", currentElem).text("*");
+
+        // Проверяем верность каждого условия недоступности
+        for (var i = 0; i < arrNotSelectorsOfElem.length; i++) {
+            // Выделяем Селект условия недоступности и его значение, при котором условие выполняется и элемент должен стать недоступным
+            var selectAndValue = arrNotSelectorsOfElem[i].split('_');
+            var currentSelectId = selectAndValue[0];
+            var currentNotSelectValue = selectAndValue[1];
+
+            // Проверяем текущее значение селекта
+            var currentSelectValue = $("#" + currentSelectId).val();
+            var isCurrentSelectDisabled = $("#" + currentSelectId).attr("disabled");
+            if (currentSelectValue == currentNotSelectValue || isCurrentSelectDisabled) { // Если текущее значение селекта совпало с тем значением, при котором данный элемент должен быть недоступен, либо селект, от значения которого зависит судьба данного недоступен, то выполняем скрытие элемента и его селектов
+                $("select, input", currentElem).attr("disabled", "disabled");
+                $(currentElem).css('color', '#e6e6e6');
+                $("select, input", currentElem).css("background-color", '#e6e6e6');
+                $(".itemRequired", currentElem).text("");
+                break; // Прерываем цикл, так как проверка остальных условий по данному элементу уже не нужна
+            }
+        }
+    });
+}
+
+/**********************************************************************************
+ * Функция для ФОРМИРОВАНИЯ И ОТОБРАЖЕНИЯ СООБЩЕНИЯ ОБ ОШИБКЕ над элементом ввода.
+ *
+ * Используется при валидации формы регистрации пользователя
+ * inputId - идентификатор элемента управления (select, input..)
+ * errorText - сообщение об ошибке, которое нужно отобразить
+ **********************************************************************************/
+
+function buildErrorMessageBlock (inputId, errorText) {
+    var divErrorBlock = document.createElement('div');
+    var divErrorContent = document.createElement('div');
+    var errorArrow = document.createElement('div');
+
+    $(divErrorBlock).addClass("errorBlock");
+    $(divErrorBlock).addClass($("#" + inputId).attr("name"));
+    $(divErrorContent).addClass("errorContent");
+    $(errorArrow).addClass("errorArrow");
+
+    $("body").append(divErrorBlock);
+    $(divErrorBlock).append(errorArrow);
+    $(divErrorBlock).append(divErrorContent);
+    $(errorArrow).html('<div class="line10"></div><div class="line9"></div><div class="line8"></div><div class="line7"></div><div class="line6"></div><div class="line5"></div><div class="line4"></div><div class="line3"></div><div class="line2"></div><div class="line1"></div>');
+    $(divErrorContent).html(errorText);
+
+    inputTopPosition = $("#" + inputId).offset().top;
+    inputleftPosition = $("#" + inputId).offset().left;
+    inputWidth = $("#" + inputId).width();
+    inputHeight = $("#" + inputId).height();
+    divErrorBlockHeight = $(divErrorBlock).height();
+
+    inputleftPosition = inputleftPosition + inputWidth - 30;
+    inputTopPosition = inputTopPosition - divErrorBlockHeight - 10;
+
+    $(divErrorBlock).css({
+        top: inputTopPosition,
+        left: inputleftPosition,
+        opacity: 0
+    });
+    $(divErrorBlock).fadeTo("fast", 0.8);
+}
+
+// При фокусировке на некотором элементе управления нам нужно удалить сообщение об ошибке, чтобы оно не мешало вводу данных
+$("input[type=text], input[type=password], select, textarea").on('focus', function() {
+    // Ищем блок с отображением ошибки, который помечен классом, совпадающим с именем элемента управления - то есть относящимся к этому элементу управления и удаляем его.
+    $(".errorBlock." + $(this).attr("name")).each(function() {
+        $(this).remove();
+    });
+});
+
+// Инициализируем флаг - нужна ли валидация вкладки при ее появлении
+var validationIsNeeded = false;
 
 /* Как только будет загружен API и готов DOM, выполняем инициализацию карты от Яндекса*/
 //ymaps.ready(init);

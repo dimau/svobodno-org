@@ -53,122 +53,27 @@ function createUploader() {
 }
 $(document).ready(createUploader);
 
-/* Если в форме Работа указано, что пользователь не работает, то блокировать заполнение остальных инпутов */
-$("#statusWork").on('change', statusWork);
-$(document).ready(statusWork);
-function statusWork() {
-    var userTypeTenant = $(".userType").attr('typeTenant') == "true";
-    var currentValue = $("#statusWork option:selected").attr('value');
-    if (currentValue == "не работаю") {
-        $("input.ifWorked").attr('disabled', 'disabled').css('color', 'grey');
-        $("div.ifWorked div.required").text("");
-    } else {
-        $("input.ifWorked").removeAttr('disabled').css('color', '');
-        // Отметим звездочкой обязательность заполнения полей для арендаторов
-        if (userTypeTenant) {
-            $("div.ifWorked div.required").text("*");
-        } else {
-            $("div.ifWorked div.required").text("");
-        }
-    }
-}
+/* Активируем механизм скрытия ненужных полей в зависимости от заполнения формы */
+// При изменении перечисленных здесь полей функция notavailability пробегает форму с целью показать нужные элементы и скрыть ненужные
+$(document).ready(notavailability);
+$("#currentStatusEducation").change(notavailability);
+$("#statusWork").change(notavailability);
+$("#typeOfObject").change(notavailability);
 
-/* Если в форме Образование выбран селект - не учился, то блокировать заполнение остальных инпутов */
-$("#currentStatusEducation").change(currentStatusEducation);
-$(document).ready(currentStatusEducation);
-function currentStatusEducation() {
-    var userTypeTenant = $(".userType").attr('typeTenant') == "true";
-    var currentValue = $("#currentStatusEducation option:selected").attr('value');
-    if (currentValue == "0") {
-        $("input.ifLearned, select.ifLearned").removeAttr('disabled').css('color', '');
-        // Отметим звездочкой обязательность заполнения полей только для арендаторов
-        if (userTypeTenant) {
-            $("div.searchItem.ifLearned div.required").text("*");
-        } else {
-            $("div.searchItem.ifLearned div.required").text("");
-        }
-    }
-    if (currentValue == "нет") {
-        $("input.ifLearned, select.ifLearned").attr('disabled', 'disabled').css('color', 'grey');
-        $("div.searchItem.ifLearned div.required").text("");
-    }
-    if (currentValue == "сейчас учусь") {
-        $("input.ifLearned, select.ifLearned").removeAttr('disabled').css('color', '');
-        $('#kursBlock').css('display', '');
-        $('#yearOfEndBlock').css('display', 'none');
-        // Отметим звездочкой обязательность заполнения полей только для арендаторов
-        if (userTypeTenant) {
-            $("div.searchItem.ifLearned div.required").text("*");
-        } else {
-            $("div.searchItem.ifLearned div.required").text("");
-        }
-    }
-    if (currentValue == "закончил") {
-        $("input.ifLearned, select.ifLearned").removeAttr('disabled').css('color', '');
-        $('#kursBlock').css('display', 'none');
-        $('#yearOfEndBlock').css('display', '');
-        // Отметим звездочкой обязательность заполнения полей для арендаторов
-        if (userTypeTenant) {
-            $("div.searchItem.ifLearned div.required").text("*");
-        } else {
-            $("div.searchItem.ifLearned div.required").text("");
-        }
-    }
-}
-
+// Функционал, который выполняется только при наличии вкладки 4 (Поиск)
 if (document.getElementById("tabs-4")) {
     // Подгонка размера правого блока параметров (районы) расширенного поиска под размер левого блока параметров. 10 пикселей - на компенсацию margin у fieldset
-    document.getElementById('rightBlockOfSearchParameters').style.height = document.getElementById('leftBlockOfSearchParameters').offsetHeight - 10 + 'px';
-    $('#rightBlockOfSearchParameters .searchItem').css('height', parseFloat($('#rightBlockOfSearchParameters fieldset').css('height')) - parseFloat($('#rightBlockOfSearchParameters fieldset legend').css('height')));
-
-    /* Активируем механизм скрытия ненужных полей в зависимости от заполнения формы */
-    // При изменении перечисленных здесь полей алгоритм пробегает форму с целью показать нужные элементы и скрыть ненужные
-    $(document).ready(notavailability);
-    $("#typeOfObject").change(notavailability);
-    // Пробегает все элементы и изменяет в соответствии с текущей ситуацией их доступность/недоступность для пользователя
-    function notavailability() {
-        // Перебираем все элементы, доступность которых зависит от каких-либо условий
-        $("[notavailability]").each(function () {
-            // Получаем текущий элемент из перебираемых и набор условий его недоступности
-            var currentElem = this;
-            var notSelectorsOfElem = $(this).attr("notavailability");
-
-            // Получаем массив, каждый элемент которого = условию недоступности
-            var arrNotSelectorsOfElem = notSelectorsOfElem.split('&');
-
-            // Презумпция доступности элемента, если одно из его условий недоступности выполнится ниже, то он станет недоступным
-            $("select, input", currentElem).removeAttr("disabled");
-            $(currentElem).css('color', '');
-            $("div.required", currentElem).text("*");
-
-            // Проверяем верность каждого условия недоступности
-            for (var i = 0; i < arrNotSelectorsOfElem.length; i++) {
-                // Выделяем Селект условия недоступности и его значение, при котором условие выполняется и элемент должен стать недоступным
-                var selectAndValue = arrNotSelectorsOfElem[i].split('_');
-                var currentSelectId = selectAndValue[0];
-                var currentNotSelectValue = selectAndValue[1];
-
-                // Проверяем текущее значение селекта
-                var currentSelectValue = $("#" + currentSelectId).val();
-                var isCurrentSelectDisabled = $("#" + currentSelectId).attr("disabled");
-                if (currentSelectValue == currentNotSelectValue || isCurrentSelectDisabled) { // Если текущее значение селекта совпало с тем значением, при котором данный элемент должен быть недоступен, либо селект, от значения которого зависит судьба данного недоступен, то выполняем скрытие элемента и его селектов
-                    $("select, input", currentElem).attr("disabled", "disabled");
-                    $(currentElem).css('color', '#e6e6e6');
-                    $("div.required", currentElem).text("");
-                    break; // Прерываем цикл, так как проверка остальных условий по данному элементу уже не нужна
-                }
-            }
-        });
-    }
+    $('#rightBlockOfSearchParameters').height($('#leftBlockOfSearchParameters').height() - 10);
+    $('#rightBlockOfSearchParameters ul').height($('#rightBlockOfSearchParameters fieldset').height() - $('#rightBlockOfSearchParameters fieldset legend').height());
 
     /* Сценарии для появления блока с подробным описанием сожителей */
     $("#withWho").on('change', withWho);
     $(document).ready(withWho);
     function withWho() {
         if ($("#withWho").attr('value') != "самостоятельно" && $("#withWho").attr('value') != "0") {
-            $("#withWhoDescription").css('display', '');
+            $(".withWhoDescription").css('display', '');
         } else {
-            $("#withWhoDescription").css('display', 'none');
+            $(".withWhoDescription").css('display', 'none');
         }
     }
 
@@ -177,9 +82,9 @@ if (document.getElementById("tabs-4")) {
     $(document).ready(children);
     function children() {
         if ($("#children").attr('value') != "без детей" && $("#children").attr('value') != "0") {
-            $("#childrenDescription").css('display', '');
+            $(".childrenDescription").css('display', '');
         } else {
-            $("#childrenDescription").css('display', 'none');
+            $(".childrenDescription").css('display', 'none');
         }
     }
 
@@ -188,9 +93,9 @@ if (document.getElementById("tabs-4")) {
     $(document).ready(animals);
     function animals() {
         if ($("#animals").attr('value') != "без животных" && $("#animals").attr('value') != "0") {
-            $("#animalsDescription").css('display', '');
+            $(".animalsDescription").css('display', '');
         } else {
-            $("#animalsDescription").css('display', 'none');
+            $(".animalsDescription").css('display', 'none');
         }
     }
 }
@@ -240,41 +145,6 @@ function rePosition(caller, divFormError) { // Соответствует дей
  * Блок с валидациями и выдачей ошибок
  *****************************************************************/
 
-// Делаем свой движок для отображения ошибок
-function buildErrorMessageBlock (inputId, errorText) {
-    var divErrorBlock = document.createElement('div');
-    var divErrorContent = document.createElement('div');
-    var errorArrow = document.createElement('div');
-
-    $(divErrorBlock).addClass("errorBlock");
-    $(divErrorContent).addClass("errorContent");
-    $(errorArrow).addClass("errorArrow");
-
-    $("body").append(divErrorBlock);
-    $(divErrorBlock).append(errorArrow);
-    $(divErrorBlock).append(divErrorContent);
-    $(errorArrow).html('<div class="line10"></div><div class="line9"></div><div class="line8"></div><div class="line7"></div><div class="line6"></div><div class="line5"></div><div class="line4"></div><div class="line3"></div><div class="line2"></div><div class="line1"></div>');
-    $(divErrorContent).html(errorText);
-
-    inputTopPosition = $("#" + inputId).offset().top;
-    inputleftPosition = $("#" + inputId).offset().left;
-    inputWidth = $("#" + inputId).width();
-    inputHeight = $("#" + inputId).height();
-    divErrorBlockHeight = $(divErrorBlock).height();
-
-    inputleftPosition = inputleftPosition + inputWidth - 30;
-    inputTopPosition = inputTopPosition - divErrorBlockHeight - 10;
-
-    $(divErrorBlock).css({
-        top: inputTopPosition,
-        left: inputleftPosition,
-        opacity: 0
-    });
-    $(divErrorBlock).fadeTo("fast", 0.8);
-}
-
-var validationIsNeeded = false;
-
 // Отображение ошибок при клике на вкладку
 $('#tabs ul li a').click(function (event) {
     // Получаем номер кликнутой вкладки
@@ -302,7 +172,7 @@ $('#tabs ul li a').click(function (event) {
 
 });
 
-// Так как
+// Так как по событию клика вкладка еще не отображается, то проверка вкладки и отображение ошибок возможно только после наступления события tabsshow
 $('#tabs').bind('tabsshow', function () {
     if (validationIsNeeded) {
         // Получаем номер текущей вкладки
@@ -383,6 +253,7 @@ $(".forwardButton").click(function() {
 
 // Обработка клика по кнопке Отправить (submitButton)
 $(".submitButton").click(function() {
+
     // Удаляем все блоки с ошибками
     $(".errorBlock").remove();
 
@@ -601,16 +472,8 @@ function step2_validation() {
     }
 
     // Коротко о себе
-    if ($('#regionOfBorn').val() == '' && $(".userType").attr('typeTenant') == 'true') {
-        buildErrorMessageBlock ("regionOfBorn", "Укажите регион, в котором Вы родились");
-        err++;
-    }
     if ($('#regionOfBorn').val().length > 50) {
         buildErrorMessageBlock ("regionOfBorn", "Слишком длинное наименование региона, в котором Вы родились (используйте не более 50 символов)");
-        err++;
-    }
-    if ($('#cityOfBorn').val() == '' && $(".userType").attr('typeTenant') == 'true') {
-        buildErrorMessageBlock ("cityOfBorn", "Укажите город (населенный пункт), в котором Вы родились");
         err++;
     }
     if ($('#cityOfBorn').val().length > 50) {
@@ -657,6 +520,11 @@ function step3_validation() {
         err++;
     }
 
+    if ($('#tabs-3 #lic').length && $('#tabs-3 #lic').attr('checked') != "checked") {
+        buildErrorMessageBlock ("lic", "Регистрация возможна только при согласии с условиями лицензионного соглашения");
+        err++;
+    }
+
     return err;
 }
 
@@ -698,10 +566,10 @@ function step4_validation() {
         err++;
     }
 
-    /*if ($('#lic').val() != "yes") {
+    if ($('#tabs-4 #lic').length && $('#tabs-4 #lic').attr('checked') != "checked") {
         buildErrorMessageBlock ("lic", "Регистрация возможна только при согласии с условиями лицензионного соглашения");
         err++;
-    }*/
+    }
 
     return err;
 }

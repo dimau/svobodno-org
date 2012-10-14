@@ -91,9 +91,7 @@
         if (isset($workPosition) && strlen($workPosition) > 100) $errors[] = 'Слишком длинное название должности (используйте не более 100 символов)';
 
         // Проверки для блока "Коротко о себе"
-        if ($regionOfBorn == "" && (($typeOfValidation == "registration" && $typeTenant == "true") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите регион, в котором Вы родились';
         if (isset($regionOfBorn) && strlen($regionOfBorn) > 50) $errors[] = 'Слишком длинное наименование региона, в котором Вы родились (используйте не более 50 символов)';
-        if ($cityOfBorn == "" && (($typeOfValidation == "registration" && $typeTenant == "true") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите город (населенный пункт), в котором Вы родились';
         if (isset($cityOfBorn) && strlen($cityOfBorn) > 50) $errors[] = 'Слишком длинное наименование города, в котором Вы родились (используйте не более 50 символов)';
 
         // Проверки для блока "Социальные сети"
