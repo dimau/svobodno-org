@@ -29,6 +29,7 @@
     searchRequests,
     property,
     propertyFotos,
+    messages,
     districts,
     currencies
     ");
@@ -73,7 +74,8 @@
         lic VARCHAR(5) CHARACTER SET utf8 COLLATE utf8_general_ci,
         user_hash VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Поле хранит id последней сессии пользователя. Это нужно для безопасности: если значение идентификатора сессии, присланное браузером, не совпадает с этим значением, значит его сессия устарела и требует обновления ',
         last_act INT(11) COMMENT 'Время последней активности пользователя в секундах после 1970 года - формат timestamp',
-        reg_date INT(11) COMMENT 'Время регистрации пользователя с точностью до секунд в формате timestamp'
+        reg_date INT(11) COMMENT 'Время регистрации пользователя с точностью до секунд в формате timestamp',
+        favoritesPropertysId BLOB COMMENT 'Список id объектов недвижимости, которые данный пользователь добавил в избранные'
 )");
 
     echo "Статус создания таблицы users: ";

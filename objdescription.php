@@ -118,7 +118,10 @@
                 <div class="blockOfIcon">
                     <a><img class="icon" src="img/blue_star.png"></a>
                 </div>
-                <a id="addToFavorit"> добавить в избранное</a>
+                <a class="addToFavorites" propertyId='8' style="background: url(img/blue_star.png) no-repeat 0 5px; padding-left: 1.2em; -moz-background-size: 1em 1em; /* Firefox 3.6+ */
+    -webkit-background-size: 1em 1em; /* Safari 3.1+ и Chrome 4.0+ */
+    -o-background-size: 1em 1em; /* Opera 9.6+ */
+    background-size: 1em 1em; /* Современные браузеры */">добавить в избранное</a>
             </li>
             <li>
                 <a href="#"> отправить по e-mail</a>

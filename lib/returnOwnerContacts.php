@@ -50,15 +50,18 @@
     if ($rezSearchRequest != FALSE) $rowSearchRequest = mysql_fetch_assoc($rezSearchRequest); else accessDenied();
     if ($rowSearchRequest == FALSE) accessDenied();
 
+    // Если объявление с данным id еще не добавлено в поисковый запрос пользователя в качестве того, кем он заинтересовался, то делаем это
     $interestingPropertysId = unserialize($rowSearchRequest['interestingPropertysId']);
-    if (!in_array($propertyId, $interestingPropertysId)) $interestingPropertysId[] = $propertyId;
-    $interestingPropertysId = serialize($interestingPropertysId);
+    if (!in_array($propertyId, $interestingPropertysId)) {
+        $interestingPropertysId[] = $propertyId;
+        $interestingPropertysId = serialize($interestingPropertysId);
 
-    // Сохраняем новые изменения в БД в таблицу поисковых запросов
-    $rez = mysql_query("UPDATE searchRequests SET
+        // Сохраняем новые изменения в БД в таблицу поисковых запросов
+        $rez = mysql_query("UPDATE searchRequests SET
             interestingPropertysId = '" . $interestingPropertysId . "'
             WHERE userId = '" . $userId . "'");
-    if (!$rez) accessDenied();
+        if (!$rez) accessDenied();
+    }
 
     /*************************************************************************************
      * Записываем id арендатора в БД, в объявление - тем самым фиксируем, что пользователь "заинтересовался" данным объявлением
@@ -66,13 +69,16 @@
 
     // Дополняем список id потенциальных арендаторов данного объявления текущим, если его еще в этом списке нет
     $visibleUsersId = unserialize($rowProperty['visibleUsersId']);
-    if (!in_array($userId, $visibleUsersId)) $visibleUsersId[] = $userId; //TODO: подстраховаться в будущем от ошибок, которые могут стереть все данные в этой ячейке, если вдруг мы достали из нее не массив
-    $visibleUsersId = serialize($visibleUsersId);
+    if (!in_array($userId, $visibleUsersId)) {
+        $visibleUsersId[] = $userId;
+        $visibleUsersId = serialize($visibleUsersId);
 
-    // Сохраняем новые изменения в БД в таблицу по данному объекту недвижмости
-    $rez = mysql_query("UPDATE property SET
+        // Сохраняем новые изменения в БД в таблицу по данному объекту недвижмости
+        $rez = mysql_query("UPDATE property SET
             visibleUsersId = '" . $visibleUsersId . "'
             WHERE id = '" . $propertyId . "'");
+    } //TODO: подстраховаться в будущем от ошибок, которые могут стереть все данные в этой ячейке, если вдруг мы достали из нее не массив
+
 
     //TODO: нужно еще новость для собственника сформировать о появлении нового арендатора по его объявлению
 

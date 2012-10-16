@@ -806,6 +806,13 @@ td.bottom.right, th.bottom.right {
    Стили для результатов поиска (таблица, карта, таблица + карта) и избранных объявлений
    ========================================================================== */
 
+/* Стили для выбора режима просмотра объявлений */
+.inUse {
+    color: black !important;
+    border-bottom: none !important;
+    cursor: default !important;
+}
+
 /* Стили для список + карта */
 .choiceViewSearchResult {
     margin: 6px 0px 6px 0px;

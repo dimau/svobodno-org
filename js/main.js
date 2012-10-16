@@ -47,6 +47,51 @@ $(function () {
     $("button, a.button, input.button").button();
 });
 
+/**********************************************************************
+ * ИЗБРАННОЕ: добавление, удаление
+ **********************************************************************/
+
+// Навешиваем обработчик клика по добавлению в избранные
+$(document).on('click', '.addToFavorites', function() {
+    var self = this;
+    var propertyId = 0;
+    propertyId = $(this).attr('propertyId');
+
+    jQuery.post("lib/changeFavorites.php", {"propertyId": propertyId, "action": "addToFavorites"}, function (data) {
+        $(data).find("span[status='successful']").each(function () {
+            // Изменяем соответствующим образом вид команды
+            $(self).removeClass("addToFavorites");
+            $(self).addClass("removeFromFavorites");
+            $(self).html(" убрать из избранного");
+        });
+        $(data).find("span[status='denied']").each(function () {
+            /* Если вдруг нужно будет что-то выдавать при получении отказа в добавлении в избранное, то закодить здесь */
+        });
+    }, "xml");
+});
+
+// Навешиваем обработчик клика по удалению из избранного
+$(document).on('click', '.removeFromFavorites', function() {
+    var self = this;
+    var propertyId = 0;
+    propertyId = $(this).attr('propertyId');
+
+    jQuery.post("lib/changeFavorites.php", {"propertyId": propertyId, "action": "removeFromFavorites"}, function (data) {
+        $(data).find("span[status='successful']").each(function () {
+            // Изменяем соответствующим образом вид команды
+            $(self).removeClass("removeFromFavorites");
+            $(self).addClass("addToFavorites");
+            $(self).html(" добавить в избранное");
+        });
+        $(data).find("span[status='denied']").each(function () {
+            /* Если вдруг нужно будет что-то выдавать при получении отказа в удалении из избранного, то закодить здесь */
+        });
+    }, "xml");
+});
+
+/**********************************************************************
+ * ПОЛЕЗНЫЕ ФУНКЦИИ
+ **********************************************************************/
 
 /* Переинициализируем функцию getElementsByClassName для работы во всех браузерах*/
 if (document.getElementsByClassName) {
