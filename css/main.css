@@ -37,7 +37,7 @@ body {
     font-family: 'Trebuchet MS', Tahoma, Verdana, Arial, sans-serif;
     font-size: 1em;
     line-height: 1.4;
-    background: #A7A4A1 url('../img/bg_white.jpg');
+    background: #A7A4A1 url('../img/bg_tile.gif');
 }
 
 /*
@@ -501,11 +501,32 @@ td.bottom.right, th.bottom.right {
     width: 90%;
 }
 
+.headerOfPageContentBlock {
+    position: relative;
+}
+
 .headerOfPage {
     font-family: Georgia, "Times New Roman", Times, serif;
     font-size: 1.3em;
     text-align: left;
     padding: 6px 0px 6px 0px;
+}
+
+.headerOfPageContentBlock .headerOfPage {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+}
+
+.importantAddInfBlock {
+    float: right;
+    min-width: 100px;
+    margin-left: 250px;
+    margin-bottom: 10px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #ffffff;
+    text-align: left;
 }
 
 .page-buffer {
@@ -530,7 +551,6 @@ td.bottom.right, th.bottom.right {
 .miniBlock {
     width: 600px;
     margin: 80px auto 0% auto;
-    line-height: 2em;
     border: 1px solid #336784;
     border-radius: 5px;
     text-align: center;
@@ -538,6 +558,7 @@ td.bottom.right, th.bottom.right {
 }
 
 .miniBlockHeader {
+    line-height: 2em;
     background-color: #6A9D02;
     color: white;
     text-align: center;
@@ -545,7 +566,7 @@ td.bottom.right, th.bottom.right {
 
 .miniBlockContent {
     display: block;
-    margin: 20px auto 20px auto;
+    margin: 20px;
     text-align: left;
 }
 
@@ -564,17 +585,18 @@ td.bottom.right, th.bottom.right {
     text-align: left;
 }
 
+.miniBlockContent table tr td {
+    padding-top: 10px;
+    padding-bottom: 10px
+}
+
 #buttonSubmit {
     clear: both;
     float: right;
-    margin-bottom: 20px;
-    margin-right: 20px;
 }
 
 .buttonRegistration {
     float: left;
-    margin-bottom: 20px;
-    margin-left: 20px;
 }
 
 /* =============================================================================
@@ -906,12 +928,6 @@ td.bottom.right, th.bottom.right {
 }
 
 /* Стили для вкладки Новости личного кабинета */
-.actionReaded {
-    float: right;
-    margin-top: -3px;
-    margin-right: 4px;
-    font-weight: normal;
-}
 
 div.unread > div.newsHeader {
     background-color: #FF9340;

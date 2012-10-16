@@ -598,6 +598,145 @@
         $briefOfAdverts .= $currentAdvert; // Добавим html-текст еще одного объявления. Готовим html-текст к добавлению на вкладку tabs-3 в Мои объявления
     }
 
+    /********************************************************************************
+     * МОИ ОБЪЯВЛЕНИЯ. Наполнение шаблона из БД
+     *******************************************************************************/
+
+    // Шаблоны для блока с сообщениями для вкладки tabs-2 Сообщения
+    $tmpl_Mes_NewTenant = "
+    <div class='news unread'>
+        <div class='newsHeader'>
+            Претендент на {typeOfObject} по адресу: {address}{apartmentNumber}
+        </div>
+
+        <div class='fotosWrapper'>
+            <div class='middleFotoWrapper'>
+                <img class='middleFoto' src=''>
+            </div>
+        </div>
+
+        <ul class='setOfInstructions'>
+            <li>
+                <a href='#'>подробнее</a>
+            </li>
+            <li>
+                <a href='#'>прочитал</a>
+            </li>
+        </ul>
+
+        <ul class='listDescription'>
+            <li>
+                <span class='headOfString'>ФИО:</span>
+                Ушаков Дмитрий Владимирович
+            </li>
+            <li>
+                <span class='headOfString'>Возраст:</span>
+                25
+            </li>
+            <li>
+                <span class='headOfString'>Срок аренды:</span>
+                долгосрочно
+            </li>
+            <li>
+                <span class='headOfString'>С кем жить:</span>
+                несемейная пара
+            </li>
+            <li>
+                <span class='headOfString'>Дети:</span>
+                нет
+            </li>
+            <li>
+                <span class='headOfString'>Животные:</span>
+                нет
+            </li>
+            <li>
+                <span class='headOfString'>Телефон:</span>
+                89221431615
+            </li>
+        </ul>
+        <div class='clearBoth'></div>
+    </div>
+
+
+
+<div class='news advertForPersonalPage {statusEng}'>
+    <div class='newsHeader'>
+        <span class='advertHeaderAddress'>{typeOfObject} по адресу: {address}{apartmentNumber}</span>
+        <div class='advertHeaderStatus'>
+            статус: {status}
+        </div>
+    </div>
+    <div class='fotosWrapper'>
+        <div class='middleFotoWrapper'>
+            <img class='middleFoto' src='{urlFoto}'>
+        </div>
+    </div>
+    <ul class='setOfInstructions'>
+        {instructionPublish}
+        <li>
+            <a href='editadvert.php?propertyId={propertyId}'>редактировать</a>
+        </li>
+        <li>
+            <a href='objdescription.php?propertyId={propertyId}'>подробнее</a>
+        </li>
+        {instructionDelete}
+    </ul>
+    <ul class='listDescription'>
+        <li>
+            <span class='headOfString' style='vertical-align: top;' title='Пользователи, запросившие контакты собственника по этому объявлению'>Возможные арендаторы:</span>{probableTenants}
+        </li>
+        <li>
+            <br>
+        </li>
+        <li>
+            <span class='headOfString'>Плата за аренду:</span> {costOfRenting} {currency} {utilities} {electricPower}
+        </li>
+        <li>
+            <span class='headOfString'>Залог:</span> {bail}
+        </li>
+        <li>
+            <span class='headOfString'>Предоплата:</span> {prepayment}
+        </li>
+        <li>
+            <span class='headOfString'>Единовременная комиссия:</span>
+            <span title='Предназначена для компенсации затрат собственника, связанных с поиском арендаторов'> {compensationMoney} {currency} ({compensationPercent}%) собственнику</span>
+        </li>
+        <li>
+            <span class='headOfString'>Срок аренды:</span> {termOfLease}, c {dateOfEntry} {dateOfCheckOut}
+        </li>
+        <li>
+            <span class='headOfString'>Адрес:</span> {address}
+        </li>
+         <li>
+            <span class='headOfString'>Район:</span> {district}
+        </li>
+        <li>
+            <span class='headOfString'>{amountOfRoomsName}</span> {amountOfRooms}{adjacentRooms}
+        </li>
+        <li>
+            <span class='headOfString'>Площадь ({areaNames}):</span> {areaValues} м²
+        </li>
+        <li>
+            <span class='headOfString'>{floorName}</span> {floor}
+        </li>
+        <li>
+            <span class='headOfString'>{furnitureName}</span> {furniture}
+        </li>
+        <li>
+            <span class='headOfString'>{repairName}</span> {repair}
+        </li>
+        <li>
+            <span class='headOfString'>{parkingName}</span> {parking}
+        </li>
+        <li>
+            <span class='headOfString'>Телефон собственника:</span>
+            {contactTelephonNumber}, <a href='{urlMan}'>{name} {secondName}</a>, c {timeForRingBegin} до {timeForRingEnd}
+        </li>
+    </ul>
+    <div class='clearBoth'></div>
+</div>
+";
+
 ?>
 
 <!DOCTYPE html>

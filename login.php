@@ -111,6 +111,7 @@
                     <div>
                         <button type="submit" id="buttonSubmit" name="buttonSubmit">Войти</button>
                         <a class="buttonRegistration" href="registration.php">Зарегистрироваться</a>
+                        <div class="clearBoth"></div>
                     </div>
                 </form>
             </div>

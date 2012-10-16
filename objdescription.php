@@ -104,13 +104,33 @@
 ?>
 
 <div class="page_main_content">
-<div class="headerOfPage">
-    <?php echo $strHeaderOfPage; ?>
-    <div class="blockOfIcon">
-        <a><img class="icon" src="img/blue_star.png"></a>
+
+<div class="headerOfPageContentBlock">
+    <div class="headerOfPage">
+        <?php echo $strHeaderOfPage; ?>
     </div>
-    <a id="addToFavorit"> добавить в избранное</a>
+    <div class="importantAddInfBlock">
+        <ul>
+            <li>
+                <button>Записаться на просмотр</button>
+            </li>
+            <li>
+                <div class="blockOfIcon">
+                    <a><img class="icon" src="img/blue_star.png"></a>
+                </div>
+                <a id="addToFavorit"> добавить в избранное</a>
+            </li>
+            <li>
+                <a href="#"> отправить по e-mail</a>
+            </li>
+            <li>
+                <a href="#"> показать похожие объявления</a>
+            </li>
+        </ul>
+    </div>
+    <div class="clearBoth"></div>
 </div>
+
 <div id="tabs">
 <ul>
     <li>

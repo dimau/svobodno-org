@@ -300,17 +300,15 @@
 
 <div class="page_main_content">
 
-<div class="commentForPageBlock" style="position: relative;">
-    <div class="headerOfPage" style="position: absolute; bottom: 0px;">
+<div class="headerOfPageContentBlock">
+    <div class="headerOfPage">
         Зарегистрируйтесь
     </div>
 <?php if ($typeTenant == "true"): ?>
-    <div class="why"
-         style="border-radius: 5px; background-color: #ffffff; padding: 5px; float: right; min-width: 100px; text-align: left; margin-left: 250px; margin-bottom: 10px;">
-        <div class="whyHeader">
+    <div class="importantAddInfBlock">
+        <div class="importantAddInfHeader">
             Регистрация позволит:
         </div>
-        <ul>
             <ul>
                 <li>
                     Записаться на просмотр любой недвижимости
@@ -325,7 +323,6 @@
                     Не указывать повторно условия поиска - система запомнит их
                 </li>
             </ul>
-        </ul>
     </div>
 <?php endif; ?>
     <div class="clearBoth"></div>
@@ -530,12 +527,7 @@
         </div>
 
         <fieldset class="edited private" style="min-width: 300px;">
-            <legend title="Для успешной регистрации должна быть загружена хотя бы 1 фотография">
-                <div class="required">
-                    <?php if ($typeTenant == "true") {
-                    echo "*";
-                } ?>
-                </div>
+            <legend title="Рекомендуем загрузить хотя бы 1 фотографию, которая в выгодном свете представит Вас перед собственником">
                 Фотографии
             </legend>
             <input type="hidden" name="fileUploadId" id="fileUploadId" <?php echo "value='$fileUploadId'";?>>

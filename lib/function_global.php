@@ -49,28 +49,6 @@
         if (($typeOfValidation == "registration" && $typeTenant == "true" && $email == "") || ($typeOfValidation == "createSearchRequest" && $email == "") || ($typeOfValidation == "validateSearchRequest" && $email == "") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == "true" && $email == "")) $errors[] = 'Укажите e-mail';
         if ($email != "" && !preg_match("/^(([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+\.)*([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]{2,5}$/", $email)) $errors[] = 'Укажите, пожалуйста, Ваш настоящий e-mail (указанный Вами e-mail не прошел проверку формата)'; //соответствует ли поле e-mail регулярному выражению
 
-        // Проверяем наличие хотя бы 1 фотографии пользователя
-        if ($typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest") { // Валидации при попытке пользователя добавить поисковый запрос (из личного кабинета) (не при регистрации!)
-            $rez = mysql_query("SELECT id FROM users WHERE login='" . $login . "'"); // Нужно получить id пользователя, чтобы проверить, есть ли у него хотя бы 1 фотка в БД
-            $row = mysql_fetch_assoc($rez);
-            $rez = mysql_query("SELECT * FROM userFotos WHERE userId='" . $row['id'] . "'");
-            if (mysql_num_rows($rez) == 0) $errors[] = 'Загрузите как минимум 1 Вашу фотографию'; // проверка на хотя бы 1 фотку
-        }
-        if ($typeOfValidation == "registration" && $typeTenant == "true" && $fileUploadId != "") // Эта ветка выполняется, если валидации производятся при попытке регистрации пользователем
-        {
-            $rez = mysql_query("SELECT * FROM tempFotos WHERE fileuploadid='" . $fileUploadId . "'");
-            if (mysql_num_rows($rez) == 0) $errors[] = 'Загрузите как минимум 1 Вашу фотографию'; // проверка на хотя бы 1 фотку
-        }
-        if ($typeOfValidation == "validateProfileParameters" && $typeTenant == "true") // Эта ветка выполняется, если валидации производятся при попытке редактирования Профайл параметров пользователя
-        {
-            $rez = mysql_query("SELECT id FROM users WHERE login='" . $oldLogin . "'"); // Нужно получить id пользователя, чтобы проверить, есть ли у него хотя бы 1 фотка в БД
-            $row = mysql_fetch_assoc($rez);
-            $rez1 = mysql_query("SELECT * FROM userFotos WHERE userId='" . $row['id'] . "'");
-            $rez2 = mysql_query("SELECT * FROM tempFotos WHERE fileuploadid='" . $fileUploadId . "'");
-            if (mysql_num_rows($rez1) == 0 && mysql_num_rows($rez2) == 0) $errors[] = 'Загрузите как минимум 1 Вашу фотографию'; // проверка на хотя бы 1 фотку
-        }
-        if (($typeOfValidation == "registration" || $typeOfValidation == "validateProfileParameters") && $fileUploadId == "") $errors[] = 'Перезагрузите браузер, пожалуйста: возникла ошибка при формировании формы для загрузки фотографий';
-
         // Проверки для блока "Образование"
         if ($currentStatusEducation == "0" && (($typeOfValidation == "registration" && $typeTenant == "true") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите Ваше образование (текущий статус)';
         if ($almamater == "" && ($currentStatusEducation == "сейчас учусь" || $currentStatusEducation == "закончил") && (($typeOfValidation == "registration" && $typeTenant == "true") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите учебное заведение';
