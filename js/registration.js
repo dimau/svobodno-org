@@ -62,9 +62,6 @@ $("#typeOfObject").change(notavailability);
 
 // Функционал, который выполняется только при наличии вкладки 4 (Поиск)
 if (document.getElementById("tabs-4")) {
-    // Подгонка размера правого блока параметров (районы) расширенного поиска под размер левого блока параметров. 10 пикселей - на компенсацию margin у fieldset
-    $('#rightBlockOfSearchParameters').height($('#leftBlockOfSearchParameters').height() - 10);
-    $('#rightBlockOfSearchParameters ul').height($('#rightBlockOfSearchParameters fieldset').height() - $('#rightBlockOfSearchParameters fieldset legend').height());
 
     /* Сценарии для появления блока с подробным описанием сожителей */
     $("#withWho").on('change', withWho);

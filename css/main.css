@@ -747,6 +747,17 @@ td.bottom.right, th.bottom.right {
    ИЗБРАННОЕ
    ========================================================================== */
 
+.addToFavorites, .removeFromFavorites {
+    cursor: pointer;
+}
+
+.addToFavorites img, .removeFromFavorites img {
+    width: 1.3em;
+    height: 1em;
+    margin-top: -0.1em;
+    padding-right: 0.3em;
+}
+
 .blockOfIcon {
     display: inline-block;
     width: 1.2em;

@@ -277,6 +277,9 @@
 <body>
 <div class="page_without_footer">
 
+<!-- Добавялем невидимый input для того, чтобы передать тип пользователя (собственник/арендатор) - это используется в JS для простановки обязательности полей для заполнения -->
+<?php echo "<input type='hidden' class='userType' typeTenant='" . $typeTenant . "' typeOwner='" . $typeOwner . "'>"; ?>
+
 <!-- Всплывающее поле для отображения списка ошибок, полученных при проверке данных на сервере (PHP)-->
 <div id="userMistakesBlock" class="ui-widget">
     <div class="ui-state-highlight ui-corner-all">
@@ -1248,8 +1251,6 @@
 </div>
 <!-- /end.tabs -->
 
-<!-- Добавялем невидимый input для того, чтобы передать тип пользователя (собственник/арендатор) - это используется в JS для простановки обязательности полей для заполнения -->
-<?php echo "<input type='hidden' class='userType' typeTenant='" . $typeTenant . "' typeOwner='" . $typeOwner . "'>"; ?>
 </form>
 </div>
 

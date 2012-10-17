@@ -52,42 +52,56 @@ $(function () {
  **********************************************************************/
 
 // Навешиваем обработчик клика по добавлению в избранные
-$(document).on('click', '.addToFavorites', function() {
+$(document).on('click', '.addToFavorites', addToFavorites);
+function addToFavorites() {
     var self = this;
     var propertyId = 0;
-    propertyId = $(this).attr('propertyId');
+    propertyId = $(self).attr('propertyId');
 
     jQuery.post("lib/changeFavorites.php", {"propertyId": propertyId, "action": "addToFavorites"}, function (data) {
         $(data).find("span[status='successful']").each(function () {
             // Изменяем соответствующим образом вид команды
-            $(self).removeClass("addToFavorites");
-            $(self).addClass("removeFromFavorites");
-            $(self).html(" убрать из избранного");
+            $("span.addToFavorites[propertyId='" + propertyId + "']").removeClass("addToFavorites").addClass("removeFromFavorites");
+            $("span.removeFromFavorites[propertyId='" + propertyId + "'] img").attr('src', 'img/gold_star.png');
+            $("span.removeFromFavorites[propertyId='" + propertyId + "'] a").html("убрать из избранного");
         });
         $(data).find("span[status='denied']").each(function () {
             /* Если вдруг нужно будет что-то выдавать при получении отказа в добавлении в избранное, то закодить здесь */
         });
     }, "xml");
-});
+
+}
 
 // Навешиваем обработчик клика по удалению из избранного
-$(document).on('click', '.removeFromFavorites', function() {
+$(document).on('click', '.removeFromFavorites', removeFromFavorites);
+function removeFromFavorites() {
     var self = this;
     var propertyId = 0;
-    propertyId = $(this).attr('propertyId');
+    propertyId = $(self).attr('propertyId');
 
     jQuery.post("lib/changeFavorites.php", {"propertyId": propertyId, "action": "removeFromFavorites"}, function (data) {
         $(data).find("span[status='successful']").each(function () {
             // Изменяем соответствующим образом вид команды
-            $(self).removeClass("removeFromFavorites");
-            $(self).addClass("addToFavorites");
-            $(self).html(" добавить в избранное");
+            $("span.removeFromFavorites[propertyId='" + propertyId + "']").removeClass("removeFromFavorites").addClass("addToFavorites");
+            $("span.addToFavorites[propertyId='" + propertyId + "'] img").attr('src', 'img/blue_star.png');
+            $("span.addToFavorites[propertyId='" + propertyId + "'] a").html("добавить в избранное");
         });
         $(data).find("span[status='denied']").each(function () {
             /* Если вдруг нужно будет что-то выдавать при получении отказа в удалении из избранного, то закодить здесь */
         });
     }, "xml");
-});
+
+}
+
+/**********************************************************************
+ * Выравнивание блока со списком районов и других блоков в параметрах поиска
+ **********************************************************************/
+
+// Подгонка размера правого блока параметров (районы) расширенного поиска под размер левого блока параметров. 10 пикселей - на компенсацию margin у fieldset
+if ($('#rightBlockOfSearchParameters').length && $('#leftBlockOfSearchParameters').length) {
+    $('#rightBlockOfSearchParameters').height($('#leftBlockOfSearchParameters').height() - 10);
+    $('#rightBlockOfSearchParameters ul').height($('#rightBlockOfSearchParameters fieldset').height() - $('#rightBlockOfSearchParameters fieldset legend').height());
+}
 
 /**********************************************************************
  * ПОЛЕЗНЫЕ ФУНКЦИИ
@@ -163,7 +177,8 @@ function getCoords(elem) {
 function notavailability() {
 
     // Понимаем роль пользователя, так как некоторые поля обязательны для арендатора, но необязательны для собственника
-    var userTypeTenant = $(".userType").attr('typeTenant') == "true";
+    var userTypeTenant = "";
+    if ($(".userType").length) userTypeTenant = $(".userType").attr('typeTenant') == "true";
 
     // Перебираем все элементы, доступность которых зависит от каких-либо условий
     $("[notavailability]").each(function () {

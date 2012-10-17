@@ -195,12 +195,36 @@
         if ($strWHERE != "") $strWHERE .= " AND" . $value; else $strWHERE .= $value;
     }
 
-    // Собираем и выполняем поисковый запрос
-    $rowPropertyArr = array(); // в итоге получим массив, каждый элемент которого представляет собой еще один массив значений конкретного объявления по недвижимости
-    $rezProperty = mysql_query("SELECT * FROM property WHERE" . $strWHERE . " ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting  LIMIT 100"); // Сортируем по стоимости аренды и ограничиваем количество 100 объявлениями
+    // Собираем и выполняем поисковый запрос - получаем ВСЕ подходящие объявления
+    $propertyLightArr = array(); // в итоге получим массив, каждый элемент которого представляет собой еще один массив значений конкретного объявления по недвижимости
+    $rezProperty = mysql_query("SELECT id, coordX, coordY FROM property WHERE" . $strWHERE . " ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting"); // Сортируем по стоимости аренды и не ограничиваем количество объявлений - все, подходящие под условия пользователя
     if ($rezProperty != FALSE) {
         for ($i = 0; $i < mysql_num_rows($rezProperty); $i++) {
-            $rowPropertyArr[] = mysql_fetch_assoc($rezProperty);
+            $propertyLightArr[] = mysql_fetch_assoc($rezProperty);
+        }
+    }
+
+    // Собираем строку WHERE для поискового запроса к БД по полным данным для не более чем 20-ти первых объектов
+    $strWHERE = "";
+    if (count($propertyLightArr) < 20) $limit = count($propertyLightArr); else $limit = 20;
+    if ($limit != 0) {
+        $strWHERE = " (";
+        for ($i = 0; $i < $limit; $i++) {
+            $strWHERE .= " id = '" . $propertyLightArr[$i]['id'] . "'";
+            if ($i < $limit - 1) $strWHERE .= " OR";
+        }
+        $strWHERE .= ")";
+    }
+
+    // Собираем и выполняем поисковый запрос - получаем подробные сведения по не более чем 20-ти первым в списке объявлениям
+    $propertyFullArr = array(); // в итоге получим массив, каждый элемент которого представляет собой еще один массив значений конкретного объявления по недвижимости
+    if ($strWHERE != "") {
+        $rezProperty = mysql_query("SELECT * FROM property WHERE" . $strWHERE . " ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting LIMIT 20"); // Сортируем по стоимости аренды и ограничиваем количество 20 объявлениями, чтобы запрос не проходил таблицу до конца, когда выделит нужные нам 20 объектов
+        if ($rezProperty != FALSE) {
+            for ($i = 0; $i < mysql_num_rows($rezProperty); $i++) {
+                $row = mysql_fetch_assoc($rezProperty);
+                if ($row != false) $propertyFullArr[$row['id']] = $row;
+            }
         }
     }
 
@@ -256,6 +280,7 @@
 
 <body>
 <div class="page_without_footer">
+
 <!-- Сформируем и вставим заголовок страницы -->
 <?php
     include("header.php");
@@ -654,7 +679,7 @@
     /***************************************************************************************************************
      * Оформляем полученные объявления в красивый HTML для размещения на странице
      **************************************************************************************************************/
-    echo getSearchResultHTML($rowPropertyArr);
+    echo getSearchResultHTML($propertyLightArr, $propertyFullArr, $userId);
 ?>
 
 </div>
@@ -670,7 +695,37 @@
 
 <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
 <script src="js/main.js"></script>
-<script src="js/search.js"></script>
+<script src="js/searchResult.js"></script>
+<script>
+    /* Навешиваем обработчик на переключение вкладок с режимами поиска */
+    $('#tabs').bind('tabsshow', function (event, ui) {
+        newTabId = ui.panel.id; // Определяем идентификатор вновь открытой вкладки
+        if (newTabId == "tabs-1") {
+            // Переносим тип объекта
+            $("#typeOfObjectFast").val($("#typeOfObject").val());
+
+            // Так как между районами при расширенном поиске и районом при быстром поиске невозможно построить взаимнооднозначную конвертацию, не будем этого делать, дабы не запутать пользователя
+
+            // Переносим стоимости
+            $("#minCostFast").val($("#minCost").val());
+            $("#maxCostFast").val($("#maxCost").val());
+        }
+        if (newTabId == "tabs-2") {
+            // Переносим тип объекта
+            $("#typeOfObject").val($("#typeOfObjectFast").val());
+
+            // Переносим стоимости
+            $("#minCost").val($("#minCostFast").val());
+            $("#maxCost").val($("#maxCostFast").val());
+        }
+    });
+
+    /* Активируем механизм скрытия ненужных полей в зависимости от заполнения формы */
+    // При изменении перечисленных здесь полей алгоритм пробегает форму с целью показать нужные элементы и скрыть ненужные
+    $(document).ready(notavailability);
+    $("#typeOfObject").change(notavailability);
+
+</script>
 <!-- end scripts -->
 
 <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.
