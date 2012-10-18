@@ -45,9 +45,10 @@
 
     // Если все хорошо и требуемое действие = Удалить из избранного, то удаляем id объявления из БД, из поля favoritesPropertysId пользователя
     if ($action == "removeFromFavorites") {
-        if (in_array($propertyId, $favoritesPropertysId)) {
-            $arrForDelete = array($propertyId);
-            $favoritesPropertysId = array_diff($favoritesPropertysId, $arrForDelete);
+        // Ищем id нашего объекта среди id избранных объектов. Если он там есть, то получим номер позиции, если нет - FALSE
+        $key = array_search($propertyId, $favoritesPropertysId);
+        if ($key !== FALSE) { // Если наш объект находится в массиве избранных объектов на 0 позиции, то нужно, чтобы условие срабатывало и этот объект можно было удалить из массива избранных, поэтому используется строгое равенство
+            array_splice($favoritesPropertysId, $key, 1);
             $favoritesPropertysId = serialize($favoritesPropertysId);
 
             // Сохраняем новые изменения в БД в таблицу поисковых запросов
@@ -55,6 +56,7 @@
             favoritesPropertysId = '" . $favoritesPropertysId . "'
             WHERE id = '" . $userId . "'");
             if (!$rez) accessDenied();
+
         }
     }
 

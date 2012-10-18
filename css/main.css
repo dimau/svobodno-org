@@ -758,6 +758,13 @@ td.bottom.right, th.bottom.right {
     padding-right: 0.3em;
 }
 
+.addToFavorites.aloneStar img, .removeFromFavorites.aloneStar img {
+    width: 1em;
+    height: 1em;
+    margin-top: 0em;
+    padding-right: 0em;
+}
+
 .blockOfIcon {
     display: inline-block;
     width: 1.2em;
@@ -836,11 +843,7 @@ td.bottom.right, th.bottom.right {
 }
 
 .numberOfRealtyObject {
-    position: absolute;
-    top: 4px;
-    left: 0px;
     text-align: center;
-    width: 100%;
     font-size: 1em;
 }
 

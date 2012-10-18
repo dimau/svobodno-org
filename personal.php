@@ -1,6 +1,7 @@
 <?php
     include_once 'lib/connect.php'; //подключаемся к БД
     include_once 'lib/function_global.php'; //подключаем файл с глобальными функциями
+    include_once 'lib/function_searchResult.php'; // Подключаем файл с функциями по HTML оформлению результатов поиска
 
     /*************************************************************************************
      * Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
@@ -747,6 +748,7 @@
 
     // Собираем строку WHERE для поискового запроса к БД
     $strWHERE = "";
+
     // Если есть хотя бы 1 идентификатор избранного объявления
     if (count($propertyIdArr) != 0) {
         $strWHERE = " (";
@@ -765,30 +767,6 @@
         if ($rezProperty != FALSE) {
             for ($i = 0; $i < mysql_num_rows($rezProperty); $i++) {
                 $propertyLightArr[] = mysql_fetch_assoc($rezProperty);
-            }
-        }
-    }
-
-    // Собираем строку WHERE для поискового запроса к БД по полным данным для не более чем 20-ти первых объектов
-    $strWHERE = "";
-    if (count($propertyLightArr) < 20) $limit = count($propertyLightArr); else $limit = 20;
-    if ($limit != 0) {
-        $strWHERE = " (";
-        for ($i = 0; $i < $limit; $i++) {
-            $strWHERE .= " id = '" . $propertyLightArr[$i]['id'] . "'";
-            if ($i < $limit - 1) $strWHERE .= " OR";
-        }
-        $strWHERE .= ")";
-    }
-
-    // Собираем и выполняем поисковый запрос к БД - получаем подробные сведения по не более чем 20-ти первым в списке объявлениям
-    $propertyFullArr = array(); // в итоге получим массив, каждый элемент которого представляет собой еще один массив значений конкретного объявления по недвижимости
-    if ($strWHERE != "") {
-        $rezProperty = mysql_query("SELECT * FROM property WHERE" . $strWHERE . " ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting LIMIT 20"); // Сортируем по стоимости аренды и ограничиваем количество 20 объявлениями, чтобы запрос не проходил таблицу до конца, когда выделит нужные нам 20 объектов
-        if ($rezProperty != FALSE) {
-            for ($i = 0; $i < mysql_num_rows($rezProperty); $i++) {
-                $row = mysql_fetch_assoc($rezProperty);
-                if ($row != false) $propertyFullArr[$row['id']] = $row;
             }
         }
     }
@@ -2231,7 +2209,7 @@
     /***************************************************************************************************************
      * Оформляем полученные объявления в красивый HTML для размещения на странице
      **************************************************************************************************************/
-    echo getSearchResultHTML($propertyLightArr, $propertyFullArr, $userId);
+    echo getSearchResultHTML($propertyLightArr, $userId, "favorites");
 
     ?>
 

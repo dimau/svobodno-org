@@ -6,7 +6,7 @@
      * Если в строке не указан идентификатор объявления, то пересылаем пользователя на спец. страницу
      ************************************************************************************/
     $propertyId = "0";
-    if (isset($_GET['propertyId'])) {
+    if (isset($_GET['propertyId']) && $_GET['propertyId'] != "") {
         $propertyId = $_GET['propertyId']; // Получаем идентификатор объявления для показа из строки запроса
     } else {
         header('Location: 404.html'); // Если в запросе не указан идентификатор объявления для редактирования, то пересылаем пользователя в личный кабинет к списку его объявлений
@@ -48,6 +48,41 @@
      * Получаем заголовок страницы
      ************************************************************************************/
     $strHeaderOfPage = getFirstCharUpper($rowProperty['typeOfObject']) . " по адресу: " . $rowProperty['address'];
+
+    /*************************************************************************************
+     * Проверяем, добавлено ли данное объявление в избранные у данного пользователя
+     ************************************************************************************/
+
+    // Получаем идентификаторы избранных объявлений для данного пользователя
+    $favoritesPropertysId = array();
+    if ($userId != FALSE) {
+        $rowUsers = FALSE;
+        $rezUsers = mysql_query("SELECT favoritesPropertysId FROM users WHERE id = '" . $userId . "'");
+        if ($rezUsers != FALSE) $rowUsers = mysql_fetch_assoc($rezUsers);
+        if ($rowUsers != FALSE) $favoritesPropertysId = unserialize($rowUsers['favoritesPropertysId']);
+    }
+
+    // Проверяем: добавлено данное объявление в избранные или нет. Соответствующим образом вычисляем тексты и оформление команды (на удаление/добавление в избранное)
+    $favoritesParam = array();
+    $favoritesParam['actionFavorites'] = "";
+    $favoritesParam['imgFavorites'] = "";
+    $favoritesParam['textFavorites'] = "";
+    if ($userId != FALSE) {
+        // Проверяем наличие данного объявления среди избранных у авторизованного пользователя
+        if (in_array($propertyId, $favoritesPropertysId)) {
+            $favoritesParam['actionFavorites'] = "removeFromFavorites";
+            $favoritesParam['imgFavorites'] = "img/gold_star.png";
+            $favoritesParam['textFavorites'] = "убрать из избранного";
+        } else {
+            $favoritesParam['actionFavorites'] = "addToFavorites";
+            $favoritesParam['imgFavorites'] = "img/blue_star.png";
+            $favoritesParam['textFavorites'] = "добавить в избранное";
+        }
+    } else {
+        $favoritesParam['actionFavorites'] = "addToFavorites";
+        $favoritesParam['imgFavorites'] = "img/blue_star.png";
+        $favoritesParam['textFavorites'] = "добавить в избранное";
+    }
 
 ?>
 
@@ -115,7 +150,9 @@
                 <button>Записаться на просмотр</button>
             </li>
             <li>
-                <span class="addToFavorites" propertyId='8'><img src="img/blue_star.png"><a href="#">добавить в избранное</a></span>
+                <?php
+                echo "<span class='" . $favoritesParam['actionFavorites'] . "' propertyId='" . $propertyId . "'><img src='" . $favoritesParam['imgFavorites'] . "'><a>" . $favoritesParam['textFavorites'] . "</a></span>";
+                ?>
             </li>
             <li>
                 <a href="#"> отправить по e-mail</a>
@@ -735,7 +772,7 @@
     }
 
     $("#showContacts").click(function () {
-        jQuery.post("lib/returnOwnerContacts.php", {"propertyId": <?php echo $propertyId ?>}, function (data) {
+        jQuery.post("lib/getOwnerContacts.php", {"propertyId": <?php echo $propertyId ?>}, function (data) {
             $(data).find("span[access='successful']").each(function () {
                 strHTML = "<tr><td class='objectDescriptionItemLabel'>Имя:</td><td class='objectDescriptionBody'><a href='man.php?compId=";
                 strHTML += $(this).attr("id") + "'> " + $(this).attr("name") + " " + $(this).attr("secondName") + "</a></td></tr>";
