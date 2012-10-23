@@ -88,6 +88,7 @@
     $rez = mysql_query("CREATE TABLE tempFotos (
         id VARCHAR(32) NOT NULL PRIMARY KEY COMMENT 'Содержит идентификатор фотографии, он же имя файла на сервере (без расширения)',
         fileUploadId VARCHAR(7) NOT NULL COMMENT 'фактически это такой идентификатор сессии заполнения формы регистрации. Позволяет добиться того, чтобы при перезагрузке формы (в случае, например, ошибок и пустых полей, незаполненных пользователем) данные о фотографиях не потерялись',
+        folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ..\uploaded_files\3\ ',
         filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
         extension VARCHAR(5) NOT NULL COMMENT 'Расширение у файла фотографии',
         filesizeMb FLOAT(1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой'
@@ -102,6 +103,7 @@
 
     $rez = mysql_query("CREATE TABLE userFotos (
         id VARCHAR(32) NOT NULL PRIMARY KEY COMMENT 'Содержит идентификатор фотографии, он же имя файла на сервере (без расширения)',
+        folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ..\uploaded_files\3\ ',
         filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
         extension VARCHAR(5) NOT NULL COMMENT 'Расширение у файла фотографии',
         filesizeMb FLOAT(1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой',
@@ -225,6 +227,7 @@
 
     $rez = mysql_query("CREATE TABLE propertyFotos (
         id VARCHAR(32) NOT NULL PRIMARY KEY,
+        folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ..\uploaded_files\3\ ',
         filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
         extension VARCHAR(5) NOT NULL COMMENT 'Расширение у файла фотографии',
         filesizeMb FLOAT(1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой',

@@ -676,13 +676,13 @@
                     <tr><td><div style='margin-top: 2em; margin-left: 1em;'>
                         К сожалению, поиск не дал результатов<br>
                         Попробуйте изменить условия поиска<br><br>
-                        У нас еще <a href='search.php?fastSearchButton='>" . $allAmountAdverts . " свободных объектов недвижимости</a></div></td></tr>
+                        Посмотреть все объекты в Екатеринбурге: <a href='search.php?fastSearchButton='>" . $allAmountAdverts . " шт.</a></div></td></tr>
                     ";
 
         if ($typeOfRequest == "favorites") $searchResultHTML .= "
                     <tr><td><div style='margin-top: 2em; margin-left: 1em;'>
                         Вы пока ничего не добавили в Избранное<br><br>
-                        У нас еще <a href='search.php?fastSearchButton='>" . $allAmountAdverts . " свободных объектов недвижимости</a></div></td></tr>
+                        Посмотреть все объекты в Екатеринбурге: <a href='search.php?fastSearchButton='>" . $allAmountAdverts . " шт.</a></div></td></tr>
                     ";
 
         return $searchResultHTML;

@@ -2,14 +2,73 @@
  * Высота карты == высоте окошка браузера
  **********************************************************************************/
 
-$('#map').css('height', document.documentElement.clientHeight + 'px');
-$('#resultOnSearchPage').css('min-height', document.documentElement.clientHeight + 'px');
+$(document).ready(changeMapSize);
+$(window).resize(changeMapSize);
+$('#tabs').bind('tabsshow', changeMapSize);
+
+function changeMapSize() {
+    // Подстраиваем высоту карты под высоту окна браузера document.documentElement.clientHeight + 'px'
+    $('#map').height($(window).height());
+    $('#resultOnSearchPage').css('min-height', $(window).height() + 'px');
+
+    // Значения этих переменных пригодятся, когда карта получит положение fixed и ее размеры будут определятся уже относительно окна браузера. При этом размеры и положение карты должны остаться теми же самыми.
+    // Исходим из того, что положение и ширина карты соотносятся с таблицей с краткими сведениями об объектах
+    mapWidth = $("#shortListOfRealtyObjects").width();
+    mapLeftCoord = $("#shortListOfRealtyObjects").offset().left + mapWidth;
+}
 
 /**********************************************************************************
  * Зафиксируем карту на всю высоту окошка браузера при прокрутке экрана
  **********************************************************************************/
 
+/* Навешиваем обработчик на прокрутку экрана с целью зафиксировать карту и заголовок таблицы в случае достижения ими верха страницы */
+
 var map = document.getElementById("map");
+var mapWrapper = document.getElementById("resultOnSearchPage");
+var mapWidth = 0;
+var mapLeftCoord = 0;
+
+$(window).scroll(function() {
+
+    if (!$("#listPlusMap a").hasClass("inUse")) return true;
+
+// Если экран опустился ниже верхней границы карты, но карта не дошла до футера, то fixedTopBlock
+
+if (getPageScroll().top <= getCoords(mapWrapper).top) { // Если мы смотрим заголовок страницы
+
+    $(map).removeClass('fixedTopBlock');
+    $(map).removeClass('absoluteBottomBlock');
+
+    // Возвращаем исходные значения
+    $(map).css({'width': '', 'left': ''});
+
+} else { // Если мы проматали ниже заголовка страницы и верх карты достиг верха экрана
+
+    if (getPageScroll().top + map.offsetHeight >= getCoords(mapWrapper).top + mapWrapper.offsetHeight) { // Если мы дошли до подвала страницы
+
+    $(map).addClass('absoluteBottomBlock');
+    $(map).removeClass('fixedTopBlock');
+
+    // Возвращаем исходные значения
+    $(map).css({'width': '', 'left': ''});
+
+    } else { // Если мы просматриваем середину списка - фиксируем карту на экране
+
+        $(map).addClass('fixedTopBlock');
+        $(map).removeClass('absoluteBottomBlock');
+
+        // Важно оставить карту на экране в том же местоположении и той же ширины, что она была до прокрутки
+        $(map).css({'width': mapWidth, 'left': mapLeftCoord});
+
+    }
+
+    }
+
+    return true;
+});
+
+
+/*var map = document.getElementById("map");
 var mapWrapper = document.getElementById("resultOnSearchPage");
 $(window).scroll(function () {
     // Если экран опустился ниже верхней границы карты, но карта не дошла до футера, то fixedTopBlock
@@ -23,7 +82,7 @@ $(window).scroll(function () {
             $(map).css('top', getPageScroll().top - getCoords(mapWrapper).top + 'px');
         }
     }
-});
+});*/
 
 /**********************************************************************************
  * Подгрузка новых 20-ти объектов при прокрутке экрана со списком
@@ -300,7 +359,7 @@ $('#expandList').on('click', function () {
 $('#listPlusMap').on('click', function () {
     $('#shortListOfRealtyObjects').css('display', '');
     $('#map').css('display', '');
-    $('#map').css('width', '49%');
+    $('#map').css('width', '50%');
     $('#fullParametersListOfRealtyObjects').css('display', 'none');
     $('#expandList a').removeClass('inUse');
     $('#listPlusMap a').addClass('inUse');

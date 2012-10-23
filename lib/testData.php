@@ -36,9 +36,9 @@
     returnResultMySql($rez);
 
     // Регистрируем данные о фотках пользователей
-    $rez = mysql_query("INSERT INTO userFotos (id, filename, extension, filesizeMb, userId) VALUES
-('1aa240c376365dd8c4a38493a8dcff64', 'DSCN0319.JPG', 'JPG', 6.7, 2),
-('8e26607a95ae215bd4831d2b9b0be1b0', 'Ольга Андреева.jpg', 'jpg', 0.1, 1)
+    $rez = mysql_query("INSERT INTO userFotos (id, folder, filename, extension, filesizeMb, userId) VALUES
+('1aa240c376365dd8c4a38493a8dcff64', '..\uploaded_files\1\', 'DSCN0319.JPG', 'JPG', 6.7, 2),
+('8e26607a95ae215bd4831d2b9b0be1b0', '..\uploaded_files\8\', 'Ольга Андреева.jpg', 'jpg', 0.1, 1)
 ");
 
     echo "Статус регистрации фотографий пользователей: ";
@@ -75,39 +75,39 @@
     returnResultMySql($rez);
 
     // Создаем таблицу для постоянного хранения информации о ФОТОГРАФИЯХ объектов недвижимости
-    $rez = mysql_query("INSERT INTO propertyFotos (id, filename, extension, filesizeMb, propertyId) VALUES
-('03b141bbb26e42040b96fb9176ae28c4', 'Квартира4.jpg', 'jpg', 0.1, 1),
-('08c1da5a4849d70e2e109219382c9dfc', '291.JPG', 'JPG', 0.1, 1),
-('11d92a3d33d510ecb02f9ad89ba842df', 'Квартира2.jpg', 'jpg', 0, 4),
-('155d3a797c42f233afc305954ce9bc3b', 'Квартира2.jpg', 'jpg', 0, 2),
-('1e01eb19077606729cd208ef8f1813c4', 'Квартира5.jpg', 'jpg', 0, 5),
-('4cbb15f69dee3c789e5cc421da294d39', 'Квартира1.jpg', 'jpg', 0, 2),
-('6ec697030d123ac8903e7b579f827fd1', 'Квартира2.jpg', 'jpg', 0, 7),
-('a2ae107cba37fa06d99c31e67e028421', 'Квартира4.jpg', 'jpg', 0.1, 6),
-('b3185f04cd6cbd1b832e16be6162b234', 'Квартира5.jpg', 'jpg', 0, 4),
-('b6ac5310bb479949a37940ef97d2d50d', 'Квартира3.jpg', 'jpg', 0.1, 3),
-('c130dad1e123737c7325f797cbeda477', 'Квартира4.jpg', 'jpg', 0.1, 7),
-('c3f0e2ec40c21d7ea821e20995389137', 'Квартира3.jpg', 'jpg', 0.1, 2),
-('d0541fa5096a2b58cc6dc99118409ec3', '291.JPG', 'JPG', 0.1, 8),
-('e3a4fba78730181de8a9037e13a5b848', 'Квартира5.jpg', 'jpg', 0, 6),
-('fb7caff3b35748fbf629fca0f6f679b7', 'Квартира1.jpg', 'jpg', 0, 7),
-('fbd5e8e558fb7e78c4d689f34ca82b55', 'Квартира5.jpg', 'jpg', 0, 7),
-('03b141bbb26e42040b96fb9176ae28c5', 'Квартира4.jpg', 'jpg', 0.1, 9),
-('08c1da5a4849d70e2e109219382c9dfd', '291.JPG', 'JPG', 0.1, 10),
-('11d92a3d33d510ecb02f9ad89ba842d0', 'Квартира2.jpg', 'jpg', 0, 11),
-('155d3a797c42f233afc305954ce9bc3c', 'Квартира2.jpg', 'jpg', 0, 12),
-('1e01eb19077606729cd208ef8f1813c5', 'Квартира5.jpg', 'jpg', 0, 13),
-('4cbb15f69dee3c789e5cc421da294d3a', 'Квартира1.jpg', 'jpg', 0, 14),
-('6ec697030d123ac8903e7b579f827fd2', 'Квартира2.jpg', 'jpg', 0, 15),
-('a2ae107cba37fa06d99c31e67e028422', 'Квартира4.jpg', 'jpg', 0.1, 16),
-('b3185f04cd6cbd1b832e16be6162b235', 'Квартира5.jpg', 'jpg', 0, 17),
-('b6ac5310bb479949a37940ef97d2d50e', 'Квартира3.jpg', 'jpg', 0.1, 18),
-('c130dad1e123737c7325f797cbeda478', 'Квартира4.jpg', 'jpg', 0.1, 19),
-('c3f0e2ec40c21d7ea821e20995389138', 'Квартира3.jpg', 'jpg', 0.1, 20),
-('d0541fa5096a2b58cc6dc99118409ec4', '291.JPG', 'JPG', 0.1, 21),
-('e3a4fba78730181de8a9037e13a5b849', 'Квартира5.jpg', 'jpg', 0, 22),
-('fb7caff3b35748fbf629fca0f6f679b8', 'Квартира1.jpg', 'jpg', 0, 23),
-('fbd5e8e558fb7e78c4d689f34ca82b56', 'Квартира5.jpg', 'jpg', 0, 23)
+    $rez = mysql_query("INSERT INTO propertyFotos (id, folder, filename, extension, filesizeMb, propertyId) VALUES
+('03b141bbb26e42040b96fb9176ae28c4', '..\uploaded_files\0\', 'Квартира4.jpg', 'jpg', 0.1, 1),
+('08c1da5a4849d70e2e109219382c9dfc', '..\uploaded_files\0\', '291.JPG', 'JPG', 0.1, 1),
+('11d92a3d33d510ecb02f9ad89ba842df', '..\uploaded_files\1\', 'Квартира2.jpg', 'jpg', 0, 4),
+('155d3a797c42f233afc305954ce9bc3b', '..\uploaded_files\1\', 'Квартира2.jpg', 'jpg', 0, 2),
+('1e01eb19077606729cd208ef8f1813c4', '..\uploaded_files\1\', 'Квартира5.jpg', 'jpg', 0, 5),
+('4cbb15f69dee3c789e5cc421da294d39', '..\uploaded_files\4\', 'Квартира1.jpg', 'jpg', 0, 2),
+('6ec697030d123ac8903e7b579f827fd1', '..\uploaded_files\6\', 'Квартира2.jpg', 'jpg', 0, 7),
+('a2ae107cba37fa06d99c31e67e028421', '..\uploaded_files\a\', 'Квартира4.jpg', 'jpg', 0.1, 6),
+('b3185f04cd6cbd1b832e16be6162b234', '..\uploaded_files\b\', 'Квартира5.jpg', 'jpg', 0, 4),
+('b6ac5310bb479949a37940ef97d2d50d', '..\uploaded_files\b\', 'Квартира3.jpg', 'jpg', 0.1, 3),
+('c130dad1e123737c7325f797cbeda477', '..\uploaded_files\c\', 'Квартира4.jpg', 'jpg', 0.1, 7),
+('c3f0e2ec40c21d7ea821e20995389137', '..\uploaded_files\c\', 'Квартира3.jpg', 'jpg', 0.1, 2),
+('d0541fa5096a2b58cc6dc99118409ec3', '..\uploaded_files\d\', '291.JPG', 'JPG', 0.1, 8),
+('e3a4fba78730181de8a9037e13a5b848', '..\uploaded_files\e\', 'Квартира5.jpg', 'jpg', 0, 6),
+('fb7caff3b35748fbf629fca0f6f679b7', '..\uploaded_files\f\', 'Квартира1.jpg', 'jpg', 0, 7),
+('fbd5e8e558fb7e78c4d689f34ca82b55', '..\uploaded_files\f\', 'Квартира5.jpg', 'jpg', 0, 7),
+('03b141bbb26e42040b96fb9176ae28c5', '..\uploaded_files\0\', 'Квартира4.jpg', 'jpg', 0.1, 9),
+('08c1da5a4849d70e2e109219382c9dfd', '..\uploaded_files\0\', '291.JPG', 'JPG', 0.1, 10),
+('11d92a3d33d510ecb02f9ad89ba842d0', '..\uploaded_files\1\', 'Квартира2.jpg', 'jpg', 0, 11),
+('155d3a797c42f233afc305954ce9bc3c', '..\uploaded_files\1\', 'Квартира2.jpg', 'jpg', 0, 12),
+('1e01eb19077606729cd208ef8f1813c5', '..\uploaded_files\1\', 'Квартира5.jpg', 'jpg', 0, 13),
+('4cbb15f69dee3c789e5cc421da294d3a', '..\uploaded_files\4\', 'Квартира1.jpg', 'jpg', 0, 14),
+('6ec697030d123ac8903e7b579f827fd2', '..\uploaded_files\6\', 'Квартира2.jpg', 'jpg', 0, 15),
+('a2ae107cba37fa06d99c31e67e028422', '..\uploaded_files\a\', 'Квартира4.jpg', 'jpg', 0.1, 16),
+('b3185f04cd6cbd1b832e16be6162b235', '..\uploaded_files\b\', 'Квартира5.jpg', 'jpg', 0, 17),
+('b6ac5310bb479949a37940ef97d2d50e', '..\uploaded_files\b\', 'Квартира3.jpg', 'jpg', 0.1, 18),
+('c130dad1e123737c7325f797cbeda478', '..\uploaded_files\c\', 'Квартира4.jpg', 'jpg', 0.1, 19),
+('c3f0e2ec40c21d7ea821e20995389138', '..\uploaded_files\c\', 'Квартира3.jpg', 'jpg', 0.1, 20),
+('d0541fa5096a2b58cc6dc99118409ec4', '..\uploaded_files\d\', '291.JPG', 'JPG', 0.1, 21),
+('e3a4fba78730181de8a9037e13a5b849', '..\uploaded_files\e\', 'Квартира5.jpg', 'jpg', 0, 22),
+('fb7caff3b35748fbf629fca0f6f679b8', '..\uploaded_files\f\', 'Квартира1.jpg', 'jpg', 0, 23),
+('fbd5e8e558fb7e78c4d689f34ca82b56', '..\uploaded_files\f\', 'Квартира5.jpg', 'jpg', 0, 23)
 ");
 
     echo "Статус регистрации фотографий недвижимости: ";

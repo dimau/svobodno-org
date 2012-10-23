@@ -20,18 +20,18 @@ $(function () {
 // Подготовим возможность загрузки фотографий
 function createUploader() {
     var uploader = new qq.FileUploader({
-        element:document.getElementById('file-uploader'),
-        action:'../lib/uploader.php',
-        allowedExtensions:["jpeg", "jpg", "img", "bmp", "png", "gif"], //Также расширения нужно менять в файле uploader.php
-        sizeLimit:10 * 1024 * 1024,
-        debug:false,
+        element: document.getElementById('file-uploader'),
+        action: '../lib/uploader.php',
+        allowedExtensions: ["jpeg", "jpg", "img", "bmp", "png", "gif"], //Также расширения нужно менять в файле uploader.php
+        sizeLimit: 10 * 1024 * 1024,
+        debug: false,
         // О каждом загруженном файле информацию передаем на сервер через переменные - для сохранения в БД
         onSubmit:function (id, fileName) {
             uploader.setParams({
-                fileuploadid:$("#fileUploadId").val(),
-                sourcefilename:fileName,
+                fileuploadid: $("#fileUploadId").val(),
+                sourcefilename: fileName,
             });
-        },
+        }
         //extraDropzones: [qq.getByClass(document, 'qq-upload-extra-drop-area')[0]]
     });
 
@@ -43,7 +43,7 @@ function createUploader() {
     for (var i = 0; i < uploadedFoto.length; i++) {
         var uploadedFotoName = $(uploadedFoto[i]).attr('filename');
 
-        // Формируем зеленый блок в списке загруженных файлов в разделе Фотографии
+        // Формируем зеленый блок в списке загруженных файлов в разделе Фотографии. Шаблон для блока хранится в fileTemplate в fileuploader.js (примерно 571 строка)
         uploader._addToList(i + 100, uploadedFotoName);
         uploader._onComplete(i + 100, uploadedFotoName, rezult);
     }
@@ -105,38 +105,6 @@ if ($('#userMistakesBlock ol').html() != "") {
     });
     $('#userMistakesBlock').css('display', 'block');
 }
-
-
-/*// Подключение и настройка динамической проверки формы на JS
-$('#tabs').bind('tabsshow', function (event, ui) {
-    newTabId = ui.panel.id; // Определяем идентификатор вновь открытой вкладки
-    $(".formError." + newTabId).css("display", ""); // Показываем все ошибки к полям на этой вкладке
-    $(".formError").not("." + newTabId).css('display', "none"); // Скрываем все ошибки полей на других вкладках
-
-    // Перепозиционируем подсказки по валидации при открытии вкладки - это важно при проверке формы перед отправкой, когда появляются все подсказки на всех вкладках (даже невидимых)
-    $(".formError." + newTabId).each(function () {
-        var validatedElemName = $(this).attr("class").split(" ")[1];
-        var validatedElem = document.body.querySelector("[name=" + validatedElemName + "]");
-        rePosition(validatedElem, this);
-    });
-});
-// В качестве входных параметров получает caller - валидируемый элемент и divFormError - элемент всплывающей подсказки с текстом сообщения об ошибке валидации
-function rePosition(caller, divFormError) { // Соответствует действиям по позиционированию функции buildPrompt из jquery.validationEngine.js - строчка 84
-    callerTopPosition = $(caller).offset().top;
-    callerleftPosition = $(caller).offset().left;
-    callerWidth = $(caller).width();
-    callerHeight = $(caller).height();
-    inputHeight = $(divFormError).height();
-
-    callerleftPosition = callerleftPosition + callerWidth - 30;
-    callerTopPosition = callerTopPosition - inputHeight - 10;
-
-    $(divFormError).css({
-        top:callerTopPosition,
-        left:callerleftPosition,
-    });
-}
-*/
 
 /*****************************************************************
  * Блок с валидациями и выдачей ошибок

@@ -87,7 +87,7 @@
 ?>
 
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8">
 
@@ -184,6 +184,7 @@
         }
         ?>
     </div>
+
     <div class="objectDescription">
         <fieldset class="notEdited">
             <legend>
@@ -500,6 +501,7 @@
                 </tbody>
             </table>
         </fieldset>
+
 
         <?php if ($rowProperty['schemeOfWork'] == 'улучшенный' || $rowProperty['schemeOfWork'] == 'оптимальный'
     ):

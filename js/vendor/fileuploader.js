@@ -59,22 +59,22 @@ qq.getUniqueId = (function () {
 
 qq.ie = function () {
     return navigator.userAgent.indexOf('MSIE') != -1;
-}
+};
 qq.safari = function () {
     return navigator.vendor != undefined && navigator.vendor.indexOf("Apple") != -1;
-}
+};
 qq.chrome = function () {
     return navigator.vendor != undefined && navigator.vendor.indexOf('Google') != -1;
-}
+};
 qq.firefox = function () {
     return (navigator.userAgent.indexOf('Mozilla') != -1 && navigator.vendor != undefined && navigator.vendor == '');
-}
+};
 qq.windows = function () {
     return navigator.platform == "Win32";
-}
+};
 
 //
-// Events
+// События
 
 /** Returns the function which detaches attached event */
 qq.attach = function (element, type, fn) {
@@ -87,6 +87,7 @@ qq.attach = function (element, type, fn) {
         qq.detach(element, type, fn)
     }
 };
+// Функция отключает обработчик события (функцию fn) с названием type от элемента element
 qq.detach = function (element, type, fn) {
     if (element.removeEventListener) {
         element.removeEventListener(type, fn, false);
@@ -191,6 +192,7 @@ qq.children = function (element) {
     return children;
 };
 
+// Возвращает массив элементов класса className, являющихся потомками элемента element
 qq.getByClass = function (element, className) {
     if (element.querySelectorAll) {
         return element.querySelectorAll('.' + className);
@@ -324,8 +326,8 @@ qq.FileUploaderBasic = function (o) {
     qq.extend(this._options, o);
     qq.extend(this, qq.DisposeSupport);
 
-    // number of files being uploaded
-    this._filesInProgress = 0;
+
+    this._filesInProgress = 0; // количество загружаемых файлов
     this._handler = this._createUploadHandler();
 
     if (this._options.button) {
@@ -393,7 +395,7 @@ qq.FileUploaderBasic.prototype = {
             onUpload:function (id, fileName, xhr) {
                 self._onUpload(id, fileName, xhr);
                 self._options.onUpload(id, fileName, xhr);
-            }
+            },
         });
 
         return handler;
@@ -546,10 +548,10 @@ qq.FileUploaderBasic.prototype = {
  * @inherits qq.FileUploaderBasic
  */
 qq.FileUploader = function (o) {
-    // call parent constructor
+    // Первоначально вызовем конструктов родителя
     qq.FileUploaderBasic.apply(this, arguments);
 
-    // additional options
+    // Добавим дополнительные опции
     qq.extend(this._options, {
         element:null,
         // if set, will be used instead of qq-upload-list in template
@@ -558,6 +560,8 @@ qq.FileUploader = function (o) {
         uploadButtonText:'Выбрать фотографии',
         cancelButtonText:'Отменить',
         failUploadText:'Ошибка при загрузке',
+        removeButtonText:'Удалить',
+        mainButtonText:' Основная',
 
         template:'<div class="qq-uploader">' +
             '<div class="qq-upload-drop-area"><span>{dragText}</span></div>' +
@@ -567,12 +571,17 @@ qq.FileUploader = function (o) {
 
         // template for one item in file list
         fileTemplate:'<li>' +
+            '<div class="qq-miniature" style="float: left"></div>' +
             '<span class="qq-progress-bar"></span>' +
             '<span class="qq-upload-file"></span>' +
+            '<br>' +
             '<span class="qq-upload-spinner"></span>' +
             '<span class="qq-upload-size"></span>' +
             '<a class="qq-upload-cancel" href="#">{cancelButtonText}</a>' +
+            '<a class="qq-upload-remove" href="#">{removeButtonText}</a>' +
             '<span class="qq-upload-failed-text">{failUploadtext}</span>' +
+            '<br>' +
+            '<input type="radio" name="mainFotoRadioButton" value="{mainFotoRadioButtonValue}" class="qq-upload-main">{mainButtonText}' +
             '</li>',
 
         classes:{
@@ -587,6 +596,9 @@ qq.FileUploader = function (o) {
             spinner:'qq-upload-spinner',
             size:'qq-upload-size',
             cancel:'qq-upload-cancel',
+            remove:'qq-upload-remove',
+            doMain: 'qq-upload-main',
+            miniature: 'qq-miniature',
 
             // added to list item <li> when upload completes
             // used in css to hide progress spinner
@@ -594,15 +606,16 @@ qq.FileUploader = function (o) {
             fail:'qq-upload-fail'
         }
     });
-    // overwrite options with user supplied
+    // Перезапишем опции в соответствии с заданными пользователем
     qq.extend(this._options, o);
 
-    // overwrite the upload button text if any
-    // same for the Cancel button and Fail message text
+    // Перезапишем тексты для кнопок в HTML шаблоне
     this._options.template = this._options.template.replace(/\{dragText\}/g, this._options.dragText);
     this._options.template = this._options.template.replace(/\{uploadButtonText\}/g, this._options.uploadButtonText);
     this._options.fileTemplate = this._options.fileTemplate.replace(/\{cancelButtonText\}/g, this._options.cancelButtonText);
     this._options.fileTemplate = this._options.fileTemplate.replace(/\{failUploadtext\}/g, this._options.failUploadText);
+    this._options.fileTemplate = this._options.fileTemplate.replace(/\{removeButtonText\}/g, this._options.removeButtonText);
+    this._options.fileTemplate = this._options.fileTemplate.replace(/\{mainButtonText\}/g, this._options.mainButtonText);
 
     this._element = this._options.element;
     this._element.innerHTML = this._options.template;
@@ -612,7 +625,13 @@ qq.FileUploader = function (o) {
 
     this._button = this._createUploadButton(this._find(this._element, 'button'));
 
+    // Обработчик на клик по кнопке Отмена загрузки
     this._bindCancelEvent();
+
+    // Обработчик на клик по кнопке Удалить файл
+    this._bindRemoveEvent();
+
+    // Видимо настройки для драг и дропа - я в них не лез
     this._setupDragDrop();
 };
 
@@ -631,10 +650,12 @@ qq.extend(qq.FileUploader.prototype, {
         return ((qq.chrome() || (qq.safari() && qq.windows())) && e.clientX == 0 && e.clientY == 0) // null coords for Chrome and Safari Windows
             || (qq.firefox() && !e.relatedTarget); // null e.relatedTarget for Firefox
     },
+
     /**
-     * Gets one of the elements listed in this._options.classes
+     * Возвращает первый элемент из DOM структуры документа, являющийся потомком элемента parent и имеющего класс, соответствующий типу type
      **/
-    _find:function (parent, type) {
+    _find: function (parent, type) {
+        // Получаем первый элемент-потомое элемента parent, содержащий класс, соответствующий type
         var element = qq.getByClass(parent, this._options.classes[type])[0];
         if (!element) {
             throw new Error('element not found ' + type);
@@ -756,19 +777,35 @@ qq.extend(qq.FileUploader.prototype, {
             qq.addClass(item, this._classes.fail);
         }
     },
+
+    /*********************************************
+     * Функция добавления К СПИСКУ загружаемых (загруженных) очередного файла
+     * id - уникальный идентификатор (инкрементный), первой строке = 0, затем 1 и так далее
+     ********************************************/
     _addToList:function (id, fileName) {
+        // Формируем HTML элемент на базе шаблона, записанного в _options.fileTemplate
         var item = qq.toElement(this._options.fileTemplate);
         item.qqFileId = id;
 
+        // Находим внутри формируемого нами элемента списка элемент класса file:'qq-upload-file' и записываем в его содержимое название файла.
+        // Название файла предварительно проходит обработку - если слишком длинное, оно будет сокращено
         var fileElement = this._find(item, 'file');
         qq.setText(fileElement, this._formatFileName(fileName));
+
+        // Элемент с размером не показываем - зачем? Я не знаю..
         this._find(item, 'size').style.display = 'none';
+
+        // Выполняется только, если загружать можно 1 файл. У меня можно загружать несколько файлов - строка не выполняется
         if (!this._options.multiple) this._clearList();
+
+        // Подготовленный элемент списка, представляющий один из загружаемых(ных) файлов присоединяем к общему списку ul - this._listElement
         this._listElement.appendChild(item);
     },
+
     _clearList:function () {
         this._listElement.innerHTML = '';
     },
+
     _getItemByFileId:function (id) {
         var item = this._listElement.firstChild;
 
@@ -780,9 +817,9 @@ qq.extend(qq.FileUploader.prototype, {
         }
     },
     /**
-     * delegate click event for cancel link
+     * Навешивает обработчик на кнопку ОТМЕНЫ загрузки
      **/
-    _bindCancelEvent:function () {
+    _bindCancelEvent: function () {
         var self = this,
             list = this._listElement;
 
@@ -791,10 +828,45 @@ qq.extend(qq.FileUploader.prototype, {
             var target = e.target || e.srcElement;
 
             if (qq.hasClass(target, self._classes.cancel)) {
+
+                // Зачем нужно - не ясно
                 qq.preventDefault(e);
 
+                // Получаем элемент списка, загрузку которого отменяет пользователь
                 var item = target.parentNode;
+
+                // Уменьшает счетчик загружаемых файлов на 1
                 self._handler.cancel(item.qqFileId);
+
+                // Удаляем элемент из списка в DOM браузера
+                qq.remove(item);
+            }
+        });
+    },
+
+    /**************************************************
+     * Навешивает обработчик на кнопку УДАЛЕНИЯ файла
+     *************************************************/
+    _bindRemoveEvent:function () {
+        var self = this,
+            list = this._listElement;
+
+        this._attach(list, 'click', function (e) {
+            e = e || window.event;
+            var target = e.target || e.srcElement;
+
+            if (qq.hasClass(target, self._classes.remove)) {
+
+                // ХЗ вообще зачем это нужно
+                qq.preventDefault(e);
+
+                // Получаем элемент списка, который нужно удалить по команде пользователя
+                var item = target.parentNode;
+
+                // TODO: реализовать удаление файла с сервера
+                alert("Местный идентификатор файла: " + item.qqFileId + ", реализовать удаление файла с сервера по аякс, либо после отправки формы?!");
+
+                // Удаляем элемент из списка в DOM браузера
                 qq.remove(item);
             }
         });

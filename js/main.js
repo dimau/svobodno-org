@@ -70,6 +70,7 @@ function addToFavorites() {
         });
     }, "xml");
 
+    return false;
 }
 
 // Навешиваем обработчик клика по удалению из избранного
@@ -91,6 +92,7 @@ function removeFromFavorites() {
         });
     }, "xml");
 
+    return false;
 }
 
 /**********************************************************************
@@ -118,12 +120,12 @@ if (document.getElementsByClassName) {
         for (i = 0; i < length; i++) {
             for (j = 0; j < classes; j++) {
                 if (list[i].className.search('\\b' + classArray[j] + '\\b') != -1) {
-                    result.push(list[i])
-                    break
+                    result.push(list[i]);
+                    break;
                 }
             }
         }
-        return result
+        return result;
     }
 }
 

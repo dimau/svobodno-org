@@ -843,8 +843,21 @@ td.bottom.right, th.bottom.right {
 }
 
 .numberOfRealtyObject {
+    color: #808080;
     text-align: center;
-    font-size: 1em;
+    font-size: 0.7em;
+}
+
+#map.fixedTopBlock {
+    position: fixed;
+    top: 0px;
+}
+
+#map.absoluteBottomBlock {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    top: auto;
 }
 
 /* Стили для чистого списка объявлений - без карты */
