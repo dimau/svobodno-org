@@ -1,4 +1,8 @@
 /**
+ *
+ * Свои комментарии к тем кускам кода, которыя я изменил сам (Ушаков Дмитрий), либо которые имеют важное значение, я отмечаю:
+ * "Мои комментарии:" для удобства поиска и редактирования
+ *
  * http://github.com/Valums-File-Uploader/file-uploader
  *
  * Multiple file upload component with progress-bar, drag-and-drop.
@@ -192,7 +196,7 @@ qq.children = function (element) {
     return children;
 };
 
-// Возвращает массив элементов класса className, являющихся потомками элемента element
+// Мои комментарии: Возвращает массив элементов класса className, являющихся потомками элемента element
 qq.getByClass = function (element, className) {
     if (element.querySelectorAll) {
         return element.querySelectorAll('.' + className);
@@ -309,7 +313,7 @@ qq.FileUploaderBasic = function (o) {
         },
         onError:function (id, fileName, xhr) {
         },
-        // messages
+        // Мои комментарии: сообщения, выдаваемые пользователю
         messages:{
             typeError:"К сожалению, один из файлов, которые Вы выбрали, имеет не поддерживаемый нами формат. Вы можете загрузить файлы только следующих типов: {extensions}",
             sizeError:"{file} имеет слишком большой размер, максимальный размер файла: {sizeLimit}.",
@@ -327,7 +331,7 @@ qq.FileUploaderBasic = function (o) {
     qq.extend(this, qq.DisposeSupport);
 
 
-    this._filesInProgress = 0; // количество загружаемых файлов
+    this._filesInProgress = 0; // Мои комментарии: количество загружаемых файлов в данный момент
     this._handler = this._createUploadHandler();
 
     if (this._options.button) {
@@ -548,10 +552,10 @@ qq.FileUploaderBasic.prototype = {
  * @inherits qq.FileUploaderBasic
  */
 qq.FileUploader = function (o) {
-    // Первоначально вызовем конструктов родителя
+    // Мои комментарии: первоначально вызовем конструктор родителя
     qq.FileUploaderBasic.apply(this, arguments);
 
-    // Добавим дополнительные опции
+    // Мои комментарии: добавим дополнительные опции
     qq.extend(this._options, {
         element:null,
         // if set, will be used instead of qq-upload-list in template
@@ -569,20 +573,22 @@ qq.FileUploader = function (o) {
             '<ul class="qq-upload-list"></ul>' +
             '</div>',
 
-        // template for one item in file list
-        fileTemplate:'<li>' +
-            '<div class="qq-miniature" style="float: left"></div>' +
-            '<span class="qq-progress-bar"></span>' +
-            '<span class="qq-upload-file"></span>' +
-            '<br>' +
-            '<span class="qq-upload-spinner"></span>' +
-            '<span class="qq-upload-size"></span>' +
-            '<a class="qq-upload-cancel" href="#">{cancelButtonText}</a>' +
-            '<a class="qq-upload-remove" href="#">{removeButtonText}</a>' +
-            '<span class="qq-upload-failed-text">{failUploadtext}</span>' +
-            '<br>' +
-            '<input type="radio" name="mainFotoRadioButton" value="{mainFotoRadioButtonValue}" class="qq-upload-main">{mainButtonText}' +
-            '</li>',
+        // Мои комментарии: шаблон для элемента списка загружаемых(ных) фотографий
+        fileTemplate:'<li><span style="white-space: nowrap;">' +
+            '<div class="qq-miniature" style="display: none; vertical-align: top; margin-right: 5px; margin-bottom: 5px;"><img src="" style=""></div>' +
+            '<div class="qq-description" style="display: inline-block; vertical-align: top;">' +
+                '<span class="qq-progress-bar"></span>' +
+                '<span class="qq-upload-file"></span>' +
+                '<br>' +
+                '<span class="qq-upload-spinner"></span>' +
+                '<span class="qq-upload-size"></span>' +
+                '<a class="qq-upload-cancel" href="#">{cancelButtonText}</a>' +
+                '<a class="qq-upload-remove" href="#">{removeButtonText}</a>' +
+                '<span class="qq-upload-failed-text">{failUploadtext}</span>' +
+                '<br>' +
+                '<input type="radio" name="mainFotoRadioButton" value="{mainFotoRadioButtonValue}" class="qq-upload-main">{mainButtonText}' +
+            '</div>' +
+            '</span></li>',
 
         classes:{
             // used to get elements from templates
@@ -606,10 +612,10 @@ qq.FileUploader = function (o) {
             fail:'qq-upload-fail'
         }
     });
-    // Перезапишем опции в соответствии с заданными пользователем
+    // Мои комментарии: перезапишем опции в соответствии с заданными пользователем
     qq.extend(this._options, o);
 
-    // Перезапишем тексты для кнопок в HTML шаблоне
+    // Мои комментарии: перезапишем тексты для кнопок в HTML шаблоне
     this._options.template = this._options.template.replace(/\{dragText\}/g, this._options.dragText);
     this._options.template = this._options.template.replace(/\{uploadButtonText\}/g, this._options.uploadButtonText);
     this._options.fileTemplate = this._options.fileTemplate.replace(/\{cancelButtonText\}/g, this._options.cancelButtonText);
@@ -625,13 +631,13 @@ qq.FileUploader = function (o) {
 
     this._button = this._createUploadButton(this._find(this._element, 'button'));
 
-    // Обработчик на клик по кнопке Отмена загрузки
+    // Мои комментарии: обработчик на клик по кнопке Отмена загрузки
     this._bindCancelEvent();
 
-    // Обработчик на клик по кнопке Удалить файл
+    // Мои комментарии: обработчик на клик по кнопке Удалить файл
     this._bindRemoveEvent();
 
-    // Видимо настройки для драг и дропа - я в них не лез
+    // Мои комментарии: видимо настройки для драг и дропа - я в них не лез
     this._setupDragDrop();
 };
 
@@ -739,7 +745,8 @@ qq.extend(qq.FileUploader.prototype, {
         qq.FileUploaderBasic.prototype._onSubmit.apply(this, arguments);
         this._addToList(id, fileName);
     },
-    // Update the progress bar & percentage as the file is uploaded
+
+    // Мои комментарии: обновление прогрессбара и процентов загрузки при выполнении загрузки файла
     _onProgress:function (id, fileName, loaded, total) {
         qq.FileUploaderBasic.prototype._onProgress.apply(this, arguments);
 
@@ -752,7 +759,7 @@ qq.extend(qq.FileUploader.prototype, {
 
         if (loaded != total) {
             // If still uploading, display percentage
-            text = percent + '% from ' + this._formatSize(total);
+            text = percent + '% из ' + this._formatSize(total);
         } else {
             // If complete, just display final size
             text = this._formatSize(total);
@@ -763,23 +770,35 @@ qq.extend(qq.FileUploader.prototype, {
 
         qq.setText(size, text);
     },
+
+    // Мои комментарии: действия при окончании загрузки файла на сервер
+    // result - объект с результатами, переданными с сервера в JSON формате
     _onComplete:function (id, fileName, result) {
         qq.FileUploaderBasic.prototype._onComplete.apply(this, arguments);
 
-        // mark completed
+        // Получаем элемент списка, соответствующий загружаемому файлу
         var item = this._getItemByFileId(id);
+
+        // Скрываем ненужные элементы и открываем нужные
         qq.remove(this._find(item, 'cancel'));
         qq.remove(this._find(item, 'spinner'));
+        qq.remove(this._find(item, 'size'));
 
+        // Присваиваем класс успешной загрузки или ошибки при загрузке - для применения соответствующего оформления
         if (result.success) {
             qq.addClass(item, this._classes.success);
+
+            // Делаем видимой миниатюру загруженной фотографии
+            $(".qq-miniature img", item).attr('src', result.folder + '\\small\\' + result.name + '.' + result.ext);
+            $(".qq-miniature", item).css('display', "inline-block");
+
         } else {
             qq.addClass(item, this._classes.fail);
         }
     },
 
     /*********************************************
-     * Функция добавления К СПИСКУ загружаемых (загруженных) очередного файла
+     * Мои комментарии: функция добавления К СПИСКУ загружаемых (загруженных) очередного файла
      * id - уникальный идентификатор (инкрементный), первой строке = 0, затем 1 и так далее
      ********************************************/
     _addToList:function (id, fileName) {
@@ -817,7 +836,7 @@ qq.extend(qq.FileUploader.prototype, {
         }
     },
     /**
-     * Навешивает обработчик на кнопку ОТМЕНЫ загрузки
+     * Мои комментарии: навешивает обработчик на кнопку ОТМЕНЫ загрузки
      **/
     _bindCancelEvent: function () {
         var self = this,
@@ -845,7 +864,7 @@ qq.extend(qq.FileUploader.prototype, {
     },
 
     /**************************************************
-     * Навешивает обработчик на кнопку УДАЛЕНИЯ файла
+     * Мои комментарии: навешивает обработчик на кнопку УДАЛЕНИЯ файла
      *************************************************/
     _bindRemoveEvent:function () {
         var self = this,
@@ -1469,7 +1488,6 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
         for (key in this._options.customHeaders) {
             xhr.setRequestHeader(key, this._options.customHeaders[key]);
         }
-        ;
         xhr.send(file);
     },
     _onComplete:function (id, xhr) {

@@ -190,10 +190,12 @@
 
             /******* Переносим информацию о фотографиях пользователя в таблицу для постоянного хранения *******/
             // Получим информацию о всех фотках, соответствующих текущему fileUploadId
-            $rezTempFotos = mysql_query("SELECT id, filename, extension, filesizeMb FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'");
+            $rezTempFotos = mysql_query("SELECT * FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'");
             for ($i = 0; $i < mysql_num_rows($rezTempFotos); $i++) {
-                $rowTempFotos = mysql_fetch_assoc($rezTempFotos);
-                mysql_query("INSERT INTO userFotos (id, filename, extension, filesizeMb, userId) VALUES ('" . $rowTempFotos['id'] . "','" . $rowTempFotos['filename'] . "','" . $rowTempFotos['extension'] . "','" . $rowTempFotos['filesizeMb'] . "','" . $rowUsers['id'] . "')"); // Переносим информацию о фотографиях на постоянное хранение
+                if ($rowTempFotos = mysql_fetch_assoc($rezTempFotos)) {
+                    $rowTempFotos['folder'] = str_replace ('\\', '\\\\', $rowTempFotos['folder']); // Переменная folder уже содержит в себе один или несколько '\', но для того, чтобы при сохранении в БД не возникло проблем, к нему нужно добавить еще один символ '\', в этом случае mysql будет воспринимать "\\" как один знак "\" и не будет считать его служебгым символом
+                    mysql_query("INSERT INTO userFotos (id, folder, filename, extension, filesizeMb, userId) VALUES ('" . $rowTempFotos['id'] . "','" . $rowTempFotos['folder'] . "','" . $rowTempFotos['filename'] . "','" . $rowTempFotos['extension'] . "','" . $rowTempFotos['filesizeMb'] . "','" . $rowUsers['id'] . "')"); // Переносим информацию о фотографиях на постоянное хранение
+                }
             }
             // Удаляем записи о фотках в таблице для временного хранения данных
             mysql_query("DELETE FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'");
@@ -1203,7 +1205,7 @@
                 $numUploadedFiles = mysql_num_rows($rez);
                 for ($i = 0; $i < $numUploadedFiles; $i++) {
                     $row = mysql_fetch_assoc($rez);
-                    echo "<input type='hidden' class='uploadedFoto' filename='" . $row['filename'] . "' filesizeMb='" . $row['filesizeMb'] . "'>";
+                    echo "<input type='hidden' class='uploadedFoto' fotoId='" . $row['id'] . "' folder='" . $row['folder'] . "' filename='" . $row['filename'] . "' extension='" . $row['extension'] . "' filesizeMb='" . $row['filesizeMb'] . "'>";
                 }
             }
             if ($rez = mysql_query("SELECT * FROM tempFotos WHERE fileuploadid = '" . $fileUploadId . "'")) // ищем уже загруженные пользователем фотки
@@ -1211,7 +1213,7 @@
                 $numUploadedFiles = mysql_num_rows($rez);
                 for ($i = 0; $i < $numUploadedFiles; $i++) {
                     $row = mysql_fetch_assoc($rez);
-                    echo "<input type='hidden' class='uploadedFoto' filename='" . $row['filename'] . "' filesizeMb='" . $row['filesizeMb'] . "'>";
+                    echo "<input type='hidden' class='uploadedFoto' fotoId='" . $row['id'] . "' folder='" . $row['folder'] . "' filename='" . $row['filename'] . "' extension='" . $row['extension'] . "' filesizeMb='" . $row['filesizeMb'] . "'>";
                 }
             }
             ?>

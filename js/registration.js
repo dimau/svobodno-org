@@ -22,7 +22,7 @@ function createUploader() {
     var uploader = new qq.FileUploader({
         element: document.getElementById('file-uploader'),
         action: '../lib/uploader.php',
-        allowedExtensions: ["jpeg", "jpg", "img", "bmp", "png", "gif"], //Также расширения нужно менять в файле uploader.php
+        allowedExtensions: ["jpeg", "JPEG", "jpg", "JPG", "png", "PNG", "gif", "GIF"], // Также расширения нужно менять в файле uploader.php
         sizeLimit: 10 * 1024 * 1024,
         debug: false,
         // О каждом загруженном файле информацию передаем на сервер через переменные - для сохранения в БД
@@ -38,18 +38,8 @@ function createUploader() {
     // Важно, что в конце файла uploader.php располагается функция handleUpload, в которой есть и мой код, работающий на сервере при получении файла
 
     // Сформируем зеленые блоки для уже загруженных фотографий руками, чтобы пользователя не путать
-    var rezult = {success:true};
-    var uploadedFoto = document.getElementsByClassName('uploadedFoto');
-    for (var i = 0; i < uploadedFoto.length; i++) {
-        var uploadedFotoName = $(uploadedFoto[i]).attr('filename');
+    createUploadedFilesBlocks(uploader);
 
-        // Формируем зеленый блок в списке загруженных файлов в разделе Фотографии. Шаблон для блока хранится в fileTemplate в fileuploader.js (примерно 571 строка)
-        uploader._addToList(i + 100, uploadedFotoName);
-        uploader._onComplete(i + 100, uploadedFotoName, rezult);
-    }
-
-    // Чтобы обмануть загрузчик файлов и он не выдавал при отправке страницы сообщение о том, что мол есть еще не загруженные фотографии, ориентируясь на сформированные вручную зеленые блоки
-    uploader._filesInProgress = 0;
 }
 $(document).ready(createUploader);
 
