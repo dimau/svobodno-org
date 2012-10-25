@@ -183,7 +183,7 @@
 
         // Проверяем корректность данных объявления. Функции isAdvertCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
         $errors = isAdvertCorrect("editAdvert");
-        if (count($errors) == 0) $correct = TRUE; else $correct = FALSE; // Считаем ошибки, если 0, то можно будет записать данные в БД
+        if (is_array($errors) && count($errors) == 0) $correct = TRUE; else $correct = FALSE; // Считаем ошибки, если 0, то можно будет записать данные в БД
 
         // Если данные, указанные пользователем, корректны, запишем объявление в базу данных
         if ($correct) {

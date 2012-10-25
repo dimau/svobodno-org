@@ -41,7 +41,7 @@
             $interestingPropertysId = unserialize($row['interestingPropertysId']);
 
             // По каждому объекту недвижимости выясняем статус и собственника. Если статус = опубликовано, то собственника добавляем в массив ($visibleUsersIdOwners)
-            if ($interestingPropertysId != FALSE && count($interestingPropertysId) != 0) {
+            if ($interestingPropertysId != FALSE && is_array($interestingPropertysId) && count($interestingPropertysId) != 0) {
                 // Составляем условие запроса к БД, указывая интересующие нас id объявлений
                 $selectValue = "";
                 for ($i = 0; $i < count($interestingPropertysId); $i++) {
@@ -317,7 +317,7 @@
                     Пользователь не ищет недвижимость в данный момент
                 </div>
                 <?php endif;?>
-                <?php if ($rowSearchRequests != FALSE && count($rowSearchRequests) != 0): ?>
+                <?php if ($rowSearchRequests != FALSE && is_array($rowSearchRequests) && count($rowSearchRequests) != 0): ?>
                 <div class="shadowText">
                     Какого рода недвижимость ищет данный пользователь
                 </div>

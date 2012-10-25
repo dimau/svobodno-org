@@ -1,4 +1,14 @@
-/* Делаем красивые (равномерные) отступы внутри плашки меню */
+
+/**********************************************************************
+ * ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ: инициализация
+ **********************************************************************/
+
+var currentFotoGalleryIndex = 0; // Инкрементный, уникальный. Используется для того, чтобы объединять на странице фотографии в отдельные галереи. Например, если на странице поиска много объектов недвижимости, то и фотки каждого отдельно взятого объекта должны быть проинициализированы как уникальная галерея через colorBox.
+
+/**********************************************************************
+ * ГЛАВНОЕ МЕНЮ: делаем красивые (равномерные) отступы внутри плашки меню
+ **********************************************************************/
+
 function changeMenuSeparatorWidth() {
     // Выясняем ширину области меню
     var menuWidth = $(".menu").width();
@@ -104,6 +114,22 @@ if ($('#rightBlockOfSearchParameters').length && $('#leftBlockOfSearchParameters
     $('#rightBlockOfSearchParameters').height($('#leftBlockOfSearchParameters').height() - 10);
     $('#rightBlockOfSearchParameters ul').height($('#rightBlockOfSearchParameters fieldset').height() - $('#rightBlockOfSearchParameters fieldset legend').height());
 }
+
+/**********************************************************************
+ * Активируем ColorBox для просмотра в модальном окне галереи фотографий по клику на миниатюре
+ **********************************************************************/
+
+$(document).ready(function () {
+    // Соберем на странице все блоки с фотографиями
+    var allFotosWrappers = document.getElementsByClassName('fotosWrapper');
+
+    // Для каждого блока с фотографиями создаем отдельную галерею colorBox
+    for (var i = 0; i < allFotosWrappers.length; i++) {
+        $(".gallery", allFotosWrappers[i]).colorbox({ opacity:0.7, rel:currentFotoGalleryIndex, current:'№ {current} из {total}' });
+        currentFotoGalleryIndex++;
+    }
+
+});
 
 /**********************************************************************
  * ПОЛЕЗНЫЕ ФУНКЦИИ

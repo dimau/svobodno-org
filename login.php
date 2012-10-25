@@ -10,7 +10,7 @@
         if (isset($_POST['buttonSubmit'])) {
             $error = enter(); //функция входа на сайт
 
-            if (count($error) == 0) //если нет ошибок, отправляем пользователя в личный кабинет
+            if (is_array($error) && count($error) == 0) //если нет ошибок, отправляем пользователя в личный кабинет
             {
                 header('Location: personal.php');
             }

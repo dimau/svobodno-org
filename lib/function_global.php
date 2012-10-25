@@ -407,4 +407,45 @@
         }
     }
 
+    // Функция возвращает ассоциативный массив, содержащий ссылки на основную фотку и HTML блок (из input hidden) с данными о неосновных фотках
+    function getLinksToFotos($propertyFotosArr = FALSE, $propertyId = 0) {
+        $urlFoto1 = ""; // TODO: Вставить адрес фотки по умолчанию
+        $hrefFoto1 = ""; // TODO: Вставить адрес фотки по умолчанию
+        $numberOfFotos = ""; // Текст о количестве фотографий (по шаблону 'еще ___ фото')
+        $hiddensLinksToOtherFotos = "";
+        // Получаем данные по всем фотографиям для данного объекта недвижимости
+        if ($propertyFotosArr == FALSE) {
+            $propertyFotosArr = array(); // Массив, в который запишем массивы, каждый из которых будет содержать данные по 1 фотке объекта
+            $rezPropertyFotos = mysql_query("SELECT * FROM propertyFotos WHERE propertyId = '" . $propertyId . "'");
+            if ($rezPropertyFotos != FALSE && mysql_num_rows($rezPropertyFotos) != FALSE) {
+                for ($i = 0; $i < mysql_num_rows($rezPropertyFotos); $i++) {
+                    $propertyFotosArr[] = mysql_fetch_assoc($rezPropertyFotos);
+                }
+            }
+        }
+
+        // Если удалось получить информацию хотя бы об 1 фотографии
+        if (is_array($propertyFotosArr) && count($propertyFotosArr) != 0) {
+            // Находим основную фотку и получаем адрес миниатюры и ссылку на большую фотографию для галереи
+            foreach ($propertyFotosArr as $value) {
+                if ($value['status'] == "основная") {
+                    $urlFoto1 = $value['folder'] . '\\small\\' . $value['id'] . "." . $value['extension'];
+                    $hrefFoto1 = $value['folder'] . '\\big\\' . $value['id'] . "." . $value['extension'];
+                    break;
+                } else {
+                    // Из неосновных фотографий формируем input hidden блоки для передачи клиентскому JS информации об адресе большой фотографии (для галереи)
+                    $hiddensLinksToOtherFotos .= "<input type='hidden' class='gallery' href='" . $value['folder'] . "\\big\\" . $value['id'] . "." . $value['extension'] . "'>";
+                }
+            }
+        }
+
+        // Если фотографий больше чем 1, то нужно внизу сделать приписку об оставшемся кол-ве фоток по шаблону: 'еще ___ фото'
+        if (is_array($propertyFotosArr) && count($propertyFotosArr) > 1) {
+            $count = count($propertyFotosArr) - 1; // Считаем сколько еще фотографий осталось кроме основной
+            $numberOfFotos = "еще $count фото";
+        }
+
+        return array('urlFoto1' => $urlFoto1, 'hrefFoto1' => $hrefFoto1, 'numberOfFotos' => $numberOfFotos, 'hiddensLinksToOtherFotos' => $hiddensLinksToOtherFotos);
+    }
+
 ?>

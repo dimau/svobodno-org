@@ -328,10 +328,29 @@ td.bottom.right, th.bottom.right {
 
 .fotosWrapper {
     float: left;
+    border: 1px solid #ffffff;
+    border-radius: 5px;
 }
 
-.resultSearchFoto {
-    float: none !important;
+.fotosWrapper:hover {
+    cursor: pointer;
+    border: 1px solid #808080;
+    border-radius: 5px;
+}
+
+.fotoInTable {
+    float: none;
+    display: inline-block;
+}
+
+.fotoNonInteractive {
+    border: none;
+    cursor: auto;
+}
+
+.fotoNonInteractive:hover {
+    border: none;
+    cursor: auto;
 }
 
 .bigFotoWrapper {
@@ -347,17 +366,25 @@ td.bottom.right, th.bottom.right {
     vertical-align: top;
 }
 
-.middleFotoWrapper {
-    display: inline-block;
+.smallFotoWrapper {
     max-width: 120px;
     max-height: 120px;
     margin: 5px;
+    overflow: hidden;
 }
 
-.middleFoto {
+.smallFoto {
     max-width: 120px;
     max-height: 120px;
-    vertical-align: top;
+}
+
+.numberOfFotos {
+    width: 100%;
+    margin-bottom: 0.36em;
+    color: #808080;
+    text-align: center;
+    font-size: 0.7em;
+    line-height: 1em;
 }
 
 /* =============================================================================
@@ -868,14 +895,14 @@ td.bottom.right, th.bottom.right {
 
 .realtyObject {
     height: 50px;
-    text-align: center;
-    border-bottom: 1px solid grey;
+    /*border-bottom: 1px solid grey;*/
+    border: 1px solid grey;
     background-color: white;
+    text-align: center;
 }
 
 .realtyObject:hover {
     border: 2px solid #6a9d02;
-    border-radius: 5px;
     cursor: pointer;
 }
 

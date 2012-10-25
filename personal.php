@@ -44,7 +44,7 @@
     // На самом деле мы получаем информацию только по 1 первой попавшейся фотке каждого из объектов недвижимости
     $rowPropertyFotosArr = array();
     for ($i = 0; $i < count($rowPropertyArr); $i++) {
-        $rezPropertyFotos = mysql_query("SELECT * FROM propertyFotos WHERE propertyId = '" . $rowPropertyArr[$i]['id'] . "'");
+        $rezPropertyFotos = mysql_query("SELECT * FROM propertyFotos WHERE propertyId = '" . $rowPropertyArr[$i]['id'] . "' AND status = 'основная'");
         $rowTemp = mysql_fetch_assoc($rezPropertyFotos);
         if ($rowTemp != FALSE) $rowPropertyFotosArr[$i] = $rowTemp; else $rowPropertyFotosArr[$i] = array(); // Кажется, текущее решение не позволит перепутать фотографии от разных объявлений
     }
@@ -313,9 +313,9 @@
             статус: {status}
         </div>
     </div>
-    <div class='fotosWrapper'>
-        <div class='middleFotoWrapper'>
-            <img class='middleFoto' src='{urlFoto}'>
+    <div class='fotosWrapper fotoNonInteractive'>
+        <div class='smallFotoWrapper'>
+            <img class='smallFoto gallery' src='{urlFoto1}' href='{hrefFoto1}'>
         </div>
     </div>
     <ul class='setOfInstructions'>
@@ -345,35 +345,13 @@
             <span class='headOfString'>Предоплата:</span> {prepayment}
         </li>
         <li>
-            <span class='headOfString'>Единовременная комиссия:</span>
-            <span title='Предназначена для компенсации затрат собственника, связанных с поиском арендаторов'> {compensationMoney} {currency} ({compensationPercent}%) собственнику</span>
-        </li>
-        <li>
             <span class='headOfString'>Срок аренды:</span> {termOfLease}, c {dateOfEntry} {dateOfCheckOut}
-        </li>
-        <li>
-            <span class='headOfString'>Адрес:</span> {address}
-        </li>
-         <li>
-            <span class='headOfString'>Район:</span> {district}
-        </li>
-        <li>
-            <span class='headOfString'>{amountOfRoomsName}</span> {amountOfRooms}{adjacentRooms}
-        </li>
-        <li>
-            <span class='headOfString'>Площадь ({areaNames}):</span> {areaValues} м²
-        </li>
-        <li>
-            <span class='headOfString'>{floorName}</span> {floor}
         </li>
         <li>
             <span class='headOfString'>{furnitureName}</span> {furniture}
         </li>
         <li>
             <span class='headOfString'>{repairName}</span> {repair}
-        </li>
-        <li>
-            <span class='headOfString'>{parkingName}</span> {parking}
         </li>
         <li>
             <span class='headOfString'>Телефон собственника:</span>
@@ -388,52 +366,53 @@
     // Если объявлений у пользователя несколько, то в переменную, содержащую весь HTML - $briefOfAdverts, записываем каждое из них последовательно
     $briefOfAdverts = "";
     for ($i = 0; $i < count($rowPropertyArr); $i++) {
-        // Копируем html-текст шаблона
-        $currentAdvert = $tmpl_MyAdvert;
+
+        // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне баллуна
+        $arrMyAdvertReplace = array();
 
         // Подставляем класс в заголовок html объявления для применения соответствующего css оформления
-        $str = "";
-        if ($rowPropertyArr[$i]['status'] == "не опубликовано") $str = "unpublished";
-        if ($rowPropertyArr[$i]['status'] == "опубликовано") $str = "published";
-        $currentAdvert = str_replace("{statusEng}", $str, $currentAdvert);
+        $arrMyAdvertReplace['statusEng'] = "";
+        if ($rowPropertyArr[$i]['status'] == "не опубликовано") $arrMyAdvertReplace['statusEng'] = "unpublished";
+        if ($rowPropertyArr[$i]['status'] == "опубликовано") $arrMyAdvertReplace['statusEng'] = "published";
 
         // В заголовке блока отображаем тип недвижимости, для красоты первую букву типа сделаем в верхнем регистре
-        $str = getFirstCharUpper($rowPropertyArr[$i]['typeOfObject']);
-        $currentAdvert = str_replace("{typeOfObject}", $str, $currentAdvert);
+        $arrMyAdvertReplace['typeOfObject'] = "";
+        $arrMyAdvertReplace['typeOfObject'] = getFirstCharUpper($rowPropertyArr[$i]['typeOfObject']);
 
         // Адрес и номер квартиры, если он есть
-        $str = $rowPropertyArr[$i]['address'];
-        $currentAdvert = str_replace("{address}", $str, $currentAdvert);
-        if ($rowPropertyArr[$i]['apartmentNumber'] != "") $str = ", № " . $rowPropertyArr[$i]['apartmentNumber']; else $str = "";
-        $currentAdvert = str_replace("{apartmentNumber}", $str, $currentAdvert);
+        $arrMyAdvertReplace['address'] = "";
+        if (isset($rowPropertyArr[$i]['address']))  $arrMyAdvertReplace['address'] = $rowPropertyArr[$i]['address'];
+        $arrMyAdvertReplace['apartmentNumber'] = "";
+        if (isset($rowPropertyArr[$i]['apartmentNumber']) && $rowPropertyArr[$i]['apartmentNumber'] != "") $arrMyAdvertReplace['apartmentNumber'] = ", № " . $rowPropertyArr[$i]['apartmentNumber'];
 
         // Статус объявления
-        $str = $rowPropertyArr[$i]['status'];
-        $currentAdvert = str_replace("{status}", $str, $currentAdvert);
+        $arrMyAdvertReplace['status'] = "";
+        $arrMyAdvertReplace['status'] = $rowPropertyArr[$i]['status'];
 
-        // Фотографию
-        $str = "";
-        if (isset($rowPropertyFotosArr[$i]['id']) && isset($rowPropertyFotosArr[$i]['extension'])) $str = "uploaded_files/" . $rowPropertyFotosArr[$i]['id'] . "." . $rowPropertyFotosArr[$i]['extension'];
-        $currentAdvert = str_replace("{urlFoto}", $str, $currentAdvert);
+        // Фото
+        $arrMyAdvertReplace['urlFoto1'] = "";
+        $arrMyAdvertReplace['hrefFoto1'] = "";
+        $arrayFotoInfAboutOneProperty = array($rowPropertyFotosArr[$i]); // функция getLinksToFotos ожидает получить массив массивов, каждый из которых будет содержать сведения об 1 фотографии
+        $linksToFotosArr = getLinksToFotos($arrayFotoInfAboutOneProperty, $rowPropertyArr[$i]['id']);
+        $arrMyAdvertReplace['urlFoto1'] = $linksToFotosArr['urlFoto1'];
+        $arrMyAdvertReplace['hrefFoto1'] = $linksToFotosArr['hrefFoto1'];
 
         // Корректируем список инструкций, доступных пользователю
-        $strInstructionPublish = "";
-        $strInstructionDelete = "";
+        $arrMyAdvertReplace['instructionPublish'] = "";
+        $arrMyAdvertReplace['propertyId'] = "";
+        $arrMyAdvertReplace['instructionDelete'] = "";
         if ($rowPropertyArr[$i]['status'] == "опубликовано") {
-            $strInstructionPublish = "<li><a href='#'>снять с публикации</a></li>";
-            $strInstructionDelete = "";
+            $arrMyAdvertReplace['instructionPublish'] = "<li><a href='#'>снять с публикации</a></li>";
+            $arrMyAdvertReplace['instructionDelete'] = "";
         }
         if ($rowPropertyArr[$i]['status'] == "не опубликовано") {
-            $strInstructionPublish = "<li><a href='#'>опубликовать</a></li>";
-            $strInstructionDelete = "<li><a href='#'>удалить</a></li>";
+            $arrMyAdvertReplace['instructionPublish'] = "<li><a href='#'>опубликовать</a></li>";
+            $arrMyAdvertReplace['instructionDelete'] = "<li><a href='#'>удалить</a></li>";
         }
-        $currentAdvert = str_replace("{instructionPublish}", $strInstructionPublish, $currentAdvert);
-        $currentAdvert = str_replace("{instructionDelete}", $strInstructionDelete, $currentAdvert);
-        $str = $rowPropertyArr[$i]['id'];
-        $currentAdvert = str_replace("{propertyId}", $str, $currentAdvert);
+        $arrMyAdvertReplace['propertyId'] = $rowPropertyArr[$i]['id'];
 
         /******* Список потенциальных арендаторов ******/
-        $str = " ";
+        $arrMyAdvertReplace['probableTenants'] = "";
         // Получаем список id заинтересовавшихся арендаторов
         $visibleUsersId = unserialize($rowPropertyArr[$i]['visibleUsersId']);
         // Получаем имена и отчества заинтересовавшихся арендаторов
@@ -450,155 +429,81 @@
                     // Формируем из имен и отчеств строку гиперссылок с ссылками на страницы арендаторов
                     if ($row['typeTenant'] == "true") { // Если данный пользователь (арендатор) еще ищет недвижимость
                         $compId = $row['id'] * 5 + 2;
-                        $str .= "<a href='man.php?compId=" . $compId . "'>" . $row['name'] . " " . $row['secondName'] . "</a>";
+                        $arrMyAdvertReplace['probableTenants'] .= "<a href='man.php?compId=" . $compId . "'>" . $row['name'] . " " . $row['secondName'] . "</a>";
                     } else {
-                        $str .= "<span title='Пользователь уже нашел недвижимость'>" . $row['name'] . " " . $row['secondName'] . "</span>";
+                        $arrMyAdvertReplace['probableTenants'] .= "<span title='Пользователь уже нашел недвижимость'>" . $row['name'] . " " . $row['secondName'] . "</span>";
                     }
-                    if ($j < mysql_num_rows($rez) - 1) $str .= ", ";
+                    if ($j < mysql_num_rows($rez) - 1) $arrMyAdvertReplace['probableTenants'] .= ", ";
                 }
             }
         }
         // Заливаем полученную строку в шаблон
-        if ($str == " ") $str = " -"; // Если нет ни одного потенциального арендатора
-        $currentAdvert = str_replace("{probableTenants}", $str, $currentAdvert);
+        if ($arrMyAdvertReplace['probableTenants'] == " ") $arrMyAdvertReplace['probableTenants'] = " -"; // Если нет ни одного потенциального арендатора
 
         // Все, что касается СТОИМОСТИ АРЕНДЫ
-        $str = $rowPropertyArr[$i]['costOfRenting'];
-        $currentAdvert = str_replace("{costOfRenting}", $str, $currentAdvert);
-        $str = $rowPropertyArr[$i]['currency'];
-        $currentAdvert = str_replace("{currency}", $str, $currentAdvert);
-        if ($rowPropertyArr[$i]['utilities'] == "да") $str = "+ коммунальные услуги от " . $rowPropertyArr[$i]['costInSummer'] . " до " . $rowPropertyArr[$i]['costInWinter'] . " " . $rowPropertyArr[$i]['currency']; else $str = "";
-        $currentAdvert = str_replace("{utilities}", $str, $currentAdvert);
-        if ($rowPropertyArr[$i]['electricPower'] == "да") $str = "+ плата за электричество"; else $str = "";
-        $currentAdvert = str_replace("{electricPower}", $str, $currentAdvert);
-        if ($rowPropertyArr[$i]['bail'] == "есть") $str = $rowPropertyArr[$i]['bailCost'] . " " . $rowPropertyArr[$i]['currency']; else $str = "нет";
-        $currentAdvert = str_replace("{bail}", $str, $currentAdvert);
-        $str = $rowPropertyArr[$i]['prepayment'];
-        $currentAdvert = str_replace("{prepayment}", $str, $currentAdvert);
-        $str = $rowPropertyArr[$i]['compensationMoney'];
-        $currentAdvert = str_replace("{compensationMoney}", $str, $currentAdvert);
-        $str = $rowPropertyArr[$i]['compensationPercent'];
-        $currentAdvert = str_replace("{compensationPercent}", $str, $currentAdvert);
+        $arrMyAdvertReplace['costOfRenting'] = "";
+        $arrMyAdvertReplace['costOfRenting'] = $rowPropertyArr[$i]['costOfRenting'];
+        $arrMyAdvertReplace['currency'] = "";
+        $arrMyAdvertReplace['currency'] = $rowPropertyArr[$i]['currency'];
+        $arrMyAdvertReplace['utilities'] = "";
+        if ($rowPropertyArr[$i]['utilities'] == "да") $arrMyAdvertReplace['utilities'] = "+ коммунальные услуги от " . $rowPropertyArr[$i]['costInSummer'] . " до " . $rowPropertyArr[$i]['costInWinter'] . " " . $rowPropertyArr[$i]['currency'];
+        $arrMyAdvertReplace['electricPower'] = "";
+        if ($rowPropertyArr[$i]['electricPower'] == "да") $arrMyAdvertReplace['electricPower'] = "+ плата за электричество";
+        $arrMyAdvertReplace['bail'] = "";
+        if ($rowPropertyArr[$i]['bail'] == "есть") $arrMyAdvertReplace['bail'] = $rowPropertyArr[$i]['bailCost'] . " " . $rowPropertyArr[$i]['currency'];
+        if ($rowPropertyArr[$i]['bail'] == "нет") $arrMyAdvertReplace['bail'] = "нет";
+        $arrMyAdvertReplace['prepayment'] = "";
+        $arrMyAdvertReplace['prepayment'] = $rowPropertyArr[$i]['prepayment'];
 
         // Срок аренды
-        $str = $rowPropertyArr[$i]['termOfLease'];
-        $currentAdvert = str_replace("{termOfLease}", $str, $currentAdvert);
-        $str = dateFromDBToView($rowPropertyArr[$i]['dateOfEntry']);
-        $currentAdvert = str_replace("{dateOfEntry}", $str, $currentAdvert);
-        if ($rowPropertyArr[$i]['bail'] == "есть") $str = $rowPropertyArr[$i]['bailCost'] . " " . $rowPropertyArr[$i]['currency']; else $str = "нет";
-        if ($rowPropertyArr[$i]['dateOfCheckOut'] != "0000-00-00") $str = " по " . dateFromDBToView($rowPropertyArr[$i]['dateOfCheckOut']); else $str = "";
-        $currentAdvert = str_replace("{dateOfCheckOut}", $str, $currentAdvert);
-
-        // Подставляем название района для данного объекта недвижимости
-        $str = $rowPropertyArr[$i]['district'];
-        $currentAdvert = str_replace("{district}", $str, $currentAdvert);
-
-        // Комнаты
-        if ($rowPropertyArr[$i]['amountOfRooms'] != "0") {
-            $str = $rowPropertyArr[$i]['amountOfRooms'];
-            $strAmountOfRoomsName = "Количество комнат:";
-        } else {
-            $str = "";
-            $strAmountOfRoomsName = "";
-        }
-        $currentAdvert = str_replace("{amountOfRooms}", $str, $currentAdvert);
-        $currentAdvert = str_replace("{amountOfRoomsName}", $strAmountOfRoomsName, $currentAdvert);
-        if ($rowPropertyArr[$i]['adjacentRooms'] == "да") {
-            if ($rowPropertyArr[$i]['amountOfAdjacentRooms'] != "0") {
-                $str = ", из них смежных: " . $rowPropertyArr[$i]['amountOfAdjacentRooms'];
-            } else {
-                $str = ", смежные";
-            }
-        } else {
-            $str = "";
-        }
-        $currentAdvert = str_replace("{adjacentRooms}", $str, $currentAdvert);
-
-        // Площади помещений
-        $strAreaNames = "";
-        $strAreaValues = "";
-        if ($rowPropertyArr[$i]['typeOfObject'] != "квартира" && $rowPropertyArr[$i]['typeOfObject'] != "дом" && $rowPropertyArr[$i]['typeOfObject'] != "таунхаус" && $rowPropertyArr[$i]['typeOfObject'] != "дача" && $rowPropertyArr[$i]['typeOfObject'] != "гараж") {
-            $strAreaNames .= "комнаты";
-            $strAreaValues .= $rowPropertyArr[$i]['roomSpace'];
-        }
-        if ($rowPropertyArr[$i]['typeOfObject'] != "комната") {
-            $strAreaNames .= "общая";
-            $strAreaValues .= $rowPropertyArr[$i]['totalArea'];
-        }
-        if ($rowPropertyArr[$i]['typeOfObject'] != "комната" && $rowPropertyArr[$i]['typeOfObject'] != "гараж") {
-            $strAreaNames .= "/жилая";
-            $strAreaValues .= " / " . $rowPropertyArr[$i]['livingSpace'];
-        }
-        if ($rowPropertyArr[$i]['typeOfObject'] != "дача" && $rowPropertyArr[$i]['typeOfObject'] != "гараж") {
-            $strAreaNames .= "/кухни";
-            $strAreaValues .= " / " . $rowPropertyArr[$i]['kitchenSpace'];
-        }
-        $currentAdvert = str_replace("{areaNames}", $strAreaNames, $currentAdvert);
-        $currentAdvert = str_replace("{areaValues}", $strAreaValues, $currentAdvert);
-
-        // Этаж
-        $strFloorName = "";
-        $strFloor = "";
-        if ($rowPropertyArr[$i]['floor'] != "0" && $rowPropertyArr[$i]['totalAmountFloor'] != "0") {
-            $strFloorName = "Этаж:";
-            $strFloor = $rowPropertyArr[$i]['floor'] . " из " . $rowPropertyArr[$i]['totalAmountFloor'];
-        }
-        if ($rowPropertyArr[$i]['numberOfFloor'] != "0") {
-            $strFloorName = "Этажность:";
-            $strFloor = $rowPropertyArr[$i]['numberOfFloor'];
-        }
-        $currentAdvert = str_replace("{floorName}", $strFloorName, $currentAdvert);
-        $currentAdvert = str_replace("{floor}", $strFloor, $currentAdvert);
+        $arrMyAdvertReplace['termOfLease'] = "";
+        $arrMyAdvertReplace['dateOfEntry'] = "";
+        $arrMyAdvertReplace['dateOfCheckOut'] = "";
+        $arrMyAdvertReplace['termOfLease'] = $rowPropertyArr[$i]['termOfLease'];
+        $arrMyAdvertReplace['dateOfEntry'] = dateFromDBToView($rowPropertyArr[$i]['dateOfEntry']);
+        if ($rowPropertyArr[$i]['dateOfCheckOut'] != "0000-00-00") $arrMyAdvertReplace['dateOfCheckOut'] = " по " . dateFromDBToView($rowPropertyArr[$i]['dateOfCheckOut']);
 
         // Мебель
-        $strFurnitureName = "";
-        $strFurniture = "";
+        $arrMyAdvertReplace['furnitureName'] = "";
+        $arrMyAdvertReplace['furniture'] = "";
         if ($rowPropertyArr[$i]['typeOfObject'] != "0" && $rowPropertyArr[$i]['typeOfObject'] != "гараж") {
-            $strFurnitureName = "Мебель:";
-            if (count(unserialize($rowPropertyArr[$i]['furnitureInLivingArea'])) != 0 || $rowPropertyArr[$i]['furnitureInLivingAreaExtra'] != "") $strFurniture = "есть в жилой зоне";
-            if (count(unserialize($rowPropertyArr[$i]['furnitureInKitchen'])) != 0 || $rowPropertyArr[$i]['furnitureInKitchenExtra'] != "") if ($strFurniture == "") $strFurniture = "есть на кухне"; else $strFurniture .= ", есть на кухне";
-            if (count(unserialize($rowPropertyArr[$i]['appliances'])) != 0 || $rowPropertyArr[$i]['appliancesExtra'] != "") if ($strFurniture == "") $strFurniture = "есть бытовая техника"; else $strFurniture .= ", есть бытовая техника";
-            if ($strFurniture == "") $strFurniture = "нет";
+            $arrMyAdvertReplace['furnitureName'] = "Мебель:";
+            if (count(unserialize($rowPropertyArr[$i]['furnitureInLivingArea'])) != 0 || $rowPropertyArr[$i]['furnitureInLivingAreaExtra'] != "") $arrMyAdvertReplace['furniture'] = "есть в жилой зоне";
+            if (count(unserialize($rowPropertyArr[$i]['furnitureInKitchen'])) != 0 || $rowPropertyArr[$i]['furnitureInKitchenExtra'] != "") if ($arrMyAdvertReplace['furniture'] == "") $arrMyAdvertReplace['furniture'] = "есть на кухне"; else $arrMyAdvertReplace['furniture'] .= ", есть на кухне";
+            if (count(unserialize($rowPropertyArr[$i]['appliances'])) != 0 || $rowPropertyArr[$i]['appliancesExtra'] != "") if ($arrMyAdvertReplace['furniture'] == "") $arrMyAdvertReplace['furniture'] = "есть бытовая техника"; else $arrMyAdvertReplace['furniture'] .= ", есть бытовая техника";
+            if ($arrMyAdvertReplace['furniture'] == "") $arrMyAdvertReplace['furniture'] = "нет";
         }
-        $currentAdvert = str_replace("{furnitureName}", $strFurnitureName, $currentAdvert);
-        $currentAdvert = str_replace("{furniture}", $strFurniture, $currentAdvert);
 
         // Ремонт
-        $strRepairName = "";
-        $strRepair = "";
+        $arrMyAdvertReplace['repairName'] = "";
+        $arrMyAdvertReplace['repair'] = "";
         if ($rowPropertyArr[$i]['repair'] != "0" && $rowPropertyArr[$i]['furnish'] != "0") {
-            $strRepairName = "Ремонт:";
-            $strRepair = $rowPropertyArr[$i]['repair'] . ", отделка " . $rowPropertyArr[$i]['furnish'];
+            $arrMyAdvertReplace['repairName'] = "Ремонт:";
+            $arrMyAdvertReplace['repair'] = $rowPropertyArr[$i]['repair'] . ", отделка " . $rowPropertyArr[$i]['furnish'];
         }
-        $currentAdvert = str_replace("{repairName}", $strRepairName, $currentAdvert);
-        $currentAdvert = str_replace("{repair}", $strRepair, $currentAdvert);
-
-        // Парковка
-        $strParkingName = "";
-        $strParking = "";
-        if ($rowPropertyArr[$i]['parking'] != "0") {
-            $strParkingName = "Парковка во дворе:";
-            $strParking = $rowPropertyArr[$i]['parking'];
-        }
-        $currentAdvert = str_replace("{parkingName}", $strParkingName, $currentAdvert);
-        $currentAdvert = str_replace("{parking}", $strParking, $currentAdvert);
 
         // Контакты собственника
-        $str = $rowPropertyArr[$i]['contactTelephonNumber'];
-        $currentAdvert = str_replace("{contactTelephonNumber}", $str, $currentAdvert);
-        $str = "man.php?compId=" . ($rowUsers['id'] * 5 + 2); // compId - "вычисленное id пользователя. Равняется id пользователя * 5 + 2. Идентификатор пользователя подвергаем математическим вычислениям с целью скрыть его реальное значение от чужих глаз - для безопасности"
-        $currentAdvert = str_replace("{urlMan}", $str, $currentAdvert);
-        $str = $rowUsers['name'];
-        $currentAdvert = str_replace("{name}", $str, $currentAdvert);
-        $str = $rowUsers['secondName'];
-        $currentAdvert = str_replace("{secondName}", $str, $currentAdvert);
-        $str = $rowPropertyArr[$i]['timeForRingBegin'];
-        $currentAdvert = str_replace("{timeForRingBegin}", $str, $currentAdvert);
-        $str = $rowPropertyArr[$i]['timeForRingEnd'];
-        $currentAdvert = str_replace("{timeForRingEnd}", $str, $currentAdvert);
+        $arrMyAdvertReplace['contactTelephonNumber'] = "";
+        $arrMyAdvertReplace['contactTelephonNumber'] = $rowPropertyArr[$i]['contactTelephonNumber'];
+        $arrMyAdvertReplace['urlMan'] = "";
+        $arrMyAdvertReplace['urlMan'] = "man.php?compId=" . ($rowUsers['id'] * 5 + 2); // compId - "вычисленное id пользователя. Равняется id пользователя * 5 + 2. Идентификатор пользователя подвергаем математическим вычислениям с целью скрыть его реальное значение от чужих глаз - для безопасности"
+        $arrMyAdvertReplace['name'] = "";
+        $arrMyAdvertReplace['name'] = $rowUsers['name'];
+        $arrMyAdvertReplace['secondName'] = "";
+        $arrMyAdvertReplace['secondName'] = $rowUsers['secondName'];
+        $arrMyAdvertReplace['timeForRingBegin'] = "";
+        $arrMyAdvertReplace['timeForRingBegin'] = $rowPropertyArr[$i]['timeForRingBegin'];
+        $arrMyAdvertReplace['timeForRingEnd'] = "";
+        $arrMyAdvertReplace['timeForRingEnd'] = $rowPropertyArr[$i]['timeForRingEnd'];
+
+        // Производим заполнение шаблона
+        // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне
+        $arrMyAdvertTemplVar = array('{statusEng}', '{typeOfObject}', '{address}', '{apartmentNumber}', '{status}', '{urlFoto1}', '{hrefFoto1}', '{instructionPublish}', '{propertyId}', '{instructionDelete}', '{probableTenants}', '{costOfRenting}', '{currency}', '{utilities}', '{electricPower}', '{bail}', '{prepayment}', '{termOfLease}', '{dateOfEntry}', '{dateOfCheckOut}', '{furnitureName}', '{furniture}', '{repairName}', '{repair}', '{contactTelephonNumber}', '{urlMan}', '{name}', '{secondName}', '{timeForRingBegin}', '{timeForRingEnd}');
+        // Копируем html-текст шаблона
+        $currentMyAdvert = str_replace($arrMyAdvertTemplVar, $arrMyAdvertReplace, $tmpl_MyAdvert);
 
         // Сформированный блок с описанием объявления добавляем в общую копилку. На вкладке tabs-3 (Мои объявления) полученный HTML всех блоков вставим в страницу.
-        $briefOfAdverts .= $currentAdvert; // Добавим html-текст еще одного объявления. Готовим html-текст к добавлению на вкладку tabs-3 в Мои объявления
+        $briefOfAdverts .= $currentMyAdvert; // Добавим html-текст еще одного объявления. Готовим html-текст к добавлению на вкладку tabs-3 в Мои объявления
     }
 
     /********************************************************************************
@@ -794,6 +699,7 @@
 
     <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
     <link rel="stylesheet" href="css/fileuploader.css">
+    <link rel="stylesheet" href="css/colorbox.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
         #newAdvertButton {
@@ -813,6 +719,8 @@
     <script src="js/vendor/jquery.ui.datepicker-ru.js"></script>
     <!-- Загрузчик фотографий на AJAX -->
     <script src="js/vendor/fileuploader.js" type="text/javascript"></script>
+    <!-- ColorBox - плагин jQuery, позволяющий делать модальное окно для просмотра фотографий -->
+    <script src="js/vendor/jquery.colorbox-min.js"></script>
     <!-- Загружаем библиотеку для работы с картой от Яндекса -->
     <script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
 

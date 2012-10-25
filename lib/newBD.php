@@ -107,7 +107,8 @@
         filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
         extension VARCHAR(5) NOT NULL COMMENT 'Расширение у файла фотографии',
         filesizeMb FLOAT(1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой',
-        userId INT(11) COMMENT 'Идентификатор пользователя, которому соответствует данная фотография'
+        userId INT(11) COMMENT 'Идентификатор пользователя, которому соответствует данная фотография',
+        status VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'У основной личной фотографии пользователя статус = основная, у остальных - пустой'
 )");
 
     echo "Статус создания таблицы userFotos: ";
@@ -231,7 +232,8 @@
         filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
         extension VARCHAR(5) NOT NULL COMMENT 'Расширение у файла фотографии',
         filesizeMb FLOAT(1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой',
-        propertyId INT(11) COMMENT 'Идентификатор объекта недвижимости (или иначе объявления), к которому относится данная фотография'
+        propertyId INT(11) COMMENT 'Идентификатор объекта недвижимости (или иначе объявления), к которому относится данная фотография',
+        status VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'У основной фотографии объекта недвижимости статус = основная, у остальных - пустой'
 )");
 
     echo "Статус создания таблицы propertyFotos: ";

@@ -104,7 +104,7 @@ function getNextRealtyObjects(lastRealtyObjectsId, lastNumber) {
         propertyIdArr.push($(this).attr('propertyId'));
     });
 
-    // Запускаем вертушку, чтобы показать пользователю, что новые данные подгружаются
+    // Запускаем вертушку, чтобы показать пользователю, что новые данные подгружаются TODO: вертушка загрузки
     //$("#upBlock").css('display', 'block');
 
     jQuery.post("../lib/getSearchResultHTML.php", {"propertyId":propertyIdArr, "typeOperation":"FullData", "number":lastNumber}, function (data) {
@@ -118,7 +118,25 @@ function getNextRealtyObjects(lastRealtyObjectsId, lastNumber) {
             $("#allBalloons .balloonBlock[propertyId='" + propertyIdArr[i] + "']").html(data.arrayOfBalloonList[propertyIdArr[i]]);
         }
 
-        //$("#upBlock").css('display', 'none'); Снимаем вертушку - данные успешно подгружены
+        //$("#upBlock").css('display', 'none'); TODO: вертушка загрузки Снимаем вертушку - данные успешно подгружены
+
+        /************* Активируем ColorBox для просмотра в модальном окне галереи фотографий по клику на миниатюре *************/
+        // Это необходимо сделать для вновь загруженных объектов
+        for (i = 0; i < propertyIdArr.length; i++) {
+
+            /* Для представления результатов поиска в виде карты с баллунами */
+            $("#allBalloons .balloonBlock[propertyId='" + propertyIdArr[i] + "'] .gallery").colorbox({ opacity: 0.7 , rel: currentFotoGalleryIndex, current: '№ {current} из {total}' });
+            currentFotoGalleryIndex++;
+
+            /* Для представления результатов поиска список + карта */
+            $("#shortListOfRealtyObjects .realtyObject[propertyId='" + propertyIdArr[i] + "'] .gallery").colorbox({ opacity: 0.7 , rel: currentFotoGalleryIndex, current: '№ {current} из {total}' });
+            currentFotoGalleryIndex++;
+
+            /* Для представления результатов поиска в виде списка */
+            $("#fullParametersListOfRealtyObjects .realtyObject[propertyId='" + propertyIdArr[i] + "'] .gallery").colorbox({ opacity: 0.7 , rel: currentFotoGalleryIndex, current: '№ {current} из {total}' });
+            currentFotoGalleryIndex++;
+
+        }
 
         // Разблокируем обработку прокрутки страницы для новых загрузок с сервера
         blockOfScrollHandler = false;
@@ -328,6 +346,7 @@ function init() {
  **********************************************************************************/
 
 $(document).on('click', '#fullParametersListOfRealtyObjects .realtyObject', function (event) {
+
     // Открываем подробное описание объекта в новом окне
     var linkToDescription = $(this).attr('linkToDescription');
     window.open(linkToDescription);

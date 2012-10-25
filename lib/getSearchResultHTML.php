@@ -96,7 +96,7 @@
 
         // Получаем фотографии объекта
         $propertyFotosArr = array(); // Массив, в который запишем массивы, каждый из которых будет содержать данные по 1 фотке объекта
-        $rezPropertyFotos = mysql_query("SELECT id, extension FROM propertyFotos WHERE propertyId = '" . $propertyFullArr[$i]['id'] . "'");
+        $rezPropertyFotos = mysql_query("SELECT * FROM propertyFotos WHERE propertyId = '" . $propertyFullArr[$i]['id'] . "'");
         if ($rezPropertyFotos != FALSE) {
             for ($j = 0; $j < mysql_num_rows($rezPropertyFotos); $j++) {
                 $propertyFotosArr[] = mysql_fetch_assoc($rezPropertyFotos);

@@ -85,7 +85,7 @@
 
             // Получаем фотографии объекта
             $propertyFotosArr = array(); // Массив, в который запишем массивы, каждый из которых будет содержать данные по 1 фотке объекта
-            $rezPropertyFotos = mysql_query("SELECT id, extension FROM propertyFotos WHERE propertyId = '" . $currentPropertyId . "'");
+            $rezPropertyFotos = mysql_query("SELECT * FROM propertyFotos WHERE propertyId = '" . $currentPropertyId . "'");
             if ($rezPropertyFotos != FALSE) {
                 for ($j = 0; $j < mysql_num_rows($rezPropertyFotos); $j++) {
                     $propertyFotosArr[] = mysql_fetch_assoc($rezPropertyFotos);
@@ -228,15 +228,11 @@
         $tmpl_balloonContentBody = "
             <div class='headOfBalloon'>{typeOfObject}{address}</div>
             <div class='fotosWrapper'>
-                <div class='middleFotoWrapper'>
-                    <img class='middleFoto' src='{urlFoto1}'>
+                <div class='smallFotoWrapper'>
+                    <img class='smallFoto gallery' src='{urlFoto1}' href='{hrefFoto1}'>
                 </div>
-                <div class='middleFotoWrapper'>
-                    <img class='middleFoto' src='{urlFoto2}'>
-                </div>
-                <div class='middleFotoWrapper'>
-                    <img class='middleFoto' src='{urlFoto3}'>
-                </div>
+                <div class='numberOfFotos'>{numberOfFotos}</div>
+                {hiddensLinksToOtherFotos}
             </div>
             <ul class='listDescription'>
                 <li>
@@ -284,22 +280,11 @@
         if (isset($oneProperty['address'])) $arrBalloonReplace['address'] = $oneProperty['address'];
 
         // Фото
-        $arrBalloonReplace['urlFoto1'] = "";
-        $arrBalloonReplace['urlFoto2'] = "";
-        $arrBalloonReplace['urlFoto3'] = "";
-        // Получаем данные по всем фотографиям для данного объекта недвижимости
-        if ($propertyFotosArr == FALSE) {
-            $propertyFotosArr = array(); // Массив, в который запишем массивы, каждый из которых будет содержать данные по 1 фотке объекта
-            $rezPropertyFotos = mysql_query("SELECT id, extension FROM propertyFotos WHERE propertyId = '" . $oneProperty['id'] . "'");
-            if ($rezPropertyFotos != FALSE) {
-                for ($i = 0; $i < mysql_num_rows($rezPropertyFotos); $i++) {
-                    $propertyFotosArr[] = mysql_fetch_assoc($rezPropertyFotos);
-                }
-            }
-        }
-        if (isset($propertyFotosArr[0])) $arrBalloonReplace['urlFoto1'] = "uploaded_files/" . $propertyFotosArr[0]['id'] . "." . $propertyFotosArr[0]['extension'];
-        if (isset($propertyFotosArr[1])) $arrBalloonReplace['urlFoto2'] = "uploaded_files/" . $propertyFotosArr[1]['id'] . "." . $propertyFotosArr[1]['extension'];
-        if (isset($propertyFotosArr[2])) $arrBalloonReplace['urlFoto3'] = "uploaded_files/" . $propertyFotosArr[2]['id'] . "." . $propertyFotosArr[2]['extension'];
+        $linksToFotosArr = getLinksToFotos($propertyFotosArr, $oneProperty['id']);
+        $arrBalloonReplace['urlFoto1'] = $linksToFotosArr['urlFoto1'];
+        $arrBalloonReplace['hrefFoto1'] = $linksToFotosArr['hrefFoto1'];
+        $arrBalloonReplace['numberOfFotos'] = $linksToFotosArr['numberOfFotos'];
+        $arrBalloonReplace['hiddensLinksToOtherFotos'] = $linksToFotosArr['hiddensLinksToOtherFotos'];
 
         // Все, что касается СТОИМОСТИ АРЕНДЫ
         $arrBalloonReplace['costOfRenting'] = "";
@@ -405,7 +390,7 @@
 
         // Производим заполнение шаблона баллуна
         // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне баллуна
-        $arrBalloonTemplVar = array('{propertyId}', '{typeOfObject}', '{address}', '{urlFoto1}', '{urlFoto2}', '{urlFoto3}', '{costOfRenting}', '{currency}', '{utilities}', '{compensationMoney}', '{compensationPercent}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaNames}', '{areaValues}', '{floorName}', '{floor}', '{furnitureName}', '{furniture}', '{actionFavorites}', '{imgFavorites}', '{textFavorites}');
+        $arrBalloonTemplVar = array('{propertyId}', '{typeOfObject}', '{address}', '{urlFoto1}', '{hrefFoto1}', '{numberOfFotos}', '{hiddensLinksToOtherFotos}', '{costOfRenting}', '{currency}', '{utilities}', '{compensationMoney}', '{compensationPercent}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaNames}', '{areaValues}', '{floorName}', '{floor}', '{furnitureName}', '{furniture}', '{actionFavorites}', '{imgFavorites}', '{textFavorites}');
         // Копируем html-текст шаблона баллуна
         $currentAdvertBalloonList = str_replace($arrBalloonTemplVar, $arrBalloonReplace, $tmpl_balloonContentBody);
 
@@ -422,10 +407,12 @@
                	    <span class='{actionFavorites} aloneStar' propertyId='{propertyId}'><img src='{imgFavorites}'></span>
                	</td>
                	<td>
-               	    <div class='fotosWrapper resultSearchFoto'>
-               		    <div class='middleFotoWrapper'>
-                  			    <img class='middleFoto' src='{urlFoto1}'>
+               	    <div class='fotosWrapper fotoInTable'>
+                        <div class='smallFotoWrapper'>
+                            <img class='smallFoto gallery' src='{urlFoto1}' href='{hrefFoto1}'>
                         </div>
+                        <div class='numberOfFotos'>{numberOfFotos}</div>
+                        {hiddensLinksToOtherFotos}
                     </div>
                 </td>
                 <td>{address}
@@ -473,18 +460,11 @@
         }
 
         // Фото
-        $arrShortListReplace['urlFoto1'] = "";
-        // Получаем данные по всем фотографиям для данного объекта недвижимости
-        if ($propertyFotosArr == FALSE) {
-            $propertyFotosArr = array(); // Массив, в который запишем массивы, каждый из которых будет содержать данные по 1 фотке объекта
-            $rezPropertyFotos = mysql_query("SELECT id, extension FROM propertyFotos WHERE propertyId = '" . $oneProperty['id'] . "'");
-            if ($rezPropertyFotos != FALSE) {
-                for ($i = 0; $i < mysql_num_rows($rezPropertyFotos); $i++) {
-                    $propertyFotosArr[] = mysql_fetch_assoc($rezPropertyFotos);
-                }
-            }
-        }
-        if (isset($propertyFotosArr[0])) $arrShortListReplace['urlFoto1'] = "uploaded_files/" . $propertyFotosArr[0]['id'] . "." . $propertyFotosArr[0]['extension'];
+        $linksToFotosArr = getLinksToFotos($propertyFotosArr, $oneProperty['id']);
+        $arrShortListReplace['urlFoto1'] = $linksToFotosArr['urlFoto1'];
+        $arrShortListReplace['hrefFoto1'] = $linksToFotosArr['hrefFoto1'];
+        $arrShortListReplace['numberOfFotos'] = $linksToFotosArr['numberOfFotos'];
+        $arrShortListReplace['hiddensLinksToOtherFotos'] = $linksToFotosArr['hiddensLinksToOtherFotos'];
 
         $arrShortListReplace['address'] = "";
         if (isset($oneProperty['address'])) $arrShortListReplace['address'] = $oneProperty['address'];
@@ -497,7 +477,7 @@
 
         // Производим заполнение шаблона строки (блока) shortList таблицы по данному объекту недвижимости
         // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне баллуна
-        $arrShortListTemplVar = array('{propertyId}', '{number}', '{actionFavorites}', '{imgFavorites}', '{urlFoto1}', '{address}', '{costOfRenting}', '{currency}');
+        $arrShortListTemplVar = array('{propertyId}', '{number}', '{actionFavorites}', '{imgFavorites}', '{urlFoto1}', '{hrefFoto1}', '{numberOfFotos}', '{hiddensLinksToOtherFotos}', '{address}', '{costOfRenting}', '{currency}');
         // Копируем html-текст шаблона блока (строки таблицы)
         $currentAdvertShortList = str_replace($arrShortListTemplVar, $arrShortListReplace, $tmpl_shortAdvert);
 
@@ -514,13 +494,12 @@
                 <span class='{actionFavorites} aloneStar' propertyId='{propertyId}'><img src='{imgFavorites}'></span>
             </td>
             <td>
-                <div class='fotosWrapper resultSearchFoto'>
-                    <div class='middleFotoWrapper'>
-                        <img class='middleFoto' src='{urlFoto1}'>
+                <div class='fotosWrapper fotoInTable'>
+                    <div class='smallFotoWrapper'>
+                        <img class='smallFoto gallery' src='{urlFoto1}' href='{hrefFoto1}'>
                     </div>
-                    <div class='middleFotoWrapper'>
-                        <img class='middleFoto' src='{urlFoto2}'>
-                    </div>
+                    <div class='numberOfFotos'>{numberOfFotos}</div>
+                    {hiddensLinksToOtherFotos}
                 </div>
             </td>
             <td>{typeOfObject}{district}{address}</td>
@@ -567,19 +546,11 @@
         }
 
         // Фото
-        $arrExtendedListReplace['urlFoto1'] = "";
-        $arrExtendedListReplace['urlFoto2'] = ""; //TODO: решить, нужно ли в широкой таблице показывать 2 фотки, если да - реализовать
-        // Получаем данные по всем фотографиям для данного объекта недвижимости
-        if ($propertyFotosArr == FALSE) {
-            $propertyFotosArr = array(); // Массив, в который запишем массивы, каждый из которых будет содержать данные по 1 фотке объекта
-            $rezPropertyFotos = mysql_query("SELECT id, extension FROM propertyFotos WHERE propertyId = '" . $oneProperty['id'] . "'");
-            if ($rezPropertyFotos != FALSE) {
-                for ($i = 0; $i < mysql_num_rows($rezPropertyFotos); $i++) {
-                    $propertyFotosArr[] = mysql_fetch_assoc($rezPropertyFotos);
-                }
-            }
-        }
-        if (isset($propertyFotosArr[0])) $arrExtendedListReplace['urlFoto1'] = "uploaded_files/" . $propertyFotosArr[0]['id'] . "." . $propertyFotosArr[0]['extension'];
+        $linksToFotosArr = getLinksToFotos($propertyFotosArr, $oneProperty['id']);
+        $arrExtendedListReplace['urlFoto1'] = $linksToFotosArr['urlFoto1'];
+        $arrExtendedListReplace['hrefFoto1'] = $linksToFotosArr['hrefFoto1'];
+        $arrExtendedListReplace['numberOfFotos'] = $linksToFotosArr['numberOfFotos'];
+        $arrExtendedListReplace['hiddensLinksToOtherFotos'] = $linksToFotosArr['hiddensLinksToOtherFotos'];
 
         // Тип
         $arrExtendedListReplace['typeOfObject'] = "<br><br>";
@@ -658,7 +629,7 @@
 
         // Производим заполнение шаблона строки (блока) fullParametersList таблицы по данному объекту недвижимости
         // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне баллуна
-        $arrExtendedListTemplVar = array('{propertyId}', '{number}', '{actionFavorites}', '{imgFavorites}', '{urlFoto1}', '{urlFoto2}', '{typeOfObject}', '{district}', '{address}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{floor}', '{furniture}', '{costOfRenting}', '{utilities}', '{compensationMoney}', '{compensationPercent}');
+        $arrExtendedListTemplVar = array('{propertyId}', '{number}', '{actionFavorites}', '{imgFavorites}', '{urlFoto1}', '{hrefFoto1}', '{numberOfFotos}', '{hiddensLinksToOtherFotos}', '{typeOfObject}', '{district}', '{address}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{floor}', '{furniture}', '{costOfRenting}', '{utilities}', '{compensationMoney}', '{compensationPercent}');
         // Копируем html-текст шаблона блока (строки таблицы)
         $currentAdvertExtendedList = str_replace($arrExtendedListTemplVar, $arrExtendedListReplace, $tmpl_extendedAdvert);
 
