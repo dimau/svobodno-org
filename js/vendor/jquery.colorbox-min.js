@@ -2,7 +2,7 @@
 // (c) 2012 Jack Moore - jacklmoore.com
 // License: http://www.opensource.org/licenses/mit-license.php
 /* Мои изменения касаются только обработчика клика. Было:
- e("."+o,t).live("click",function(e){e.which>1||e.shiftKey||e.altKey||e.metaKey||(e.preventDefault(),ot(this));return false;})),
+ e("."+o,t).live("click",function(e){e.which>1||e.shiftKey||e.altKey||e.metaKey||(e.preventDefault(),ot(this))})),
  Стало:
  e(".fotosWrapper",t).live("click",function(e){e.which>1||e.shiftKey||e.altKey||e.metaKey||(e.preventDefault(),ot(this.querySelector("img.cboxElement")));return false;})),
  Это позволило вызывать событие не только по клику на картинке, но и по клику в области вокруг картинки (в том числе, еще и по тексту об общем кол-ве фоток). Кроме того, по окончанию обработки события передается false - остальные обработчики не вызываются.

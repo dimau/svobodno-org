@@ -104,6 +104,7 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
 
     <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
+    <link rel="stylesheet" href="css/colorbox.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
             /* Особые стили для блоков с описанием объекта - для выравнивания*/
@@ -126,6 +127,8 @@
     </script>
     <!-- jQuery UI с моей темой оформления -->
     <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
+    <!-- ColorBox - плагин jQuery, позволяющий делать модальное окно для просмотра фотографий -->
+    <script src="js/vendor/jquery.colorbox-min.js"></script>
     <!-- Загружаем библиотеку для работы с картой от Яндекса -->
     <script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
 
@@ -176,15 +179,22 @@
 </ul>
 <div id="tabs-1">
     <!-- Подробное описание объекта -->
-    <div>
+    <div class='fotosWrapper'>
         <?php
-        foreach ($rowPropertyFotosArr as $value) {
-            $strUrl = "uploaded_files/" . $value['id'] . "." . $value['extension'];
-            echo "<div class='bigFotoWrapper'><img src='" . $strUrl . "' class='bigFoto'></div>";
-        }
+            // Фото
+            $linksToFotosArr = getLinksToFotos($rowPropertyFotosArr, $propertyId, 'middle');
+            $urlFoto1 = $linksToFotosArr['urlFoto1'];
+            $hrefFoto1 = $linksToFotosArr['hrefFoto1'];
+            $numberOfFotos = $linksToFotosArr['numberOfFotos'];
+            $hiddensLinksToOtherFotos = $linksToFotosArr['hiddensLinksToOtherFotos'];
+
+            echo "<div class='middleFotoWrapper'>
+                    <img class='middleFoto gallery' src='$urlFoto1' href='$hrefFoto1'>
+                  </div>
+                  <div class='numberOfFotos'>$numberOfFotos</div>
+                  $hiddensLinksToOtherFotos";
         ?>
     </div>
-
     <div class="objectDescription">
         <fieldset class="notEdited">
             <legend>

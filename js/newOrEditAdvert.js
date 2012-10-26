@@ -75,25 +75,14 @@ function createUploader() {
                 fileuploadid:$("#fileUploadId").val(),
                 sourcefilename:fileName,
             });
-        },
+        }
         //extraDropzones: [qq.getByClass(document, 'qq-upload-extra-drop-area')[0]]
     });
 
     // Важно, что в конце файла uploader.php располагается функция handleUpload, в которой есть и мой код, работающий на сервере при получении файла
 
     // Сформируем зеленые блоки для уже загруженных фотографий руками, чтобы пользователя не путать
-    var rezult = {success:true};
-    var uploadedFoto = document.getElementsByClassName('uploadedFoto');
-    for (var i = 0; i < uploadedFoto.length; i++) {
-        var uploadedFotoName = $(uploadedFoto[i]).attr('filename');
-
-        // Формируем зеленый блок в списке загруженных файлов в разделе Фотографии
-        uploader._addToList(i + 100, uploadedFotoName);
-        uploader._onComplete(i + 100, uploadedFotoName, rezult);
-    }
-
-    // Чтобы обмануть загрузчик файлов и он не выдавал при отправке страницы сообщение о том, что мол есть еще не загруженные фотографии, ориентируясь на сформированные вручную зеленые блоки
-    uploader._filesInProgress = 0;
+    createUploadedFilesBlocks(uploader);
 }
 $(document).ready(createUploader);
 

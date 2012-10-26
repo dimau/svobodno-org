@@ -113,3 +113,46 @@
     color: #FFFFFF;
     border-radius: 5px;
 }
+
+/* Моя коррекция стилей: (первые коррекции я делал прямо по тексту) */
+
+.qq-miniature {
+    display: none;
+    vertical-align: top;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.qq-miniature img {
+    max-height: 120px;
+    max-width: 120px;
+    vertical-align: middle;
+}
+
+ul.qq-description {
+    display: inline-block;
+    vertical-align: top;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+ul.qq-description li {
+    padding: 2px;
+    background: none;
+}
+
+.qq-upload-failed-text {
+    float: left;
+    margin-right: 5px;
+}
+
+.qq-upload-primary-wrapper {
+    float: left;
+    margin-right: 5px;
+}
+
+.qq-upload-remove-wrapper {
+    float: right;
+    font-size: 0.7em;
+}

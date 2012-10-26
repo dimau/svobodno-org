@@ -31,7 +31,7 @@
 
     // Получаем информацию о фотографиях пользователя
     $rezUserFotos = mysql_query("SELECT * FROM userfotos WHERE userId = '" . $rowUsers['id'] . "'");
-    $rowUserFotos = mysql_fetch_assoc($rezUserFotos); // TODO: сделать отображение нескольких фоток, если пользователь загрузит не одну
+    $rowUserFotos = mysql_fetch_assoc($rezUserFotos);
 
     // Получаем информацию о всех объектах пользователя (возможно он является собственником)
     $rowPropertyArr = array(); // в итоге получаем массив, каждый элемент которого представляет собой еще один массив значений конкретного объявления данного пользователя
@@ -354,8 +354,8 @@
             <span class='headOfString'>{repairName}</span> {repair}
         </li>
         <li>
-            <span class='headOfString'>Телефон собственника:</span>
-            {contactTelephonNumber}, <a href='{urlMan}'>{name} {secondName}</a>, c {timeForRingBegin} до {timeForRingEnd}
+            <span class='headOfString'>Контактный телефон:</span>
+            {contactTelephonNumber}, {name} {secondName}, c {timeForRingBegin} до {timeForRingEnd}
         </li>
     </ul>
     <div class='clearBoth'></div>
@@ -393,7 +393,7 @@
         $arrMyAdvertReplace['urlFoto1'] = "";
         $arrMyAdvertReplace['hrefFoto1'] = "";
         $arrayFotoInfAboutOneProperty = array($rowPropertyFotosArr[$i]); // функция getLinksToFotos ожидает получить массив массивов, каждый из которых будет содержать сведения об 1 фотографии
-        $linksToFotosArr = getLinksToFotos($arrayFotoInfAboutOneProperty, $rowPropertyArr[$i]['id']);
+        $linksToFotosArr = getLinksToFotos($arrayFotoInfAboutOneProperty, $rowPropertyArr[$i]['id'], 'small');
         $arrMyAdvertReplace['urlFoto1'] = $linksToFotosArr['urlFoto1'];
         $arrMyAdvertReplace['hrefFoto1'] = $linksToFotosArr['hrefFoto1'];
 
@@ -794,10 +794,17 @@
         <a href="#">редактировать</a>
         <br>
     </div>
-    <div class="fotosWrapper">
+    <div class="fotosWrapper fotoNonInteractive">
+        <div class='middleFotoWrapper'>
         <?php
-        if (isset($rowUserFotos['id']) && isset($rowUserFotos['extension'])) echo "<div class='bigFotoWrapper'><img class='bigFoto' src='uploaded_files/" . $rowUserFotos['id'] . "." . $rowUserFotos['extension'] . "'></div>";
+            if (isset($rowUserFotos['id']) && isset($rowUserFotos['extension'])) {
+                echo "<img class='middleFoto' src='" . $rowUserFotos['folder'] . "\\middle\\" . $rowUserFotos['id'] . "." . $rowUserFotos['extension'] . "'>";
+            } else {
+                // TODO: вставить реквизиты фотки по умолчанию, "нет фото"
+                echo "<img class='middleFoto' src=''>";
+            }
         ?>
+        </div>
     </div>
     <div class="profileInformation">
         <ul class="listDescription">
@@ -1096,13 +1103,8 @@
             </fieldset>
         </div>
 
-        <fieldset class="edited private" style="min-width: 300px;">
+        <fieldset id='fotoWrapperBlock' class="edited private" style="min-width: 300px;">
             <legend title="Для успешной регистрации должна быть загружена хотя бы 1 фотография">
-                <div class="required">
-                    <?php if ($typeTenant == "true") {
-                    echo "*";
-                } ?>
-                </div>
                 Фотографии
             </legend>
             <input type="hidden" name="fileUploadId" id="fileUploadId" <?php echo "value='$fileUploadId'";?>>

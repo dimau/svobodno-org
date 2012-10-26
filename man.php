@@ -92,10 +92,15 @@
     $rezTargetUser = mysql_query("SELECT * FROM users WHERE id = '" . $targetUserId . "'");
     if ($rezTargetUser != FALSE) $rowTargetUser = mysql_fetch_assoc($rezTargetUser);
 
-    // Получаем информацию о фотографиях пользователя
+    // Получаем информацию о личных фотографиях пользователя
+    // Массив $rowUserFotos представляет собой массив массивов, каждый из которых содержит информацию об одной фотографии пользователя
     $rowUserFotos = array();
     $rezUserFotos = mysql_query("SELECT * FROM userfotos WHERE userId = '" . $targetUserId . "'");
-    if ($rezUserFotos != FALSE) $rowUserFotos = mysql_fetch_assoc($rezUserFotos); // TODO: сделать отображение нескольких фоток, если пользователь загрузит не одну
+    if ($rezUserFotos != FALSE) {
+        for ($i = 0; $i < mysql_num_rows($rezUserFotos); $i++) {
+            $rowUserFotos[] = mysql_fetch_assoc($rezUserFotos);
+        }
+    }
 
     // Получаем информацию о поисковом запросе пользователя, если он есть
     $rowSearchRequests = array();
@@ -131,6 +136,7 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
 
     <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
+    <link rel="stylesheet" href="css/colorbox.css">
     <link rel="stylesheet" href="css/main.css">
 
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -141,6 +147,8 @@
     </script>
     <!-- jQuery UI с моей темой оформления -->
     <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
+    <!-- ColorBox - плагин jQuery, позволяющий делать модальное окно для просмотра фотографий -->
+    <script src="js/vendor/jquery.colorbox-min.js"></script>
 
 </head>
 
@@ -166,9 +174,20 @@
             </ul>
             <div id="tabs-1">
                 <div id="notEditingProfileParametersBlock">
-                    <div class="fotosWrapper">
+                    <div class='fotosWrapper'>
                         <?php
-                        if (isset($rowUserFotos['id']) && isset($rowUserFotos['extension'])) echo "<div class='bigFotoWrapper'><img class='bigFoto' src='uploaded_files/" . $rowUserFotos['id'] . "." . $rowUserFotos['extension'] . "'></div>";
+                        // Фото
+                        $linksToFotosArr = getLinksToFotos($rowUserFotos, 0, 'middle');
+                        $urlFoto1 = $linksToFotosArr['urlFoto1'];
+                        $hrefFoto1 = $linksToFotosArr['hrefFoto1'];
+                        $numberOfFotos = $linksToFotosArr['numberOfFotos'];
+                        $hiddensLinksToOtherFotos = $linksToFotosArr['hiddensLinksToOtherFotos'];
+
+                        echo "<div class='middleFotoWrapper'>
+                                <img class='middleFoto gallery' src='$urlFoto1' href='$hrefFoto1'>
+                            </div>
+                            <div class='numberOfFotos'>$numberOfFotos</div>
+                            $hiddensLinksToOtherFotos";
                         ?>
                     </div>
                     <div class="profileInformation">

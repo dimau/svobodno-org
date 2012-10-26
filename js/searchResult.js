@@ -286,7 +286,7 @@ function init() {
             // Получаем параметры метки, в том числе id объекта недвижимости.
             var placemark = event.get('target'),
                 map = placemark.getMap(), // Ссылка на карту.
-            //bounds = map.getBounds(), // Область показа карты.
+                //bounds = map.getBounds(), // Область показа карты.
                 propertyid = placemark.properties.get('propertyid'); // Получаем данные для запроса из свойств метки.
 
             // Пытаемся найти контент для баллуна на нашей текущей странице в разделе AllBalloons
@@ -297,6 +297,11 @@ function init() {
 
                 // Обновляем поле "body" у properties метки
                 placemark.properties.set('balloonContentBody', balloonHTML);
+
+                // TODO: поправить: обработчик на клик по строчке краткого списка работает как надо - дает возможность открыть галерею фоток, а этот код дает возможность открыть только 1 фотку в галерее!
+                // Берем только что сформированный HTML баллуна и навешиваем на фотографии галерею colorBox
+                $("#map .fotosWrapper .gallery").removeClass('cboxElement').colorbox({ opacity: 0.7 , rel: currentFotoGalleryIndex, current: '№ {current} из {total}' });
+                currentFotoGalleryIndex++;
 
             } else { // Если данные по этому объекту еще не были подгружены на страницу, то обращаемся к серверу
 
@@ -310,6 +315,11 @@ function init() {
 
                     // Также в случае успеха, сохраняем данные по баллуну для данного объекта на странице с целью уменьшения количества запросов к серверу
                     $("#allBalloons .balloonBlock[propertyId='" + propertyid + "']").html(balloonHTML);
+
+                    // TODO: поправить: обработчик на клик по строчке краткого списка работает как надо - дает возможность открыть галерею фоток, а этот код дает возможность открыть только 1 фотку в галерее!
+                    // Берем только что сформированный HTML баллуна и навешиваем на фотографии галерею colorBox
+                    $("#map .fotosWrapper .gallery").removeClass('cboxElement').colorbox({ opacity: 0.7 , rel: currentFotoGalleryIndex, current: '№ {current} из {total}' });
+                    currentFotoGalleryIndex++;
 
                 }, 'json');
 
@@ -335,6 +345,10 @@ function init() {
                 // Свойства балуна
                 contentBody:balloonContentBodyVar
             });
+
+        // Берем только что сформированный HTML баллуна и навешиваем на фотографии галерею colorBox
+        $("#map .fotosWrapper .gallery").removeClass('cboxElement').colorbox({ opacity: 0.7 , rel: currentFotoGalleryIndex, current: '№ {current} из {total}' });
+        currentFotoGalleryIndex++;
 
         return true; // чтобы дать возможность отработать и другим обработчикам клика (например, для добавления/удаления в избранное, просмотра объявления подробнее)
     });

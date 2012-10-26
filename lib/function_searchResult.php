@@ -280,7 +280,7 @@
         if (isset($oneProperty['address'])) $arrBalloonReplace['address'] = $oneProperty['address'];
 
         // Фото
-        $linksToFotosArr = getLinksToFotos($propertyFotosArr, $oneProperty['id']);
+        $linksToFotosArr = getLinksToFotos($propertyFotosArr, $oneProperty['id'], 'small');
         $arrBalloonReplace['urlFoto1'] = $linksToFotosArr['urlFoto1'];
         $arrBalloonReplace['hrefFoto1'] = $linksToFotosArr['hrefFoto1'];
         $arrBalloonReplace['numberOfFotos'] = $linksToFotosArr['numberOfFotos'];
@@ -460,7 +460,7 @@
         }
 
         // Фото
-        $linksToFotosArr = getLinksToFotos($propertyFotosArr, $oneProperty['id']);
+        $linksToFotosArr = getLinksToFotos($propertyFotosArr, $oneProperty['id'], 'small');
         $arrShortListReplace['urlFoto1'] = $linksToFotosArr['urlFoto1'];
         $arrShortListReplace['hrefFoto1'] = $linksToFotosArr['hrefFoto1'];
         $arrShortListReplace['numberOfFotos'] = $linksToFotosArr['numberOfFotos'];
@@ -546,7 +546,7 @@
         }
 
         // Фото
-        $linksToFotosArr = getLinksToFotos($propertyFotosArr, $oneProperty['id']);
+        $linksToFotosArr = getLinksToFotos($propertyFotosArr, $oneProperty['id'], 'small');
         $arrExtendedListReplace['urlFoto1'] = $linksToFotosArr['urlFoto1'];
         $arrExtendedListReplace['hrefFoto1'] = $linksToFotosArr['hrefFoto1'];
         $arrExtendedListReplace['numberOfFotos'] = $linksToFotosArr['numberOfFotos'];

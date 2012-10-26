@@ -565,7 +565,7 @@ qq.FileUploader = function (o) {
         cancelButtonText:'Отменить',
         failUploadText:'Ошибка при загрузке',
         removeButtonText:'Удалить',
-        mainButtonText:' Основная',
+        primaryButtonText:' Основная',
 
         template:'<div class="qq-uploader">' +
             '<div class="qq-upload-drop-area"><span>{dragText}</span></div>' +
@@ -574,21 +574,29 @@ qq.FileUploader = function (o) {
             '</div>',
 
         // Мои комментарии: шаблон для элемента списка загружаемых(ных) фотографий
-        fileTemplate:'<li><span style="white-space: nowrap;">' +
-            '<div class="qq-miniature" style="display: none; vertical-align: top; margin-right: 5px; margin-bottom: 5px;"><img src="" style=""></div>' +
-            '<div class="qq-description" style="display: inline-block; vertical-align: top;">' +
-                '<span class="qq-progress-bar"></span>' +
-                '<span class="qq-upload-file"></span>' +
-                '<br>' +
-                '<span class="qq-upload-spinner"></span>' +
-                '<span class="qq-upload-size"></span>' +
-                '<a class="qq-upload-cancel" href="#">{cancelButtonText}</a>' +
-                '<a class="qq-upload-remove" href="#">{removeButtonText}</a>' +
-                '<span class="qq-upload-failed-text">{failUploadtext}</span>' +
-                '<br>' +
-                '<input type="radio" name="mainFotoRadioButton" value="{mainFotoRadioButtonValue}" class="qq-upload-main">{mainButtonText}' +
-            '</div>' +
-            '</span></li>',
+        fileTemplate:
+            '<li class="uploadedFotoVisualItem">' +
+                '<span style="white-space: nowrap;">' +
+                    '<div class="qq-miniature"><img src=""></div>' +
+                    '<ul class="qq-description">' +
+                        '<li>' +
+                            '<span class="qq-upload-file"></span>' +
+                        '</li>' +
+                        '<li>' +
+                            '<span class="qq-progress-bar"></span>' +
+                            '<span class="qq-upload-spinner"></span>' +
+                            '<span class="qq-upload-size"></span>' +
+                            '<a class="qq-upload-cancel" href="#">{cancelButtonText}</a>' +
+
+                            '<div class="qq-upload-failed-text">{failUploadtext}</div>' +
+
+                            '<div class="qq-upload-primary-wrapper"><label><input type="radio" name="primaryFotoRadioButton" value="" class="qq-upload-primary">{primaryButtonText}</label></div>' +
+
+                            '<div class="qq-upload-remove-wrapper"><a class="qq-upload-remove" href="#">{removeButtonText}</a></div>' +
+                        '</li>' +
+                    '</ul>' +
+                '</span>' +
+            '</li>',
 
         classes:{
             // used to get elements from templates
@@ -603,7 +611,7 @@ qq.FileUploader = function (o) {
             size:'qq-upload-size',
             cancel:'qq-upload-cancel',
             remove:'qq-upload-remove',
-            doMain: 'qq-upload-main',
+            primary: 'qq-upload-primary',
             miniature: 'qq-miniature',
 
             // added to list item <li> when upload completes
@@ -621,7 +629,7 @@ qq.FileUploader = function (o) {
     this._options.fileTemplate = this._options.fileTemplate.replace(/\{cancelButtonText\}/g, this._options.cancelButtonText);
     this._options.fileTemplate = this._options.fileTemplate.replace(/\{failUploadtext\}/g, this._options.failUploadText);
     this._options.fileTemplate = this._options.fileTemplate.replace(/\{removeButtonText\}/g, this._options.removeButtonText);
-    this._options.fileTemplate = this._options.fileTemplate.replace(/\{mainButtonText\}/g, this._options.mainButtonText);
+    this._options.fileTemplate = this._options.fileTemplate.replace(/\{primaryButtonText\}/g, this._options.primaryButtonText);
 
     this._element = this._options.element;
     this._element.innerHTML = this._options.template;
@@ -635,7 +643,8 @@ qq.FileUploader = function (o) {
     this._bindCancelEvent();
 
     // Мои комментарии: обработчик на клик по кнопке Удалить файл
-    this._bindRemoveEvent();
+    /*this._bindRemoveEvent();
+      Реализовал удаление в другом месте*/
 
     // Мои комментарии: видимо настройки для драг и дропа - я в них не лез
     this._setupDragDrop();
@@ -784,6 +793,9 @@ qq.extend(qq.FileUploader.prototype, {
         qq.remove(this._find(item, 'spinner'));
         qq.remove(this._find(item, 'size'));
 
+        // В атрибут value радиокнопки для выбора основной фотографии заносим id данного фото.
+        $(this._find(item, 'primary')).attr('value', result.name);
+
         // Присваиваем класс успешной загрузки или ошибки при загрузке - для применения соответствующего оформления
         if (result.success) {
             qq.addClass(item, this._classes.success);
@@ -795,11 +807,31 @@ qq.extend(qq.FileUploader.prototype, {
         } else {
             qq.addClass(item, this._classes.fail);
         }
+
+        // Присваиваем id фотографии элементу списка. Это возволит однозначно сопоставлять данный элемент списка и соответствующий ему INPUT hidden
+        item.fotoid = result.name;
+
+        if (result.uploadedFotoObjExists != 'true') {
+
+            /*// Создаем соответствующий загруженному файлу input hidden для аккумулирования информации о действиях пользователя с этим файлом на клиентской стороне и передачи их на сервер (действия пользователя: "удаление" фотографии, выбор основной фотографии)
+            newInputHidden = "<input type='hidden' name='uploadedFoto[]' class='uploadedFoto' fotoid='" + result.name + "' folder='" + result.folder + "' filename='" + fileName + "' extension='" + result.ext + "' filesizemb='' status=''>";
+            $("#fotoWrapperBlock legend").after(newInputHidden); */
+
+            uploadedFoto.push({
+                fotoid: result.name,
+                folder: result.folder,
+                filename: fileName,
+                extension: result.ext,
+                filesizemb: '',
+                status: ''
+            });
+        }
+
     },
 
     /*********************************************
      * Мои комментарии: функция добавления К СПИСКУ загружаемых (загруженных) очередного файла
-     * id - уникальный идентификатор (инкрементный), первой строке = 0, затем 1 и так далее
+     * id - уникальный идентификатор (инкрементный), первой строке = 0, затем 1 и так далее. Я записываю в него идентификатор (имя) файла фотографии
      ********************************************/
     _addToList:function (id, fileName) {
         // Формируем HTML элемент на базе шаблона, записанного в _options.fileTemplate
@@ -866,7 +898,7 @@ qq.extend(qq.FileUploader.prototype, {
     /**************************************************
      * Мои комментарии: навешивает обработчик на кнопку УДАЛЕНИЯ файла
      *************************************************/
-    _bindRemoveEvent:function () {
+    /*_bindRemoveEvent:function () {
         var self = this,
             list = this._listElement;
 
@@ -882,14 +914,13 @@ qq.extend(qq.FileUploader.prototype, {
                 // Получаем элемент списка, который нужно удалить по команде пользователя
                 var item = target.parentNode;
 
-                // TODO: реализовать удаление файла с сервера
                 alert("Местный идентификатор файла: " + item.qqFileId + ", реализовать удаление файла с сервера по аякс, либо после отправки формы?!");
 
                 // Удаляем элемент из списка в DOM браузера
                 qq.remove(item);
             }
         });
-    }
+    } */
 });
 
 qq.UploadDropZone = function (o) {

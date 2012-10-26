@@ -38,6 +38,7 @@
     $telephon = "";
     $email = "";
     $fileUploadId = generateCode(7);
+    $uploadedFoto = array(); // В переменной будет храниться информация о загруженных фотографиях. Представляет собой массив ассоциированных массивов
 
     $currentStatusEducation = "0";
     $almamater = "";
@@ -99,7 +100,9 @@
         if (isset($_POST['password'])) $password = htmlspecialchars($_POST['password']);
         if (isset($_POST['telephon'])) $telephon = htmlspecialchars($_POST['telephon']);
         if (isset($_POST['email'])) $email = htmlspecialchars($_POST['email']);
+
         $fileUploadId = $_POST['fileUploadId'];
+        if (isset($_POST['uploadedFoto'])) $uploadedFoto = json_decode($_POST['uploadedFoto']); // Массив объектов со сведениями о загруженных фотографиях сериализуется в JSON формат на клиенте и передается как содержимое атрибута value одного единственного INPUT hidden
 
         if (isset($_POST['currentStatusEducation'])) $currentStatusEducation = htmlspecialchars($_POST['currentStatusEducation']);
         if (isset($_POST['almamater'])) $almamater = htmlspecialchars($_POST['almamater']);
@@ -157,9 +160,10 @@
             // Записываем пустой массив в поле с идентификаторами избранных объявлений
             $favoritesPropertysId = array();
             $favoritesPropertysId = serialize($favoritesPropertysId);
+
             // Для простоты технической поддержки пользователей пойдем на небольшой риск с точки зрения безопасности и будем хранить пароли пользователей на сервере в БД без соли и шифрования
             /*$salt = mt_rand(100, 999);
-        $password = md5(md5($password) . $salt);*/
+              $password = md5(md5($password) . $salt);*/
 
             if (mysql_query("INSERT INTO users (typeTenant,typeOwner,name,secondName,surname,sex,nationality,birthday,login,password,telephon,emailReg,email,currentStatusEducation,almamater,speciality,kurs,ochnoZaochno,yearOfEnd,statusWork,placeOfWork,workPosition,regionOfBorn,cityOfBorn,shortlyAboutMe,vkontakte,odnoklassniki,facebook,twitter,lic,last_act,reg_date,favoritesPropertysId) VALUES ('" . $typeTenant . "','" . $typeOwner . "','" . $name . "','" . $secondName . "','" . $surname . "','" . $sex . "','" . $nationality . "','" . $birthdayDB . "','" . $login . "','" . $password . "','" . $telephon . "','" . $email . "','" . $email . "','" . $currentStatusEducation . "','" . $almamater . "','" . $speciality . "','" . $kurs . "','" . $ochnoZaochno . "','" . $yearOfEnd . "','" . $statusWork . "','" . $placeOfWork . "','" . $workPosition . "','" . $regionOfBorn . "','" . $cityOfBorn . "','" . $shortlyAboutMe . "','" . $vkontakte . "','" . $odnoklassniki . "','" . $facebook . "','" . $twitter . "','" . $lic . "','" . $last_act . "','" . $reg_date . "','" . $favoritesPropertysId . "')")) // Пишем данные нового пользователя в БД
             {
@@ -168,12 +172,35 @@
                 // Узнаем id пользователя - необходимо при сохранении информации о фотке в постоянную базу
                 $rezId = mysql_query("SELECT id FROM users WHERE login = '" . $login . "'");
                 $rowId = mysql_fetch_assoc($rezId);
-                // Получим информацию о всех фотках, соответствующих текущему fileUploadId
+                // Параметры каждой фотографии хранятся на странице в виде атрибутов input hidden-а класса uploadedFoto. Для каждой фотографии свой input hidden. В массиве $uploadFilesData содержатся строки, каждая из которых содержит атрибуты, полученные через форму, по одной фотографии. Перебираем каждую строку и записываем информацию о фотографии в таблицу userFotos БД
+                foreach ($uploadFilesData as $value) {
+                    // Составляем массив данных о фотографии из строки с параметрами input hidden-а
+                    $oneInputHiddenArr = explode("-", $value);
+                    $oneInputHiddenArr = array_combine($keysArr, $oneInputHiddenArr);
+
+                    // Получаем данные по этой фотографии из таблицы tempFotos
+                    $rezTempFotos = mysql_query("SELECT * FROM tempFotos WHERE id = '" . $oneInputHiddenArr['fotoId'] . "'");
+                    if ($rezTempFotos == FALSE) continue;
+                    $rowTempFotos = mysql_fetch_assoc($rezTempFotos);
+                    if ($rowTempFotos == FALSE) continue;
+
+                    // Сохраняем данные по фотографии в таблицу постоянного хранения userFotos
+                    $rowTempFotos['folder'] = str_replace ('\\', '\\\\', $rowTempFotos['folder']); // Переменная folder уже содержит в себе один или несколько '\', но для того, чтобы при сохранении в БД не возникло проблем, к нему нужно добавить еще один символ '\', в этом случае mysql будет воспринимать "\\" как один знак "\" и не будет считать его служебгым символом
+                    mysql_query("INSERT INTO userFotos (id, folder, filename, extension, filesizeMb, userId, status) VALUES ('" . $rowTempFotos['id'] . "','" . $rowTempFotos['folder'] . "','" . $rowTempFotos['filename'] . "','" . $rowTempFotos['extension'] . "','" . $rowTempFotos['filesizeMb'] . "','" . $rowId['id'] . "','" . $oneInputHiddenArr['status'] . "')"); // Переносим информацию о фотографиях на постоянное хранение
+
+                    // Удаляем данные по фотографии из таблицы временного хранения
+                    mysql_query("DELETE FROM tempFotos WHERE id = '" . $oneInputHiddenArr['fotoId'] . "'");
+                }
+                // Получим данные по всем фотографиям, относящимся к данной итерации (сессии) работы пользователя, которые не были переведены на постоянное хранение. Файлы этих фотографий нужно удалить.
                 $rezTempFotos = mysql_query("SELECT * FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'");
-                for ($i = 0; $i < mysql_num_rows($rezTempFotos); $i++) {
-                    if ($rowTempFotos = mysql_fetch_assoc($rezTempFotos)) {
-                        $rowTempFotos['folder'] = str_replace ('\\', '\\\\', $rowTempFotos['folder']); // Переменная folder уже содержит в себе один или несколько '\', но для того, чтобы при сохранении в БД не возникло проблем, к нему нужно добавить еще один символ '\', в этом случае mysql будет воспринимать "\\" как один знак "\" и не будет считать его служебгым символом
-                        mysql_query("INSERT INTO userFotos (id, folder, filename, extension, filesizeMb, userId) VALUES ('" . $rowTempFotos['id'] . "','" . $rowTempFotos['folder'] . "','" . $rowTempFotos['filename'] . "','" . $rowTempFotos['extension'] . "','" . $rowTempFotos['filesizeMb'] . "','" . $rowId['id'] . "')"); // Переносим информацию о фотографиях на постоянное хранение
+                if ($rezTempFotos != FALSE && mysql_num_rows($rezTempFotos) != False) {
+                    for ($i = 0; $i < mysql_num_rows($rezTempFotos); $i++) {
+                        $rowTempFotos = mysql_fetch_assoc($rezTempFotos);
+                        if ($rowTempFotos != FALSE) {
+                            @unlink($rowTempFotos['folder'] . '\\small\\' . $rowTempFotos['fotoId'] . "." . $rowTempFotos['extension']);
+                            @unlink($rowTempFotos['folder'] . '\\middle\\' . $rowTempFotos['fotoId'] . "." . $rowTempFotos['extension']);
+                            @unlink($rowTempFotos['folder'] . '\\big\\' . $rowTempFotos['fotoId'] . "." . $rowTempFotos['extension']);
+                        }
                     }
                 }
                 // Удаляем записи о фотках в таблице для временного хранения данных
@@ -334,7 +361,7 @@
     <div class="clearBoth"></div>
 </div>
 
-<form name="personalInformation" method="post" enctype="multipart/form-data">
+<form name="personalInformation" id="personalInformationForm" class="formWithFotos" method="post" enctype="multipart/form-data">
 <div id="tabs">
 <ul>
     <li>
@@ -532,23 +559,14 @@
             </fieldset>
         </div>
 
-        <fieldset class="edited private" style="min-width: 300px;">
+        <fieldset id='fotoWrapperBlock' class="edited private" style="min-width: 300px;">
             <legend title="Рекомендуем загрузить хотя бы 1 фотографию, которая в выгодном свете представит Вас перед собственником">
                 Фотографии
             </legend>
-            <input type="hidden" name="fileUploadId" id="fileUploadId" <?php echo "value='$fileUploadId'";?>>
             <?php
-            // Получаем информацию о всех загруженных фото и формируем для каждого свой input type hidden для передачи данных в обработчик яваскрипта
-            if ($rez = mysql_query("SELECT * FROM tempFotos WHERE fileuploadid = '" . $fileUploadId . "'")) // ищем уже загруженные пользователем фотки
-            {
-                $numUploadedFiles = mysql_num_rows($rez);
-                for ($i = 0; $i < $numUploadedFiles; $i++) {
-                    if ($row = mysql_fetch_assoc($rez)) {
-                        echo "<input type='hidden' class='uploadedFoto' fotoId='" . $row['id'] . "' folder='" . $row['folder'] . "' filename='" . $row['filename'] . "' extension='" . $row['extension'] . "' filesizeMb='" . $row['filesizeMb'] . "'>";
-                    }
-                }
-            }
+                echo "<input type='hidden' name='fileUploadId' id='fileUploadId' value='" . $fileUploadId . "'>";
             ?>
+            <input type='hidden' name='uploadedFoto' id='uploadedFoto' value=''>
             <div id="file-uploader">
                 <noscript>
                     <p>Пожалуйста, активируйте JavaScript для загрузки файлов</p>
@@ -1265,6 +1283,12 @@
 <!-- /end.footer -->
 
 <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
+<script>
+    // Сервер сохранит в эту переменную данные о загруженных фотографиях в формате JSON
+    // Переменная uploadedFoto содержит массив объектов, каждый из которых представляет информацию по 1 фотографии
+    var temp = '<?php echo json_encode($uploadedFoto);?>'.replace("\\", "\\\\");
+    var uploadedFoto = JSON.parse(temp);
+</script>
 <script src="js/main.js"></script>
 <script src="js/registration.js"></script>
 <!-- end scripts -->

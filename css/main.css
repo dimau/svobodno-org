@@ -343,27 +343,21 @@ td.bottom.right, th.bottom.right {
     display: inline-block;
 }
 
-.fotoNonInteractive {
+.fotoNonInteractive, .fotoNonInteractive:hover {
     border: none;
     cursor: auto;
 }
 
-.fotoNonInteractive:hover {
-    border: none;
-    cursor: auto;
-}
-
-.bigFotoWrapper {
-    display: inline-block;
+.middleFotoWrapper {
     max-width: 300px;
     max-height: 300px;
     margin: 5px;
+    overflow: hidden;
 }
 
-.bigFoto {
+.middleFoto {
     max-width: 300px;
     max-height: 300px;
-    vertical-align: top;
 }
 
 .smallFotoWrapper {
