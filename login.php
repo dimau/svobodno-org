@@ -1,14 +1,33 @@
 <?php
-    include_once 'lib/connect.php'; //подключаемся к БД
-    include_once 'lib/function_global.php'; //подключаем файл с глобальными функциями
 
-    if (login()) //вызываем функцию login, определяющую, авторизирован юзер или нет
-    {
-        header('Location: personal.php'); // пересылаем юзера сразу в личный кабинет
+    // Стартуем сессию с пользователем - сделать доступными переменные сессии
+    session_start();
+
+    // Подключаем нужные классы
+    include_once 'classesForProjectSecurityName/GlobFunc.php';
+    include_once 'classesForProjectSecurityName/User.php';
+
+    // Создаем объект-хранилище глобальных функций
+    $globFunc = new GlobFunc();
+
+    // Подключаемся к БД
+    $DBlink = $globFunc->connectToDB();
+    // Удалось ли подключиться к БД?
+    if ($DBlink == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
+
+    // Инициализируем объект пользователя
+    $user = new User($globFunc, $DBlink);
+
+    // Проверим, быть может пользователь уже авторизирован. Если это так, перенаправим его в личный кабинет
+    if ($user->login()) {
+
+        header('Location: personal.php');
+
     } else //если пользователь не авторизирован, то проверим, была ли нажата кнопка входа на сайт
     {
         if (isset($_POST['buttonSubmit'])) {
-            $error = enter(); //функция входа на сайт
+
+            $error = $user->enter(); //функция входа на сайт
 
             if (is_array($error) && count($error) == 0) //если нет ошибок, отправляем пользователя в личный кабинет
             {

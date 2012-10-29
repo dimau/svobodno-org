@@ -6,7 +6,7 @@
      * Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
      ************************************************************************************/
 
-    $userId = login();
+    $userId = login($DBlink);
     if (!$userId) {
         header('Location: login.php');
     }
@@ -182,7 +182,7 @@
         $fileUploadId = $_POST['fileUploadId'];
 
         // Проверяем корректность данных объявления. Функции isAdvertCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
-        $errors = isAdvertCorrect("editAdvert");
+        $errors = isAdvertCorrect("editAdvert", $DBlink);
         if (is_array($errors) && count($errors) == 0) $correct = TRUE; else $correct = FALSE; // Считаем ошибки, если 0, то можно будет записать данные в БД
 
         // Если данные, указанные пользователем, корректны, запишем объявление в базу данных

@@ -795,6 +795,10 @@ qq.extend(qq.FileUploader.prototype, {
 
         // В атрибут value радиокнопки для выбора основной фотографии заносим id данного фото.
         $(this._find(item, 'primary')).attr('value', result.name);
+        // Если статус у данной фотографии = основная, то сделать радиокнопку выбранной
+        if (result.status == 'основная') {
+            $(this._find(item, 'primary')).attr('checked', 'checked');
+        }
 
         // Присваиваем класс успешной загрузки или ошибки при загрузке - для применения соответствующего оформления
         if (result.success) {

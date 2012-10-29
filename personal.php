@@ -6,7 +6,7 @@
     /*************************************************************************************
      * Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
      ************************************************************************************/
-    $userId = login();
+    $userId = login($DBlink);
     if (!$userId) {
         header('Location: login.php');
     }
@@ -30,7 +30,7 @@
     }
 
     // Получаем информацию о фотографиях пользователя
-    $rezUserFotos = mysql_query("SELECT * FROM userfotos WHERE userId = '" . $rowUsers['id'] . "'");
+    $rezUserFotos = mysql_query("SELECT * FROM userfotos WHERE userId = '" . $rowUsers['id'] . "' AND status = 'основная'");
     $rowUserFotos = mysql_fetch_assoc($rezUserFotos);
 
     // Получаем информацию о всех объектах пользователя (возможно он является собственником)
@@ -79,7 +79,11 @@
     if (isset($rowUsers['password'])) $password = $rowUsers['password']; else $password = "";
     if (isset($rowUsers['telephon'])) $telephon = $rowUsers['telephon']; else $telephon = "";
     if (isset($rowUsers['email'])) $email = $rowUsers['email']; else $email = "";
+
     $fileUploadId = generateCode(7);
+    $uploadedFoto = array(); // В переменной будет храниться информация о загруженных фотографиях. Представляет собой массив ассоциированных массивов
+    $primaryFotoId = "";
+
     if (isset($rowUsers['currentStatusEducation'])) $currentStatusEducation = $rowUsers['currentStatusEducation']; else $currentStatusEducation = "0";
     if (isset($rowUsers['almamater'])) $almamater = $rowUsers['almamater']; else $almamater = "";
     if (isset($rowUsers['speciality'])) $speciality = $rowUsers['speciality']; else $speciality = "";
@@ -129,7 +133,11 @@
         if (isset($_POST['password'])) $password = htmlspecialchars($_POST['password']);
         if (isset($_POST['telephon'])) $telephon = htmlspecialchars($_POST['telephon']);
         if (isset($_POST['email'])) $email = htmlspecialchars($_POST['email']);
+
         $fileUploadId = $_POST['fileUploadId'];
+        if (isset($_POST['uploadedFoto'])) $uploadedFoto = json_decode($_POST['uploadedFoto'], true); // Массив объектов со сведениями о загруженных фотографиях сериализуется в JSON формат на клиенте и передается как содержимое атрибута value одного единственного INPUT hidden
+        if ($uploadedFoto == NULL) $uploadedFoto = array();
+        if (isset($_POST['primaryFotoRadioButton'])) $primaryFotoId = htmlspecialchars($_POST['primaryFotoRadioButton']);
 
         if (isset($_POST['currentStatusEducation'])) $currentStatusEducation = htmlspecialchars($_POST['currentStatusEducation']);
         if (isset($_POST['almamater'])) $almamater = htmlspecialchars($_POST['almamater']);
@@ -150,7 +158,7 @@
         if (isset($_POST['twitter'])) $twitter = htmlspecialchars($_POST['twitter']);
 
         // Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
-        $errors = userDataCorrect("validateProfileParameters");
+        $errors = userDataCorrect("validateProfileParameters", $DBlink);
         if (count($errors) == 0) $correctNewProfileParameters = "true"; else $correctNewProfileParameters = "false"; // Считаем ошибки, если 0, то можно сохранит новые параметры в БД
 
         // Если данные верны, сохраним их в БД
@@ -228,7 +236,7 @@
         if (isset($_POST['additionalDescriptionOfSearch'])) $additionalDescriptionOfSearch = htmlspecialchars($_POST['additionalDescriptionOfSearch']);
 
         // Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
-        $errors = userDataCorrect("validateSearchRequest"); // Параметр validateSearchRequest задает режим проверки "Проверка корректности уже существующих параметров поиска", который активирует только соответствующие ему проверки
+        $errors = userDataCorrect("validateSearchRequest", $DBlink); // Параметр validateSearchRequest задает режим проверки "Проверка корректности уже существующих параметров поиска", который активирует только соответствующие ему проверки
         if (count($errors) == 0) $correctNewSearchRequest = "true"; else $correctNewSearchRequest = "false"; // Считаем ошибки, если 0, то можно принять и сохранить новые параметры поиска
 
         // Если данные верны, сохраним их в БД
@@ -296,7 +304,7 @@
     // Проверяем: захотел ли пользователь добавить поисковый запрос. На этом месте мы можем быть уверены, что пользователь является только собственником, но не является пока арендатором, лишь собирается им стать (для чего он и хочет сформировать поисковый запрос)
     if (isset($_POST['createSearchRequestButton'])) {
         // Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
-        $errors = userDataCorrect("createSearchRequest"); // Параметр createSearchRequest задает режим проверки "Создание запроса на поиск", который активирует только соответствующие ему проверки
+        $errors = userDataCorrect("createSearchRequest", $DBlink); // Параметр createSearchRequest задает режим проверки "Создание запроса на поиск", который активирует только соответствующие ему проверки
         if (count($errors) == 0) $correct = "true"; else $correct = "false"; // Считаем ошибки, если 0, то можно выдать пользователю форму для ввода параметров Запроса поиска
     }
 

@@ -1,10 +1,3 @@
-<?php
-    include_once ('lib/connect.php'); //подключаемся к БД
-    include_once ('lib/function_global.php'); //подключаем файл с глобальными функциями
-
-    $userId = login(); // Вызываем функцию login, определяющую, авторизирован юзер или нет. Если не авторизован, то $userId => false
-?>
-
 <div class="header">
     <div class="nameOfServiceBox">
         <div>
@@ -17,7 +10,7 @@
         <ul>
             <?php
             // Задаем первоначальные ширины пунктов меню в % в зависимости от того, авторизован пользователь или нет (чтобы при загрузке пункты меню выглядели более-менее равномерно распределенными)
-            if ($userId) {
+            if ($user->login()) {
                 $width = array(13.08, 32.71, 30.84, 23.37); // ширины для каждого пункта меню определены в соответствии с количеством букв в каждом из них
             } else {
                 $width = array(18.07, 42.69, 39.24, 0); //
@@ -48,9 +41,9 @@
                 echo ("<li class='choice' style='width:" . $width[2] . "%'><a href='forowner.php'>Подать объявление</a>"); //TODO: также поменять ссылку forowner
             }
 
-            if ($userId) echo "<li class='separator'></li>"; else echo "<li class='right separator'></li>";
+            if ($user->login()) echo "<li class='separator'></li>"; else echo "<li class='right separator'></li>";
 
-            if ($userId) { // Пункт меню "Сообщения" выдается только авторизованным пользователям
+            if ($user->login()) { // Пункт меню "Сообщения" выдается только авторизованным пользователям
                 if ($_SERVER['PHP_SELF'] == "/fortenant.php") { // TODO: поменять ссылку, на которую нужно переходить fortenant - cltkfnm c gjvjom. JS правильное выделение ссылки при нахождении на вкладке новости
                     echo ("<li class='selected choice' style='width:" . $width[3] . "%'><span>Сообщения (<span class='amountOfNewMessages'>15</span>)</span>"); // TODO: научиться рассчитывать количество сообщений
                 } else {
@@ -66,7 +59,7 @@
     <div class="iconBox"></div>
     <div class="enter">
         <?php
-        if ($userId == FALSE) {
+        if ($user->login() == FALSE) {
             if ($_SERVER['PHP_SELF'] == "/registration.php") {
                 echo ("<span>Регистрация</span><br>");
             } else {

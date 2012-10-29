@@ -11,7 +11,7 @@
     }
 
      // Проверяем, залогинен ли пользователь, если нет - то отказываем в доступе
-    $userId = login();
+    $userId = login($DBlink);
     if (!$userId) {
         accessDenied();
     }

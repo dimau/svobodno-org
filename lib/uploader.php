@@ -1,5 +1,10 @@
 <?php
 
+    // Подключаем библиотеку общих функций
+    include_once 'function_global.php';
+    // Подключаемся к БД
+    $DBlink = connectToDB();
+
     // Задаем список допустимых расширений для загружаемых файлов. Также расширение при начале загрузки проверяется в js файле vendor\fileuploader.js. Списки должны совпадать
     $allowedExtensions = array("jpeg", "JPEG", "jpg", "JPG", "png", "PNG", "gif", "GIF");
     // Задаем максимальный размер файла для загрузки в байтах
@@ -8,7 +13,10 @@
     $uploader = new qqFileUploader($allowedExtensions, $sizeLimit);
 
     // Call handleUpload() with the name of the folder, relative to PHP's getcwd()
-    $result = $uploader->handleUpload('..\uploaded_files\\');
+    $result = $uploader->handleUpload('..\uploaded_files\\', FALSE, $DBlink);
+
+    // Закрываем соединенние с БД
+    closeConnectToDB($DBlink);
 
     // to pass data through iframe you will need to encode all html tags
     echo htmlspecialchars(json_encode($result), ENT_NOQUOTES);
@@ -148,7 +156,7 @@
          * Обработчик загрузки файла
          * Returns array('success'=>true) or array('error'=>'error message')
          */
-        function handleUpload($uploadDirectory, $replaceOldFile = FALSE)
+        function handleUpload($uploadDirectory, $replaceOldFile = FALSE, $DBlink)
         {
 
             /****************************************************************************************************************************
@@ -263,17 +271,32 @@
                 }
             }
 
-            function saveInfToDB($folder, $filename, $size) {
-                include_once 'connect.php'; // Подключаемся к БД
-                $folder = str_replace ('\\', '\\\\', $folder); // Переменная folder уже содержит в себе один или несколько '\', но для того, чтобы при сохранении в БД не возникло проблем, к нему нужно добавить еще один символ '\', в этом случае mysql будет воспринимать "\\" как один знак "\" и не будет считать его служебгым символом
+            // Функция сохраняет данные о файле фотографии в Базу данных - в таблицу tempFotos
+            function saveInfToDB($folder, $filename, $size, $DBlink) {
+
+                // Готовим данные для сохранения в БД
                 $sizeMb = round($size / 1024 / 1024, 1);
+                $extension = 'jpeg';
 
                 // Сохраняем информацию о загруженной фотке в БД
-                if (!mysql_query("INSERT INTO tempfotos (id, fileUploadId, folder, filename, extension, filesizeMb) VALUES ('" . $filename . "','" . $_GET['fileuploadid'] . "','" . $folder . "','" . $_GET['sourcefilename'] . "','" . "jpeg" . "','" . $sizeMb . "')")) {
-                    return FALSE;
+                $stmt = mysqli_prepare($DBlink, "INSERT INTO tempfotos (id, fileUploadId, folder, filename, extension, filesizeMb) VALUES (?,?,?,?,?,?)");
+                if ($stmt) {
+                    mysqli_stmt_bind_param($stmt, "sssssd", $filename, $_GET['fileuploadid'], $folder, $_GET['sourcefilename'], $extension, $sizeMb);
+                    mysqli_stmt_execute($stmt);
+                    $res = mysqli_affected_rows($DBlink);
+                    mysqli_stmt_close($stmt);
+                } else {
+                    $res = FALSE; // ошибка обращения к БД
                 }
 
-                return true;
+                // Возвращаем статус сохранения данных в БД
+                if ($res == 1) {
+                    return TRUE;
+                } else {
+                    return FALSE;
+                    //TODO: Сохранить в лог инфу об ошибке обращения к БД
+                }
+
             }
 
             // Функция для очистки памяти
@@ -339,7 +362,6 @@
 
             // Определяем размеры и тип исходной фотографии
             $srcParams = getimagesize($tempFilePath);
-            // TODO: тест return array('error' => 'формат файла: ' . strtolower($srcParams['mime']));
 
             // Получим ресурс, соответствующий исходной фотографии для дальнейшего преобразования его в нужные типы фотографий (small, middle, big)
             $foto_src = getSrcImage($srcParams, $tempFilePath);
@@ -374,7 +396,9 @@
             }
 
             // Сохраняем информацию о фотографиях в Базу данных
-            if (!saveInfToDB($saveRes['folder'], $filename, $size)) {
+            $res = saveInfToDB($saveRes['folder'], $filename, $size, $DBlink);
+
+            if ($res == FALSE) {
                 return array('error' => 'Не удалось сохранить загруженный файл на сервере.' . ' Ошибка при сохранении информации в базу данных. Попробуйте еще раз, либо загрузите другую фотографию');
             }
 
