@@ -209,7 +209,7 @@ function attrInputHiddenToValue() {
     // Актуализируем статус у объектов массива uploadedFoto
     var primaryFotoId = getRadioValue('primaryFotoRadioButton');
     for (var i = 0; i < uploadedFoto.length; i++) {
-        if (uploadedFoto[i]['fotoid'] == primaryFotoId) {
+        if (uploadedFoto[i]['id'] == primaryFotoId) {
             uploadedFoto[i]['status'] = 'основная';
         } else {
             uploadedFoto[i]['status'] = '';
@@ -242,7 +242,7 @@ function createUploadedFilesBlocks(uploader) {
     // Перебираем массив uploadedFoto, содержащий объекты, каждый из которых представляет данные по 1 ранее загруженной фотографии
     for (var i = 0; i < uploadedFoto.length; i++) {
         var folder = uploadedFoto[i]['folder'];
-        var fotoid = uploadedFoto[i]['fotoid'];
+        var fotoid = uploadedFoto[i]['id'];
         var extension = uploadedFoto[i]['extension'];
         var filename = uploadedFoto[i]['filename'];
         var status = uploadedFoto[i]['status'];

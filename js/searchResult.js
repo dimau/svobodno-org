@@ -7,6 +7,7 @@ $(window).resize(changeMapSize);
 $('#tabs').bind('tabsshow', changeMapSize);
 
 function changeMapSize() {
+
     // Подстраиваем высоту карты под высоту окна браузера document.documentElement.clientHeight + 'px'
     $('#map').height($(window).height());
     $('#resultOnSearchPage').css('min-height', $(window).height() + 'px');

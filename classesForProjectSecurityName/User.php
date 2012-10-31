@@ -56,15 +56,17 @@
         public $lic = "";
 
         private $id = "";
-        private $typeTenant = "";
-        private $typeOwner = "";
+        private $typeTenant = NULL;
+        private $typeOwner = NULL;
         private $emailReg = "";
         private $user_hash = "";
         private $last_act = "";
         private $reg_date = "";
         private $favoritesPropertysId = array();
-        private $isLoggedIn = ""; // В переменную сохраняется функцией login() значение FALSE или TRUE после первого вызова на странице. Для уменьшения обращений к БД
 
+        private $interestingPropertysId = array();
+
+        private $isLoggedIn = ""; // В переменную сохраняется функцией login() значение FALSE или TRUE после первого вызова на странице. Для уменьшения обращений к БД
         private $DBlink = FALSE; // Переменная для хранения объекта соединения с базой данных
         private $globFunc = FALSE; // Переменная для хранения глобальных функций
 
@@ -99,9 +101,595 @@
 
         }
 
+        // Является ли пользователь арендатором (то есть имеет действующий поисковый запрос или регистрируется в качестве арендатора)
+        public function isTenant()
+        {
+            if ($this->typeTenant != NULL) {
+                return $this->typeTenant;
+            }
+
+            // Если пользователь авторизован, то значение typeTenant будет записано в переменную $this->typeTenant из БД автоматически
+            if ($this->login()) return $this->typeTenant;
+
+            // Если пользователь еще только регистрируется, то возвращаем значение из get параметров
+            if (isset($_GET['typeTenant'])) {
+                $this->typeTenant = TRUE;
+            } else {
+                $this->typeTenant = FALSE;
+            }
+            if (!isset($_GET['typeTenant']) && !isset($_GET['typeOwner'])) {
+                $this->typeTenant = TRUE;
+            }
+            return $this->typeTenant;
+        }
+
+        // Является ли пользователь собственником (то есть имеет хотя бы 1 объявление или регистрируется в качестве собственника)
+        public function isOwner()
+        {
+            if ($this->typeOwner != NULL) {
+                return $this->typeOwner;
+            }
+
+            // Если пользователь авторизован, то значение typeOwner будет записано в переменную $this->typeOwner из БД автоматически
+            if ($this->login()) return $this->typeOwner;
+
+            // Если пользователь еще только регистрируется, то возвращаем значение из get параметров
+            if (isset($_GET['typeOwner'])) {
+                $this->typeOwner = TRUE;
+            } else {
+                $this->typeOwner = FALSE;
+            }
+            if (!isset($_GET['typeTenant']) && !isset($_GET['typeOwner'])) {
+                $this->typeOwner = TRUE;
+            }
+            return $this->typeOwner;
+        }
+
+        // Метод возвращает id пользователя
+        public function getId() {
+
+            if ($this->id == "") return FALSE;
+
+            return $this->id;
+        }
+
+        // Функция сохраняет личные параметры пользователя (текущие значения параметров данного объекта) в БД. Все параметры, кроме поискового запроса (у него отдельная функция)
+        // $typeOfUser = "new" - режим сохранения для нового (регистрируемого пользователя)
+        // $typeOfUser = "edit" - режим сохранения для редактируемых параметров (для существующего пользователя)
+        // Возвращает TRUE, если данные успешно сохранены и FALSE в противном случае
+        public function saveCharacteristicToDB($typeOfUser)
+        {
+
+            // Если запись данные в БД требуется не для нового пользователя (не на странице регистрации) и данный пользователь не авторизован, то функция не выполняется
+            if ($typeOfUser == "edit" && !$this->login()) return FALSE;
+            if ($typeOfUser == "edit" && $this->id == "") return FALSE;
+
+            // Корректируем дату дня рождения для того, чтобы сделать ее пригодной для сохранения в базу данных
+            $birthdayDB = $this->globFunc->dateFromViewToDB($this->birthday);
+            // Получаем текущее время для сохранения в качестве даты регистрации и даты последнего действия
+            $tm = time();
+            $last_act = $tm;
+            $reg_date = $tm; // Сохранится в БД только для нового пользователя $typeOfUser = "new"
+            // Сериализуем массив с избранными объявлениями
+            $favoritesPropertysId = serialize($this->favoritesPropertysId);
+            // Преобразуем из логических в строковые (MySQL почему-то не поддерживает сохранение логических параметров)
+            if ($this->typeTenant === TRUE) $typeTenant = "TRUE";
+            if ($this->typeTenant === FALSE) $typeTenant = "FALSE";
+            if ($this->typeTenant === NULL) $typeTenant = NULL;
+            if ($this->typeOwner === TRUE) $typeOwner = "TRUE";
+            if ($this->typeOwner === FALSE) $typeOwner = "FALSE";
+            if ($this->typeOwner === NULL) $typeOwner = NULL;
+
+            // Для простоты технической поддержки пользователей пойдем на небольшой риск с точки зрения безопасности и будем хранить пароли пользователей на сервере в БД без соли и шифрования
+            /*$salt = mt_rand(100, 999);
+              $password = md5(md5($password) . $salt);*/
+
+            // Пишем данные пользователя в БД. При успехе в $res сохраняем TRUE, иначе - FALSE
+            // Код для сохранения данных разный: для нового пользователя и при редактировании параметров существующего пользователя
+            if ($typeOfUser == "new") {
+
+                $stmt = $this->DBlink->stmt_init();
+                if (($stmt->prepare("INSERT INTO users (typeTenant,typeOwner,name,secondName,surname,sex,nationality,birthday,login,password,telephon,emailReg,email,currentStatusEducation,almamater,speciality,kurs,ochnoZaochno,yearOfEnd,statusWork,placeOfWork,workPosition,regionOfBorn,cityOfBorn,shortlyAboutMe,vkontakte,odnoklassniki,facebook,twitter,lic,last_act,reg_date,favoritesPropertysId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
+                    OR ($stmt->bind_param("ssssssssssssssssssssssssssssssiib", $typeTenant, $typeOwner, $this->name, $this->secondName, $this->surname, $this->sex, $this->nationality, $birthdayDB, $this->login, $this->password, $this->telephon, $this->email, $this->email, $this->currentStatusEducation, $this->almamater, $this->speciality, $this->kurs, $this->ochnoZaochno, $this->yearOfEnd, $this->statusWork, $this->placeOfWork, $this->workPosition, $this->regionOfBorn, $this->cityOfBorn, $this->shortlyAboutMe, $this->vkontakte, $this->odnoklassniki, $this->facebook, $this->twitter, $this->lic, $last_act, $reg_date, $favoritesPropertysId) === FALSE)
+                    OR ($stmt->execute() === FALSE)
+                    OR (($res = $stmt->affected_rows) === -1)
+                    OR ($res === 0)
+                    OR ($stmt->close() === FALSE)
+                ) {
+                    // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                    return FALSE;
+                }
+
+                return TRUE;
+
+            }
+
+            if ($typeOfUser == "edit") {
+
+                $stmt = $this->DBlink->stmt_init();
+                if (($stmt->prepare("UPDATE users SET name=?, secondName=?, surname=?, sex=?, nationality=?, birthday=?, password=?, telephon=?, email=?, currentStatusEducation=?, almamater=?, speciality=?, kurs=?, ochnoZaochno=?, yearOfEnd=?, statusWork=?, placeOfWork=?, workPosition=?, regionOfBorn=?, cityOfBorn=?, shortlyAboutMe=?, vkontakte=?, odnoklassniki=?, facebook=?, twitter=?, last_act=? WHERE id=?") === FALSE)
+                    OR ($stmt->bind_param("sssssssssssssssssssssssssis", $this->name, $this->secondName, $this->surname, $this->sex, $this->nationality, $birthdayDB, $this->password, $this->telephon, $this->email, $this->currentStatusEducation, $this->almamater, $this->speciality, $this->kurs, $this->ochnoZaochno, $this->yearOfEnd, $this->statusWork, $this->placeOfWork, $this->workPosition, $this->regionOfBorn, $this->cityOfBorn, $this->shortlyAboutMe, $this->vkontakte, $this->odnoklassniki, $this->facebook, $this->twitter, $last_act, $this->id) === FALSE)
+                    OR ($stmt->execute() === FALSE)
+                    OR (($res = $stmt->affected_rows) === -1)
+                    OR ($res === 0)
+                    OR ($stmt->close() === FALSE)
+                ) {
+                    // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                    return FALSE;
+                }
+
+                return TRUE;
+            }
+
+            // Пользователь не является ни новым, ни существующим - видимо какая-то ошибка была допущена при передаче параметров методу
+            return FALSE;
+
+        }
+
+        // Функция сохраняет актуальные данные о фотографиях пользователя в БД. Если какие-то из ранее загруженных фотографий были удалены пользователем (помечены в браузере на удаление), то функция удаляет их с сервера и из БД
+        // TODO: функция пока ничего не возвращает, а может нужно добавить TRUE или FALSE?
+        public function saveFotoInformationToDB()
+        {
+
+            // ВАЖНО:
+            // Функция считает, что если пользователь залогинен, то он уже был зарегистрирован и требуется отредактировать его фотографии
+            // Если же пользователь не залогинен, то функция считает его Новым пользователем (а значит у него нет сохраненных фоток в userFotos)
+            // ВАЖНО:
+            // Схема работы функции:
+            // 1. Проверить наличие массива данных о фотографиях ($this->uploadedFoto), а также id пользователя
+            // 2. Собираем инфу по всем фотографиям пользователя из БД tempFotos (по $this->fileUploadId) и userFotos (по id пользователя)
+            // 3. Добавляем в полученные из БД данные актуалную инфу по статусом (основная/неосновная) и помечаем те фотки, которые нужно удалить
+            // 4. Перебираем массив и удаляем ненужные фотки с жесткого диска
+            // 5. Редактируем данные по нужным фоткам (UPDATE для userFotos)
+            // 6. Добавляем данные по нужным фоткам (INSERT для userFotos)
+            // 7. Удаляем ненужные фотки (DELETE для userFotos и для tempFotos)
+
+            // На всякий случай, проверим на массив
+            if (!is_array($this->uploadedFoto)) return FALSE;
+
+            // Для выполнения функция у пользователя обязательно должен быть id
+            if ($this->id = "") return FALSE;
+
+            // Получаем данные по всем фоткам с нашим $this->fileUploadId
+            $stmt = $this->DBlink->stmt_init();
+            if (($stmt->prepare("SELECT * FROM tempFotos WHERE fileUploadId=?") === FALSE)
+                OR ($stmt->bind_param("s", $this->fileUploadId) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($allFotos = $stmt->get_result()) === FALSE)
+                OR (($allFotos = $allFotos->fetch_all(MYSQLI_ASSOC)) === FALSE)
+                OR ($stmt->close() === FALSE)
+            ) {
+                $allFotos = array();
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+            }
+
+            // Пометим все члены массива признаком их получения из таблицы tempFotos и дополним id пользователя
+            foreach ($allFotos as $value) {
+                $value['fromTable'] = "tempFotos";
+            }
+
+            // Получаем данные по всем фоткам пользователя (с идентификатором $this->id)
+            // Но только для существующего - авторизованного пользователя (не для нового)
+            if ($this->login()) {
+                $stmt = $this->DBlink->stmt_init();
+                if (($stmt->prepare("SELECT * FROM userFotos WHERE userId=?") === FALSE)
+                    OR ($stmt->bind_param("s", $this->id) === FALSE)
+                    OR ($stmt->execute() === FALSE)
+                    OR (($res = $stmt->get_result()) === FALSE)
+                    OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+                    OR ($stmt->close() === FALSE)
+                ) {
+                    // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                } else {
+
+                    // Пометим все члены массива признаком их получения из таблицы userFotos
+                    foreach ($res as $value) {
+                        $value['fromTable'] = "userFotos";
+                    }
+
+                    $allFotos = array_merge($allFotos, $res);
+                }
+            }
+
+
+            // Перебираем все имеющиеся фотографии пользователя и актуализируем их параметры
+            $primaryFotoExists = 0; // Инициализируем переменную, по которой после прохода по всем фотографиям, полученным в форме, сможем сказать была ли указана пользователем основная фотка (число - сколько фоток со статусом основная мы получили с клиента) или нет (0)
+            for ($i = 0; $i < count($allFotos); $i++) {
+
+                // Для сокращения количества запросов на UPDATE будем отмечать особым признаком те фотографии, по которым требуется выполнения этого запроса к БД
+                $allFotos[$i]['updated'] = FALSE;
+
+                // На заметку: в массиве $uploadedFoto также содержится актуальная информация по всем статусам фотографий, но легче получить id основной фотки из формы, а не из этого массива
+                if ($allFotos[$i]['id'] == $this->primaryFotoId) {
+                    // Проверяем - нужно ли для данной фотографии проводить UPDATE
+                    if ($allFotos[$i]['fromTable'] == "userFotos" && $allFotos[$i]['status'] != 'основная') {
+                        $allFotos[$i]['updated'] = TRUE;
+                    }
+                    $allFotos[$i]['status'] = 'основная';
+                    // Признак наличия основной фотографии
+                    $primaryFotoExists++;
+                } else {
+                    if ($allFotos[$i]['fromTable'] == "userFotos" && $allFotos[$i]['status'] != '') {
+                        $allFotos[$i]['updated'] = TRUE;
+                    }
+                    $allFotos[$i]['status'] = '';
+                }
+
+                // Отмечаем фотографии на удаление
+                $allFotos[$i]['forRemove'] = TRUE;
+                foreach ($this->uploadedFoto as $value) {
+                    if ($allFotos[$i]['id'] == $value['id']) {
+                        $allFotos[$i]['forRemove'] = FALSE;
+                        break;
+                    }
+                }
+
+                // Подготовим данные о пути к каталогу хранения фотографии в вид, пригодный для перезаписи в БД
+                //$$allFotos[$i]['folder'] = str_replace('\\', '\\\\', $$allFotos[$i]['folder']); // Переменная folder уже содержит в себе один или несколько '\', но для того, чтобы при сохранении в БД не возникло проблем, к нему нужно добавить еще один символ '\', в этом случае mysql будет воспринимать "\\" как один знак "\" и не будет считать его служебгым символом
+
+            }
+
+            // Если пользователь не указал основное фото, то укажем первую попавшуюся фотографию (не помеченную на удаление) в качестве основной
+            if ($primaryFotoExists == 0) {
+                for ($i = 0; $i < count($allFotos); $i++) {
+                    if ($allFotos[$i]['forRemove'] == FALSE) {
+                        $allFotos[$i]['status'] = 'основная';
+                        break;
+                    }
+                }
+            }
+
+
+            // Удаляем файлы фотографий (помеченных признаком удаления) с сервера
+            for ($i = 0; $i < count($allFotos); $i++) {
+                if ($allFotos[$i]['forRemove'] == FALSE) continue;
+                if ((unlink($allFotos[$i]['folder'] . '\\small\\' . $allFotos[$i]['id'] . "." . $allFotos[$i]['extension']) === FALSE)
+                    OR unlink($allFotos[$i]['folder'] . '\\middle\\' . $allFotos[$i]['id'] . "." . $allFotos[$i]['extension'])
+                    OR unlink($allFotos[$i]['folder'] . '\\big\\' . $allFotos[$i]['id'] . "." . $allFotos[$i]['extension'])
+                ) {
+                    // TODO: сделать сохранение статусов отработки команд по удалению фоток в лог файл. Каждый unlink выдает TRUE, если все хорошо и FALSE, если плохо
+                }
+            }
+
+            // Выполним запросы на UPDATE данных в userFotos
+            $stmt = $this->DBlink->stmt_init();
+            if ($stmt->prepare("UPDATE userFotos SET status=? WHERE id=?") === FALSE) {
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+            }
+            for ($i = 0; $i < count($allFotos); $i++) {
+                if ($allFotos[$i]['fromTable'] == "userFotos" && $allFotos[$i]['updated'] == TRUE && $allFotos[$i]['forRemove'] == FALSE) {
+                    if (($stmt->bind_param("ss", $allFotos[$i]['status'], $allFotos[$i]['id']) === FALSE)
+                        OR ($stmt->execute() === FALSE)
+                        OR (($res = $stmt->affected_rows) === -1)
+                        OR ($res === 0)
+                        OR ($stmt->close() === FALSE)
+                    ) {
+                        // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                    }
+                }
+            }
+
+            // Для уменьшения запросов к БД соберем 2 общих заспроса на изменение сразу всех нужных строк
+            // Соберем условия WHERE для SQL запросов к БД:
+            // на INSERT новых строк в userFotos
+            // на DELETE более ненужных фоток из userFotos
+            $strINSERT = "";
+            $strDELETE = "";
+            for ($i = 0; $i < $count = count($allFotos); $i++) {
+
+                if ($allFotos[$i]['fromTable'] == "tempFotos" && $allFotos[$i]['forRemove'] == FALSE) {
+                    if ($strINSERT != "") $strINSERT .= ",";
+                    $strINSERT .= "('" . $allFotos[$i]['id'] . "','" . $allFotos[$i]['folder'] . "','" . $allFotos[$i]['filename'] . "','" . $allFotos[$i]['extension'] . "','" . $allFotos[$i]['filesizeMb'] . "','" . $this->id . "','" . $allFotos[$i]['status'] . "')";
+                }
+
+                if ($allFotos[$i]['forRemove'] == TRUE) {
+                    if ($strDELETE != "") $strDELETE .= " OR";
+                    $strDELETE .= " id = '" . $allFotos[$i]['id'] . "'";
+                }
+
+            }
+
+            // Выполним сформированные запросы
+            // INSERT
+            if ($strINSERT != "") {
+                $res = $this->DBlink->query("INSERT INTO userFotos (id, folder, filename, extension, filesizeMb, userId, status) VALUES " . $strINSERT);
+                if (($this->DBlink->errno)
+                    OR (($res = $res->affected_rows) === -1)
+                    OR ($res === 0)
+                ) {
+                    // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                }
+            }
+            // DELETE
+            if ($strDELETE != "") {
+                $res = $this->DBlink->query("DELETE FROM userFotos WHERE " . $strDELETE);
+                if (($this->DBlink->errno)
+                    OR (($res = $res->affected_rows) === -1)
+                    OR ($res === 0)
+                ) {
+                    // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                }
+            }
+
+
+            // Удаляем инфу о всех фотках с fileUploadId из tempFotos
+            // TODO: Не очень безопасно
+            if ($this->fileUploadId != "") {
+                $res = $this->DBlink->query("DELETE FROM tempFotos WHERE fileUploadId = '" . $this->fileUploadId . "'");
+                if (($this->DBlink->errno)
+                    OR ($res->affected_rows === -1)
+                ) {
+                    // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                }
+            }
+
+        }
+
+        // Функция для сохранения параметров поискового запроса пользователя
+        public function saveSearchRequestToDB()
+        {
+
+            if ($this->isTenant() != TRUE || $this->id == "") return FALSE;
+
+            // Преобразование формата инфы об искомом кол-ве комнат и районах, так как MySQL не умеет хранить массивы
+            $amountOfRoomsSerialized = serialize($this->amountOfRooms);
+            $districtSerialized = serialize($this->district);
+            $interestingPropertysIdSerialized = serialize($this->interestingPropertysId);
+
+            // Непосредственное сохранение данных о поисковом запросе
+            $stmt = $this->DBlink->stmt_init();
+            if (($stmt->prepare("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, interestingPropertysId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
+                OR ($stmt->bind_param("ssbssiiisbssssssssb", $this->id, $this->typeOfObject, $amountOfRoomsSerialized, $this->adjacentRooms, $this->floor, $this->minCost, $this->maxCost, $this->pledge, $this->prepayment, $districtSerialized, $this->withWho, $this->linksToFriends, $this->children, $this->howManyChildren, $this->animals, $this->howManyAnimals, $this->termOfLease, $this->additionalDescriptionOfSearch, $interestingPropertysIdSerialized) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($res = $stmt->affected_rows) === -1)
+                OR ($res === 0)
+                OR ($stmt->close() === FALSE)
+            ) {
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                return FALSE;
+            }
+
+            return TRUE;
+        }
+
+        public function writeCharacteristicFromDB() {
+
+            // Если идентификатор пользователя неизвестен, то дальнейшие действия не имеют смысла
+            if ($this->id == "") return FALSE;
+
+            // Получим из БД данные ($res) по пользователю с идентификатором = $this->id
+            $stmt = $this->DBlink->stmt_init();
+            if (($stmt->prepare("SELECT * FROM users WHERE id=?") === FALSE)
+                OR ($stmt->bind_param("s", $this->id) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($res = $stmt->get_result()) === FALSE)
+                OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+                OR ($stmt->close() === FALSE)
+            ) {
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                return FALSE;
+            }
+
+            // Если получено меньше или больше одной строки (одного пользователя) из БД, то сообщаем об ошибке
+            if (!is_array($res) || count($res) != 1) {
+                // TODO: Сохранить в лог ошибку получения данных пользователя из БД
+                return FALSE;
+            }
+
+            // Для красоты (чтобы избавить от индекса ноль при обращении к переменным) переприсвоим значение $res[0] специальной переменной
+            $oneUserDataArr = $res[0];
+
+            // Если данные по пользователю есть в БД, присваиваем их соответствующим переменным, иначе - у них останутся значения по умолчанию.
+            if (isset($oneUserDataArr['id'])) $this->id = $oneUserDataArr['id'];
+
+            if (isset($oneUserDataArr['typeTenant'])) {
+                if ($oneUserDataArr['typeTenant'] == "TRUE") $this->typeTenant = TRUE;
+                if ($oneUserDataArr['typeTenant'] == "FALSE") $this->typeTenant = FALSE;
+            }
+            if (isset($oneUserDataArr['typeOwner']))
+            {
+                if ($oneUserDataArr['typeOwner'] == "TRUE") $this->typeOwner = TRUE;
+                if ($oneUserDataArr['typeOwner'] == "FALSE") $this->typeOwner = FALSE;
+            }
+            if (isset($oneUserDataArr['name'])) $this->name = $oneUserDataArr['name'];
+            if (isset($oneUserDataArr['secondName'])) $this->secondName = $oneUserDataArr['secondName'];
+            if (isset($oneUserDataArr['surname'])) $this->surname = $oneUserDataArr['surname'];
+            if (isset($oneUserDataArr['sex'])) $this->sex = $oneUserDataArr['sex'];
+            if (isset($oneUserDataArr['nationality'])) $this->nationality = $oneUserDataArr['nationality'];
+            if (isset($oneUserDataArr['birthday'])) $this->birthday = $this->globFunc->dateFromDBToView($oneUserDataArr['birthday']);
+            if (isset($oneUserDataArr['login'])) $this->login = $oneUserDataArr['login'];
+            if (isset($oneUserDataArr['password'])) $this->password = $oneUserDataArr['password'];
+            if (isset($oneUserDataArr['telephon'])) $this->telephon = $oneUserDataArr['telephon'];
+            if (isset($oneUserDataArr['emailReg'])) $this->emailReg = $oneUserDataArr['emailReg'];
+            if (isset($oneUserDataArr['email'])) $this->email = $oneUserDataArr['email'];
+
+            if (isset($oneUserDataArr['currentStatusEducation'])) $this->currentStatusEducation = $oneUserDataArr['currentStatusEducation'];
+            if (isset($oneUserDataArr['almamater'])) $this->almamater = $oneUserDataArr['almamater'];
+            if (isset($oneUserDataArr['speciality'])) $this->speciality = $oneUserDataArr['speciality'];
+            if (isset($oneUserDataArr['kurs'])) $this->kurs = $oneUserDataArr['kurs'];
+            if (isset($oneUserDataArr['ochnoZaochno'])) $this->ochnoZaochno = $oneUserDataArr['ochnoZaochno'];
+            if (isset($oneUserDataArr['yearOfEnd'])) $this->yearOfEnd = $oneUserDataArr['yearOfEnd'];
+            if (isset($oneUserDataArr['statusWork'])) $this->statusWork = $oneUserDataArr['statusWork'];
+            if (isset($oneUserDataArr['placeOfWork'])) $this->placeOfWork = $oneUserDataArr['placeOfWork'];
+            if (isset($oneUserDataArr['workPosition'])) $this->workPosition = $oneUserDataArr['workPosition'];
+            if (isset($oneUserDataArr['regionOfBorn'])) $this->regionOfBorn = $oneUserDataArr['regionOfBorn'];
+            if (isset($oneUserDataArr['cityOfBorn'])) $this->cityOfBorn = $oneUserDataArr['cityOfBorn'];
+            if (isset($oneUserDataArr['shortlyAboutMe'])) $this->shortlyAboutMe = $oneUserDataArr['shortlyAboutMe'];
+            if (isset($oneUserDataArr['vkontakte'])) $this->vkontakte = $oneUserDataArr['vkontakte'];
+            if (isset($oneUserDataArr['odnoklassniki'])) $this->odnoklassniki = $oneUserDataArr['odnoklassniki'];
+            if (isset($oneUserDataArr['facebook'])) $this->facebook = $oneUserDataArr['facebook'];
+            if (isset($oneUserDataArr['twitter'])) $this->twitter = $oneUserDataArr['twitter'];
+
+            if (isset($oneUserDataArr['lic'])) $this->lic = $oneUserDataArr['lic'];
+            if (isset($oneUserDataArr['user_hash'])) $this->user_hash = $oneUserDataArr['user_hash'];
+            if (isset($oneUserDataArr['last_act'])) $this->last_act = $oneUserDataArr['last_act'];
+            if (isset($oneUserDataArr['reg_date'])) $this->reg_date = $oneUserDataArr['reg_date'];
+            if (isset($oneUserDataArr['favoritesPropertysId'])) $this->favoritesPropertysId = unserialize($oneUserDataArr['favoritesPropertysId']);
+
+            return TRUE;
+        }
+
+        // Метод читает данные о фотографиях из БД и записывает их в параметры пользователя
+        public function writeFotoInformationFromDB() {
+
+            // Если идентификатор пользователя неизвестен, то дальнейшие действия не имеют смысла
+            if ($this->id == "") return FALSE;
+
+            // Получим из БД данные ($res) по пользователю с идентификатором = $this->id
+            $stmt = $this->DBlink->stmt_init();
+            if (($stmt->prepare("SELECT * FROM userfotos WHERE userId=?") === FALSE)
+                OR ($stmt->bind_param("s", $this->id) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($res = $stmt->get_result()) === FALSE)
+                OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+                OR ($stmt->close() === FALSE)
+            ) {
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                return FALSE;
+            }
+
+            // Сохраняем в параметры объекта массив массивов, каждый из которых содержит данные по 1 фотографии
+            $this->uploadedFoto = $res;
+
+            // Сохраняем идентификатор основной фотографии пользователя в параметры объекта
+            foreach ($res as $value) {
+                if ($value['status'] == 'основная') {
+                    $this->primaryFotoId = $value['id'];
+                    break;
+                }
+            }
+
+            return TRUE;
+
+        }
+
+        // Метод читает данные о поисковом запросе из БД и записывает их в параметры пользователя
+        public function writeSearchRequestFromDB() {
+
+            // Если идентификатор пользователя неизвестен, то дальнейшие действия не имеют смысла
+            if ($this->id == "") return FALSE;
+
+            // Получим из БД данные ($res) по пользователю с идентификатором = $this->id
+            $stmt = $this->DBlink->stmt_init();
+            if (($stmt->prepare("SELECT * FROM searchrequests WHERE userId=?") === FALSE)
+                OR ($stmt->bind_param("s", $this->id) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($res = $stmt->get_result()) === FALSE)
+                OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+                OR ($stmt->close() === FALSE)
+            ) {
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                return FALSE;
+            }
+
+            // Если получено меньше или больше одной строки (а на одного пользователя строго приходится 1 поисковый запрос) из БД, то либо произошла шибка, либо (что значительно более вероятно) у данного пользователя нет поискового запроса
+            if (!is_array($res) || count($res) != 1) {
+                if ($this->isTenant() && count($res) == 0) {
+                    // TODO: Сохранить в лог ошибку - пользователь является арендатором, но не имеет поискового запроса!
+                }
+                if (count($res) > 1) {
+                    // TODO: Сохранить в лог ошибку - у пользователя заведено более 1 поискового запроса!
+                }
+
+                // В любом случае, при таком раскладе записать данные поискового запроса в параметры пользователя не представляется возможным
+                return FALSE;
+            }
+
+            if (!$this->isTenant() && count($res) != 0) {
+                // TODO: Сохранить в лог ошибку - пользователь НЕ является арендатором, но имеет поисковый запрос!
+            }
+
+            // Для красоты (чтобы избавить от индекса ноль при обращении к переменным) переприсвоим значение $res[0] специальной переменной
+            $oneUserDataArr = $res[0];
+
+            // Если данные по пользователю есть в БД, присваиваем их соответствующим переменным, иначе - у них останутся значения по умолчанию
+            if (isset($oneUserDataArr['typeOfObject'])) $this->typeOfObject = $oneUserDataArr['typeOfObject'];
+            if (isset($oneUserDataArr['amountOfRooms'])) $this->amountOfRooms = unserialize($oneUserDataArr['amountOfRooms']);
+            if (isset($oneUserDataArr['adjacentRooms'])) $this->adjacentRooms = $oneUserDataArr['adjacentRooms'];
+            if (isset($oneUserDataArr['floor'])) $this->floor = $oneUserDataArr['floor'];
+            if (isset($oneUserDataArr['minCost'])) $this->minCost = $oneUserDataArr['minCost'];
+            if (isset($oneUserDataArr['maxCost'])) $this->maxCost = $oneUserDataArr['maxCost'];
+            if (isset($oneUserDataArr['pledge'])) $this->pledge = $oneUserDataArr['pledge'];
+            if (isset($oneUserDataArr['prepayment'])) $this->prepayment = $oneUserDataArr['prepayment'];
+            if (isset($oneUserDataArr['district'])) $this->district = unserialize($oneUserDataArr['district']);
+            if (isset($oneUserDataArr['withWho'])) $this->withWho = $oneUserDataArr['withWho'];
+            if (isset($oneUserDataArr['linksToFriends'])) $this->linksToFriends = $oneUserDataArr['linksToFriends'];
+            if (isset($oneUserDataArr['children'])) $this->children = $oneUserDataArr['children'];
+            if (isset($oneUserDataArr['howManyChildren'])) $this->howManyChildren = $oneUserDataArr['howManyChildren'];
+            if (isset($oneUserDataArr['animals'])) $this->animals = $oneUserDataArr['animals'];
+            if (isset($oneUserDataArr['howManyAnimals'])) $this->howManyAnimals = $oneUserDataArr['howManyAnimals'];
+            if (isset($oneUserDataArr['termOfLease'])) $this->termOfLease = $oneUserDataArr['termOfLease'];
+            if (isset($oneUserDataArr['additionalDescriptionOfSearch'])) $this->additionalDescriptionOfSearch = $oneUserDataArr['additionalDescriptionOfSearch'];
+            if (isset($oneUserDataArr['interestingPropertysId'])) $this->interestingPropertysId = unserialize($oneUserDataArr['interestingPropertysId']);
+
+            return TRUE;
+
+        }
+
+        // Метод удаляет параметры поискового запроса пользователя из БД, сбрасывает соответствующие настройки объекта на "по-умолчанию", а также меняет статус isTenant на FALSE.
+        public function removeSearchRequest() {
+
+            // Проверка на наличие id пользователя
+            if ($this->id == "") return FALSE;
+
+            // Удалим данные поискового запроса по данному пользователю из БД
+            $stmt = $this->DBlink->stmt_init();
+            if (($stmt->prepare("DELETE FROM searchrequests WHERE userId=?") === FALSE)
+                OR ($stmt->bind_param("s", $this->id) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($res = $stmt->affected_rows) === -1)
+                OR ($stmt->close() === FALSE)
+            ) {
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                return FALSE;
+            }
+
+            // Обновляем статус данного пользователю (он больше не арендатор)
+            $stmt = $this->DBlink->stmt_init();
+            if (($stmt->prepare("UPDATE users SET typeTenant='FALSE' WHERE id=?") === FALSE)
+                OR ($stmt->bind_param("s", $this->id) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($res = $stmt->affected_rows) === -1)
+                OR ($res === 0)
+                OR ($stmt->close() === FALSE)
+            ) {
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                return FALSE;
+            }
+
+            // Внесем соответствующие изменения в статус объекта пользователя
+            $this->typeTenant = "FALSE";
+
+            // Скинем на дефолтные параметры поискового запроса данного пользователя
+            $this->typeOfObject = "0";
+            $this->amountOfRooms = array();
+            $this->adjacentRooms = "0";
+            $this->floor = "0";
+            $this->minCost = "";
+            $this->maxCost = "";
+            $this->pledge = "";
+            $this->prepayment = "0";
+            $this->district = array();
+            $this->withWho = "0";
+            $this->linksToFriends = "";
+            $this->children = "0";
+            $this->howManyChildren = "";
+            $this->animals = "0";
+            $this->howManyAnimals = "";
+            $this->termOfLease = "0";
+            $this->additionalDescriptionOfSearch = "";
+            $this->interestingPropertysId = array();
+
+            return TRUE;
+
+        }
+
         // Записать в качестве параметров user-а значения, полученные через POST запрос
         public function writePOSTparameters()
         {
+            //TODO: не проверять и не менять $_POST['login'], если происходит редактирование существующего пользователя (теоретически можно через POST параметр заслать новый логин и метод его поменяет для ранее зарегистрированного пользователя)
+            //TODO: убедиться, что если на клиенте удалить все фотки, то при перезагрузке они снова не появятся (из-за того, что $uploadedFoto не придет в POST параметрах и останется предыдущая версия - которая не будет перезатерта)
+
             if (isset($_POST['name'])) $this->name = htmlspecialchars($_POST['name']);
             if (isset($_POST['secondName'])) $this->secondName = htmlspecialchars($_POST['secondName']);
             if (isset($_POST['surname'])) $this->surname = htmlspecialchars($_POST['surname']);
@@ -115,7 +703,6 @@
 
             if (isset($_POST['fileUploadId'])) $this->fileUploadId = $_POST['fileUploadId'];
             if (isset($_POST['uploadedFoto'])) $this->uploadedFoto = json_decode($_POST['uploadedFoto'], TRUE); // Массив объектов со сведениями о загруженных фотографиях сериализуется в JSON формат на клиенте и передается как содержимое атрибута value одного единственного INPUT hidden
-            if ($this->uploadedFoto == NULL) $this->uploadedFoto = array();
             if (isset($_POST['primaryFotoRadioButton'])) $this->primaryFotoId = htmlspecialchars($_POST['primaryFotoRadioButton']);
 
             if (isset($_POST['currentStatusEducation'])) $this->currentStatusEducation = htmlspecialchars($_POST['currentStatusEducation']);
@@ -132,7 +719,7 @@
             if (isset($_POST['shortlyAboutMe'])) $this->shortlyAboutMe = htmlspecialchars($_POST['shortlyAboutMe']);
 
             if (isset($_POST['vkontakte'])) $this->vkontakte = htmlspecialchars($_POST['vkontakte']);
-            if (isset($_POST['odnoklassniki'])) $this->odnoklassniki = htmlspecialchars($this->$_POST['odnoklassniki']);
+            if (isset($_POST['odnoklassniki'])) $this->odnoklassniki = htmlspecialchars($_POST['odnoklassniki']);
             if (isset($_POST['facebook'])) $this->facebook = htmlspecialchars($_POST['facebook']);
             if (isset($_POST['twitter'])) $this->twitter = htmlspecialchars($_POST['twitter']);
 
@@ -256,26 +843,26 @@
                 $errors[] = 'Укажите контактный (мобильный) телефон';
             }
 
-            if ($this->email == "" && (($typeOfValidation == "registration" && $typeTenant == "true") || ($typeOfValidation == "createSearchRequest") || ($typeOfValidation == "validateSearchRequest") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == "true"))) $errors[] = 'Укажите e-mail';
+            if ($this->email == "" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "createSearchRequest") || ($typeOfValidation == "validateSearchRequest") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE))) $errors[] = 'Укажите e-mail';
             if ($this->email != "" && !preg_match("/^(([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+\.)*([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]{2,5}$/", $this->email)) $errors[] = 'Укажите, пожалуйста, Ваш настоящий e-mail (указанный Вами e-mail не прошел проверку формата)';
 
             // Проверки для блока "Образование"
-            if ($this->currentStatusEducation == "0" && (($typeOfValidation == "registration" && $typeTenant == "true") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите Ваше образование (текущий статус)';
-            if ($this->almamater == "" && ($this->currentStatusEducation == "сейчас учусь" || $this->currentStatusEducation == "закончил") && (($typeOfValidation == "registration" && $typeTenant == "true") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите учебное заведение';
+            if ($this->currentStatusEducation == "0" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите Ваше образование (текущий статус)';
+            if ($this->almamater == "" && ($this->currentStatusEducation == "сейчас учусь" || $this->currentStatusEducation == "закончил") && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите учебное заведение';
             if (isset($this->almamater) && strlen($this->almamater) > 100) $errors[] = 'Слишком длинное название учебного заведения (используйте не более 100 символов)';
-            if ($this->speciality == "" && ($this->currentStatusEducation == "сейчас учусь" || $this->currentStatusEducation == "закончил") && (($typeOfValidation == "registration" && $typeTenant == "true") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите специальность';
+            if ($this->speciality == "" && ($this->currentStatusEducation == "сейчас учусь" || $this->currentStatusEducation == "закончил") && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите специальность';
             if (isset($this->speciality) && strlen($this->speciality) > 100) $errors[] = 'Слишком длинное название специальности (используйте не более 100 символов)';
-            if ($this->kurs == "" && $this->currentStatusEducation == "сейчас учусь" && (($typeOfValidation == "registration" && $typeTenant == "true") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите курс обучения';
+            if ($this->kurs == "" && $this->currentStatusEducation == "сейчас учусь" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите курс обучения';
             if (isset($this->kurs) && strlen($this->kurs) > 30) $errors[] = 'Курс. Указана слишком длинная строка (используйте не более 30 символов)';
-            if ($this->ochnoZaochno == "0" && ($this->currentStatusEducation == "сейчас учусь" || $this->currentStatusEducation == "закончил") && (($typeOfValidation == "registration" && $typeTenant == "true") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите форму обучения (очная, заочная)';
-            if ($this->yearOfEnd == "" && $this->currentStatusEducation == "закончил" && (($typeOfValidation == "registration" && $typeTenant == "true") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите год окончания учебного заведения';
+            if ($this->ochnoZaochno == "0" && ($this->currentStatusEducation == "сейчас учусь" || $this->currentStatusEducation == "закончил") && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите форму обучения (очная, заочная)';
+            if ($this->yearOfEnd == "" && $this->currentStatusEducation == "закончил" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите год окончания учебного заведения';
             if ($this->yearOfEnd != "" && !preg_match("/^[12]{1}[0-9]{3}$/", $this->yearOfEnd)) $errors[] = 'Укажите год окончания учебного заведения в формате: "гггг". Например: 2007';
 
             // Проверки для блока "Работа"
-            if ($this->statusWork == "0" && (($typeOfValidation == "registration" && $typeTenant == "true") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите статус занятости';
-            if ($this->placeOfWork == "" && $this->statusWork == "работаю" && (($typeOfValidation == "registration" && $typeTenant == "true") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите Ваше место работы (название организации)';
+            if ($this->statusWork == "0" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите статус занятости';
+            if ($this->placeOfWork == "" && $this->statusWork == "работаю" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите Ваше место работы (название организации)';
             if (isset($this->placeOfWork) && strlen($this->placeOfWork) > 100) $errors[] = 'Слишком длинное наименование места работы (используйте не более 100 символов)';
-            if ($this->workPosition == "" && $this->statusWork == "работаю" && (($typeOfValidation == "registration" && $typeTenant == "true") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == "true") || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите Вашу должность';
+            if ($this->workPosition == "" && $this->statusWork == "работаю" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите Вашу должность';
             if (isset($this->workPosition) && strlen($this->workPosition) > 100) $errors[] = 'Слишком длинное название должности (используйте не более 100 символов)';
 
             // Проверки для блока "Коротко о себе"
@@ -293,14 +880,14 @@
             if (strlen($this->twitter) > 0 && !preg_match("/twitter\.com/", $this->twitter)) $errors[] = 'Укажите, пожалуйста, Вашу настоящую личную страницу в Twitter, либо оставьте поле пустым (ссылка должна содержать строчку "twitter.com")';
 
             // Проверки для блока "Параметры поиска"
-            if ((($typeOfValidation == "registration" && $typeTenant == "true") || $typeOfValidation == "validateSearchRequest") && !preg_match("/^\d{0,8}$/", $this->minCost)) $errors[] = 'Неправильный формат числа в поле минимальной величины арендной платы (проверьте: только числа, не более 8 символов)';
-            if ((($typeOfValidation == "registration" && $typeTenant == "true") || $typeOfValidation == "validateSearchRequest") && !preg_match("/^\d{0,8}$/", $this->maxCost)) $errors[] = 'Неправильный формат числа в поле максимальной величины арендной платы (проверьте: только числа, не более 8 символов)';
-            if ((($typeOfValidation == "registration" && $typeTenant == "true") || $typeOfValidation == "validateSearchRequest") && !preg_match("/^\d{0,8}$/", $this->pledge)) $errors[] = 'Неправильный формат числа в поле максимальной величины залога (проверьте: только числа, не более 8 символов)';
-            if ((($typeOfValidation == "registration" && $typeTenant == "true") || $typeOfValidation == "validateSearchRequest") && $this->minCost > $this->maxCost) $errors[] = 'Минимальная стоимость аренды не может быть больше, чем максимальная. Исправьте поля, в которых указаны Ваши требования к диапазону стоимости аренды';
-            if ($this->withWho == "0" && $this->typeOfObject != "гараж" && (($typeOfValidation == "registration" && $typeTenant == "true") || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите, как Вы собираетесь проживать в арендуемой недвижимости (с кем)';
-            if ($this->children == "0" && $this->typeOfObject != "гараж" && (($typeOfValidation == "registration" && $typeTenant == "true") || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите, собираетесь ли Вы проживать вместе с детьми или без них';
-            if ($this->animals == "0" && $this->typeOfObject != "гараж" && (($typeOfValidation == "registration" && $typeTenant == "true") || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите, собираетесь ли Вы проживать вместе с животными или без них';
-            if ($this->termOfLease == "0" && (($typeOfValidation == "registration" && $typeTenant == "true") || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите предполагаемый срок аренды';
+            if ((($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest") && !preg_match("/^\d{0,8}$/", $this->minCost)) $errors[] = 'Неправильный формат числа в поле минимальной величины арендной платы (проверьте: только числа, не более 8 символов)';
+            if ((($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest") && !preg_match("/^\d{0,8}$/", $this->maxCost)) $errors[] = 'Неправильный формат числа в поле максимальной величины арендной платы (проверьте: только числа, не более 8 символов)';
+            if ((($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest") && !preg_match("/^\d{0,8}$/", $this->pledge)) $errors[] = 'Неправильный формат числа в поле максимальной величины залога (проверьте: только числа, не более 8 символов)';
+            if ((($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest") && $this->minCost > $this->maxCost) $errors[] = 'Минимальная стоимость аренды не может быть больше, чем максимальная. Исправьте поля, в которых указаны Ваши требования к диапазону стоимости аренды';
+            if ($this->withWho == "0" && $this->typeOfObject != "гараж" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите, как Вы собираетесь проживать в арендуемой недвижимости (с кем)';
+            if ($this->children == "0" && $this->typeOfObject != "гараж" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите, собираетесь ли Вы проживать вместе с детьми или без них';
+            if ($this->animals == "0" && $this->typeOfObject != "гараж" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите, собираетесь ли Вы проживать вместе с животными или без них';
+            if ($this->termOfLease == "0" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите предполагаемый срок аренды';
 
             // Проверка согласия пользователя с лицензией
             if ($typeOfValidation == "registration" && $this->lic != "yes") $errors[] = 'Регистрация возможна только при согласии с условиями лицензионного соглашения'; //приняты ли правила
@@ -308,253 +895,9 @@
             return $errors; // Возвращаем список ошибок, если все в порядке, то он будет пуст
         }
 
-        // Является ли пользователь арендатором (то есть имеет действующий поисковый запрос или регистрируется в качестве арендатора)
-        public function isTenant()
-        {
-            if ($this->typeTenant != "") {
-                return $this->typeTenant;
-            }
-
-            // Если пользователь авторизован, то значение typeTenant будет записано в переменную $this->typeTenant из БД автоматически
-            if ($this->login()) return $this->typeTenant;
-
-            // Если пользователь еще только регистрируется, то возвращаем значение из get параметров
-            if (isset($_GET['typeTenant'])) {
-                $this->typeTenant = "true";
-            } else {
-                $this->typeTenant = "false";
-            }
-            if (!isset($_GET['typeTenant']) && !isset($_GET['typeOwner'])) {
-                $this->typeTenant = "true";
-            }
-            return $this->typeTenant;
-        }
-
-        // Является ли пользователь собственником (то есть имеет хотя бы 1 объявление или регистрируется в качестве собственника)
-        public function isOwner()
-        {
-            if ($this->typeOwner != "") {
-                return $this->typeOwner;
-            }
-
-            // Если пользователь авторизован, то значение typeOwner будет записано в переменную $this->typeOwner из БД автоматически
-            if ($this->login()) return $this->typeOwner;
-
-            // Если пользователь еще только регистрируется, то возвращаем значение из get параметров
-            if (isset($_GET['typeOwner'])) {
-                $this->typeOwner = "true";
-            } else {
-                $this->typeOwner = "false";
-            }
-            if (!isset($_GET['typeTenant']) && !isset($_GET['typeOwner'])) {
-                $this->typeOwner = "true";
-            }
-            return $this->typeOwner;
-        }
-
-        // Функция сохраняет текущие параметры пользователя (хранящиеся в данном объекте) в базу данных
-        // $typeOfUser = "new" - режим сохранения для нового (регистрируемого пользователя)
-        // $typeOfUser = "edit" - режим сохранения для редактируемых параметров (для существующего пользователя)
-        public function saveToDB($typeOfUser = "new")
-        {
-
-            // Инициализируем массив для возвращения в качестве результата функции
-            $error = array();
-
-            // Корректируем дату дня рождения для того, чтобы сделать ее пригодной для сохранения в базу данных
-            $birthdayDB = $this->globFunc->dateFromViewToDB($this->birthday);
-            // Получаем текущее время для сохранения в качестве даты регистрации и даты последнего действия
-            $tm = time();
-            $last_act = $tm;
-            $reg_date = $tm;
-            // Сериализуем массив с избранными объявлениями
-            $favoritesPropertysId = serialize($this->favoritesPropertysId);
-
-            // Для простоты технической поддержки пользователей пойдем на небольшой риск с точки зрения безопасности и будем хранить пароли пользователей на сервере в БД без соли и шифрования
-            /*$salt = mt_rand(100, 999);
-              $password = md5(md5($password) . $salt);*/
-
-            // Формируем запрос в зависимости от того: сохраняем данные нового пользователя (при регистрации) или редактированные параметры существующего пользователя
-            if ($typeOfUser == "new") {
-                $query = "INSERT INTO users (typeTenant,typeOwner,name,secondName,surname,sex,nationality,birthday,login,password,telephon,emailReg,email,currentStatusEducation,almamater,speciality,kurs,ochnoZaochno,yearOfEnd,statusWork,placeOfWork,workPosition,regionOfBorn,cityOfBorn,shortlyAboutMe,vkontakte,odnoklassniki,facebook,twitter,lic,last_act,reg_date,favoritesPropertysId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                $typeForParams = "sssssssssssssssssssssssssssssssiib";
-                $paramsArr = array(&$this->typeTenant, &$this->typeOwner, &$this->name, &$this->secondName, &$this->surname, &$this->sex, &$this->nationality, &$birthdayDB, &$this->login, &$this->password, &$this->telephon, &$this->email, &$this->email, &$this->currentStatusEducation, &$this->almamater, &$this->speciality, &$this->kurs, &$this->ochnoZaochno, &$this->yearOfEnd, &$this->statusWork, &$this->placeOfWork, &$this->workPosition, &$this->regionOfBorn, &$this->cityOfBorn, &$this->shortlyAboutMe, &$this->vkontakte, &$this->odnoklassniki, &$this->facebook, &$this->twitter, &$this->lic, &$last_act, &$reg_date, &$favoritesPropertysId);
-            }
-            if ($typeOfUser == "edit") {
-                // TODO: реализовать для режима edit
-            }
-
-            // Пишем данные нового пользователя в БД. При успехе в $res сохраняем TRUE, иначе - FALSE
-            $stmt = $this->DBlink->stmt_init();
-            if (($stmt->prepare($query) === FALSE)
-                OR ($stmt->bind_param($typeForParams, $paramsArr) === FALSE)
-                OR ($stmt->execute() === FALSE)
-                OR (($res = $stmt->affected_rows) === -1)
-                OR ($res === 0)
-                OR ($stmt->close() === FALSE)
-            ) {
-                $res = FALSE;
-                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-            } else {
-                $res = TRUE;
-            }
-
-            // Если сохранение Личных данных пользователя прошло успешно, то
-            if ($res == TRUE) {
-
-                /******* Переносим информацию о фотографиях пользователя в таблицу для постоянного хранения, лишние файлы удаляем *******/
-
-                if (is_array($this->uploadedFoto) && count($this->uploadedFoto) != 0) {
-                    // Узнаем id пользователя - необходимо при сохранении информации о фотке в постоянную базу
-                    if ($this->id == "") {
-                        // Получим из БД данные ($res) по пользователю с логином = $login
-                        $stmt = $this->DBlink->stmt_init();
-                        if (($stmt->prepare("SELECT id FROM users WHERE login=?") === FALSE)
-                            OR ($stmt->bind_param("s", $this->login) === FALSE)
-                            OR ($stmt->execute() === FALSE)
-                            OR (($res = $stmt->get_result()) === FALSE)
-                            OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-                            OR (count($res) === 0)
-                            OR ($stmt->close() === FALSE)
-                        ) {
-                            // Для того, чтобы при сохранении фотографий и условий поиска не напороться на неожиданное поведение, присвоим идентификатору пользователя 0, таким образом любая выборка из БД с таким id даст нулевые результаты
-                            $this->id = 0;
-                            // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-                        } else {
-                            $this->id = $res[0]['id'];
-                        }
-                    }
-
-                    // Соберем условие WHERE для 2-х SQL запросов к БД: один для получения данных из таблицы tempFotos по всем фотографиям, содержащимся в $uploadedFoto (то есть которые пользователь хочет сохранить на постоянное хранение), второй - для запроса тоже к таблице tempFotos, но с целью выявить записи, соответствующие данной сессии взаимодействия с пользователем (совпадает fileUploadId), но не содержащиеся в $uploadedFoto (пользователь удалил соответствующие фотографии на клиенте при редактировании списка фотографий). Второй запрос нужен для того, чтобы выявить ненужные файлы фотографий, которые хранятся на сервере, и удалить их.
-                    // TODO: лень сделать как надо - через подготовленные запросы - prepare и bind_param. Как-нибудь потом
-                    $strWHEREforLife = " (";
-                    $strWHEREforDead = " (";
-                    for ($i = 0; $i < count($this->uploadedFoto); $i++) {
-
-                        $strWHEREforLife .= " id = '" . $this->uploadedFoto[$i]['fotoid'] . "'";
-                        $strWHEREforDead .= " id != '" . $this->uploadedFoto[$i]['fotoid'] . "'";
-
-                        if ($i < count($this->uploadedFoto) - 1) {
-                            $strWHEREforLife .= " OR";
-                            $strWHEREforDead .= " AND";
-                        }
-
-                    }
-                    $strWHEREforLife .= " )";
-                    $strWHEREforDead .= " ) AND (fileUploadId = '" . $this->fileUploadId . "')";
-
-                    // Получаем данные по фотографиям, предназначенным для переноса на постоянное хранение
-                    $fotoForLifeArr = array(); // в итоге получим массив, каждый элемент которого представляет собой еще один массив данных по конкретной фотографии
-                    if ($strWHEREforLife != "") {
-                        // Получим из БД данные ($res) по фотографиям с указанными id
-                        $res = $this->DBlink->query("SELECT * FROM tempFotos WHERE " . $strWHEREforLife);
-                        if (($this->DBlink->errno)
-                            OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-                        ) {
-                            $res = array();
-                            // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-                        }
-                    }
-
-                    // Дополним данные, полученные из БД ($fotoForLifeArr) актуальными сведениями с клиентского места о статусе каждой фотографии (основная или нет)
-                    $primaryFotoExists = 0; // Инициализируем переменную, по которой после прохода по всем фотографиям, полученным в форме, сможем сказать была ли указана пользователем основная фотка (число) или нет (0)
-                    for ($i = 0; $i < count($fotoForLifeArr); $i++) {
-                        // В массиве $uploadedFoto также содержится актуальная информация по всем статусам фотографий, но легче получить id основной фотки из формы, а не из этого массива
-                        if ($fotoForLifeArr[$i]['id'] == $this->primaryFotoId) {
-                            $fotoForLifeArr[$i]['status'] = 'основная';
-                            $primaryFotoExists++;
-                        } else {
-                            $fotoForLifeArr[$i]['status'] = '';
-                        }
-
-                        // Подготовим данные о пути к каталогу хранения фотографии в вид, пригодный для перезаписи в БД
-                        $fotoForLifeArr[$i]['folder'] = str_replace('\\', '\\\\', $fotoForLifeArr[$i]['folder']); // Переменная folder уже содержит в себе один или несколько '\', но для того, чтобы при сохранении в БД не возникло проблем, к нему нужно добавить еще один символ '\', в этом случае mysql будет воспринимать "\\" как один знак "\" и не будет считать его служебгым символом
-                    }
-
-                    // Если пользователь не указал основное фото, то укажем первую попавшуюся фотографию в качестве основной
-                    if ($primaryFotoExists == 0 && isset($fotoForLifeArr[0])) $fotoForLifeArr[0]['status'] = 'основная';
-
-                    // Сформируем запрос к БД (таблица userFotos) для записи данных о фотографиях
-                    $strINSERTvalues = "";
-                    for ($i = 0; $i < count($fotoForLifeArr); $i++) {
-                        $strINSERTvalues .= "('" . $fotoForLifeArr[$i]['id'] . "','" . $fotoForLifeArr[$i]['folder'] . "','" . $fotoForLifeArr[$i]['filename'] . "','" . $fotoForLifeArr[$i]['extension'] . "','" . $fotoForLifeArr[$i]['filesizeMb'] . "','" . $this->id . "','" . $fotoForLifeArr[$i]['status'] . "')";
-                        if ($i < count($fotoForLifeArr) - 1) $strINSERTvalues .= ",";
-                    }
-                    // Сохраняем на постоянное хранение информацию о загруженных пользователем фотографиях
-                    $res = $this->DBlink->query("INSERT INTO userFotos (id, folder, filename, extension, filesizeMb, userId, status) VALUES " . $strINSERTvalues);
-                    if (($this->DBlink->errno)
-                        OR (($res = $res->affected_rows) === -1)
-                        OR ($res === 0)
-                    ) {
-                        $res = FALSE;
-                        // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-                    }
-                }
-
-
-
-
-
-
-
-
-
-                // В любом случае проверяем есть ли в таблице tempFotos данные о фотографиях, загруженных пользователем во время этой сессии взаимодействия.
-                if (!isset($strWHEREforDead)) $strWHEREforDead = "fileUploadId = '" . $this->fileUploadId . "'";
-                // Выполним запрос к таблице tempFotos с целью выявить записи, соответствующие данной сессии взаимодействия с пользователем (совпадает fileUploadId), но не содержащиеся в $uploadedFoto (пользователь удалил соответствующие фотографии на клиенте при редактировании списка фотографий). Этот запрос нужен для того, чтобы выявить ненужные файлы фотографий, которые хранятся на сервере, и удалить их.
-                $tempFotosForDead = getResultSQLSelect($this->DBlink, "SELECT * FROM tempFotos WHERE " . $strWHEREforDead);
-                for ($i = 0; $i < count($tempFotosForDead); $i++) {
-                    // Удаляем файлы, которые пользователь на клиенте пометил на удаление (нажал на кнопку/ссылку удалить)
-                    // TODO: сделать сохранение статусов отработки команд по удалению фоток в лог файл. Каждый unlink выдает true, если все хорошо и false, если плохо
-                    unlink($tempFotosForDead['folder'] . '\\small\\' . $tempFotosForDead['id'] . "." . $tempFotosForDead['extension']);
-                    unlink($tempFotosForDead['folder'] . '\\middle\\' . $tempFotosForDead['id'] . "." . $tempFotosForDead['extension']);
-                    unlink($tempFotosForDead['folder'] . '\\big\\' . $tempFotosForDead['id'] . "." . $tempFotosForDead['extension']);
-                }
-
-                // Удаляем все записи о фотках в таблице для временного хранения данных по данной сессии
-                $rez = mysqli_query($this->DBlink, mysqli_real_escape_string($this->DBlink, "DELETE FROM tempFotos WHERE fileUploadId = '" . $this->fileUploadId . "'"));
-                if ($rez == FALSE) {
-                    // TODO: сохраняем в лог ошибку обращения к БД
-                }
-
-                /******* Сохраняем поисковый запрос, если он был указан пользователем *******/
-
-                // Преобразование формата инфы об искомом кол-ве комнат и районах, так как MySQL не умеет хранить массивы
-                $amountOfRoomsSerialized = serialize($this->amountOfRooms);
-                $districtSerialized = serialize($this->district);
-
-                // Готовим пустой массив с идентификаторами объектов, которыми заинтересовался пользователь - на будущее
-                $interestingPropertysId = array();
-                $interestingPropertysId = serialize($interestingPropertysId);
-
-                // Непосредственное сохранение данных о поисковом запросе
-                if ($typeTenant == "true") {
-                    $rez = mysqli_query($this->DBlink, mysqli_real_escape_string($this->DBlink, "INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, interestingPropertysId) VALUES ('" . $userId . "','" . $typeOfObject . "','" . $amountOfRoomsSerialized . "','" . $adjacentRooms . "','" . $floor . "','" . $minCost . "','" . $maxCost . "','" . $pledge . "','" . $prepayment . "','" . $districtSerialized . "','" . $withWho . "','" . $linksToFriends . "','" . $children . "','" . $howManyChildren . "','" . $animals . "','" . $howManyAnimals . "','" . $termOfLease . "','" . $additionalDescriptionOfSearch . "','" . $interestingPropertysId . "')")); // Поисковый запрос пользователя сохраняется в специальной таблице
-                    if ($rez == FALSE) {
-                        // TODO: сохраняем в лог ошибку обращения к БД
-                    }
-                }
-
-
-                /******* Авторизовываем пользователя *******/
-                $error = enter($this->DBlink);
-                if (count($error) == 0) //если нет ошибок, отправляем уже авторизованного пользователя на страницу успешной регистрации
-                {
-                    header('Location: successfullRegistration.php'); //после успешной регистрации - переходим на соответствующую страницу
-                } else {
-                    // TODO:что-то нужно делать в случае, если возникли ошибки при авторизации во время регистрации - как минимум вывести их текст во всплывающем окошке
-                }
-
-            } else { // Если сохранить личные данные пользователя в БД не удалось
-
-                $errors[] = 'К сожалению, при сохранении данных произошла ошибка: проверьте, пожалуйста, еще раз корректность Вашей информации и повторите попытку регистрации';
-                // Сохранении данных в БД не прошло - пользователь не зарегистрирован
-            }
-
-            return $errors;
-        }
-
-        // Функция проверяет - залогинен ли пользователь сейчас (взвращает TRUE или FALSE). И если залогинен, то обновляет его личные параметры в соответствии с указанными в БД
+        // Функция проверяет - залогинен ли пользователь сейчас (возвращает TRUE или FALSE).
+        // И если пользователь залогинен, то обновляет его личные параметры в соответствии с указанными в БД (но не обновляет параметры поиска)
+        // TODO: Оптимизировать код - делать только 1 запрос к БД с параметром идентификатор сессии и одновременно логин пользователя
         public function login()
         {
             // Если данная функция уже вызывалась на этой странице, то результат ее работы сохранен в приватной переменной, достаочно выдать его
@@ -677,7 +1020,8 @@
 
         }
 
-        // Функция для авторизации (входа) пользователя на сайте
+        // Функция для авторизации (входа) пользователя на сайте.
+        // Возвращает массив с ошибками в случае невозможности авторизации пользователя и пустой массив при успехе
         function enter()
         {
             $error = array(); // Массив для ошибок
@@ -777,5 +1121,3 @@
         }
 
     }
-
-?>

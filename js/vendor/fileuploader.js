@@ -762,6 +762,9 @@ qq.extend(qq.FileUploader.prototype, {
         var item = this._getItemByFileId(id);
         var size = this._find(item, 'size');
         size.style.display = 'inline';
+        // Мои комментарии: прячем команду удалить на время загурзки. У пользователя есть команда Отмены.
+        var remove = this._find(item, 'remove');
+        remove.style.display = 'none';
 
         var text;
         var percent = Math.round(loaded / total * 100);
@@ -792,6 +795,10 @@ qq.extend(qq.FileUploader.prototype, {
         qq.remove(this._find(item, 'cancel'));
         qq.remove(this._find(item, 'spinner'));
         qq.remove(this._find(item, 'size'));
+
+        // Отображаем команду на удаление фотографии
+        var remove = this._find(item, 'remove');
+        remove.style.display = '';
 
         // В атрибут value радиокнопки для выбора основной фотографии заносим id данного фото.
         $(this._find(item, 'primary')).attr('value', result.name);

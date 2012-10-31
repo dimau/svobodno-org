@@ -20,11 +20,10 @@
 
     // Проверим, быть может пользователь уже авторизирован. Если это так, перенаправим его в личный кабинет
     if ($user->login()) {
-
         header('Location: personal.php');
+    }
 
-    } else //если пользователь не авторизирован, то проверим, была ли нажата кнопка входа на сайт
-    {
+    //если пользователь не авторизирован, то проверим, была ли нажата кнопка входа на сайт
         if (isset($_POST['buttonSubmit'])) {
 
             $error = $user->enter(); //функция входа на сайт
@@ -35,7 +34,7 @@
             }
             // Если при авторизации возникли ошибки, мы их покажем в специальном всплывающем сверху блоке вместе со страницей авторизации
         }
-    }
+
 ?>
 
 <!DOCTYPE html>
@@ -162,6 +161,11 @@
     }
 </script>
 <!-- end scripts -->
+
+<?php
+    // Закрываем соединение с БД
+    $globFunc->closeConnectToDB($DBlink);
+?>
 
 <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.
         mathiasbynens.be/notes/async-analytics-snippet -->

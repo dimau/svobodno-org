@@ -6,13 +6,8 @@
         private $DBlink = FALSE; // Переменная для хранения объекта соединения с базой данных
 
         // КОНСТРУКТОР
-        // В качестве входных параметров: $DBlink объект соединения с базой данных
-        public function __construct($DBlink = FALSE)
+        public function __construct()
         {
-            // Если объект соединения с БД получен - сделаем его доступным для всех методов класса
-            if ($DBlink != FALSE) {
-                $this->DBlink = $DBlink;
-            }
 
         }
 
@@ -35,28 +30,33 @@
             }
 
             // Устанавливаем кодировку
-            $mysqli->set_charset("utf8");
+            if (!$mysqli->set_charset("utf8")) {
+                // TODO: сохранить в лог ошибку изменения кодировки БД
+            }
+
+            // Если объект соединения с БД получен - сделаем его доступным для всех методов класса
+            $this->DBlink = $mysqli;
 
             // Возвращаем объект - соединение с БД
             return $mysqli;
 
-            /*$DBlink = mysqli_connect("localhost", "dimau1_dimau", "udvudv", "dimau1_homes");
-            if (!$DBlink) {
-                // TODO: сохранить в лог ошибку подключения к БД: ('Ошибка подключения к базе данных (' . mysqli_connect_errno() . ') ' . mysqli_connect_error())
-                // TODO: сделать красивую страницу тех поддержки, на которую перенаправлять пользователя, если с БД связи нет
-                return FALSE;
-            }
-
-            // Устанавливаем кодировку
-            mysqli_set_charset($DBlink, 'utf8');
-
-            // Возвращаем ресурс - соединение с БД
-            return $DBlink; */
         }
 
         // Функция закрывает соединение с БД
-        public function closeConnectToDB($mysqli) {
-            $mysqli->close();
+        public function closeConnectToDB($DBlink = FALSE) {
+            if ($DBlink == FALSE) return FALSE;
+
+            if ($DBlink->close()) {
+
+                return TRUE;
+
+            } else {
+
+                // TODO: сохранить в лог ошибку закрытия соединения с БД
+                return FALSE;
+
+            }
+
         }
 
         //Функция для генерации случайной строки
@@ -111,5 +111,3 @@
         }
 
     }
-
-?>

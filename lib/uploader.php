@@ -1,22 +1,31 @@
 <?php
 
-    // Подключаем библиотеку общих функций
-    include_once 'function_global.php';
+    // Стартуем сессию с пользователем - сделать доступными переменные сессии
+    session_start();
+
+    // Подключаем нужные классы
+    include_once '../classesForProjectSecurityName/GlobFunc.php';
+
+    // Создаем объект-хранилище глобальных функций
+    $globFunc = new GlobFunc();
+
     // Подключаемся к БД
-    $DBlink = connectToDB();
+    $DBlink = $globFunc->connectToDB();
+    // Удалось ли подключиться к БД?
+    if ($DBlink == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
     // Задаем список допустимых расширений для загружаемых файлов. Также расширение при начале загрузки проверяется в js файле vendor\fileuploader.js. Списки должны совпадать
     $allowedExtensions = array("jpeg", "JPEG", "jpg", "JPG", "png", "PNG", "gif", "GIF");
     // Задаем максимальный размер файла для загрузки в байтах
     $sizeLimit = 10 * 1024 * 1024;
 
-    $uploader = new qqFileUploader($allowedExtensions, $sizeLimit);
+    $uploader = new qqFileUploader($allowedExtensions, $sizeLimit, $DBlink);
 
     // Call handleUpload() with the name of the folder, relative to PHP's getcwd()
-    $result = $uploader->handleUpload('..\uploaded_files\\', FALSE, $DBlink);
+    $result = $uploader->handleUpload('..\uploaded_files\\', FALSE);
 
-    // Закрываем соединенние с БД
-    closeConnectToDB($DBlink);
+    // Закрываем соединение с БД
+    $globFunc->closeConnectToDB($DBlink);
 
     // to pass data through iframe you will need to encode all html tags
     echo htmlspecialchars(json_encode($result), ENT_NOQUOTES);
@@ -100,13 +109,15 @@
         private $allowedExtensions = array(); // Хранит ограничение на расширения файлов для загрузки. По умолчанию - нет ограничений
         private $sizeLimit = 10485760; // Хранит ограничение на максимальный объем файла для загрузки. По  умолчанию - 10485760 байт
         private $file;
+        private $DBlink = FALSE;
 
-        function __construct(array $allowedExtensions = array(), $sizeLimit = 10485760)
+        function __construct(array $allowedExtensions = array(), $sizeLimit = 10485760, $DBlink = FALSE)
         {
             $allowedExtensions = array_map("strtolower", $allowedExtensions);
 
             $this->allowedExtensions = $allowedExtensions;
             $this->sizeLimit = $sizeLimit;
+            $this->DBlink = $DBlink;
 
             $this->checkServerSettings();
 
@@ -154,158 +165,10 @@
 
         /**
          * Обработчик загрузки файла
-         * Returns array('success'=>true) or array('error'=>'error message')
+         * Возвращает массив ('success'=>true) или массив ('error'=>'error message')??
          */
-        function handleUpload($uploadDirectory, $replaceOldFile = FALSE, $DBlink)
+        function handleUpload($uploadDirectory, $replaceOldFile = FALSE)
         {
-
-            /****************************************************************************************************************************
-             * Набор функций для обработки фотографий
-             ***************************************************************************************************************************/
-
-            // Функция по типу исходного файла фотографии создает ресурс для обработки
-            // Кроме того эта функция не позволяет загрузить на сервер файл, не являющийся фотографией, т.е. защищает например от банального изменения расширения для вредоносного файла
-            function getSrcImage($srcParams, $tempFilePath)
-            {
-                // Вычисляем тип (расширении) фотографии пользователя и вызываем соответствующую функцию для создания обрабатываемого с помощью php изображения
-                switch (strtolower($srcParams['mime'])) {
-                    case "image/gif":
-                        $foto_src = imagecreatefromgif($tempFilePath);
-                        break;
-                    case "image/jpeg":
-                        $foto_src = imagecreatefromjpeg($tempFilePath);
-                        break;
-                    case "image/png":
-                        $foto_src = imagecreatefrompng($tempFilePath);
-                        break;
-                    /*case "image/bmp":
-                    case "image/x-ms-bmp":
-                        $foto_src = imagecreatefromwbmp($tempFilePath);
-                        break;*/
-                    default:
-                        return false;
-                }
-
-                return $foto_src;
-            }
-
-            // Функция возвращает фотографию с измененными размерами. Размеры изменены в соответствии с указанным типом назначения
-            function getReSizeImage($foto_src, $srcParams, $type)
-            {
-                // Определяем размеры исходной фотографии
-                $srcWidth = $srcParams[0]; // Получаем ширину исходной загруженной пользователем фотографии
-                $srcHeight = $srcParams[1]; // Получаем высоту исходной загруженной пользователем фотографии
-
-                // Инициализируем размеры для новой фотографии
-                $new_width = $srcWidth;
-                $new_height = $srcHeight;
-
-                // Определяем максимальные размеры целевой фотографии - в зависимости от типа
-                if ($type == "big") {
-
-                    $new_width_max = 900;
-                    $new_height_max = 900;
-
-                } elseif ($type == "middle") {
-
-                    $new_width_max = 300;
-                    $new_height_max = 300;
-
-                } elseif ($type == "small") {
-
-                    $new_width_max = 120;
-                    $new_height_max = 120;
-
-                } else {
-
-                    return false;
-
-                }
-
-                // Вычисляем целевые размеры изображения
-                if ($srcWidth > $new_width_max) {
-                    $ratio = $srcWidth / $new_width_max;
-                    $new_width = $new_width_max;
-                    $new_height = $srcHeight / $ratio;
-                }
-                if ($new_height > $new_height_max) {
-                    $ratio = $new_height / $new_height_max;
-                    $new_height = $new_height_max;
-                    $new_width = $new_width / $ratio;
-                }
-
-                // Инициализируем целевое изображение
-                // функция  imagecreatetruecolor создает пустое полноцветное изображение размерами $new_width и $new_height.
-                // Созданное изображение имеет черный фон.
-                $foto_dst = imagecreatetruecolor($new_width, $new_height);
-
-                // Непосредственное получение целевой фотографии из исходной
-                imagecopyresampled($foto_dst, $foto_src, 0, 0, 0, 0, $new_width, $new_height, $srcWidth, $srcHeight);
-
-                return $foto_dst;
-            }
-
-            // Функция сохраняет в нужный каталог файл фотографии, а также записывает в БД данные о нем
-            function saveImg($foto_dst, $uploadDirectory, $type, $filename)
-            {
-                $subDirectory = substr($filename, 0, 1);
-                $typeDirectory = "\\" . $type . "\\";
-
-                // Вычисляем адрес для сохранения целевой фотографии ($foto_dst)
-                // Для того, чтобы не складывать все фотографии в один каталог (при достижении 3-4 тыс. файлов все будет сильно тормозить) я делаю следующее: по первому символу в id(названии) файла определяю каталог для хранения внутри каталога file_upload. Внутри найденного каталога определяю еще один каталог, соответствующий размеру фотографии (small, middle, big)
-                $urlForSave = $uploadDirectory . $subDirectory . $typeDirectory . $filename . '.' . "jpeg";
-
-                // Сохранение целевой фотографии в формате jpeg в целевой каталог
-                if (imagejpeg($foto_dst, $urlForSave, 85)) {
-
-                    // Преобразуем $uploadDirectory = '..\uploaded_files\\' к виду, который нужно сохранить в БД. То есть путь нужно показать относительно корня проекта, а не относительно текущего каталога расположения uploader.php
-                    $uploadDirectoryFromCore = substr($uploadDirectory, 3);
-
-                    return array('folder' => $uploadDirectoryFromCore . $subDirectory,
-                                 'ext'    => "jpeg");
-
-                } else {
-
-                    return FALSE;
-
-                }
-            }
-
-            // Функция сохраняет данные о файле фотографии в Базу данных - в таблицу tempFotos
-            function saveInfToDB($folder, $filename, $size, $DBlink) {
-
-                // Готовим данные для сохранения в БД
-                $sizeMb = round($size / 1024 / 1024, 1);
-                $extension = 'jpeg';
-
-                // Сохраняем информацию о загруженной фотке в БД
-                $stmt = mysqli_prepare($DBlink, "INSERT INTO tempfotos (id, fileUploadId, folder, filename, extension, filesizeMb) VALUES (?,?,?,?,?,?)");
-                if ($stmt) {
-                    mysqli_stmt_bind_param($stmt, "sssssd", $filename, $_GET['fileuploadid'], $folder, $_GET['sourcefilename'], $extension, $sizeMb);
-                    mysqli_stmt_execute($stmt);
-                    $res = mysqli_affected_rows($DBlink);
-                    mysqli_stmt_close($stmt);
-                } else {
-                    $res = FALSE; // ошибка обращения к БД
-                }
-
-                // Возвращаем статус сохранения данных в БД
-                if ($res == 1) {
-                    return TRUE;
-                } else {
-                    return FALSE;
-                    //TODO: Сохранить в лог инфу об ошибке обращения к БД
-                }
-
-            }
-
-            // Функция для очистки памяти
-            function clearMemory($foto_dst, $foto_src, $tempFilePath)
-            {
-                imagedestroy($foto_dst);
-                imagedestroy($foto_src);
-                unlink($tempFilePath);
-            }
 
             /****************************************************************************************************************************
              * Предварительная подготовка к обработке фотографии, загруженной пользователем
@@ -333,7 +196,7 @@
             // Вычисляем новое уникальное имя для файла
             $pathinfo = pathinfo($this->file->getName());
             //$filename = $pathinfo['filename'];
-            $filename = md5(uniqid());
+            $filename = md5(uniqid()); //TODO: сделать равномерное случайное число (чтобы файлы равномерно распределеялись по каталогам при сохранении на сервер)
             $ext = @$pathinfo['extension']; // hide notices if extension is empty
 
             // Серверная проверка расширения файла
@@ -364,45 +227,45 @@
             $srcParams = getimagesize($tempFilePath);
 
             // Получим ресурс, соответствующий исходной фотографии для дальнейшего преобразования его в нужные типы фотографий (small, middle, big)
-            $foto_src = getSrcImage($srcParams, $tempFilePath);
+            $foto_src = $this->getSrcImage($srcParams, $tempFilePath);
             if (!$foto_src) {
                 return array('error' => 'Не удалось сохранить загруженный файл на сервере.' . ' Формат загруженного файла не входит в список поддерживаемых: ' . 'gif, jpeg, png');
             };
 
             // Производим преобразование исходной фотографии в целевую большую
-            $foto_dst = getReSizeImage($foto_src, $srcParams, "big");
+            $foto_dst = $this->getReSizeImage($foto_src, $srcParams, "big");
             if (!$foto_dst) {
                 return array('error' => 'Не удалось сохранить загруженный файл на сервере.' . ' Ошибка при преобразовании исходной фотографии в jpeg большого размера. Попробуйте еще раз, либо загрузите другую фотографию');
             }
 
-            if (!$saveRes = saveImg($foto_dst, $uploadDirectory, "big", $filename)) {
+            if (!$saveRes = $this->saveImg($foto_dst, $uploadDirectory, "big", $filename)) {
                 return array('error' => 'Не удалось сохранить загруженный файл на сервере.' . ' Ошибка при записи в каталог хранения фотографии большого размера. Попробуйте еще раз, либо загрузите другую фотографию');
             }
 
             // Производим преобразование исходной фотографии в целевую среднюю
-            $foto_dst = getReSizeImage($foto_src, $srcParams, "middle");
+            $foto_dst = $this->getReSizeImage($foto_src, $srcParams, "middle");
             if (!$foto_dst) return array('error' => 'Не удалось сохранить загруженный файл на сервере.' . ' Ошибка при преобразовании исходной фотографии в jpeg среднего размера. Попробуйте еще раз, либо загрузите другую фотографию');
 
-            if (!$saveRes = saveImg($foto_dst, $uploadDirectory, "middle", $filename)) {
+            if (!$saveRes = $this->saveImg($foto_dst, $uploadDirectory, "middle", $filename)) {
                 return array('error' => 'Не удалось сохранить загруженный файл на сервере.' . ' Ошибка при записи в каталог хранения фотографии среднего размера. Попробуйте еще раз, либо загрузите другую фотографию');
             }
 
             // Производим преобразование исходной фотографии в целевую маленькую
-            $foto_dst = getReSizeImage($foto_src, $srcParams, "small");
+            $foto_dst = $this->getReSizeImage($foto_src, $srcParams, "small");
             if (!$foto_dst) return array('error' => 'Не удалось сохранить загруженный файл на сервере.' . ' Ошибка при преобразовании исходной фотографии в jpeg маленького размера. Попробуйте еще раз, либо загрузите другую фотографию');
 
-            if (!$saveRes = saveImg($foto_dst, $uploadDirectory, "small", $filename)) {
+            if (!$saveRes = $this->saveImg($foto_dst, $uploadDirectory, "small", $filename)) {
                 return array('error' => 'Не удалось сохранить загруженный файл на сервере.' . ' Ошибка при записи в каталог хранения фотографии маленького размера. Попробуйте еще раз, либо загрузите другую фотографию');
             }
 
             // Сохраняем информацию о фотографиях в Базу данных
-            $res = saveInfToDB($saveRes['folder'], $filename, $size, $DBlink);
+            $res = $this->saveInfToDB($saveRes['folder'], $filename, $size);
 
             if ($res == FALSE) {
                 return array('error' => 'Не удалось сохранить загруженный файл на сервере.' . ' Ошибка при сохранении информации в базу данных. Попробуйте еще раз, либо загрузите другую фотографию');
             }
 
-            clearMemory($foto_dst, $foto_src, $tempFilePath);
+            $this->clearMemory($foto_dst, $foto_src, $tempFilePath);
 
             /****************************************************************************************************************************
              * Выдача положительного результата и полезных для JS на клиенте данных
@@ -413,6 +276,153 @@
                          'name'    => $filename, // Идентификатор фотографии, который также служит уникальным именем файла (без расширения)
                          'ext'     => $saveRes['ext']); // Расширение, под которым сохранены все 3 копии файла (small, medium, big)
 
+        }
+
+        /****************************************************************************************************************************
+         * Набор методов для обработки фотографий
+         ***************************************************************************************************************************/
+
+        // Функция по типу исходного файла фотографии создает ресурс для обработки
+        // Кроме того эта функция не позволяет загрузить на сервер файл, не являющийся фотографией, т.е. защищает например от банального изменения расширения для вредоносного файла
+        function getSrcImage($srcParams, $tempFilePath)
+        {
+            // Вычисляем тип (расширении) фотографии пользователя и вызываем соответствующую функцию для создания обрабатываемого с помощью php изображения
+            switch (strtolower($srcParams['mime'])) {
+                case "image/gif":
+                    $foto_src = imagecreatefromgif($tempFilePath);
+                    break;
+                case "image/jpeg":
+                    $foto_src = imagecreatefromjpeg($tempFilePath);
+                    break;
+                case "image/png":
+                    $foto_src = imagecreatefrompng($tempFilePath);
+                    break;
+                /*case "image/bmp":
+            case "image/x-ms-bmp":
+                $foto_src = imagecreatefromwbmp($tempFilePath);
+                break;*/
+                default:
+                    return FALSE;
+            }
+
+            return $foto_src;
+        }
+
+        // Функция возвращает фотографию с измененными размерами. Размеры изменены в соответствии с указанным типом назначения
+        function getReSizeImage($foto_src, $srcParams, $type)
+        {
+            // Определяем размеры исходной фотографии
+            $srcWidth = $srcParams[0]; // Получаем ширину исходной загруженной пользователем фотографии
+            $srcHeight = $srcParams[1]; // Получаем высоту исходной загруженной пользователем фотографии
+
+            // Инициализируем размеры для новой фотографии
+            $new_width = $srcWidth;
+            $new_height = $srcHeight;
+
+            // Определяем максимальные размеры целевой фотографии - в зависимости от типа
+            if ($type == "big") {
+
+                $new_width_max = 900;
+                $new_height_max = 900;
+
+            } elseif ($type == "middle") {
+
+                $new_width_max = 300;
+                $new_height_max = 300;
+
+            } elseif ($type == "small") {
+
+                $new_width_max = 120;
+                $new_height_max = 120;
+
+            } else {
+
+                return FALSE;
+
+            }
+
+            // Вычисляем целевые размеры изображения
+            if ($srcWidth > $new_width_max) {
+                $ratio = $srcWidth / $new_width_max;
+                $new_width = $new_width_max;
+                $new_height = $srcHeight / $ratio;
+            }
+            if ($new_height > $new_height_max) {
+                $ratio = $new_height / $new_height_max;
+                $new_height = $new_height_max;
+                $new_width = $new_width / $ratio;
+            }
+
+            // Инициализируем целевое изображение
+            // функция  imagecreatetruecolor создает пустое полноцветное изображение размерами $new_width и $new_height.
+            // Созданное изображение имеет черный фон.
+            $foto_dst = imagecreatetruecolor($new_width, $new_height);
+
+            // Непосредственное получение целевой фотографии из исходной
+            imagecopyresampled($foto_dst, $foto_src, 0, 0, 0, 0, $new_width, $new_height, $srcWidth, $srcHeight);
+
+            return $foto_dst;
+        }
+
+        // Функция сохраняет в нужный каталог файл фотографии, а также записывает в БД данные о нем
+        function saveImg($foto_dst, $uploadDirectory, $type, $filename)
+        {
+            $subDirectory = substr($filename, 0, 1);
+            $typeDirectory = "\\" . $type . "\\";
+
+            // Вычисляем адрес для сохранения целевой фотографии ($foto_dst)
+            // Для того, чтобы не складывать все фотографии в один каталог (при достижении 3-4 тыс. файлов все будет сильно тормозить) я делаю следующее: по первому символу в id(названии) файла определяю каталог для хранения внутри каталога file_upload. Внутри найденного каталога определяю еще один каталог, соответствующий размеру фотографии (small, middle, big)
+            $urlForSave = $uploadDirectory . $subDirectory . $typeDirectory . $filename . '.' . "jpeg";
+
+            // Сохранение целевой фотографии в формате jpeg в целевой каталог
+            if (imagejpeg($foto_dst, $urlForSave, 85)) {
+
+                // Преобразуем $uploadDirectory = '..\uploaded_files\\' к виду, который нужно сохранить в БД. То есть путь нужно показать относительно корня проекта, а не относительно текущего каталога расположения uploader.php
+                $uploadDirectoryFromCore = substr($uploadDirectory, 3);
+
+                return array('folder' => $uploadDirectoryFromCore . $subDirectory,
+                             'ext'    => "jpeg");
+
+            } else {
+
+                return FALSE;
+
+            }
+        }
+
+        // Функция сохраняет данные о файле фотографии в Базу данных - в таблицу tempFotos
+        function saveInfToDB($folder, $filename, $size) {
+
+            // Проверяем, что есть соединение с БД
+            if ($this->DBlink == FALSE) return FALSE;
+
+            // Готовим данные для сохранения в БД
+            $sizeMb = round($size / 1024 / 1024, 1);
+            $extension = 'jpeg';
+
+            // Сохраняем информацию о загруженной фотке в БД
+            $stmt = $this->DBlink->stmt_init();
+            if (($stmt->prepare("INSERT INTO tempfotos (id, fileUploadId, folder, filename, extension, filesizeMb) VALUES (?,?,?,?,?,?)") === FALSE)
+                OR ($stmt->bind_param("sssssd", $filename, $_GET['fileuploadid'], $folder, $_GET['sourcefilename'], $extension, $sizeMb) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($res = $stmt->affected_rows) === -1)
+                OR ($res === 0)
+                OR ($stmt->close() === FALSE)
+            ) {
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                return FALSE;
+            }
+
+            return TRUE;
+
+        }
+
+        // Функция для очистки памяти
+        function clearMemory($foto_dst, $foto_src, $tempFilePath)
+        {
+            imagedestroy($foto_dst);
+            imagedestroy($foto_src);
+            unlink($tempFilePath);
         }
 
     }

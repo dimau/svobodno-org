@@ -1,3 +1,25 @@
+<?php
+
+    // Стартуем сессию с пользователем - сделать доступными переменные сессии
+    session_start();
+
+    // Подключаем нужные классы
+    include_once 'classesForProjectSecurityName/GlobFunc.php';
+    include_once 'classesForProjectSecurityName/User.php';
+
+    // Создаем объект-хранилище глобальных функций
+    $globFunc = new GlobFunc();
+
+    // Подключаемся к БД
+    $DBlink = $globFunc->connectToDB();
+    // Удалось ли подключиться к БД?
+    if ($DBlink == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
+
+    // Инициализируем объект пользователя
+    $user = new User($globFunc, $DBlink);
+
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -81,6 +103,11 @@
 <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
 <script src="js/main.js"></script>
 <!-- end scripts -->
+
+<?php
+    // Закрываем соединение с БД
+    $globFunc->closeConnectToDB($DBlink);
+?>
 
 <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.
         mathiasbynens.be/notes/async-analytics-snippet -->

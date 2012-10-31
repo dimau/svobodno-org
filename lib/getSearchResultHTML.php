@@ -52,7 +52,7 @@
         if ($rezProperty != FALSE) {
             for ($i = 0; $i < mysql_num_rows($rezProperty); $i++) {
                 $row = mysql_fetch_assoc($rezProperty);
-                if ($row != false) $propertyFullArr[] = $row;
+                if ($row != FALSE) $propertyFullArr[] = $row;
             }
         }
     }

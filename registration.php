@@ -22,9 +22,8 @@
         header('Location: index.php');
     }
 
-    // Инициализируем переменную корректности - нужно для того, чтобы не менять лишний раз идентификатор в input hidden у фотографий
-    /*$correct = NULL;*/
-    //TODO: нужна ли переменная?
+    // Инициализируем переменную для сохранения ошибок, связанных с регистрационными данными пользователя, и других ошибок, которые не позволили успешно закончить его регистрацию
+    $errors = array();
 
     // Готовим массив со списком районов в городе пользователя
     $allDistrictsInCity = $globFunc->getAllDistrictsInCity("Екатеринбург");
@@ -37,141 +36,57 @@
 
         // Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
         $errors = $user->userDataCorrect("registration");
-        if (count($errors) == 0) $correct = TRUE; else $correct = FALSE; // Считаем ошибки, если 0, то можно будет записать данные в БД
 
         // Если данные, указанные пользователем, корректны, запишем их в базу данных
-        if ($correct) {
-            $user->saveToDB("new");
-           /* // Корректируем дату дня рождения для того, чтобы сделать ее пригодной для сохранения в базу данных
-            $birthdayDB = dateFromViewToDB($birthday);
-            // Получаем текущее время для сохранения в качестве даты регистрации и даты последнего действия
-            $tm = time();
-            $last_act = $tm;
-            $reg_date = $tm;
-            // Записываем пустой массив в поле с идентификаторами избранных объявлений
-            $favoritesPropertysId = array();
-            $favoritesPropertysId = serialize($favoritesPropertysId);
+        if (is_array($errors) && count($errors) == 0) {
 
-            // Для простоты технической поддержки пользователей пойдем на небольшой риск с точки зрения безопасности и будем хранить пароли пользователей на сервере в БД без соли и шифрования
-            /*$salt = mt_rand(100, 999);
-              $password = md5(md5($password) . $salt);*/
+            $correctSaveCharacteristicToDB = $this->saveCharacteristicToDB("new");
 
-            // Пишем данные нового пользователя в БД
-           /* $rez = mysqli_query($DBlink, mysqli_real_escape_string($DBlink, "INSERT INTO users (typeTenant,typeOwner,name,secondName,surname,sex,nationality,birthday,login,password,telephon,emailReg,email,currentStatusEducation,almamater,speciality,kurs,ochnoZaochno,yearOfEnd,statusWork,placeOfWork,workPosition,regionOfBorn,cityOfBorn,shortlyAboutMe,vkontakte,odnoklassniki,facebook,twitter,lic,last_act,reg_date,favoritesPropertysId) VALUES ('" . $typeTenant . "','" . $typeOwner . "','" . $name . "','" . $secondName . "','" . $surname . "','" . $sex . "','" . $nationality . "','" . $birthdayDB . "','" . $login . "','" . $password . "','" . $telephon . "','" . $email . "','" . $email . "','" . $currentStatusEducation . "','" . $almamater . "','" . $speciality . "','" . $kurs . "','" . $ochnoZaochno . "','" . $yearOfEnd . "','" . $statusWork . "','" . $placeOfWork . "','" . $workPosition . "','" . $regionOfBorn . "','" . $cityOfBorn . "','" . $shortlyAboutMe . "','" . $vkontakte . "','" . $odnoklassniki . "','" . $facebook . "','" . $twitter . "','" . $lic . "','" . $last_act . "','" . $reg_date . "','" . $favoritesPropertysId . "')"));
-            if ($rez != FALSE) {
+            // Если сохранение Личных данных пользователя прошло успешно, то считаем, что пользователь уже зарегистрирован, выполняем сохранение в БД остальных данных (фотографии и поисковый запрос)
+            if ($correctSaveCharacteristicToDB) {
 
-                /******* Переносим информацию о фотографиях пользователя в таблицу для постоянного хранения, лишние файлы удаляем *******/
-
-              /*  if (is_array($uploadedFoto) && count($uploadedFoto) != 0) {
-                    // Узнаем id пользователя - необходимо при сохранении информации о фотке в постоянную базу
-                    $rezId = getResultSQLSelect($DBlink, "SELECT id FROM users WHERE login = '" . $login . "'");
-                    if (isset($rezId[0]['id'])) $userId = $rezId[0]['id']; else $userId = 0;
-
-                    // Соберем условие WHERE для 2-х SQL запросов к БД: один для получения данных из таблицы tempFotos по всем фотографиям, содержащимся в $uploadedFoto (то есть которые пользователь хочет сохранить на постоянное хранение), второй - для запроса тоже к таблице tempFotos, но с целью выявить записи, соответствующие данной сессии взаимодействия с пользователем (совпадает fileUploadId), но не содержащиеся в $uploadedFoto (пользователь удалил соответствующие фотографии на клиенте при редактировании списка фотографий). Второй запрос нужен для того, чтобы выявить ненужные файлы фотографий, которые хранятся на сервере, и удалить их.
-                    $strWHEREforLife = " (";
-                    $strWHEREforDead = " (";
-                    for ($i = 0; $i < count($uploadedFoto); $i++) {
-
-                        $strWHEREforLife .= " id = '" . $uploadedFoto[$i]['fotoid'] . "'";
-                        $strWHEREforDead .= " id != '" . $uploadedFoto[$i]['fotoid'] . "'";
-
-                        if ($i < count($uploadedFoto) - 1) {
-                            $strWHEREforLife .= " OR";
-                            $strWHEREforDead .= " AND";
-                        }
-
-                    }
-                    $strWHEREforLife .= " )";
-                    $strWHEREforDead .= " ) AND (fileUploadId = '" . $fileUploadId . "')";
-
-                    // Получаем данные по фотографиям, предназначенным для переноса на постоянное хранение
-                    $fotoForLifeArr = array(); // в итоге получим массив, каждый элемент которого представляет собой еще один массив данных по конкретной фотографии
-                    if ($strWHEREforLife != "") {
-                        $fotoForLifeArr = getResultSQLSelect($DBlink, "SELECT * FROM tempFotos WHERE " . $strWHEREforLife);
-                    }
-
-                    // Дополним данные, полученные из БД ($fotoForLifeArr) актуальными сведениями с клиентского места о статусе каждой фотографии (основная или нет)
-                    $primaryFotoExists = 0; // Инициализируем переменную, по которой после прохода по всем фотографиям, полученным в форме, сможем сказать была ли указана пользователем основная фотка (число) или нет (0)
-                    for ($i = 0; $i < count($fotoForLifeArr); $i++) {
-                        // В массиве $uploadedFoto также содержится актуальная информация по всем статусам фотографий, но легче получить id основной фотки из формы, а не из этого массива
-                        if ($fotoForLifeArr[$i]['id'] == $primaryFotoId) {
-                            $fotoForLifeArr[$i]['status'] = 'основная';
-                            $primaryFotoExists++;
-                        } else {
-                            $fotoForLifeArr[$i]['status'] = '';
-                        }
-
-                        // Подготовим данные о пути к каталогу хранения фотографии в вид, пригодный для перезаписи в БД
-                        $fotoForLifeArr[$i]['folder'] = str_replace('\\', '\\\\', $fotoForLifeArr[$i]['folder']); // Переменная folder уже содержит в себе один или несколько '\', но для того, чтобы при сохранении в БД не возникло проблем, к нему нужно добавить еще один символ '\', в этом случае mysql будет воспринимать "\\" как один знак "\" и не будет считать его служебгым символом
-                    }
-
-                    // Если пользователь не указал основное фото, то укажем первую попавшуюся фотографию в качестве основной
-                    if ($primaryFotoExists == 0 && isset($fotoForLifeArr[0])) $fotoForLifeArr[0]['status'] = 'основная';
-
-                    // Сформируем запрос к БД (таблица userFotos) для записи данных о фотографиях
-                    $strINSERTvalues = "";
-                    for ($i = 0; $i < count($fotoForLifeArr); $i++) {
-                        $strINSERTvalues .= "('" . $fotoForLifeArr[$i]['id'] . "','" . $fotoForLifeArr[$i]['folder'] . "','" . $fotoForLifeArr[$i]['filename'] . "','" . $fotoForLifeArr[$i]['extension'] . "','" . $fotoForLifeArr[$i]['filesizeMb'] . "','" . $userId . "','" . $fotoForLifeArr[$i]['status'] . "')";
-                        if ($i < count($fotoForLifeArr) - 1) $strINSERTvalues .= ",";
-                    }
-                    $rez = mysqli_query($DBlink, mysqli_real_escape_string($DBlink, "INSERT INTO userFotos (id, folder, filename, extension, filesizeMb, userId, status) VALUES " . $strINSERTvalues)); // Переносим информацию о фотографиях на постоянное хранение
-                    if ($rez == FALSE) {
-                        //TODO: сохранить в лог ошибку обращения к БД
+                // Узнаем id пользователя - необходимо при сохранении информации о фотке в постоянную базу */
+                if ($this->id == "") {
+                    // Получим из БД данные ($res) по пользователю с логином = $login
+                    $stmt = $this->DBlink->stmt_init();
+                    if (($stmt->prepare("SELECT id FROM users WHERE login=?") === FALSE)
+                        OR ($stmt->bind_param("s", $this->login) === FALSE)
+                        OR ($stmt->execute() === FALSE)
+                        OR (($res = $stmt->get_result()) === FALSE)
+                        OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+                        OR (count($res) === 0)
+                        OR ($stmt->close() === FALSE)
+                    ) {
+                        // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                    } else {
+                        $this->id = $res[0]['id'];
                     }
                 }
 
-                // В любом случае проверяем есть ли в таблице tempFotos данные о фотографиях, загруженных пользователем во время этой сессии взаимодействия.
-                if (!isset($strWHEREforDead)) $strWHEREforDead = "fileUploadId = '" . $fileUploadId . "'";
-                // Выполним запрос к таблице tempFotos с целью выявить записи, соответствующие данной сессии взаимодействия с пользователем (совпадает fileUploadId), но не содержащиеся в $uploadedFoto (пользователь удалил соответствующие фотографии на клиенте при редактировании списка фотографий). Этот запрос нужен для того, чтобы выявить ненужные файлы фотографий, которые хранятся на сервере, и удалить их.
-                $tempFotosForDead = getResultSQLSelect($DBlink, "SELECT * FROM tempFotos WHERE " . $strWHEREforDead);
-                for ($i = 0; $i < count($tempFotosForDead); $i++) {
-                    // Удаляем файлы, которые пользователь на клиенте пометил на удаление (нажал на кнопку/ссылку удалить)
-                        // TODO: сделать сохранение статусов отработки команд по удалению фоток в лог файл. Каждый unlink выдает true, если все хорошо и false, если плохо
-                        unlink($tempFotosForDead['folder'] . '\\small\\' . $tempFotosForDead['id'] . "." . $tempFotosForDead['extension']);
-                        unlink($tempFotosForDead['folder'] . '\\middle\\' . $tempFotosForDead['id'] . "." . $tempFotosForDead['extension']);
-                        unlink($tempFotosForDead['folder'] . '\\big\\' . $tempFotosForDead['id'] . "." . $tempFotosForDead['extension']);
+                // Сохраним информацию о фотографиях пользователя
+                // Функция вызывать необходимо независимо от того, есть ли в uploadedFoto информация о фотографиях или нет, так как при регистрации пользователь мог сначала выбрать фотографии, а затем их удалить. В этом случае $this->saveFotoInformationToDB почистит БД и серве от удаленных пользователем файлов
+                $this->saveFotoInformationToDB();
+
+                // Сохраняем поисковый запрос, если пользователь регистрируется в качестве арендатора
+                if ($user->isTenant()){
+                    $this->saveSearchRequestToDB();
                 }
-
-                // Удаляем все записи о фотках в таблице для временного хранения данных по данной сессии
-                $rez = mysqli_query($DBlink, mysqli_real_escape_string($DBlink, "DELETE FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'"));
-                if ($rez == FALSE) {
-                    // TODO: сохраняем в лог ошибку обращения к БД
-                }
-
-                /******* Сохраняем поисковый запрос, если он был указан пользователем *******/
-
-                // Преобразование формата инфы об искомом кол-ве комнат и районах, так как MySQL не умеет хранить массивы
-              /*  $amountOfRoomsSerialized = serialize($amountOfRooms);
-                $districtSerialized = serialize($district);
-
-                // Готовим пустой массив с идентификаторами объектов, которыми заинтересовался пользователь - на будущее
-                $interestingPropertysId = array();
-                $interestingPropertysId = serialize($interestingPropertysId);
-
-                // Непосредственное сохранение данных о поисковом запросе
-                if ($typeTenant == "true") {
-                    $rez = mysqli_query($DBlink, mysqli_real_escape_string($DBlink, "INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, interestingPropertysId) VALUES ('" . $userId . "','" . $typeOfObject . "','" . $amountOfRoomsSerialized . "','" . $adjacentRooms . "','" . $floor . "','" . $minCost . "','" . $maxCost . "','" . $pledge . "','" . $prepayment . "','" . $districtSerialized . "','" . $withWho . "','" . $linksToFriends . "','" . $children . "','" . $howManyChildren . "','" . $animals . "','" . $howManyAnimals . "','" . $termOfLease . "','" . $additionalDescriptionOfSearch . "','" . $interestingPropertysId . "')")); // Поисковый запрос пользователя сохраняется в специальной таблице
-                    if ($rez == FALSE) {
-                        // TODO: сохраняем в лог ошибку обращения к БД
-                    }
-                }
-
 
                 /******* Авторизовываем пользователя *******/
-              /*  $error = enter($DBlink);
-                if (count($error) == 0) //если нет ошибок, отправляем уже авторизованного пользователя на страницу успешной регистрации
+                $correctEnter = $user->enter();
+                if (count($correctEnter) == 0) //если нет ошибок, отправляем уже авторизованного пользователя на страницу успешной регистрации
                 {
-                    header('Location: successfullRegistration.php'); //после успешной регистрации - переходим на соответствующую страницу
+                    header('Location: successfullRegistration.php');
                 } else {
                     // TODO:что-то нужно делать в случае, если возникли ошибки при авторизации во время регистрации - как минимум вывести их текст во всплывающем окошке
                 }
 
-            } else {
-                $correct = FALSE;
+            } else { // Если сохранить личные данные пользователя в БД не удалось
 
                 $errors[] = 'К сожалению, при сохранении данных произошла ошибка: проверьте, пожалуйста, еще раз корректность Вашей информации и повторите попытку регистрации';
                 // Сохранении данных в БД не прошло - пользователь не зарегистрирован
-            }*/
+            }
+
         }
     }
 ?>
@@ -238,7 +153,7 @@
 <div class="page_without_footer">
 
 <!-- Добавялем невидимый input для того, чтобы передать тип пользователя (собственник/арендатор) - это используется в JS для простановки обязательности полей для заполнения -->
-<?php echo "<input type='hidden' class='userType' typeTenant='" . $typeTenant . "' typeOwner='" . $typeOwner . "'>"; ?>
+<?php echo "<input type='hidden' class='userType' typeTenant='" . $user->isTenant() . "' typeOwner='" . $user->isOwner() . "'>"; ?>
 
 <!-- Всплывающее поле для отображения списка ошибок, полученных при проверке данных на сервере (PHP)-->
 <div id="userMistakesBlock" class="ui-widget">
@@ -250,7 +165,7 @@
                     id="userMistakesText">Для продолжения, пожалуйста, дополните или исправьте следующие данные:</span>
             </p>
             <ol><?php
-                if ($correct == FALSE && isset($errors)) {
+                if (is_array($errors) && count($errors) != 0) {
                     foreach ($errors as $key => $value) {
                         echo "<li>$value</li>";
                     }
@@ -271,7 +186,7 @@
     <div class="headerOfPage">
         Зарегистрируйтесь
     </div>
-    <?php if ($typeTenant == "true"): ?>
+    <?php if ($user->isTenant()): ?>
     <div class="importantAddInfBlock">
         <div class="importantAddInfHeader">
             Регистрация позволит:
@@ -308,7 +223,7 @@
     <li>
         <a href="#tabs-3">Социальные сети</a>
     </li>
-    <?php if ($typeTenant == "true"): ?>
+    <?php if ($user->isTenant()): ?>
     <li>
         <a href="#tabs-4">Что ищете?</a>
     </li>
@@ -336,7 +251,7 @@
                             *
                         </td>
                         <td class="itemBody">
-                            <input name="surname" id="surname" type="text" autofocus <?php echo "value='$surname'";?>>
+                            <input name="surname" id="surname" type="text" autofocus <?php echo "value='$user->surname'";?>>
                         </td>
                     </tr>
                     <tr>
@@ -347,7 +262,7 @@
                             *
                         </td>
                         <td class="itemBody">
-                            <input name="name" id="name" type="text" <?php echo "value='$name'";?>>
+                            <input name="name" id="name" type="text" <?php echo "value='$user->name'";?>>
                         </td>
                     </tr>
                     <tr>
@@ -358,7 +273,7 @@
                             *
                         </td>
                         <td class="itemBody">
-                            <input name="secondName" id="secondName" type="text" <?php echo "value='$secondName'";?>>
+                            <input name="secondName" id="secondName" type="text" <?php echo "value='$user->secondName'";?>>
                         </td>
                     </tr>
                     <tr>
@@ -370,9 +285,9 @@
                         </td>
                         <td class="itemBody">
                             <select name="sex" id="sex">
-                                <option value="0" <?php if ($sex == "0") echo "selected";?>></option>
-                                <option value="мужской" <?php if ($sex == "мужской") echo "selected";?>>мужской</option>
-                                <option value="женский" <?php if ($sex == "женский") echo "selected";?>>женский</option>
+                                <option value="0" <?php if ($user->sex == "0") echo "selected";?>></option>
+                                <option value="мужской" <?php if ($user->sex == "мужской") echo "selected";?>>мужской</option>
+                                <option value="женский" <?php if ($user->sex == "женский") echo "selected";?>>женский</option>
                             </select>
                         </td>
                     </tr>
@@ -385,25 +300,25 @@
                         </td>
                         <td class="itemBody">
                             <select name="nationality" id="nationality">
-                                <option value="0" <?php if ($nationality == "0") echo "selected";?>></option>
+                                <option value="0" <?php if ($user->nationality == "0") echo "selected";?>></option>
                                 <option
-                                    value="славянская" <?php if ($nationality == "славянская") echo "selected";?>>
+                                    value="славянская" <?php if ($user->nationality == "славянская") echo "selected";?>>
                                     славянская
                                 </option>
                                 <option
-                                    value="европейская" <?php if ($nationality == "европейская") echo "selected";?>>
+                                    value="европейская" <?php if ($user->nationality == "европейская") echo "selected";?>>
                                     европейская
                                 </option>
                                 <option
-                                    value="азиатская" <?php if ($nationality == "азиатская") echo "selected";?>>
+                                    value="азиатская" <?php if ($user->nationality == "азиатская") echo "selected";?>>
                                     азиатская
                                 </option>
                                 <option
-                                    value="кавказская" <?php if ($nationality == "кавказская") echo "selected";?>>
+                                    value="кавказская" <?php if ($user->nationality == "кавказская") echo "selected";?>>
                                     кавказская
                                 </option>
                                 <option
-                                    value="африканская" <?php if ($nationality == "африканская") echo "selected";?>>
+                                    value="африканская" <?php if ($user->nationality == "африканская") echo "selected";?>>
                                     африканская
                                 </option>
                             </select>
@@ -418,7 +333,7 @@
                         </td>
                         <td class="itemBody">
                             <input name="birthday" id="birthday" type="text"
-                                   placeholder="дд.мм.гггг" <?php echo "value='$birthday'";?>>
+                                   placeholder="дд.мм.гггг" <?php echo "value='$user->birthday'";?>>
                         </td>
                     </tr>
                 </tbody>
@@ -442,7 +357,7 @@
                             </td>
                             <td class="itemBody">
                                 <input type="text" name="login" id="login" maxlength="50"
-                                       placeholder="e-mail или номер телефона" <?php echo "value='$login'";?>>
+                                       placeholder="e-mail или номер телефона" <?php echo "value='$user->login'";?>>
                             </td>
                         </tr>
                         <tr>
@@ -454,7 +369,7 @@
                             </td>
                             <td class="itemBody">
                                 <input type="password" name="password" id="password"
-                                       maxlength="50" <?php echo "value='$password'";?>>
+                                       maxlength="50" <?php echo "value='$user->password'";?>>
                             </td>
                         </tr>
                     </tbody>
@@ -475,7 +390,7 @@
                                 *
                             </td>
                             <td class="itemBody">
-                                <input type="text" name="telephon" id="telephon" <?php echo "value='$telephon'";?>>
+                                <input type="text" name="telephon" id="telephon" <?php echo "value='$user->telephon'";?>>
                             </td>
                         </tr>
                         <tr>
@@ -483,12 +398,12 @@
                                 E-mail
                             </td>
                             <td class="itemRequired">
-                                <?php if ($typeTenant == "true") {
+                                <?php if ($user->isTenant()) {
                                 echo "*";
                             } ?>
                             </td>
                             <td class="itemBody">
-                                <input type="text" name="email" id="email" <?php echo "value='$email'"; ?>>
+                                <input type="text" name="email" id="email" <?php echo "value='$user->email'"; ?>>
                             </td>
                         </tr>
                     </tbody>
@@ -498,11 +413,11 @@
 
         <fieldset id='fotoWrapperBlock' class="edited private" style="min-width: 300px;">
             <legend
-                title="Рекомендуем загрузить хотя бы 1 фотографию, которая в выгодном свете представит Вас перед собственником">
+                <?php if ($user->isTenant()) echo 'title="Рекомендуем загрузить хотя бы 1 фотографию, которая в выгодном свете представит Вас перед собственником"'; ?>>
                 Фотографии
             </legend>
             <?php
-            echo "<input type='hidden' name='fileUploadId' id='fileUploadId' value='" . $fileUploadId . "'>";
+            echo "<input type='hidden' name='fileUploadId' id='fileUploadId' value='" . $user->fileUploadId . "'>";
             ?>
             <input type='hidden' name='uploadedFoto' id='uploadedFoto' value=''>
 
@@ -537,23 +452,23 @@
                         Текущий статус
                     </td>
                     <td class="itemRequired">
-                        <?php if ($typeTenant == "true") {
+                        <?php if ($user->isTenant()) {
                         echo "*";
                     } ?>
                     </td>
                     <td class="itemBody">
                         <select name="currentStatusEducation" id="currentStatusEducation">
-                            <option value="0" <?php if ($currentStatusEducation == "0") echo "selected";?>></option>
+                            <option value="0" <?php if ($user->currentStatusEducation == "0") echo "selected";?>></option>
                             <option
-                                value="нет" <?php if ($currentStatusEducation == "нет") echo "selected";?>>
+                                value="нет" <?php if ($user->currentStatusEducation == "нет") echo "selected";?>>
                                 Нигде не учился
                             </option>
                             <option
-                                value="сейчас учусь" <?php if ($currentStatusEducation == "сейчас учусь") echo "selected";?>>
+                                value="сейчас учусь" <?php if ($user->currentStatusEducation == "сейчас учусь") echo "selected";?>>
                                 Сейчас учусь
                             </option>
                             <option
-                                value="закончил" <?php if ($currentStatusEducation == "закончил") echo "selected";?>>
+                                value="закончил" <?php if ($user->currentStatusEducation == "закончил") echo "selected";?>>
                                 Закончил
                             </option>
                         </select>
@@ -568,7 +483,7 @@
                     </td>
                     <td class="itemBody">
                         <input type="text" name="almamater" id="almamater"
-                               class="ifLearned" <?php echo "value='$almamater'";?>>
+                               class="ifLearned" <?php echo "value='$user->almamater'";?>>
                     </td>
                 </tr>
                 <tr id="specialityBlock" notavailability="currentStatusEducation_0&currentStatusEducation_нет">
@@ -579,7 +494,7 @@
                     </td>
                     <td class="itemBody">
                         <input type="text" name="speciality" id="speciality"
-                               class="ifLearned" <?php echo "value='$speciality'";?>>
+                               class="ifLearned" <?php echo "value='$user->speciality'";?>>
                     </td>
                 </tr>
                 <tr id="kursBlock"
@@ -591,7 +506,7 @@
                     <td class="itemRequired typeTenantRequired">
                     </td>
                     <td class="itemBody">
-                        <input type="text" name="kurs" id="kurs" class="ifLearned" <?php echo "value='$kurs'";?>>
+                        <input type="text" name="kurs" id="kurs" class="ifLearned" <?php echo "value='$user->kurs'";?>>
                     </td>
                 </tr>
                 <tr id="formatEducation"
@@ -604,9 +519,9 @@
                     </td>
                     <td class="itemBody">
                         <select name="ochnoZaochno" id="ochnoZaochno" class="ifLearned">
-                            <option value="0" <?php if ($ochnoZaochno == "0") echo "selected";?>></option>
-                            <option value="очно" <?php if ($ochnoZaochno == "очно") echo "selected";?>>Очно</option>
-                            <option value="заочно" <?php if ($ochnoZaochno == "заочно") echo "selected";?>>Заочно
+                            <option value="0" <?php if ($user->ochnoZaochno == "0") echo "selected";?>></option>
+                            <option value="очно" <?php if ($user->ochnoZaochno == "очно") echo "selected";?>>Очно</option>
+                            <option value="заочно" <?php if ($user->ochnoZaochno == "заочно") echo "selected";?>>Заочно
                             </option>
                         </select>
                     </td>
@@ -621,7 +536,7 @@
                     </td>
                     <td class="itemBody">
                         <input type="text" name="yearOfEnd" id="yearOfEnd"
-                               class="ifLearned" <?php echo "value='$yearOfEnd'";?>>
+                               class="ifLearned" <?php echo "value='$user->yearOfEnd'";?>>
                     </td>
                 </tr>
             </tbody>
@@ -640,16 +555,16 @@
                         Статус занятости
                     </td>
                     <td class="itemRequired">
-                        <?php if ($typeTenant == "true") {
+                        <?php if ($user->isTenant()) {
                         echo "*";
                     } ?>
                     </td>
                     <td class="itemBody">
                         <select name="statusWork" id="statusWork">
-                            <option value="0" <?php if ($statusWork == "0") echo "selected";?>></option>
-                            <option value="работаю" <?php if ($statusWork == "работаю") echo "selected";?>>работаю
+                            <option value="0" <?php if ($user->statusWork == "0") echo "selected";?>></option>
+                            <option value="работаю" <?php if ($user->statusWork == "работаю") echo "selected";?>>работаю
                             </option>
-                            <option value="не работаю" <?php if ($statusWork == "не работаю") echo "selected";?>>не
+                            <option value="не работаю" <?php if ($user->statusWork == "не работаю") echo "selected";?>>не
                                 работаю
                             </option>
                         </select>
@@ -663,7 +578,7 @@
                     </td>
                     <td class="itemBody">
                         <input type="text" name="placeOfWork" id="placeOfWork"
-                               class="ifWorked" <?php echo "value='$placeOfWork'";?>>
+                               class="ifWorked" <?php echo "value='$user->placeOfWork'";?>>
                     </td>
                 </tr>
                 <tr notavailability="statusWork_0&statusWork_не работаю">
@@ -674,7 +589,7 @@
                     </td>
                     <td class="itemBody">
                         <input type="text" name="workPosition" id="workPosition"
-                               class="ifWorked" <?php echo "value='$workPosition'";?>>
+                               class="ifWorked" <?php echo "value='$user->workPosition'";?>>
                     </td>
                 </tr>
             </tbody>
@@ -695,7 +610,7 @@
                     <td class="itemRequired">
                     </td>
                     <td class="itemBody">
-                        <input type="text" name="regionOfBorn" id="regionOfBorn" <?php echo "value='$regionOfBorn'";?>>
+                        <input type="text" name="regionOfBorn" id="regionOfBorn" <?php echo "value='$user->regionOfBorn'";?>>
                     </td>
                 </tr>
                 <tr>
@@ -705,7 +620,7 @@
                     <td class="itemRequired">
                     </td>
                     <td class="itemBody">
-                        <input type="text" name="cityOfBorn" id="cityOfBorn" <?php echo "value='$cityOfBorn'";?>>
+                        <input type="text" name="cityOfBorn" id="cityOfBorn" <?php echo "value='$user->cityOfBorn'";?>>
                     </td>
                 </tr>
                 <tr>
@@ -718,7 +633,7 @@
                 <tr>
                     <td colspan="3">
                         <textarea name="shortlyAboutMe" id="shortlyAboutMe"
-                                  rows="4"><?php echo $shortlyAboutMe;?></textarea>
+                                  rows="4"><?php echo $user->shortlyAboutMe;?></textarea>
                     </td>
                 </tr>
             </tbody>
@@ -752,7 +667,7 @@
                     </td>
                     <td class="itemBody">
                         <input type="text" name="vkontakte" id="vkontakte"
-                               placeholder="http://vk.com/..." <?php echo "value='$vkontakte'";?>>
+                               placeholder="http://vk.com/..." <?php echo "value='$user->vkontakte'";?>>
                     </td>
                 </tr>
                 <tr title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
@@ -763,7 +678,7 @@
                     </td>
                     <td class="itemBody">
                         <input type="text" name="odnoklassniki" id="odnoklassniki"
-                               placeholder="http://www.odnoklassniki.ru/profile/..." <?php echo "value='$odnoklassniki'";?>>
+                               placeholder="http://www.odnoklassniki.ru/profile/..." <?php echo "value='$user->odnoklassniki'";?>>
                     </td>
                 </tr>
                 <tr title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
@@ -774,7 +689,7 @@
                     </td>
                     <td class="itemBody">
                         <input type="text" name="facebook" id="facebook"
-                               placeholder="https://www.facebook.com/profile.php?..." <?php echo "value='$facebook'";?>>
+                               placeholder="https://www.facebook.com/profile.php?..." <?php echo "value='$user->facebook'";?>>
                     </td>
                 </tr>
                 <tr title="Скопируйте ссылку из адресной строки браузера при просмотре своей личной страницы в социальной сети">
@@ -785,24 +700,24 @@
                     </td>
                     <td class="itemBody">
                         <input type="text" name="twitter" id="twitter"
-                               placeholder="https://twitter.com/..." <?php echo "value='$twitter'";?>>
+                               placeholder="https://twitter.com/..." <?php echo "value='$user->twitter'";?>>
                     </td>
                 </tr>
             </tbody>
         </table>
     </fieldset>
 
-    <?php if ($typeTenant == "true"): ?>
+    <?php if ($user->isTenant()): ?>
     <div class="bottomControls">
         <button class="backButton">Назад</button>
         <button class="forwardButton">Далее</button>
         <div class="clearBoth"></div>
     </div>
     <?php endif; ?>
-    <?php if ($typeTenant != "true"): ?>
+    <?php if (!$user->isTenant()): ?>
     <div class="bottomControls">
         <div style="float: right; margin-bottom: 10px; text-align: left;">
-            <input type="checkbox" name="lic" id="lic" value="yes" <?php if ($lic == "yes") echo "checked";?>> Я
+            <input type="checkbox" name="lic" id="lic" value="yes" <?php if ($user->lic == "yes") echo "checked";?>> Я
             принимаю условия <a
             href="#">лицензионного соглашения</a>
         </div>
@@ -814,7 +729,7 @@
     <?php endif; ?>
 
 </div>
-<?php if ($typeTenant == "true"): ?>
+<?php if ($user->isTenant()): ?>
 <div id="tabs-4">
     <div class="shadowText">
         Заполните форму как можно подробнее, это позволит системе подобрать для Вас наиболее интересные предложения
@@ -835,22 +750,22 @@
                             </td>
                             <td class="itemBody">
                                 <select name="typeOfObject" id="typeOfObject">
-                                    <option value="0" <?php if ($typeOfObject == "0") echo "selected";?>></option>
-                                    <option value="квартира" <?php if ($typeOfObject == "квартира") echo "selected";?>>
+                                    <option value="0" <?php if ($user->typeOfObject == "0") echo "selected";?>></option>
+                                    <option value="квартира" <?php if ($user->typeOfObject == "квартира") echo "selected";?>>
                                         квартира
                                     </option>
-                                    <option value="комната" <?php if ($typeOfObject == "комната") echo "selected";?>>
+                                    <option value="комната" <?php if ($user->typeOfObject == "комната") echo "selected";?>>
                                         комната
                                     </option>
-                                    <option value="дом" <?php if ($typeOfObject == "дом") echo "selected";?>>дом,
+                                    <option value="дом" <?php if ($user->typeOfObject == "дом") echo "selected";?>>дом,
                                         коттедж
                                     </option>
-                                    <option value="таунхаус" <?php if ($typeOfObject == "таунхаус") echo "selected";?>>
+                                    <option value="таунхаус" <?php if ($user->typeOfObject == "таунхаус") echo "selected";?>>
                                         таунхаус
                                     </option>
-                                    <option value="дача" <?php if ($typeOfObject == "дача") echo "selected";?>>дача
+                                    <option value="дача" <?php if ($user->typeOfObject == "дача") echo "selected";?>>дача
                                     </option>
-                                    <option value="гараж" <?php if ($typeOfObject == "гараж") echo "selected";?>>гараж
+                                    <option value="гараж" <?php if ($user->typeOfObject == "гараж") echo "selected";?>>гараж
                                     </option>
                                 </select>
                             </td>
@@ -864,7 +779,7 @@
                             <td class="itemBody">
                                 <input type="checkbox" value="1" name="amountOfRooms[]"
                                     <?php
-                                    foreach ($amountOfRooms as $value) {
+                                    foreach ($user->amountOfRooms as $value) {
                                         if ($value == "1") {
                                             echo "checked";
                                             break;
@@ -874,7 +789,7 @@
                                 1
                                 <input type="checkbox" value="2"
                                        name="amountOfRooms[]" <?php
-                                    foreach ($amountOfRooms as $value) {
+                                    foreach ($user->amountOfRooms as $value) {
                                         if ($value == "2") {
                                             echo "checked";
                                             break;
@@ -884,7 +799,7 @@
                                 2
                                 <input type="checkbox" value="3"
                                        name="amountOfRooms[]" <?php
-                                    foreach ($amountOfRooms as $value) {
+                                    foreach ($user->amountOfRooms as $value) {
                                         if ($value == "3") {
                                             echo "checked";
                                             break;
@@ -894,7 +809,7 @@
                                 3
                                 <input type="checkbox" value="4"
                                        name="amountOfRooms[]" <?php
-                                    foreach ($amountOfRooms as $value) {
+                                    foreach ($user->amountOfRooms as $value) {
                                         if ($value == "4") {
                                             echo "checked";
                                             break;
@@ -904,7 +819,7 @@
                                 4
                                 <input type="checkbox" value="5"
                                        name="amountOfRooms[]" <?php
-                                    foreach ($amountOfRooms as $value) {
+                                    foreach ($user->amountOfRooms as $value) {
                                         if ($value == "5") {
                                             echo "checked";
                                             break;
@@ -914,7 +829,7 @@
                                 5
                                 <input type="checkbox" value="6"
                                        name="amountOfRooms[]" <?php
-                                    foreach ($amountOfRooms as $value) {
+                                    foreach ($user->amountOfRooms as $value) {
                                         if ($value == "6") {
                                             echo "checked";
                                             break;
@@ -932,14 +847,14 @@
                             </td>
                             <td class="itemBody">
                                 <select name="adjacentRooms" id="adjacentRooms">
-                                    <option value="0" <?php if ($adjacentRooms == "0") echo "selected";?>></option>
+                                    <option value="0" <?php if ($user->adjacentRooms == "0") echo "selected";?>></option>
                                     <option
-                                        value="не имеет значения" <?php if ($adjacentRooms == "не имеет значения") echo "selected";?>>
+                                        value="не имеет значения" <?php if ($user->adjacentRooms == "не имеет значения") echo "selected";?>>
                                         не
                                         имеет значения
                                     </option>
                                     <option
-                                        value="только изолированные" <?php if ($adjacentRooms == "только изолированные") echo "selected";?>>
+                                        value="только изолированные" <?php if ($user->adjacentRooms == "только изолированные") echo "selected";?>>
                                         только изолированные
                                     </option>
                                 </select>
@@ -953,13 +868,13 @@
                             </td>
                             <td class="itemBody">
                                 <select name="floor" id="floor">
-                                    <option value="0" <?php if ($floor == "0") echo "selected";?>></option>
-                                    <option value="любой" <?php if ($floor == "любой") echo "selected";?>>любой</option>
-                                    <option value="не первый" <?php if ($floor == "не первый") echo "selected";?>>не
+                                    <option value="0" <?php if ($user->floor == "0") echo "selected";?>></option>
+                                    <option value="любой" <?php if ($user->floor == "любой") echo "selected";?>>любой</option>
+                                    <option value="не первый" <?php if ($user->floor == "не первый") echo "selected";?>>не
                                         первый
                                     </option>
                                     <option
-                                        value="не первый и не последний" <?php if ($floor == "не первый и не последний") echo "selected";?>>
+                                        value="не первый и не последний" <?php if ($user->floor == "не первый и не последний") echo "selected";?>>
                                         не первый и не
                                         последний
                                     </option>
@@ -984,7 +899,7 @@
                             </td>
                             <td class="itemBody">
                                 <input type="text" name="minCost" id="minCost"
-                                       maxlength="8" <?php echo "value='$minCost'";?>>
+                                       maxlength="8" <?php echo "value='$user->minCost'";?>>
                                 руб.
                             </td>
                         </tr>
@@ -996,7 +911,7 @@
                             </td>
                             <td class="itemBody">
                                 <input type="text" name="maxCost" id="maxCost"
-                                       maxlength="8" <?php echo "value='$maxCost'";?>>
+                                       maxlength="8" <?php echo "value='$user->maxCost'";?>>
                                 руб.
                             </td>
                         </tr>
@@ -1008,7 +923,7 @@
                             </td>
                             <td class="itemBody">
                                 <input type="text" name="pledge" id="pledge"
-                                       maxlength="8" <?php echo "value='$pledge'";?>>
+                                       maxlength="8" <?php echo "value='$user->pledge'";?>>
                                 руб.
                             </td>
                         </tr>
@@ -1020,24 +935,24 @@
                             </td>
                             <td class="itemBody">
                                 <select name="prepayment" id="prepayment">
-                                    <option value="0" <?php if ($prepayment == "0") echo "selected";?>></option>
-                                    <option value="нет" <?php if ($prepayment == "нет") echo "selected";?>>нет</option>
-                                    <option value="1 месяц" <?php if ($prepayment == "1 месяц") echo "selected";?>>1
+                                    <option value="0" <?php if ($user->prepayment == "0") echo "selected";?>></option>
+                                    <option value="нет" <?php if ($user->prepayment == "нет") echo "selected";?>>нет</option>
+                                    <option value="1 месяц" <?php if ($user->prepayment == "1 месяц") echo "selected";?>>1
                                         месяц
                                     </option>
-                                    <option value="2 месяца" <?php if ($prepayment == "2 месяца") echo "selected";?>>2
+                                    <option value="2 месяца" <?php if ($user->prepayment == "2 месяца") echo "selected";?>>2
                                         месяца
                                     </option>
-                                    <option value="3 месяца" <?php if ($prepayment == "3 месяца") echo "selected";?>>3
+                                    <option value="3 месяца" <?php if ($user->prepayment == "3 месяца") echo "selected";?>>3
                                         месяца
                                     </option>
-                                    <option value="4 месяца" <?php if ($prepayment == "4 месяца") echo "selected";?>>4
+                                    <option value="4 месяца" <?php if ($user->prepayment == "4 месяца") echo "selected";?>>4
                                         месяца
                                     </option>
-                                    <option value="5 месяцев" <?php if ($prepayment == "5 месяцев") echo "selected";?>>5
+                                    <option value="5 месяцев" <?php if ($user->prepayment == "5 месяцев") echo "selected";?>>5
                                         месяцев
                                     </option>
-                                    <option value="6 месяцев" <?php if ($prepayment == "6 месяцев") echo "selected";?>>6
+                                    <option value="6 месяцев" <?php if ($user->prepayment == "6 месяцев") echo "selected";?>>6
                                         месяцев
                                     </option>
                                 </select>
@@ -1057,7 +972,7 @@
                     if (isset($allDistrictsInCity)) {
                         foreach ($allDistrictsInCity as $value) { // Для каждого идентификатора района и названия формируем чекбокс
                             echo "<li><input type='checkbox' name='district[]' value='" . $value['name'] . "'";
-                            foreach ($district as $valueDistrict) {
+                            foreach ($user->district as $valueDistrict) {
                                 if ($valueDistrict == $value['name']) {
                                     echo "checked";
                                     break;
@@ -1086,22 +1001,22 @@
                         </td>
                         <td class="itemBody">
                             <select name="withWho" id="withWho">
-                                <option value="0" <?php if ($withWho == "0") echo "selected";?>></option>
+                                <option value="0" <?php if ($user->withWho == "0") echo "selected";?>></option>
                                 <option
-                                    value="самостоятельно" <?php if ($withWho == "самостоятельно") echo "selected";?>>
+                                    value="самостоятельно" <?php if ($user->withWho == "самостоятельно") echo "selected";?>>
                                     самостоятельно
                                 </option>
-                                <option value="семья" <?php if ($withWho == "семья") echo "selected";?>>семьей
+                                <option value="семья" <?php if ($user->withWho == "семья") echo "selected";?>>семьей
                                 </option>
-                                <option value="пара" <?php if ($withWho == "пара") echo "selected";?>>парой
+                                <option value="пара" <?php if ($user->withWho == "пара") echo "selected";?>>парой
                                 </option>
-                                <option value="2 мальчика" <?php if ($withWho == "2 мальчика") echo "selected";?>>2
+                                <option value="2 мальчика" <?php if ($user->withWho == "2 мальчика") echo "selected";?>>2
                                     мальчика
                                 </option>
-                                <option value="2 девочки" <?php if ($withWho == "2 девочки") echo "selected";?>>2
+                                <option value="2 девочки" <?php if ($user->withWho == "2 девочки") echo "selected";?>>2
                                     девочки
                                 </option>
-                                <option value="со знакомыми" <?php if ($withWho == "со знакомыми") echo "selected";?>>со
+                                <option value="со знакомыми" <?php if ($user->withWho == "со знакомыми") echo "selected";?>>со
                                     знакомыми
                                 </option>
                             </select>
@@ -1115,7 +1030,7 @@
                     <tr class="withWhoDescription" style="display: none;">
                         <td colspan="3">
                             <textarea name="linksToFriends" id="linksToFriends"
-                                      rows="3"><?php echo $linksToFriends;?></textarea>
+                                      rows="3"><?php echo $user->linksToFriends;?></textarea>
                         </td>
                     </tr>
 
@@ -1128,17 +1043,17 @@
                         </td>
                         <td class="itemBody">
                             <select name="children" id="children">
-                                <option value="0" <?php if ($children == "0") echo "selected";?>></option>
-                                <option value="без детей" <?php if ($children == "без детей") echo "selected";?>>без
+                                <option value="0" <?php if ($user->children == "0") echo "selected";?>></option>
+                                <option value="без детей" <?php if ($user->children == "без детей") echo "selected";?>>без
                                     детей
                                 </option>
                                 <option
-                                    value="с детьми младше 4-х лет" <?php if ($children == "с детьми младше 4-х лет") echo "selected";?>>
+                                    value="с детьми младше 4-х лет" <?php if ($user->children == "с детьми младше 4-х лет") echo "selected";?>>
                                     с детьми
                                     младше 4-х лет
                                 </option>
                                 <option
-                                    value="с детьми старше 4-х лет" <?php if ($children == "с детьми старше 4-х лет") echo "selected";?>>
+                                    value="с детьми старше 4-х лет" <?php if ($user->children == "с детьми старше 4-х лет") echo "selected";?>>
                                     с детьми
                                     старше 4-х лет
                                 </option>
@@ -1153,7 +1068,7 @@
                     <tr class="childrenDescription" style="display: none;">
                         <td colspan="3">
                             <textarea name="howManyChildren" id="howManyChildren"
-                                      rows="3"><?php echo $howManyChildren;?></textarea>
+                                      rows="3"><?php echo $user->howManyChildren;?></textarea>
                         </td>
                     </tr>
 
@@ -1166,13 +1081,13 @@
                         </td>
                         <td class="itemBody">
                             <select name="animals" id="animals">
-                                <option value="0" <?php if ($animals == "0") echo "selected";?>></option>
-                                <option value="без животных" <?php if ($animals == "без животных") echo "selected";?>>
+                                <option value="0" <?php if ($user->animals == "0") echo "selected";?>></option>
+                                <option value="без животных" <?php if ($user->animals == "без животных") echo "selected";?>>
                                     без
                                     животных
                                 </option>
                                 <option
-                                    value="с животным(ми)" <?php if ($animals == "с животным(ми)") echo "selected";?>>с
+                                    value="с животным(ми)" <?php if ($user->animals == "с животным(ми)") echo "selected";?>>с
                                     животным(ми)
                                 </option>
                             </select>
@@ -1186,7 +1101,7 @@
                     <tr class="animalsDescription" style="display: none;">
                         <td colspan="3">
                             <textarea name="howManyAnimals" id="howManyAnimals"
-                                      rows="3"><?php echo $howManyAnimals;?></textarea>
+                                      rows="3"><?php echo $user->howManyAnimals;?></textarea>
                         </td>
                     </tr>
 
@@ -1199,13 +1114,13 @@
                         </td>
                         <td class="itemBody">
                             <select name="termOfLease" id="termOfLease">
-                                <option value="0" <?php if ($termOfLease == "0") echo "selected";?>></option>
+                                <option value="0" <?php if ($user->termOfLease == "0") echo "selected";?>></option>
                                 <option
-                                    value="длительный срок" <?php if ($termOfLease == "длительный срок") echo "selected";?>>
+                                    value="длительный срок" <?php if ($user->termOfLease == "длительный срок") echo "selected";?>>
                                     длительный срок (от года)
                                 </option>
                                 <option
-                                    value="несколько месяцев" <?php if ($termOfLease == "несколько месяцев") echo "selected";?>>
+                                    value="несколько месяцев" <?php if ($user->termOfLease == "несколько месяцев") echo "selected";?>>
                                     несколько месяцев (до года)
                                 </option>
                             </select>
@@ -1222,7 +1137,7 @@
                     <tr>
                         <td colspan="3">
                             <textarea name="additionalDescriptionOfSearch" id="additionalDescriptionOfSearch"
-                                      rows="4"><?php echo $additionalDescriptionOfSearch;?></textarea>
+                                      rows="4"><?php echo $user->additionalDescriptionOfSearch;?></textarea>
                         </td>
                     </tr>
                 </tbody>
@@ -1232,7 +1147,7 @@
 
     <div class="bottomControls">
         <div style="float: right; margin-bottom: 10px; text-align: left;">
-            <input type="checkbox" name="lic" id="lic" value="yes" <?php if ($lic == "yes") echo "checked";?>> Я
+            <input type="checkbox" name="lic" id="lic" value="yes" <?php if ($user->lic == "yes") echo "checked";?>> Я
             принимаю условия <a
             href="#">лицензионного соглашения</a>
         </div>
@@ -1265,7 +1180,7 @@
 <script>
     // Сервер сохранит в эту переменную данные о загруженных фотографиях в формате JSON
     // Переменная uploadedFoto содержит массив объектов, каждый из которых представляет информацию по 1 фотографии
-    var temp = '<?php echo json_encode($uploadedFoto);?>'.split("\\").join("\\\\");
+    var temp = '<?php echo json_encode($user->uploadedFoto);?>'.split("\\").join("\\\\");
     var uploadedFoto = JSON.parse(temp);
 </script>
 <script src="js/main.js"></script>
@@ -1274,7 +1189,7 @@
 
 <?php
     // Закрываем соединение с БД
-    closeConnectToDB($DBlink);
+    $globFunc->closeConnectToDB($DBlink);
 ?>
 
 <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.
