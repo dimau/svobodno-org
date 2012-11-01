@@ -26,3 +26,20 @@
         return $res;
     }
 
+    /**********************************************************************************
+     * БАЗА ДАННЫХ
+     *********************************************************************************/
+
+    // Получить результаты выполнения SQL запроса SELECT в виде массива ассоциированных массивов
+    function getResultSQLSelect($DBlink, $request) {
+        $res = mysqli_query($DBlink, mysqli_real_escape_string($DBlink, $request));
+        if ($res != FALSE) {
+            $value = mysqli_fetch_all($res, MYSQLI_ASSOC); // Получаем массив массивов, каждый из которых содержит параметры отдельной строки БД
+        } else {
+            $value = array();
+            // TODO: сообщить в лог об ошибке обращения к БД!
+        }
+        if ($res != FALSE) mysqli_free_result($res); // Очищаем занятую память
+
+        return $value;
+    }

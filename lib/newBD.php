@@ -4,10 +4,14 @@
      * При изменении структуры таблиц в этом файле или в БД, не забудь соответствующим образом изменить проверку валидности введенных пользователем данных на JS и на PHP, а также запрос на сохранение данных в БД при регистрации и другие запросы к БД
      */
 
-    // Подключаем библиотеку общих функций
-    include_once 'function_global.php';
+    // Подключаем нужные классы
+    include_once '../classesForProjectSecurityName/GlobFunc.php';
+
+    // Создаем объект-хранилище глобальных функций
+    $globFunc = new GlobFunc();
+
     // Подключаемся к БД
-    $DBlink = connectToDB();
+    $DBlink = $globFunc->connectToDB();
     // Удалось ли подключиться к БД?
     if ($DBlink == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
@@ -16,10 +20,12 @@
     // $typeRes = "2" - выдача результата по набору однотипных операций с БД - в одну строку!
     function returnResultMySql($rez)
     {
+        global $DBlink;
+
         if ($rez == FALSE) {
-            echo " <span style='color: red;'>FALSE(" . mysql_error() . ")</span> ";
+            echo " <span style='color: red;'>FALSE(".$DBlink->errno." ".$DBlink->error.")</span> ";
         } else {
-            echo $rez;
+            echo 1;
         }
         echo "<br>";
     }
@@ -28,7 +34,7 @@
      * Чистим базу данных перед закачкой исходных данных
      ***************************************************************************/
 
-    $rez = mysqli_query($DBlink, "DROP TABLE IF EXISTS
+    $DBlink->query("DROP TABLE IF EXISTS
     users,
     tempFotos,
     userFotos,
@@ -41,12 +47,12 @@
     ");
 
     echo "Статус удаления старых таблиц: ";
-    returnResultMySql($rez);
+    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Создаем таблицу для хранения информации о ПОЛЬЗОВАТЕЛЯХ
      ***************************************************************************/
-    $rez = mysqli_query($DBlink, "CREATE TABLE users (
+    $DBlink->query("CREATE TABLE users (
         id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
         typeTenant VARCHAR(5) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Равен строке true, если пользователь в данный момент ищет недвижимость (является потенциальным арендатором), в том числе, обязательно имеет поисковый запрос',
         typeOwner VARCHAR(5) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Равен строке true, если пользователь указал хотя бы 1 объявление по сдаче в аренду недвижимости (является собственником)(не имеет значение - опубликованное или нет)',
@@ -85,13 +91,13 @@
 )");
 
     echo "Статус создания таблицы users: ";
-    returnResultMySql($rez);
+    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Создаем таблицу для временного хранения информации о ЗАГРУЖЕННЫХ при регистрации ФОТОГРАФИЯХ пользователей
      ***************************************************************************/
 
-    $rez = mysqli_query($DBlink, "CREATE TABLE tempFotos (
+    $DBlink->query("CREATE TABLE tempFotos (
         id VARCHAR(32) NOT NULL PRIMARY KEY COMMENT 'Содержит идентификатор фотографии, он же имя файла на сервере (без расширения)',
         fileUploadId VARCHAR(7) NOT NULL COMMENT 'фактически это такой идентификатор сессии заполнения формы регистрации. Позволяет добиться того, чтобы при перезагрузке формы (в случае, например, ошибок и пустых полей, незаполненных пользователем) данные о фотографиях не потерялись',
         folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ..\uploaded_files\3\ ',
@@ -101,13 +107,13 @@
 )");
 
     echo "Статус создания таблицы tempFotos: ";
-    returnResultMySql($rez);
+    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Создаем таблицу для постоянного хранения информации о ФОТОГРАФИЯХ пользователей (только личные)
      ***************************************************************************/
 
-    $rez = mysqli_query($DBlink, "CREATE TABLE userFotos (
+    $DBlink->query("CREATE TABLE userFotos (
         id VARCHAR(32) NOT NULL PRIMARY KEY COMMENT 'Содержит идентификатор фотографии, он же имя файла на сервере (без расширения)',
         folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ..\uploaded_files\3\ ',
         filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
@@ -118,13 +124,13 @@
 )");
 
     echo "Статус создания таблицы userFotos: ";
-    returnResultMySql($rez);
+    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Создаем таблицу для хранения информации о ПОИСКОВЫХ ЗАПРОСАХ пользователей
      ***************************************************************************/
 
-    $rez = mysqli_query($DBlink, "CREATE TABLE searchRequests (
+    $DBlink->query("CREATE TABLE searchRequests (
         userId INT(11) NOT NULL PRIMARY KEY COMMENT 'Идентификатор пользователя, которому принадлежит данный поисковый запрос. Так как я считаю, что каждый пользователь может иметь только 1 поисковый запрос, то данное поле является ключом таблицы',
         typeOfObject VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип объекта, который ищет пользователь',
         amountOfRooms BLOB,
@@ -147,13 +153,13 @@
 )");
 
     echo "Статус создания таблицы searchRequests: ";
-    returnResultMySql($rez);
+    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Создаем таблицу для хранения информации об ОБЪЕКТАХ НЕДВИЖИМОСТИ пользователей
      ***************************************************************************/
 
-    $rez = mysqli_query($DBlink, "CREATE TABLE property (
+    $DBlink->query("CREATE TABLE property (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор объекта недвижимости или объявления - можно его называть и так, и так',
         userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя (собственника), который указал данное объявление в системе и который сдает данный объект',
         typeOfObject VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип объекта: квартира, комната, дом, таунхаус, дача, гараж',
@@ -226,13 +232,13 @@
 )");
 
     echo "Статус создания таблицы property: ";
-    returnResultMySql($rez);
+    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Создаем таблицу для постоянного хранения информации о ФОТОГРАФИЯХ объектов недвижимости
      ***************************************************************************/
 
-    $rez = mysqli_query($DBlink, "CREATE TABLE propertyFotos (
+    $DBlink->query("CREATE TABLE propertyFotos (
         id VARCHAR(32) NOT NULL PRIMARY KEY,
         folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ..\uploaded_files\3\ ',
         filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
@@ -243,13 +249,13 @@
 )");
 
     echo "Статус создания таблицы propertyFotos: ";
-    returnResultMySql($rez);
+    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Создаем таблицу для хранения информации о СООБЩЕНИЯХ пользователей
      ***************************************************************************/
 
-    $rez = mysqli_query($DBlink, "CREATE TABLE messages (
+    $DBlink->query("CREATE TABLE messages (
         id VARCHAR(32) NOT NULL PRIMARY KEY COMMENT 'Идентификатор сообщения (новости)',
         userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное сообщение',
         typeMessage VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип сообщения: о новом кандидате в арендаторы, о новом объекте недвижимости для арендатора, о назначении времени просмотра объекта для собственника, о назначении времени просмотра объекта для арендатора, об изменении времени просмотра объекта для собственника, об изменении времени просмотра объекта для арендатора',
@@ -259,7 +265,7 @@
     )");
 
     echo "Статус создания таблицы messages: ";
-    returnResultMySql($rez);
+    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Создаем таблицу для хранения информации о заявках на просмотр
@@ -280,19 +286,19 @@
      * Создаем таблицу для хранения списка районов каждого города присутствия сервиса
      ***************************************************************************/
 
-    $rez = mysqli_query($DBlink, "CREATE TABLE districts (
+    $DBlink->query("CREATE TABLE districts (
         name VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Название района, которое отображается пользователю',
         city VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Город, в котором расположен данный район'
 )");
 
     echo "Статус создания таблицы districts: ";
-    returnResultMySql($rez);
+    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Записываем в таблицу с районами инфу о районах
      ***************************************************************************/
 
-    $rez = mysqli_query($DBlink, "INSERT INTO districts (name, city) VALUES
+    $DBlink->query("INSERT INTO districts (name, city) VALUES
     ('Автовокзал (южный)', 'Екатеринбург'),
     ('Академический', 'Екатеринбург'),
     ('Ботанический', 'Екатеринбург'),
@@ -342,31 +348,31 @@
 ");
 
     echo "Статус записи инфы о районах в таблицу districts: ";
-    returnResultMySql($rez);
+    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Создаем таблицу для хранения курсов валют: доллара США и евро к рублю
      ***************************************************************************/
 
-    $rez = mysqli_query($DBlink, "CREATE TABLE currencies (
+    $DBlink->query("CREATE TABLE currencies (
         name VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Название валюты',
         value FLOAT(2) COMMENT 'Текущий курс обмена данной валюты на рубли'
 )");
 
     echo "Статус создания таблицы currencies: ";
-    returnResultMySql($rez);
+    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Записываем в таблицу с валютами текущие курсы
      ***************************************************************************/
 
-    $rezCurrencies[] = mysqli_query($DBlink, "INSERT INTO currencies (name, value) VALUES
+    $DBlink->query("INSERT INTO currencies (name, value) VALUES
     ('дол. США', 31.22),
     ('евро', 40.17)
     ");
 
     echo "Статус записи инфы о валютах: ";
-    returnResultMySql($rez);
+    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /**
      * Проверяем настройки PHP сервера
@@ -375,5 +381,4 @@
      */
 
     // Закрываем соединение с БД
-    closeConnectToDB($DBlink);
-?>
+    $globFunc->closeConnectToDB($DBlink);

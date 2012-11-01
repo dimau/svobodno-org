@@ -195,7 +195,7 @@ function removeFoto() {
     // Удалим соответствующий фотографии элемент списка и запишем изменения в массив uploadedFoto (а фактически удалим из массива соответствующий фотографии объект)
     $(this).closest("li.uploadedFotoVisualItem").remove();
     for (var i = 0; i < uploadedFoto.length; i++) {
-        if (uploadedFoto[i]['fotoid'] == fotoid) {
+        if (uploadedFoto[i]['id'] == fotoid) {
             uploadedFoto.splice(i, 1);
             break;
         }
@@ -205,6 +205,7 @@ function removeFoto() {
 
 // Подготовка данных о фотографиях для передачи на сервер
 // this - форма, на которой произошло событие submit
+// Функция выполняется при событии submit на форме с class = "formWithFotos" (обработчик навешивается в функции createUploader)
 function attrInputHiddenToValue() {
     // Актуализируем статус у объектов массива uploadedFoto
     var primaryFotoId = getRadioValue('primaryFotoRadioButton');

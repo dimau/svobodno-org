@@ -819,7 +819,7 @@ qq.extend(qq.FileUploader.prototype, {
             qq.addClass(item, this._classes.fail);
         }
 
-        // Присваиваем id фотографии элементу списка. Это возволит однозначно сопоставлять данный элемент списка и соответствующий ему INPUT hidden
+        // Присваиваем id фотографии элементу списка. Это возволит однозначно сопоставлять данный элемент списка и соответствующий ему элемент массива uploadedFoto
         item.fotoid = result.name;
 
         if (result.uploadedFotoObjExists != 'true') {
@@ -829,7 +829,7 @@ qq.extend(qq.FileUploader.prototype, {
             $("#fotoWrapperBlock legend").after(newInputHidden); */
 
             uploadedFoto.push({
-                fotoid: result.name,
+                id: result.name,
                 folder: result.folder,
                 filename: fileName,
                 extension: result.ext,

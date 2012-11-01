@@ -4,6 +4,8 @@
     {
 
         private $DBlink = FALSE; // Переменная для хранения объекта соединения с базой данных
+        public $loggerName = "test"; // Название логера (а также и название файла, в который сохраняется лог)
+        // ВАЖНО: если изменяешь название логгера ($loggerName), то необходимо создать файл с ровно таким же именем и расширением .log в каталоге logs (корень проекта)
 
         // КОНСТРУКТОР
         public function __construct()
@@ -108,6 +110,17 @@
             $month = substr($dateFromView, 3, 2);
             $year = substr($dateFromView, 6, 4);
             return $year . "." . $month . "." . $date;
+        }
+
+        // Функция делает первый символ строки в верхнем регистре
+        function getFirstCharUpper($str)
+        {
+            $firstChar = mb_substr($str, 0, 1, 'UTF-8'); // Первая буква
+            $lastStr = mb_substr($str, 1); // Все кроме первой буквы
+            $firstChar = mb_strtoupper($firstChar, 'UTF-8');
+            $lastStr = mb_strtolower($lastStr, 'UTF-8');
+            $str = $firstChar . $lastStr;
+            return $str;
         }
 
     }

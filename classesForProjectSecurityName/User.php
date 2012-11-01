@@ -87,12 +87,13 @@
             // Инициализируем переменную "сессии" для временного сохранения фотографий
             $this->fileUploadId = $this->globFunc->generateCode(7);
 
-            // Проверяем, авторизован ли пользователь, и если да, инициализируем параметры объекта соответствующими значениями из БД
+            // Проверяем, авторизован ли пользователь, и если да, инициализируем ключевые параметры объекта (id, typeTenant, typeOwner) соответствующими значениями из БД
             $this->login();
 
             // Инициализируем переменные typeTenant и typeOwner
             $this->isTenant();
             $this->isOwner();
+
         }
 
         // ДЕСТРУКТОР
@@ -146,7 +147,8 @@
         }
 
         // Метод возвращает id пользователя
-        public function getId() {
+        public function getId()
+        {
 
             if ($this->id == "") return FALSE;
 
@@ -175,10 +177,10 @@
             // Преобразуем из логических в строковые (MySQL почему-то не поддерживает сохранение логических параметров)
             if ($this->typeTenant === TRUE) $typeTenant = "TRUE";
             if ($this->typeTenant === FALSE) $typeTenant = "FALSE";
-            if ($this->typeTenant === NULL) $typeTenant = NULL;
+            if ($this->typeTenant === NULL) $typeTenant = "FALSE";
             if ($this->typeOwner === TRUE) $typeOwner = "TRUE";
             if ($this->typeOwner === FALSE) $typeOwner = "FALSE";
-            if ($this->typeOwner === NULL) $typeOwner = NULL;
+            if ($this->typeOwner === NULL) $typeOwner = "FALSE";
 
             // Для простоты технической поддержки пользователей пойдем на небольшой риск с точки зрения безопасности и будем хранить пароли пользователей на сервере в БД без соли и шифрования
             /*$salt = mt_rand(100, 999);
@@ -197,6 +199,7 @@
                     OR ($stmt->close() === FALSE)
                 ) {
                     // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+
                     return FALSE;
                 }
 
@@ -211,7 +214,6 @@
                     OR ($stmt->bind_param("sssssssssssssssssssssssssis", $this->name, $this->secondName, $this->surname, $this->sex, $this->nationality, $birthdayDB, $this->password, $this->telephon, $this->email, $this->currentStatusEducation, $this->almamater, $this->speciality, $this->kurs, $this->ochnoZaochno, $this->yearOfEnd, $this->statusWork, $this->placeOfWork, $this->workPosition, $this->regionOfBorn, $this->cityOfBorn, $this->shortlyAboutMe, $this->vkontakte, $this->odnoklassniki, $this->facebook, $this->twitter, $last_act, $this->id) === FALSE)
                     OR ($stmt->execute() === FALSE)
                     OR (($res = $stmt->affected_rows) === -1)
-                    OR ($res === 0)
                     OR ($stmt->close() === FALSE)
                 ) {
                     // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
@@ -248,7 +250,7 @@
             if (!is_array($this->uploadedFoto)) return FALSE;
 
             // Для выполнения функция у пользователя обязательно должен быть id
-            if ($this->id = "") return FALSE;
+            if ($this->id == "") return FALSE;
 
             // Получаем данные по всем фоткам с нашим $this->fileUploadId
             $stmt = $this->DBlink->stmt_init();
@@ -260,17 +262,22 @@
                 OR ($stmt->close() === FALSE)
             ) {
                 $allFotos = array();
+                // Логируем ошибку
+                Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM tempFotos WHERE fileUploadId=".$this->fileUploadId."'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
                 // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-            }
+            } else {
 
-            // Пометим все члены массива признаком их получения из таблицы tempFotos и дополним id пользователя
-            foreach ($allFotos as $value) {
-                $value['fromTable'] = "tempFotos";
+                // Пометим все члены массива признаком их получения из таблицы tempFotos и дополним id пользователя
+                for ($i = 0; $i < count($allFotos); $i++) {
+                    $allFotos[$i]['fromTable'] = "tempFotos";
+                }
+
             }
 
             // Получаем данные по всем фоткам пользователя (с идентификатором $this->id)
             // Но только для существующего - авторизованного пользователя (не для нового)
             if ($this->login()) {
+
                 $stmt = $this->DBlink->stmt_init();
                 if (($stmt->prepare("SELECT * FROM userFotos WHERE userId=?") === FALSE)
                     OR ($stmt->bind_param("s", $this->id) === FALSE)
@@ -279,18 +286,18 @@
                     OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
                     OR ($stmt->close() === FALSE)
                 ) {
-                    // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                    // Логируем ошибку
+                    Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM userFotos WHERE userId=".$this->id."'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
                 } else {
 
                     // Пометим все члены массива признаком их получения из таблицы userFotos
-                    foreach ($res as $value) {
-                        $value['fromTable'] = "userFotos";
+                    for ($i = 0; $i < count($res); $i++) {
+                        $res[$i]['fromTable'] = "userFotos";
                     }
 
                     $allFotos = array_merge($allFotos, $res);
                 }
             }
-
 
             // Перебираем все имеющиеся фотографии пользователя и актуализируем их параметры
             $primaryFotoExists = 0; // Инициализируем переменную, по которой после прохода по всем фотографиям, полученным в форме, сможем сказать была ли указана пользователем основная фотка (число - сколько фоток со статусом основная мы получили с клиента) или нет (0)
@@ -299,7 +306,7 @@
                 // Для сокращения количества запросов на UPDATE будем отмечать особым признаком те фотографии, по которым требуется выполнения этого запроса к БД
                 $allFotos[$i]['updated'] = FALSE;
 
-                // На заметку: в массиве $uploadedFoto также содержится актуальная информация по всем статусам фотографий, но легче получить id основной фотки из формы, а не из этого массива
+                // На заметку: в массиве $uploadedFoto также содержится (а точнее может содержаться) актуальная информация по всем статусам фотографий, но легче получить id основной фотки из формы, а не из этого массива
                 if ($allFotos[$i]['id'] == $this->primaryFotoId) {
                     // Проверяем - нужно ли для данной фотографии проводить UPDATE
                     if ($allFotos[$i]['fromTable'] == "userFotos" && $allFotos[$i]['status'] != 'основная') {
@@ -325,20 +332,26 @@
                 }
 
                 // Подготовим данные о пути к каталогу хранения фотографии в вид, пригодный для перезаписи в БД
-                //$$allFotos[$i]['folder'] = str_replace('\\', '\\\\', $$allFotos[$i]['folder']); // Переменная folder уже содержит в себе один или несколько '\', но для того, чтобы при сохранении в БД не возникло проблем, к нему нужно добавить еще один символ '\', в этом случае mysql будет воспринимать "\\" как один знак "\" и не будет считать его служебгым символом
+                $allFotos[$i]['folder'] = str_replace('\\', '\\\\', $allFotos[$i]['folder']); // Переменная folder уже содержит в себе один или несколько '\', но для того, чтобы при сохранении в БД не возникло проблем, к нему нужно добавить еще один символ '\', в этом случае mysql будет воспринимать "\\" как один знак "\" и не будет считать его служебгым символом
 
             }
 
             // Если пользователь не указал основное фото, то укажем первую попавшуюся фотографию (не помеченную на удаление) в качестве основной
             if ($primaryFotoExists == 0) {
                 for ($i = 0; $i < count($allFotos); $i++) {
-                    if ($allFotos[$i]['forRemove'] == FALSE) {
-                        $allFotos[$i]['status'] = 'основная';
-                        break;
+                    // Если файл помечен на удаление, то ему статус основной не присваиваем
+                    if ($allFotos[$i]['forRemove'] == TRUE) continue;
+
+                    // Проверяем - нужно ли для данной фотографии проводить UPDATE
+                    if ($allFotos[$i]['fromTable'] == "userFotos" && $allFotos[$i]['status'] != 'основная') {
+                        $allFotos[$i]['updated'] = TRUE;
                     }
+                    $allFotos[$i]['status'] = 'основная';
+
+                    // Как только нашли одну фотку, которая не подлежит удалению и присвоили ей статус основной, так выходим из перебора
+                    break;
                 }
             }
-
 
             // Удаляем файлы фотографий (помеченных признаком удаления) с сервера
             for ($i = 0; $i < count($allFotos); $i++) {
@@ -347,7 +360,8 @@
                     OR unlink($allFotos[$i]['folder'] . '\\middle\\' . $allFotos[$i]['id'] . "." . $allFotos[$i]['extension'])
                     OR unlink($allFotos[$i]['folder'] . '\\big\\' . $allFotos[$i]['id'] . "." . $allFotos[$i]['extension'])
                 ) {
-                    // TODO: сделать сохранение статусов отработки команд по удалению фоток в лог файл. Каждый unlink выдает TRUE, если все хорошо и FALSE, если плохо
+                    // Логируем ошибку
+                    Logger::getLogger($this->globFunc->loggerName)->log("Ошибка удаления файлов фотографий пользователя. Адрес: ".$allFotos[$i]['folder']."\\big\\".$allFotos[$i]['id'].".".$allFotos[$i]['extension']." Местонахождение кода: User->saveFotoInformationToDB(). ID пользователя: ".$this->id);
                 }
             }
 
@@ -361,15 +375,15 @@
                     if (($stmt->bind_param("ss", $allFotos[$i]['status'], $allFotos[$i]['id']) === FALSE)
                         OR ($stmt->execute() === FALSE)
                         OR (($res = $stmt->affected_rows) === -1)
-                        OR ($res === 0)
-                        OR ($stmt->close() === FALSE)
                     ) {
-                        // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                        // Логируем ошибку
+                        Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE userFotos SET status=".$allFotos[$i]['status']." WHERE id=".$allFotos[$i]['id']."'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
                     }
                 }
             }
+            $stmt->close();
 
-            // Для уменьшения запросов к БД соберем 2 общих заспроса на изменение сразу всех нужных строк
+            // Для уменьшения запросов к БД соберем 2 общих запроса на изменение сразу всех нужных строк
             // Соберем условия WHERE для SQL запросов к БД:
             // на INSERT новых строк в userFotos
             // на DELETE более ненужных фоток из userFotos
@@ -392,67 +406,108 @@
             // Выполним сформированные запросы
             // INSERT
             if ($strINSERT != "") {
-                $res = $this->DBlink->query("INSERT INTO userFotos (id, folder, filename, extension, filesizeMb, userId, status) VALUES " . $strINSERT);
+                $this->DBlink->query("INSERT INTO userFotos (id, folder, filename, extension, filesizeMb, userId, status) VALUES " . $strINSERT);
                 if (($this->DBlink->errno)
-                    OR (($res = $res->affected_rows) === -1)
+                    OR (($res = $this->DBlink->affected_rows) === -1)
                     OR ($res === 0)
                 ) {
-                    // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                    // Логируем ошибку
+                    Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO userFotos (id, folder, filename, extension, filesizeMb, userId, status) VALUES ".$strINSERT."'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
                 }
             }
             // DELETE
             if ($strDELETE != "") {
-                $res = $this->DBlink->query("DELETE FROM userFotos WHERE " . $strDELETE);
+                $this->DBlink->query("DELETE FROM userFotos WHERE " . $strDELETE);
                 if (($this->DBlink->errno)
-                    OR (($res = $res->affected_rows) === -1)
-                    OR ($res === 0)
+                    OR (($res = $this->DBlink->affected_rows) === -1)
                 ) {
-                    // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                    // Логируем ошибку
+                    Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM userFotos WHERE ".$strDELETE."'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
                 }
             }
-
 
             // Удаляем инфу о всех фотках с fileUploadId из tempFotos
-            // TODO: Не очень безопасно
+            // TODO: Не очень безопасно (используется полученный с клиента fileUploadId)
             if ($this->fileUploadId != "") {
-                $res = $this->DBlink->query("DELETE FROM tempFotos WHERE fileUploadId = '" . $this->fileUploadId . "'");
+                $this->DBlink->query("DELETE FROM tempFotos WHERE fileUploadId = '" . $this->fileUploadId . "'");
                 if (($this->DBlink->errno)
-                    OR ($res->affected_rows === -1)
+                    OR ($this->DBlink->affected_rows === -1)
                 ) {
-                    // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                    // Логируем ошибку
+                    Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM tempFotos WHERE fileUploadId = '" . $this->fileUploadId . "'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
                 }
             }
+
+            // Приведем в соответствие с данными из БД наш массив с фотографиями $this->uploadedFotos
+            $this->writeFotoInformationFromDB();
 
         }
 
         // Функция для сохранения параметров поискового запроса пользователя
-        public function saveSearchRequestToDB()
+        // $typeOfUser = "new" - режим сохранения для нового (регистрируемого пользователя)
+        // $typeOfUser = "edit" - режим сохранения для существующего пользователя
+        // Режимы нужны из-за того, что typeTenant в случае нового пользователя означает намерение стать арендатором (но у него еще нет в БД поискового запроса), а в случае существующего пользователя typeTenant означает наличие в БД поискового запроса (если = TRUE), либо его отсутствие (если = FALSE)
+        // Возвращает TRUE, если данные успешно сохранены и FALSE в противном случае
+        public function saveSearchRequestToDB($typeOfUser = "edit")
         {
 
-            if ($this->isTenant() != TRUE || $this->id == "") return FALSE;
+            if ($this->id == "") return FALSE;
 
             // Преобразование формата инфы об искомом кол-ве комнат и районах, так как MySQL не умеет хранить массивы
             $amountOfRoomsSerialized = serialize($this->amountOfRooms);
             $districtSerialized = serialize($this->district);
             $interestingPropertysIdSerialized = serialize($this->interestingPropertysId);
 
-            // Непосредственное сохранение данных о поисковом запросе
-            $stmt = $this->DBlink->stmt_init();
-            if (($stmt->prepare("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, interestingPropertysId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
-                OR ($stmt->bind_param("ssbssiiisbssssssssb", $this->id, $this->typeOfObject, $amountOfRoomsSerialized, $this->adjacentRooms, $this->floor, $this->minCost, $this->maxCost, $this->pledge, $this->prepayment, $districtSerialized, $this->withWho, $this->linksToFriends, $this->children, $this->howManyChildren, $this->animals, $this->howManyAnimals, $this->termOfLease, $this->additionalDescriptionOfSearch, $interestingPropertysIdSerialized) === FALSE)
-                OR ($stmt->execute() === FALSE)
-                OR (($res = $stmt->affected_rows) === -1)
-                OR ($res === 0)
-                OR ($stmt->close() === FALSE)
-            ) {
-                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-                return FALSE;
+            if ($this->isTenant() && $typeOfUser == "edit") {
+
+                // Непосредственное сохранение данных о поисковом запросе
+                $stmt = $this->DBlink->stmt_init();
+                if (($stmt->prepare("UPDATE searchRequests SET userId=?, typeOfObject=?, amountOfRooms=?, adjacentRooms=?, floor=?, minCost=?, maxCost=?, pledge=?, prepayment=?, district=?, withWho=?, linksToFriends=?, children=?, howManyChildren=?, animals=?, howManyAnimals=?, termOfLease=?, additionalDescriptionOfSearch=?, interestingPropertysId=? WHERE userId=?") === FALSE)
+                    OR ($stmt->bind_param("ssbssiiisbssssssssbs", $this->id, $this->typeOfObject, $amountOfRoomsSerialized, $this->adjacentRooms, $this->floor, $this->minCost, $this->maxCost, $this->pledge, $this->prepayment, $districtSerialized, $this->withWho, $this->linksToFriends, $this->children, $this->howManyChildren, $this->animals, $this->howManyAnimals, $this->termOfLease, $this->additionalDescriptionOfSearch, $interestingPropertysIdSerialized, $this->id) === FALSE)
+                    OR ($stmt->execute() === FALSE)
+                    OR (($res = $stmt->affected_rows) === -1)
+                    OR ($stmt->close() === FALSE)
+                ) {
+                    // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                    return FALSE;
+                }
+
+            } else {
+
+                // Непосредственное сохранение данных о поисковом запросе
+                $stmt = $this->DBlink->stmt_init();
+                if (($stmt->prepare("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, interestingPropertysId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
+                    OR ($stmt->bind_param("ssbssiiisbssssssssb", $this->id, $this->typeOfObject, $amountOfRoomsSerialized, $this->adjacentRooms, $this->floor, $this->minCost, $this->maxCost, $this->pledge, $this->prepayment, $districtSerialized, $this->withWho, $this->linksToFriends, $this->children, $this->howManyChildren, $this->animals, $this->howManyAnimals, $this->termOfLease, $this->additionalDescriptionOfSearch, $interestingPropertysIdSerialized) === FALSE)
+                    OR ($stmt->execute() === FALSE)
+                    OR (($res = $stmt->affected_rows) === -1)
+                    OR ($res === 0)
+                    OR ($stmt->close() === FALSE)
+                ) {
+                    // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                    return FALSE;
+                }
+
+                // Обновляем статус пользователя - теперь он арендатор
+                $stmt = $this->DBlink->stmt_init();
+                if (($stmt->prepare("UPDATE users SET typeTenant='TRUE' WHERE id=?") === FALSE)
+                    OR ($stmt->bind_param("s", $this->id) === FALSE)
+                    OR ($stmt->execute() === FALSE)
+                    OR (($res = $stmt->affected_rows) === -1)
+                    OR ($stmt->close() === FALSE)
+                ) {
+                    // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                    return FALSE;
+                }
+
+                $this->typeTenant = TRUE;
+
             }
 
             return TRUE;
         }
 
-        public function writeCharacteristicFromDB() {
+        public function writeCharacteristicFromDB()
+        {
 
             // Если идентификатор пользователя неизвестен, то дальнейшие действия не имеют смысла
             if ($this->id == "") return FALSE;
@@ -486,8 +541,7 @@
                 if ($oneUserDataArr['typeTenant'] == "TRUE") $this->typeTenant = TRUE;
                 if ($oneUserDataArr['typeTenant'] == "FALSE") $this->typeTenant = FALSE;
             }
-            if (isset($oneUserDataArr['typeOwner']))
-            {
+            if (isset($oneUserDataArr['typeOwner'])) {
                 if ($oneUserDataArr['typeOwner'] == "TRUE") $this->typeOwner = TRUE;
                 if ($oneUserDataArr['typeOwner'] == "FALSE") $this->typeOwner = FALSE;
             }
@@ -530,7 +584,8 @@
         }
 
         // Метод читает данные о фотографиях из БД и записывает их в параметры пользователя
-        public function writeFotoInformationFromDB() {
+        public function writeFotoInformationFromDB()
+        {
 
             // Если идентификатор пользователя неизвестен, то дальнейшие действия не имеют смысла
             if ($this->id == "") return FALSE;
@@ -564,10 +619,11 @@
         }
 
         // Метод читает данные о поисковом запросе из БД и записывает их в параметры пользователя
-        public function writeSearchRequestFromDB() {
+        public function writeSearchRequestFromDB()
+        {
 
-            // Если идентификатор пользователя неизвестен, то дальнейшие действия не имеют смысла
-            if ($this->id == "") return FALSE;
+            // Если идентификатор пользователя неизвестен или пользователь не является арендатором, то дальнейшие действия не имеют смысла
+            if ($this->id == "" || $this->isTenant() == FALSE) return FALSE;
 
             // Получим из БД данные ($res) по пользователю с идентификатором = $this->id
             $stmt = $this->DBlink->stmt_init();
@@ -627,7 +683,8 @@
         }
 
         // Метод удаляет параметры поискового запроса пользователя из БД, сбрасывает соответствующие настройки объекта на "по-умолчанию", а также меняет статус isTenant на FALSE.
-        public function removeSearchRequest() {
+        public function removeSearchRequest()
+        {
 
             // Проверка на наличие id пользователя
             if ($this->id == "") return FALSE;
@@ -650,7 +707,6 @@
                 OR ($stmt->bind_param("s", $this->id) === FALSE)
                 OR ($stmt->execute() === FALSE)
                 OR (($res = $stmt->affected_rows) === -1)
-                OR ($res === 0)
                 OR ($stmt->close() === FALSE)
             ) {
                 // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
@@ -685,10 +741,9 @@
         }
 
         // Записать в качестве параметров user-а значения, полученные через POST запрос
-        public function writePOSTparameters()
+        public function writeCharacteristicFromPOST()
         {
             //TODO: не проверять и не менять $_POST['login'], если происходит редактирование существующего пользователя (теоретически можно через POST параметр заслать новый логин и метод его поменяет для ранее зарегистрированного пользователя)
-            //TODO: убедиться, что если на клиенте удалить все фотки, то при перезагрузке они снова не появятся (из-за того, что $uploadedFoto не придет в POST параметрах и останется предыдущая версия - которая не будет перезатерта)
 
             if (isset($_POST['name'])) $this->name = htmlspecialchars($_POST['name']);
             if (isset($_POST['secondName'])) $this->secondName = htmlspecialchars($_POST['secondName']);
@@ -700,10 +755,6 @@
             if (isset($_POST['password'])) $this->password = htmlspecialchars($_POST['password']);
             if (isset($_POST['telephon'])) $this->telephon = htmlspecialchars($_POST['telephon']);
             if (isset($_POST['email'])) $this->email = htmlspecialchars($_POST['email']);
-
-            if (isset($_POST['fileUploadId'])) $this->fileUploadId = $_POST['fileUploadId'];
-            if (isset($_POST['uploadedFoto'])) $this->uploadedFoto = json_decode($_POST['uploadedFoto'], TRUE); // Массив объектов со сведениями о загруженных фотографиях сериализуется в JSON формат на клиенте и передается как содержимое атрибута value одного единственного INPUT hidden
-            if (isset($_POST['primaryFotoRadioButton'])) $this->primaryFotoId = htmlspecialchars($_POST['primaryFotoRadioButton']);
 
             if (isset($_POST['currentStatusEducation'])) $this->currentStatusEducation = htmlspecialchars($_POST['currentStatusEducation']);
             if (isset($_POST['almamater'])) $this->almamater = htmlspecialchars($_POST['almamater']);
@@ -723,9 +774,27 @@
             if (isset($_POST['facebook'])) $this->facebook = htmlspecialchars($_POST['facebook']);
             if (isset($_POST['twitter'])) $this->twitter = htmlspecialchars($_POST['twitter']);
 
+            if (isset($_POST['lic'])) $this->lic = htmlspecialchars($_POST['lic']);
+
+        }
+
+        public function writeFotoInformationFromPOST()
+        {
+            //TODO: убедиться, что если на клиенте удалить все фотки, то при перезагрузке они снова не появятся (из-за того, что $uploadedFoto не придет в POST параметрах и останется предыдущая версия - которая не будет перезатерта)
+
+            if (isset($_POST['fileUploadId'])) $this->fileUploadId = $_POST['fileUploadId'];
+            if (isset($_POST['uploadedFoto'])) $this->uploadedFoto = json_decode($_POST['uploadedFoto'], TRUE); // Массив объектов со сведениями о загруженных фотографиях сериализуется в JSON формат на клиенте и передается как содержимое атрибута value одного единственного INPUT hidden
+            if (isset($_POST['primaryFotoRadioButton'])) $this->primaryFotoId = htmlspecialchars($_POST['primaryFotoRadioButton']);
+
+        }
+
+        // Записать в качестве параметров user-а значения, полученные через POST запрос
+        public function writeSearchRequestFromPOST()
+        {
+
             if (isset($_POST['typeOfObject'])) $this->typeOfObject = htmlspecialchars($_POST['typeOfObject']);
-            if (isset($_POST['amountOfRooms']) && is_array($_POST['amountOfRooms'])) $this->amountOfRooms = $_POST['amountOfRooms'];
-            if (isset($_POST['district']) && is_array($_POST['district'])) $this->district = $_POST['district'];
+            if (isset($_POST['amountOfRooms']) && is_array($_POST['amountOfRooms'])) $this->amountOfRooms = $_POST['amountOfRooms']; else $this->amountOfRooms = array(); // Если пользователь отправил форму submit, и в параметрах нет значения amountOfRooms, значит пользователь не отметил ни один чекбокс из группы, чему соответствует пустой массив
+            if (isset($_POST['district']) && is_array($_POST['district'])) $this->district = $_POST['district']; else $this->district = array(); // Если пользователь отправил форму submit, и в параметрах нет значения district, значит пользователь не отметил ни один чекбокс из группы, чему соответствует пустой массив
             if (isset($_POST['adjacentRooms'])) $this->adjacentRooms = htmlspecialchars($_POST['adjacentRooms']);
             if (isset($_POST['floor'])) $this->floor = htmlspecialchars($_POST['floor']);
             if (isset($_POST['minCost'])) $this->minCost = htmlspecialchars($_POST['minCost']);
@@ -741,47 +810,6 @@
             if (isset($_POST['termOfLease'])) $this->termOfLease = htmlspecialchars($_POST['termOfLease']);
             if (isset($_POST['additionalDescriptionOfSearch'])) $this->additionalDescriptionOfSearch = htmlspecialchars($_POST['additionalDescriptionOfSearch']);
 
-            if (isset($_POST['lic'])) $this->lic = htmlspecialchars($_POST['lic']);
-        }
-
-        // Записывает параметры переданные через ассоциированный массив ($paramsArr) в параметры объекта
-        private function writeParametersPersonal($paramsArr)
-        {
-            $this->id = $paramsArr['id'];
-            $this->typeTenant = $paramsArr['typeTenant'];
-            $this->typeOwner = $paramsArr['typeOwner'];
-            $this->name = $paramsArr['name'];
-            $this->secondName = $paramsArr['secondName'];
-            $this->surname = $paramsArr['surname'];
-            $this->sex = $paramsArr['sex'];
-            $this->nationality = $paramsArr['nationality'];
-            $this->birthday = $paramsArr['birthday'];
-            $this->login = $paramsArr['login'];
-            $this->password = $paramsArr['password'];
-            $this->telephon = $paramsArr['telephon'];
-            $this->emailReg = $paramsArr['emailReg'];
-            $this->email = $paramsArr['email'];
-            $this->currentStatusEducation = $paramsArr['currentStatusEducation'];
-            $this->almamater = $paramsArr['almamater'];
-            $this->speciality = $paramsArr['speciality'];
-            $this->kurs = $paramsArr['kurs'];
-            $this->ochnoZaochno = $paramsArr['ochnoZaochno'];
-            $this->yearOfEnd = $paramsArr['yearOfEnd'];
-            $this->statusWork = $paramsArr['statusWork'];
-            $this->placeOfWork = $paramsArr['placeOfWork'];
-            $this->workPosition = $paramsArr['workPosition'];
-            $this->regionOfBorn = $paramsArr['regionOfBorn'];
-            $this->cityOfBorn = $paramsArr['cityOfBorn'];
-            $this->shortlyAboutMe = $paramsArr['shortlyAboutMe'];
-            $this->vkontakte = $paramsArr['vkontakte'];
-            $this->odnoklassniki = $paramsArr['odnoklassniki'];
-            $this->facebook = $paramsArr['facebook'];
-            $this->twitter = $paramsArr['twitter'];
-            $this->lic = $paramsArr['lic'];
-            $this->user_hash = $paramsArr['user_hash'];
-            $this->last_act = $paramsArr['last_act'];
-            $this->reg_date = $paramsArr['reg_date'];
-            $this->favoritesPropertysId = $paramsArr['favoritesPropertysId'];
         }
 
         // Проверка корректности параметров пользователя
@@ -895,12 +923,91 @@
             return $errors; // Возвращаем список ошибок, если все в порядке, то он будет пуст
         }
 
+        // Метод возвращает блок (div) для отображения фотографии (и, если нужно, по клику галереи фотографий) пользователя
+        // На входе: $sizeForPrimary - размер основной фотографии (small, middle, big); $isInteractive - нужно ли по клику включать галерею фотографий(TRUE- нужно, FALSE - нет)
+        public function getHTMLfotosWrapper($sizeForPrimary = "small", $isInteractive = FALSE) {
+
+            // Шаблон для формируемого HTML блока с фотографиями
+            $templ = "
+                <div class='fotosWrapper {isInteractive}'>
+                    <div class='{size}FotoWrapper'>
+                        <img class='{size}Foto {gallery}' src='{urlFotoPrimary}' href='{hrefFotoPrimary}'>
+                    </div>
+                    <div class='numberOfFotos'>{numberOfFotos}</div>
+                    {hiddensLinksToOtherFotos}
+                </div>
+            ";
+
+            // Если идентификатор пользователя неизвестен, то дальнейшие действия не имеют смысла
+            if ($this->id == "") return FALSE;
+
+            // Если объект не содержит информации о фотографиях пользователя, то получим ее из БД
+            if (!is_array($this->uploadedFoto) || count($this->uploadedFoto) == 0) {
+                $this->writeFotoInformationFromDB();
+            }
+
+            // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне
+            $arrForReplace = array();
+
+            // Делаем блок фотографий интерактивным или нет?
+            $arrForReplace['isInteractive'] = "";
+            if (!$isInteractive) $arrForReplace['isInteractive'] = "fotoNonInteractive";
+
+            // Размер для блока (и следовательно для основной фотографии)
+            $arrForReplace['size'] = "";
+            if ($sizeForPrimary == "small") $arrForReplace['size'] = "small";
+            if ($sizeForPrimary == "middle") $arrForReplace['size'] = "middle";
+            if ($sizeForPrimary == "big") $arrForReplace['size'] = "big";
+
+            // Галерея?
+            $arrForReplace['gallery'] = "";
+            if ($isInteractive) $arrForReplace['gallery'] = "gallery";
+
+            // URL до показываемой в качестве основной фотографии. Атрибут href будет полезен, если эту же фотографию нужно будет открыть в галерее - он всегда показывает путь до данного фото в большом формате
+            $arrForReplace['urlFotoPrimary'] = "";
+            $arrForReplace['hrefFotoPrimary'] = "";
+            $arrForReplace['numberOfFotos'] = "";
+            $arrForReplace['hiddensLinksToOtherFotos'] = "";
+            // Перебираем все имеющиеся фотографии пользователя
+            if (!is_array($this->uploadedFoto) || count($this->uploadedFoto) == 0) {
+                // Если у пользователя нет фото - присваиваем картинку по умолчанию
+                $arrForReplace['urlFotoPrimary'] = "uploaded_files\\1\\".$arrForReplace['size']."\\1c1dfa378d4d9caaa93703c0b89f4077.jpeg";
+                $arrForReplace['hrefFotoPrimary'] = "uploaded_files\\1\\big\\1c1dfa378d4d9caaa93703c0b89f4077.jpeg";
+            } else {
+                // Если у пользователя есть фото - найдем среди них основное. А из неосновных сделаем hidden блоки для галереи
+                foreach ($this->uploadedFoto as $value) {
+                    if ($value['status'] == "основная") {
+                        $arrForReplace['urlFotoPrimary'] = $value['folder'] . '\\' . $arrForReplace['size'] . '\\' . $value['id'] . "." . $value['extension'];
+                        $arrForReplace['hrefFotoPrimary'] = $value['folder'] . '\\big\\' . $value['id'] . "." . $value['extension'];
+                    } else {
+                        // Из неосновных фотографий формируем input hidden блоки для передачи клиентскому JS информации об адресе большой фотографии (для галереи)
+                        $arrForReplace['hiddensLinksToOtherFotos'] .= "<input type='hidden' class='gallery' href='" . $value['folder'] . "\\big\\" . $value['id'] . "." . $value['extension'] . "'>";
+                    }
+                }
+            }
+
+            // Если фотографий больше чем 1 и блок с фотками интерактивный (можно по клику открыть галерею), то нужно внизу сделать приписку об оставшемся кол-ве фоток по шаблону: 'еще ___ фото'
+            if (is_array($this->uploadedFoto) && count($this->uploadedFoto) > 1 && $isInteractive) {
+                $count = count($this->uploadedFoto) - 1; // Считаем сколько еще фотографий осталось кроме основной
+                $arrForReplace['numberOfFotos'] = "еще $count фото";
+            }
+
+            // Заполняем шаблон
+            // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне баллуна
+            $arrTemplVar = array('{isInteractive}', '{size}', '{gallery}', '{urlFotoPrimary}', '{hrefFotoPrimary}', '{numberOfFotos}', '{hiddensLinksToOtherFotos}');
+            // Копируем html-текст шаблона баллуна
+            $fotosWrapperHTML = str_replace($arrTemplVar, $arrForReplace, $templ);
+
+            return $fotosWrapperHTML;
+
+        }
+
         // Функция проверяет - залогинен ли пользователь сейчас (возвращает TRUE или FALSE).
-        // И если пользователь залогинен, то обновляет его личные параметры в соответствии с указанными в БД (но не обновляет параметры поиска)
+        // И если пользователь залогинен, то обновляет его ключевые личные параметры (id, typeTenant, typeOwner) в соответствии с указанными в БД
         // TODO: Оптимизировать код - делать только 1 запрос к БД с параметром идентификатор сессии и одновременно логин пользователя
         public function login()
         {
-            // Если данная функция уже вызывалась на этой странице, то результат ее работы сохранен в приватной переменной, достаочно выдать его
+            // Если данная функция уже вызывалась на этой странице, то результат ее работы сохранен в приватной переменной, достаточно выдать его
             if ($this->isLoggedIn != "") return $this->isLoggedIn;
 
             // Если сессия еще не была запущена - запускаем.
@@ -908,114 +1015,90 @@
                 session_start();
             }
 
-            // СНАЧАЛА ПРОВЕРЯЕМ СЕССИЮ ПОЛЬЗОВАТЕЛЯ. Если какая-то сесcия есть - проверим ее актуальность: если найдется пользователь у которого идентификатор последней сессии совпадет с этим - значит это он и есть
-            if (isset($_SESSION['id'])) {
+            // Инициализируем переменную для проверки сессии пользователя. Если какая-то сесcия есть - проверим ее актуальность: если найдется пользователь у которого идентификатор последней сессии совпадет с этим - значит это он и есть
+            if (isset($_SESSION['id'])) $sessionId = $_SESSION['id']; else $sessionId = "крокодил"; // Если id сессии не определен, то инициализируем соответствующую переменную комбинацией символов, которая точно не встречается в БД в качестве идентификатора сессии
+            // Инициализируем переменную для проверки куки пользователя. Как запасной вариант для того, чтобы убедиться в авторизованности данного пользователя на этой машине
+            if (isset($_COOKIE['login']) && isset($_COOKIE['password'])) $cookieLogin = $_COOKIE['login']; else $cookieLogin = NULL; // Если в куки логин не определен, то инициализируем соответствующую переменную комбинацией символов, которая точно не встречается в БД в качестве логина пользователя
 
-                // Получим из БД данные ($res) по пользователю с идентификатором сессии = $_SESSION['id']
-                $stmt = $this->DBlink->stmt_init();
-                if (($stmt->prepare("SELECT * FROM users WHERE user_hash=?") === FALSE)
-                    OR ($stmt->bind_param("s", $_SESSION['id']) === FALSE)
-                    OR ($stmt->execute() === FALSE)
-                    OR (($res = $stmt->get_result()) === FALSE)
-                    OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-                    OR ($stmt->close() === FALSE)
-                ) {
-                    $res = array();
-                    // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-                }
-
-                // Если нашли 1 строку в БД - значит все хорошо и пользователь является авторизованным.
-                // Сохраним данные пользователя в свойствах объекта
-                if (count($res) == 1) {
-
-                    $idFromDB = $res[0]['id'];
-                    $loginFromDB = $res[0]['login'];
-                    $passwordFromDB = $res[0]['password'];
-
-                    $this->writeParametersPersonal($res[0]);
-
-                    // Если текущая сессия актуальна - добавим куки, чтобы после перезапуска браузера сессия не слетала
-                    setcookie("login", "", time() - 1, '/');
-                    setcookie("password", "", time() - 1, '/');
-                    setcookie("login", $loginFromDB, time() + 60 * 60 * 24 * 7, '/');
-                    setcookie("password", md5($loginFromDB . $passwordFromDB), time() + 60 * 60 * 24 * 7, '/');
-
-                    // Запускаем новую сессию и фиксируем время последнего действия пользователя
-                    $this->newSession($idFromDB);
-                    $this->lastAct($idFromDB);
-
-                    // Вернули ответ - пользователь залогинен
-                    $this->isLoggedIn = TRUE;
-                    return TRUE;
-                }
-            }
-
-            // ЗАТЕМ ПРОВЕРЯЕМ КУКИ. Если сессия уже потеряла актуальность или не существовала
-            if (isset($_COOKIE['login']) && isset($_COOKIE['password'])) // смотрим куки, если cookie есть, то проверим их актуальность
-            {
-
-                // Получим из БД данные ($res) по пользователю с логином = $_COOKIE['login']
-                $stmt = $this->DBlink->stmt_init();
-                if (($stmt->prepare("SELECT * FROM users WHERE login=?") === FALSE)
-                    OR ($stmt->bind_param("s", $_COOKIE['login']) === FALSE)
-                    OR ($stmt->execute() === FALSE)
-                    OR (($res = $stmt->get_result()) === FALSE)
-                    OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-                    OR ($stmt->close() === FALSE)
-                ) {
-                    $res = array();
-                    // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-                    $this->isLoggedIn = FALSE;
-                    return FALSE;
-                }
-
-                // Сохраним данные пользователя в свойствах объекта
-                if (count($res) == 1) {
-
-                    $idFromDB = $res[0]['id'];
-                    $loginFromDB = $res[0]['login'];
-                    $passwordFromDB = $res[0]['password'];
-
-                    if (md5($loginFromDB . $passwordFromDB) == $_COOKIE['password']) {
-
-                        $this->writeParametersPersonal($res[0]);
-
-                        // Обновим куки
-                        setcookie("login", "", time() - 1, '/');
-                        setcookie("password", "", time() - 1, '/');
-                        setcookie("login", $loginFromDB, time() + 60 * 60 * 24 * 7, '/');
-                        setcookie("password", md5($loginFromDB . $passwordFromDB), time() + 60 * 60 * 24 * 7, '/');
-
-                        // Запускаем новую сессию и фиксируем время последнего действия пользователя
-                        $this->newSession($idFromDB);
-                        $this->lastAct($idFromDB);
-
-                        // Вернули ответ - пользователь залогинен
-                        $this->isLoggedIn = TRUE;
-                        return TRUE;
-
-                    } else {
-
-                        setcookie("login", "", time() - 360000, '/');
-                        setcookie("password", "", time() - 360000, '/');
-
-                        $this->isLoggedIn = FALSE;
-                        return FALSE;
-                    }
-
-                } else {
-
-                    setcookie("login", "", time() - 360000, '/');
-                    setcookie("password", "", time() - 360000, '/');
-
-                    $this->isLoggedIn = FALSE;
-                    return FALSE;
-                }
-
-            } else // Если сессия не актуальна и куки не существуют
-            {
+            // Если у пользователя нет идентификатора сессии и нет куки (логин + пароль), то он точно не авторизован
+            if ($sessionId == "крокодил" && $cookieLogin == NULL) {
                 $this->isLoggedIn = FALSE;
                 return FALSE;
+            }
+
+            // Получим из БД данные ($res) по пользователю с идентификатором сессии = $_SESSION['id'] или логином = $_COOKIE['login']
+            $stmt = $this->DBlink->stmt_init();
+            if (($stmt->prepare("SELECT id, typeTenant, typeOwner, login, password, user_hash FROM users WHERE user_hash=? OR login=?") === FALSE)
+                OR ($stmt->bind_param("ss", $sessionId, $cookieLogin) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($res = $stmt->get_result()) === FALSE)
+                OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+                OR ($stmt->close() === FALSE)
+            ) {
+                $res = array();
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+            }
+
+            // Если никого не нашли или нашли данные больше чем по 1 пользователю - значит наш user не авторизован
+            if (is_array($res) && count($res) != 1) {
+
+                // На всякий случай удаляем id сессии (если он конечно был указан)
+                unset($_SESSION['id']);
+
+                // На всякий случай удаляем куки (если они были конечно)
+                setcookie("login", "", time() - 1, '/');
+                setcookie("password", "", time() - 1, '/');
+
+                $this->isLoggedIn = FALSE;
+                return FALSE;
+
+            }
+
+            // Убедимся, что данные пользователя (id сессиии или куки) не устарели - соответствуют данным из БД
+            $user_hashFromDB = $res[0]['user_hash'];
+            $idFromDB = $res[0]['id'];
+            $loginFromDB = $res[0]['login'];
+            $passwordFromDB = $res[0]['password'];
+
+            if ($user_hashFromDB == $sessionId || md5($loginFromDB . $passwordFromDB) == $_COOKIE['password']) {
+
+                // Сохраняем ключевые параметры пользователя, полученные из БД в параметры объекта
+                $this->id = $res[0]['id'];
+                if (isset($res[0]['typeTenant'])) {
+                    if ($res[0]['typeTenant'] == "TRUE") $this->typeTenant = TRUE;
+                    if ($res[0]['typeTenant'] == "FALSE") $this->typeTenant = FALSE;
+                }
+                if (isset($res[0]['typeOwner'])) {
+                    if ($res[0]['typeOwner'] == "TRUE") $this->typeOwner = TRUE;
+                    if ($res[0]['typeOwner'] == "FALSE") $this->typeOwner = FALSE;
+                }
+
+                // Обновим куки (или добавим, если их ранее не было), чтобы после перезапуска браузера сессия не слетала
+                setcookie("login", "", time() - 1, '/');
+                setcookie("password", "", time() - 1, '/');
+                setcookie("login", $loginFromDB, time() + 60 * 60 * 24 * 7, '/');
+                setcookie("password", md5($loginFromDB . $passwordFromDB), time() + 60 * 60 * 24 * 7, '/');
+
+                // Запускаем новую сессию и фиксируем время последнего действия пользователя
+                $this->newSession($idFromDB);
+                $this->lastAct($idFromDB);
+
+                // Вернули ответ - пользователь залогинен
+                $this->isLoggedIn = TRUE;
+                return TRUE;
+
+            } else {
+
+                // На всякий случай удаляем id сессии (если он конечно был указан)
+                unset($_SESSION['id']);
+
+                // На всякий случай удаляем куки (если они были конечно)
+                setcookie("login", "", time() - 1, '/');
+                setcookie("password", "", time() - 1, '/');
+
+                $this->isLoggedIn = FALSE;
+                return FALSE;
+
             }
 
         }
@@ -1092,7 +1175,6 @@
                 OR ($stmt->bind_param("ss", $hash, $userId) === FALSE)
                 OR ($stmt->execute() === FALSE)
                 OR (($res = $stmt->affected_rows) === -1)
-                OR ($res === 0)
                 OR ($stmt->close() === FALSE)
             ) {
                 // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
@@ -1112,7 +1194,6 @@
                 OR ($stmt->bind_param("ss", $tm, $userId) === FALSE)
                 OR ($stmt->execute() === FALSE)
                 OR (($res = $stmt->affected_rows) === -1)
-                OR ($res === 0)
                 OR ($stmt->close() === FALSE)
             ) {
                 // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)

@@ -4,6 +4,7 @@
 
     // Подключаем нужные классы
     include_once 'classesForProjectSecurityName/GlobFunc.php';
+    include_once 'classesForProjectSecurityName/Logger.php';
     include_once 'classesForProjectSecurityName/User.php';
 
     // Создаем объект-хранилище глобальных функций
@@ -32,7 +33,9 @@
     if (isset($_POST['submitButton'])) {
 
         // Записываем POST параметры в параметры объекта пользователя
-        $user->writePOSTparameters();
+        $user->writeCharacteristicFromPOST();
+        $user->writeFotoInformationFromPOST();
+        $user->writeSearchRequestFromPOST();
 
         // Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
         $errors = $user->userDataCorrect("registration");
@@ -68,8 +71,8 @@
                 $this->saveFotoInformationToDB();
 
                 // Сохраняем поисковый запрос, если пользователь регистрируется в качестве арендатора
-                if ($user->isTenant()){
-                    $this->saveSearchRequestToDB();
+                if ($user->isTenant()) {
+                    $this->saveSearchRequestToDB("new");
                 }
 
                 /******* Авторизовываем пользователя *******/

@@ -1,13 +1,11 @@
 <?php
 
-    //TODO: удалить строку!
-    //include_once 'lib/function_searchResult.php'; // Подключаем файл с функциями по HTML оформлению результатов поиска
-
     // Стартуем сессию с пользователем - сделать доступными переменные сессии
     session_start();
 
     // Подключаем нужные классы
     include_once 'classesForProjectSecurityName/GlobFunc.php';
+    include_once 'classesForProjectSecurityName/Logger.php';
     include_once 'classesForProjectSecurityName/User.php';
     include_once 'classesForProjectSecurityName/CollectionProperty.php';
     include_once 'classesForProjectSecurityName/Property.php';
@@ -44,20 +42,15 @@
         $user->writeSearchRequestFromDB();
     }
 
-    // Информация о фотографиях пользователя
-    $user->writeFotoInformationFromDB();
+    // Информация о фотографиях пользователя. Метод вызывается во всех случаях, кроме того, когда пользователь отредактировал свои личные параметры и нажал на кнопку "Сохранить"
+    if (!isset($_POST['saveProfileParameters'])) $user->writeFotoInformationFromDB();
 
+    //TODO: переработать!
     // Если пользователь - собственник, получим коллекцию его объектов недвижимости
     /*if ($user->isOwner()) {
         $propertyCol = new PropertyCollection($globFunc, $DBlink);
         $propertyCol->buildFromOwnerId($user->getId());
     }*/
-
-
-
-
-
-
 
     // Получаем информацию о фотографиях объектов недвижимости пользователя (возможно он является собственником)
     // На самом деле мы получаем информацию только по 1 первой попавшейся фотке каждого из объектов недвижимости
@@ -72,34 +65,44 @@
     $allDistrictsInCity = $globFunc->getAllDistrictsInCity("Екатеринбург");
 
     // Инициализируем переменные корректности - используется при формировании нового Запроса на поиск
-    $correct = NULL; // Отражает корректность и полноту личных данных пользователя, необходимую для создания НОВОГО поискового запроса.
-    $correctNewSearchRequest = NULL; // Отражает корректность отредактированных пользователем параметров поиска
-    $correctNewProfileParameters = NULL; // Корректность личных данных пользователя. Работает, если он пытается изменить личные данные своего профайла. Проверка осуществляется в соответствии со статусом пользователя (арендатор или собственник)
+    $correctNewSearchRequest = NULL; // Отражает корректность и полноту личных данных пользователя, необходимую для создания НОВОГО поискового запроса.
+    $correctEditSearchRequest = NULL; // Отражает корректность отредактированных пользователем параметров поиска
+    $correctEditProfileParameters = NULL; // Корректность личных данных пользователя. Работает, если он пытается изменить личные данные своего профайла. Проверка осуществляется в соответствии со статусом пользователя (арендатор или собственник)
 
     /********************************************************************************
      * РЕДАКТИРОВАНИЕ ЛИЧНЫХ ДАННЫХ ПРОФИЛЯ. Если пользователь отправил редактированные параметры своего профиля
      *******************************************************************************/
+
     if (isset($_POST['saveProfileParameters'])) {
 
         // Записываем POST параметры в параметры объекта пользователя
-        $user->writePOSTparameters();
+        $user->writeCharacteristicFromPOST();
+        $user->writeFotoInformationFromPOST();
 
         // Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
         $errors = $user->userDataCorrect("validateProfileParameters");
 
         // Установим признак корректности введенных пользователем новых личных параметров
         if (is_array($errors) && count($errors) == 0) {
-            $correctNewProfileParameters = TRUE;
+            $correctEditProfileParameters = TRUE;
         } else {
-            $correctNewProfileParameters = FALSE;
+            $correctEditProfileParameters = FALSE;
         }
 
         // Если данные верны, сохраним их в БД
-        if ($correctNewProfileParameters == TRUE) {
+        if ($correctEditProfileParameters == TRUE) {
+
             // Личная информация
             $correctSaveCharacteristicToDB = $user->saveCharacteristicToDB("edit");
-            // Сохраним информацию о фотографиях пользователя
-            $user->saveFotoInformationToDB();
+
+            if ($correctSaveCharacteristicToDB) {
+                // Сохраним информацию о фотографиях пользователя
+                $user->saveFotoInformationToDB();
+            } else {
+                $errors[] = 'К сожалению, при сохранении данных произошла ошибка: проверьте, пожалуйста, еще раз корректность Вашей информации и нажмите кнопку Сохранить';
+                // Сохранении данных в БД не прошло - данные пользователя не сохранены
+            }
+
         }
     }
 
@@ -107,98 +110,31 @@
      * РЕДАКТИРОВАНИЕ УСЛОВИЙ ПОИСКА. Если пользователь отправил редактированные параметры поискового запроса
      *******************************************************************************/
 
-    // Так как пользователь ввел новые парметры поискового запроса - их нужно воспроизвести в форму - это необходимо, чтобы в случае ошибки пользователю не пришлось все данные перебивать заново
     if (isset($_POST['saveSearchParametersButton'])) {
-        // Формируем набор переменных для сохранения в базу данных, либо для возвращения вместе с формой при их некорректности
-        if (isset($_POST['typeOfObject'])) $typeOfObject = htmlspecialchars($_POST['typeOfObject']);
-        if (isset($_POST['amountOfRooms']) && is_array($_POST['amountOfRooms'])) $amountOfRooms = $_POST['amountOfRooms']; else $amountOfRooms = array(); // Если пользователь отправил форму submit, и в параметрах нет значения amountOfRooms, значит пользователь не отметил ни один чекбокс из группы, чему соответствует пустой массив
-        if (isset($_POST['district']) && is_array($_POST['district'])) $district = $_POST['district']; else $district = array(); // Если пользователь отправил форму submit, и в параметрах нет значения district, значит пользователь не отметил ни один чекбокс из группы, чему соответствует пустой массив
-        if (isset($_POST['adjacentRooms'])) $adjacentRooms = htmlspecialchars($_POST['adjacentRooms']);
-        if (isset($_POST['floor'])) $floor = htmlspecialchars($_POST['floor']);
-        if (isset($_POST['minCost'])) $minCost = htmlspecialchars($_POST['minCost']);
-        if (isset($_POST['maxCost'])) $maxCost = htmlspecialchars($_POST['maxCost']);
-        if (isset($_POST['pledge'])) $pledge = htmlspecialchars($_POST['pledge']);
-        if (isset($_POST['prepayment'])) $prepayment = htmlspecialchars($_POST['prepayment']);
-        if (isset($_POST['withWho'])) $withWho = htmlspecialchars($_POST['withWho']);
-        if (isset($_POST['linksToFriends'])) $linksToFriends = htmlspecialchars($_POST['linksToFriends']);
-        if (isset($_POST['children'])) $children = htmlspecialchars($_POST['children']);
-        if (isset($_POST['howManyChildren'])) $howManyChildren = htmlspecialchars($_POST['howManyChildren']);
-        if (isset($_POST['animals'])) $animals = htmlspecialchars($_POST['animals']);
-        if (isset($_POST['howManyAnimals'])) $howManyAnimals = htmlspecialchars($_POST['howManyAnimals']);
-        if (isset($_POST['termOfLease'])) $termOfLease = htmlspecialchars($_POST['termOfLease']);
-        if (isset($_POST['additionalDescriptionOfSearch'])) $additionalDescriptionOfSearch = htmlspecialchars($_POST['additionalDescriptionOfSearch']);
+
+        // Записываем POST параметры в параметры объекта пользователя
+        $user->writeSearchRequestFromPOST();
 
         // Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
-        $errors = userDataCorrect("validateSearchRequest", $DBlink); // Параметр validateSearchRequest задает режим проверки "Проверка корректности уже существующих параметров поиска", который активирует только соответствующие ему проверки
-        if (count($errors) == 0) $correctNewSearchRequest = TRUE; else $correctNewSearchRequest = FALSE; // Считаем ошибки, если 0, то можно принять и сохранить новые параметры поиска
+        $errors = $user->userDataCorrect("validateSearchRequest"); // Параметр validateSearchRequest задает режим проверки "Проверка корректности уже существующих параметров поиска", который активирует только соответствующие ему проверки
+        if (count($errors) == 0) $correctEditSearchRequest = TRUE; else $correctEditSearchRequest = FALSE; // Считаем ошибки, если 0, то можно принять и сохранить новые параметры поиска
 
         // Если данные верны, сохраним их в БД
-        if ($correctNewSearchRequest == TRUE) {
-
-            $amountOfRoomsSerialized = serialize($amountOfRooms);
-            $districtSerialized = serialize($district);
-
-            // Готовим пустой массив с идентификаторами объектов, которыми заинтересовался пользователь. Нужны только, если пользователь сформировал новый поисковый запрос, а не отредактировал уже имеющийся
-            $interestingPropertysId = array();
-            $interestingPropertysId = serialize($interestingPropertysId);
-
-            if ($typeTenant == TRUE) {
-                $rez = mysql_query("UPDATE searchrequests SET
-            typeOfObject='" . $typeOfObject . "',
-            amountOfRooms='" . $amountOfRoomsSerialized . "',
-            adjacentRooms='" . $adjacentRooms . "',
-            floor='" . $floor . "',
-            minCost='" . $minCost . "',
-            maxCost='" . $maxCost . "',
-            pledge='" . $pledge . "',
-            prepayment='" . $prepayment . "',
-            district='" . $districtSerialized . "',
-            withWho='" . $withWho . "',
-            linksToFriends='" . $linksToFriends . "',
-            children='" . $children . "',
-            howManyChildren='" . $howManyChildren . "',
-            animals='" . $animals . "',
-            howManyAnimals='" . $howManyAnimals . "',
-            termOfLease='" . $termOfLease . "',
-            additionalDescriptionOfSearch='" . $additionalDescriptionOfSearch . "'
-            WHERE userId = '" . $rowUsers['id'] . "'");
-            } else {
-                $rez = mysql_query("INSERT INTO searchrequests SET
-            userId='" . $rowUsers['id'] . "',
-            typeOfObject='" . $typeOfObject . "',
-            amountOfRooms='" . $amountOfRoomsSerialized . "',
-            adjacentRooms='" . $adjacentRooms . "',
-            floor='" . $floor . "',
-            minCost='" . $minCost . "',
-            maxCost='" . $maxCost . "',
-            pledge='" . $pledge . "',
-            prepayment='" . $prepayment . "',
-            district='" . $districtSerialized . "',
-            withWho='" . $withWho . "',
-            linksToFriends='" . $linksToFriends . "',
-            children='" . $children . "',
-            howManyChildren='" . $howManyChildren . "',
-            animals='" . $animals . "',
-            howManyAnimals='" . $howManyAnimals . "',
-            termOfLease='" . $termOfLease . "',
-            additionalDescriptionOfSearch='" . $additionalDescriptionOfSearch . "',
-            interestingPropertysId='" . $interestingPropertysId . "'");
-            }
-
-            $rez = mysql_query("UPDATE users SET typeTenant='true' WHERE login = '" . $login . "'");
-            $typeTenant = "true";
+        if ($correctEditSearchRequest == TRUE) {
+            $user->saveSearchRequestToDB("edit");
         }
     }
 
     /********************************************************************************
-     * ЗАПРОС НА СОЗДАНИЕ УСЛОВИЙ ПОИСКА. Если пользователь нажал на кнопку Формирования поискового запроса
+     * ЗАПРОС НА СОЗДАНИЕ УСЛОВИЙ ПОИСКА. Если пользователь нажал на кнопку Формирования нового поискового запроса
      *******************************************************************************/
 
-    // Проверяем: захотел ли пользователь добавить поисковый запрос. На этом месте мы можем быть уверены, что пользователь является только собственником, но не является пока арендатором, лишь собирается им стать (для чего он и хочет сформировать поисковый запрос)
     if (isset($_POST['createSearchRequestButton'])) {
+
         // Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
-        $errors = userDataCorrect("createSearchRequest", $DBlink); // Параметр createSearchRequest задает режим проверки "Создание запроса на поиск", который активирует только соответствующие ему проверки
-        if (count($errors) == 0) $correct = TRUE; else $correct = FALSE; // Считаем ошибки, если 0, то можно выдать пользователю форму для ввода параметров Запроса поиска
+        $errors = $user->userDataCorrect("createSearchRequest"); // Параметр createSearchRequest задает режим проверки "Создание запроса на поиск", который активирует только соответствующие ему проверки
+        if (count($errors) == 0) $correctNewSearchRequest = TRUE; else $correctNewSearchRequest = FALSE; // Считаем ошибки, если 0, то можно выдать пользователю форму для ввода параметров Запроса поиска
+
     }
 
     /********************************************************************************
@@ -652,12 +588,12 @@
 </div>
 
 <!-- Добавялем невидимый input для того, чтобы передать тип пользователя (собственник/арендатор) - это используется в JS для простановки обязательности полей для заполнения -->
-<?php echo "<input type='hidden' class='userType' typeTenant='" . $user->isTenant() . "' typeOwner='" . $user->isOwner() . "' correctNewSearchRequest='" . $correctNewSearchRequest . "'>"; ?>
+<?php echo "<input type='hidden' class='userType' typeTenant='" . $user->isTenant() . "' typeOwner='" . $user->isOwner() . "' correctNewSearchRequest='" . $correctEditSearchRequest . "'>"; ?>
 
 <!-- Добавялем невидимый input для того, чтобы передать идентификатор вкладки, которую нужно открыть через JS -->
 <?php
-    // При загрузке страницы открываем вкладку № 4 "Поиск", если пользователь создает поисковый запрос и его личные данные для этого достаточны ($correct == "true"), либо если он редактирует поисковый запрос ($correctNewSearchRequest == TRUE, $correctNewSearchRequest == FALSE). В ином случае - открываем вкладку №1.
-    if ($correct === TRUE || $correctNewSearchRequest === TRUE || $correctNewSearchRequest == FALSE) {
+    // При загрузке страницы открываем вкладку № 4 "Поиск", если пользователь создает поисковый запрос и его личные данные для этого достаточны ($correctNewSearchRequest == "true"), либо если он редактирует поисковый запрос ($correctEditSearchRequest == TRUE, $correctEditSearchRequest == FALSE). В ином случае - открываем вкладку №1.
+    if ($correctNewSearchRequest === TRUE || $correctEditSearchRequest === TRUE || $correctEditSearchRequest === FALSE) {
         $tabsId = "tabs-4";
     } elseif (isset($_GET['tabsId'])) {
         $tabsId = $_GET['tabsId'];
@@ -695,25 +631,19 @@
     </li>
 </ul>
 <div id="tabs-1">
-<?php if ($correctNewProfileParameters !== FALSE): ?>
+<?php if ($correctEditProfileParameters !== FALSE): ?>
 <!-- Блок с нередактируемыми параметрами Профайла не выдается только в 1 случае: если пользователь корректировал свои параметры, и они не прошли проверку -->
 <div id="notEditingProfileParametersBlock">
     <div class="setOfInstructions">
         <a href="#">редактировать</a>
         <br>
     </div>
-    <div class="fotosWrapper fotoNonInteractive">
-        <div class='middleFotoWrapper'>
-        <?php
-            if (isset($rowUserFotos['id']) && isset($rowUserFotos['extension'])) {
-                echo "<img class='middleFoto' src='" . $rowUserFotos['folder'] . "\\middle\\" . $rowUserFotos['id'] . "." . $rowUserFotos['extension'] . "'>";
-            } else {
-                // TODO: вставить реквизиты фотки по умолчанию, "нет фото"
-                echo "<img class='middleFoto' src=''>";
-            }
-        ?>
-        </div>
-    </div>
+    <?php
+
+        // Формируем и размещаем на странице блок для основной фотографии пользователя
+        echo $user->getHTMLfotosWrapper("middle", FALSE);
+
+    ?>
     <div class="profileInformation">
         <ul class="listDescription">
             <li>
@@ -853,8 +783,8 @@
     </div>
 </div>
     <?php endif; ?>
-<form method="post" name="profileParameters" id="editingProfileParametersBlock" class="descriptionFieldsetsWrapper" enctype="multipart/form-data"
-      style='<?php if ($correctNewProfileParameters !== FALSE) echo "display: none;"?>'>
+<form method="post" name="profileParameters" id="editingProfileParametersBlock" class="descriptionFieldsetsWrapper formWithFotos" enctype="multipart/form-data"
+      style='<?php if ($correctEditProfileParameters !== FALSE) echo "display: none;"?>'>
     <div class="descriptionFieldsetsWrapper">
         <fieldset class="edited private">
             <legend>
@@ -1540,7 +1470,7 @@
     профиле
     e-mail
 </div>
-<?php if ($user->isTenant() != TRUE && $correct != TRUE && $correctNewSearchRequest == NULL): ?>
+<?php if ($user->isTenant() != TRUE && $correctNewSearchRequest !== TRUE && $correctEditSearchRequest === NULL): ?>
 <!-- Если пользователь еще не сформировал поисковый запрос (а значит не является арендатором) и он либо не нажимал на кнопку формирования запроса, либо нажимал, но не прошел проверку на полноту информации о пользователи, то ему доступна только кнопка формирования нового запроса. В ином случае будет отображаться сам поисковый запрос пользователя, либо форма для его заполнения -->
 <form name="createSearchRequest" method="post">
     <button type="submit" name="createSearchRequestButton" id='createSearchRequestButton' class='left-bottom'>
@@ -1548,7 +1478,7 @@
     </button>
 </form>
     <?php endif;?>
-<?php if ($user->isTenant() == TRUE && $correctNewSearchRequest !== FALSE): ?>
+<?php if ($user->isTenant() == TRUE && $correctEditSearchRequest !== FALSE): ?>
 <!-- Если пользователь является арендатором и (если он редактировал пар-ры поиска) после редактирования параметров поиска ошибок не обнаружено, то у пользователя уже сформирован корректный поисковый запрос, который мы и показываем на этой вкладке -->
     <!--
 <div id="notEditingSearchParametersBlock" class="objectDescription">
@@ -1716,7 +1646,7 @@
     </fieldset>
 </div>
     <?php endif;?>
-<?php if ($user->isTenant() === TRUE || $correct === TRUE || $correctNewSearchRequest === FALSE): ?>
+<?php if ($user->isTenant() === TRUE || $correctNewSearchRequest === TRUE || $correctEditSearchRequest === FALSE): ?>
 <!-- Если пользователь является арендатором, то вместе с отображением текущих параметров поискового запроса мы выдаем скрытую форму для их редактирования, также мы выдаем видимую форму для редактирования параметров поиска в случае, если пользователь нажал на кнопку Нового поискового запроса и проверка на корректность его данных Профиля профла успешно, а также в случае если пользователь корректировал данные поискового запроса, но они не прошли проверку -->
 <form method="post" name="searchParameters" id="extendedSearchParametersBlock">
     <div id="leftBlockOfSearchParameters" style="display: inline-block;">

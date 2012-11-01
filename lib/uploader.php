@@ -5,6 +5,7 @@
 
     // Подключаем нужные классы
     include_once '../classesForProjectSecurityName/GlobFunc.php';
+    include_once '../classesForProjectSecurityName/Logger.php';
 
     // Создаем объект-хранилище глобальных функций
     $globFunc = new GlobFunc();

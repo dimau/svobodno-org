@@ -1,22 +1,6 @@
 <?php
 
-    /**********************************************************************************
-     * БАЗА ДАННЫХ
-     *********************************************************************************/
 
-    // Получить результаты выполнения SQL запроса SELECT в виде массива ассоциированных массивов
-    function getResultSQLSelect($DBlink, $request) {
-        $res = mysqli_query($DBlink, mysqli_real_escape_string($DBlink, $request));
-        if ($res != FALSE) {
-            $value = mysqli_fetch_all($res, MYSQLI_ASSOC); // Получаем массив массивов, каждый из которых содержит параметры отдельной строки БД
-        } else {
-            $value = array();
-            // TODO: сообщить в лог об ошибке обращения к БД!
-        }
-        if ($res != FALSE) mysqli_free_result($res); // Очищаем занятую память
-
-        return $value;
-    }
 
     // $typeOfValidation = newAdvert - режим первичной (для нового объявления) проверки указанных пользователем параметров объекта недвижимости
     // $typeOfValidation = editAdvert - режим вторичной (при редактировании уже существующего объявления) проверки указанных пользователем параметров объекта недвижимости
@@ -179,68 +163,6 @@
         return $errors; // Возвращаем список ошибок, если все в порядке, то он будет пуст
     }
 
-    // Функция делает первый символ строки в верхнем регистре
-    function getFirstCharUpper($str)
-    {
-        $firstChar = mb_substr($str, 0, 1, 'UTF-8'); // Первая буква
-        $lastStr = mb_substr($str, 1); // Все кроме первой буквы
-        $firstChar = mb_strtoupper($firstChar, 'UTF-8');
-        $lastStr = mb_strtolower($lastStr, 'UTF-8');
-        $str = $firstChar . $lastStr;
-        return $str;
-    }
 
-
-
-    /**********************************************************************
-     * ПАРАМЕТРЫ ДЛЯ БЛОКА .fotosWrapper
-     *
-     * *********************************************************************
-     * Функция возвращает ассоциативный массив, содержащий ссылки на основную фотку и HTML блок (из input hidden) с данными о неосновных фотках
-     * $propertyFotosArr - массив массивов, каждый из которых содержит сведения об 1 фотографии объекта (или пользователя)
-     * $propertyId - идентификатор объекта недвижимости
-     * $size - размер для фотографии, выдаваемой сразу на странице (в качестве миниатюры к галерее). Возможны значения: small, middle, big
-     **********************************************************************/
-
-    function getLinksToFotos($propertyFotosArr = FALSE, $propertyId = 0, $size = 'small') {
-        $urlFoto1 = ""; // TODO: Вставить адрес фотки по умолчанию (должна подходить как для бъекта, так и для человека)
-        $hrefFoto1 = ""; // TODO: Вставить адрес фотки по умолчанию "нет фото"
-        $numberOfFotos = ""; // Текст о количестве фотографий (по шаблону 'еще ___ фото')
-        $hiddensLinksToOtherFotos = "";
-        // Получаем данные по всем фотографиям для данного объекта недвижимости
-        if ($propertyFotosArr == FALSE) {
-            $rezPropertyFotos = mysqli_query($link, "SELECT * FROM propertyFotos WHERE propertyId = '" . $propertyId . "'");
-
-            if ($rezPropertyFotos != FALSE) {
-                $propertyFotosArr = mysqli_fetch_all($rezPropertyFotos, MYSQLI_ASSOC); // Массив, в который запишем массивы, каждый из которых будет содержать данные по 1 фотке объекта
-            } else {
-                $propertyFotosArr = array();
-                // TODO: сообщить в лог об ошибке обращения к БД!
-            }
-        }
-
-        // Если удалось получить информацию хотя бы об 1 фотографии
-        if (is_array($propertyFotosArr) && count($propertyFotosArr) != 0) {
-            // Находим основную фотку и получаем адрес миниатюры и ссылку на большую фотографию для галереи
-            foreach ($propertyFotosArr as $value) {
-                if ($value['status'] == "основная") {
-                    $urlFoto1 = $value['folder'] . '\\' . $size . '\\' . $value['id'] . "." . $value['extension'];
-                    $hrefFoto1 = $value['folder'] . '\\big\\' . $value['id'] . "." . $value['extension'];
-                    continue;
-                } else {
-                    // Из неосновных фотографий формируем input hidden блоки для передачи клиентскому JS информации об адресе большой фотографии (для галереи)
-                    $hiddensLinksToOtherFotos .= "<input type='hidden' class='gallery' href='" . $value['folder'] . "\\big\\" . $value['id'] . "." . $value['extension'] . "'>";
-                }
-            }
-        }
-
-        // Если фотографий больше чем 1, то нужно внизу сделать приписку об оставшемся кол-ве фоток по шаблону: 'еще ___ фото'
-        if (is_array($propertyFotosArr) && count($propertyFotosArr) > 1) {
-            $count = count($propertyFotosArr) - 1; // Считаем сколько еще фотографий осталось кроме основной
-            $numberOfFotos = "еще $count фото";
-        }
-
-        return array('urlFoto1' => $urlFoto1, 'hrefFoto1' => $hrefFoto1, 'numberOfFotos' => $numberOfFotos, 'hiddensLinksToOtherFotos' => $hiddensLinksToOtherFotos);
-    }
 
 ?>
