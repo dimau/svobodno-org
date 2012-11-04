@@ -1,88 +1,48 @@
 <?php
-    include_once 'lib/connect.php'; //подключаемся к БД
-    include_once 'lib/function_global.php'; //подключаем файл с глобальными функциями
+
+    // Стартуем сессию с пользователем - сделать доступными переменные сессии
+    session_start();
+
+    // Подключаем нужные классы
+    include_once 'classesForProjectSecurityName/GlobFunc.php';
+    include_once 'classesForProjectSecurityName/Logger.php';
+    include_once 'classesForProjectSecurityName/User.php';
+    include_once 'classesForProjectSecurityName/PropertyFull.php';
+
+    // Создаем объект-хранилище глобальных функций
+    $globFunc = new GlobFunc();
+
+    // Подключаемся к БД
+    $DBlink = $globFunc->connectToDB();
+    // Удалось ли подключиться к БД?
+    if ($DBlink == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
+
+    // Инициализируем объект пользователя
+    $user = new User($globFunc, $DBlink);
 
     /*************************************************************************************
-     * Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
+     * Проверка доступности страницы для данного пользователя
      ************************************************************************************/
-    $userId = login($DBlink);
-    if (!$userId) {
+
+    // Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
+    if (!$user->login()) {
         header('Location: login.php');
     }
 
+    // TODO: сделать проверку на право администратора у данного пользователя
+
     /*************************************************************************************
-     * Присваиваем всем переменным значения по умолчанию
+     * Инициализируем объект для работы с параметрами недвижимости
      ************************************************************************************/
-    $typeOfObject = "0";
-    $dateOfEntry = "";
-    $termOfLease = "0";
-    $dateOfCheckOut = "";
-    $amountOfRooms = "0";
-    $adjacentRooms = "0";
-    $amountOfAdjacentRooms = "0";
-    $typeOfBathrooms = "0";
-    $typeOfBalcony = "0";
-    $balconyGlazed = "0";
-    $roomSpace = "";
-    $totalArea = "";
-    $livingSpace = "";
-    $kitchenSpace = "";
-    $floor = "";
-    $totalAmountFloor = "";
-    $numberOfFloor = "";
-    $concierge = "0";
-    $intercom = "0";
-    $parking = "0";
-    $city = "Екатеринбург";
-    $district = "0";
-    $coordX = "";
-    $coordY = "";
-    $address = "";
-    $apartmentNumber = "";
-    $subwayStation = "0";
-    $distanceToMetroStation = "";
-    $currency = "0";
-    $costOfRenting = "";
-    $utilities = "0";
-    $costInSummer = "";
-    $costInWinter = "";
-    $electricPower = "0";
-    $bail = "0";
-    $bailCost = "";
-    $prepayment = "0";
-    $compensationMoney = "";
-    $compensationPercent = "";
-    $repair = "0";
-    $furnish = "0";
-    $windows = "0";
-    $internet = "0";
-    $telephoneLine = "0";
-    $cableTV = "0";
-    $furnitureInLivingArea = array();
-    $furnitureInLivingAreaExtra = "";
-    $furnitureInKitchen = array();
-    $furnitureInKitchenExtra = "";
-    $appliances = array();
-    $appliancesExtra = "";
-    $sexOfTenant = array();
-    $relations = array();
-    $children = "0";
-    $animals = "0";
-    $contactTelephonNumber = "";
-    $timeForRingBegin = "0";
-    $timeForRingEnd = "0";
-    $checking = "0";
-    $responsibility = "";
-    $comment = "";
-    $fileUploadId = generateCode(7);
+
+    $property = new PropertyFull($globFunc, $DBlink);
 
     // Готовим массив со списком районов в городе пользователя
-    $allDistrictsInCity = array();
-    $rezDistricts = mysql_query("SELECT name FROM districts WHERE city = '" . "Екатеринбург" . "' ORDER BY name ASC");
-    for ($i = 0; $i < mysql_num_rows($rezDistricts); $i++) {
-        $rowDistricts = mysql_fetch_assoc($rezDistricts);
-        $allDistrictsInCity[] = $rowDistricts['name'];
-    }
+    $allDistrictsInCity = $globFunc->getAllDistrictsInCity("Екатеринбург");
+
+
+
+
 
     // Если была нажата кнопка Сохранить, проверим данные на корректность и, если данные введены и введены правильно, добавим запись с новым объектом недвижмости в БД
     if (isset($_POST['saveAdvertButton'])) {

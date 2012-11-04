@@ -812,7 +812,7 @@ qq.extend(qq.FileUploader.prototype, {
             qq.addClass(item, this._classes.success);
 
             // Делаем видимой миниатюру загруженной фотографии
-            $(".qq-miniature img", item).attr('src', result.folder + '\\small\\' + result.name + '.' + result.ext);
+            $(".qq-miniature img", item).attr('src', result.folder + '/small/' + result.name + '.' + result.ext);
             $(".qq-miniature", item).css('display', "inline-block");
 
         } else {

@@ -1,6 +1,6 @@
 <?php
 
-    class PropertyFull extends Property
+    class Property
     {
 
         public $typeOfObject = "0";
@@ -96,8 +96,8 @@
                 $this->DBlink = $DBlink;
             }
 
-            //TODO: для некоторых объявлений нужно генерить $fileUploadId
-
+            // Инициализируем переменную "сессии" для временного сохранения фотографий
+            $this->fileUploadId = $this->globFunc->generateCode(7);
 
         }
 

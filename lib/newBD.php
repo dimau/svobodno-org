@@ -56,6 +56,7 @@
         id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
         typeTenant VARCHAR(5) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Равен строке true, если пользователь в данный момент ищет недвижимость (является потенциальным арендатором), в том числе, обязательно имеет поисковый запрос',
         typeOwner VARCHAR(5) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Равен строке true, если пользователь указал хотя бы 1 объявление по сдаче в аренду недвижимости (является собственником)(не имеет значение - опубликованное или нет)',
+        typeAdmin VARCHAR(15) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'Содержит строку, указывающую какие привилегии администратора имеет данный пользователь. Для каждой привилегии может быть установлено состояние: 0 (выключена) или 1 (включена), состояние NULL характеризует обычного пользователя (не админа). 1-ый признак - есть ли право создавать новые объекты под существующими пользователями, 2-ой признак - есть ли право создавать новые объявления (без проверки полноты реквизитов) для объектов из чужих баз по недвижимости',
         name VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Имя пользователя',
         secondName VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Отчество пользователя',
         surname VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Фамилия пользователя',
@@ -100,7 +101,7 @@
     $DBlink->query("CREATE TABLE tempFotos (
         id VARCHAR(32) NOT NULL PRIMARY KEY COMMENT 'Содержит идентификатор фотографии, он же имя файла на сервере (без расширения)',
         fileUploadId VARCHAR(7) NOT NULL COMMENT 'фактически это такой идентификатор сессии заполнения формы регистрации. Позволяет добиться того, чтобы при перезагрузке формы (в случае, например, ошибок и пустых полей, незаполненных пользователем) данные о фотографиях не потерялись',
-        folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ..\uploaded_files\3\ ',
+        folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ../uploaded_files/3/ ',
         filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
         extension VARCHAR(5) NOT NULL COMMENT 'Расширение у файла фотографии',
         filesizeMb FLOAT(1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой'
@@ -115,11 +116,11 @@
 
     $DBlink->query("CREATE TABLE userFotos (
         id VARCHAR(32) NOT NULL PRIMARY KEY COMMENT 'Содержит идентификатор фотографии, он же имя файла на сервере (без расширения)',
-        folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ..\uploaded_files\3\ ',
+        folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ../uploaded_files/3/ ',
         filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
         extension VARCHAR(5) NOT NULL COMMENT 'Расширение у файла фотографии',
         filesizeMb FLOAT(1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой',
-        userId INT(11) COMMENT 'Идентификатор пользователя, которому соответствует данная фотография',
+        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, которому соответствует данная фотография',
         status VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'У основной личной фотографии пользователя статус = основная, у остальных - пустой'
 )");
 
@@ -240,11 +241,11 @@
 
     $DBlink->query("CREATE TABLE propertyFotos (
         id VARCHAR(32) NOT NULL PRIMARY KEY,
-        folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ..\uploaded_files\3\ ',
+        folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ../uploaded_files/3/ ',
         filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
         extension VARCHAR(5) NOT NULL COMMENT 'Расширение у файла фотографии',
         filesizeMb FLOAT(1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой',
-        propertyId INT(11) COMMENT 'Идентификатор объекта недвижимости (или иначе объявления), к которому относится данная фотография',
+        propertyId INT(11) NOT NULL COMMENT 'Идентификатор объекта недвижимости (или иначе объявления), к которому относится данная фотография',
         status VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'У основной фотографии объекта недвижимости статус = основная, у остальных - пустой'
 )");
 

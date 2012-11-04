@@ -23,7 +23,7 @@
     $uploader = new qqFileUploader($allowedExtensions, $sizeLimit, $DBlink);
 
     // Call handleUpload() with the name of the folder, relative to PHP's getcwd()
-    $result = $uploader->handleUpload('..\uploaded_files\\', FALSE);
+    $result = $uploader->handleUpload('../uploaded_files/', FALSE);
 
     // Закрываем соединение с БД
     $globFunc->closeConnectToDB($DBlink);
@@ -273,7 +273,7 @@
              ***************************************************************************************************************************/
 
             return array('success' => TRUE,
-                         'folder'  => $saveRes['folder'], // Папка, в которой сохранена фотография, вида: "uploaded_files\6"
+                         'folder'  => $saveRes['folder'], // Папка, в которой сохранена фотография, вида: "uploaded_files/6"
                          'name'    => $filename, // Идентификатор фотографии, который также служит уникальным именем файла (без расширения)
                          'ext'     => $saveRes['ext']); // Расширение, под которым сохранены все 3 копии файла (small, medium, big)
 
@@ -369,7 +369,7 @@
         function saveImg($foto_dst, $uploadDirectory, $type, $filename)
         {
             $subDirectory = substr($filename, 0, 1);
-            $typeDirectory = "\\" . $type . "\\";
+            $typeDirectory = "/" . $type . "/";
 
             // Вычисляем адрес для сохранения целевой фотографии ($foto_dst)
             // Для того, чтобы не складывать все фотографии в один каталог (при достижении 3-4 тыс. файлов все будет сильно тормозить) я делаю следующее: по первому символу в id(названии) файла определяю каталог для хранения внутри каталога file_upload. Внутри найденного каталога определяю еще один каталог, соответствующий размеру фотографии (small, middle, big)
@@ -378,7 +378,7 @@
             // Сохранение целевой фотографии в формате jpeg в целевой каталог
             if (imagejpeg($foto_dst, $urlForSave, 85)) {
 
-                // Преобразуем $uploadDirectory = '..\uploaded_files\\' к виду, который нужно сохранить в БД. То есть путь нужно показать относительно корня проекта, а не относительно текущего каталога расположения uploader.php
+                // Преобразуем $uploadDirectory = '../uploaded_files/' к виду, который нужно сохранить в БД. То есть путь нужно показать относительно корня проекта, а не относительно текущего каталога расположения uploader.php
                 $uploadDirectoryFromCore = substr($uploadDirectory, 3);
 
                 return array('folder' => $uploadDirectoryFromCore . $subDirectory,

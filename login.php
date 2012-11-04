@@ -94,7 +94,7 @@
 
     <!-- Сформируем и вставим заголовок страницы -->
     <?php
-    include("header.php");
+    //include("header.php");
     ?>
 
     <div class="page_main_content">
