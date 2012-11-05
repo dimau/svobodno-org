@@ -1,13 +1,13 @@
 <?php
-
     // Стартуем сессию с пользователем - сделать доступными переменные сессии
     session_start();
 
-    // Подключаем нужные классы
-    include_once 'classesForProjectSecurityName/GlobFunc.php';
-    include_once 'classesForProjectSecurityName/Logger.php';
-    include_once 'classesForProjectSecurityName/User.php';
-    include_once 'classesForProjectSecurityName/PropertyFull.php';
+    // Подключаем нужные модели и представления
+    include 'models/GlobFunc.php';
+    include 'models/Logger.php';
+    include 'models/IncomingUser.php';
+    include 'views/View.php';
+    include 'models/Property.php';
 
     // Создаем объект-хранилище глобальных функций
     $globFunc = new GlobFunc();
@@ -17,15 +17,15 @@
     // Удалось ли подключиться к БД?
     if ($DBlink == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
-    // Инициализируем объект пользователя
-    $user = new User($globFunc, $DBlink);
+    // Инициализируем модель для запросившего страницу пользователя
+    $incomingUser = new IncomingUser($globFunc, $DBlink);
 
     /*************************************************************************************
      * Проверка доступности страницы для данного пользователя
      ************************************************************************************/
 
     // Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
-    if (!$user->login()) {
+    if (!$incomingUser->login()) {
         header('Location: login.php');
     }
 
@@ -35,109 +35,31 @@
      * Инициализируем объект для работы с параметрами недвижимости
      ************************************************************************************/
 
-    $property = new PropertyFull($globFunc, $DBlink);
+    $property = new Property($globFunc, $DBlink);
 
     // Готовим массив со списком районов в городе пользователя
     $allDistrictsInCity = $globFunc->getAllDistrictsInCity("Екатеринбург");
 
+    /*************************************************************************************
+     * Отправлена форма с параметрами объекта недвижимости
+     ************************************************************************************/
 
-
-
-
-    // Если была нажата кнопка Сохранить, проверим данные на корректность и, если данные введены и введены правильно, добавим запись с новым объектом недвижмости в БД
     if (isset($_POST['saveAdvertButton'])) {
 
-        // Формируем набор переменных для сохранения в базу данных, либо для возвращения вместе с формой при их некорректности
-        if (isset($_POST['typeOfObject'])) $typeOfObject = htmlspecialchars($_POST['typeOfObject']);
-        if (isset($_POST['dateOfEntry'])) $dateOfEntry = htmlspecialchars($_POST['dateOfEntry']);
-        if (isset($_POST['termOfLease'])) $termOfLease = htmlspecialchars($_POST['termOfLease']);
-        if (isset($_POST['dateOfCheckOut'])) $dateOfCheckOut = htmlspecialchars($_POST['dateOfCheckOut']);
-        if (isset($_POST['amountOfRooms'])) $amountOfRooms = htmlspecialchars($_POST['amountOfRooms']);
-        if (isset($_POST['adjacentRooms'])) $adjacentRooms = htmlspecialchars($_POST['adjacentRooms']);
-        if (isset($_POST['amountOfAdjacentRooms'])) $amountOfAdjacentRooms = htmlspecialchars($_POST['amountOfAdjacentRooms']);
-        if (isset($_POST['typeOfBathrooms'])) $typeOfBathrooms = htmlspecialchars($_POST['typeOfBathrooms']);
-        if (isset($_POST['typeOfBalcony'])) $typeOfBalcony = htmlspecialchars($_POST['typeOfBalcony']);
-        if (isset($_POST['balconyGlazed'])) $balconyGlazed = htmlspecialchars($_POST['balconyGlazed']);
-        if (isset($_POST['roomSpace'])) $roomSpace = htmlspecialchars($_POST['roomSpace']);
-        if (isset($_POST['totalArea'])) $totalArea = htmlspecialchars($_POST['totalArea']);
-        if (isset($_POST['livingSpace'])) $livingSpace = htmlspecialchars($_POST['livingSpace']);
-        if (isset($_POST['kitchenSpace'])) $kitchenSpace = htmlspecialchars($_POST['kitchenSpace']);
-        if (isset($_POST['floor'])) $floor = htmlspecialchars($_POST['floor']);
-        if (isset($_POST['totalAmountFloor'])) $totalAmountFloor = htmlspecialchars($_POST['totalAmountFloor']);
-        if (isset($_POST['numberOfFloor'])) $numberOfFloor = htmlspecialchars($_POST['numberOfFloor']);
-        if (isset($_POST['concierge'])) $concierge = htmlspecialchars($_POST['concierge']);
-        if (isset($_POST['intercom'])) $intercom = htmlspecialchars($_POST['intercom']);
-        if (isset($_POST['parking'])) $parking = htmlspecialchars($_POST['parking']);
-        if (isset($_POST['district'])) $district = htmlspecialchars($_POST['district']);
-        if (isset($_POST['coordX'])) $coordX = htmlspecialchars($_POST['coordX']);
-        if (isset($_POST['coordY'])) $coordY = htmlspecialchars($_POST['coordY']);
-        if (isset($_POST['address'])) $address = htmlspecialchars($_POST['address']);
-        if (isset($_POST['apartmentNumber'])) $apartmentNumber = htmlspecialchars($_POST['apartmentNumber']);
-        if (isset($_POST['subwayStation'])) $subwayStation = htmlspecialchars($_POST['subwayStation']);
-        if (isset($_POST['distanceToMetroStation'])) $distanceToMetroStation = htmlspecialchars($_POST['distanceToMetroStation']);
-        if (isset($_POST['currency'])) $currency = htmlspecialchars($_POST['currency']);
-        if (isset($_POST['costOfRenting'])) $costOfRenting = htmlspecialchars($_POST['costOfRenting']);
-        if (isset($_POST['utilities'])) $utilities = htmlspecialchars($_POST['utilities']);
-        if (isset($_POST['costInSummer'])) $costInSummer = htmlspecialchars($_POST['costInSummer']);
-        if (isset($_POST['costInWinter'])) $costInWinter = htmlspecialchars($_POST['costInWinter']);
-        if (isset($_POST['electricPower'])) $electricPower = htmlspecialchars($_POST['electricPower']);
-        if (isset($_POST['bail'])) $bail = htmlspecialchars($_POST['bail']);
-        if (isset($_POST['bailCost'])) $bailCost = htmlspecialchars($_POST['bailCost']);
-        if (isset($_POST['prepayment'])) $prepayment = htmlspecialchars($_POST['prepayment']);
-        if (isset($_POST['compensationMoney'])) $compensationMoney = htmlspecialchars($_POST['compensationMoney']);
-        if (isset($_POST['compensationPercent'])) $compensationPercent = htmlspecialchars($_POST['compensationPercent']);
-        if (isset($_POST['repair'])) $repair = htmlspecialchars($_POST['repair']);
-        if (isset($_POST['furnish'])) $furnish = htmlspecialchars($_POST['furnish']);
-        if (isset($_POST['windows'])) $windows = htmlspecialchars($_POST['windows']);
-        if (isset($_POST['internet'])) $internet = htmlspecialchars($_POST['internet']);
-        if (isset($_POST['telephoneLine'])) $telephoneLine = htmlspecialchars($_POST['telephoneLine']);
-        if (isset($_POST['cableTV'])) $cableTV = htmlspecialchars($_POST['cableTV']);
-        if (isset($_POST['furnitureInLivingArea'])) $furnitureInLivingArea = $_POST['furnitureInLivingArea'];
-        if (isset($_POST['furnitureInLivingAreaExtra'])) $furnitureInLivingAreaExtra = htmlspecialchars($_POST['furnitureInLivingAreaExtra']);
-        if (isset($_POST['furnitureInKitchen'])) $furnitureInKitchen = $_POST['furnitureInKitchen'];
-        if (isset($_POST['furnitureInKitchenExtra'])) $furnitureInKitchenExtra = htmlspecialchars($_POST['furnitureInKitchenExtra']);
-        if (isset($_POST['appliances'])) $appliances = $_POST['appliances'];
-        if (isset($_POST['appliancesExtra'])) $appliancesExtra = htmlspecialchars($_POST['appliancesExtra']);
-        if (isset($_POST['sexOfTenant'])) $sexOfTenant = $_POST['sexOfTenant'];
-        if (isset($_POST['relations'])) $relations = $_POST['relations'];
-        if (isset($_POST['children'])) $children = htmlspecialchars($_POST['children']);
-        if (isset($_POST['animals'])) $animals = htmlspecialchars($_POST['animals']);
-        if (isset($_POST['contactTelephonNumber'])) $contactTelephonNumber = htmlspecialchars($_POST['contactTelephonNumber']);
-        if (isset($_POST['timeForRingBegin'])) $timeForRingBegin = htmlspecialchars($_POST['timeForRingBegin']);
-        if (isset($_POST['timeForRingEnd'])) $timeForRingEnd = htmlspecialchars($_POST['timeForRingEnd']);
-        if (isset($_POST['checking'])) $checking = htmlspecialchars($_POST['checking']);
-        if (isset($_POST['responsibility'])) $responsibility = htmlspecialchars($_POST['responsibility']);
-        if (isset($_POST['comment'])) $comment = htmlspecialchars($_POST['comment']);
-        $fileUploadId = $_POST['fileUploadId'];
+        $property->writeParametersFromPOST();
 
         // Проверяем корректность данных нового объявления. Функции isAdvertCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
-        $errors = isAdvertCorrect("newAdvert", $DBlink);
+        $errors = $property->isAdvertCorrect("newAdvert");
+
         if (is_array($errors) && count($errors) == 0) $correct = TRUE; else $correct = FALSE; // Считаем ошибки, если 0, то можно будет записать данные в БД
 
         // Если данные, указанные пользователем, корректны, запишем объявление в базу данных
         if ($correct) {
-            // Корректируем даты для того, чтобы сделать их пригодными для сохранения в базу данных
-            $dateOfEntryForDB = dateFromViewToDB($dateOfEntry);
-            $dateOfCheckOutForDB = dateFromViewToDB($dateOfCheckOut);
 
-            // Для хранения массивов в БД, их необходимо сериализовать
-            $furnitureInLivingAreaSerialized = serialize($furnitureInLivingArea);
-            $furnitureInKitchenSerialized = serialize($furnitureInKitchen);
-            $appliancesSerialized = serialize($appliances);
-            $sexOfTenantImploded = implode("_", $sexOfTenant);
-            $relationsImploded = implode("_", $relations);
+            $property->saveParametersToDB();
 
-            // Проверяем в какой валюте сохраняется стоимость аренды, формируем переменную realCostOfRenting
-            if ($currency == 'руб.') $realCostOfRenting = $costOfRenting;
-            if ($currency != 'руб.') {
-                $rezCurrency = mysql_query("SELECT value FROM currencies WHERE name = '" . $currency . "'");
-                $rowCurrency = mysql_fetch_assoc($rezCurrency);
-                if ($rowCurrency != FALSE) $realCostOfRenting = $costOfRenting * $rowCurrency['value']; else $realCostOfRenting = 0;
-            }
 
-            $tm = time();
-            $last_act = $tm; // время последнего редактирования объявления
-            $reg_date = $tm; // время регистрации ("рождения") объявления
+
 
             if (mysql_query("INSERT INTO property SET
                             userId='" . $userId . "',

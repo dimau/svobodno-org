@@ -3,9 +3,10 @@
     // Стартуем сессию с пользователем - сделать доступными переменные сессии
     session_start();
 
-    // Подключаем нужные классы
-    include_once '../classesForProjectSecurityName/GlobFunc.php';
-    include_once '../classesForProjectSecurityName/Logger.php';
+    // Подключаем нужные модели и представления
+    include '../models/GlobFunc.php';
+    include '../models/Logger.php';
+    include '../models/IncomingUser.php';
 
     // Создаем объект-хранилище глобальных функций
     $globFunc = new GlobFunc();
@@ -14,6 +15,9 @@
     $DBlink = $globFunc->connectToDB();
     // Удалось ли подключиться к БД?
     if ($DBlink == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
+
+    // Инициализируем модель для запросившего страницу пользователя
+    $incomingUser = new IncomingUser($globFunc, $DBlink);
 
     // Задаем список допустимых расширений для загружаемых файлов. Также расширение при начале загрузки проверяется в js файле vendor\fileuploader.js. Списки должны совпадать
     $allowedExtensions = array("jpeg", "JPEG", "jpg", "JPG", "png", "PNG", "gif", "GIF");

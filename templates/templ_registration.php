@@ -1,19 +1,12 @@
 <?
-
     // Инициализируем используемые в шаблоне переменные
-
     $userCharacteristic = $dataArr['userCharacteristic'];
     $userFotoInformation = $dataArr['userFotoInformation'];
     $userSearchRequest = $dataArr['userSearchRequest'];
-
     $errors = $dataArr['errors'];
-
     $allDistrictsInCity = $dataArr['allDistrictsInCity'];
-
     $isLoggedIn = $dataArr['isLoggedIn'];
-
 ?>
-
 
 <!DOCTYPE html>
 <html>
@@ -77,7 +70,7 @@
 <div class="page_without_footer">
 
 <!-- Добавялем невидимый input для того, чтобы передать тип пользователя (собственник/арендатор) - это используется в JS для простановки обязательности полей для заполнения -->
-<?php echo "<input type='hidden' class='userType' typeTenant='" . $user->isTenant() . "' typeOwner='" . $user->isOwner() . "'>"; ?>
+<input type='hidden' class='userType' typeTenant='<?php if ($userCharacteristic['typeTenant']) echo "TRUE"; else echo "FALSE";?>' typeOwner='<?php if ($userCharacteristic['typeOwner']) echo "TRUE"; else echo "FALSE";?>'>
 
 <!-- Всплывающее поле для отображения списка ошибок, полученных при проверке данных на сервере (PHP)-->
 <div id="userMistakesBlock" class="ui-widget">
@@ -110,6 +103,7 @@
     <div class="headerOfPage">
         Зарегистрируйтесь
     </div>
+
     <?php if ($userCharacteristic['typeTenant']): ?>
     <div class="importantAddInfBlock">
         <div class="importantAddInfHeader">
@@ -131,6 +125,7 @@
         </ul>
     </div>
     <?php endif; ?>
+
     <div class="clearBoth"></div>
 </div>
 
@@ -212,9 +207,9 @@
     <?php if (!$userCharacteristic['typeTenant']): ?>
     <div class="bottomControls">
         <div style="float: right; margin-bottom: 10px; text-align: left;">
-            <input type="checkbox" name="lic" id="lic" value="yes" <?php if ($user->lic == "yes") echo "checked";?>> Я
+            <label><input type="checkbox" name="lic" id="lic" value="yes" <?php if ($userCharacteristic['lic'] == "yes") echo "checked";?>> Я
             принимаю условия <a
-            href="#">лицензионного соглашения</a>
+            href="#">лицензионного соглашения</a></label>
         </div>
         <div class="clearBoth"></div>
         <button class="backButton">Назад</button>
@@ -229,422 +224,17 @@
     <div class="shadowText">
         Заполните форму как можно подробнее, это позволит системе подобрать для Вас наиболее интересные предложения
     </div>
-    <div id="extendedSearchParametersBlock">
-        <div id="leftBlockOfSearchParameters" style="display: inline-block;">
-            <fieldset class="edited">
-                <legend>
-                    Характеристика объекта
-                </legend>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td class="itemLabel">
-                                Тип
-                            </td>
-                            <td class="itemRequired">
-                            </td>
-                            <td class="itemBody">
-                                <select name="typeOfObject" id="typeOfObject">
-                                    <option value="0" <?php if ($user->typeOfObject == "0") echo "selected";?>></option>
-                                    <option value="квартира" <?php if ($user->typeOfObject == "квартира") echo "selected";?>>
-                                        квартира
-                                    </option>
-                                    <option value="комната" <?php if ($user->typeOfObject == "комната") echo "selected";?>>
-                                        комната
-                                    </option>
-                                    <option value="дом" <?php if ($user->typeOfObject == "дом") echo "selected";?>>дом,
-                                        коттедж
-                                    </option>
-                                    <option value="таунхаус" <?php if ($user->typeOfObject == "таунхаус") echo "selected";?>>
-                                        таунхаус
-                                    </option>
-                                    <option value="дача" <?php if ($user->typeOfObject == "дача") echo "selected";?>>дача
-                                    </option>
-                                    <option value="гараж" <?php if ($user->typeOfObject == "гараж") echo "selected";?>>гараж
-                                    </option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr notavailability="typeOfObject_гараж">
-                            <td class="itemLabel">
-                                Количество комнат
-                            </td>
-                            <td class="itemRequired">
-                            </td>
-                            <td class="itemBody">
-                                <input type="checkbox" value="1" name="amountOfRooms[]"
-                                    <?php
-                                    foreach ($user->amountOfRooms as $value) {
-                                        if ($value == "1") {
-                                            echo "checked";
-                                            break;
-                                        }
-                                    }
-                                    ?>>
-                                1
-                                <input type="checkbox" value="2"
-                                       name="amountOfRooms[]" <?php
-                                    foreach ($user->amountOfRooms as $value) {
-                                        if ($value == "2") {
-                                            echo "checked";
-                                            break;
-                                        }
-                                    }
-                                    ?>>
-                                2
-                                <input type="checkbox" value="3"
-                                       name="amountOfRooms[]" <?php
-                                    foreach ($user->amountOfRooms as $value) {
-                                        if ($value == "3") {
-                                            echo "checked";
-                                            break;
-                                        }
-                                    }
-                                    ?>>
-                                3
-                                <input type="checkbox" value="4"
-                                       name="amountOfRooms[]" <?php
-                                    foreach ($user->amountOfRooms as $value) {
-                                        if ($value == "4") {
-                                            echo "checked";
-                                            break;
-                                        }
-                                    }
-                                    ?>>
-                                4
-                                <input type="checkbox" value="5"
-                                       name="amountOfRooms[]" <?php
-                                    foreach ($user->amountOfRooms as $value) {
-                                        if ($value == "5") {
-                                            echo "checked";
-                                            break;
-                                        }
-                                    }
-                                    ?>>
-                                5
-                                <input type="checkbox" value="6"
-                                       name="amountOfRooms[]" <?php
-                                    foreach ($user->amountOfRooms as $value) {
-                                        if ($value == "6") {
-                                            echo "checked";
-                                            break;
-                                        }
-                                    }
-                                    ?>>
-                                6...
-                            </td>
-                        </tr>
-                        <tr notavailability="typeOfObject_гараж">
-                            <td class="itemLabel">
-                                Комнаты смежные
-                            </td>
-                            <td class="itemRequired">
-                            </td>
-                            <td class="itemBody">
-                                <select name="adjacentRooms" id="adjacentRooms">
-                                    <option value="0" <?php if ($user->adjacentRooms == "0") echo "selected";?>></option>
-                                    <option
-                                        value="не имеет значения" <?php if ($user->adjacentRooms == "не имеет значения") echo "selected";?>>
-                                        не
-                                        имеет значения
-                                    </option>
-                                    <option
-                                        value="только изолированные" <?php if ($user->adjacentRooms == "только изолированные") echo "selected";?>>
-                                        только изолированные
-                                    </option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr notavailability="typeOfObject_дом&typeOfObject_таунхаус&typeOfObject_дача&typeOfObject_гараж">
-                            <td class="itemLabel">
-                                Этаж
-                            </td>
-                            <td class="itemRequired">
-                            </td>
-                            <td class="itemBody">
-                                <select name="floor" id="floor">
-                                    <option value="0" <?php if ($user->floor == "0") echo "selected";?>></option>
-                                    <option value="любой" <?php if ($user->floor == "любой") echo "selected";?>>любой</option>
-                                    <option value="не первый" <?php if ($user->floor == "не первый") echo "selected";?>>не
-                                        первый
-                                    </option>
-                                    <option
-                                        value="не первый и не последний" <?php if ($user->floor == "не первый и не последний") echo "selected";?>>
-                                        не первый и не
-                                        последний
-                                    </option>
-                                </select>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </fieldset>
 
-            <fieldset class="edited cost">
-                <legend>
-                    Стоимость
-                </legend>
-                <table>
-                    <tbody>
-                        <tr title="В месяц за аренду недвижимости с учетом стоимости коммунальных услуг (если они оплачиваются дополнительно)">
-                            <td class="itemLabel">
-                                Арендная плата от
-                            </td>
-                            <td class="itemRequired">
-                            </td>
-                            <td class="itemBody">
-                                <input type="text" name="minCost" id="minCost"
-                                       maxlength="8" <?php echo "value='$user->minCost'";?>>
-                                руб.
-                            </td>
-                        </tr>
-                        <tr title="В месяц за аренду недвижимости с учетом стоимости коммунальных услуг (если они оплачиваются дополнительно)">
-                            <td class="itemLabel">
-                                Арендная плата до
-                            </td>
-                            <td class="itemRequired">
-                            </td>
-                            <td class="itemBody">
-                                <input type="text" name="maxCost" id="maxCost"
-                                       maxlength="8" <?php echo "value='$user->maxCost'";?>>
-                                руб.
-                            </td>
-                        </tr>
-                        <tr title="Какую сумму Вы готовы передать собственнику в качестве возвращаемого гарантийного депозита">
-                            <td class="itemLabel">
-                                Залог до
-                            </td>
-                            <td class="itemRequired">
-                            </td>
-                            <td class="itemBody">
-                                <input type="text" name="pledge" id="pledge"
-                                       maxlength="8" <?php echo "value='$user->pledge'";?>>
-                                руб.
-                            </td>
-                        </tr>
-                        <tr title="Какую предоплату за проживание Вы готовы внести">
-                            <td class="itemLabel">
-                                Макс. предоплата
-                            </td>
-                            <td class="itemRequired">
-                            </td>
-                            <td class="itemBody">
-                                <select name="prepayment" id="prepayment">
-                                    <option value="0" <?php if ($user->prepayment == "0") echo "selected";?>></option>
-                                    <option value="нет" <?php if ($user->prepayment == "нет") echo "selected";?>>нет</option>
-                                    <option value="1 месяц" <?php if ($user->prepayment == "1 месяц") echo "selected";?>>1
-                                        месяц
-                                    </option>
-                                    <option value="2 месяца" <?php if ($user->prepayment == "2 месяца") echo "selected";?>>2
-                                        месяца
-                                    </option>
-                                    <option value="3 месяца" <?php if ($user->prepayment == "3 месяца") echo "selected";?>>3
-                                        месяца
-                                    </option>
-                                    <option value="4 месяца" <?php if ($user->prepayment == "4 месяца") echo "selected";?>>4
-                                        месяца
-                                    </option>
-                                    <option value="5 месяцев" <?php if ($user->prepayment == "5 месяцев") echo "selected";?>>5
-                                        месяцев
-                                    </option>
-                                    <option value="6 месяцев" <?php if ($user->prepayment == "6 месяцев") echo "selected";?>>6
-                                        месяцев
-                                    </option>
-                                </select>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </fieldset>
-        </div>
-        <div id="rightBlockOfSearchParameters">
-            <fieldset class="edited">
-                <legend>
-                    Район
-                </legend>
-                <ul>
-                    <?php
-                    if (isset($allDistrictsInCity)) {
-                        foreach ($allDistrictsInCity as $value) { // Для каждого идентификатора района и названия формируем чекбокс
-                            echo "<li><input type='checkbox' name='district[]' value='" . $value['name'] . "'";
-                            foreach ($user->district as $valueDistrict) {
-                                if ($valueDistrict == $value['name']) {
-                                    echo "checked";
-                                    break;
-                                }
-                            }
-                            echo "> " . $value['name'] . "</li>";
-                        }
-                    }
-                    ?>
-                </ul>
-            </fieldset>
-        </div>
-        <!-- /end.rightBlockOfSearchParameters -->
-        <fieldset class="edited private">
-            <legend>
-                Особые параметры поиска
-            </legend>
-            <table>
-                <tbody>
-                    <tr notavailability="typeOfObject_гараж">
-                        <td class="itemLabel">
-                            Как собираетесь проживать
-                        </td>
-                        <td class="itemRequired typeTenantRequired">
-                            *
-                        </td>
-                        <td class="itemBody">
-                            <select name="withWho" id="withWho">
-                                <option value="0" <?php if ($user->withWho == "0") echo "selected";?>></option>
-                                <option
-                                    value="самостоятельно" <?php if ($user->withWho == "самостоятельно") echo "selected";?>>
-                                    самостоятельно
-                                </option>
-                                <option value="семья" <?php if ($user->withWho == "семья") echo "selected";?>>семьей
-                                </option>
-                                <option value="пара" <?php if ($user->withWho == "пара") echo "selected";?>>парой
-                                </option>
-                                <option value="2 мальчика" <?php if ($user->withWho == "2 мальчика") echo "selected";?>>2
-                                    мальчика
-                                </option>
-                                <option value="2 девочки" <?php if ($user->withWho == "2 девочки") echo "selected";?>>2
-                                    девочки
-                                </option>
-                                <option value="со знакомыми" <?php if ($user->withWho == "со знакомыми") echo "selected";?>>со
-                                    знакомыми
-                                </option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr class="withWhoDescription" style="display: none;">
-                        <td class="itemLabel" colspan="3">
-                            Что Вы можете сказать о сожителях:
-                        </td>
-                    </tr>
-                    <tr class="withWhoDescription" style="display: none;">
-                        <td colspan="3">
-                            <textarea name="linksToFriends" id="linksToFriends"
-                                      rows="3"><?php echo $user->linksToFriends;?></textarea>
-                        </td>
-                    </tr>
-
-                    <tr notavailability="typeOfObject_гараж">
-                        <td class="itemLabel">
-                            Дети
-                        </td>
-                        <td class="itemRequired typeTenantRequired">
-                            *
-                        </td>
-                        <td class="itemBody">
-                            <select name="children" id="children">
-                                <option value="0" <?php if ($user->children == "0") echo "selected";?>></option>
-                                <option value="без детей" <?php if ($user->children == "без детей") echo "selected";?>>без
-                                    детей
-                                </option>
-                                <option
-                                    value="с детьми младше 4-х лет" <?php if ($user->children == "с детьми младше 4-х лет") echo "selected";?>>
-                                    с детьми
-                                    младше 4-х лет
-                                </option>
-                                <option
-                                    value="с детьми старше 4-х лет" <?php if ($user->children == "с детьми старше 4-х лет") echo "selected";?>>
-                                    с детьми
-                                    старше 4-х лет
-                                </option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr class="childrenDescription" style="display: none;">
-                        <td class="itemLabel" colspan="3">
-                            Сколько у Вас детей и какого возраста:
-                        </td>
-                    </tr>
-                    <tr class="childrenDescription" style="display: none;">
-                        <td colspan="3">
-                            <textarea name="howManyChildren" id="howManyChildren"
-                                      rows="3"><?php echo $user->howManyChildren;?></textarea>
-                        </td>
-                    </tr>
-
-                    <tr notavailability="typeOfObject_гараж">
-                        <td class="itemLabel">
-                            Домашние животные
-                        </td>
-                        <td class="itemRequired typeTenantRequired">
-                            *
-                        </td>
-                        <td class="itemBody">
-                            <select name="animals" id="animals">
-                                <option value="0" <?php if ($user->animals == "0") echo "selected";?>></option>
-                                <option value="без животных" <?php if ($user->animals == "без животных") echo "selected";?>>
-                                    без
-                                    животных
-                                </option>
-                                <option
-                                    value="с животным(ми)" <?php if ($user->animals == "с животным(ми)") echo "selected";?>>с
-                                    животным(ми)
-                                </option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr class="animalsDescription" style="display: none;">
-                        <td class="itemLabel" colspan="3">
-                            Сколько у Вас животных и какого вида:
-                        </td>
-                    </tr>
-                    <tr class="animalsDescription" style="display: none;">
-                        <td colspan="3">
-                            <textarea name="howManyAnimals" id="howManyAnimals"
-                                      rows="3"><?php echo $user->howManyAnimals;?></textarea>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td class="itemLabel">
-                            Срок аренды
-                        </td>
-                        <td class="itemRequired typeTenantRequired">
-                            *
-                        </td>
-                        <td class="itemBody">
-                            <select name="termOfLease" id="termOfLease">
-                                <option value="0" <?php if ($user->termOfLease == "0") echo "selected";?>></option>
-                                <option
-                                    value="длительный срок" <?php if ($user->termOfLease == "длительный срок") echo "selected";?>>
-                                    длительный срок (от года)
-                                </option>
-                                <option
-                                    value="несколько месяцев" <?php if ($user->termOfLease == "несколько месяцев") echo "selected";?>>
-                                    несколько месяцев (до года)
-                                </option>
-                            </select>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td class="itemLabel">
-                            Дополнительные условия поиска:
-                        </td>
-                        <td class="itemRequired">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="3">
-                            <textarea name="additionalDescriptionOfSearch" id="additionalDescriptionOfSearch"
-                                      rows="4"><?php echo $user->additionalDescriptionOfSearch;?></textarea>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </fieldset>
-    </div>
+    <?php
+        // Подключим форму для ввода и редактирования данных о социальных сетях пользователя
+        include "templates/templ_editableSearchRequest.php";
+    ?>
 
     <div class="bottomControls">
         <div style="float: right; margin-bottom: 10px; text-align: left;">
-            <input type="checkbox" name="lic" id="lic" value="yes" <?php if ($user->lic == "yes") echo "checked";?>> Я
+            <label><input type="checkbox" name="lic" id="lic" value="yes" <?php if ($userCharacteristic['lic'] == "yes") echo "checked";?>> Я
             принимаю условия <a
-            href="#">лицензионного соглашения</a>
+            href="#">лицензионного соглашения</a></label>
         </div>
         <div class="clearBoth"></div>
         <button class="backButton">Назад</button>

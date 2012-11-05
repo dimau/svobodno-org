@@ -67,7 +67,7 @@
 
         // КОНСТРУКТОР
         // В качестве входных параметров: $DBlink объект соединения с базой данных
-        public function __construct($globFunc = FALSE, $DBlink = FALSE, $userId = "")
+        public function __construct($globFunc = FALSE, $DBlink = FALSE, $incomingUser = FALSE)
         {
             // Если объект с глобальными функциями получен - сделаем его доступным для всех методов класса
             if ($globFunc != FALSE) {
@@ -82,8 +82,12 @@
             // Инициализируем переменную "сессии" для временного сохранения фотографий
             $this->fileUploadId = $this->globFunc->generateCode(7);
 
-            // Если мы собираемся инициализировать модель из БД, то необходимо передать в конструктор id пользователя
-            $this->id = $userId;
+            // Если мы собираемся инициализировать данную модель в соответствии с текущим пользователем, запросившим страницу, то запишем его ключевые параметры
+            if ($incomingUser != FALSE) {
+                $this->id = $incomingUser->getId();
+                $this->typeTenant = $incomingUser->isTenant();
+                $this->typeOwner = $incomingUser->isOwner();
+            }
 
         }
 
@@ -966,85 +970,6 @@
 
             $this->id = $res[0]['id'];
             return $this->id;
-
-        }
-
-        // Метод возвращает блок (div) для отображения фотографии (и, если нужно, по клику галереи фотографий) пользователя
-        // На входе: $sizeForPrimary - размер основной фотографии (small, middle, big); $isInteractive - нужно ли по клику включать галерею фотографий(TRUE- нужно, FALSE - нет)
-        public function getHTMLfotosWrapper($sizeForPrimary = "small", $isInteractive = FALSE) {
-
-            // Шаблон для формируемого HTML блока с фотографиями
-            $templ = "
-                <div class='fotosWrapper {isInteractive}'>
-                    <div class='{size}FotoWrapper'>
-                        <img class='{size}Foto {gallery}' src='{urlFotoPrimary}' href='{hrefFotoPrimary}'>
-                    </div>
-                    <div class='numberOfFotos'>{numberOfFotos}</div>
-                    {hiddensLinksToOtherFotos}
-                </div>
-            ";
-
-            // Если идентификатор пользователя неизвестен, то дальнейшие действия не имеют смысла
-            if ($this->id == "") return FALSE;
-
-            // Если объект не содержит информации о фотографиях пользователя, то получим ее из БД
-            if (!is_array($this->uploadedFoto) || count($this->uploadedFoto) == 0) {
-                $this->writeFotoInformationFromDB();
-            }
-
-            // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне
-            $arrForReplace = array();
-
-            // Делаем блок фотографий интерактивным или нет?
-            $arrForReplace['isInteractive'] = "";
-            if (!$isInteractive) $arrForReplace['isInteractive'] = "fotoNonInteractive";
-
-            // Размер для блока (и следовательно для основной фотографии)
-            $arrForReplace['size'] = "";
-            if ($sizeForPrimary == "small") $arrForReplace['size'] = "small";
-            if ($sizeForPrimary == "middle") $arrForReplace['size'] = "middle";
-            if ($sizeForPrimary == "big") $arrForReplace['size'] = "big";
-
-            // Галерея?
-            $arrForReplace['gallery'] = "";
-            if ($isInteractive) $arrForReplace['gallery'] = "gallery";
-
-            // URL до показываемой в качестве основной фотографии. Атрибут href будет полезен, если эту же фотографию нужно будет открыть в галерее - он всегда показывает путь до данного фото в большом формате
-            $arrForReplace['urlFotoPrimary'] = "";
-            $arrForReplace['hrefFotoPrimary'] = "";
-            $arrForReplace['numberOfFotos'] = "";
-            $arrForReplace['hiddensLinksToOtherFotos'] = "";
-            // Перебираем все имеющиеся фотографии пользователя
-            if (!is_array($this->uploadedFoto) || count($this->uploadedFoto) == 0) {
-                // Если у пользователя нет фото - присваиваем картинку по умолчанию
-                $arrForReplace['urlFotoPrimary'] = "uploaded_files/1/".$arrForReplace['size']."/1c1dfa378d4d9caaa93703c0b89f4077.jpeg";
-                $arrForReplace['hrefFotoPrimary'] = "uploaded_files/1/big/1c1dfa378d4d9caaa93703c0b89f4077.jpeg";
-            } else {
-                // Если у пользователя есть фото - найдем среди них основное. А из неосновных сделаем hidden блоки для галереи
-                foreach ($this->uploadedFoto as $value) {
-                    if ($value['status'] == "основная") {
-                        $arrForReplace['urlFotoPrimary'] = $value['folder'] . '/' . $arrForReplace['size'] . '/' . $value['id'] . "." . $value['extension'];
-                        $arrForReplace['hrefFotoPrimary'] = $value['folder'] . '/big/' . $value['id'] . "." . $value['extension'];
-                    } else {
-                        // Из неосновных фотографий формируем input hidden блоки для передачи клиентскому JS информации об адресе большой фотографии (для галереи)
-                        $arrForReplace['hiddensLinksToOtherFotos'] .= "<input type='hidden' class='gallery' href='" . $value['folder'] . "/big/" . $value['id'] . "." . $value['extension'] . "'>";
-                    }
-                }
-            }
-
-            // Если фотографий больше чем 1 и блок с фотками интерактивный (можно по клику открыть галерею), то нужно внизу сделать приписку об оставшемся кол-ве фоток по шаблону: 'еще ___ фото'
-            if (is_array($this->uploadedFoto) && count($this->uploadedFoto) > 1 && $isInteractive) {
-                $count = count($this->uploadedFoto) - 1; // Считаем сколько еще фотографий осталось кроме основной
-                $arrForReplace['numberOfFotos'] = "еще $count фото";
-            }
-
-            // Заполняем шаблон
-            // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне баллуна
-            $arrTemplVar = array('{isInteractive}', '{size}', '{gallery}', '{urlFotoPrimary}', '{hrefFotoPrimary}', '{numberOfFotos}', '{hiddensLinksToOtherFotos}');
-            // Копируем html-текст шаблона баллуна
-            $fotosWrapperHTML = str_replace($arrTemplVar, $arrForReplace, $templ);
-
-            return $fotosWrapperHTML;
 
         }
 

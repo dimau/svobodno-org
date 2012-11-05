@@ -611,7 +611,7 @@ qq.FileUploader = function (o) {
             size:'qq-upload-size',
             cancel:'qq-upload-cancel',
             remove:'qq-upload-remove',
-            primary: 'qq-upload-primary',
+            primary: 'qq-upload-primary-wrapper',
             miniature: 'qq-miniature',
 
             // added to list item <li> when upload completes
@@ -641,10 +641,6 @@ qq.FileUploader = function (o) {
 
     // Мои комментарии: обработчик на клик по кнопке Отмена загрузки
     this._bindCancelEvent();
-
-    // Мои комментарии: обработчик на клик по кнопке Удалить файл
-    /*this._bindRemoveEvent();
-      Реализовал удаление в другом месте*/
 
     // Мои комментарии: видимо настройки для драг и дропа - я в них не лез
     this._setupDragDrop();
@@ -762,9 +758,12 @@ qq.extend(qq.FileUploader.prototype, {
         var item = this._getItemByFileId(id);
         var size = this._find(item, 'size');
         size.style.display = 'inline';
-        // Мои комментарии: прячем команду удалить на время загурзки. У пользователя есть команда Отмены.
+        // Мои комментарии: прячем команду удалить на время загрузки. У пользователя есть команда Отмены.
         var remove = this._find(item, 'remove');
         remove.style.display = 'none';
+        // Мои комментарии: прячем команду выбора основной фотографии на время загрузки.
+        var primary = this._find(item, 'primary');
+        primary.style.display = 'none';
 
         var text;
         var percent = Math.round(loaded / total * 100);
@@ -799,6 +798,11 @@ qq.extend(qq.FileUploader.prototype, {
         // Отображаем команду на удаление фотографии
         var remove = this._find(item, 'remove');
         remove.style.display = '';
+        // Если фотография успешно загружена на сервер, то отображаем команду на выбор основной фотографии
+        if (result.success) {
+            var primary = this._find(item, 'primary');
+            primary.style.display = '';
+        }
 
         // В атрибут value радиокнопки для выбора основной фотографии заносим id данного фото.
         $(this._find(item, 'primary')).attr('value', result.name);

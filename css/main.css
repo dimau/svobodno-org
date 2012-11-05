@@ -1084,6 +1084,15 @@ div.unread > div.newsHeader {
     font-size: 1em;
 }
 
+/* Оформление аккордеона */
+.accordion {
+    text-align: left;
+}
+
+.accordionContentUnit {
+    font-size: 0.9em;
+}
+
 /* Не рисуем нижнюю границу у вкладок (как это происходит для обычных ссылок) */
 .ui-tabs .ui-tabs-nav li a {
     border-bottom: none;

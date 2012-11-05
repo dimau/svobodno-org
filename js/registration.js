@@ -321,7 +321,7 @@ function step1_validation() {
             err++;
         }
     }
-    if ($('#email').val() == '' && $(".userType").attr('typeTenant') == 'true') {
+    if ($('#email').val() == '' && $(".userType").attr('typeTenant') == 'TRUE') {
         buildErrorMessageBlock ("email", "Укажите e-mail");
         err++;
     }
@@ -338,12 +338,12 @@ function step2_validation() {
     var err = 0;
 // TODO: тест
     /*
-    if ($('#currentStatusEducation').val() == '0' && $(".userType").attr('typeTenant') == 'true') {
+    if ($('#currentStatusEducation').val() == '0' && $(".userType").attr('typeTenant') == 'TRUE') {
         buildErrorMessageBlock ("currentStatusEducation", "Укажите Ваше образование (текущий статус)");
         err++;
     } else {
         // Образование
-        if ($('#almamater').val() == '' && $(".userType").attr('typeTenant') == 'true' && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  )) {
+        if ($('#almamater').val() == '' && $(".userType").attr('typeTenant') == 'TRUE' && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  )) {
             buildErrorMessageBlock ("almamater", "Укажите учебное заведение");
             err++;
         }
@@ -351,7 +351,7 @@ function step2_validation() {
             buildErrorMessageBlock ("almamater", "Слишком длинное название учебного заведения (используйте не более 100 символов)");
             err++;
         }
-        if ($('#speciality').val() == '' && $(".userType").attr('typeTenant') == 'true' && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  )) {
+        if ($('#speciality').val() == '' && $(".userType").attr('typeTenant') == 'TRUE' && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  )) {
             buildErrorMessageBlock ("speciality", "Укажите специальность");
             err++;
         }
@@ -359,7 +359,7 @@ function step2_validation() {
             buildErrorMessageBlock ("speciality", "Слишком длинное название специальности (используйте не более 100 символов)");
             err++;
         }
-        if ($('#kurs').val() == '' && $(".userType").attr('typeTenant') == 'true' && $('#currentStatusEducation').val() == 'сейчас учусь') {
+        if ($('#kurs').val() == '' && $(".userType").attr('typeTenant') == 'TRUE' && $('#currentStatusEducation').val() == 'сейчас учусь') {
             buildErrorMessageBlock ("kurs", "Укажите курс обучения");
             err++;
         }
@@ -367,11 +367,11 @@ function step2_validation() {
             buildErrorMessageBlock ("kurs", "Указана слишком длинная строка (используйте не более 30 символов)");
             err++;
         }
-        if ($('#ochnoZaochno').val() == '0' && $(".userType").attr('typeTenant') == 'true' && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  )) {
+        if ($('#ochnoZaochno').val() == '0' && $(".userType").attr('typeTenant') == 'TRUE' && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  )) {
             buildErrorMessageBlock ("ochnoZaochno", "Укажите форму обучения (очная, заочная)");
             err++;
         }
-        if ($('#yearOfEnd').val() == '' && $(".userType").attr('typeTenant') == 'true' && $('#currentStatusEducation').val() == 'закончил') {
+        if ($('#yearOfEnd').val() == '' && $(".userType").attr('typeTenant') == 'TRUE' && $('#currentStatusEducation').val() == 'закончил') {
             buildErrorMessageBlock ("yearOfEnd", "Укажите год окончания учебного заведения");
             err++;
         }
@@ -382,11 +382,11 @@ function step2_validation() {
     }
 
     // Работа
-    if ($('#statusWork').val() == '0' && $(".userType").attr('typeTenant') == 'true') {
+    if ($('#statusWork').val() == '0' && $(".userType").attr('typeTenant') == 'TRUE') {
         buildErrorMessageBlock ("statusWork", "Укажите статус занятости");
         err++;
     } else {
-        if ($('#placeOfWork').val() == '' && $("#statusWork").val() == 'работаю' && $(".userType").attr('typeTenant') == 'true') {
+        if ($('#placeOfWork').val() == '' && $("#statusWork").val() == 'работаю' && $(".userType").attr('typeTenant') == 'TRUE') {
             buildErrorMessageBlock ("placeOfWork", "Укажите Ваше место работы (название организации)");
             err++;
         }
@@ -394,7 +394,7 @@ function step2_validation() {
             buildErrorMessageBlock ("placeOfWork", "Слишком длинное наименование места работы (используйте не более 100 символов)");
             err++;
         }
-        if ($('#workPosition').val() == '' && $("#statusWork").val() == 'работаю' && $(".userType").attr('typeTenant') == 'true') {
+        if ($('#workPosition').val() == '' && $("#statusWork").val() == 'работаю' && $(".userType").attr('typeTenant') == 'TRUE') {
             buildErrorMessageBlock ("workPosition", "Укажите Вашу должность");
             err++;
         }

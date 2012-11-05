@@ -31,7 +31,7 @@
      ************************************************************************************/
 
     // Инициализируем полную модель пользователя
-    $user = new User($globFunc, $DBlink, $incomingUser->getId());
+    $user = new User($globFunc, $DBlink, $incomingUser);
 
     // Анкетные (основные персональные) данные пользователя
     $user->writeCharacteristicFromDB();
