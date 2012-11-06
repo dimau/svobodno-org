@@ -124,6 +124,7 @@
         if (count($errors) == 0) $correctEditSearchRequest = TRUE; else $correctEditSearchRequest = FALSE; // Считаем ошибки, если 0, то можно принять и сохранить новые параметры поиска
 
         // Если данные верны, сохраним их в БД
+        // Кроме сохранение данных поискового запроса метод перезапишет статус пользователя (typeTenant), так как он теперь точно стал арендатором
         if ($correctEditSearchRequest == TRUE) {
             $user->saveSearchRequestToDB("edit");
         }

@@ -82,7 +82,7 @@
         private $globFunc = FALSE; // Переменная для хранения глобальных функций
 
         // КОНСТРУКТОР
-        public function __construct($globFunc = FALSE, $DBlink = FALSE)
+        public function __construct($globFunc = FALSE, $DBlink = FALSE, $propertyId = FALSE)
         {
 
             // Если объект с глобальными функциями получен - сделаем его доступным для всех методов класса
@@ -98,6 +98,9 @@
             // Инициализируем переменную "сессии" для временного сохранения фотографий
             $this->fileUploadId = $this->globFunc->generateCode(7);
 
+            // Если конструктору передан идентификатор объекта недвижимости, запишем его в параметры объекта. Это позволит, например, инициализировать объект данными из БД
+            if ($propertyId != FALSE) $this->id = $propertyId;
+
         }
 
         // ДЕСТРУКТОР
@@ -109,8 +112,15 @@
         // Функция сохраняет текущие параметры объекта недвижимости в БД
         // $typeOfProperty = "new" - режим сохранения для нового объекта недвижимости
         // $typeOfProperty = "edit" - режим сохранения для редактируемых параметров объекта недвижимости
+        // Кроме того, при успешной работе изменяет статус typeOwner пользователя (с id = userId) на TRUE
         // Возвращает TRUE, если данные успешно сохранены и FALSE в противном случае
-        public function saveParametersToDB($typeOfProperty) {
+        public function saveCharacteristicToDB($typeOfProperty = "edit", $userId = "") {
+
+            // Если не указан id пользователя собственника, то дальнейшие действия не имеют смысла
+            if ($userId == "") return FALSE;
+
+            // Если объявление не является ни новым, ни существующим - видимо какая-то ошибка была допущена при передаче параметров методу
+            if ($typeOfProperty != "edit" && $typeOfProperty != "new") return FALSE;
 
             // Корректируем даты для того, чтобы сделать их пригодными для сохранения в базу данных
             $dateOfEntryForDB = $this->globFunc->dateFromViewToDB($this->dateOfEntry);
@@ -148,29 +158,23 @@
             // Пишем данные объекта недвижимости в БД.
             // Код для сохранения данных разный: для нового объявления и при редактировании параметров существующего объявления
             if ($typeOfProperty == "new") {
-                //TODO: переделать как надо сохранение
                 $stmt = $this->DBlink->stmt_init();
-                if (($stmt->prepare("INSERT INTO users (typeTenant,typeOwner,name,secondName,surname,sex,nationality,birthday,login,password,telephon,emailReg,email,currentStatusEducation,almamater,speciality,kurs,ochnoZaochno,yearOfEnd,statusWork,placeOfWork,workPosition,regionOfBorn,cityOfBorn,shortlyAboutMe,vkontakte,odnoklassniki,facebook,twitter,lic,last_act,reg_date,favoritesPropertysId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
-                    OR ($stmt->bind_param("ssssssssssssssssssssssssssssssiib", $typeTenant, $typeOwner, $this->name, $this->secondName, $this->surname, $this->sex, $this->nationality, $birthdayDB, $this->login, $this->password, $this->telephon, $this->email, $this->email, $this->currentStatusEducation, $this->almamater, $this->speciality, $this->kurs, $this->ochnoZaochno, $this->yearOfEnd, $this->statusWork, $this->placeOfWork, $this->workPosition, $this->regionOfBorn, $this->cityOfBorn, $this->shortlyAboutMe, $this->vkontakte, $this->odnoklassniki, $this->facebook, $this->twitter, $this->lic, $last_act, $reg_date, $favoritesPropertysId) === FALSE)
+                if (($stmt->prepare("INSERT INTO property SET userId=?, typeOfObject=?, dateOfEntry=?, termOfLease=?, dateOfCheckOut=?, amountOfRooms=?, adjacentRooms=?, amountOfAdjacentRooms=?, typeOfBathrooms=?, typeOfBalcony=?, balconyGlazed=?, roomSpace=?, totalArea=?, livingSpace=?, kitchenSpace=?, floor=?, totalAmountFloor=?, numberOfFloor=?, concierge=?, intercom=?, parking=?, city=?, district=?, coordX=?, coordY=?, address=?, apartmentNumber=?, subwayStation=?, distanceToMetroStation=?, currency=?, costOfRenting=?, realCostOfRenting=?, utilities=?, costInSummer=?, costInWinter=?, electricPower=?, bail=?, bailCost=?, prepayment=?, compensationMoney=?, compensationPercent=?, repair=?, furnish=?, windows=?, internet=?, telephoneLine=?, cableTV=?, furnitureInLivingArea=?, furnitureInLivingAreaExtra=?, furnitureInKitchen=?, furnitureInKitchenExtra=?, appliances=?, appliancesExtra=?, sexOfTenant=?, relations=?, children=?, animals=?, contactTelephonNumber=?, timeForRingBegin=?, timeForRingEnd=?, checking=?, responsibility=?, comment=?, last_act=?, reg_date=?, status=?, visibleUsersId=?, schemeOfWork=?") === FALSE)
+                    OR ($stmt->bind_param("sssssssssssddddiiissssssssssisddsddssdsddssssssbsbsbsssssssssssiisbs", $userId, $this->typeOfObject, $dateOfEntryForDB, $this->termOfLease, $dateOfCheckOutForDB, $this->amountOfRooms, $this->adjacentRooms, $this->amountOfAdjacentRooms, $this->typeOfBathrooms, $this->typeOfBalcony, $this->balconyGlazed, $this->roomSpace, $this->totalArea, $this->livingSpace, $this->kitchenSpace, $this->floor, $this->totalAmountFloor, $this->numberOfFloor, $this->concierge, $this->intercom, $this->parking, $this->city, $this->district, $this->coordX, $this->coordY, $this->address, $this->apartmentNumber, $this->subwayStation, $this->distanceToMetroStation, $this->currency, $this->costOfRenting, $realCostOfRenting, $this->utilities, $this->costInSummer, $this->costInWinter, $this->electricPower, $this->bail, $this->bailCost, $this->prepayment, $this->compensationMoney, $this->compensationPercent, $this->repair, $this->furnish, $this->windows, $this->internet, $this->telephoneLine, $this->cableTV, $furnitureInLivingAreaSerialized, $this->furnitureInLivingAreaExtra, $furnitureInKitchenSerialized , $this->furnitureInKitchenExtra, $appliancesSerialized, $this->appliancesExtra, $sexOfTenantImploded, $relationsImploded, $this->children, $this->animals, $this->contactTelephonNumber, $this->timeForRingBegin, $this->timeForRingEnd, $this->checking, $this->responsibility, $this->comment, $last_act, $reg_date, $this->status, $this->visibleUsersId, $this->schemeOfWork) === FALSE)
                     OR ($stmt->execute() === FALSE)
                     OR (($res = $stmt->affected_rows) === -1)
                     OR ($res === 0)
                     OR ($stmt->close() === FALSE)
                 ) {
                     // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-
                     return FALSE;
                 }
-
-                return TRUE;
-
             }
 
             if ($typeOfProperty == "edit") {
-                //TODO: переделать как надо сохранение
                 $stmt = $this->DBlink->stmt_init();
-                if (($stmt->prepare("UPDATE users SET name=?, secondName=?, surname=?, sex=?, nationality=?, birthday=?, password=?, telephon=?, email=?, currentStatusEducation=?, almamater=?, speciality=?, kurs=?, ochnoZaochno=?, yearOfEnd=?, statusWork=?, placeOfWork=?, workPosition=?, regionOfBorn=?, cityOfBorn=?, shortlyAboutMe=?, vkontakte=?, odnoklassniki=?, facebook=?, twitter=?, last_act=? WHERE id=?") === FALSE)
-                    OR ($stmt->bind_param("sssssssssssssssssssssssssis", $this->name, $this->secondName, $this->surname, $this->sex, $this->nationality, $birthdayDB, $this->password, $this->telephon, $this->email, $this->currentStatusEducation, $this->almamater, $this->speciality, $this->kurs, $this->ochnoZaochno, $this->yearOfEnd, $this->statusWork, $this->placeOfWork, $this->workPosition, $this->regionOfBorn, $this->cityOfBorn, $this->shortlyAboutMe, $this->vkontakte, $this->odnoklassniki, $this->facebook, $this->twitter, $last_act, $this->id) === FALSE)
+                if (($stmt->prepare("UPDATE property SET userId=?, typeOfObject=?, dateOfEntry=?, termOfLease=?, dateOfCheckOut=?, amountOfRooms=?, adjacentRooms=?, amountOfAdjacentRooms=?, typeOfBathrooms=?, typeOfBalcony=?, balconyGlazed=?, roomSpace=?, totalArea=?, livingSpace=?, kitchenSpace=?, floor=?, totalAmountFloor=?, numberOfFloor=?, concierge=?, intercom=?, parking=?, city=?, district=?, coordX=?, coordY=?, address=?, apartmentNumber=?, subwayStation=?, distanceToMetroStation=?, currency=?, costOfRenting=?, realCostOfRenting=?, utilities=?, costInSummer=?, costInWinter=?, electricPower=?, bail=?, bailCost=?, prepayment=?, compensationMoney=?, compensationPercent=?, repair=?, furnish=?, windows=?, internet=?, telephoneLine=?, cableTV=?, furnitureInLivingArea=?, furnitureInLivingAreaExtra=?, furnitureInKitchen=?, furnitureInKitchenExtra=?, appliances=?, appliancesExtra=?, sexOfTenant=?, relations=?, children=?, animals=?, contactTelephonNumber=?, timeForRingBegin=?, timeForRingEnd=?, checking=?, responsibility=?, comment=?, last_act=?, schemeOfWork=? WHERE id=?") === FALSE)
+                    OR ($stmt->bind_param("sssssssssssddddiiissssssssssisddsddssdsddssssssbsbsbsssssssssssiss", $userId, $this->typeOfObject, $dateOfEntryForDB, $this->termOfLease, $dateOfCheckOutForDB, $this->amountOfRooms, $this->adjacentRooms, $this->amountOfAdjacentRooms, $this->typeOfBathrooms, $this->typeOfBalcony, $this->balconyGlazed, $this->roomSpace, $this->totalArea, $this->livingSpace, $this->kitchenSpace, $this->floor, $this->totalAmountFloor, $this->numberOfFloor, $this->concierge, $this->intercom, $this->parking, $this->city, $this->district, $this->coordX, $this->coordY, $this->address, $this->apartmentNumber, $this->subwayStation, $this->distanceToMetroStation, $this->currency, $this->costOfRenting, $realCostOfRenting, $this->utilities, $this->costInSummer, $this->costInWinter, $this->electricPower, $this->bail, $this->bailCost, $this->prepayment, $this->compensationMoney, $this->compensationPercent, $this->repair, $this->furnish, $this->windows, $this->internet, $this->telephoneLine, $this->cableTV, $furnitureInLivingAreaSerialized, $this->furnitureInLivingAreaExtra, $furnitureInKitchenSerialized , $this->furnitureInKitchenExtra, $appliancesSerialized, $this->appliancesExtra, $sexOfTenantImploded, $relationsImploded, $this->children, $this->animals, $this->contactTelephonNumber, $this->timeForRingBegin, $this->timeForRingEnd, $this->checking, $this->responsibility, $this->comment, $last_act, $this->schemeOfWork, $this->id) === FALSE)
                     OR ($stmt->execute() === FALSE)
                     OR (($res = $stmt->affected_rows) === -1)
                     OR ($stmt->close() === FALSE)
@@ -178,17 +182,373 @@
                     // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
                     return FALSE;
                 }
-
-                return TRUE;
             }
 
-            // Объявление не является ни новым, ни существующим - видимо какая-то ошибка была допущена при передаче параметров методу
-            return FALSE;
+            // Если объявление новое - изменим статус пользователя (typeOwner), так как он теперь точно стал собственником
+            if ($typeOfProperty == "new") {
+                $stmt = $this->DBlink->stmt_init();
+                if (($stmt->prepare("UPDATE users SET typeOwner='TRUE' WHERE id=?") === FALSE)
+                    OR ($stmt->bind_param("s", $userId) === FALSE)
+                    OR ($stmt->execute() === FALSE)
+                    OR (($res = $stmt->affected_rows) === -1)
+                    OR ($stmt->close() === FALSE)
+                ) {
+                    // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                }
+            }
+
+            return TRUE;
+
+        }
+
+        // Функция сохраняет актуальные данные о фотографиях пользователя в БД. Если какие-то из ранее загруженных фотографий были удалены пользователем (помечены в браузере на удаление), то функция удаляет их с сервера и из БД
+        // TODO: функция пока ничего не возвращает, а может нужно добавить TRUE или FALSE?
+        public function saveFotoInformationToDB()
+        {
+
+            // ВАЖНО:
+            // Функция считает, что если объект имеет id, то он уже был зарегистрирован и требуется отредактировать его фотографии
+            // Если же объект не имеет id, то функция считает его Новым объектом недвижимости (а значит у него нет сохраненных фоток в propertyFotos)
+            //
+            // Схема работы функции:
+            // 1. Проверить наличие массива данных о фотографиях ($this->uploadedFoto), а также id объекта недвижимости
+            // 2. Собираем инфу по всем фотографиям объекта недвижимости из БД tempFotos (по $this->fileUploadId) и propertyFotos (по id)
+            // 3. Добавляем в полученные из БД данные актуальную инфу по статусам (основная/неосновная) и помечаем те фотки, которые нужно удалить
+            // 4. Перебираем массив и удаляем ненужные фотки с жесткого диска
+            // 5. Редактируем данные по нужным фоткам (UPDATE для propertyFotos)
+            // 6. Добавляем данные по нужным фоткам (INSERT для propertyFotos)
+            // 7. Удаляем ненужные фотки (DELETE для propertyFotos и для tempFotos)
+
+            // На всякий случай, проверим на массив
+            if (!is_array($this->uploadedFoto)) return FALSE;
+
+            // Для выполнения функция у объекта недвижимости обязательно должен быть id (то есть основные данные о нем уже занесены в БД)
+            if ($this->id == "") return FALSE;
+
+            // Получаем данные по всем фоткам с нашим $this->fileUploadId
+            $stmt = $this->DBlink->stmt_init();
+            if (($stmt->prepare("SELECT * FROM tempFotos WHERE fileUploadId=?") === FALSE)
+                OR ($stmt->bind_param("s", $this->fileUploadId) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($allFotos = $stmt->get_result()) === FALSE)
+                OR (($allFotos = $allFotos->fetch_all(MYSQLI_ASSOC)) === FALSE)
+                OR ($stmt->close() === FALSE)
+            ) {
+                $allFotos = array();
+                // Логируем ошибку
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+            } else {
+                // Пометим все члены массива признаком их получения из таблицы tempFotos
+                for ($i = 0; $i < count($allFotos); $i++) {
+                    $allFotos[$i]['fromTable'] = "tempFotos";
+                }
+            }
+
+            // Получаем данные по всем фоткам объекта недвижимости (с идентификатором $this->id)
+            // Но только для существующих объектов (имеющих id)
+            if ($this->id != "") {
+
+                $stmt = $this->DBlink->stmt_init();
+                if (($stmt->prepare("SELECT * FROM propertyFotos WHERE propertyId=?") === FALSE)
+                    OR ($stmt->bind_param("s", $this->id) === FALSE)
+                    OR ($stmt->execute() === FALSE)
+                    OR (($res = $stmt->get_result()) === FALSE)
+                    OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+                    OR ($stmt->close() === FALSE)
+                ) {
+                    // Логируем ошибку
+                    //TODO: логировать ошибку обращения к БД
+                } else {
+                    // Пометим все члены массива признаком их получения из таблицы userFotos
+                    for ($i = 0; $i < count($res); $i++) {
+                        $res[$i]['fromTable'] = "propertyFotos";
+                    }
+                    $allFotos = array_merge($allFotos, $res);
+                }
+            }
+
+            // Перебираем все имеющиеся фотографии пользователя и актуализируем их параметры
+            $primaryFotoExists = 0; // Инициализируем переменную, по которой после прохода по всем фотографиям, полученным в форме, сможем сказать была ли указана пользователем основная фотка (число - сколько фоток со статусом основная мы получили с клиента) или нет (0)
+            for ($i = 0; $i < count($allFotos); $i++) {
+
+                // Для сокращения количества запросов на UPDATE будем отмечать особым признаком те фотографии, по которым требуется выполнения этого запроса к БД
+                $allFotos[$i]['updated'] = FALSE;
+
+                // На заметку: в массиве $uploadedFoto также содержится (а точнее может содержаться) актуальная информация по всем статусам фотографий, но легче получить id основной фотки из формы, а не из этого массива
+                if ($allFotos[$i]['id'] == $this->primaryFotoId) {
+                    // Проверяем - нужно ли для данной фотографии проводить UPDATE
+                    if ($allFotos[$i]['fromTable'] == "propertyFotos" && $allFotos[$i]['status'] != 'основная') {
+                        $allFotos[$i]['updated'] = TRUE;
+                    }
+                    $allFotos[$i]['status'] = 'основная';
+                    // Признак наличия основной фотографии
+                    $primaryFotoExists++;
+                } else {
+                    if ($allFotos[$i]['fromTable'] == "propertyFotos" && $allFotos[$i]['status'] != '') {
+                        $allFotos[$i]['updated'] = TRUE;
+                    }
+                    $allFotos[$i]['status'] = '';
+                }
+
+                // Отмечаем фотографии на удаление
+                $allFotos[$i]['forRemove'] = TRUE;
+                foreach ($this->uploadedFoto as $value) {
+                    if ($allFotos[$i]['id'] == $value['id']) {
+                        $allFotos[$i]['forRemove'] = FALSE;
+                        break;
+                    }
+                }
+
+            }
+
+            // Если пользователь не указал основное фото, то укажем первую попавшуюся фотографию (не помеченную на удаление) в качестве основной
+            if ($primaryFotoExists == 0) {
+                for ($i = 0; $i < count($allFotos); $i++) {
+                    // Если файл помечен на удаление, то ему статус основной не присваиваем
+                    if ($allFotos[$i]['forRemove'] == TRUE) continue;
+
+                    // Проверяем - нужно ли для данной фотографии проводить UPDATE
+                    if ($allFotos[$i]['fromTable'] == "propertyFotos" && $allFotos[$i]['status'] != 'основная') {
+                        $allFotos[$i]['updated'] = TRUE;
+                    }
+                    $allFotos[$i]['status'] = 'основная';
+
+                    // Как только нашли одну фотку, которая не подлежит удалению и присвоили ей статус основной, так выходим из перебора
+                    break;
+                }
+            }
+
+            // Удаляем файлы фотографий (помеченных признаком удаления) с сервера
+            for ($i = 0; $i < count($allFotos); $i++) {
+                if ($allFotos[$i]['forRemove'] == FALSE) continue;
+                if ((unlink($allFotos[$i]['folder'] . '/small/' . $allFotos[$i]['id'] . "." . $allFotos[$i]['extension']) === FALSE)
+                    OR unlink($allFotos[$i]['folder'] . '/middle/' . $allFotos[$i]['id'] . "." . $allFotos[$i]['extension'])
+                    OR unlink($allFotos[$i]['folder'] . '/big/' . $allFotos[$i]['id'] . "." . $allFotos[$i]['extension'])
+                ) {
+                    // Логируем ошибку
+                    //TODO: сделать логирование ошибки обращения к БД
+                }
+            }
+
+            // Выполним запросы на UPDATE данных в propertyFotos
+            $stmt = $this->DBlink->stmt_init();
+            if ($stmt->prepare("UPDATE propertyFotos SET status=? WHERE id=?") === FALSE) {
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+            }
+            for ($i = 0; $i < count($allFotos); $i++) {
+                if ($allFotos[$i]['fromTable'] == "propertyFotos" && $allFotos[$i]['updated'] == TRUE && $allFotos[$i]['forRemove'] == FALSE) {
+                    if (($stmt->bind_param("ss", $allFotos[$i]['status'], $allFotos[$i]['id']) === FALSE)
+                        OR ($stmt->execute() === FALSE)
+                        OR (($res = $stmt->affected_rows) === -1)
+                    ) {
+                        // Логируем ошибку
+                        // TODO: логировать ошибку обращенияк БД
+                    }
+                }
+            }
+            $stmt->close();
+
+            // Для уменьшения запросов к БД соберем 2 общих запроса на изменение сразу всех нужных строк
+            // Соберем условия WHERE для SQL запросов к БД:
+            // на INSERT новых строк в userFotos
+            // на DELETE более ненужных фоток из userFotos
+            $strINSERT = "";
+            $strDELETE = "";
+            for ($i = 0; $i < $count = count($allFotos); $i++) {
+
+                if ($allFotos[$i]['fromTable'] == "propertyFotos" && $allFotos[$i]['forRemove'] == FALSE) {
+                    if ($strINSERT != "") $strINSERT .= ",";
+                    $strINSERT .= "('" . $allFotos[$i]['id'] . "','" . $allFotos[$i]['folder'] . "','" . $allFotos[$i]['filename'] . "','" . $allFotos[$i]['extension'] . "','" . $allFotos[$i]['filesizeMb'] . "','" . $this->id . "','" . $allFotos[$i]['status'] . "')";
+                }
+
+                if ($allFotos[$i]['forRemove'] == TRUE) {
+                    if ($strDELETE != "") $strDELETE .= " OR";
+                    $strDELETE .= " id = '" . $allFotos[$i]['id'] . "'";
+                }
+
+            }
+
+            // Выполним сформированные запросы
+            // INSERT
+            if ($strINSERT != "") {
+                $this->DBlink->query("INSERT INTO propertyFotos (id, folder, filename, extension, filesizeMb, propertyId, status) VALUES " . $strINSERT);
+                if (($this->DBlink->errno)
+                    OR (($res = $this->DBlink->affected_rows) === -1)
+                    OR ($res === 0)
+                ) {
+                    // Логируем ошибку
+                    // TODO: логирование ошибки
+                }
+            }
+            // DELETE
+            if ($strDELETE != "") {
+                $this->DBlink->query("DELETE FROM propertyFotos WHERE " . $strDELETE);
+                if (($this->DBlink->errno)
+                    OR (($res = $this->DBlink->affected_rows) === -1)
+                ) {
+                    // Логируем ошибку
+                    // TODO: логирование ошибки
+                }
+            }
+
+            // Удаляем инфу о всех фотках с fileUploadId из tempFotos
+            // TODO: Не очень безопасно (используется полученный с клиента fileUploadId)
+            if ($this->fileUploadId != "") {
+                $this->DBlink->query("DELETE FROM tempFotos WHERE fileUploadId = '" . $this->fileUploadId . "'");
+                if (($this->DBlink->errno)
+                    OR ($this->DBlink->affected_rows === -1)
+                ) {
+                    // Логируем ошибку
+                    // TODO: логирование ошибки
+                }
+            }
+
+            // Приведем в соответствие с данными из БД наш массив с фотографиями $this->uploadedFotos
+            $this->writeFotoInformationFromDB();
+
+        }
+
+        // Метод читает данные объекта недвижимости из БД и записывает их в параметры данного объекта
+        public function writeCharacteristicFromDB()
+        {
+            // Если идентификатор объекта недвижимости неизвестен, то дальнейшие действия не имеют смысла
+            if ($this->id == "") return FALSE;
+
+            // Получим из БД данные ($res) по объекту недвижимости с идентификатором = $this->id
+            $stmt = $this->DBlink->stmt_init();
+            if (($stmt->prepare("SELECT * FROM property WHERE id=?") === FALSE)
+                OR ($stmt->bind_param("s", $this->id) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($res = $stmt->get_result()) === FALSE)
+                OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+                OR ($stmt->close() === FALSE)
+            ) {
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                return FALSE;
+            }
+
+            // Если получено меньше или больше одной строки (одного объекта недвижимости) из БД, то сообщаем об ошибке
+            if (!is_array($res) || count($res) != 1) {
+                // TODO: Сохранить в лог ошибку получения данных пользователя из БД
+                return FALSE;
+            }
+
+            // Для красоты (чтобы избавить от индекса ноль при обращении к переменным) переприсвоим значение $res[0] специальной переменной
+            $onePropertyDataArr = $res[0];
+
+            // Если данные по пользователю есть в БД, присваиваем их соответствующим переменным, иначе - у них останутся значения по умолчанию.
+            if (isset($onePropertyDataArr['typeOfObject'])) $this->typeOfObject = $onePropertyDataArr['typeOfObject'];
+            if (isset($onePropertyDataArr['dateOfEntry'])) $this->dateOfEntry = $this->globFunc->dateFromDBToView($onePropertyDataArr['dateOfEntry']);
+            if (isset($onePropertyDataArr['termOfLease'])) $this->termOfLease = $onePropertyDataArr['termOfLease'];
+            if (isset($onePropertyDataArr['dateOfCheckOut'])) $this->dateOfCheckOut = $this->globFunc->dateFromDBToView($onePropertyDataArr['dateOfCheckOut']);
+            if (isset($onePropertyDataArr['amountOfRooms'])) $this->amountOfRooms = $onePropertyDataArr['amountOfRooms'];
+            if (isset($onePropertyDataArr['adjacentRooms'])) $this->adjacentRooms = $onePropertyDataArr['adjacentRooms'];
+            if (isset($onePropertyDataArr['amountOfAdjacentRooms'])) $this->amountOfAdjacentRooms = $onePropertyDataArr['amountOfAdjacentRooms'];
+            if (isset($onePropertyDataArr['typeOfBathrooms'])) $this->typeOfBathrooms = $onePropertyDataArr['typeOfBathrooms'];
+            if (isset($onePropertyDataArr['typeOfBalcony'])) $this->typeOfBalcony = $onePropertyDataArr['typeOfBalcony'];
+            if (isset($onePropertyDataArr['balconyGlazed'])) $this->balconyGlazed = $onePropertyDataArr['balconyGlazed'];
+            if (isset($onePropertyDataArr['roomSpace'])) $this->roomSpace = $onePropertyDataArr['roomSpace'];
+            if (isset($onePropertyDataArr['totalArea'])) $this->totalArea = $onePropertyDataArr['totalArea'];
+            if (isset($onePropertyDataArr['livingSpace'])) $this->livingSpace = $onePropertyDataArr['livingSpace'];
+            if (isset($onePropertyDataArr['kitchenSpace'])) $this->kitchenSpace = $onePropertyDataArr['kitchenSpace'];
+            if (isset($onePropertyDataArr['floor'])) $this->floor = $onePropertyDataArr['floor'];
+            if (isset($onePropertyDataArr['totalAmountFloor'])) $this->totalAmountFloor = $onePropertyDataArr['totalAmountFloor'];
+            if (isset($onePropertyDataArr['numberOfFloor'])) $this->numberOfFloor = $onePropertyDataArr['numberOfFloor'];
+            if (isset($onePropertyDataArr['concierge'])) $this->concierge = $onePropertyDataArr['concierge'];
+            if (isset($onePropertyDataArr['intercom'])) $this->intercom = $onePropertyDataArr['intercom'];
+            if (isset($onePropertyDataArr['parking'])) $this->parking = $onePropertyDataArr['parking'];
+            if (isset($onePropertyDataArr['city'])) $this->city = $onePropertyDataArr['city'];
+            if (isset($onePropertyDataArr['district'])) $this->district = $onePropertyDataArr['district'];
+            if (isset($onePropertyDataArr['coordX'])) $this->coordX = $onePropertyDataArr['coordX'];
+            if (isset($onePropertyDataArr['coordY'])) $this->coordY = $onePropertyDataArr['coordY'];
+            if (isset($onePropertyDataArr['address'])) $this->address = $onePropertyDataArr['address'];
+            if (isset($onePropertyDataArr['apartmentNumber'])) $this->apartmentNumber = $onePropertyDataArr['apartmentNumber'];
+            if (isset($onePropertyDataArr['subwayStation'])) $this->subwayStation = $onePropertyDataArr['subwayStation'];
+            if (isset($onePropertyDataArr['distanceToMetroStation'])) $this->distanceToMetroStation = $onePropertyDataArr['distanceToMetroStation'];
+            if (isset($onePropertyDataArr['currency'])) $this->currency = $onePropertyDataArr['currency'];
+            if (isset($onePropertyDataArr['costOfRenting'])) $this->costOfRenting = $onePropertyDataArr['costOfRenting'];
+            if (isset($onePropertyDataArr['utilities'])) $this->utilities = $onePropertyDataArr['utilities'];
+            if (isset($onePropertyDataArr['costInSummer'])) $this->costInSummer = $onePropertyDataArr['costInSummer'];
+            if (isset($onePropertyDataArr['costInWinter'])) $this->costInWinter = $onePropertyDataArr['costInWinter'];
+            if (isset($onePropertyDataArr['electricPower'])) $this->electricPower = $onePropertyDataArr['electricPower'];
+            if (isset($onePropertyDataArr['bail'])) $this->bail = $onePropertyDataArr['bail'];
+            if (isset($onePropertyDataArr['bailCost'])) $this->bailCost = $onePropertyDataArr['bailCost'];
+            if (isset($onePropertyDataArr['prepayment'])) $this->prepayment = $onePropertyDataArr['prepayment'];
+            if (isset($onePropertyDataArr['compensationMoney'])) $this->compensationMoney = $onePropertyDataArr['compensationMoney'];
+            if (isset($onePropertyDataArr['compensationPercent'])) $this->compensationPercent = $onePropertyDataArr['compensationPercent'];
+            if (isset($onePropertyDataArr['repair'])) $this->repair = $onePropertyDataArr['repair'];
+            if (isset($onePropertyDataArr['furnish'])) $this->furnish = $onePropertyDataArr['furnish'];
+            if (isset($onePropertyDataArr['windows'])) $this->windows = $onePropertyDataArr['windows'];
+            if (isset($onePropertyDataArr['internet'])) $this->internet = $onePropertyDataArr['internet'];
+            if (isset($onePropertyDataArr['telephoneLine'])) $this->telephoneLine = $onePropertyDataArr['telephoneLine'];
+            if (isset($onePropertyDataArr['cableTV'])) $this->cableTV = $onePropertyDataArr['cableTV'];
+            if (isset($onePropertyDataArr['furnitureInLivingArea'])) $this->furnitureInLivingArea = unserialize($onePropertyDataArr['furnitureInLivingArea']);
+            if (isset($onePropertyDataArr['furnitureInLivingAreaExtra'])) $this->furnitureInLivingAreaExtra = $onePropertyDataArr['furnitureInLivingAreaExtra'];
+            if (isset($onePropertyDataArr['furnitureInKitchen'])) $this->furnitureInKitchen = unserialize($onePropertyDataArr['furnitureInKitchen']);
+            if (isset($onePropertyDataArr['furnitureInKitchenExtra'])) $this->furnitureInKitchenExtra = $onePropertyDataArr['furnitureInKitchenExtra'];
+            if (isset($onePropertyDataArr['appliances'])) $this->appliances = unserialize($onePropertyDataArr['appliances']);
+            if (isset($onePropertyDataArr['appliancesExtra'])) $this->appliancesExtra = $onePropertyDataArr['appliancesExtra'];
+            if (isset($onePropertyDataArr['sexOfTenant'])) $this->sexOfTenant = explode("_", $onePropertyDataArr['sexOfTenant']);
+            if (isset($onePropertyDataArr['relations'])) $this->relations = explode("_", $onePropertyDataArr['relations']);
+            if (isset($onePropertyDataArr['children'])) $this->children = $onePropertyDataArr['children'];
+            if (isset($onePropertyDataArr['animals'])) $this->animals = $onePropertyDataArr['animals'];
+            if (isset($onePropertyDataArr['contactTelephonNumber'])) $this->contactTelephonNumber = $onePropertyDataArr['contactTelephonNumber'];
+            if (isset($onePropertyDataArr['timeForRingBegin'])) $this->timeForRingBegin = $onePropertyDataArr['timeForRingBegin'];
+            if (isset($onePropertyDataArr['timeForRingEnd'])) $this->timeForRingEnd = $onePropertyDataArr['timeForRingEnd'];
+            if (isset($onePropertyDataArr['checking'])) $this->checking = $onePropertyDataArr['checking'];
+            if (isset($onePropertyDataArr['responsibility'])) $this->responsibility = $onePropertyDataArr['responsibility'];
+            if (isset($onePropertyDataArr['comment'])) $this->comment = $onePropertyDataArr['comment'];
+
+            if (isset($onePropertyDataArr['realCostOfRenting'])) $this->realCostOfRenting = $onePropertyDataArr['realCostOfRenting'];
+            if (isset($onePropertyDataArr['last_act'])) $this->last_act = $onePropertyDataArr['last_act'];
+            if (isset($onePropertyDataArr['reg_date'])) $this->reg_date = $onePropertyDataArr['reg_date'];
+            if (isset($onePropertyDataArr['status'])) $this->status = $onePropertyDataArr['status'];
+            if (isset($onePropertyDataArr['visibleUsersId'])) $this->visibleUsersId = unserialize($onePropertyDataArr['visibleUsersId']);
+            if (isset($onePropertyDataArr['schemeOfWork'])) $this->schemeOfWork = $onePropertyDataArr['schemeOfWork'];
+            if (isset($onePropertyDataArr['id'])) $this->id = $onePropertyDataArr['id'];
+            if (isset($onePropertyDataArr['userId'])) $this->userId = $onePropertyDataArr['userId'];
+
+            return TRUE;
+        }
+
+        // Метод читает данные о фотографиях из БД и записывает их в параметры объекта недвижимости
+        // Для корректной работы в параметрах объекта должен быть указан id объекта недвижимости ($this->id)
+        public function writeFotoInformationFromDB()
+        {
+
+            // Если идентификатор объекта недвижимости неизвестен, то дальнейшие действия не имеют смысла
+            if ($this->id == "") return FALSE;
+
+            // Получим из БД данные ($res) по объекту недвижимости с идентификатором = $this->id
+            $stmt = $this->DBlink->stmt_init();
+            if (($stmt->prepare("SELECT * FROM propertyFotos WHERE propertyId=?") === FALSE)
+                OR ($stmt->bind_param("s", $this->id) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($res = $stmt->get_result()) === FALSE)
+                OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+                OR ($stmt->close() === FALSE)
+            ) {
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                return FALSE;
+            }
+
+            // Сохраняем в параметры объекта массив массивов, каждый из которых содержит данные по 1 фотографии
+            $this->uploadedFoto = $res;
+
+            // Сохраняем идентификатор основной фотографии пользователя в параметры объекта
+            foreach ($res as $value) {
+                if ($value['status'] == 'основная') {
+                    $this->primaryFotoId = $value['id'];
+                    break;
+                }
+            }
+
+            return TRUE;
 
         }
 
         // Записать в качестве параметров объекта недвижимости значения, полученные через POST запрос
-        public function writeParametersFromPOST() {
+        public function writeCharacteristicFromPOST() {
 
             if (isset($_POST['typeOfObject'])) $this->typeOfObject = htmlspecialchars($_POST['typeOfObject']);
             if (isset($_POST['dateOfEntry'])) $this->dateOfEntry = htmlspecialchars($_POST['dateOfEntry']);
@@ -251,9 +611,107 @@
             if (isset($_POST['responsibility'])) $this->responsibility = htmlspecialchars($_POST['responsibility']);
             if (isset($_POST['comment'])) $this->comment = htmlspecialchars($_POST['comment']);
 
+        }
+
+        // Записать в качестве данных о фотографиях соответствующую информацию из POST запроса
+        public function writeFotoInformationFromPOST() {
+            //TODO: убедиться, что если на клиенте удалить все фотки, то при перезагрузке они снова не появятся (из-за того, что $uploadedFoto не придет в POST параметрах и останется предыдущая версия - которая не будет перезатерта)
+
             if (isset($_POST['fileUploadId'])) $this->fileUploadId = $_POST['fileUploadId'];
             if (isset($_POST['uploadedFoto'])) $this->uploadedFoto = json_decode($_POST['uploadedFoto'], TRUE); // Массив объектов со сведениями о загруженных фотографиях сериализуется в JSON формат на клиенте и передается как содержимое атрибута value одного единственного INPUT hidden
             if (isset($_POST['primaryFotoRadioButton'])) $this->primaryFotoId = htmlspecialchars($_POST['primaryFotoRadioButton']);
+
+        }
+
+        // Получить ассоциированный массив с данными анкеты объекта недвижимости (для использования в представлении)
+        public function getCharacteristicData() {
+
+            $result = array();
+
+            $result['typeOfObject'] = $this->typeOfObject;
+            $result['dateOfEntry'] = $this->dateOfEntry;
+            $result['termOfLease'] = $this->termOfLease;
+            $result['dateOfCheckOut'] = $this->dateOfCheckOut;
+            $result['amountOfRooms'] = $this->amountOfRooms;
+            $result['adjacentRooms'] = $this->adjacentRooms;
+            $result['amountOfAdjacentRooms'] = $this->amountOfAdjacentRooms;
+            $result['typeOfBathrooms'] = $this->typeOfBathrooms;
+            $result['typeOfBalcony'] = $this->typeOfBalcony;
+            $result['balconyGlazed'] = $this->balconyGlazed;
+            $result['roomSpace'] = $this->roomSpace;
+            $result['totalArea'] = $this->totalArea;
+            $result['livingSpace'] = $this->livingSpace;
+            $result['kitchenSpace'] = $this->kitchenSpace;
+            $result['floor'] = $this->floor;
+            $result['totalAmountFloor'] = $this->totalAmountFloor;
+            $result['numberOfFloor'] = $this->numberOfFloor;
+            $result['concierge'] = $this->concierge;
+            $result['intercom'] = $this->intercom;
+            $result['parking'] = $this->parking;
+            $result['city'] = $this->city;
+            $result['district'] = $this->district;
+            $result['coordX'] = $this->coordX;
+            $result['coordY'] = $this->coordY;
+            $result['address'] = $this->address;
+            $result['apartmentNumber'] = $this->apartmentNumber;
+            $result['subwayStation'] = $this->subwayStation;
+            $result['distanceToMetroStation'] = $this->distanceToMetroStation;
+            $result['currency'] = $this->currency;
+            $result['costOfRenting'] = $this->costOfRenting;
+            $result['utilities'] = $this->utilities;
+            $result['costInSummer'] = $this->costInSummer;
+            $result['costInWinter'] = $this->costInWinter;
+            $result['electricPower'] = $this->electricPower;
+            $result['bail'] = $this->bail;
+            $result['bailCost'] = $this->bailCost;
+            $result['prepayment'] = $this->prepayment;
+            $result['compensationMoney'] = $this->compensationMoney;
+            $result['compensationPercent'] = $this->compensationPercent;
+            $result['repair'] = $this->repair;
+            $result['furnish'] = $this->furnish;
+            $result['windows'] = $this->windows;
+            $result['internet'] = $this->internet;
+            $result['telephoneLine'] = $this->telephoneLine;
+            $result['cableTV'] = $this->cableTV;
+            $result['furnitureInLivingArea'] = $this->furnitureInLivingArea;
+            $result['furnitureInLivingAreaExtra'] = $this->furnitureInLivingAreaExtra;
+            $result['furnitureInKitchen'] = $this->furnitureInKitchen;
+            $result['furnitureInKitchenExtra'] = $this->furnitureInKitchenExtra;
+            $result['appliances'] = $this->appliances;
+            $result['appliancesExtra'] = $this->appliancesExtra;
+            $result['sexOfTenant'] = $this->sexOfTenant;
+            $result['relations'] = $this->relations;
+            $result['children'] = $this->children;
+            $result['animals'] = $this->animals;
+            $result['contactTelephonNumber'] = $this->contactTelephonNumber;
+            $result['timeForRingBegin'] = $this->timeForRingBegin;
+            $result['timeForRingEnd'] = $this->timeForRingEnd;
+            $result['checking'] = $this->checking;
+            $result['responsibility'] = $this->responsibility;
+            $result['comment'] = $this->comment;
+
+            $result['realCostOfRenting'] = $this->realCostOfRenting;
+            $result['last_act'] = $this->last_act;
+            $result['reg_date'] = $this->reg_date;
+            $result['status'] = $this->status;
+            $result['visibleUsersId'] = $this->visibleUsersId;
+            $result['schemeOfWork'] = $this->schemeOfWork;
+            $result['id'] = $this->id;
+            $result['userId'] = $this->userId;
+
+            return $result;
+        }
+
+        // Получить ассоциированный массив с данными о фотографиях объекта недвижимости (для использования в представлении)
+        public function getFotoInformationData() {
+
+            $result = array();
+
+            $result['fileUploadId'] = $this->fileUploadId;
+            $result['uploadedFoto'] = $this->uploadedFoto;
+            $result['primaryFotoId'] = $this->primaryFotoId;
+
+            return $result;
 
         }
 
@@ -467,23 +925,26 @@
             return $errors; // Возвращаем список ошибок, если все в порядке, то он будет пуст
         }
 
-        // Метод инициализирует параметры объекта в соответствии с переданным ассоциативным массивом
-        // На входе - ассоциированный массив, который, скорее всего, был получен из БД вызывающей метод функцией
-        // В случае успеха возвращает TRUE, иначе FALSE
-        public function buildFromArr($arr = FALSE)
-        {
+        // Используется при регистрации нового объекта недвижимости - позволяет получить идентификатор, используя адрес.
+        // Полученный идентификатор также указывается в параметрах данного объекта
+        public function getIdUseAddress() {
 
-            if ($arr == FALSE) return FALSE;
-
-            // Присваиваем параметры ассоцативного массива соответствующим свойствам нашего объекта
-            foreach ($arr as $key => $value) {
-
-                // TODO: реализовать проверки отдельных $key и преобразование (даты, BLOB..)
-
-                if (isset($this->$key)) $this->$key = $value;
+            $stmt = $this->DBlink->stmt_init();
+            if (($stmt->prepare("SELECT id FROM property WHERE address=? AND coordX=? AND coordY=? AND apartmentNumber=?") === FALSE)
+                OR ($stmt->bind_param("ssss", $this->address, $this->coordX, $this->coordY, $this->apartmentNumber) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($res = $stmt->get_result()) === FALSE)
+                OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+                OR (count($res) === 0)
+                OR ($stmt->close() === FALSE)
+            ) {
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                return FALSE;
             }
 
-            return TRUE;
+            $this->id = $res[0]['id'];
+            return $this->id;
 
         }
+
     }

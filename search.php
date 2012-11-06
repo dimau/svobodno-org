@@ -1,72 +1,55 @@
 <?php
-    include_once 'lib/connect.php'; //подключаемся к БД
-    include_once 'lib/function_global.php'; //подключаем файл с глобальными функциями
-    include_once 'lib/function_searchResult.php'; // Подключаем файл с функциями по HTML оформлению результатов поиска
+    // Стартуем сессию с пользователем - сделать доступными переменные сессии
+    session_start();
+
+    // Подключаем нужные модели и представления
+    include 'models/GlobFunc.php';
+    include 'models/Logger.php';
+    include 'models/IncomingUser.php';
+    include 'views/View.php';
+    include 'models/SearchRequest.php';
+
+    // Создаем объект-хранилище глобальных функций
+    $globFunc = new GlobFunc();
+
+    // Подключаемся к БД
+    $DBlink = $globFunc->connectToDB();
+    // Удалось ли подключиться к БД?
+    if ($DBlink == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
+
+    // Инициализируем модель для запросившего страницу пользователя
+    $incomingUser = new IncomingUser($globFunc, $DBlink);
 
     /*************************************************************************************
-     * Если пользователь авторизован - получим его id
+     * Инициализируем поисковый запрос значениями по умолчанию, и другие переменные
      ************************************************************************************/
 
-    $userId = login($DBlink);
-
-    /*************************************************************************************
-     * Присваиваем поисковым переменным значения по умолчанию
-     ************************************************************************************/
-
-    $typeOfObject = "0";
-    $amountOfRooms = array();
-    $adjacentRooms = "0";
-    $floor = "0";
-    $minCost = "";
-    $maxCost = "";
-    $pledge = "";
-    $prepayment = "0";
-    $district = array();
-    $withWho = "0";
-    $children = "0";
-    $animals = "0";
-    $termOfLease = "0";
+    $searchRequest = new SearchRequest();
 
     // Готовим массив со списком районов в городе пользователя
-    $allDistrictsInCity = array();
-    $rezDistricts = mysql_query("SELECT name FROM districts WHERE city = '" . "Екатеринбург" . "' ORDER BY name ASC");
-    for ($i = 0; $i < mysql_num_rows($rezDistricts); $i++) {
-        $rowDistricts = mysql_fetch_assoc($rezDistricts);
-        $allDistrictsInCity[] = $rowDistricts['name'];
-    }
+    $allDistrictsInCity = $globFunc->getAllDistrictsInCity("Екатеринбург");
 
     /***************************************************************************************************************
-     * Если пользователь нажал на кнопку Поиск
+     * ОТПРАВЛЕНА ФОРМА ПОИСКА
      **************************************************************************************************************/
 
     if (isset($_GET['fastSearchButton'])) {
-        if (isset($_GET['typeOfObjectFast'])) $typeOfObject = htmlspecialchars($_GET['typeOfObjectFast']);
-        if (isset($_GET['districtFast']) && $_GET['districtFast'] != "0") $district = array($_GET['districtFast']);
-        if (isset($_GET['minCostFast']) && preg_match("/^\d{0,8}$/", $_GET['minCostFast'])) $minCost = htmlspecialchars($_GET['minCostFast']); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
-        if (isset($_GET['maxCostFast']) && preg_match("/^\d{0,8}$/", $_GET['maxCostFast'])) $maxCost = htmlspecialchars($_GET['maxCostFast']); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
+        $searchRequest->writeParamsFastFromPOST();
     }
 
     if (isset($_GET['extendedSearchButton'])) {
-        if (isset($_GET['typeOfObject'])) $typeOfObject = htmlspecialchars($_GET['typeOfObject']);
-        if (isset($_GET['amountOfRooms']) && is_array($_GET['amountOfRooms'])) $amountOfRooms = $_GET['amountOfRooms'];
-        if (isset($_GET['adjacentRooms'])) $adjacentRooms = htmlspecialchars($_GET['adjacentRooms']);
-        if (isset($_GET['floor'])) $floor = htmlspecialchars($_GET['floor']);
-        if (isset($_GET['minCost']) && preg_match("/^\d{0,8}$/", $_GET['minCost'])) $minCost = htmlspecialchars($_GET['minCost']); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
-        if (isset($_GET['maxCost']) && preg_match("/^\d{0,8}$/", $_GET['maxCost'])) $maxCost = htmlspecialchars($_GET['maxCost']); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
-        if (isset($_GET['pledge']) && preg_match("/^\d{0,8}$/", $_GET['pledge'])) $pledge = htmlspecialchars($_GET['pledge']); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
-        if (isset($_GET['prepayment'])) $prepayment = htmlspecialchars($_GET['prepayment']);
-        if (isset($_GET['district']) && is_array($_GET['district'])) $district = $_GET['district'];
-        if (isset($_GET['withWho'])) $withWho = htmlspecialchars($_GET['withWho']);
-        if (isset($_GET['children'])) $children = htmlspecialchars($_GET['children']);
-        if (isset($_GET['animals'])) $animals = htmlspecialchars($_GET['animals']);
-        if (isset($_GET['termOfLease'])) $termOfLease = htmlspecialchars($_GET['termOfLease']);
+        $searchRequest->writeParamsExtendedFromPOST();
     }
 
     /***************************************************************************************************************
      * Если пользователь залогинен и указал в личном кабинете параметры поиска, но еще не нажимал кнопки Поиск на этой странице
      **************************************************************************************************************/
 
-    if (!isset($_GET['fastSearchButton']) && !isset($_GET['extendedSearchButton']) && $userId != FALSE) {
+    if (!isset($_GET['fastSearchButton']) && !isset($_GET['extendedSearchButton']) && $incomingUser->login()) {
+
+
+
+
         // Получаем данные поискового запроса данного пользователя из БД, если они конечно там есть
         $rezSearchRequests = mysql_query("SELECT * FROM searchrequests WHERE userId = '" . $userId . "'");
         $rowSearchRequests = mysql_fetch_assoc($rezSearchRequests);

@@ -1,4 +1,4 @@
-<?
+<?php
     // Инициализируем используемые в шаблоне переменные
     $userCharacteristic = $dataArr['userCharacteristic'];
     $userFotoInformation = $dataArr['userFotoInformation'];

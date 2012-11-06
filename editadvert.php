@@ -187,97 +187,15 @@
 
         // Если данные, указанные пользователем, корректны, запишем объявление в базу данных
         if ($correct) {
-            // Корректируем даты для того, чтобы сделать их пригодными для сохранения в базу данных
-            $dateOfEntryForDB = dateFromViewToDB($dateOfEntry);
-            $dateOfCheckOutForDB = dateFromViewToDB($dateOfCheckOut);
 
-            // Для хранения массивов в БД, их необходимо сериализовать
-            $furnitureInLivingAreaSerialized = serialize($furnitureInLivingArea);
-            $furnitureInKitchenSerialized = serialize($furnitureInKitchen);
-            $appliancesSerialized = serialize($appliances);
-            $sexOfTenantImploded = implode("_", $sexOfTenant);
-            $relationsImploded = implode("_", $relations);
+            // Сохраняем отредактированные параметры объявления на текущего пользователя
+            $property->saveCharacteristicToDB("edit", $incomingUser->getId());
 
-            // Проверяем в какой валюте сохраняется стоимость аренды, формируем переменную realCostOfRenting
-            if ($currency == 'руб.') $realCostOfRenting = $costOfRenting;
-            if ($currency != 'руб.') {
-                $rezCurrency = mysql_query("SELECT value FROM currencies WHERE name = '" . $currency . "'");
-                $rowCurrency = mysql_fetch_assoc($rezCurrency);
-                if ($rowCurrency != FALSE) $realCostOfRenting = $costOfRenting * $rowCurrency['value']; else $realCostOfRenting = 0;
-            }
 
-            $tm = time();
-            $last_act = $tm; // время последнего редактирования объявления
-            $reg_date = $tm; // время регистрации ("рождения") объявления
 
-            if (mysql_query("UPDATE property SET
-                            userId='" . $userId . "',
-                            typeOfObject='" . $typeOfObject . "',
-                            dateOfEntry='" . $dateOfEntryForDB . "',
-                            termOfLease='" . $termOfLease . "',
-                            dateOfCheckOut='" . $dateOfCheckOutForDB . "',
-                            amountOfRooms='" . $amountOfRooms . "',
-                            adjacentRooms='" . $adjacentRooms . "',
-                            amountOfAdjacentRooms='" . $amountOfAdjacentRooms . "',
-                            typeOfBathrooms='" . $typeOfBathrooms . "',
-                            typeOfBalcony='" . $typeOfBalcony . "',
-                            balconyGlazed='" . $balconyGlazed . "',
-                            roomSpace='" . $roomSpace . "',
-                            totalArea='" . $totalArea . "',
-                            livingSpace='" . $livingSpace . "',
-                            kitchenSpace='" . $kitchenSpace . "',
-                            floor='" . $floor . "',
-                            totalAmountFloor='" . $totalAmountFloor . "',
-                            numberOfFloor='" . $numberOfFloor . "',
-                            concierge='" . $concierge . "',
-                            intercom='" . $intercom . "',
-                            parking='" . $parking . "',
-                            city='" . $city . "',
-                            district='" . $district . "',
-                            coordX='" . $coordX . "',
-                            coordY='" . $coordY . "',
-                            address='" . $address . "',
-                            apartmentNumber='" . $apartmentNumber . "',
-                            subwayStation='" . $subwayStation . "',
-                            distanceToMetroStation='" . $distanceToMetroStation . "',
-                            currency='" . $currency . "',
-                            costOfRenting='" . $costOfRenting . "',
-                            realCostOfRenting='" . $realCostOfRenting . "',
-                            utilities='" . $utilities . "',
-                            costInSummer='" . $costInSummer . "',
-                            costInWinter='" . $costInWinter . "',
-                            electricPower='" . $electricPower . "',
-                            bail='" . $bail . "',
-                            bailCost='" . $bailCost . "',
-                            prepayment='" . $prepayment . "',
-                            compensationMoney='" . $compensationMoney . "',
-                            compensationPercent='" . $compensationPercent . "',
-                            repair='" . $repair . "',
-                            furnish='" . $furnish . "',
-                            windows='" . $windows . "',
-                            internet='" . $internet . "',
-                            telephoneLine='" . $telephoneLine . "',
-                            cableTV='" . $cableTV . "',
-                            furnitureInLivingArea='" . $furnitureInLivingAreaSerialized . "',
-                            furnitureInLivingAreaExtra='" . $furnitureInLivingAreaExtra . "',
-                            furnitureInKitchen='" . $furnitureInKitchenSerialized . "',
-                            furnitureInKitchenExtra='" . $furnitureInKitchenExtra . "',
-                            appliances='" . $appliancesSerialized . "',
-                            appliancesExtra='" . $appliancesExtra . "',
-                            sexOfTenant='" . $sexOfTenantImploded . "',
-                            relations='" . $relationsImploded . "',
-                            children='" . $children . "',
-                            animals='" . $animals . "',
-                            contactTelephonNumber='" . $contactTelephonNumber . "',
-                            timeForRingBegin='" . $timeForRingBegin . "',
-                            timeForRingEnd='" . $timeForRingEnd . "',
-                            checking='" . $checking . "',
-                            responsibility='" . $responsibility . "',
-                            comment='" . $comment . "',
-                            last_act='" . $last_act . "',
-                            reg_date='" . $reg_date . "'
-                            WHERE id = '" . $propertyId . "'")
-            ) {
+
+
+            if () {
                 /******* Переносим информацию о фотографиях объекта недвижимости в таблицу для постоянного хранения *******/
                 // Получим информацию о всех фотках, соответствующих текущему fileUploadId
                 $rezTempFotos = mysql_query("SELECT id, filename, extension, filesizeMb FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'");
