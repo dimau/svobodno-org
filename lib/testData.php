@@ -4,8 +4,8 @@
      * Важно не забывать копировать соответствующие тестовые картинки
      */
 
-    // Подключаем нужные классы
-    include_once '../classesForProjectSecurityName/GlobFunc.php';
+    // Подключаем нужные модели и представления
+    include '../models/GlobFunc.php';
 
     // Создаем объект-хранилище глобальных функций
     $globFunc = new GlobFunc();

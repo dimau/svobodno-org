@@ -340,7 +340,7 @@ function notavailability() {
 
     // Понимаем роль пользователя, так как некоторые поля обязательны для арендатора, но необязательны для собственника
     var userTypeTenant = "";
-    if ($(".userType").length) userTypeTenant = $(".userType").attr('typeTenant') == "true";
+    if ($(".userType").length) userTypeTenant = $(".userType").attr('typeTenant') == "TRUE";
 
     // Перебираем все элементы, доступность которых зависит от каких-либо условий
     $("[notavailability]").each(function () {

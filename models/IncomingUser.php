@@ -8,6 +8,7 @@
         private $typeTenant = NULL;
         private $typeOwner = NULL;
         private $typeAdmin = NULL;
+        private $favoritesPropertysId = array();
 
         private $isLoggedIn = NULL; // В переменную сохраняется функцией login() значение FALSE или TRUE после первого вызова на странице. Для уменьшения обращений к БД
         private $DBlink = FALSE; // Переменная для хранения объекта соединения с базой данных
@@ -89,10 +90,14 @@
         // Метод возвращает id пользователя
         public function getId()
         {
-
             if ($this->id == "") return FALSE;
 
             return $this->id;
+        }
+
+        // Метод возвращает массив избранных объявлений текущего пользователя (если он не авторизован, то пустой массив)
+        public function getFavoritesPropertysId() {
+            return $this->favoritesPropertysId;
         }
 
         // Функция проверяет - залогинен ли пользователь сейчас (возвращает TRUE или FALSE).
@@ -120,7 +125,7 @@
 
             // Получим из БД данные ($res) по пользователю с идентификатором сессии = $_SESSION['id'] или логином = $_COOKIE['login']
             $stmt = $this->DBlink->stmt_init();
-            if (($stmt->prepare("SELECT id, typeTenant, typeOwner, typeAdmin, login, password, user_hash FROM users WHERE user_hash=? OR login=?") === FALSE)
+            if (($stmt->prepare("SELECT id, typeTenant, typeOwner, typeAdmin, login, password, user_hash, favoritesPropertysId FROM users WHERE user_hash=? OR login=?") === FALSE)
                 OR ($stmt->bind_param("ss", $sessionId, $cookieLogin) === FALSE)
                 OR ($stmt->execute() === FALSE)
                 OR (($res = $stmt->get_result()) === FALSE)
@@ -165,6 +170,8 @@
                     if ($res[0]['typeOwner'] == "FALSE") $this->typeOwner = FALSE;
                 }
                 if (isset($res[0]['typeAdmin'])) $this->typeAdmin = $res[0]['typeAdmin'];
+                if (isset($res[0]['favoritesPropertysId'])) $this->favoritesPropertysId = unserialize($res[0]['favoritesPropertysId']);
+
 
                 // Обновим куки (или добавим, если их ранее не было), чтобы после перезапуска браузера сессия не слетала
                 setcookie("login", "", time() - 1, '/');
