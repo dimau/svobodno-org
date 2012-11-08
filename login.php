@@ -44,7 +44,7 @@
      * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
      *******************************************************************************/
 
-    $view = new View();
+    $view = new View($globFunc, $DBlink);
     $view->generate("templ_login.php", array('errors' => $errors,
                                             'isLoggedIn' => $incomingUser->login()));
 

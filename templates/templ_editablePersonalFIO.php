@@ -6,7 +6,7 @@
 ?>
 
 <div class="descriptionFieldsetsWrapper">
-        <fieldset class="edited private">
+        <fieldset class="edited left private">
             <legend>
                 ФИО
             </legend>
@@ -109,8 +109,7 @@
             </table>
         </fieldset>
 
-        <div style="display: inline-block; vertical-align: top;">
-            <fieldset class="edited private" style="display: block;">
+            <fieldset class="edited right private" style="display: block;">
                 <legend>
                     Логин и пароль
                 </legend>
@@ -149,7 +148,7 @@
                 </table>
             </fieldset>
 
-            <fieldset class="edited private" style="display: block;">
+            <fieldset class="edited right private" style="display: block;">
                 <legend>
                     Контакты
                 </legend>
@@ -182,9 +181,9 @@
                     </tbody>
                 </table>
             </fieldset>
-        </div>
 
-        <fieldset id='fotoWrapperBlock' class="edited private" style="min-width: 300px;">
+
+        <fieldset id='fotoWrapperBlock' class="edited fullWidth private" style="min-width: 300px;">
             <legend
                 <?php if ($userCharacteristic['typeTenant']) echo 'title="Рекомендуем загрузить хотя бы 1 фотографию, которая в выгодном свете представит Вас перед собственником"'; ?>>
                 Фотографии
@@ -198,5 +197,5 @@
                 </noscript>
             </div>
         </fieldset>
-
+    <div class="clearBoth"></div>
     </div>

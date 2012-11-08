@@ -1,4 +1,56 @@
-<fieldset class="edited private">
+<fieldset class="edited left">
+    <legend>
+        Работа
+    </legend>
+    <table>
+        <tbody>
+            <tr>
+                <td class="itemLabel">
+                    Статус занятости
+                </td>
+                <td class="itemRequired">
+                    <?php if ($userCharacteristic['typeTenant']) {
+                    echo "*";
+                } ?>
+                </td>
+                <td class="itemBody">
+                    <select name="statusWork" id="statusWork">
+                        <option value="0" <?php if ($userCharacteristic['statusWork'] == "0") echo "selected";?>></option>
+                        <option value="работаю" <?php if ($userCharacteristic['statusWork'] == "работаю") echo "selected";?>>работаю
+                        </option>
+                        <option value="не работаю" <?php if ($userCharacteristic['statusWork'] == "не работаю") echo "selected";?>>не
+                            работаю
+                        </option>
+                    </select>
+                </td>
+            </tr>
+            <tr notavailability="statusWork_0&statusWork_не работаю">
+                <td class="itemLabel">
+                    Место работы
+                </td>
+                <td class="itemRequired typeTenantRequired">
+                </td>
+                <td class="itemBody">
+                    <input type="text" name="placeOfWork" id="placeOfWork"
+                           class="ifWorked" <?php echo "value='".$userCharacteristic['placeOfWork']."'";?>>
+                </td>
+            </tr>
+            <tr notavailability="statusWork_0&statusWork_не работаю">
+                <td class="itemLabel">
+                    Должность
+                </td>
+                <td class="itemRequired typeTenantRequired">
+                </td>
+                <td class="itemBody">
+                    <input type="text" name="workPosition" id="workPosition"
+                           class="ifWorked" <?php echo "value='".$userCharacteristic['workPosition']."'";?>>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</fieldset>
+
+<fieldset class="edited right">
     <legend>
         Образование
     </legend>
@@ -100,59 +152,7 @@
     </table>
 </fieldset>
 
-<fieldset class="edited private">
-    <legend>
-        Работа
-    </legend>
-    <table>
-        <tbody>
-            <tr>
-                <td class="itemLabel">
-                    Статус занятости
-                </td>
-                <td class="itemRequired">
-                    <?php if ($userCharacteristic['typeTenant']) {
-                    echo "*";
-                } ?>
-                </td>
-                <td class="itemBody">
-                    <select name="statusWork" id="statusWork">
-                        <option value="0" <?php if ($userCharacteristic['statusWork'] == "0") echo "selected";?>></option>
-                        <option value="работаю" <?php if ($userCharacteristic['statusWork'] == "работаю") echo "selected";?>>работаю
-                        </option>
-                        <option value="не работаю" <?php if ($userCharacteristic['statusWork'] == "не работаю") echo "selected";?>>не
-                            работаю
-                        </option>
-                    </select>
-                </td>
-            </tr>
-            <tr notavailability="statusWork_0&statusWork_не работаю">
-                <td class="itemLabel">
-                    Место работы
-                </td>
-                <td class="itemRequired typeTenantRequired">
-                </td>
-                <td class="itemBody">
-                    <input type="text" name="placeOfWork" id="placeOfWork"
-                           class="ifWorked" <?php echo "value='".$userCharacteristic['placeOfWork']."'";?>>
-                </td>
-            </tr>
-            <tr notavailability="statusWork_0&statusWork_не работаю">
-                <td class="itemLabel">
-                    Должность
-                </td>
-                <td class="itemRequired typeTenantRequired">
-                </td>
-                <td class="itemBody">
-                    <input type="text" name="workPosition" id="workPosition"
-                           class="ifWorked" <?php echo "value='".$userCharacteristic['workPosition']."'";?>>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</fieldset>
-
-<fieldset class="edited private">
+<fieldset class="edited left">
     <legend>
         Коротко о себе
     </legend>
@@ -194,3 +194,5 @@
         </tbody>
     </table>
 </fieldset>
+
+<div class="clearBoth"></div>

@@ -142,26 +142,7 @@
 
     }
 
-    /********************************************************************************
-     * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
-     *******************************************************************************/
 
-    $view = new View();
-    $view->generate("templ_personal.php", array('userCharacteristic' => $user->getCharacteristicData(),
-                                                'userFotoInformation' => $user->getFotoInformationData(),
-                                                'userSearchRequest' => $user->getSearchRequestData(),
-                                                'errors' => $errors,
-                                                'correctNewSearchRequest' => $correctNewSearchRequest,
-                                                'correctEditSearchRequest' => $correctEditSearchRequest,
-                                                'correctEditProfileParameters' => $correctEditProfileParameters,
-                                                'allDistrictsInCity' => $allDistrictsInCity,
-                                                'isLoggedIn' => $incomingUser->login()));
-
-    /********************************************************************************
-     * Закрываем соединение с БД
-     *******************************************************************************/
-
-    $globFunc->closeConnectToDB($DBlink);
 
     /********************************************************************************
      * МОИ ОБЪЯВЛЕНИЯ. Наполнение шаблона из БД
@@ -510,34 +491,31 @@
 ";
 
     /***************************************************************************************************************
-     * ИЗБРАННОЕ. Получаем данные по каждому избранному объявлению из БД и ниже наполняем вкладку tabs-5
+     * ИЗБРАННОЕ. Получаем данные по каждому избранному объявлению из БД (это позволит наполнить вкладку tabs-5)
      **************************************************************************************************************/
 
-    // Получаем массив с идентификаторами избранных объявлений для данного пользователя
-   /* $propertyIdArr = array();
-    if (isset($rowUsers['favoritesPropertysId'])) $propertyIdArr = unserialize($rowUsers['favoritesPropertysId']);
+    $propertyLightArr = $incomingUser->getPropertyLightArrForFavorites();
 
-    // Собираем строку WHERE для поискового запроса к БД
-    $strWHERE = "";
+    /********************************************************************************
+     * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
+     *******************************************************************************/
 
-    // Если есть хотя бы 1 идентификатор избранного объявления
-    if (count($propertyIdArr) != 0) {
-        $strWHERE = " (";
-        for ($i = 0; $i < count($propertyIdArr); $i++) {
-            $strWHERE .= " id = '" . $propertyIdArr[$i] . "'";
-            if ($i < count($propertyIdArr) - 1) $strWHERE .= " OR";
-        }
-        $strWHERE .= ") AND (status = 'опубликовано')"; //TODO: сделать особое отображение (засеренное) для не опубликованных объявлений, тогда можно будет снять это ограничение на показ пользователю в избранных только еще опубликованных объектов
-    }
+    $view = new View($globFunc, $DBlink);
+    $view->generate("templ_personal.php", array('userCharacteristic' => $user->getCharacteristicData(),
+                                                'userFotoInformation' => $user->getFotoInformationData(),
+                                                'userSearchRequest' => $user->getSearchRequestData(),
+                                                'errors' => $errors,
+                                                'correctNewSearchRequest' => $correctNewSearchRequest,
+                                                'correctEditSearchRequest' => $correctEditSearchRequest,
+                                                'correctEditProfileParameters' => $correctEditProfileParameters,
+                                                'allDistrictsInCity' => $allDistrictsInCity,
+                                                'isLoggedIn' => $incomingUser->login(),
+                                                'propertyLightArr' => $propertyLightArr,
+                                                'favoritesPropertysId' => $incomingUser->getFavoritesPropertysId(),
+                                                'whatPage' => "forPersonalPage"));
 
-    // Собираем и выполняем поисковый запрос на получение основных данных (id, координаты) по каждому из избранных объявлений
-    $propertyLightArr = array(); // в итоге получим массив, каждый элемент которого представляет собой еще один массив значений конкретного объявления по недвижимости
-    if ($strWHERE != "") { // Если $strWHERE = "", значит у пользователя нет ни одного избранного объявления и выполнять поиск нам не нужно
-        $rezProperty = mysql_query("SELECT id, coordX, coordY FROM property WHERE" . $strWHERE . " ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting"); // Сортируем по стоимости аренды и не ограничиваем количество объявлений - все, добавленные в избранные
-        // Сортируем по стоимости аренды и ограничиваем количество 100 объявлениями
-        if ($rezProperty != FALSE) {
-            for ($i = 0; $i < mysql_num_rows($rezProperty); $i++) {
-                $propertyLightArr[] = mysql_fetch_assoc($rezProperty);
-            }
-        }
-    } */
+    /********************************************************************************
+     * Закрываем соединение с БД
+     *******************************************************************************/
+
+    $globFunc->closeConnectToDB($DBlink);

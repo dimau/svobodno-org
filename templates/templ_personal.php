@@ -9,6 +9,9 @@
     $correctEditProfileParameters = $dataArr['correctEditProfileParameters'];
     $allDistrictsInCity = $dataArr['allDistrictsInCity'];
     $isLoggedIn = $dataArr['isLoggedIn'];
+    $propertyLightArr = $dataArr['propertyLightArr'];
+    $favoritesPropertysId = $dataArr['favoritesPropertysId'];
+    $whatPage = $dataArr['whatPage'];
 ?>
 
 <!DOCTYPE html>
@@ -33,8 +36,20 @@
     <link rel="stylesheet" href="css/colorbox.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
-    #newAdvertButton {
-    margin-bottom: 10px;
+        #newAdvertButton {
+            margin-bottom: 10px;
+        }
+
+        #notEditedDistricts table tr {
+            border-bottom: none;
+        }
+
+        #notEditedSpecialParams {
+            width: 100%;
+        }
+
+        #notEditedSpecialParams .objectDescriptionItemLabel, #notEditedSpecialParams .objectDescriptionBody {
+            width: auto;
         }
     </style>
 
@@ -81,7 +96,11 @@
 </div>
 
 <!-- Добавялем невидимый input для того, чтобы передать тип пользователя (собственник/арендатор) - это используется в JS для простановки обязательности полей для заполнения -->
-<input type='hidden' class='userType' typeTenant='<?php if ($userCharacteristic['typeTenant']) echo "TRUE"; else echo "FALSE";?>' typeOwner='<?php if ($userCharacteristic['typeOwner']) echo "TRUE"; else echo "FALSE";?>' correctNewSearchRequest='<?php if ($correctEditSearchRequest) echo "TRUE"; else echo "FALSE";?>'>
+<input type='hidden' class='userType'
+       typeTenant='<?php if ($userCharacteristic['typeTenant']) echo "TRUE"; else echo "FALSE";?>'
+       typeOwner='<?php if ($userCharacteristic['typeOwner']) echo "TRUE"; else echo "FALSE";?>'
+       correctEditSearchRequest='<?php
+           if ($correctEditSearchRequest) echo "TRUE"; else if ($correctEditSearchRequest === FALSE) echo "FALSE"; else echo "NULL"; ?>'>
 
 <!-- Добавялем невидимый input для того, чтобы передать идентификатор вкладки, которую нужно открыть через JS -->
 <?php
@@ -125,163 +144,164 @@
 </ul>
 
 <div id="tabs-1">
-<?php if ($correctEditProfileParameters !== FALSE): ?>
-<!-- Блок с нередактируемыми параметрами Профайла не выдается только в 1 случае: если пользователь корректировал свои параметры, и они не прошли проверку -->
-<div id="notEditingProfileParametersBlock">
-    <div class="setOfInstructions">
-        <a href="#">редактировать</a>
-        <br>
-    </div>
+    <?php if ($correctEditProfileParameters !== FALSE): ?>
+    <!-- Блок с нередактируемыми параметрами Профайла не выдается только в 1 случае: если пользователь корректировал свои параметры, и они не прошли проверку -->
+    <div id="notEditingProfileParametersBlock">
+        <div class="setOfInstructions">
+            <a href="#">редактировать</a>
+            <br>
+        </div>
 
-    <?php
+        <?php
         // Формируем и размещаем на странице блок для основной фотографии пользователя
-        echo $this->getHTMLfotosWrapper("middle", FALSE, $userFotoInformation['uploadedFoto']);
-    ?>
+        echo $this->getHTMLfotosWrapper("middle", FALSE, FALSE, $userFotoInformation['uploadedFoto']);
+        ?>
 
-    <div class="profileInformation">
-        <ul class="listDescription">
-            <li>
+        <div class="profileInformation">
+            <ul class="listDescription">
+                <li>
                 <span
                     class="FIO"><?php echo $userCharacteristic['surname'] . " " . $userCharacteristic['name'] . " " . $userCharacteristic['secondName'] ?></span>
-            </li>
-            <li>
-                <br>
-            </li>
-            <li>
-                <span class="headOfString">Образование:</span> <?php
-                if ($userCharacteristic['currentStatusEducation'] == "0") {
-                    echo "";
-                }
-                if ($userCharacteristic['currentStatusEducation'] == "нет") {
-                    echo "нет";
-                }
-                if ($userCharacteristic['currentStatusEducation'] == "сейчас учусь") {
-                    if (isset($userCharacteristic['almamater'])) echo $userCharacteristic['almamater'] . ", ";
-                    if (isset($userCharacteristic['speciality'])) echo $userCharacteristic['speciality'] . ", ";
-                    if (isset($userCharacteristic['ochnoZaochno'])) echo $userCharacteristic['ochnoZaochno'] . ", ";
-                    if (isset($userCharacteristic['kurs'])) echo "курс: " . $userCharacteristic['kurs'];
-                }
-                if ($userCharacteristic['currentStatusEducation'] == "закончил") {
-                    if (isset($userCharacteristic['almamater'])) echo $userCharacteristic['almamater'] . ", ";
-                    if (isset($userCharacteristic['speciality'])) echo $userCharacteristic['speciality'] . ", ";
-                    if (isset($userCharacteristic['ochnoZaochno'])) echo $userCharacteristic['ochnoZaochno'] . ", ";
-                    if (isset($userCharacteristic['yearOfEnd'])) echo "<span style='white-space: nowrap;'>закончил в " . $userCharacteristic['yearOfEnd'] . " году</span>";
-                }
-                ?>
-            </li>
-            <li>
-                <span class="headOfString">Работа:</span> <?php
-                if ($userCharacteristic['statusWork'] == "не работаю") {
-                    echo "не работаю";
-                } else {
-                    if (isset($userCharacteristic['placeOfWork']) && $userCharacteristic['placeOfWork'] != "") {
-                        echo $userCharacteristic['placeOfWork'] . ", ";
+                </li>
+                <li>
+                    <br>
+                </li>
+                <li>
+                    <span class="headOfString">Образование:</span> <?php
+                    if ($userCharacteristic['currentStatusEducation'] == "0") {
+                        echo "";
                     }
-                    if (isset($userCharacteristic['workPosition'])) {
-                        echo $userCharacteristic['workPosition'];
+                    if ($userCharacteristic['currentStatusEducation'] == "нет") {
+                        echo "нет";
                     }
-                }
-                ?>
-            </li>
-            <li>
-                <span class="headOfString">Внешность:</span> <?php
-                if (isset($userCharacteristic['nationality']) && $userCharacteristic['nationality'] != "0") echo "<span style='white-space: nowrap;'>" . $userCharacteristic['nationality'] . "</span>";
-                ?>
-            </li>
-            <li>
-                <span class="headOfString">Пол:</span> <?php
-                if (isset($userCharacteristic['sex'])) echo $userCharacteristic['sex'];
-                ?>
-            </li>
-            <li>
-                <span class="headOfString">День рождения:</span> <?php
-                if (isset($userCharacteristic['birthday'])) echo $userCharacteristic['birthday'];
-                ?>
-            </li>
-            <li>
-                <span class="headOfString">Возраст:</span>
-                <?php
-                $date = substr($userCharacteristic['birthday'], 0, 2);
-                $month = substr($userCharacteristic['birthday'], 3, 2);
-                $year = substr($userCharacteristic['birthday'], 6, 4);
-                $birthdayForAge = mktime(0, 0, 0, $month, $date, $year);
-                $currentDate = time();
-                echo date_interval_format(date_diff(new DateTime("@{$currentDate}"), new DateTime("@{$birthdayForAge}")), '%y');
-                ?>
-            </li>
-            <li>
-                <br>
-            </li>
-            <li>
-                <span style="font-weight: bold;">Контакты:</span>
-            </li>
-            <li>
-                <span class="headOfString">E-mail:</span> <?php
-                if (isset($userCharacteristic['email'])) echo $userCharacteristic['email'];
-                ?>
-            </li>
-            <li>
-                <span class="headOfString">Телефон:</span> <?php
-                if (isset($userCharacteristic['telephon'])) echo $userCharacteristic['telephon'];
-                ?>
-            </li>
-            <li>
-                <br>
-            </li>
-            <li>
-                <span style="font-weight: bold;">Малая Родина:</span>
-            </li>
-            <li>
-                <span class="headOfString">Город (населенный пункт):</span> <?php
-                if (isset($userCharacteristic['cityOfBorn'])) echo $userCharacteristic['cityOfBorn'];
-                ?>
-            </li>
-            <li>
-                <span class="headOfString">Регион:</span> <?php
-                if (isset($userCharacteristic['regionOfBorn'])) echo $userCharacteristic['regionOfBorn'];
-                ?>
-            </li>
-            <li>
-                <br>
-            </li>
-            <li>
-                <span style="font-weight: bold;">Коротко о себе и своих интересах:</span>
-            </li>
-            <li>
-                <?php
-                if (isset($userCharacteristic['shortlyAboutMe'])) echo $userCharacteristic['shortlyAboutMe'];
-                ?>
-            </li>
-            <li>
-                <br>
-            </li>
-            <li>
-                <span style="font-weight: bold;">Страницы в социальных сетях:</span>
-            </li>
-            <li>
-                <ul class="linksToAccounts">
-                    <?php
-                    if (isset($userCharacteristic['vkontakte'])) echo "<li><a href='" . $userCharacteristic['vkontakte'] . "'>" . $userCharacteristic['vkontakte'] . "</a></li>";
+                    if ($userCharacteristic['currentStatusEducation'] == "сейчас учусь") {
+                        if (isset($userCharacteristic['almamater'])) echo $userCharacteristic['almamater'] . ", ";
+                        if (isset($userCharacteristic['speciality'])) echo $userCharacteristic['speciality'] . ", ";
+                        if (isset($userCharacteristic['ochnoZaochno'])) echo $userCharacteristic['ochnoZaochno'] . ", ";
+                        if (isset($userCharacteristic['kurs'])) echo "курс: " . $userCharacteristic['kurs'];
+                    }
+                    if ($userCharacteristic['currentStatusEducation'] == "закончил") {
+                        if (isset($userCharacteristic['almamater'])) echo $userCharacteristic['almamater'] . ", ";
+                        if (isset($userCharacteristic['speciality'])) echo $userCharacteristic['speciality'] . ", ";
+                        if (isset($userCharacteristic['ochnoZaochno'])) echo $userCharacteristic['ochnoZaochno'] . ", ";
+                        if (isset($userCharacteristic['yearOfEnd'])) echo "<span style='white-space: nowrap;'>закончил в " . $userCharacteristic['yearOfEnd'] . " году</span>";
+                    }
                     ?>
-                    <?php
-                    if (isset($userCharacteristic['odnoklassniki'])) echo "<li><a href='" . $userCharacteristic['odnoklassniki'] . "'>" . $userCharacteristic['odnoklassniki'] . "</a></li>";
+                </li>
+                <li>
+                    <span class="headOfString">Работа:</span> <?php
+                    if ($userCharacteristic['statusWork'] == "не работаю") {
+                        echo "не работаю";
+                    } else {
+                        if (isset($userCharacteristic['placeOfWork']) && $userCharacteristic['placeOfWork'] != "") {
+                            echo $userCharacteristic['placeOfWork'] . ", ";
+                        }
+                        if (isset($userCharacteristic['workPosition'])) {
+                            echo $userCharacteristic['workPosition'];
+                        }
+                    }
                     ?>
-                    <?php
-                    if (isset($userCharacteristic['facebook'])) echo "<li><a href='" . $userCharacteristic['facebook'] . "'>" . $userCharacteristic['facebook'] . "</a></li>";
+                </li>
+                <li>
+                    <span class="headOfString">Внешность:</span> <?php
+                    if (isset($userCharacteristic['nationality']) && $userCharacteristic['nationality'] != "0") echo "<span style='white-space: nowrap;'>" . $userCharacteristic['nationality'] . "</span>";
                     ?>
-                    <?php
-                    if (isset($userCharacteristic['twitter'])) echo "<li><a href='" . $userCharacteristic['twitter'] . "'>" . $userCharacteristic['twitter'] . "</a></li>";
+                </li>
+                <li>
+                    <span class="headOfString">Пол:</span> <?php
+                    if (isset($userCharacteristic['sex'])) echo $userCharacteristic['sex'];
                     ?>
-                </ul>
-            </li>
-        </ul>
+                </li>
+                <li>
+                    <span class="headOfString">День рождения:</span> <?php
+                    if (isset($userCharacteristic['birthday'])) echo $userCharacteristic['birthday'];
+                    ?>
+                </li>
+                <li>
+                    <span class="headOfString">Возраст:</span>
+                    <?php
+                    $date = substr($userCharacteristic['birthday'], 0, 2);
+                    $month = substr($userCharacteristic['birthday'], 3, 2);
+                    $year = substr($userCharacteristic['birthday'], 6, 4);
+                    $birthdayForAge = mktime(0, 0, 0, $month, $date, $year);
+                    $currentDate = time();
+                    echo date_interval_format(date_diff(new DateTime("@{$currentDate}"), new DateTime("@{$birthdayForAge}")), '%y');
+                    ?>
+                </li>
+                <li>
+                    <br>
+                </li>
+                <li>
+                    <span style="font-weight: bold;">Контакты:</span>
+                </li>
+                <li>
+                    <span class="headOfString">E-mail:</span> <?php
+                    if (isset($userCharacteristic['email'])) echo $userCharacteristic['email'];
+                    ?>
+                </li>
+                <li>
+                    <span class="headOfString">Телефон:</span> <?php
+                    if (isset($userCharacteristic['telephon'])) echo $userCharacteristic['telephon'];
+                    ?>
+                </li>
+                <li>
+                    <br>
+                </li>
+                <li>
+                    <span style="font-weight: bold;">Малая Родина:</span>
+                </li>
+                <li>
+                    <span class="headOfString">Город (населенный пункт):</span> <?php
+                    if (isset($userCharacteristic['cityOfBorn'])) echo $userCharacteristic['cityOfBorn'];
+                    ?>
+                </li>
+                <li>
+                    <span class="headOfString">Регион:</span> <?php
+                    if (isset($userCharacteristic['regionOfBorn'])) echo $userCharacteristic['regionOfBorn'];
+                    ?>
+                </li>
+                <li>
+                    <br>
+                </li>
+                <li>
+                    <span style="font-weight: bold;">Коротко о себе и своих интересах:</span>
+                </li>
+                <li>
+                    <?php
+                    if (isset($userCharacteristic['shortlyAboutMe'])) echo $userCharacteristic['shortlyAboutMe'];
+                    ?>
+                </li>
+                <li>
+                    <br>
+                </li>
+                <li>
+                    <span style="font-weight: bold;">Страницы в социальных сетях:</span>
+                </li>
+                <li>
+                    <ul class="linksToAccounts">
+                        <?php
+                        if (isset($userCharacteristic['vkontakte'])) echo "<li><a href='" . $userCharacteristic['vkontakte'] . "'>" . $userCharacteristic['vkontakte'] . "</a></li>";
+                        ?>
+                        <?php
+                        if (isset($userCharacteristic['odnoklassniki'])) echo "<li><a href='" . $userCharacteristic['odnoklassniki'] . "'>" . $userCharacteristic['odnoklassniki'] . "</a></li>";
+                        ?>
+                        <?php
+                        if (isset($userCharacteristic['facebook'])) echo "<li><a href='" . $userCharacteristic['facebook'] . "'>" . $userCharacteristic['facebook'] . "</a></li>";
+                        ?>
+                        <?php
+                        if (isset($userCharacteristic['twitter'])) echo "<li><a href='" . $userCharacteristic['twitter'] . "'>" . $userCharacteristic['twitter'] . "</a></li>";
+                        ?>
+                    </ul>
+                </li>
+            </ul>
+        </div>
     </div>
-</div>
     <?php endif; ?>
-<form method="post" name="profileParameters" id="editingProfileParametersBlock" class="descriptionFieldsetsWrapper formWithFotos" enctype="multipart/form-data"
-      style='<?php if ($correctEditProfileParameters !== FALSE) echo "display: none;"?>'>
+    <form method="post" name="profileParameters" id="editingProfileParametersBlock"
+          class="descriptionFieldsetsWrapper formWithFotos" enctype="multipart/form-data"
+          style='<?php if ($correctEditProfileParameters !== FALSE) echo "display: none;"?>'>
 
-    <?php
+        <?php
         // Подключим форму для ввода и редактирования данных о ФИО, логине, контактах пользователя, а также о фотографиях
         include "templates/templ_editablePersonalFIO.php";
 
@@ -290,22 +310,22 @@
 
         // Подключим форму для ввода и редактирования данных о социальных сетях пользователя
         include "templates/templ_editablePersonalSocial.php";
-    ?>
+        ?>
 
+        <div class="clearBoth"></div>
+
+        <div class="bottomButton">
+            <a href="personal.php?tabsId=1" style="margin-right: 10px;">Отмена</a>
+            <button type="submit" name="saveProfileParameters" id="saveProfileParameters" class="button">
+                Сохранить
+            </button>
+        </div>
+
+        <div class="clearBoth"></div>
+
+    </form>
+    <!-- /end.descriptionFieldsetsWrapper -->
     <div class="clearBoth"></div>
-
-    <div class="bottomButton">
-        <a href="personal.php?tabsId=1" style="margin-right: 10px;">Отмена</a>
-        <button type="submit" name="saveProfileParameters" id="saveProfileParameters" class="button">
-            Сохранить
-        </button>
-    </div>
-
-    <div class="clearBoth"></div>
-
-</form>
-<!-- /end.descriptionFieldsetsWrapper -->
-<div class="clearBoth"></div>
 </div>
 <!-- /end.tabs-1 -->
 
@@ -531,209 +551,212 @@
 </div>
 
 <div id="tabs-4">
-<div class="shadowText">
-    На этой вкладке Вы можете задать параметры, в соответствии с которыми ресурс Хани Хом будет осуществлять
-    автоматический поиск объявлений на портале и будет оповещать Вас о появлении новых объектов по указанному в
-    профиле
-    e-mail
-</div>
-<?php if ($userCharacteristic['typeTenant'] != TRUE && $correctNewSearchRequest !== TRUE && $correctEditSearchRequest === NULL): ?>
-<!-- Если пользователь еще не сформировал поисковый запрос (а значит не является арендатором) и он либо не нажимал на кнопку формирования запроса, либо нажимал, но не прошел проверку на полноту информации о пользователи, то ему доступна только кнопка формирования нового запроса. В ином случае будет отображаться сам поисковый запрос пользователя, либо форма для его заполнения -->
-<form name="createSearchRequest" method="post">
-    <button type="submit" name="createSearchRequestButton" id='createSearchRequestButton' class='left-bottom'>
-        Запрос на поиск
-    </button>
-</form>
-    <?php endif;?>
-<?php if ($userCharacteristic['typeTenant'] == TRUE && $correctEditSearchRequest !== FALSE): ?>
-<!-- Если пользователь является арендатором и (если он редактировал пар-ры поиска) после редактирования параметров поиска ошибок не обнаружено, то у пользователя уже сформирован корректный поисковый запрос, который мы и показываем на этой вкладке -->
-    <!--
-<div id="notEditingSearchParametersBlock" class="objectDescription">
-    <div class="setOfInstructions">
-        <li><a href="#">редактировать</a></li>
-        <li><a href="personal.php?action=deleteSearchRequest&tabsId=4"
-               title="Удаляет запрос на поиск - кликните по этой ссылке, когда Вы найдете недвижимость">удалить</a>
-        </li>
-        <br>
+    <div class="shadowText">
+        На этой вкладке Вы можете задать параметры, в соответствии с которыми ресурс Хани Хом будет осуществлять
+        автоматический поиск объявлений на портале и будет оповещать Вас о появлении новых объектов по указанному в
+        профиле
+        e-mail
     </div>
-    <fieldset class="notEdited">
-        <legend>
-            Характеристика объекта
-        </legend>
-        <table>
-            <tbody>
-                <tr>
-                    <td class="objectDescriptionItemLabel">Тип:</td>
-                    <td class="objectDescriptionBody">
+
+    <?php if ($userCharacteristic['typeTenant'] !== TRUE && $correctNewSearchRequest !== TRUE && $correctEditSearchRequest === NULL): ?>
+    <!-- Если пользователь еще не сформировал поисковый запрос (а значит не является арендатором) и он либо не нажимал на кнопку формирования запроса, либо нажимал, но не прошел проверку на полноту информации о пользователи, то ему доступна только кнопка формирования нового запроса. В ином случае будет отображаться сам поисковый запрос пользователя, либо форма для его заполнения -->
+    <form name="createSearchRequest" method="post">
+        <button type="submit" name="createSearchRequestButton" id='createSearchRequestButton' class='left-bottom'>
+            Запрос на поиск
+        </button>
+    </form>
+    <?php endif;?>
+
+    <?php if ($userCharacteristic['typeTenant'] === TRUE && $correctEditSearchRequest !== FALSE): ?>
+    <!-- Если пользователь является арендатором и (если он редактировал пар-ры поиска) после редактирования параметров поиска ошибок не обнаружено, то у пользователя уже сформирован корректный поисковый запрос, который мы и показываем на этой вкладке -->
+    <div id="notEditingSearchParametersBlock" class="objectDescription">
+        <ul class="setOfInstructions">
+            <li><a href="#">редактировать</a></li>
+            <li><a href="personal.php?action=deleteSearchRequest&tabsId=4"
+                   title="Удаляет запрос на поиск - кликните по этой ссылке, когда Вы найдете недвижимость">удалить</a>
+            </li>
+            <br>
+        </ul>
+        <div id="notEditedDistricts" class="notEdited left">
+            <div class="legend">
+                Район
+            </div>
+            <table>
+                <tbody>
+                    <?php
+                    if (isset($userSearchRequest['district']) && count($userSearchRequest['district']) != 0) { // Если район указан пользователем
+                        echo "<tr><td>";
+                        for ($i = 0; $i < count($userSearchRequest['district']); $i++) { // Выводим названия всех районов, в которых ищет недвижимость пользователь
+                            echo $userSearchRequest['district'][$i];
+                            if ($i < count($userSearchRequest['district']) - 1) echo ", ";
+                        }
+                        echo  "</td></tr>";
+                    } else {
+                        echo "<tr><td>" . "любой" . "</td></tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="notEdited left">
+            <div class="legend">
+                Характеристика объекта
+            </div>
+            <table>
+                <tbody>
+                    <tr>
+                        <td class="objectDescriptionItemLabel">Тип:</td>
+                        <td class="objectDescriptionBody">
             <span>
             <?php
-    //if (isset($user->typeOfObject) && $user->typeOfObject != "0") echo $user->typeOfObject; else echo "любой";
-    ?>
+                if (isset($userSearchRequest['typeOfObject']) && $userSearchRequest['typeOfObject'] != "0") echo $userSearchRequest['typeOfObject']; else echo "любой";
+                ?>
             </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="objectDescriptionItemLabel">Количество комнат:</td>
-                    <td class="objectDescriptionBody"><span><?php
-    /*  if (isset($user->amountOfRooms) && count($user->amountOfRooms) != "0") for ($i = 0; $i < count($user->amountOfRooms); $i++) {
-    echo $amountOfRooms[$i];
-    if ($i < count($amountOfRooms) - 1) echo ", ";
-} else echo "любое"; */
-    ?></span></td>
-                </tr>
-                <tr>
-                    <td class="objectDescriptionItemLabel">Комнаты смежные:</td>
-                    <td class="objectDescriptionBody"><span><?php
-    // if (isset($adjacentRooms) && $adjacentRooms != "0") echo $adjacentRooms; else echo "любые";
-    ?></span></td>
-                </tr>
-                <tr>
-                    <td class="objectDescriptionItemLabel">Этаж:</td>
-                    <td class="objectDescriptionBody"><span><?php
-    //  if (isset($floor) && $floor != "0") echo $floor; else echo "любой";
-    ?></span></td>
-                </tr>
-            </tbody>
-        </table>
-    </fieldset>
-    <fieldset class="notEdited">
-        <legend>
-            Стоимость
-        </legend>
-        <table>
-            <tbody>
-                <tr>
-                    <td class="objectDescriptionItemLabel">Арендная плата в месяц от:</td>
-                    <td class="objectDescriptionBody"><?php
-    //   if (isset($minCost) && $minCost != "0") echo "<span>" . $minCost . "</span> руб."; else echo "любая";
-    ?></td>
-                </tr>
-                <tr>
-                    <td class="objectDescriptionItemLabel">Арендная плата в месяц до:</td>
-                    <td class="objectDescriptionBody"><?php
-    //   if (isset($maxCost) && $maxCost != "0") echo "<span>" . $maxCost . "</span> руб."; else echo "любая";
-    ?></td>
-                </tr>
-                <tr>
-                    <td class="objectDescriptionItemLabel">Залог до:</td>
-                    <td class="objectDescriptionBody"><?php
-    //  if (isset($pledge) && $pledge != "0") echo "<span>" . $pledge . "</span> руб."; else echo "любой";
-    ?></td>
-                </tr>
-                <tr>
-                    <td class="objectDescriptionItemLabel">Максимальная предоплата:</td>
-                    <td class="objectDescriptionBody"><?php
-    //  if (isset($prepayment) && $prepayment != "0") echo "<span>" . $prepayment . "</span>"; else echo "любая";
-    ?></td>
-                </tr>
-            </tbody>
-        </table>
-    </fieldset>
-    <fieldset class="notEdited">
-        <legend>
-            Район
-        </legend>
-        <table>
-            <tbody>
-                <?php
-    /*  if (isset($district) && count($district) != 0) { // Если район указан пользователем
-       echo "<tr><td>";
-       for ($i = 0; $i < count($district); $i++) { // Выводим названия всех районов, в которых ищет недвижимость пользователь
-           echo $district[$i];
-           if ($i < count($district) - 1) echo ", ";
-       }
-       echo  "</td></tr>";
-   } else {
-       echo "<tr><td>" . "любой" . "</td></tr>";
-   } */
-    ?>
-            </tbody>
-        </table>
-    </fieldset>
-    <div class="clearBoth"></div>
-    <fieldset class="notEdited">
-        <legend>
-            Особые параметры поиска
-        </legend>
-        <table>
-            <tbody>
-                <tr>
-                    <td class="objectDescriptionItemLabel">Как собираетесь проживать:</td>
-                    <td class="objectDescriptionBody"><span><?php
-    //   if (isset($withWho) && $withWho != "0") echo $withWho; else echo "не указано";
-    ?></span></td>
-                </tr>
-                <?php
-    /*  if ($withWho != "самостоятельно" && $withWho != "0") {
-       echo "<tr><td class='objectDescriptionItemLabel'>Информация о сожителях:</td><td class='objectDescriptionBody''><span>";
-       if (isset($linksToFriends)) echo $linksToFriends;
-       echo "</span></td></tr>";
-   } */
-    ?>
-                <tr>
-                    <td class="objectDescriptionItemLabel">Дети:</td>
-                    <td class="objectDescriptionBody"><span><?php
-    //   if (isset($children) && $children != "0") echo $children; else echo "не указано";
-    ?></span></td>
-                </tr>
-                <?php
-    /* if ($children != "без детей" && $children != "0") {
-       echo "<tr><td class='objectDescriptionItemLabel'>Количество детей и их возраст:</td><td class='objectDescriptionBody''><span>";
-       if (isset($howManyChildren)) echo $howManyChildren;
-       echo "</span></td></tr>";
-   } */
-    ?>
-                <tr>
-                    <td class="objectDescriptionItemLabel">Животные:</td>
-                    <td class="objectDescriptionBody"><span><?php
-    //    if (isset($animals) && $animals != "0") echo $animals; else echo "не указано";
-    ?></span></td>
-                </tr>
-                <?php
-    /*   if ($animals != "без животных" && $animals != "0") {
-       echo "<tr><td class='objectDescriptionItemLabel'>Количество животных и их вид:</td><td class='objectDescriptionBody''><span>";
-       if (isset($howManyAnimals)) echo $howManyAnimals;
-       echo "</span></td></tr>";
-   } */
-    ?>
-                <tr>
-                    <td class="objectDescriptionItemLabel">Срок аренды:</td>
-                    <td class="objectDescriptionBody"><span><?php
-    //     if (isset($termOfLease) && $termOfLease != "0") echo $termOfLease; else echo "не указан";
-    ?></span></td>
-                </tr>
-                <tr>
-                    <td class="objectDescriptionItemLabel">Дополнительные условия поиска:</td>
-                    <td class="objectDescriptionBody"><span><?php
-    //    if (isset($additionalDescriptionOfSearch)) echo $additionalDescriptionOfSearch;
-    ?></span></td>
-                </tr>
-            </tbody>
-        </table>
-    </fieldset>
-</div>
-    <?php endif;?>
-<?php if ($userCharacteristic['typeTenant'] === TRUE || $correctNewSearchRequest === TRUE || $correctEditSearchRequest === FALSE): ?>
-<!-- Если пользователь является арендатором, то вместе с отображением текущих параметров поискового запроса мы выдаем скрытую форму для их редактирования, также мы выдаем видимую форму для редактирования параметров поиска в случае, если пользователь нажал на кнопку Нового поискового запроса и проверка на корректность его данных Профиля профла успешно, а также в случае если пользователь корректировал данные поискового запроса, но они не прошли проверку -->
-<form method="post" name="searchParameters" id="extendedSearchParametersBlock">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="objectDescriptionItemLabel">Количество комнат:</td>
+                        <td class="objectDescriptionBody"><span><?php
+                            if (isset($userSearchRequest['amountOfRooms']) && count($userSearchRequest['amountOfRooms']) != "0") for ($i = 0; $i < count($userSearchRequest['amountOfRooms']); $i++) {
+                                echo $userSearchRequest['amountOfRooms'][$i];
+                                if ($i < count($userSearchRequest['amountOfRooms']) - 1) echo ", ";
+                            } else echo "любое";
+                            ?></span></td>
+                    </tr>
+                    <tr>
+                        <td class="objectDescriptionItemLabel">Комнаты смежные:</td>
+                        <td class="objectDescriptionBody"><span><?php
+                            if (isset($userSearchRequest['adjacentRooms']) && $userSearchRequest['adjacentRooms'] != "0") echo $userSearchRequest['adjacentRooms']; else echo "любые";
+                            ?></span></td>
+                    </tr>
+                    <tr>
+                        <td class="objectDescriptionItemLabel">Этаж:</td>
+                        <td class="objectDescriptionBody"><span><?php
+                            if (isset($userSearchRequest['floor']) && $userSearchRequest['floor'] != "0") echo $userSearchRequest['floor']; else echo "любой";
+                            ?></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="notEdited right">
+            <div class="legend">
+                Стоимость
+            </div>
+            <table>
+                <tbody>
+                    <tr>
+                        <td class="objectDescriptionItemLabel">Арендная плата в месяц от:</td>
+                        <td class="objectDescriptionBody"><?php
+                            if (isset($userSearchRequest['minCost']) && $userSearchRequest['minCost'] != "0") echo "<span>" . $userSearchRequest['minCost'] . "</span> руб."; else echo "любая";
+                            ?></td>
+                    </tr>
+                    <tr>
+                        <td class="objectDescriptionItemLabel">Арендная плата в месяц до:</td>
+                        <td class="objectDescriptionBody"><?php
+                            if (isset($userSearchRequest['maxCost']) && $userSearchRequest['maxCost'] != "0") echo "<span>" . $userSearchRequest['maxCost'] . "</span> руб."; else echo "любая";
+                            ?></td>
+                    </tr>
+                    <tr>
+                        <td class="objectDescriptionItemLabel">Залог до:</td>
+                        <td class="objectDescriptionBody"><?php
+                            if (isset($userSearchRequest['pledge']) && $userSearchRequest['pledge'] != "0") echo "<span>" . $userSearchRequest['pledge'] . "</span> руб."; else echo "любой";
+                            ?></td>
+                    </tr>
+                    <tr>
+                        <td class="objectDescriptionItemLabel">Максимальная предоплата:</td>
+                        <td class="objectDescriptionBody"><?php
+                            if (isset($userSearchRequest['prepayment']) && $userSearchRequest['prepayment'] != "0") echo "<span>" . $userSearchRequest['prepayment'] . "</span>"; else echo "любая";
+                            ?></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-    <?php
+        <div id="notEditedSpecialParams" class="notEdited left" style="width: 100%;">
+            <div class="legend">
+                Особые параметры поиска
+            </div>
+            <table>
+                <tbody>
+                    <tr>
+                        <td class="objectDescriptionItemLabel">Как собираетесь проживать:</td>
+                        <td class="objectDescriptionBody"><span><?php
+                            if (isset($userSearchRequest['withWho']) && $userSearchRequest['withWho'] != "0") echo $userSearchRequest['withWho']; else echo "не указано";
+                            ?></span></td>
+                    </tr>
+                    <?php
+                    if ($userSearchRequest['withWho'] != "самостоятельно" && $userSearchRequest['withWho'] != "0") {
+                        echo "<tr><td class='objectDescriptionItemLabel'>Информация о сожителях:</td><td class='objectDescriptionBody''><span>";
+                        if (isset($userSearchRequest['linksToFriends'])) echo $userSearchRequest['linksToFriends'];
+                        echo "</span></td></tr>";
+                    }
+                    ?>
+                    <tr>
+                        <td class="objectDescriptionItemLabel">Дети:</td>
+                        <td class="objectDescriptionBody"><span><?php
+                            if (isset($userSearchRequest['children']) && $userSearchRequest['children'] != "0") echo $userSearchRequest['children']; else echo "не указано";
+                            ?></span></td>
+                    </tr>
+                    <?php
+                    if ($userSearchRequest['children'] != "без детей" && $userSearchRequest['children'] != "0") {
+                        echo "<tr><td class='objectDescriptionItemLabel'>Количество детей и их возраст:</td><td class='objectDescriptionBody''><span>";
+                        if (isset($userSearchRequest['howManyChildren'])) echo $userSearchRequest['howManyChildren'];
+                        echo "</span></td></tr>";
+                    }
+                    ?>
+                    <tr>
+                        <td class="objectDescriptionItemLabel">Животные:</td>
+                        <td class="objectDescriptionBody"><span><?php
+                            if (isset($userSearchRequest['animals']) && $userSearchRequest['animals'] != "0") echo $userSearchRequest['animals']; else echo "не указано";
+                            ?></span></td>
+                    </tr>
+                    <?php
+                    if ($userSearchRequest['animals'] != "без животных" && $userSearchRequest['animals'] != "0") {
+                        echo "<tr><td class='objectDescriptionItemLabel'>Количество животных и их вид:</td><td class='objectDescriptionBody''><span>";
+                        if (isset($userSearchRequest['howManyAnimals'])) echo $userSearchRequest['howManyAnimals'];
+                        echo "</span></td></tr>";
+                    }
+                    ?>
+                    <tr>
+                        <td class="objectDescriptionItemLabel">Срок аренды:</td>
+                        <td class="objectDescriptionBody"><span><?php
+                            if (isset($userSearchRequest['termOfLease']) && $userSearchRequest['termOfLease'] != "0") echo $userSearchRequest['termOfLease']; else echo "не указан";
+                            ?></span></td>
+                    </tr>
+                    <tr>
+                        <td class="objectDescriptionItemLabel">Дополнительные условия поиска:</td>
+                        <td class="objectDescriptionBody"><span><?php
+                            if (isset($userSearchRequest['additionalDescriptionOfSearch'])) echo $userSearchRequest['additionalDescriptionOfSearch'];
+                            ?></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="clearBoth"></div>
+    </div>
+    <?php endif;?>
+
+    <?php if ($userCharacteristic['typeTenant'] === TRUE || $correctNewSearchRequest === TRUE || $correctEditSearchRequest === FALSE): ?>
+    <!-- Если пользователь является арендатором, то вместе с отображением текущих параметров поискового запроса мы выдаем скрытую форму для их редактирования, также мы выдаем видимую форму для редактирования параметров поиска в случае, если пользователь нажал на кнопку Нового поискового запроса и проверка на корректность его данных Профиля профла успешно, а также в случае если пользователь корректировал данные поискового запроса, но они не прошли проверку -->
+    <form method="post" name="searchParameters" id="extendedSearchParametersBlock">
+
+        <?php
         // Подключим форму для ввода и редактирования данных о социальных сетях пользователя
         include "templates/templ_editableSearchRequest.php";
-    ?>
+        ?>
 
-    <div class="clearBoth"></div>
-    <div class="bottomButton">
-        <a href="personal.php?tabsId=4" style="margin-right: 10px;">Отмена</a>
-        <button type="submit" name="saveSearchParametersButton" id="saveSearchParametersButton" class="button">
-            Сохранить
-        </button>
-    </div>
+        <div class="clearBoth"></div>
+        <div class="bottomButton">
+            <a href="personal.php?tabsId=4" style="margin-right: 10px;">Отмена</a>
+            <button type="submit" name="saveSearchParametersButton" id="saveSearchParametersButton" class="button">
+                Сохранить
+            </button>
+        </div>
 
-    <div class="clearBoth"></div>
-</form>
-<!-- /end.extendedSearchParametersBlock -->
+        <div class="clearBoth"></div>
+    </form>
     <?php endif;?>
+
 </div>
 <!-- /end.tabs-4 -->
 <div id="tabs-5">
@@ -744,13 +767,14 @@
     /***************************************************************************************************************
      * Оформляем полученные объявления в красивый HTML для размещения на странице
      **************************************************************************************************************/
-    //echo getSearchResultHTML($propertyLightArr, $userId, "favorites");
+    echo $this->getSearchResultHTML($propertyLightArr, $favoritesPropertysId, "favorites");
 
     ?>
 
 </div>
 
-</div><!-- /end.tabs -->
+</div>
+<!-- /end.tabs -->
 
 </div>
 <!-- /end.page_main_content -->
@@ -771,7 +795,7 @@
 </script>
 <script src="js/main.js"></script>
 <script src="js/personal.js"></script>
-<!-- TODO: тест <script src="../js/searchResult.js"></script>-->
+<script src="js/searchResult.js"></script>
 <!-- end scripts -->
 
 <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.

@@ -76,6 +76,12 @@ function clickNewAdvertButton() {
  * Вкладка Поиск
  ***********************************************************/
 
+// Блок редактируемых параметров поиска невидим в случае если пользователь уже является арендатором (у него есть поисковый запрос, данные которого и отображаются в нередактируемом виде (блок id="notEditingSearchParametersBlock"))
+// Важно, что сначала в видимом состоянии вычисляется нужная высота блока со списком районов, а только затем он вместе со всем блоком параметров поиска становится невидимым
+if ($('#extendedSearchParametersBlock').length) {
+    if ($(".userType").attr('typeTenant') == "TRUE" && $(".userType").attr('correctEditSearchRequest') != "FALSE") $('#extendedSearchParametersBlock').css('display', 'none');
+}
+
 // Активируем кнопку Нового поискового запроса, если она есть на странице
 $(function () {
     $("button#createSearchRequestButton").button({

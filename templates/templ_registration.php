@@ -6,6 +6,7 @@
     $errors = $dataArr['errors'];
     $allDistrictsInCity = $dataArr['allDistrictsInCity'];
     $isLoggedIn = $dataArr['isLoggedIn'];
+    $whatPage = $dataArr['whatPage'];
 ?>
 
 <!DOCTYPE html>

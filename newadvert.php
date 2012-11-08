@@ -86,7 +86,7 @@
      * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
      *******************************************************************************/
 
-    $view = new View();
+    $view = new View($globFunc, $DBlink);
     $view->generate("templ_newadvert.php", array('propertyCharacteristic' => $property->getCharacteristicData(),
                                                  'propertyFotoInformation' => $property->getFotoInformationData(),
                                                  'errors' => $errors,

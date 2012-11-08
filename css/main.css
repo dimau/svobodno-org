@@ -124,62 +124,157 @@ ul.listDescription .headOfString {
     border-bottom: 1px dotted black;
 }
 
-/* =============================================================================
-   Forms
-   ========================================================================== */
+/* ======================================================================
+   БЛОКИ Fieldset с полями ввода для ВВОДА И РЕДАКТИРОВАНИЯ ПАРАМЕТРОВ
+   ====================================================================== */
+
+/*.required {
+    display: inline-block;
+    color: red;
+    width: 5px;
+}
+
+#addressForm {
+    clear: both;
+}
+
+.objectDescriptionItem {
+    margin: 7px;
+    width: 100%;
+}
+
+.inputItem .label, .objectDescriptionItem .objectDescriptionLabel {
+    width: 300px;
+    text-align: right;
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 7px;
+} */
 
 form {
     margin: 0;
 }
 
-fieldset {
-    margin: 5px;
+fieldset.edited {
+    width: 48.5%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 0;
+    margin-right: 0;
     border-radius: 5px;
     border: 1px solid #336784;
     text-align: left;
     vertical-align: top;
 }
 
-fieldset legend {
+fieldset.edited.left {
+    float: left;
+    clear: left;
+    margin-right: 1.4%;
+}
+
+fieldset.edited.right {
+    float: right;
+    clear: right;
+    margin-left: 1.4%;
+}
+
+fieldset.edited.fullWidth {
+    width: 100%;
+    float: none;
+    clear: both;
+}
+
+fieldset.edited legend {
     font-weight: bold;
     color: #336784;
-}
-
-/* Стили для НЕредактируемых блоков fieldset*/
-fieldset.notEdited {
-    display: inline-block;
-    max-width: 32em;
-}
-
-fieldset.notEdited table td {
-    vertical-align: middle;
-    padding: 5px;
-}
-
-fieldset.notEdited tr {
-    border-bottom: 1px dotted #336784;
-}
-
-.highlighted {
-    background-color: #33CEC3;
-}
-
-/*
- * 1. Correct color not inheriting in IE6/7/8/9
- * 2. Correct alignment displayed oddly in IE6/7
- */
-
-legend {
     border: 0;
     padding: 0;
     white-space: normal;
 }
 
-/*
- * 1. Correct font-size not inheriting in all browsers
- * 2. Remove margins in FF3/4 S5 Chrome
- * 3. Define consistent vertical alignment display in all browsers
- */
+fieldset.edited table td {
+    vertical-align: middle;
+    padding: 3px 0px 3px 0px;
+}
+
+fieldset.edited table td.itemLabel {
+    padding-right: 6px;
+    text-align: right
+}
+
+fieldset.edited table td.itemRequired {
+    color: red;
+}
+
+fieldset.edited table td.itemBody {
+    padding-left: 6px;
+    text-align: left;
+}
+
+fieldset.edited table .withWhoDescription td.itemLabel, .edited table .childrenDescription td.itemLabel, .edited table .animalsDescription td.itemLabel {
+    text-align: left;
+}
+
+.private {
+
+}
+
+/* =============================================================================
+   НЕРЕДАКТИРУЕМЫЕ БЛОКИ С ДАННЫМИ
+   ========================================================================== */
+
+div.notEdited {
+    display: inline-block;
+    /*max-width: 32em;*/
+    width: 50%;
+    border: none;
+}
+
+div.notEdited.left {
+    float: left;
+    clear: left;
+    width: 48.5%;
+    margin-right: 1.5%;
+}
+
+div.notEdited.right {
+    float: right;
+    clear: right;
+    width: 48.5%;
+    margin-left: 1.5%;
+}
+
+div.notEdited .legend {
+    width: 100%;
+    text-align: left;
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #336784;
+    padding-top: 1em;
+    padding-bottom: 0.3em;
+}
+
+div.notEdited .objectDescriptionItemLabel {
+    width: 65%
+}
+
+div.notEdited .objectDescriptionBody {
+    width: 35%
+}
+
+div.notEdited table {
+    width: 100%;
+}
+
+div.notEdited table td {
+    vertical-align: middle;
+    padding: 5px;
+}
+
+div.notEdited table tr {
+    border-bottom: 1px dotted #336784;
+}
 
 /* =============================================================================
    Элементы управления - кнопки, чекбоксы, селекты и textarea
@@ -837,10 +932,6 @@ td.bottom.right, th.bottom.right {
     display: inline-block;
 }  */
 
-.private {
-    display: inline-block;
-}
-
 /* =============================================================================
    Стили для результатов поиска (таблица, карта, таблица + карта) и избранных объявлений
    ========================================================================== */
@@ -1008,60 +1099,6 @@ div.unread > div.newsHeader {
     list-style: none;
     padding: 0;
     margin: 0;
-}
-
-/* ======================================================================
-   БЛОКИ Fieldset с полями ввода для ВВОДА И РЕДАКТИРОВАНИЯ ПАРАМЕТРОВ. Стили для РЕДАКТИРОВАНИЯ описания человека (Профайл личного кабинета и форма регистрации)
-   ====================================================================== */
-
-/*.required {
-    display: inline-block;
-    color: red;
-    width: 5px;
-}
-
-.private {
-    display: inline-block;
-}
-
-#addressForm {
-    clear: both;
-}
-
-.objectDescriptionItem {
-    margin: 7px;
-    width: 100%;
-}
-
-.inputItem .label, .objectDescriptionItem .objectDescriptionLabel {
-    width: 300px;
-    text-align: right;
-    display: inline-block;
-    vertical-align: top;
-    margin-right: 7px;
-} */
-
-.edited table td {
-    vertical-align: middle;
-    padding: 3px 0px 3px 0px;
-}
-
-.edited table td.itemLabel {
-    padding-right: 6px;
-    text-align: right
-}
-
-.edited table td.itemRequired {
-    color: red;
-}
-
-.edited table td.itemBody {
-    padding-left: 6px;
-    text-align: left;
-}
-
-.edited table .withWhoDescription td.itemLabel, .edited table .childrenDescription td.itemLabel, .edited table .animalsDescription td.itemLabel {
-    text-align: left;
 }
 
 /* =======================================================================

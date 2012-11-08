@@ -64,7 +64,7 @@
      * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
      *******************************************************************************/
 
-    $view = new View();
+    $view = new View($globFunc, $DBlink);
     $view->generate("templ_objdescription.php", array('propertyCharacteristic' => $property->getCharacteristicData(),
                                                  'propertyFotoInformation' => $property->getFotoInformationData(),
                                                  'isLoggedIn' => $incomingUser->login(),

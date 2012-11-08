@@ -1,4 +1,4 @@
-<fieldset class="edited private social">
+<fieldset class="edited left social">
     <legend>
         Страницы в социальных сетях
     </legend>
@@ -51,3 +51,5 @@
         </tbody>
     </table>
 </fieldset>
+
+    <div class="clearBoth"></div>

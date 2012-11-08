@@ -95,9 +95,98 @@
             return $this->id;
         }
 
-        // Метод возвращает массив избранных объявлений текущего пользователя (если он не авторизован, то пустой массив)
-        public function getFavoritesPropertysId() {
+        // Метод возвращает массив идентификаторов избранных объявлений текущего пользователя (если он не авторизован, то пустой массив)
+        public function getFavoritesPropertysId()
+        {
             return $this->favoritesPropertysId;
+        }
+
+        // Метод добавляет в избранные у данного пользователя идентификатор объекта недвижимости $propertyId
+        public function addFavoritesPropertysId($propertyId = FALSE)
+        {
+
+            if (!$this->login()) return FALSE;
+            if ($propertyId == FALSE) return FALSE;
+            if (in_array($propertyId, $this->favoritesPropertysId)) return TRUE;
+
+            $this->favoritesPropertysId[] = $propertyId;
+            $favoritesPropertysIdSerialized = serialize($this->favoritesPropertysId);
+
+            // Сохраняем новые изменения в БД в таблицу поисковых запросов
+            $stmt = $this->DBlink->stmt_init();
+            if (($stmt->prepare("UPDATE users SET favoritesPropertysId=? WHERE id=?") === FALSE)
+                OR ($stmt->bind_param("ss", $favoritesPropertysIdSerialized, $this->id) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($res = $stmt->affected_rows) === -1)
+                OR ($stmt->close() === FALSE)
+            ) {
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                return FALSE;
+            }
+
+            return TRUE;
+        }
+
+        // Метод удаляет из избранного у данного пользователя идентификатор объекта недвижимости $propertyId
+        public function removeFavoritesPropertysId($propertyId = FALSE)
+        {
+
+            if (!$this->login()) return FALSE;
+            if ($propertyId == FALSE) return FALSE;
+            if (!in_array($propertyId, $this->favoritesPropertysId)) return TRUE;
+
+            // Ищем id нашего объекта среди id избранных объектов. Если он там есть, то получим номер позиции, если нет - FALSE
+            $key = array_search($propertyId, $this->favoritesPropertysId);
+            if ($key === FALSE) return FALSE; // Если наш объект находится в массиве избранных объектов на 0 позиции, то нужно, чтобы условие срабатывало и этот объект можно было удалить из массива избранных, поэтому используется строгое равенство
+
+            // Удаляем $propertyId из списка избранных объявлений
+            array_splice($this->favoritesPropertysId, $key, 1);
+            $favoritesPropertysIdSerialized = serialize($this->favoritesPropertysId);
+
+            // Сохраняем новые изменения в БД в таблицу поисковых запросов
+            $stmt = $this->DBlink->stmt_init();
+            if (($stmt->prepare("UPDATE users SET favoritesPropertysId=? WHERE id=?") === FALSE)
+                OR ($stmt->bind_param("ss", $favoritesPropertysIdSerialized, $this->id) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($res = $stmt->affected_rows) === -1)
+                OR ($stmt->close() === FALSE)
+            ) {
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                return FALSE;
+            }
+
+            return TRUE;
+        }
+
+        // Метод возвращает массив массивов с краткими данными (id, coordX, coordY) об избранных объектах недвижимости
+        public function getPropertyLightArrForFavorites()
+        {
+            // Инициализируем массив, в который и сохраним всю информацию
+            $propertyLightArr = array();
+
+            // Убедимся, что список идентификаторов объектов недвижимости представляет собой массив и его длина не равна нулю
+            if (!is_array($this->favoritesPropertysId) || count($this->favoritesPropertysId) == 0) return $propertyLightArr;
+
+            // Собираем строку WHERE для поискового запроса к БД
+            $strWHERE = " (";
+            for ($i = 0; $i < count($this->favoritesPropertysId); $i++) {
+                $strWHERE .= " id = '" . $this->favoritesPropertysId[$i] . "'";
+                if ($i < count($this->favoritesPropertysId) - 1) $strWHERE .= " OR";
+            }
+            $strWHERE .= ") AND (status = 'опубликовано')"; //TODO: сделать особое отображение (засеренное) для не опубликованных объявлений, тогда можно будет снять это ограничение на показ пользователю в избранных только еще опубликованных объектов
+
+            // Получаем данные из БД - ВСЕ объекты недвижимости, которые являются избранными для данного пользователя
+            // В итоге получим массив ($propertyLightArr), каждый элемент которого представляет собой также массив значений конкретного объявления по недвижимости
+            $res = $this->DBlink->query("SELECT id, coordX, coordY FROM property WHERE".$strWHERE." ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting"); // Сортируем по стоимости аренды и не ограничиваем количество объявлений - все, добавленные в избранные
+            if (($this->DBlink->errno)
+                OR (($propertyLightArr = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+            ) {
+                // Логируем ошибку
+                //TODO: сделать логирование ошибки
+                return array();
+            }
+
+            return $propertyLightArr;
         }
 
         // Функция проверяет - залогинен ли пользователь сейчас (возвращает TRUE или FALSE).
@@ -137,7 +226,7 @@
             }
 
             // Если никого не нашли или нашли данные больше чем по 1 пользователю - значит наш user не авторизован
-            if (is_array($res) && count($res) != 1) {
+            if (!is_array($res) || count($res) != 1) {
 
                 // На всякий случай удаляем id сессии (если он конечно был указан)
                 unset($_SESSION['id']);
@@ -157,7 +246,7 @@
             $loginFromDB = $res[0]['login'];
             $passwordFromDB = $res[0]['password'];
 
-            if ($user_hashFromDB == $sessionId || md5($loginFromDB.$passwordFromDB) == $_COOKIE['password']) {
+            if ($user_hashFromDB == $sessionId || md5($loginFromDB . $passwordFromDB) == $_COOKIE['password']) {
 
                 // Сохраняем ключевые параметры пользователя, полученные из БД в параметры объекта
                 $this->id = $res[0]['id'];
@@ -170,7 +259,9 @@
                     if ($res[0]['typeOwner'] == "FALSE") $this->typeOwner = FALSE;
                 }
                 if (isset($res[0]['typeAdmin'])) $this->typeAdmin = $res[0]['typeAdmin'];
-                if (isset($res[0]['favoritesPropertysId'])) $this->favoritesPropertysId = unserialize($res[0]['favoritesPropertysId']);
+                if (isset($res[0]['favoritesPropertysId'])) {
+                    if (($unserializedData = unserialize($res[0]['favoritesPropertysId'])) != FALSE && is_array($unserializedData)) $this->favoritesPropertysId = $unserializedData;
+                }
 
 
                 // Обновим куки (или добавим, если их ранее не было), чтобы после перезапуска браузера сессия не слетала
@@ -241,7 +332,7 @@
                         setcookie("login", "", time() - 1, '/');
                         setcookie("password", "", time() - 1, '/');
                         setcookie("login", $loginFromDB, time() + 60 * 60 * 24 * 7);
-                        setcookie("password", md5($loginFromDB.$passwordFromDB), time() + 60 * 60 * 24 * 7);
+                        setcookie("password", md5($loginFromDB . $passwordFromDB), time() + 60 * 60 * 24 * 7);
                         $this->newSession($idFromDB);
                         $this->lastAct($idFromDB);
 

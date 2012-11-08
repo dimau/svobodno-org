@@ -27,12 +27,12 @@
         }
 
         // Метод возвращает блок (div) для отображения фотографии (и, если нужно, по клику галереи фотографий) пользователя
-        // На входе: $sizeForPrimary - размер основной фотографии (small, middle, big); $isInteractive - нужно ли по клику включать галерею фотографий(TRUE- нужно, FALSE - нет)
-        public function getHTMLfotosWrapper($sizeForPrimary = "small", $isInteractive = FALSE, $uploadedFoto = FALSE) {
+        // На входе: $sizeForPrimary - размер основной фотографии (small, middle, big); $isInteractive - нужно ли по клику включать галерею фотографий(TRUE- нужно, FALSE - нет), $forTable - блок будет размещаться в таблице? (если TRUE - блок центрируется)
+        public function getHTMLfotosWrapper($sizeForPrimary = "small", $isInteractive = FALSE, $forTable = FALSE, $uploadedFoto = FALSE) {
 
             // Шаблон для формируемого HTML блока с фотографиями
             $templ = "
-                <div class='fotosWrapper {isInteractive}'>
+                <div class='fotosWrapper {isInteractive} {forTable}'>
                     <div class='{size}FotoWrapper'>
                         <img class='{size}Foto {gallery}' src='{urlFotoPrimary}' href='{hrefFotoPrimary}'>
                     </div>
@@ -50,6 +50,10 @@
             // Делаем блок фотографий интерактивным или нет?
             $arrForReplace['isInteractive'] = "";
             if (!$isInteractive) $arrForReplace['isInteractive'] = "fotoNonInteractive";
+
+            // Делаем блок фотографий для таблицы (с центрированием) или нет?
+            $arrForReplace['forTable'] = "";
+            if ($forTable) $arrForReplace['forTable'] = "fotoInTable";
 
             // Размер для блока (и следовательно для основной фотографии)
             $arrForReplace['size'] = "";
@@ -92,7 +96,7 @@
 
             // Заполняем шаблон
             // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне баллуна
-            $arrTemplVar = array('{isInteractive}', '{size}', '{gallery}', '{urlFotoPrimary}', '{hrefFotoPrimary}', '{numberOfFotos}', '{hiddensLinksToOtherFotos}');
+            $arrTemplVar = array('{isInteractive}', '{forTable}', '{size}', '{gallery}', '{urlFotoPrimary}', '{hrefFotoPrimary}', '{numberOfFotos}', '{hiddensLinksToOtherFotos}');
             // Копируем html-текст шаблона баллуна
             $fotosWrapperHTML = str_replace($arrTemplVar, $arrForReplace, $templ);
 
@@ -100,7 +104,7 @@
 
         }
 
-        function getSearchResultHTML($propertyLightArr, $favoritesPropertysId = array(), $typeOfRequest = "search")
+        function getSearchResultHTML($propertyLightArr = array(), $favoritesPropertysId = array(), $typeOfRequest = "search")
         {
 
             // Инициализируем переменную, в которую сложим весь HTML код результатов поиска
@@ -118,7 +122,10 @@
                 $strWHERE .= ")";
             }
 
+            //TODO: тест
+            //die($strWHERE);
 
+            // Получаем данные из БД
             $res = $this->DBlink->query("SELECT * FROM property WHERE".$strWHERE." ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting LIMIT 20");
             if (($this->DBlink->errno)
                 OR (($propertyFullArr = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
@@ -132,19 +139,6 @@
             for ($i = 0; $i < count($propertyFullArr); $i++) {
                 $propertyFullArrNew[$propertyFullArr[$i]['id']] = $propertyFullArr[$i];
             }
-
-
-            /*// Собираем и выполняем поисковый запрос - получаем подробные сведения по не более чем 20-ти первым в списке объявлениям
-            $propertyFullArr = array(); // в итоге получим массив, каждый элемент которого представляет собой еще один массив значений конкретного объявления по недвижимости
-            if ($strWHERE != "") {
-                $rezProperty = mysql_query("SELECT * FROM property WHERE" . $strWHERE . " ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting LIMIT 20"); // Сортируем по стоимости аренды и ограничиваем количество 20 объявлениями, чтобы запрос не проходил таблицу до конца, когда выделит нужные нам 20 объектов
-                if ($rezProperty != FALSE) {
-                    for ($i = 0; $i < mysql_num_rows($rezProperty); $i++) {
-                        $row = mysql_fetch_assoc($rezProperty);
-                        if ($row != FALSE) $propertyFullArr[$row['id']] = $row; // Применение ассоциативного массива для сохранения помогает при построении
-                    }
-                }
-            } */
 
             // Инициализируем переменные, в которые сложим HTML блоки каждого из объявлений.
             $matterOfBalloonList = ""; // Содержимое невидимого блока с HTML данными для всех баллунов
@@ -182,20 +176,6 @@
                     //TODO: сделать логирование ошибки
                     $propertyFotosArr = array();
                 }
-
-
-                /*// Получаем фотографии объекта
-                $propertyFotosArr = array(); // Массив, в который запишем массивы, каждый из которых будет содержать данные по 1 фотке объекта
-                $rezPropertyFotos = mysql_query("SELECT * FROM propertyFotos WHERE propertyId = '" . $currentPropertyId . "'");
-                if ($rezPropertyFotos != FALSE) {
-                    for ($j = 0; $j < mysql_num_rows($rezPropertyFotos); $j++) {
-                        $propertyFotosArr[] = mysql_fetch_assoc($rezPropertyFotos);
-                    }
-                }*/
-
-
-
-
 
                 // Если у нам удалось ранее получить полные сведения по объекту $propertyLightArr[$i], то отрабатываем его, в противном случае - игнорируем.
                 // Кажется, что данное условие будет НЕ выполняться крайне редко - при сбоях в работе с БД, но для большей безопасности, думаю, не помещает такая проверка
@@ -387,7 +367,7 @@
 
             // Фото
             $arrBalloonReplace['fotosWrapper'] = "";
-            $arrBalloonReplace['fotosWrapper'] = $this->getHTMLfotosWrapper("small", TRUE, $propertyFotosArr);
+            $arrBalloonReplace['fotosWrapper'] = $this->getHTMLfotosWrapper("small", TRUE, FALSE, $propertyFotosArr);
 
             // Все, что касается СТОИМОСТИ АРЕНДЫ
             $arrBalloonReplace['costOfRenting'] = "";
@@ -542,7 +522,7 @@
 
             // Фото
             $arrShortListReplace['fotosWrapper'] = "";
-            $arrShortListReplace['fotosWrapper'] = $this->getHTMLfotosWrapper("small", TRUE, $propertyFotosArr);
+            $arrShortListReplace['fotosWrapper'] = $this->getHTMLfotosWrapper("small", TRUE, TRUE, $propertyFotosArr);
 
             $arrShortListReplace['address'] = "";
             if (isset($oneProperty['address'])) $arrShortListReplace['address'] = $oneProperty['address'];
@@ -611,7 +591,7 @@
 
             // Фото
             $arrExtendedListReplace['fotosWrapper'] = "";
-            $arrExtendedListReplace['fotosWrapper'] = $this->getHTMLfotosWrapper("small", TRUE, $propertyFotosArr);
+            $arrExtendedListReplace['fotosWrapper'] = $this->getHTMLfotosWrapper("small", TRUE, TRUE, $propertyFotosArr);
 
             // Тип
             $arrExtendedListReplace['typeOfObject'] = "<br><br>";

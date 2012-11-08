@@ -1,63 +1,53 @@
 <?php
+    // Стартуем сессию с пользователем - сделать доступными переменные сессии
+    session_start();
 
-    include_once 'connect.php'; //подключаемся к БД
-    include_once 'function_global.php'; //подключаем файл с глобальными функциями
+    // Подключаем нужные модели и представления
+    include '../models/GlobFunc.php';
+    include '../models/Logger.php';
+    include '../models/IncomingUser.php';
+    include '../views/View.php';
+
+    // Создаем объект-хранилище глобальных функций
+    $globFunc = new GlobFunc();
+
+    // Подключаемся к БД
+    $DBlink = $globFunc->connectToDB();
+    // Удалось ли подключиться к БД?
+    if ($DBlink == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
+
+    // Инициализируем модель для запросившего страницу пользователя
+    $incomingUser = new IncomingUser($globFunc, $DBlink);
 
     // Вспомогательная функция отказа в доступе
-    function accessDenied() {
+    function accessDenied()
+    {
         header('Content-Type: text/xml; charset=UTF-8');
         echo "<xml><span status='denied'></span></xml>";
         exit();
     }
 
-     // Проверяем, залогинен ли пользователь, если нет - то отказываем в доступе
-    $userId = login($DBlink);
-    if (!$userId) {
+    // Проверяем, залогинен ли пользователь, если нет - то отказываем в доступе
+    if (!$incomingUser->login()) {
         accessDenied();
     }
 
     // Получаем идентификатор объявления, которое пользователь хочет добавить/удалить в Избранное и действие, которое нужно совершить с объявлением (добавить в избранное или удалить)
-    $propertyId = 0;
+    $propertyId = "";
     if (isset($_POST['propertyId'])) $propertyId = $_POST['propertyId']; else accessDenied();
     $action = "";
     if (isset($_POST['action'])) $action = $_POST['action']; else accessDenied();
 
-    // Если все хорошо - получаем список избранных объявлений данного пользователя
-    $rowUsers = FALSE;
-    $rezUsers = mysql_query("SELECT favoritesPropertysId FROM users WHERE id = '" . $userId . "'");
-    if ($rezUsers != FALSE) $rowUsers = mysql_fetch_assoc($rezUsers); else accessDenied();
-    if ($rowUsers == FALSE) accessDenied();
-    $favoritesPropertysId = unserialize($rowUsers['favoritesPropertysId']);
-
-    // Если все хорошо и требуемое действие = Добавить в избранное, то записываем id объявления в БД, в поле favoritesPropertysId пользователя - тем самым фиксируем, что он добавил данное объявление к себе в избранные
+    // Если требуемое действие = Добавить в избранное, то записываем id объявления в БД, в поле favoritesPropertysId пользователя - тем самым фиксируем, что он добавил данное объявление к себе в избранные
     if ($action == "addToFavorites") {
-        if (!in_array($propertyId, $favoritesPropertysId)) {
-            $favoritesPropertysId[] = $propertyId;
-            $favoritesPropertysId = serialize($favoritesPropertysId);
 
-            // Сохраняем новые изменения в БД в таблицу поисковых запросов
-            $rez = mysql_query("UPDATE users SET
-            favoritesPropertysId = '" . $favoritesPropertysId . "'
-            WHERE id = '" . $userId . "'");
-            if (!$rez) accessDenied();
-        }
+        if (!$incomingUser->addFavoritesPropertysId($propertyId)) accessDenied();
     }
 
-    // Если все хорошо и требуемое действие = Удалить из избранного, то удаляем id объявления из БД, из поля favoritesPropertysId пользователя
+    // Если требуемое действие = Удалить из избранного, то удаляем id объявления из БД, из поля favoritesPropertysId пользователя
     if ($action == "removeFromFavorites") {
-        // Ищем id нашего объекта среди id избранных объектов. Если он там есть, то получим номер позиции, если нет - FALSE
-        $key = array_search($propertyId, $favoritesPropertysId);
-        if ($key !== FALSE) { // Если наш объект находится в массиве избранных объектов на 0 позиции, то нужно, чтобы условие срабатывало и этот объект можно было удалить из массива избранных, поэтому используется строгое равенство
-            array_splice($favoritesPropertysId, $key, 1);
-            $favoritesPropertysId = serialize($favoritesPropertysId);
 
-            // Сохраняем новые изменения в БД в таблицу поисковых запросов
-            $rez = mysql_query("UPDATE users SET
-            favoritesPropertysId = '" . $favoritesPropertysId . "'
-            WHERE id = '" . $userId . "'");
-            if (!$rez) accessDenied();
-
-        }
+        if (!$incomingUser->removeFavoritesPropertysId($propertyId)) accessDenied();
     }
 
     /*************************************************************************************
@@ -67,4 +57,8 @@
     header('Content-Type: text/xml; charset=UTF-8');
     echo "<xml><span status='successful'></span></xml>";
 
-?>
+    /********************************************************************************
+     * Закрываем соединение с БД
+     *******************************************************************************/
+
+    $globFunc->closeConnectToDB($DBlink);

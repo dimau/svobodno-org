@@ -90,13 +90,14 @@
      * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
      *******************************************************************************/
 
-    $view = new View();
+    $view = new View($globFunc, $DBlink);
     $view->generate("templ_registration.php", array('userCharacteristic' => $user->getCharacteristicData(),
                                                     'userFotoInformation' => $user->getFotoInformationData(),
                                                     'userSearchRequest' => $user->getSearchRequestData(),
                                                     'errors' => $errors,
                                                     'allDistrictsInCity' => $allDistrictsInCity,
-                                                    'isLoggedIn' => $incomingUser->login()));
+                                                    'isLoggedIn' => $incomingUser->login(),
+                                                    'whatPage' => "forPersonalPage"));
 
     /********************************************************************************
      * Закрываем соединение с БД

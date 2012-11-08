@@ -1280,26 +1280,22 @@
     </div>
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
-            Как часто собственник проверяет недвижимость:
+            Где проживает собственник:
         </div>
         <div class="objectDescriptionBody" style="min-width: 330px">
             <select name="checking">
                 <option value="0"  <?php if ($propertyCharacteristic['checking'] == "0") echo "selected";?>></option>
                 <option
-                    value="Никогда (проживает в другом городе)" <?php if ($propertyCharacteristic['checking'] == "Никогда (проживает в другом городе)") echo "selected";?>>
-                    Никогда (проживает в другом городе)
+                    value="в другом городе" <?php if ($propertyCharacteristic['checking'] == "в другом городе") echo "selected";?>>
+                    в другом городе
                 </option>
                 <option
-                    value="1 раз в месяц (при получении оплаты)" <?php if ($propertyCharacteristic['checking'] == "1 раз в месяц (при получении оплаты)") echo "selected";?>>
-                    1 раз в месяц (при получении оплаты)
+                    value="отдельное жилье" <?php if ($propertyCharacteristic['checking'] == "отдельное жилье") echo "selected";?>>
+                    отдельное жилье
                 </option>
                 <option
-                    value="Периодически (чаще 1 раза в месяц)" <?php if ($propertyCharacteristic['checking'] == "Периодически (чаще 1 раза в месяц)") echo "selected";?>>
-                    Периодически (чаще 1 раза в месяц)
-                </option>
-                <option
-                    value="Постоянно (проживает на этой же площади)" <?php if ($propertyCharacteristic['checking'] == "Постоянно (проживает на этой же площади)") echo "selected";?>>
-                    Постоянно (проживает на этой же площади)
+                    value="рядом (в качестве соседа)" <?php if ($propertyCharacteristic['checking'] == "рядом (в качестве соседа)") echo "selected";?>>
+                    рядом (в качестве соседа)
                 </option>
             </select>
         </div>
