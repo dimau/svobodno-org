@@ -45,7 +45,11 @@
         }
 
             /* Стили для страницы социальных сетей */
-        .social input[type=text] {
+        fieldset.edited.social {
+            width: auto;
+        }
+
+        fieldset.edited.social input[type=text] {
             width: 400px;
         }
 

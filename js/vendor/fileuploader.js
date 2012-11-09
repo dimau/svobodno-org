@@ -592,7 +592,7 @@ qq.FileUploader = function (o) {
 
                             '<div class="qq-upload-primary-wrapper"><label><input type="radio" name="primaryFotoRadioButton" value="" class="qq-upload-primary">{primaryButtonText}</label></div>' +
 
-                            '<div class="qq-upload-remove-wrapper"><a class="qq-upload-remove" href="#">{removeButtonText}</a></div>' +
+                            '<div class="qq-upload-remove-wrapper"><a class="qq-upload-remove">{removeButtonText}</a></div>' +
                         '</li>' +
                     '</ul>' +
                 '</span>' +
@@ -805,10 +805,10 @@ qq.extend(qq.FileUploader.prototype, {
         }
 
         // В атрибут value радиокнопки для выбора основной фотографии заносим id данного фото.
-        $(this._find(item, 'primary')).attr('value', result.name);
+        $("input[type='radio']", this._find(item, 'primary')).attr('value', result.name);
         // Если статус у данной фотографии = основная, то сделать радиокнопку выбранной
         if (result.status == 'основная') {
-            $(this._find(item, 'primary')).attr('checked', 'checked');
+            $("input[type='radio']", this._find(item, 'primary')).attr('checked', 'checked');
         }
 
         // Присваиваем класс успешной загрузки или ошибки при загрузке - для применения соответствующего оформления

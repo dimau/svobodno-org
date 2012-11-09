@@ -193,7 +193,7 @@ function removeFoto() {
     fotoid = li.fotoid;
 
     // Удалим соответствующий фотографии элемент списка и запишем изменения в массив uploadedFoto (а фактически удалим из массива соответствующий фотографии объект)
-    $(this).closest("li.uploadedFotoVisualItem").remove();
+    $(li).remove();
     for (var i = 0; i < uploadedFoto.length; i++) {
         if (uploadedFoto[i]['id'] == fotoid) {
             uploadedFoto.splice(i, 1);

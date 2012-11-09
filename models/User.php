@@ -765,7 +765,7 @@
             $result['nationality'] = $this->nationality;
             $result['birthday'] = $this->birthday;
             $result['login'] = $this->login;
-            $result['passwor'] = $this->password;
+            $result['password'] = $this->password;
             $result['telephon'] = $this->telephon;
             $result['email'] = $this->email;
             $result['currentStatusEducation'] = $this->currentStatusEducation;

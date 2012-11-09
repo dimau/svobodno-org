@@ -117,7 +117,7 @@
                     <tbody>
                         <tr title="Используйте в качестве логина ваш e-mail или телефон">
                             <td class="itemLabel">
-                                Логин:
+                                Логин
                             </td>
                             <td class="itemRequired">
                                 <?php if (!$isLoggedIn) echo "*";?>

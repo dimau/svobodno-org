@@ -7,8 +7,7 @@
 ?>
 
 <div id="extendedSearchParametersBlock">
-    <div id="leftBlockOfSearchParameters" style="display: inline-block;">
-        <fieldset class="edited">
+        <fieldset class="edited left">
             <legend>
                 Характеристика объекта
             </legend>
@@ -157,7 +156,7 @@
             </table>
         </fieldset>
 
-        <fieldset class="edited cost">
+        <fieldset class="edited right cost">
             <legend>
                 Стоимость
             </legend>
@@ -233,9 +232,9 @@
                 </tbody>
             </table>
         </fieldset>
-    </div>
-    <div id="rightBlockOfSearchParameters">
-        <fieldset class="edited">
+
+
+        <fieldset class="edited districts left">
             <legend>
                 Район
             </legend>
@@ -255,10 +254,10 @@
                 }
                 ?>
             </ul>
+            <div class="clearBoth"></div>
         </fieldset>
-    </div>
-    <!-- /end.rightBlockOfSearchParameters -->
-    <fieldset class="edited private">
+
+    <fieldset class="edited right">
         <legend>
             Особые параметры поиска
         </legend>
@@ -399,11 +398,9 @@
                     </td>
                 </tr>
 
-                <tr>
-                    <td class="itemLabel">
+                <tr class="additionalSearchConditions">
+                    <td class="itemLabel" colspan="3">
                         Дополнительные условия поиска:
-                    </td>
-                    <td class="itemRequired">
                     </td>
                 </tr>
                 <tr>

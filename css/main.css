@@ -185,6 +185,7 @@ fieldset.edited.fullWidth {
     clear: both;
 }
 
+/* Заголовок блока с полями ввода */
 fieldset.edited legend {
     font-weight: bold;
     color: #336784;
@@ -193,14 +194,19 @@ fieldset.edited legend {
     white-space: normal;
 }
 
+fieldset.edited table {
+    width: 100%;
+}
+
 fieldset.edited table td {
     vertical-align: middle;
     padding: 3px 0px 3px 0px;
 }
 
 fieldset.edited table td.itemLabel {
+    max-width: 280px;
     padding-right: 6px;
-    text-align: right
+    text-align: right;
 }
 
 fieldset.edited table td.itemRequired {
@@ -208,16 +214,57 @@ fieldset.edited table td.itemRequired {
 }
 
 fieldset.edited table td.itemBody {
+    min-width: 220px;
     padding-left: 6px;
     text-align: left;
 }
 
-fieldset.edited table .withWhoDescription td.itemLabel, .edited table .childrenDescription td.itemLabel, .edited table .animalsDescription td.itemLabel {
+fieldset.edited table .withWhoDescription td.itemLabel,
+fieldset.edited table .childrenDescription td.itemLabel,
+fieldset.edited table .animalsDescription td.itemLabel,
+fieldset.edited table .additionalSearchConditions td.itemLabel {
     text-align: left;
 }
 
-.private {
+fieldset.edited table td input[type=text],
+fieldset.edited table td input[type=password],
+fieldset.edited table td select,
+fieldset.edited table td textarea {
+    width: 100%;
+}
 
+/* Особые стили для блока с параметрами ввода стоимостных условий поиска */
+fieldset.edited.cost table td input[type=text] {
+    width: auto;
+}
+
+/* Особое оформление для блока с редактированием фотографий */
+#fotoWrapperBlock ul li.uploadedFotoVisualItem {
+    float: left;
+    width: 50%;
+    min-width: 450px;
+    height: 120px;
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+
+/* Особые условия для блока с выбором районов для поиска */
+fieldset.edited.districts {
+    height: 325px;
+}
+
+fieldset.edited.districts ul {
+    height: 285px;
+    line-height: 1.6em;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+}
+
+fieldset.edited.districts ul li {
+    width: 200px;
+    float: left;
 }
 
 /* =============================================================================
@@ -279,12 +326,6 @@ div.notEdited table tr {
 /* =============================================================================
    Элементы управления - кнопки, чекбоксы, селекты и textarea
    ========================================================================== */
-
-/* Кнопка, расположенная слева внизу*/
-button.left-bottom {
-    margin-top: 7px;
-    margin-left: 15px;
-}
 
 button,
 input,
@@ -364,15 +405,16 @@ textarea {
     resize: vertical;
 }
 
-input[type=text], input[type=password], select {
-    width: 220px;
-    border: 1px solid #CFCFCF;
-    border-radius: 4px 4px 4px 4px;
+/* Кнопка, расположенная слева внизу*/
+button.left-bottom {
+    margin-top: 7px;
+    margin-left: 15px;
 }
 
-/* Внутри таблицы занимает все отведенное пространство */
-textarea {
-    width: 100%;
+/* Красивое оформление элементов ввода */
+input[type=text], input[type=password], select, textarea {
+    border: 1px solid #CFCFCF;
+    border-radius: 4px 4px 4px 4px;
 }
 
 /* =============================================================================
@@ -895,42 +937,9 @@ td.bottom.right, th.bottom.right {
    ПАРАМЕТРЫ ПОИСКА
    ========================================================================== */
 
-#leftBlockOfSearchParameters {
-    display: inline-block;
-    vertical-align: top;
-}
-
-#rightBlockOfSearchParameters {
-    display: inline-block;
-    height: 345px;
-}
-
-#rightBlockOfSearchParameters fieldset {
-    height: 100%;
-}
-
-#rightBlockOfSearchParameters ul {
-    display: inline-block;
-    height: 100%;
-    line-height: 1.4em;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    width: 200px;
-    overflow-y: auto;
-}
-
-.extendedSearchParametersBlock {
-    display: inline-block;
-}
-
 .searchChapter {
     display: inline-block;
 }
-
-/*.searchItemBody {
-    display: inline-block;
-}  */
 
 /* =============================================================================
    Стили для результатов поиска (таблица, карта, таблица + карта) и избранных объявлений
