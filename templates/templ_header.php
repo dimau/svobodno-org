@@ -61,7 +61,7 @@
         </ul>
         <div class="clearBoth"></div>
     </div>
-    <div class="iconBox"></div>
+    <a href="index.php"><div class="iconBox"></div></a>
     <div class="enter">
         <?php
         if ($isLoggedIn == FALSE) {

@@ -110,16 +110,6 @@ function removeFromFavorites() {
 }
 
 /**********************************************************************
- * Выравнивание блока со списком районов и других блоков в параметрах поиска
- **********************************************************************/
-
-// Подгонка размера правого блока параметров (районы) расширенного поиска под размер левого блока параметров. 10 пикселей - на компенсацию margin у fieldset
-if ($('#rightBlockOfSearchParameters').length && $('#leftBlockOfSearchParameters').length) {
-    $('#rightBlockOfSearchParameters').height($('#leftBlockOfSearchParameters').height() - 10);
-    $('#rightBlockOfSearchParameters ul').height($('#rightBlockOfSearchParameters fieldset').height() - $('#rightBlockOfSearchParameters fieldset legend').height());
-}
-
-/**********************************************************************
  * Активируем ColorBox для просмотра в модальном окне галереи фотографий по клику на миниатюре
  **********************************************************************/
 

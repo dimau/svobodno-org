@@ -126,7 +126,7 @@
                                        maxlength="8" value='<?php echo $userSearchRequest['maxCost'];?>'>
 								руб./мес.
 								&nbsp;
-								<button type="submit" name="fastSearchButton" id="fastSearchButton">
+								<button type="submit" name="fastSearchButton" id="fastSearchButton" class="mainButton">
                                     Найти
                                 </button>
                             </span>
@@ -142,7 +142,7 @@
 
                     <div class="actionsOnSearch">
                         <a href="#">Запомнить условия поиска</a>
-                        <button type="submit" name="extendedSearchButton" id="extendedSearchButton">
+                        <button type="submit" name="extendedSearchButton" id="extendedSearchButton" class="mainButton">
                             Найти
                         </button>
                     </div>
@@ -168,7 +168,7 @@
 </div>
 <!-- /end.page_without_footer -->
 <div class="footer">
-    2012 «Хани Хом», вопросы и пожелания по работе портала можно передавать по телефону 8-922-143-16-15
+    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-143-16-15, e-mail: support@svobodno.org
 </div>
 <!-- /end.footer -->
 

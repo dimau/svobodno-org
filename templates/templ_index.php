@@ -12,7 +12,7 @@
          More info: h5bp.com/i/378 -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    <title>Хани Хом</title>
+    <title>Главная</title>
     <meta name="description" content="Аренда недвижимости">
 
     <!-- Mobile viewport optimized: h5bp.com/viewport -->
@@ -21,6 +21,7 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
 
     <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
+    <link rel="stylesheet" href="css/feature-carousel.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
         .blockHeader {
@@ -39,18 +40,63 @@
     </script>
     <!-- jQuery UI с моей темой оформления -->
     <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
+    <!-- Карусель -->
+    <script src="js/vendor/jquery.featureCarousel.js"></script>
 </head>
 
 <body>
 <div class="page_without_footer">
     <!-- Сформируем и вставим заголовок страницы -->
     <?php
-        include("templates/templ_header.php");
+    include("templates/templ_header.php");
     ?>
 
     <div class="page_main_content">
 
-        <div class="bigAndBeatifullAnimation" style="height: 250px;"></div>
+        <div class="carousel-container">
+            <div id="carousel">
+                <div class="carousel-feature">
+                    <a href="#"><img class="carousel-image" alt="Image Caption"
+                                     src="uploaded_files\0\big\03b141bbb26e42040b96fb9176ae28c4.jpeg"></a>
+
+                    <div class="carousel-caption">
+                        <p>
+                            Подпись к первому слайду.
+                        </p>
+                    </div>
+                </div>
+                <div class="carousel-feature">
+                    <a href="#"><img class="carousel-image" alt="Image Caption"
+                                     src="uploaded_files\0\big\08c1da5a4849d70e2e109219382c9dfc.jpeg"></a>
+
+                    <div class="carousel-caption">
+                        <p>
+                            Подпись ко второму слайду. Она побольше<br>И даже в несколько строк<br>Вот еще
+                        </p>
+                    </div>
+                </div>
+                <div class="carousel-feature">
+                    <a href="#"><img class="carousel-image" alt="Image Caption"
+                                     src="uploaded_files\b\big\b6ac5310bb479949a37940ef97d2d50d.jpeg"></a>
+
+                    <div class="carousel-caption">
+                        <p>
+                            Подпись к третьему слайду.
+                        </p>
+                    </div>
+                </div>
+                <div class="carousel-feature">
+                    <a href="#"><img class="carousel-image" alt="Image Caption"
+                                     src="uploaded_files\1\big\1c1dfa378d4d9caaa93703c0b89f4077.jpeg"></a>
+
+                    <div class="carousel-caption">
+                        <p>
+                            Подпись к четвертому слайду. Она побольше<br>И даже в несколько строк<br>Вот еще
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div id="tabs">
 
@@ -141,7 +187,7 @@
                 <div class="nextActionBlock"
                      style="width: 49.5%; display: inline-block; vertical-align: top; text-align: center;">
                     <div class="blockHeader">Что дальше?</div>
-                    <a class="button" href="#"><span style="font-size: 1.1em;">Подайте заявку</span><br><span
+                    <a class="button mainButton" href="#"><span style="font-size: 1.1em;">Подайте заявку</span><br><span
                         style="font-size: 0.9em;">наш специалист свяжется с Вами</span></a>
                 </div>
 
@@ -213,9 +259,9 @@
                 <div class="nextActionBlock"
                      style="width: 49.5%; display: inline-block; vertical-align: top; text-align: center;">
                     <div class="blockHeader">Что дальше?</div>
-                    <a class="button" href="registration.php"><span
+                    <a class="button mainButton" href="registration.php"><span
                         style="font-size: 1.1em;">Зарегистрируйтесь</span><br><span style="font-size: 0.9em;">и получите новые возможности</span></a>
-                    <ul style="text-align: left;">
+                    <ul class="benefits" style="text-align: left;">
                         <li>
                             Записаться на просмотр любой недвижимости
                         </li>
@@ -245,12 +291,25 @@
 </div>
 <!-- /end.page_without_footer -->
 <div class="footer">
-    2012 «Хани Хом», вопросы и пожелания по работе портала можно передавать по телефону 8-922-143-16-15
+    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-143-16-15, e-mail: support@svobodno.org
 </div>
 <!-- /end.footer -->
 
 <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
 <script src="js/main.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#carousel').featureCarousel({
+            trackerIndividual:false,
+            trackerSummation:false,
+            largeFeatureWidth:400,
+            largeFeatureHeight:300,
+            smallFeatureWidth:200,
+            smallFeatureHeight:150,
+            smallFeatureOffset:110
+        });
+    });
+</script>
 <!-- end scripts -->
 
 <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.

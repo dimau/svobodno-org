@@ -1290,8 +1290,8 @@
                     в другом городе
                 </option>
                 <option
-                    value="отдельное жилье" <?php if ($propertyCharacteristic['checking'] == "отдельное жилье") echo "selected";?>>
-                    отдельное жилье
+                    value="отдельно" <?php if ($propertyCharacteristic['checking'] == "отдельно") echo "selected";?>>
+                    отдельно
                 </option>
                 <option
                     value="рядом (в качестве соседа)" <?php if ($propertyCharacteristic['checking'] == "рядом (в качестве соседа)") echo "selected";?>>
@@ -1321,7 +1321,7 @@
 
 <div class="bottomButton">
     <a href="personal.php?tabsId=3" style="margin-right: 10px;">Отмена</a>
-    <button type="submit" name="saveAdvertButton" id="saveAdvertButton" class="button">
+    <button type="submit" name="saveAdvertButton" id="saveAdvertButton" class="button mainButton">
         Сохранить
     </button>
 </div>
@@ -1336,7 +1336,7 @@
 </div>
 <!-- /end.page_without_footer -->
 <div class="footer">
-    2012 «Хани Хом», вопросы и пожелания по работе портала можно передавать по телефону 8-922-143-16-15
+    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-143-16-15, e-mail: support@svobodno.org
 </div>
 <!-- /end.footer -->
 

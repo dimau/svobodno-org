@@ -55,7 +55,7 @@
     <div class="page_main_content">
         <div class="miniBlock">
             <div class="miniBlockHeader">
-                Вы успешно зарегистрировались на Хани Хом!
+                Вы успешно зарегистрировались на портале аренды недвижимости Svobodno.org!
             </div>
             <div class="miniBlockContent">
                 <div class="text">
@@ -79,7 +79,7 @@
 </div>
 <!-- /end.page_without_footer -->
 <div class="footer">
-    2012 «Хани Хом», вопросы и пожелания по работе портала можно передавать по телефону 8-922-143-16-15
+    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-143-16-15, e-mail: support@svobodno.org
 </div>
 <!-- /end.footer -->
 

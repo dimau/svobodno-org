@@ -112,9 +112,9 @@
     <?php if ($userCharacteristic['typeTenant']): ?>
     <div class="importantAddInfBlock">
         <div class="importantAddInfHeader">
-            Регистрация позволит:
+            Регистрация позволит бесплатно:
         </div>
-        <ul>
+        <ul class="benefits">
             <li>
                 Записаться на просмотр любой недвижимости
             </li>
@@ -168,7 +168,7 @@
     ?>
 
     <div class="bottomControls">
-        <button class="forwardButton">Далее</button>
+        <button class="forwardButton mainButton">Далее</button>
         <div class="clearBoth"></div>
     </div>
 </div>
@@ -186,7 +186,7 @@
 
     <div class="bottomControls">
         <button class="backButton">Назад</button>
-        <button class="forwardButton">Далее</button>
+        <button class="forwardButton mainButton">Далее</button>
         <div class="clearBoth"></div>
     </div>
 </div>
@@ -205,7 +205,7 @@
     <?php if ($userCharacteristic['typeTenant']): ?>
     <div class="bottomControls">
         <button class="backButton">Назад</button>
-        <button class="forwardButton">Далее</button>
+        <button class="forwardButton mainButton">Далее</button>
         <div class="clearBoth"></div>
     </div>
     <?php endif; ?>
@@ -218,7 +218,7 @@
         </div>
         <div class="clearBoth"></div>
         <button class="backButton">Назад</button>
-        <button type="submit" name="submitButton" class="submitButton">Отправить</button>
+        <button type="submit" name="submitButton" class="submitButton mainButton">Отправить</button>
         <div class="clearBoth"></div>
     </div>
     <?php endif; ?>
@@ -243,7 +243,7 @@
         </div>
         <div class="clearBoth"></div>
         <button class="backButton">Назад</button>
-        <button type="submit" name="submitButton" class="submitButton">Отправить</button>
+        <button type="submit" name="submitButton" class="submitButton mainButton">Отправить</button>
         <div class="clearBoth"></div>
     </div>
 
@@ -262,7 +262,7 @@
 </div>
 <!-- /end.page_without_footer -->
 <div class="footer">
-    2012 «Хани Хом», вопросы и пожелания по работе портала можно передавать по телефону 8-922-143-16-15
+    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-143-16-15, e-mail: support@svobodno.org
 </div>
 <!-- /end.footer -->
 

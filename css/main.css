@@ -124,6 +124,11 @@ ul.listDescription .headOfString {
     border-bottom: 1px dotted black;
 }
 
+/* Список преимуществ */
+.benefits li {
+    list-style-image: url(../img/ui-icons_tick.png);
+}
+
 /* ======================================================================
    БЛОКИ Fieldset с полями ввода для ВВОДА И РЕДАКТИРОВАНИЯ ПАРАМЕТРОВ
    ====================================================================== */
@@ -155,7 +160,7 @@ form {
     margin: 0;
 }
 
-fieldset.edited {
+.edited {
     width: 48.5%;
     margin-top: 10px;
     margin-bottom: 10px;
@@ -167,26 +172,26 @@ fieldset.edited {
     vertical-align: top;
 }
 
-fieldset.edited.left {
+.edited.left {
     float: left;
     clear: left;
     margin-right: 1.4%;
 }
 
-fieldset.edited.right {
+.edited.right {
     float: right;
     clear: right;
     margin-left: 1.4%;
 }
 
-fieldset.edited.fullWidth {
+.edited.fullWidth {
     width: 100%;
     float: none;
     clear: both;
 }
 
 /* Заголовок блока с полями ввода */
-fieldset.edited legend {
+.edited legend {
     font-weight: bold;
     color: #336784;
     border: 0;
@@ -194,47 +199,47 @@ fieldset.edited legend {
     white-space: normal;
 }
 
-fieldset.edited table {
+.edited table {
     width: 100%;
 }
 
-fieldset.edited table td {
+.edited table td {
     vertical-align: middle;
     padding: 3px 0px 3px 0px;
 }
 
-fieldset.edited table td.itemLabel {
+.edited table td.itemLabel {
     max-width: 280px;
     padding-right: 6px;
     text-align: right;
 }
 
-fieldset.edited table td.itemRequired {
+.edited table td.itemRequired {
     color: red;
 }
 
-fieldset.edited table td.itemBody {
+.edited table td.itemBody {
     min-width: 220px;
     padding-left: 6px;
     text-align: left;
 }
 
-fieldset.edited table .withWhoDescription td.itemLabel,
-fieldset.edited table .childrenDescription td.itemLabel,
-fieldset.edited table .animalsDescription td.itemLabel,
-fieldset.edited table .additionalSearchConditions td.itemLabel {
+.edited table .withWhoDescription td.itemLabel,
+.edited table .childrenDescription td.itemLabel,
+.edited table .animalsDescription td.itemLabel,
+.edited table .additionalSearchConditions td.itemLabel {
     text-align: left;
 }
 
-fieldset.edited table td input[type=text],
-fieldset.edited table td input[type=password],
-fieldset.edited table td select,
-fieldset.edited table td textarea {
+.edited table td input[type=text],
+.edited table td input[type=password],
+.edited table td select,
+.edited table td textarea {
     width: 100%;
 }
 
 /* Особые стили для блока с параметрами ввода стоимостных условий поиска */
-fieldset.edited.cost table td input[type=text] {
+.edited.cost table td input[type=text] {
     width: auto;
 }
 
@@ -243,17 +248,17 @@ fieldset.edited.cost table td input[type=text] {
     float: left;
     width: 50%;
     min-width: 450px;
-    height: 120px;
+    height: 140px;
     overflow-y: hidden;
     overflow-x: hidden;
 }
 
 /* Особые условия для блока с выбором районов для поиска */
-fieldset.edited.districts {
+.edited.districts {
     height: 325px;
 }
 
-fieldset.edited.districts ul {
+.edited.districts ul {
     height: 285px;
     line-height: 1.6em;
     list-style: none;
@@ -262,7 +267,7 @@ fieldset.edited.districts ul {
     overflow-y: auto;
 }
 
-fieldset.edited.districts ul li {
+.edited.districts ul li {
     width: 200px;
     float: left;
 }
@@ -417,6 +422,20 @@ input[type=text], input[type=password], select, textarea {
     border-radius: 4px 4px 4px 4px;
 }
 
+/* Особенное выделение главных кнопок на страницах сайта */
+a.button.mainButton,
+button.mainButton {
+    border-color: #ffffff !important;
+    background: none !important;
+    background-color: #FF9340 !important;
+    color: white !important;
+}
+
+a.button.mainButton:hover,
+button.mainButton:hover {
+    border-color: #ff6f00 !important;
+}
+
 /* =============================================================================
    ТАБЛИЦЫ
    ========================================================================== */
@@ -552,12 +571,11 @@ td.bottom.right, th.bottom.right {
 
 .iconBox {
     background-image: url('../img/brand.png');
-    width: 94px;
-    height: 94px;
-    /*float: left;*/
+    width: 190px;
+    height: 40px;
     position: absolute;
-    left: 0px;
-    top: 0px;
+    left: 0;
+    top: 1em;
 }
 
 .nameOfServiceBox {
@@ -592,7 +610,7 @@ td.bottom.right, th.bottom.right {
    ========================================================================== */
 
 .menu {
-    margin: 15px 0px 0px 100px;
+    margin: 15px 50px 0px 50px;
     min-width: 500px;
     text-align: center;
 }
@@ -1147,6 +1165,15 @@ div.unread > div.newsHeader {
 /* Не рисуем нижнюю границу у заголовкой аккордеона (как это происходит для обычных ссылок) */
 .ui-accordion-header a {
     border-bottom: none;
+}
+
+/* Не рисуем нижнюю границу у крестика в модальном окне (которое появляется при нажатии на кнопку "Записаться на просмотр") */
+.ui-dialog-titlebar-close {
+    border-bottom: none;
+}
+
+.ui-dialog .ui-dialog-titlebar-close span {
+    margin: 0;
 }
 
 /* Календарь - всегда на самом верху страницы, чтобы его ничего не закрывало, а также ссылки без подчеркивания (в отличие от оформления ссылок по умолчанию) */

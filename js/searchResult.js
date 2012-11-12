@@ -68,23 +68,6 @@ if (getPageScroll().top <= getCoords(mapWrapper).top) { // Если мы смо�
     return true;
 });
 
-
-/*var map = document.getElementById("map");
-var mapWrapper = document.getElementById("resultOnSearchPage");
-$(window).scroll(function () {
-    // Если экран опустился ниже верхней границы карты, но карта не дошла до футера, то fixedTopBlock
-    if (getPageScroll().top <= getCoords(mapWrapper).top) {
-        $(map).css('top', 0 + 'px');
-    } else {
-        if (getPageScroll().top + map.offsetHeight >= getCoords(mapWrapper).top + mapWrapper.offsetHeight) {
-            $(map).css('top', 'auto');
-            $(map).css('bottom', 0 + 'px');
-        } else {
-            $(map).css('top', getPageScroll().top - getCoords(mapWrapper).top + 'px');
-        }
-    }
-});*/
-
 /**********************************************************************************
  * Подгрузка новых 20-ти объектов при прокрутке экрана со списком
  **********************************************************************************/

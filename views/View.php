@@ -104,7 +104,53 @@
 
         }
 
-        function getSearchResultHTML($propertyLightArr = array(), $favoritesPropertysId = array(), $typeOfRequest = "search")
+        // Метод возвращает строку команды добавления в избранное или удаления из избранного в зависимости от ситуации
+        // На входе: $propertyId - id объекта недвижимости, для которого формируется строка, $favoritesPropertysId - массив идентификаторов всех избранных объявлений недвижимости данного пользователя,
+        // $typeOfHTML - задает используемый шаблон. Если = "onlyIcon" - выдается шаблон исключительно с иконкой избранного. Если = "stringWithIcon" - выдается строка и иконка избранного
+        public function getHTMLforFavorites($propertyId = 0, $favoritesPropertysId = array(), $typeOfHTML = "stringWithIcon") {
+
+            // Шаблон для формируемого HTML блока с командой добавления в избранное / удаления из избранного
+            $templ = "
+                <span class='{actionFavorites}' propertyId='{propertyId}'><img src='{imgFavorites}'><a>{textFavorites}</a></span>
+            ";
+
+            // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне
+            $arrForReplace = array();
+            $arrForReplace['actionFavorites'] = "";
+            $arrForReplace['propertyId'] = "";
+            $arrForReplace['imgFavorites'] = "";
+            $arrForReplace['textFavorites'] = "";
+
+            if ($propertyId != 0) $arrForReplace['propertyId'] = $propertyId;
+
+            if ($propertyId != 0 && count($favoritesPropertysId) != 0) {
+                // Проверяем наличие данного объявления среди избранных у пользователя
+                if (in_array($propertyId, $favoritesPropertysId)) {
+                    $arrForReplace['actionFavorites'] = "removeFromFavorites";
+                    $arrForReplace['imgFavorites'] = "img/gold_star.png";
+                    $arrForReplace['textFavorites'] = "убрать из избранного";
+                } else {
+                    $arrForReplace['actionFavorites'] = "addToFavorites";
+                    $arrForReplace['imgFavorites'] = "img/blue_star.png";
+                    $arrForReplace['textFavorites'] = "добавить в избранное";
+                }
+            } else {
+                $arrForReplace['actionFavorites'] = "addToFavorites";
+                $arrForReplace['imgFavorites'] = "img/blue_star.png";
+                $arrForReplace['textFavorites'] = "добавить в избранное";
+            }
+
+            // Заполняем шаблон
+            // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне
+            $arrTemplVar = array('{actionFavorites}', '{propertyId}', '{imgFavorites}', '{textFavorites}');
+            // Копируем html-текст шаблона
+            $favoritesHTML = str_replace($arrTemplVar, $arrForReplace, $templ);
+
+            return $favoritesHTML;
+
+        }
+
+        public function getSearchResultHTML($propertyLightArr = array(), $favoritesPropertysId = array(), $typeOfRequest = "search")
         {
 
             // Инициализируем переменную, в которую сложим весь HTML код результатов поиска
@@ -296,7 +342,7 @@
 
         }
 
-        function getLightBalloonHTML($oneProperty)
+        public function getLightBalloonHTML($oneProperty)
         {
 
             // Координаты объекта
@@ -314,7 +360,7 @@
             return $currentAdvertBalloonList;
         }
 
-        function getFullBalloonHTML($oneProperty, $propertyFotosArr = FALSE, $favoritesPropertysId = array())
+        public function getFullBalloonHTML($oneProperty, $propertyFotosArr = FALSE, $favoritesPropertysId = array())
         {
             // Шаблон для всплывающего баллуна с описанием объекта недвижимости на карте Яндекса
             $tmpl_balloonContentBody = "
@@ -345,8 +391,10 @@
             </ul>
             <div class='clearBoth'></div>
             <div style='width:100%;'>
-                <a href='objdescription.php?propertyId={propertyId}'>Подробнее</a>
-                <span class='{actionFavorites}' propertyId='{propertyId}' style='float: right;'><img src='{imgFavorites}'><a>{textFavorites}</a></span>
+                <a href='objdescription.php?propertyId={propertyId}' target='_blank'>Подробнее</a>
+                <div style='float: right;'>
+                    {favorites}
+                </div>
             </div>
             ";
 
@@ -443,36 +491,20 @@
             }
 
             // Избранное
-            $arrBalloonReplace['actionFavorites'] = "";
-            $arrBalloonReplace['imgFavorites'] = "";
-            $arrBalloonReplace['textFavorites'] = "";
-            if (count($favoritesPropertysId) != 0) {
-                // Проверяем наличие данного объявления среди избранных у пользователя
-                if (in_array($arrBalloonReplace['propertyId'], $favoritesPropertysId)) {
-                    $arrBalloonReplace['actionFavorites'] = "removeFromFavorites";
-                    $arrBalloonReplace['imgFavorites'] = "img/gold_star.png";
-                    $arrBalloonReplace['textFavorites'] = "убрать из избранного";
-                } else {
-                    $arrBalloonReplace['actionFavorites'] = "addToFavorites";
-                    $arrBalloonReplace['imgFavorites'] = "img/blue_star.png";
-                    $arrBalloonReplace['textFavorites'] = "добавить в избранное";
-                }
-            } else {
-                $arrBalloonReplace['actionFavorites'] = "addToFavorites";
-                $arrBalloonReplace['imgFavorites'] = "img/blue_star.png";
-                $arrBalloonReplace['textFavorites'] = "добавить в избранное";
+            if (!($arrBalloonReplace['favorites'] = $this->getHTMLforFavorites($oneProperty['id'], $favoritesPropertysId, "stringWithIcon"))) {
+                $arrBalloonReplace['favorites'] = "";
             }
 
             // Производим заполнение шаблона баллуна
             // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне баллуна
-            $arrBalloonTemplVar = array('{propertyId}', '{typeOfObject}', '{address}', '{fotosWrapper}', '{costOfRenting}', '{currency}', '{utilities}', '{compensationMoney}', '{compensationPercent}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaNames}', '{areaValues}', '{floorName}', '{floor}', '{furnitureName}', '{furniture}', '{actionFavorites}', '{imgFavorites}', '{textFavorites}');
+            $arrBalloonTemplVar = array('{propertyId}', '{typeOfObject}', '{address}', '{fotosWrapper}', '{costOfRenting}', '{currency}', '{utilities}', '{compensationMoney}', '{compensationPercent}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaNames}', '{areaValues}', '{floorName}', '{floor}', '{furnitureName}', '{furniture}', '{favorites}');
             // Копируем html-текст шаблона баллуна
             $currentAdvertBalloonList = str_replace($arrBalloonTemplVar, $arrBalloonReplace, $tmpl_balloonContentBody);
 
             return $currentAdvertBalloonList;
         }
 
-        function getShortListItemHTML($oneProperty, $propertyFotosArr = FALSE, $favoritesPropertysId = array(), $number)
+        public function getShortListItemHTML($oneProperty, $propertyFotosArr = FALSE, $favoritesPropertysId = array(), $number)
         {
             // Шаблон для блока с кратким описанием объекта недвижимости в таблице
             $tmpl_shortAdvert = "
@@ -542,7 +574,7 @@
             return $currentAdvertShortList;
         }
 
-        function getFullParametersListItemHTML($oneProperty, $propertyFotosArr = FALSE, $favoritesPropertysId = array(), $number)
+        public function getFullParametersListItemHTML($oneProperty, $propertyFotosArr = FALSE, $favoritesPropertysId = array(), $number)
         {
             // Шаблон для блока (строки) с подробным описанием объекта недвижимости в таблице
             $tmpl_extendedAdvert = "
@@ -678,7 +710,7 @@
         }
 
         // Функция возвращает HTML код, который нужно поместить на страницу при отсутствии результатов поиска
-        function searchResultIsEmptyHTML($typeOfRequest, $allAmountAdverts)
+        public function searchResultIsEmptyHTML($typeOfRequest, $allAmountAdverts)
         {
 
             $searchResultHTML = "";

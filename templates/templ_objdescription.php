@@ -1,8 +1,10 @@
 <?php
     // Инициализируем используемые в шаблоне переменные
+    $userCharacteristic = $dataArr['userCharacteristic']; // Но для данной страницы данный массив содержит только имя, отчество, фамилию, телефон пользователя
     $propertyCharacteristic = $dataArr['propertyCharacteristic'];
     $propertyFotoInformation = $dataArr['propertyFotoInformation'];
     $isLoggedIn = $dataArr['isLoggedIn']; // Используется в templ_header.php
+    $favoritesPropertysId = $dataArr['favoritesPropertysId'];
     $strHeaderOfPage = $dataArr['strHeaderOfPage'];
 ?>
 
@@ -26,6 +28,14 @@
     <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
     <link rel="stylesheet" href="css/colorbox.css">
     <link rel="stylesheet" href="css/main.css">
+    <style>
+        .setOfInstructions {
+            text-align: left;
+            line-height: 2em;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
 
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
@@ -37,8 +47,6 @@
     <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
     <!-- ColorBox - плагин jQuery, позволяющий делать модальное окно для просмотра фотографий -->
     <script src="js/vendor/jquery.colorbox-min.js"></script>
-    <!-- Загружаем библиотеку для работы с картой от Яндекса -->
-    <script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
 
 </head>
 
@@ -72,27 +80,92 @@
                     echo $this->getHTMLfotosWrapper("middle", TRUE, FALSE, $propertyFotoInformation['uploadedFoto']);
                     ?>
 
-                    <div style="float: right;">
-                        <ul>
-                            <li>
-                                <button>Записаться на просмотр</button>
-                            </li>
-                            <li>
-                                <?php
-                                //TODO: переделать как надо!
-                                //echo "<span class='" . $favoritesParam['actionFavorites'] . "' propertyId='" . $propertyId . "'><img src='" . $favoritesParam['imgFavorites'] . "'><a>" . $favoritesParam['textFavorites'] . "</a></span>";
-                                ?>
-                            </li>
-                            <li>
-                                <a href="#"> отправить по e-mail</a>
-                            </li>
-                            <li>
-                                <a href="#"> похожие объявления</a>
-                            </li>
-                        </ul>
-                    </div>
+                    <ul class="setOfInstructions">
+
+                        <?php if ($correctEditProfileParameters !== FALSE): ?>
+                        <li>
+                            <button class="mainButton signUpToViewButton">Записаться на просмотр</button>
+                        </li>
+                        <?php endif; ?>
+
+                        <li>
+                            <?php
+                            echo $this->getHTMLforFavorites($propertyCharacteristic["id"], $favoritesPropertysId, "stringWithIcon");
+                            ?>
+                        </li>
+                        <!-- TODO: добавить функциональность!
+                        <li>
+                            <a href="#"> отправить по e-mail</a>
+                        </li>
+                        <li>
+                            <a href="#"> похожие объявления</a>
+                        </li>-->
+                    </ul>
+
                     <div class="clearBoth"></div>
+
                 </div>
+
+                <?php if ($correctEditProfileParameters !== FALSE): ?>
+                <form method="post" name="signUpToViewDialog" id="signUpToViewDialog"
+                      title="Записаться на просмотр">
+
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td class="itemLabel">
+                                    ФИО:
+                                </td>
+                                <td class="itemBody">
+                                    <?php
+                                    echo $userCharacteristic['surname'] . " " . $userCharacteristic['name'] . " " . $userCharacteristic['secondName'];
+                                    ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="itemLabel">
+                                    Телефон:
+                                </td>
+                                <td class="itemBody">
+                                    <?php
+                                    if (isset($userCharacteristic['telephon']) && $userCharacteristic['telephon'] != "") echo "+7" . $userCharacteristic['telephon'];
+                                    ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="itemLabel">
+                                    Удобные даты и время:
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <textarea name="convenientTime" rows="3"
+                                              placeholder="Например: 15 декабря 15.00 - 17.00" autofocus></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="itemLabel">
+                                    Комментарий:
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <textarea name="comment" rows="3"></textarea>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="bottomButton">
+                        <a id="signUpToViewDialogCancel" style="margin-right: 10px; cursor: pointer;">Отмена</a>
+                        <button type="submit" name="signUpToViewDialogButton" id="signUpToViewDialogButton"
+                                class="button">
+                            Отправить
+                        </button>
+                    </div>
+
+                </form>
+                <?php endif; ?>
 
                 <div class="objectDescription">
 
@@ -400,12 +473,21 @@
 
                     <div class="clearBoth"></div>
                 </div>
-                <a href="search.php">Найти похожие объявления</a>
             </div>
             <div id="tabs-2">
                 <!-- Карта Яндекса -->
                 <div id="mapForAdvertView" style="width: 50%; min-width: 300px; height: 400px; float: left;"></div>
 
+                <ul class="setOfInstructions">
+                    <li>
+                        <button class="mainButton signUpToViewButton">Записаться на просмотр</button>
+                    </li>
+                    <li>
+                        <?php
+                        echo $this->getHTMLforFavorites($propertyCharacteristic["id"], $favoritesPropertysId, "stringWithIcon");
+                        ?>
+                    </li>
+                </ul>
 
                 <div class="notEdited right">
                     <input type="hidden" name="coordX"
@@ -441,8 +523,6 @@
                     </table>
                 </div>
 
-                <a href="search.php">Найти похожие объявления</a>
-
                 <div class="clearBoth"></div>
             </div>
         </div>
@@ -454,12 +534,32 @@
 </div>
 <!-- /end.page_without_footer -->
 <div class="footer">
-    2012 «Хани Хом», вопросы и пожелания по работе портала можно передавать по телефону 8-922-143-16-15
+    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-143-16-15, e-mail:
+    support@svobodno.org
 </div>
 <!-- /end.footer -->
 
 <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
 <script src="js/main.js"></script>
+<script>
+
+    $("#signUpToViewDialog").dialog({
+        autoOpen:false,
+        modal:true,
+        width:600,
+        dialogClass:"edited"
+    });
+
+    $(".signUpToViewButton").click(function () {
+        $("#signUpToViewDialog").dialog("open");
+    });
+
+    $("#signUpToViewDialogCancel").on('click', function () {
+        $("#signUpToViewDialog").dialog("close");
+    });
+</script>
+<!-- Загружаем библиотеку для работы с картой от Яндекса -->
+<script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
 <script>
     /* Как только будет загружен API и готов DOM, выполняем инициализацию */
     ymaps.ready(init);

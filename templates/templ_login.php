@@ -13,8 +13,8 @@
          More info: h5bp.com/i/378 -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    <title>Вход на портал Хани Хом</title>
-    <meta name="description" content="Вход на портал Хани Хом">
+    <title>Вход</title>
+    <meta name="description" content="Вход на портал Svobodno.org">
 
     <!-- Mobile viewport optimized: h5bp.com/viewport -->
     <meta name="viewport" content="initialscale=1.0, width=device-width">
@@ -112,7 +112,7 @@
 </div>
 <!-- /end.page_without_footer -->
 <div class="footer">
-    2012 «Хани Хом», вопросы и пожелания по работе портала можно передавать по телефону 8-922-143-16-15
+    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-143-16-15, e-mail: support@svobodno.org
 </div>
 <!-- /end.footer -->
 

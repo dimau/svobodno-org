@@ -3,6 +3,10 @@
     // Класс (модель) для хранения и обработки ключевой информации по текущему пользователю (запросившему страницу)
     class IncomingUser
     {
+        public $name = "";
+        public $secondName = "";
+        public $surname = "";
+        public $telephon = "";
 
         private $id = "";
         private $typeTenant = NULL;
@@ -214,7 +218,7 @@
 
             // Получим из БД данные ($res) по пользователю с идентификатором сессии = $_SESSION['id'] или логином = $_COOKIE['login']
             $stmt = $this->DBlink->stmt_init();
-            if (($stmt->prepare("SELECT id, typeTenant, typeOwner, typeAdmin, login, password, user_hash, favoritesPropertysId FROM users WHERE user_hash=? OR login=?") === FALSE)
+            if (($stmt->prepare("SELECT id, typeTenant, typeOwner, typeAdmin, name, secondName, surname, telephon, login, password, user_hash, favoritesPropertysId FROM users WHERE user_hash=? OR login=?") === FALSE)
                 OR ($stmt->bind_param("ss", $sessionId, $cookieLogin) === FALSE)
                 OR ($stmt->execute() === FALSE)
                 OR (($res = $stmt->get_result()) === FALSE)
@@ -262,7 +266,10 @@
                 if (isset($res[0]['favoritesPropertysId'])) {
                     if (($unserializedData = unserialize($res[0]['favoritesPropertysId'])) != FALSE && is_array($unserializedData)) $this->favoritesPropertysId = $unserializedData;
                 }
-
+                if (isset($res[0]['name'])) $this->name = $res[0]['name'];
+                if (isset($res[0]['secondName'])) $this->secondName = $res[0]['secondName'];
+                if (isset($res[0]['surname'])) $this->surname = $res[0]['surname'];
+                if (isset($res[0]['telephon'])) $this->telephon = $res[0]['telephon'];
 
                 // Обновим куки (или добавим, если их ранее не было), чтобы после перезапуска браузера сессия не слетала
                 setcookie("login", "", time() - 1, '/');
@@ -340,12 +347,12 @@
 
                     } else //если пароли не совпали
                     {
-                        $error[] = "Неверный пароль";
+                        $error[] = "Неверный логин или пароль";
                         return $error;
                     }
                 } else // Если такого пользователя не найдено в БД
                 {
-                    $error[] = "Неверный логин и пароль";
+                    $error[] = "Неверный логин или пароль";
                     return $error;
                 }
 
