@@ -283,12 +283,28 @@
        propertyId INT(11) NOT NULL COMMENT 'Идентификатор объекта недвижимости, который желает посмотреть арендатор',
        tenantTime VARCHAR(200) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Дата и время, которые указал арендатор в качестве желаемых (удобных) по этому запросу',
        tenantComment VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Комментарий арендатора к запросу на просмотр',
+       ownerStatus VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Ответ собственника на запрос показа его недвижимости данному претенденту: confirmed - подтверждает, время показа указано в полях finalDate и т.д.; failure - отказ собственника от показа объекта данному претенденту; inProgress - ответ от собственника еще не получен',
        finalDate DATE COMMENT 'Хранит дату показа, согласованную с собственником и арендатором',
-       finalTimeHours INT(2) COMMENT 'Хранит время (часы) показа, согласованные с собственником и арендатором',
-       finalTimeMinutes INT(2) COMMENT 'Хранит время (минуты) показа, согласованные с собственником и арендатором'
+       finalTimeHours VARCHAR(2) COMMENT 'Хранит время (часы) показа, согласованные с собственником и арендатором',
+       finalTimeMinutes VARCHAR(2) COMMENT 'Хранит время (минуты) показа, согласованные с собственником и арендатором'
     )");
 
     echo "Статус создания таблицы requestToView: ";
+    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
+    /****************************************************************************
+     * Создаем таблицу для хранения информации о заявках на сдачу в аренду недвижимости от собственников
+     ***************************************************************************/
+
+    $DBlink->query("CREATE TABLE requestFromOwners (
+       id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор запроса на сдачу в аренду недвижимости',
+       name VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Имя собственника - как к нему обращаться',
+       telephon VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
+       address VARCHAR(60) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Человеческое назва',
+       commentOwner TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Комментарий собственника к запросу'
+    )");
+
+    echo "Статус создания таблицы requestFromOwners: ";
     if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
@@ -385,6 +401,10 @@
 
     /**
      * Проверяем настройки PHP сервера
+     * В файле php.ini нужно установить ограничения на максимальный размер загружаемых файлов:
+     * post_max_size = 100M
+     * upload_max_filesize = 25M
+     * memory_limit = 256M
      *
      * ini_set ("session.use_trans_sid", true); вроде как PHP сам умеет устанавливать id сессии либо в куки, либо в строку запроса (http://www.phpfaq.ru/sessions)
      */

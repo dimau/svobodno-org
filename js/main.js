@@ -150,7 +150,7 @@ function createUploader() {
         element: document.getElementById('file-uploader'),
         action: '../lib/uploader.php',
         allowedExtensions: ["jpeg", "JPEG", "jpg", "JPG", "png", "PNG", "gif", "GIF"], // Также расширения нужно менять в файле uploader.php
-        sizeLimit: 10 * 1024 * 1024,
+        sizeLimit: 25 * 1024 * 1024,
         debug: false,
         // О каждом загруженном файле информацию передаем на сервер через переменные - для сохранения в БД
         onSubmit:function (id, fileName) {

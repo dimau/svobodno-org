@@ -1,6 +1,7 @@
 <?php
 
     // Класс (модель) для хранения и обработки ключевой информации по текущему пользователю (запросившему страницу)
+    // Позволяет узнать авторизован пользователь или нет, имеет ли он статус арендатора, собственника или администратора
     class IncomingUser
     {
         public $name = "";
@@ -57,16 +58,7 @@
             // Если пользователь авторизован, то значения typeTenant и typeOwner будут записаны в переменные объекта из БД автоматически
             if ($this->login()) return $this->typeTenant;
 
-            // Если пользователь еще только регистрируется, то возвращаем значение из get параметров
-            if (isset($_GET['typeTenant'])) {
-                $this->typeTenant = TRUE;
-            } else {
-                $this->typeTenant = FALSE;
-            }
-            if (!isset($_GET['typeTenant']) && !isset($_GET['typeOwner'])) {
-                $this->typeTenant = TRUE;
-            }
-            return $this->typeTenant;
+            return FALSE;
         }
 
         // Является ли пользователь собственником (то есть имеет хотя бы 1 объявление или регистрируется в качестве собственника)
@@ -79,23 +71,12 @@
             // Если пользователь авторизован, то значения typeTenant и typeOwner будут записаны в переменные объекта из БД автоматически
             if ($this->login()) return $this->typeOwner;
 
-            // Если пользователь еще только регистрируется, то возвращаем значение из get параметров
-            if (isset($_GET['typeOwner'])) {
-                $this->typeOwner = TRUE;
-            } else {
-                $this->typeOwner = FALSE;
-            }
-            if (!isset($_GET['typeTenant']) && !isset($_GET['typeOwner'])) {
-                $this->typeOwner = TRUE;
-            }
-            return $this->typeOwner;
+            return FALSE;
         }
 
         // Метод возвращает id пользователя
         public function getId()
         {
-            if ($this->id == "") return FALSE;
-
             return $this->id;
         }
 

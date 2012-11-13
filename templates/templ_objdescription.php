@@ -6,6 +6,37 @@
     $isLoggedIn = $dataArr['isLoggedIn']; // Используется в templ_header.php
     $favoritesPropertysId = $dataArr['favoritesPropertysId'];
     $strHeaderOfPage = $dataArr['strHeaderOfPage'];
+    $signUpToViewData = $dataArr['signUpToViewData'];
+    $statusOfSaveParamsToDB = $dataArr['statusOfSaveParamsToDB'];
+
+    /**************************************
+     * Алгоритм выбора HTML оформления статуса Запроса на просмотр и модального окна для запроса на просмотр
+     *
+     * Пользователь не авторизован {
+     *      Кнопка Записаться на просмотр + модальное окно для неавторизованного пользователя
+     * }
+     * Пользователь авторизован {
+     *      Пользователь не является арендатором {
+     *          Кнопка Записаться на просмотр + модальное окно для пользователей не арендаторов
+     *      }
+     *      Пользователь является арендатором {
+     *          Для этого пользователя и этого объекта недвижимости еще не создано Запроса на просмотр {
+     *              Кнопка Записаться на просмотр + модальное окно с формой Записи на просмотр
+     *          }
+     *          Для этого пользователя и этого объекта недвижимости уже был создан Запрос на просмотр {
+     *              Статус Запроса = confirmed {
+     *                  Вместо кнопки Запроса инфа о времени просмотра + кнопка Изменить
+     *              }
+     *              Статус Запроса = failure {
+     *                  Вместо кнопки Запроса инфа об отказе собственника
+     *              }
+     *              Статус Запроса = inProgress {
+     *                  Вместо кнопки Запроса инфа о том, что Заявка обрабатывается
+     *              }
+     *          }
+     *      }
+     *}
+     **************************************/
 ?>
 
 <!DOCTYPE html>
@@ -82,11 +113,46 @@
 
                     <ul class="setOfInstructions">
 
-                        <?php if ($correctEditProfileParameters !== FALSE): ?>
-                        <li>
-                            <button class="mainButton signUpToViewButton">Записаться на просмотр</button>
-                        </li>
-                        <?php endif; ?>
+                        <?php
+                        /* Оформляем пункт Меню о Заявке на просмотр */
+                            // Если при передаче Запроса на показ возникли ошибки
+                            if ($statusOfSaveParamsToDB === FALSE) {
+                                echo "  <li>
+                                            <span>Ошибка при отправке запроса<br>Попробуйте немного позже</span>
+                                        </li>
+                                     ";
+
+                            } else { // Если ошибок не было
+
+                                if ($isLoggedIn === FALSE || $userCharacteristic['typeTenant'] === FALSE || $signUpToViewData['ownerStatus'] == "") {
+                                    echo "  <li>
+                                                <button class='mainButton signUpToViewButton'>Записаться на просмотр</button>
+                                            </li>
+                                         ";
+                                }
+
+                                if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['ownerStatus'] == "confirmed") {
+                                    echo "  <li>
+                                                <span>Просмотр {$signUpToViewData['finalDate']} в {$signUpToViewData['finalTimeHours']}:{$signUpToViewData['finalTimeMinutes']}</span>
+                                            </li>
+                                          ";
+                                }
+
+                                if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['ownerStatus'] == "failure") {
+                                    echo " <li>
+                                               <span title='К сожалению, собственник отказался от показа'>Отказ собственника</span>
+                                           </li>
+                                         ";
+                                }
+
+                                if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['ownerStatus'] == "inProgress") {
+                                    echo " <li>
+                                             <span title='Оператор с Вами свяжется в ближайшее время'>Заявка отправлена</span>
+                                           </li>
+                                         ";
+                                }
+                            }
+                        ?>
 
                         <li>
                             <?php
@@ -106,66 +172,16 @@
 
                 </div>
 
-                <?php if ($correctEditProfileParameters !== FALSE): ?>
-                <form method="post" name="signUpToViewDialog" id="signUpToViewDialog"
-                      title="Записаться на просмотр">
 
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td class="itemLabel">
-                                    ФИО:
-                                </td>
-                                <td class="itemBody">
-                                    <?php
-                                    echo $userCharacteristic['surname'] . " " . $userCharacteristic['name'] . " " . $userCharacteristic['secondName'];
-                                    ?>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="itemLabel">
-                                    Телефон:
-                                </td>
-                                <td class="itemBody">
-                                    <?php
-                                    if (isset($userCharacteristic['telephon']) && $userCharacteristic['telephon'] != "") echo "+7" . $userCharacteristic['telephon'];
-                                    ?>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="itemLabel">
-                                    Удобные даты и время:
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">
-                                    <textarea name="convenientTime" rows="3"
-                                              placeholder="Например: 15 декабря 15.00 - 17.00" autofocus></textarea>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="itemLabel">
-                                    Комментарий:
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">
-                                    <textarea name="comment" rows="3"></textarea>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <?php
+                    // Подключаем нужное модальное окно для Запроса на просмотр
 
-                    <div class="bottomButton">
-                        <a id="signUpToViewDialogCancel" style="margin-right: 10px; cursor: pointer;">Отмена</a>
-                        <button type="submit" name="signUpToViewDialogButton" id="signUpToViewDialogButton"
-                                class="button">
-                            Отправить
-                        </button>
-                    </div>
+                    if ($isLoggedIn === FALSE) include "templates/templ_signUpToViewDialog_ForLoggedOut.php";
+                    if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include "templates/templ_signUpToViewDialog_ForTenant.php";
 
-                </form>
-                <?php endif; ?>
+
+
+                ?>
 
                 <div class="objectDescription">
 

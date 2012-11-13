@@ -34,11 +34,6 @@
             line-height: 2.4;
         }
 
-        .actionsOnSearch {
-            float: right;
-            margin-top: 10px;
-        }
-
         #extendedSearchButton {
             margin-left: 20px;
         }
@@ -140,8 +135,7 @@
                         include "templates/templ_editableSearchRequest.php";
                     ?>
 
-                    <div class="actionsOnSearch">
-                        <a href="#">Запомнить условия поиска</a>
+                    <div class="bottomButton">
                         <button type="submit" name="extendedSearchButton" id="extendedSearchButton" class="mainButton">
                             Найти
                         </button>

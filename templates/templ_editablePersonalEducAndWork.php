@@ -115,7 +115,7 @@
                 <td class="itemRequired typeTenantRequired">
                 </td>
                 <td class="itemBody">
-                    <input type="text" name="kurs" id="kurs" class="ifLearned" <?php echo "value='".$userCharacteristic['kurs']."'";?>>
+                    <input type="text" name="kurs" id="kurs" class="ifLearned" value='<?php echo $userCharacteristic['kurs'];?>'>
                 </td>
             </tr>
             <tr id="formatEducation"
@@ -145,7 +145,7 @@
                 </td>
                 <td class="itemBody">
                     <input type="text" name="yearOfEnd" id="yearOfEnd"
-                           class="ifLearned" <?php echo "value='".$userCharacteristic['yearOfEnd']."'";?>>
+                           class="ifLearned" value='<?php echo $userCharacteristic['yearOfEnd'];?>'>
                 </td>
             </tr>
         </tbody>
@@ -165,7 +165,7 @@
                 <td class="itemRequired">
                 </td>
                 <td class="itemBody">
-                    <input type="text" name="regionOfBorn" id="regionOfBorn" <?php echo "value='".$userCharacteristic['regionOfBorn']."'";?>>
+                    <input type="text" name="regionOfBorn" id="regionOfBorn" value='<?php echo $userCharacteristic['regionOfBorn'];?>'>
                 </td>
             </tr>
             <tr>
@@ -175,7 +175,7 @@
                 <td class="itemRequired">
                 </td>
                 <td class="itemBody">
-                    <input type="text" name="cityOfBorn" id="cityOfBorn" <?php echo "value='".$userCharacteristic['cityOfBorn']."'";?>>
+                    <input type="text" name="cityOfBorn" id="cityOfBorn" value='<?php echo $userCharacteristic['cityOfBorn'];?>'>
                 </td>
             </tr>
             <tr>

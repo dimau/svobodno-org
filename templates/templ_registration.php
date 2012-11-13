@@ -18,8 +18,8 @@
          More info: h5bp.com/i/378 -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    <title>Форма регистрации</title>
-    <meta name="description" content="Форма регистрации">
+    <title>Регистрация</title>
+    <meta name="description" content="Форма регистрации для нового пользователя">
 
     <!-- Mobile viewport optimized: h5bp.com/viewport -->
     <meta name="viewport" content="initialscale=1.0, width=device-width">
@@ -111,7 +111,7 @@
 
     <?php if ($userCharacteristic['typeTenant']): ?>
     <div class="importantAddInfBlock">
-        <div class="importantAddInfHeader">
+        <div class="localHeader">
             Регистрация позволит бесплатно:
         </div>
         <ul class="benefits">
@@ -125,7 +125,7 @@
                 Добавлять объявления в избранные и в любой момент просматривать их
             </li>
             <li>
-                Не указывать повторно условия поиска - система запомнит их
+                Не указывать повторно условия поиска - портал запомнит
             </li>
         </ul>
     </div>

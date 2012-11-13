@@ -2,6 +2,8 @@
 
     class User
     {
+        public $typeTenant = NULL;
+        public $typeOwner = NULL;
         public $name = "";
         public $secondName = "";
         public $surname = "";
@@ -30,8 +32,6 @@
         public $twitter = "";
         public $lic = "";
         private $id = "";
-        private $typeTenant = NULL;
-        private $typeOwner = NULL;
         private $typeAdmin = NULL;
         private $emailReg = "";
         private $user_hash = "";
@@ -85,8 +85,6 @@
             // Если мы собираемся инициализировать данную модель в соответствии с текущим пользователем, запросившим страницу, то запишем его ключевые параметры
             if ($incomingUser != FALSE) {
                 $this->id = $incomingUser->getId();
-                $this->typeTenant = $incomingUser->isTenant();
-                $this->typeOwner = $incomingUser->isOwner();
             }
 
         }
@@ -971,6 +969,31 @@
 
             $this->id = $res[0]['id'];
             return $this->id;
+
+        }
+
+        // Если пользователь еще только регистрируется, то необходимо установить его статус в зависимости от строки запроса, по которой была запрошена страница регистрации. В этом строке могут быть указана доп. параметры - в качестве арендатора или в качестве собственника регистрируется пользователь
+        public function setTypeTenantOwnerFromGET()
+        {
+
+            if (isset($_GET['typeTenant'])) {
+                $this->typeTenant = TRUE;
+            } else {
+                $this->typeTenant = FALSE;
+            }
+            if (!isset($_GET['typeTenant']) && !isset($_GET['typeOwner'])) {
+                $this->typeTenant = TRUE;
+            }
+
+
+            if (isset($_GET['typeOwner'])) {
+                $this->typeOwner = TRUE;
+            } else {
+                $this->typeOwner = FALSE;
+            }
+            if (!isset($_GET['typeTenant']) && !isset($_GET['typeOwner'])) {
+                $this->typeOwner = TRUE;
+            }
 
         }
 

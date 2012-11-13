@@ -129,6 +129,11 @@ ul.listDescription .headOfString {
     list-style-image: url(../img/ui-icons_tick.png);
 }
 
+/* Просто текстовый список */
+.simpleTextList li {
+    list-style-image: url(../img/ui-icons_arrow.png);
+}
+
 /* ======================================================================
    БЛОКИ Fieldset с полями ввода для ВВОДА И РЕДАКТИРОВАНИЯ ПАРАМЕТРОВ
    ====================================================================== */
@@ -166,6 +171,7 @@ form {
     margin-bottom: 10px;
     margin-left: 0;
     margin-right: 0;
+    padding: 0.75em;
     border-radius: 5px;
     border: 1px solid #336784;
     text-align: left;
@@ -336,10 +342,11 @@ button,
 input,
 select,
 textarea {
-    font-size: 100%;
     margin: 0;
-    vertical-align: baseline;
     padding: 0.2em 0.4em;
+    vertical-align: baseline;
+    font-family: inherit;
+    font-size: 100%;
 }
 
 /*
@@ -420,6 +427,11 @@ button.left-bottom {
 input[type=text], input[type=password], select, textarea {
     border: 1px solid #CFCFCF;
     border-radius: 4px 4px 4px 4px;
+}
+
+/* Оформление ссылок-кнопок */
+a.button:focus {
+    outline: none;
 }
 
 /* Особенное выделение главных кнопок на страницах сайта */
@@ -569,6 +581,11 @@ td.bottom.right, th.bottom.right {
     padding-top: 10px; /* Используем вместо margin-top 10px padding-top=10px, так как это позволяет прижать футер к низу страницы без появления полосы прокрутки */
 }
 
+.localHeader {
+    margin: 10px 0 0 10px;
+    font-size: 1.1em;
+}
+
 .iconBox {
     background-image: url('../img/brand.png');
     width: 190px;
@@ -580,7 +597,7 @@ td.bottom.right, th.bottom.right {
 
 .nameOfServiceBox {
     min-width: 370px;
-    margin-left: 100px;
+    margin-left: 190px;
     margin-right: 130px;
     text-align: center;
 }

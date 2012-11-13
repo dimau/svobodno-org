@@ -412,4 +412,7 @@
             </tbody>
         </table>
     </fieldset>
+
+    <div class="clearBoth"></div>
+
 </div>

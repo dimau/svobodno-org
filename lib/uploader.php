@@ -22,7 +22,7 @@
     // Задаем список допустимых расширений для загружаемых файлов. Также расширение при начале загрузки проверяется в js файле vendor\fileuploader.js. Списки должны совпадать
     $allowedExtensions = array("jpeg", "JPEG", "jpg", "JPG", "png", "PNG", "gif", "GIF");
     // Задаем максимальный размер файла для загрузки в байтах
-    $sizeLimit = 10 * 1024 * 1024;
+    $sizeLimit = 25 * 1024 * 1024;
 
     $uploader = new qqFileUploader($allowedExtensions, $sizeLimit, $DBlink);
 

@@ -1,4 +1,4 @@
-<?
+<?php
     // Инициализируем используемые в шаблоне переменные
     $isLoggedIn = $dataArr['isLoggedIn']; // Используется в templ_header.php
 ?>
@@ -57,41 +57,57 @@
             <div id="carousel">
                 <div class="carousel-feature">
                     <a href="#"><img class="carousel-image" alt="Image Caption"
-                                     src="uploaded_files\0\big\03b141bbb26e42040b96fb9176ae28c4.jpeg"></a>
+                                     src="uploaded_files\8\big\8191e133c5de9ac88f6e2044f9fa1492.jpeg"></a>
 
                     <div class="carousel-caption">
                         <p>
-                            Подпись к первому слайду.
+                            Бесплатно для собственников<br>
+                            Низкая комиссия для арендаторов - 30%
                         </p>
                     </div>
                 </div>
                 <div class="carousel-feature">
                     <a href="#"><img class="carousel-image" alt="Image Caption"
-                                     src="uploaded_files\0\big\08c1da5a4849d70e2e109219382c9dfc.jpeg"></a>
+                                     src="uploaded_files\a\big\abc59f61571d0be307c5a055edb26d4b.jpeg"></a>
 
                     <div class="carousel-caption">
                         <p>
-                            Подпись ко второму слайду. Она побольше<br>И даже в несколько строк<br>Вот еще
+                            Находим порядочных арендаторов<br>
+                            Подробные анкеты по каждому претенденту на Вашу недвижимость
                         </p>
                     </div>
                 </div>
                 <div class="carousel-feature">
                     <a href="#"><img class="carousel-image" alt="Image Caption"
-                                     src="uploaded_files\b\big\b6ac5310bb479949a37940ef97d2d50d.jpeg"></a>
+                                     src="uploaded_files\b\big\b5a2f24d0ed2160c95701a94e2d6a72c.jpeg"></a>
 
                     <div class="carousel-caption">
                         <p>
-                            Подпись к третьему слайду.
+                            Сдать жилье с нами - просто<br>
+                            Мы составим подробное описание Вашей недвижимости<br>
+                            Мы его опубликуем на всех городских ресурсах<br>
+                            Вам останется только выбрать арендатора
                         </p>
                     </div>
                 </div>
                 <div class="carousel-feature">
                     <a href="#"><img class="carousel-image" alt="Image Caption"
-                                     src="uploaded_files\1\big\1c1dfa378d4d9caaa93703c0b89f4077.jpeg"></a>
+                                     src="uploaded_files\c\big\ccb661a47f3f25dc25ca154234728f62.jpeg"></a>
 
                     <div class="carousel-caption">
                         <p>
-                            Подпись к четвертому слайду. Она побольше<br>И даже в несколько строк<br>Вот еще
+                            Ежедневно от 70 до 150 новых объявлений с реальными данными
+                        </p>
+                    </div>
+                </div>
+                <div class="carousel-feature">
+                    <a href="#"><img class="carousel-image" alt="Image Caption"
+                                     src="uploaded_files\7\big\70bcdb9e7b9648f145d097ed72c33a28.jpeg"></a>
+
+                    <div class="carousel-caption">
+                        <p>
+                            Арендатор оплачивает комиссию только по факту заселения<br>
+                            Работаем с выездом
                         </p>
                     </div>
                 </div>
@@ -187,7 +203,7 @@
                 <div class="nextActionBlock"
                      style="width: 49.5%; display: inline-block; vertical-align: top; text-align: center;">
                     <div class="blockHeader">Что дальше?</div>
-                    <a class="button mainButton" href="#"><span style="font-size: 1.1em;">Подайте заявку</span><br><span
+                    <a class="button mainButton" href="forowner.php"><span style="font-size: 1.1em;">Подайте заявку</span><br><span
                         style="font-size: 0.9em;">наш специалист свяжется с Вами</span></a>
                 </div>
 
@@ -272,7 +288,7 @@
                             Добавлять объявления в избранные и в любой момент просматривать их
                         </li>
                         <li>
-                            Не указывать повторно условия поиска - система запомнит их
+                            Не указывать повторно условия поиска - портал запомнит
                         </li>
                     </ul>
                     или воспользуйтесь <a href="search.php">Поиском недвижимости</a>

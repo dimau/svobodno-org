@@ -24,6 +24,7 @@
     include 'models/IncomingUser.php';
     include 'views/View.php';
     include 'models/Property.php';
+    include 'models/SignUpToView.php';
 
     // Создаем объект-хранилище глобальных функций
     $globFunc = new GlobFunc();
@@ -36,13 +37,12 @@
     // Инициализируем модель для запросившего страницу пользователя
     $incomingUser = new IncomingUser($globFunc, $DBlink);
 
-    // Инициализируем переменную для хранения статуса запроса на просмотр данного объекта недвижимости
-    // Может принимать значения:
-    // "new" - запрос еще не отправлен данным пользователем,
-    // "waitingForConfirmation" - был отправлен, но еще не подтвержден собственником,
-    // "error" - был отправлен, но при передаче произошла ошибка
-    // "confirmed" - был отправлен и со стороны собственника получено подтверждение
-    $signUpToViewStatus = "";
+    // Инициализируем модель запроса на просмотр данного объекта данным пользователем.
+    // Если он уже записался на просмотр, то в модели будут содержаться данные его запроса (время, комментарий...)
+    $signUpToView = new SignUpToView($globFunc, $DBlink, $incomingUser->getId(), $propertyId);
+
+    // Инициализируем переменную для хранения информации об успешности/неуспешности отправки запроса на просмотр в БД
+    $statusOfSaveParamsToDB = NULL;
 
     /*************************************************************************************
      * Получаем данные объявления для просмотра, а также другие данные из БД
@@ -74,7 +74,10 @@
 
     if (isset($_POST['signUpToViewDialogButton'])) {
 
+        $signUpToView->writeParamsFromPOST(); // TODO: добавить проверку на заполненность комментария и удобного времени просмотра
+        $statusOfSaveParamsToDB = $signUpToView->saveParamsToDB();
 
+        //TODO: оповестить оператора о новом запросе на просмотр
     }
 
     /********************************************************************************
@@ -82,12 +85,14 @@
      *******************************************************************************/
 
     $view = new View($globFunc, $DBlink);
-    $view->generate("templ_objdescription.php", array('userCharacteristic' => array('name' => $incomingUser->name, 'secondName' => $incomingUser->secondName, 'surname' => $incomingUser->surname, 'telephon' => $incomingUser->telephon),
+    $view->generate("templ_objdescription.php", array('userCharacteristic' => array('typeTenant' => $incomingUser->isTenant(), 'name' => $incomingUser->name, 'secondName' => $incomingUser->secondName, 'surname' => $incomingUser->surname, 'telephon' => $incomingUser->telephon),
                                                  'propertyCharacteristic' => $property->getCharacteristicData(),
                                                  'propertyFotoInformation' => $property->getFotoInformationData(),
                                                  'isLoggedIn' => $incomingUser->login(),
                                                  'favoritesPropertysId' => $incomingUser->getFavoritesPropertysId(),
-                                                 'strHeaderOfPage' => $strHeaderOfPage));
+                                                 'strHeaderOfPage' => $strHeaderOfPage,
+                                                 'signUpToViewData' => $signUpToView->getParams(),
+                                                 'statusOfSaveParamsToDB' => $statusOfSaveParamsToDB));
 
     /********************************************************************************
      * Закрываем соединение с БД
