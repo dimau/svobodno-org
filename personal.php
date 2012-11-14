@@ -173,7 +173,7 @@
         </li>
         {instructionDelete}
     </ul>
-    <ul class='listDescription'>
+    <ul class='listDescriptionSmall'>
         <li>
             <span class='headOfString' style='vertical-align: top;' title='Пользователи, запросившие контакты собственника по этому объявлению'>Возможные арендаторы:</span>{probableTenants}
         </li>
@@ -378,7 +378,7 @@
             </li>
         </ul>
 
-        <ul class='listDescription'>
+        <ul class='listDescriptionSmall'>
             <li>
                 <span class='headOfString'>ФИО:</span>
                 Ушаков Дмитрий Владимирович
@@ -435,7 +435,7 @@
         </li>
         {instructionDelete}
     </ul>
-    <ul class='listDescription'>
+    <ul class='listDescriptionSmall'>
         <li>
             <span class='headOfString' style='vertical-align: top;' title='Пользователи, запросившие контакты собственника по этому объявлению'>Возможные арендаторы:</span>{probableTenants}
         </li>

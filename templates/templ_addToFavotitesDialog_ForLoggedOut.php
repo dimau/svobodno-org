@@ -1,7 +1,7 @@
-<div id="signUpToViewDialog" title="Записаться на просмотр">
+<div id="addToFavoritesDialog" title="Добавить в избранное">
 
     <div style="margin: 10px 0 10px 0">
-        Для отправки заявки на просмотр необходимо <a href="registration.php?typeTenant=TRUE">Зарегистрироваться</a>
+        Для добавления в избранное необходимо <a href="registration.php?typeTenant=TRUE">Зарегистрироваться</a>
     </div>
 
     <div class="localHeader">Регистрация позволит:</div>

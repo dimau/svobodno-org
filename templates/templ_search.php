@@ -37,6 +37,16 @@
         #extendedSearchButton {
             margin-left: 20px;
         }
+
+        /* Отступ под блок класса advertActions */
+        .realtyObject .listDescriptionSmall {
+            margin-bottom: 21px;
+        }
+
+        /* Отступ слева для описания объекта в баллуне */
+        .listDescriptionSmall.forBalloon {
+            margin-left: 6px;
+        }
     </style>
 
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -155,6 +165,11 @@
         echo $searchResultHTML;
         ?>
 
+        <?php
+        // Модальное окно для незарегистрированных пользователей, которые нажимают на кнопку добавления в Избранное
+        if ($isLoggedIn === FALSE) include "templates/templ_addToFavotitesDialog_ForLoggedOut.php";
+        ?>
+
     </div>
     <!-- /end.page_main_content -->
     <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
@@ -197,6 +212,12 @@
     // При изменении перечисленных здесь полей алгоритм пробегает форму с целью показать нужные элементы и скрыть ненужные
     $(document).ready(notavailability);
     $("#typeOfObject").change(notavailability);
+
+    /* Проматываем на область результатов поиска */
+    $(document).ready(function() {
+        document.getElementsByClassName("choiceViewSearchResult")[0].scrollIntoView(true);
+    });
+
 </script>
 <!-- end scripts -->
 

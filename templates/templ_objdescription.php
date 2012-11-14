@@ -78,6 +78,27 @@
     <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
     <!-- ColorBox - плагин jQuery, позволяющий делать модальное окно для просмотра фотографий -->
     <script src="js/vendor/jquery.colorbox-min.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        $(document).ready(function() {
+
+            $("#signUpToViewDialog").dialog({
+                autoOpen:false,
+                modal:true,
+                width:600,
+                dialogClass:"edited"
+            });
+
+            $(".signUpToViewButton").click(function () {
+                $("#signUpToViewDialog").dialog("open");
+            });
+
+            $("#signUpToViewDialogCancel").on('click', function () {
+                $("#signUpToViewDialog").dialog("close");
+            });
+
+        });
+    </script>
 
 </head>
 
@@ -178,8 +199,6 @@
 
                     if ($isLoggedIn === FALSE) include "templates/templ_signUpToViewDialog_ForLoggedOut.php";
                     if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include "templates/templ_signUpToViewDialog_ForTenant.php";
-
-
 
                 ?>
 
@@ -543,6 +562,11 @@
             </div>
         </div>
 
+        <?php
+            // Модальное окно для незарегистрированных пользователей, которые нажимают на кнопку добавления в Избранное
+            if ($isLoggedIn === FALSE) include "templates/templ_addToFavotitesDialog_ForLoggedOut.php";
+        ?>
+
     </div>
     <!-- /end.page_main_content -->
     <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
@@ -555,25 +579,7 @@
 </div>
 <!-- /end.footer -->
 
-<!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
-<script src="js/main.js"></script>
-<script>
-
-    $("#signUpToViewDialog").dialog({
-        autoOpen:false,
-        modal:true,
-        width:600,
-        dialogClass:"edited"
-    });
-
-    $(".signUpToViewButton").click(function () {
-        $("#signUpToViewDialog").dialog("open");
-    });
-
-    $("#signUpToViewDialogCancel").on('click', function () {
-        $("#signUpToViewDialog").dialog("close");
-    });
-</script>
+<!-- scripts -->
 <!-- Загружаем библиотеку для работы с картой от Яндекса -->
 <script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
 <script>

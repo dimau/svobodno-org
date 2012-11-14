@@ -109,19 +109,38 @@ ol {
     padding: 0 0 0 40px;
 }
 
-ul.listDescription {
-    /* Используется для блоков с описанием человека, объекта и др в виде списка параметров*/
-    list-style: none;
+/* Для крупных по размеру списков с описанием (личный кабинет - профиль, страница с описанием человека) */
+ul.listDescriptionBig {
+    float: left;
+    max-width: 40em;
     padding: 0;
     margin-top: 0;
     margin-left: 1%;
-    float: left;
+    list-style: none;
+    text-align: left;
     line-height: 1.6em;
-    max-width: 40em;
+    font-size: 1em;
 }
 
-ul.listDescription .headOfString {
-    border-bottom: 1px dotted black;
+ul.listDescriptionBig .headOfString {
+    border-bottom: 1px dotted #808080;
+    color: #808080;
+}
+
+/* Для маленьких по размеру списков с описанием (описание недвижимости на странице поиска) */
+ul.listDescriptionSmall {
+    float: left;
+    max-width: 36em;
+    padding: 0;
+    margin-top: 0;
+    list-style: none;
+    text-align: left;
+    line-height: 1.6em;
+    font-size: 0.9em;
+}
+
+ul.listDescriptionSmall .headOfString {
+    color: #808080;
 }
 
 /* Список преимуществ */
@@ -1016,7 +1035,7 @@ td.bottom.right, th.bottom.right {
     top: auto;
 }
 
-/* Стили для чистого списка объявлений - без карты */
+/* Стили для списка объявлений - с картой или без карты */
 .listOfRealtyObjects {
     width: 50%;
     float: left;
@@ -1024,8 +1043,7 @@ td.bottom.right, th.bottom.right {
 
 .realtyObject {
     height: 50px;
-    /*border-bottom: 1px solid grey;*/
-    border: 1px solid grey;
+    border: 2px solid silver;
     background-color: white;
     text-align: center;
 }
@@ -1039,20 +1057,27 @@ td.bottom.right, th.bottom.right {
     position: relative; /* Чтобы абсолютно позиционированная ссылка Подробнее не уезжала из ячейки */
 }
 
-.linkToDescriptionBlock {
+.realtyObject:hover td {
+    border-top: 2px solid #6a9d02; /* Вместе с соответствующим правилом для tr класса realtyObject помогает сделать рамку нужного цвета при наведении курсора */
+}
+
+/* Стили для команд управления объявлением в режиме Список + Карта */
+.advertActions {
     /* Блок для ссылки подробнее под каждым объявлением в списке */
     position: absolute;
-    bottom: 4px;
-    right: 4px;
+    bottom: 6px;
+    left: 6px;
+    right: 6px;
+    text-align: right;
+    font-size: 0.9em;
 }
 
-.linkToDescriptionBlock a {
-    /* Белый цвет для ссылки дает иллюзию невидимости ссылки на белом фоне, пока не будет наведен указатель мыши */
-    color: white;
+.advertActions a {
+    opacity: 0;
 }
 
-.linkToDescriptionBlock a:hover {
-    color: #7BDED9;
+.realtyObject:hover .advertActions a {
+    opacity: 1;
 }
 
 /* Режим только карты */

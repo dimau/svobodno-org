@@ -51,6 +51,11 @@
         #notEditedSpecialParams .objectDescriptionItemLabel, #notEditedSpecialParams .objectDescriptionBody {
             width: auto;
         }
+
+            /* Отступ слева для описания объекта в баллуне */
+        .listDescriptionSmall.forBalloon {
+            margin-left: 6px;
+        }
     </style>
 
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -157,7 +162,7 @@
         ?>
 
         <div class="profileInformation">
-            <ul class="listDescription">
+            <ul class="listDescriptionBig">
                 <li>
                 <span
                     class="FIO"><?php echo $userCharacteristic['surname'] . " " . $userCharacteristic['name'] . " " . $userCharacteristic['secondName'] ?></span>
@@ -355,7 +360,7 @@
                 <a href="#">подробнее</a>
             </li>
         </ul>
-        <ul class="listDescription">
+        <ul class="listDescriptionSmall">
             <li>
                 <span class="headOfString">ФИО:</span>
                 Ушаков Дмитрий Владимирович
@@ -405,7 +410,7 @@
                 <a href="#">подробнее</a>
             </li>
         </ul>
-        <ul class="listDescription">
+        <ul class="listDescriptionSmall">
             <li>
                 <span class="headOfString">Адрес объекта:</span>
                 улица Шаумяна 107, кв 70
@@ -442,7 +447,7 @@
                 <a href="#">подробнее</a>
             </li>
         </ul>
-        <ul class="listDescription">
+        <ul class="listDescriptionSmall">
             <li>
                 <span class="headOfString">ФИО:</span>
                 Ушаков Дмитрий Владимирович
@@ -491,7 +496,7 @@
                 <a href="#">посмотреть на карте</a>
             </li>
         </ul>
-        <ul class="listDescription">
+        <ul class="listDescriptionSmall">
             <li>
                 <span class="headOfString">Тип:</span> Квартира
             </li>
@@ -774,6 +779,11 @@
 
 </div>
 <!-- /end.tabs -->
+
+<?php
+    // Модальное окно для незарегистрированных пользователей, которые нажимают на кнопку добавления в Избранное
+    if ($isLoggedIn === FALSE) include "templates/templ_addToFavotitesDialog_ForLoggedOut.php";
+?>
 
 </div>
 <!-- /end.page_main_content -->

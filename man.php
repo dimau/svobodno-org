@@ -191,7 +191,7 @@
                         ?>
                     </div>
                     <div class="profileInformation">
-                        <ul class="listDescription">
+                        <ul class="listDescriptionBig">
                             <li>
                                 <span class="FIO"><?php echo $strHeaderOfPage; ?></span>
                             </li>
