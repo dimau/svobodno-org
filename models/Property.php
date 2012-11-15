@@ -116,6 +116,11 @@
         // Возвращает TRUE, если данные успешно сохранены и FALSE в противном случае
         public function saveCharacteristicToDB($typeOfProperty = "edit", $userId = "") {
 
+            // Вычислим id пользователя собственника данного объекта недвижимости (если создается не новое объявление, а идет редактирование ранее созданного)
+            if ($typeOfProperty == "edit") {
+                $userId = $this->userId;
+            }
+
             // Если не указан id пользователя собственника, то дальнейшие действия не имеют смысла
             if ($userId == "") return FALSE;
 
@@ -438,9 +443,9 @@
 
             // Если данные по пользователю есть в БД, присваиваем их соответствующим переменным, иначе - у них останутся значения по умолчанию.
             if (isset($onePropertyDataArr['typeOfObject'])) $this->typeOfObject = $onePropertyDataArr['typeOfObject'];
-            if (isset($onePropertyDataArr['dateOfEntry'])) $this->dateOfEntry = $this->globFunc->dateFromDBToView($onePropertyDataArr['dateOfEntry']);
+            if (isset($onePropertyDataArr['dateOfEntry']) && $onePropertyDataArr['dateOfEntry'] != "0000-00-00") $this->dateOfEntry = $this->globFunc->dateFromDBToView($onePropertyDataArr['dateOfEntry']);
             if (isset($onePropertyDataArr['termOfLease'])) $this->termOfLease = $onePropertyDataArr['termOfLease'];
-            if (isset($onePropertyDataArr['dateOfCheckOut'])) $this->dateOfCheckOut = $this->globFunc->dateFromDBToView($onePropertyDataArr['dateOfCheckOut']);
+            if (isset($onePropertyDataArr['dateOfCheckOut']) && $onePropertyDataArr['dateOfCheckOut'] != "0000-00-00") $this->dateOfCheckOut = $this->globFunc->dateFromDBToView($onePropertyDataArr['dateOfCheckOut']);
             if (isset($onePropertyDataArr['amountOfRooms'])) $this->amountOfRooms = $onePropertyDataArr['amountOfRooms'];
             if (isset($onePropertyDataArr['adjacentRooms'])) $this->adjacentRooms = $onePropertyDataArr['adjacentRooms'];
             if (isset($onePropertyDataArr['amountOfAdjacentRooms'])) $this->amountOfAdjacentRooms = $onePropertyDataArr['amountOfAdjacentRooms'];
@@ -594,14 +599,14 @@
             if (isset($_POST['internet'])) $this->internet = htmlspecialchars($_POST['internet']);
             if (isset($_POST['telephoneLine'])) $this->telephoneLine = htmlspecialchars($_POST['telephoneLine']);
             if (isset($_POST['cableTV'])) $this->cableTV = htmlspecialchars($_POST['cableTV']);
-            if (isset($_POST['furnitureInLivingArea'])) $this->furnitureInLivingArea = $_POST['furnitureInLivingArea'];
+            if (isset($_POST['furnitureInLivingArea'])) $this->furnitureInLivingArea = $_POST['furnitureInLivingArea']; else $this->furnitureInLivingArea = array(); // Если пользователь отправил форму и не отметил ни одного предмета мебели, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
             if (isset($_POST['furnitureInLivingAreaExtra'])) $this->furnitureInLivingAreaExtra = htmlspecialchars($_POST['furnitureInLivingAreaExtra']);
-            if (isset($_POST['furnitureInKitchen'])) $this->furnitureInKitchen = $_POST['furnitureInKitchen'];
+            if (isset($_POST['furnitureInKitchen'])) $this->furnitureInKitchen = $_POST['furnitureInKitchen']; else $this->furnitureInKitchen = array(); // Если пользователь отправил форму и не отметил ни одного предмета мебели, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
             if (isset($_POST['furnitureInKitchenExtra'])) $this->furnitureInKitchenExtra = htmlspecialchars($_POST['furnitureInKitchenExtra']);
-            if (isset($_POST['appliances'])) $this->appliances = $_POST['appliances'];
+            if (isset($_POST['appliances'])) $this->appliances = $_POST['appliances']; else $this->appliances = array(); // Если пользователь отправил форму и не отметил ни одного предмета бытовой техники, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
             if (isset($_POST['appliancesExtra'])) $this->appliancesExtra = htmlspecialchars($_POST['appliancesExtra']);
-            if (isset($_POST['sexOfTenant'])) $this->sexOfTenant = $_POST['sexOfTenant'];
-            if (isset($_POST['relations'])) $this->relations = $_POST['relations'];
+            if (isset($_POST['sexOfTenant'])) $this->sexOfTenant = $_POST['sexOfTenant']; else $this->sexOfTenant = array(); // Если пользователь отправил форму и не отметил ни одного допустимого пола для одиночного арендатора, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
+            if (isset($_POST['relations'])) $this->relations = $_POST['relations']; else $this->relations = array(); // Если пользователь отправил форму и не отметил ни одного допустимого вида отношений между арендаторами, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
             if (isset($_POST['children'])) $this->children = htmlspecialchars($_POST['children']);
             if (isset($_POST['animals'])) $this->animals = htmlspecialchars($_POST['animals']);
             if (isset($_POST['contactTelephonNumber'])) $this->contactTelephonNumber = htmlspecialchars($_POST['contactTelephonNumber']);

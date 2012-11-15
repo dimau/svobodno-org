@@ -16,8 +16,8 @@
          More info: h5bp.com/i/378 -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    <title>Новое объявление</title>
-    <meta name="description" content="Новое объявление">
+    <title>Редактирование объявления</title>
+    <meta name="description" content="Редактирование объявления">
 
     <!-- Mobile viewport optimized: h5bp.com/viewport -->
     <meta name="viewport" content="initialscale=1.0, width=device-width">
@@ -28,7 +28,8 @@
     <link rel="stylesheet" href="css/fileuploader.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
-        /* Стили для создания нового Объявления*/
+            /* Стили для создания нового Объявления*/
+
         .objectDescriptionItem .objectDescriptionItemLabel {
             min-width: 150px;
             width: 49%;
@@ -123,7 +124,11 @@
 <div class="page_main_content">
 
 <div class="headerOfPage">
-    Новое объявление
+    Редактирование объявления.
+    <?php
+    if ($propertyCharacteristic['apartmentNumber'] != "") $apartmentNumberInHeader = ", № " . $propertyCharacteristic['apartmentNumber']; else $apartmentNumberInHeader = "";
+    echo $this->globFunc->getFirstCharUpper($propertyCharacteristic['typeOfObject']) . " по адресу: " . $propertyCharacteristic['address'] . $apartmentNumberInHeader;
+    ?>
 </div>
 
 <form method="post" name="newAdvert" class="advertDescriptionEdit">
@@ -136,15 +141,11 @@
             Тип объекта:
         </div>
         <div class="objectDescriptionBody">
-            <select name="typeOfObject" id="typeOfObject">
-                <option value="0" <?php if ($propertyCharacteristic['typeOfObject'] == "0") echo "selected";?>></option>
-                <option value="квартира" <?php if ($propertyCharacteristic['typeOfObject'] == "квартира") echo "selected";?>>квартира</option>
-                <option value="комната" <?php if ($propertyCharacteristic['typeOfObject'] == "комната") echo "selected";?>>комната</option>
-                <option value="дом" <?php if ($propertyCharacteristic['typeOfObject'] == "дом") echo "selected";?>>дом, коттедж</option>
-                <option value="таунхаус" <?php if ($propertyCharacteristic['typeOfObject'] == "таунхаус") echo "selected";?>>таунхаус</option>
-                <option value="дача" <?php if ($propertyCharacteristic['typeOfObject'] == "дача") echo "selected";?>>дача</option>
-                <option value="гараж" <?php if ($propertyCharacteristic['typeOfObject'] == "гараж") echo "selected";?>>гараж</option>
-            </select>
+            <input type="hidden" name="typeOfObject" id="typeOfObject" value='<?php echo $propertyCharacteristic['typeOfObject']; ?>'>
+            <?php
+            // Значение поля необходимо сохранить еще и в скрытом input, так как JS в зависимости от него будет делать некоторые элементы недоступными для редактирования
+            echo $propertyCharacteristic['typeOfObject'];
+            ?>
         </div>
     </div>
     <div class="objectDescriptionItem">
@@ -356,9 +357,11 @@
             Этаж:
         </div>
         <div class="objectDescriptionBody">
-            <input type="text" size="3" name="floor" value='<?php echo $propertyCharacteristic['floor'];?>'>
+            <input type="hidden" name="floor" value='<?php echo $propertyCharacteristic['floor'];?>'>
+            <?php echo $propertyCharacteristic['floor'];?>
             из
-            <input type="text" size="3" name="totalAmountFloor" value='<?php echo $propertyCharacteristic['totalAmountFloor'];?>'>
+            <input type="hidden" name="totalAmountFloor" value='<?php echo $propertyCharacteristic['totalAmountFloor'];?>'>
+            <?php echo $propertyCharacteristic['totalAmountFloor'];?>
         </div>
     </div>
     <div class="objectDescriptionItem"
@@ -367,7 +370,8 @@
             Этажность дома:
         </div>
         <div class="objectDescriptionBody">
-            <input type="text" size="3" name="numberOfFloor" value='<?php echo $propertyCharacteristic['numberOfFloor'];?>'>
+            <input type="hidden" name="numberOfFloor" value='<?php echo $propertyCharacteristic['numberOfFloor'];?>'>
+            <?php echo $propertyCharacteristic['numberOfFloor'];?>
         </div>
     </div>
     <div class="objectDescriptionItem"
@@ -429,22 +433,14 @@
             Район:
         </div>
         <div class="objectDescriptionBody">
-            <select name="district">
-                <option value="0"></option>
-                <?php
-                if (isset($allDistrictsInCity)) {
-                    foreach ($allDistrictsInCity as $value) { // Для каждого названия района формируем option в селекте
-                        echo "<option value='" . $value['name'] . "'";
-                        if ($value['name'] == $propertyCharacteristic['district']) echo "selected";
-                        echo ">" . $value['name'] . "</option>";
-                    }
-                }
-                ?>
-            </select>
+            <input type="hidden" name="district" value='<?php echo $propertyCharacteristic['district'];?>'>
+            <?php
+            if (isset($propertyCharacteristic['district'])) echo $propertyCharacteristic['district'];
+            ?>
         </div>
     </div>
     <div class="objectDescriptionItem">
-        <div class="objectDescriptionItemLabel" style="line-height: 2em;">
+        <div class="objectDescriptionItemLabel" style="line-height: 2.3em;">
             Улица и номер дома:
         </div>
         <div class="objectDescriptionBody" style="min-width: 470px">
@@ -454,8 +450,8 @@
                 <tbody>
                     <tr>
                         <td>
-                            <input type="text" name="address" id="addressTextBox"
-                                   size="30" value='<?php echo $propertyCharacteristic['address'];?>'>
+                            <input type="hidden" name="address" id="addressTextBox" value='<?php echo $propertyCharacteristic['address'];?>'>
+                            <?php echo $propertyCharacteristic['address']; ?>
                         </td>
                         <td>
                             <button id="checkAddressButton" style='margin-left: 0.7em;'>Подтвердить адрес</button>
@@ -476,7 +472,9 @@
             Номер квартиры:
         </div>
         <div class="objectDescriptionBody">
-            <input type="text" name="apartmentNumber" size="7" maxlength="20" value='<?php echo $propertyCharacteristic['apartmentNumber'];?>'>
+            <input type="hidden" name="apartmentNumber" value='<?php echo $propertyCharacteristic['apartmentNumber'];?>'>
+            <!-- Значение поля необходимо сохранить, так как JS в зависимости от него будет делать некоторые элементы недоступными для редактирования -->
+            <?php if ($propertyCharacteristic['apartmentNumber'] != "") echo $propertyCharacteristic['apartmentNumber']; ?>
         </div>
     </div>
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_дача&typeOfObject_гараж">
@@ -607,18 +605,8 @@
             </select>
         </div>
     </div>
-    <div class="objectDescriptionItem">
-        <div class="objectDescriptionItemLabel">
-            Единоразовая комиссия:
-        </div>
-        <div class="objectDescriptionBody">
-            <input type="text" size="7" name="compensationMoney"
-                   id="compensationMoney" value='<?php echo $propertyCharacteristic['compensationMoney'];?>'>
-            <span class="currency"></span> или <input type="text" size="7" name="compensationPercent"
-                                                      id="compensationPercent" value='<?php echo $propertyCharacteristic['compensationPercent'];?>'>
-            % от стоимости аренды
-        </div>
-    </div>
+    <input type="hidden" name="compensationMoney" id="compensationMoney" value='<?php echo $propertyCharacteristic['compensationMoney'];?>'>
+    <input type="hidden" name="compensationPercent" id="compensationPercent" value='<?php echo $propertyCharacteristic['compensationPercent'];?>'>
 </div>
 
 <div class="advertDescriptionChapter" id="currentStatus">

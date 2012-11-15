@@ -55,35 +55,13 @@ $(function () {
         changeYear:true,
         minDate:now,
         maxDate:twoYearsAfterNow,
-        defaultDate:new Date(),
+        defaultDate:new Date()
     });
     $("#datepicker").datepicker($.datepicker.regional["ru"]);
 
 });
 
 // Подготовим возможность загрузки фотографий
-function createUploader() {
-    var uploader = new qq.FileUploader({
-        element:document.getElementById('file-uploader'),
-        action:'../lib/uploader.php',
-        allowedExtensions:["jpeg", "jpg", "img", "bmp", "png", "gif"], //Также расширения нужно менять в файле uploader.php
-        sizeLimit:10 * 1024 * 1024,
-        debug:false,
-        // О каждом загруженном файле информацию передаем на сервер через переменные - для сохранения в БД
-        onSubmit:function (id, fileName) {
-            uploader.setParams({
-                fileuploadid:$("#fileUploadId").val(),
-                sourcefilename:fileName,
-            });
-        }
-        //extraDropzones: [qq.getByClass(document, 'qq-upload-extra-drop-area')[0]]
-    });
-
-    // Важно, что в конце файла uploader.php располагается функция handleUpload, в которой есть и мой код, работающий на сервере при получении файла
-
-    // Сформируем зеленые блоки для уже загруженных фотографий руками, чтобы пользователя не путать
-    createUploadedFilesBlocks(uploader);
-}
 $(document).ready(createUploader);
 
 // Деактивируем кнопку проверки адреса, если это форма для РЕДАКТИРОВАНИЯ

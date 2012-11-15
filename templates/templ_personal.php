@@ -3,6 +3,9 @@
     $userCharacteristic = $dataArr['userCharacteristic'];
     $userFotoInformation = $dataArr['userFotoInformation'];
     $userSearchRequest = $dataArr['userSearchRequest'];
+    $allPropertiesCharacteristic = $dataArr['allPropertiesCharacteristic'];
+    $allPropertiesFotoInformation = $dataArr['allPropertiesFotoInformation'];
+    $allPropertiesTenantPretenders = $dataArr['allPropertiesTenantPretenders'];
     $errors = $dataArr['errors'];
     $correctNewSearchRequest = $dataArr['correctNewSearchRequest'];
     $correctEditSearchRequest = $dataArr['correctEditSearchRequest'];
@@ -12,6 +15,7 @@
     $propertyLightArr = $dataArr['propertyLightArr'];
     $favoritesPropertysId = $dataArr['favoritesPropertysId'];
     $whatPage = $dataArr['whatPage'];
+    $tabsId = $dataArr['tabsId'];
 ?>
 
 <!DOCTYPE html>
@@ -55,6 +59,12 @@
             /* Отступ слева для описания объекта в баллуне */
         .listDescriptionSmall.forBalloon {
             margin-left: 6px;
+        }
+
+            /* Отступы для описания объекта на вкладке Мои объявления */
+        .listDescriptionSmall.forMyAdverts {
+            margin-left: 6px;
+            margin-bottom: 0px;
         }
     </style>
 
@@ -107,22 +117,19 @@
        correctEditSearchRequest='<?php
            if ($correctEditSearchRequest) echo "TRUE"; else if ($correctEditSearchRequest === FALSE) echo "FALSE"; else echo "NULL"; ?>'>
 
-<!-- Добавялем невидимый input для того, чтобы передать идентификатор вкладки, которую нужно открыть через JS -->
 <?php
-    // При загрузке страницы открываем вкладку № 4 "Поиск", если пользователь создает поисковый запрос и его личные данные для этого достаточны ($correctNewSearchRequest == "true"), либо если он редактирует поисковый запрос ($correctEditSearchRequest == TRUE, $correctEditSearchRequest == FALSE). В ином случае - открываем вкладку №1.
-    if ($correctNewSearchRequest === TRUE || $correctEditSearchRequest === TRUE || $correctEditSearchRequest === FALSE) {
-        $tabsId = "tabs-4";
-    } elseif (isset($_GET['tabsId'])) {
-        $tabsId = $_GET['tabsId'];
-    } else {
-        $tabsId = "tabs-1";
-    }
+    // Добавяем невидимый input для того, чтобы передать идентификатор вкладки, которую нужно открыть через JS
     echo "<input type='hidden' class='tabsId' tabsId='" . $tabsId . "'>";
 ?>
 
-<!-- Сформируем и вставим заголовок страницы -->
 <?php
+    // Сформируем и вставим заголовок страницы
     include("templates/templ_header.php");
+?>
+
+<?php
+    // Модальное окно для незарегистрированных пользователей, которые нажимают на кнопку добавления в Избранное
+    if ($isLoggedIn === FALSE) include "templates/templ_addToFavotitesDialog_ForLoggedOut.php";
 ?>
 
 <div class="page_main_content">
@@ -425,7 +432,8 @@
             </li>
             <li>
                 <span class="headOfString">Комментарий к статусу:</span>
-                объявление опубликовано на ресурсе Svobodno.org, а также поставлено в очередь на автоматическую ежедневную
+                объявление опубликовано на ресурсе Svobodno.org, а также поставлено в очередь на автоматическую
+                ежедневную
                 публикацию на основных интернет-порталах города. Это обеспечит максимальный приток арендаторов, из
                 которых
                 Вы сможете выбрать наиболее ответственных и надежных
@@ -545,13 +553,14 @@
 </div>
 
 <div id="tabs-3">
-    <button id="newAdvertButton">
+    <a href="forowner.php" class="button" id="newAdvertButton">
         Новое объявление
-    </button>
+    </a>
+
     <?php
-    /*echo $briefOfAdverts;*/
-    //TODO: поправить как надо
+    echo $this->getHTMLforOwnersCollectionProperty($allPropertiesCharacteristic, $allPropertiesFotoInformation, $allPropertiesTenantPretenders);
     ?>
+
 </div>
 
 <div id="tabs-4">
@@ -780,11 +789,6 @@
 </div>
 <!-- /end.tabs -->
 
-<?php
-    // Модальное окно для незарегистрированных пользователей, которые нажимают на кнопку добавления в Избранное
-    if ($isLoggedIn === FALSE) include "templates/templ_addToFavotitesDialog_ForLoggedOut.php";
-?>
-
 </div>
 <!-- /end.page_main_content -->
 <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
@@ -792,7 +796,8 @@
 </div>
 <!-- /end.page_without_footer -->
 <div class="footer">
-    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-143-16-15, e-mail: support@svobodno.org
+    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-143-16-15, e-mail:
+    support@svobodno.org
 </div>
 <!-- /end.footer -->
 

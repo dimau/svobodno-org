@@ -21,7 +21,7 @@
     $incomingUser = new IncomingUser($globFunc, $DBlink);
 
     // Инициализируем модель для работ с запросом на новое объявление от собственника
-    $requestFromOwner = new RequestFromOwner($globFunc, $DBlink);
+    $requestFromOwner = new RequestFromOwner($globFunc, $DBlink, $incomingUser);
 
     // Инициализируем переменную, в которую будет сохранен статус записи запроса собственника в БД
     $statusOfSaveParamsToDB = NULL;

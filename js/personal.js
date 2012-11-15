@@ -58,19 +58,12 @@ $("#typeOfObject").change(notavailability);
 
 // Активируем кнопки "Новое объявление" через jQuery UI - добавляем пиктограммку плюсика в кружочке
 $(function () {
-    $("button#newAdvertButton").button({
+    $("#newAdvertButton").button({
         icons:{
             primary:"ui-icon-circle-plus"
         }
     });
 });
-
-// Навешиваем обработчик на клик на кнопке нового объявления
-$("button#newAdvertButton").on('click', clickNewAdvertButton);
-function clickNewAdvertButton() {
-    window.open('newadvert.php');
-    return false;
-}
 
 /***********************************************************
  * Вкладка Поиск

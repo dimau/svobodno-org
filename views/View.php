@@ -7,7 +7,8 @@
         private $globFunc = FALSE; // Переменная для хранения глобальных функций
 
         // КОНСТРУКТОР
-        public function __construct($globFunc = FALSE, $DBlink = FALSE) {
+        public function __construct($globFunc = FALSE, $DBlink = FALSE)
+        {
 
             // Если объект с глобальными функциями получен - сделаем его доступным для всех методов класса
             if ($globFunc != FALSE) {
@@ -22,13 +23,15 @@
         }
 
         // Генерация HTML страницы через заполнение шаблона $templ данными $dataArr
-        public function generate($templ, $dataArr) {
-            include "templates/".$templ;
+        public function generate($templ, $dataArr)
+        {
+            include "templates/" . $templ;
         }
 
         // Метод возвращает блок (div) для отображения фотографии (и, если нужно, по клику галереи фотографий) пользователя
         // На входе: $sizeForPrimary - размер основной фотографии (small, middle, big); $isInteractive - нужно ли по клику включать галерею фотографий(TRUE- нужно, FALSE - нет), $forTable - блок будет размещаться в таблице? (если TRUE - блок центрируется)
-        public function getHTMLfotosWrapper($sizeForPrimary = "small", $isInteractive = FALSE, $forTable = FALSE, $uploadedFoto = FALSE) {
+        public function getHTMLfotosWrapper($sizeForPrimary = "small", $isInteractive = FALSE, $forTable = FALSE, $uploadedFoto = FALSE)
+        {
 
             // Шаблон для формируемого HTML блока с фотографиями
             $templ = "
@@ -73,7 +76,7 @@
             // Перебираем все имеющиеся фотографии пользователя
             if (count($uploadedFoto) == 0) {
                 // Если у пользователя нет фото - присваиваем картинку по умолчанию
-                $arrForReplace['urlFotoPrimary'] = "uploaded_files/1/".$arrForReplace['size']."/1c1dfa378d4d9caaa93703c0b89f4077.jpeg";
+                $arrForReplace['urlFotoPrimary'] = "uploaded_files/1/" . $arrForReplace['size'] . "/1c1dfa378d4d9caaa93703c0b89f4077.jpeg";
                 $arrForReplace['hrefFotoPrimary'] = "uploaded_files/1/big/1c1dfa378d4d9caaa93703c0b89f4077.jpeg";
             } else {
                 // Если у пользователя есть фото - найдем среди них основное. А из неосновных сделаем hidden блоки для галереи
@@ -107,7 +110,8 @@
         // Метод возвращает строку команды добавления в избранное или удаления из избранного в зависимости от ситуации
         // На входе: $propertyId - id объекта недвижимости, для которого формируется строка, $favoritesPropertysId - массив идентификаторов всех избранных объявлений недвижимости данного пользователя,
         // $typeOfHTML - задает используемый шаблон. Если = "onlyIcon" - выдается шаблон исключительно с иконкой избранного. Если = "stringWithIcon" - выдается строка и иконка избранного
-        public function getHTMLforFavorites($propertyId = 0, $favoritesPropertysId = array(), $typeOfHTML = "stringWithIcon") {
+        public function getHTMLforFavorites($propertyId = 0, $favoritesPropertysId = array(), $typeOfHTML = "stringWithIcon")
+        {
 
             // Шаблон для формируемого HTML блока с командой добавления в избранное / удаления из избранного
             $templ = "
@@ -169,7 +173,7 @@
             }
 
             // Получаем данные из БД
-            $res = $this->DBlink->query("SELECT * FROM property WHERE".$strWHERE." ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting LIMIT 20");
+            $res = $this->DBlink->query("SELECT * FROM property WHERE" . $strWHERE . " ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting LIMIT 20");
             if (($this->DBlink->errno)
                 OR (($propertyFullArr = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
             ) {
@@ -352,7 +356,7 @@
             $propertyId = "";
             if (isset($oneProperty['id'])) $propertyId = $oneProperty['id'];
 
-            $currentAdvertBalloonList = "<div class='balloonBlock' coordX='".$coordX."' coordY='".$coordY."' propertyId='".$propertyId."'></div>";
+            $currentAdvertBalloonList = "<div class='balloonBlock' coordX='" . $coordX . "' coordY='" . $coordY . "' propertyId='" . $propertyId . "'></div>";
 
             return $currentAdvertBalloonList;
         }
@@ -587,7 +591,7 @@
 
             // Тип
             $arrShortListReplace['typeOfObject'] = "";
-            if (isset($oneProperty['typeOfObject'])) $arrShortListReplace['typeOfObject'] = $this->globFunc->getFirstCharUpper($oneProperty['typeOfObject']).":";
+            if (isset($oneProperty['typeOfObject'])) $arrShortListReplace['typeOfObject'] = $this->globFunc->getFirstCharUpper($oneProperty['typeOfObject']) . ":";
 
             // Адрес
             $arrShortListReplace['address'] = "";
@@ -790,7 +794,7 @@
             return $currentAdvertExtendedList;
         }
 
-        // Функция возвращает HTML код, который нужно поместить на страницу при отсутствии результатов поиска
+        // Возвращает HTML, который нужно поместить на страницу при отсутствии результатов поиска
         public function searchResultIsEmptyHTML($typeOfRequest, $allAmountAdverts)
         {
 
@@ -811,5 +815,187 @@
 
             return $searchResultHTML;
 
+        }
+
+        // Возвращает HTML для списка объектов недвижимости собственника
+        public function getHTMLforOwnersCollectionProperty($allPropertiesCharacteristic = array(), $allPropertiesFotoInformation = FALSE, $allPropertiesTenantPretenders = FALSE)
+        {
+            // Шаблон блока с описанием отдельного объекта недвижимости
+            $tmpl_MyAdvert = "
+                <div class='news advertForPersonalPage {statusEng}'>
+                    <div class='newsHeader'>
+                        <span class='advertHeaderAddress'>{typeOfObject} по адресу: {address}{apartmentNumber}</span>
+                        <div class='advertHeaderStatus'>
+                            статус: {status}
+                        </div>
+                    </div>
+                    {fotosWrapper}
+                    <ul class='setOfInstructions'>
+                        {instructionPublish}
+                        <li>
+                            <a href='editadvert.php?propertyId={propertyId}'>редактировать</a>
+                        </li>
+                        <li>
+                            <a href='objdescription.php?propertyId={propertyId}'>подробнее</a>
+                        </li>
+                    </ul>
+                    <ul class='listDescriptionSmall forMyAdverts'>
+                        <li>
+                            <span class='headOfString' style='vertical-align: top;' title='Пользователи, запросившие контакты собственника по этому объявлению'>Возможные арендаторы:</span>{probableTenants}
+                        </li>
+                        <li>
+                            <br>
+                        </li>
+                        <li>
+                            <span class='headOfString'>Плата за аренду:</span> {costOfRenting} {currency} {utilities} {electricPower}
+                        </li>
+                        <li>
+                            <span class='headOfString'>Залог:</span> {bail}
+                        </li>
+                        <li>
+                            <span class='headOfString'>Предоплата:</span> {prepayment}
+                        </li>
+                        <li>
+                            <span class='headOfString'>Срок аренды:</span> {termOfLease}, c {dateOfEntry} {dateOfCheckOut}
+                        </li>
+                        <li>
+                            <span class='headOfString'>{furnitureName}</span> {furniture}
+                        </li>
+                        <li>
+                            <span class='headOfString'>{repairName}</span> {repair}
+                        </li>
+                        <li>
+                            <span class='headOfString'>Контактный телефон:</span>
+                            {contactTelephonNumber}, c {timeForRingBegin} до {timeForRingEnd}
+                        </li>
+                    </ul>
+                    <div class='clearBoth'></div>
+                </div>
+            ";
+
+            // Проверяем наличие хотя бы 1 объекта недвижимости, в противном случае отдаем пустую HTML строку
+            if (count($allPropertiesCharacteristic) == 0) return "";
+
+            // Создаем бриф для каждого объявления пользователя на основе шаблона (для вкладки МОИ ОБЪЯВЛЕНИЯ), и в цикле объединяем их в один HTML блок - $briefOfAdverts.
+            // Если объявлений у пользователя несколько, то в переменную, содержащую весь HTML - $briefOfAdverts, записываем каждое из них последовательно
+            $briefOfAdverts = "";
+            for ($i = 0; $i < count($allPropertiesCharacteristic); $i++) {
+
+                // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне
+                $arrMyAdvertReplace = array();
+
+                // Подставляем класс в заголовок html объявления для применения соответствующего css оформления
+                $arrMyAdvertReplace['statusEng'] = "";
+                if ($allPropertiesCharacteristic[$i]['status'] == "не опубликовано") $arrMyAdvertReplace['statusEng'] = "unpublished";
+                if ($allPropertiesCharacteristic[$i]['status'] == "опубликовано") $arrMyAdvertReplace['statusEng'] = "published";
+
+                // В заголовке блока отображаем тип недвижимости, для красоты первую букву типа сделаем в верхнем регистре
+                $arrMyAdvertReplace['typeOfObject'] = "";
+                $arrMyAdvertReplace['typeOfObject'] = $this->globFunc->getFirstCharUpper($allPropertiesCharacteristic[$i]['typeOfObject']);
+
+                // Адрес и номер квартиры, если он есть
+                $arrMyAdvertReplace['address'] = "";
+                if (isset($allPropertiesCharacteristic[$i]['address'])) $arrMyAdvertReplace['address'] = $allPropertiesCharacteristic[$i]['address'];
+                $arrMyAdvertReplace['apartmentNumber'] = "";
+                if (isset($allPropertiesCharacteristic[$i]['apartmentNumber']) && $allPropertiesCharacteristic[$i]['apartmentNumber'] != "") $arrMyAdvertReplace['apartmentNumber'] = ", № " . $allPropertiesCharacteristic[$i]['apartmentNumber'];
+
+                // Статус объявления
+                $arrMyAdvertReplace['status'] = "";
+                $arrMyAdvertReplace['status'] = $allPropertiesCharacteristic[$i]['status'];
+
+                // Фото
+                $arrMyAdvertReplace['fotosWrapper'] = "";
+                if ($allPropertiesFotoInformation != FALSE) $fotosArr = $allPropertiesFotoInformation[$i]; else $fotosArr = array();
+                $arrMyAdvertReplace['fotosWrapper'] = $this->getHTMLfotosWrapper("small", FALSE, FALSE, $fotosArr);
+
+                // Корректируем список инструкций, доступных пользователю
+                $arrMyAdvertReplace['instructionPublish'] = "";
+                $arrMyAdvertReplace['propertyId'] = "";
+                if ($allPropertiesCharacteristic[$i]['status'] == "опубликовано") {
+                    $arrMyAdvertReplace['instructionPublish'] = "<li><a href='personal.php?propertyId=".$allPropertiesCharacteristic[$i]['id']."&action=publicationOff'>снять с публикации</a></li>";
+                }
+                if ($allPropertiesCharacteristic[$i]['status'] == "не опубликовано") {
+                    $arrMyAdvertReplace['instructionPublish'] = "<li><a href='personal.php?propertyId=".$allPropertiesCharacteristic[$i]['id']."&action=publicationOn'>опубликовать</a></li>";
+                }
+                $arrMyAdvertReplace['propertyId'] = $allPropertiesCharacteristic[$i]['id'];
+
+                /******* Список потенциальных арендаторов ******/
+               $arrMyAdvertReplace['probableTenants'] = "";
+                if ($allPropertiesTenantPretenders != FALSE) {
+                    for ($j = 0; $j < count($allPropertiesTenantPretenders[$i]); $j++) {
+                        // Перебираем данные по потенциальным арендаторам, проявившим интерес к данному объекту и добавляем их в строку $arrMyAdvertReplace['probableTenants']
+                        // Формируем из имен и отчеств строку гиперссылок с ссылками на страницы арендаторов
+                        if ($allPropertiesTenantPretenders[$i][$j]['typeTenant'] == "TRUE") { // Если данный пользователь (арендатор) еще ищет недвижимость
+                            $compId = $allPropertiesTenantPretenders[$i][$j]['id'] * 5 + 2;
+                            $arrMyAdvertReplace['probableTenants'] .= "<a href='man.php?compId=" . $compId . "'>" . $allPropertiesTenantPretenders[$i][$j]['name'] . " " . $allPropertiesTenantPretenders[$i][$j]['secondName'] . "</a>";
+                        } else {
+                            $arrMyAdvertReplace['probableTenants'] .= "<span title='Пользователь уже нашел недвижимость'>" . $allPropertiesTenantPretenders[$i][$j]['name'] . " " . $allPropertiesTenantPretenders[$i][$j]['secondName'] . "</span>";
+                        }
+                        if ($j < count($allPropertiesCharacteristic[$i]) - 1) $arrMyAdvertReplace['probableTenants'] .= ", ";
+                    }
+                }
+                if ($arrMyAdvertReplace['probableTenants'] == "") $arrMyAdvertReplace['probableTenants'] = " <span title='Пока никто из арендаторов не проявил интереса к этому объявлению'>-</span>"; // Если нет ни одного потенциального арендатора
+
+                // Все, что касается СТОИМОСТИ АРЕНДЫ
+                $arrMyAdvertReplace['costOfRenting'] = "";
+                $arrMyAdvertReplace['costOfRenting'] = $allPropertiesCharacteristic[$i]['costOfRenting'];
+                $arrMyAdvertReplace['currency'] = "";
+                $arrMyAdvertReplace['currency'] = $allPropertiesCharacteristic[$i]['currency'];
+                $arrMyAdvertReplace['utilities'] = "";
+                if ($allPropertiesCharacteristic[$i]['utilities'] == "да") $arrMyAdvertReplace['utilities'] = "+ коммунальные услуги от " . $allPropertiesCharacteristic[$i]['costInSummer'] . " до " . $allPropertiesCharacteristic[$i]['costInWinter'] . " " . $allPropertiesCharacteristic[$i]['currency'];
+                $arrMyAdvertReplace['electricPower'] = "";
+                if ($allPropertiesCharacteristic[$i]['electricPower'] == "да") $arrMyAdvertReplace['electricPower'] = "+ плата за электричество";
+                $arrMyAdvertReplace['bail'] = "";
+                if ($allPropertiesCharacteristic[$i]['bail'] == "есть") $arrMyAdvertReplace['bail'] = $allPropertiesCharacteristic[$i]['bailCost'] . " " . $allPropertiesCharacteristic[$i]['currency'];
+                if ($allPropertiesCharacteristic[$i]['bail'] == "нет") $arrMyAdvertReplace['bail'] = "нет";
+                $arrMyAdvertReplace['prepayment'] = "";
+                $arrMyAdvertReplace['prepayment'] = $allPropertiesCharacteristic[$i]['prepayment'];
+
+                // Срок аренды
+                $arrMyAdvertReplace['termOfLease'] = "";
+                $arrMyAdvertReplace['dateOfEntry'] = "";
+                $arrMyAdvertReplace['dateOfCheckOut'] = "";
+                $arrMyAdvertReplace['termOfLease'] = $allPropertiesCharacteristic[$i]['termOfLease'];
+                $arrMyAdvertReplace['dateOfEntry'] = $this->globFunc->dateFromDBToView($allPropertiesCharacteristic[$i]['dateOfEntry']);
+                if ($allPropertiesCharacteristic[$i]['dateOfCheckOut'] != "0000-00-00") $arrMyAdvertReplace['dateOfCheckOut'] = " по " . $this->globFunc->dateFromDBToView($allPropertiesCharacteristic[$i]['dateOfCheckOut']);
+
+                // Мебель
+                $arrMyAdvertReplace['furnitureName'] = "";
+                $arrMyAdvertReplace['furniture'] = "";
+                if ($allPropertiesCharacteristic[$i]['typeOfObject'] != "0" && $allPropertiesCharacteristic[$i]['typeOfObject'] != "гараж") {
+                    $arrMyAdvertReplace['furnitureName'] = "Мебель:";
+                    if (count(unserialize($allPropertiesCharacteristic[$i]['furnitureInLivingArea'])) != 0 || $allPropertiesCharacteristic[$i]['furnitureInLivingAreaExtra'] != "") $arrMyAdvertReplace['furniture'] = "есть в жилой зоне";
+                    if (count(unserialize($allPropertiesCharacteristic[$i]['furnitureInKitchen'])) != 0 || $allPropertiesCharacteristic[$i]['furnitureInKitchenExtra'] != "") if ($arrMyAdvertReplace['furniture'] == "") $arrMyAdvertReplace['furniture'] = "есть на кухне"; else $arrMyAdvertReplace['furniture'] .= ", есть на кухне";
+                    if (count(unserialize($allPropertiesCharacteristic[$i]['appliances'])) != 0 || $allPropertiesCharacteristic[$i]['appliancesExtra'] != "") if ($arrMyAdvertReplace['furniture'] == "") $arrMyAdvertReplace['furniture'] = "есть бытовая техника"; else $arrMyAdvertReplace['furniture'] .= ", есть бытовая техника";
+                    if ($arrMyAdvertReplace['furniture'] == "") $arrMyAdvertReplace['furniture'] = "нет";
+                }
+
+                // Ремонт
+                $arrMyAdvertReplace['repairName'] = "";
+                $arrMyAdvertReplace['repair'] = "";
+                if ($allPropertiesCharacteristic[$i]['repair'] != "0" && $allPropertiesCharacteristic[$i]['furnish'] != "0") {
+                    $arrMyAdvertReplace['repairName'] = "Ремонт:";
+                    $arrMyAdvertReplace['repair'] = $allPropertiesCharacteristic[$i]['repair'] . ", отделка " . $allPropertiesCharacteristic[$i]['furnish'];
+                }
+
+                // Контакты собственника
+                $arrMyAdvertReplace['contactTelephonNumber'] = "";
+                $arrMyAdvertReplace['contactTelephonNumber'] = $allPropertiesCharacteristic[$i]['contactTelephonNumber'];
+                $arrMyAdvertReplace['timeForRingBegin'] = "";
+                $arrMyAdvertReplace['timeForRingBegin'] = $allPropertiesCharacteristic[$i]['timeForRingBegin'];
+                $arrMyAdvertReplace['timeForRingEnd'] = "";
+                $arrMyAdvertReplace['timeForRingEnd'] = $allPropertiesCharacteristic[$i]['timeForRingEnd'];
+
+                // Производим заполнение шаблона
+                // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне
+                $arrMyAdvertTemplVar = array('{statusEng}', '{typeOfObject}', '{address}', '{apartmentNumber}', '{status}', '{fotosWrapper}', '{instructionPublish}', '{propertyId}', '{probableTenants}', '{costOfRenting}', '{currency}', '{utilities}', '{electricPower}', '{bail}', '{prepayment}', '{termOfLease}', '{dateOfEntry}', '{dateOfCheckOut}', '{furnitureName}', '{furniture}', '{repairName}', '{repair}', '{contactTelephonNumber}', '{timeForRingBegin}', '{timeForRingEnd}');
+                // Копируем html-текст шаблона
+                $currentMyAdvert = str_replace($arrMyAdvertTemplVar, $arrMyAdvertReplace, $tmpl_MyAdvert);
+
+                // Сформированный блок с описанием объявления добавляем в общую копилку. На вкладке tabs-3 (Мои объявления) полученный HTML всех блоков вставим в страницу.
+                $briefOfAdverts .= $currentMyAdvert; // Добавим html-текст еще одного объявления. Готовим html-текст к добавлению на вкладку tabs-3 в Мои объявления
+            }
+
+            return $briefOfAdverts;
         }
     }

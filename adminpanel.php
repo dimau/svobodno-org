@@ -39,9 +39,10 @@
 
 <body>
 <div class="page_without_footer">
-    <!-- Сформируем и вставим заголовок страницы -->
+
     <?php
-    include("header.php");
+        // Сформируем и вставим заголовок страницы
+        include("templates/templ_header.php");
     ?>
 
     <div class="page_main_content">

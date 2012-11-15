@@ -154,6 +154,15 @@ ul.listDescriptionSmall .headOfString {
 }
 
 /* ======================================================================
+   БЛОКИ с полями ввода для ВВОДА И РЕДАКТИРОВАНИЯ ПАРАМЕТРОВ ОБЪЕКТОВ НЕДВИЖИМОСТИ
+   ====================================================================== */
+
+.objectDescriptionItem {
+    margin: 7px;
+    width: 100%;
+}
+
+/* ======================================================================
    БЛОКИ Fieldset с полями ввода для ВВОДА И РЕДАКТИРОВАНИЯ ПАРАМЕТРОВ
    ====================================================================== */
 
@@ -165,11 +174,6 @@ ul.listDescriptionSmall .headOfString {
 
 #addressForm {
     clear: both;
-}
-
-.objectDescriptionItem {
-    margin: 7px;
-    width: 100%;
 }
 
 .inputItem .label, .objectDescriptionItem .objectDescriptionLabel {

@@ -47,6 +47,8 @@
     property,
     propertyFotos,
     messages,
+    requestToView,
+    requestFromOwners,
     districts,
     currencies
     ");
@@ -301,7 +303,8 @@
        name VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Имя собственника - как к нему обращаться',
        telephon VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
        address VARCHAR(60) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Человеческое назва',
-       commentOwner TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Комментарий собственника к запросу'
+       commentOwner TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Комментарий собственника к запросу',
+       userId INT(11) COMMENT 'Идентификатор обратившегося пользователя. Не пуст, если с новым объявлением к нам обращается уже авторизованный пользователь'
     )");
 
     echo "Статус создания таблицы requestFromOwners: ";
