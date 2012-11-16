@@ -44,6 +44,9 @@
     // Инициализируем переменную для хранения информации об успешности/неуспешности отправки запроса на просмотр в БД
     $statusOfSaveParamsToDB = NULL;
 
+    // Инициализируем массив для хранения данных об ошибках валидации формы запроса на просмотр
+    $errors = array();
+
     /*************************************************************************************
      * Получаем данные объявления для просмотра, а также другие данные из БД
      ************************************************************************************/
@@ -74,8 +77,9 @@
 
     if (isset($_POST['signUpToViewDialogButton'])) {
 
-        $signUpToView->writeParamsFromPOST(); // TODO: добавить проверку на заполненность комментария и удобного времени просмотра
-        $statusOfSaveParamsToDB = $signUpToView->saveParamsToDB();
+        $signUpToView->writeParamsFromPOST();
+        $errors = $signUpToView->isParamsCorrect();
+        $statusOfSaveParamsToDB = $signUpToView->saveParamsToDB(); // вне зависимости от полноты заполнения формы (корректности) она будет отправлена на сервер и обработана. Это решение связано с тем, что сложно отобразить на клиенте пользователю - что он не заполнил поле в модальном окне, лень это реализовывать
 
         //TODO: оповестить оператора о новом запросе на просмотр
     }
@@ -92,7 +96,8 @@
                                                  'favoritesPropertysId' => $incomingUser->getFavoritesPropertysId(),
                                                  'strHeaderOfPage' => $strHeaderOfPage,
                                                  'signUpToViewData' => $signUpToView->getParams(),
-                                                 'statusOfSaveParamsToDB' => $statusOfSaveParamsToDB));
+                                                 'statusOfSaveParamsToDB' => $statusOfSaveParamsToDB,
+                                                 'errors' => $errors));
 
     /********************************************************************************
      * Закрываем соединение с БД

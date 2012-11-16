@@ -27,6 +27,9 @@
      * Проверка доступности страницы для данного пользователя
      ************************************************************************************/
 
+    //TODO: тест
+    //die(json_encode($_POST['uploadedFoto']));
+
     // Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
     if (!$incomingUser->login()) {
         header('Location: login.php');
@@ -49,7 +52,7 @@
 
     if (isset($_POST['saveAdvertButton'])) {
 
-        $property->writeCharacteristicFromPOST();
+        $property->writeCharacteristicFromPOST("new");
         $property->writeFotoInformationFromPOST();
 
         // Проверяем корректность данных нового объявления. Функции isAdvertCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае

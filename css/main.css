@@ -87,7 +87,8 @@ a:hover {
 }
 
 a:focus {
-    outline: thin dotted;
+    /*outline: thin dotted; так как при открытии модального окна без элементов ввода некрасиво выделяется рамочкой первая попавшаяся ссылка */
+    outline: none;
 }
 
 /*
@@ -740,6 +741,7 @@ td.bottom.right, th.bottom.right {
     margin-left: 250px;
     margin-bottom: 10px;
     padding: 5px;
+    border: 2px solid #6A9D02;
     border-radius: 5px;
     background-color: #ffffff;
     text-align: left;

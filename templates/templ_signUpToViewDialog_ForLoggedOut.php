@@ -1,8 +1,7 @@
 <div id="signUpToViewDialog" title="Записаться на просмотр">
 
-    <div style="margin: 10px 0 10px 0">
-        Для отправки заявки на просмотр необходимо <a href="registration.php?typeTenant=TRUE">Зарегистрироваться</a>
-    </div>
+    <div style="text-align: left; margin: 10px 0 10px 0;">Для отправки заявки на просмотр необходимо</div>
+    <div style="text-align: center; margin: 10px 0 10px 0;"><a href="login.php">Войти</a> или <a href="registration.php?typeTenant=TRUE">Зарегистрироваться</a></div>
 
     <div class="localHeader">Регистрация позволит:</div>
     <ul class="benefits" style="text-align: left;">

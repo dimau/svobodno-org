@@ -126,7 +126,7 @@
     Новое объявление
 </div>
 
-<form method="post" name="newAdvert" class="advertDescriptionEdit">
+<form method="post" name="newAdvert" class="advertDescriptionEdit formWithFotos" enctype="multipart/form-data">
 <div class="advertDescriptionChapter" id="typeAndPeriodChapter">
     <div class="advertDescriptionChapterHeader">
         Тип и сроки
@@ -186,7 +186,7 @@
             Фотографии:
         </div>
         <div class="objectDescriptionBody">
-            <fieldset id='fotoWrapperBlock' class="edited private" style="min-width: 300px;">
+            <fieldset id='fotoWrapperBlock' class="edited fullWidth" style="min-width: 300px;">
                 <input type='hidden' name='fileUploadId' id='fileUploadId' value='<?php echo $propertyFotoInformation['fileUploadId'];?>'>
                 <input type='hidden' name='uploadedFoto' id='uploadedFoto' value=''>
                 <div id="file-uploader">

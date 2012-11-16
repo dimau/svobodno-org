@@ -8,6 +8,7 @@
     $strHeaderOfPage = $dataArr['strHeaderOfPage'];
     $signUpToViewData = $dataArr['signUpToViewData'];
     $statusOfSaveParamsToDB = $dataArr['statusOfSaveParamsToDB'];
+    $errors = $dataArr['errors'];
 
     /**************************************
      * Алгоритм выбора HTML оформления статуса Запроса на просмотр и модального окна для запроса на просмотр
@@ -62,11 +63,67 @@
     <style>
         .setOfInstructions {
             text-align: left;
-            line-height: 2em;
-            margin-top: 10px;
-            margin-bottom: 20px;
+            margin: 10px 0 20px 10px;
+        }
+        .setOfInstructions li {
+            margin: 6px 0 6px 0;
+        }
+        .setOfInstructions li:first-child {
+            margin-top: 0;
+        }
+        .setOfInstructions li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Стиль блока с информацией о текущем статусе Заявки на просмотр */
+        .signUpToViewStatusBlock {
+            display: inline-block;
+            border: 2px solid #ff6f00;
+            border-radius: 5px;
+            padding: 5px 8px 5px 8px;
+            text-align: center;
+        }
+        .signUpToViewStatusBlock.inProgress,
+        .signUpToViewStatusBlock.confirmed{
+            color: #6A9D02;
+            font-weight: bold;
+        }
+        .signUpToViewStatusBlock.error,
+        .signUpToViewStatusBlock.failure {
+            color: red;
+            font-weight: bold;
         }
     </style>
+
+</head>
+
+<body>
+<div class="page_without_footer">
+
+<!-- Всплывающее поле для отображения списка ошибок, полученных при проверке данных на сервере (PHP)-->
+<div id="userMistakesBlock" class="ui-widget">
+    <div class="ui-state-highlight ui-corner-all">
+        <div>
+            <p>
+                <span class="icon-mistake ui-icon ui-icon-info"></span>
+                <span
+                    id="userMistakesText">Для продолжения, пожалуйста, дополните или исправьте следующие данные:</span>
+            </p>
+            <ol><?php
+                if (isset($errors) && count($errors) != 0) {
+                    foreach ($errors as $value) {
+                        echo "<li>$value</li>";
+                    }
+                }
+                ?></ol>
+        </div>
+    </div>
+</div>
+
+    <?php
+        // Сформируем и вставим заголовок страницы
+        include("templates/templ_header.php");
+    ?>
 
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
@@ -78,6 +135,8 @@
     <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
     <!-- ColorBox - плагин jQuery, позволяющий делать модальное окно для просмотра фотографий -->
     <script src="js/vendor/jquery.colorbox-min.js"></script>
+    <!-- Загружаем библиотеку для работы с картой от Яндекса -->
+    <script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
     <script src="js/main.js"></script>
     <script>
         $(document).ready(function() {
@@ -98,17 +157,71 @@
             });
 
         });
+
+        /* Как только будет загружен API и готов DOM, выполняем инициализацию */
+        ymaps.ready(init);
+        function init() {
+            // Создание экземпляра карты и его привязка к контейнеру с
+            // заданным id ("mapForAdvertView")
+            // Получаем координаты объекта недвижимости
+            var coordX = $("#coordX").val();
+            var coordY = $("#coordY").val();
+
+            // Непосредственно инициализируем карту
+            if (coordX != "" && coordY != "") {
+                var map = new ymaps.Map('mapForAdvertView', {
+                    // При инициализации карты, обязательно нужно указать
+                    // ее центр и коэффициент масштабирования
+                    center:[$("#coordX").val(), $("#coordY").val()],
+                    zoom:16,
+                    // Включим поведения по умолчанию (default) и,
+                    // дополнительно, масштабирование колесом мыши.
+                    // дополнительно включаем измеритель расстояний по клику левой кнопки мыши
+                    behaviors:['default', 'scrollZoom', 'ruler']
+                });
+
+                // Добавляем на карту метку объекта недвижимости
+                currentPlacemark = new ymaps.Placemark([coordX, coordY]);
+                map.geoObjects.add(currentPlacemark);
+
+            } else {
+                var map = new ymaps.Map('mapForAdvertView', {
+                    // При инициализации карты, обязательно нужно указать
+                    // ее центр и коэффициент масштабирования
+                    center:[56.829748, 60.617435], // Екатеринбург
+                    zoom:11,
+                    // Включим поведения по умолчанию (default) и,
+                    // дополнительно, масштабирование колесом мыши.
+                    // дополнительно включаем измеритель расстояний по клику левой кнопки мыши
+                    behaviors:['default', 'scrollZoom', 'ruler']
+                });
+            }
+
+            /***** Добавляем элементы управления на карту *****/
+                // Для добавления элемента управления на карту используется поле controls, ссылающееся на
+                // коллекцию элементов управления картой. Добавление элемента в коллекцию производится с помощью метода add().
+                // В метод add можно передать строковый идентификатор элемента управления и его параметры.
+                // Список типов карты
+            map.controls.add('typeSelector');
+            // Кнопка изменения масштаба - компактный вариант
+            // Расположим её ниже и левее левого верхнего угла
+            map.controls.add('smallZoomControl', {
+                left:5,
+                top:55
+            });
+            // Стандартный набор кнопок
+            map.controls.add('mapTools');
+
+            // При переключении вкладки карту нужно перестраивать
+            $('#tabs').bind('tabsshow', reDrawMap);
+
+            /***** Функция перестроения карты - используется при изменении размеров блока *****/
+            function reDrawMap() {
+                //map.setCenter([56.829748, 60.617435]);
+                map.container.fitToViewport();
+            }
+        }
     </script>
-
-</head>
-
-<body>
-<div class="page_without_footer">
-
-    <?php
-        // Сформируем и вставим заголовок страницы
-        include("templates/templ_header.php");
-    ?>
 
     <div class="page_main_content">
 
@@ -140,7 +253,7 @@
                             // Если при передаче Запроса на показ возникли ошибки
                             if ($statusOfSaveParamsToDB === FALSE) {
                                 echo "  <li>
-                                            <span>Ошибка при отправке запроса<br>Попробуйте немного позже</span>
+                                            <div class='signUpToViewStatusBlock error'>Ошибка при отправке запроса<br>Попробуйте еще раз немного позже</div>
                                         </li>
                                      ";
 
@@ -155,21 +268,21 @@
 
                                 if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['ownerStatus'] == "confirmed") {
                                     echo "  <li>
-                                                <span>Просмотр {$signUpToViewData['finalDate']} в {$signUpToViewData['finalTimeHours']}:{$signUpToViewData['finalTimeMinutes']}</span>
+                                                <div class='signUpToViewStatusBlock confirmed'>Просмотр<br>{$signUpToViewData['finalDate']} в {$signUpToViewData['finalTimeHours']}:{$signUpToViewData['finalTimeMinutes']}</div>
                                             </li>
                                           ";
                                 }
 
                                 if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['ownerStatus'] == "failure") {
                                     echo " <li>
-                                               <span title='К сожалению, собственник отказался от показа'>Отказ собственника</span>
+                                               <div class='signUpToViewStatusBlock failure' title='к сожалению, собственник отказался от показа'>Отказ собственника</div>
                                            </li>
                                          ";
                                 }
 
                                 if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['ownerStatus'] == "inProgress") {
                                     echo " <li>
-                                             <span title='Оператор с Вами свяжется в ближайшее время'>Заявка отправлена</span>
+                                             <div class='signUpToViewStatusBlock inProgress' title='оператор свяжется с Вами в ближайшее время'>Заявка отправлена</div>
                                            </li>
                                          ";
                                 }
@@ -199,6 +312,7 @@
                     // Подключаем нужное модальное окно для Запроса на просмотр
 
                     if ($isLoggedIn === FALSE) include "templates/templ_signUpToViewDialog_ForLoggedOut.php";
+                    if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] !== TRUE) include "templates/templ_signUpToViewDialog_ForOwner.php";
                     if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include "templates/templ_signUpToViewDialog_ForTenant.php";
 
                 ?>
@@ -515,14 +629,60 @@
                 <div id="mapForAdvertView" style="width: 50%; min-width: 300px; height: 400px; float: left;"></div>
 
                 <ul class="setOfInstructions">
-                    <li>
-                        <button class="mainButton signUpToViewButton">Записаться на просмотр</button>
-                    </li>
+
+                    <?php
+                    /* Оформляем пункт Меню о Заявке на просмотр */
+                    // Если при передаче Запроса на показ возникли ошибки
+                    if ($statusOfSaveParamsToDB === FALSE) {
+                        echo "  <li>
+                                            <div class='signUpToViewStatusBlock error'>Ошибка при отправке запроса<br>Попробуйте еще раз немного позже</div>
+                                        </li>
+                                     ";
+
+                    } else { // Если ошибок не было
+
+                        if ($isLoggedIn === FALSE || $userCharacteristic['typeTenant'] === FALSE || $signUpToViewData['ownerStatus'] == "") {
+                            echo "  <li>
+                                                <button class='mainButton signUpToViewButton'>Записаться на просмотр</button>
+                                            </li>
+                                         ";
+                        }
+
+                        if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['ownerStatus'] == "confirmed") {
+                            echo "  <li>
+                                                <div class='signUpToViewStatusBlock confirmed'>Просмотр<br>{$signUpToViewData['finalDate']} в {$signUpToViewData['finalTimeHours']}:{$signUpToViewData['finalTimeMinutes']}</div>
+                                            </li>
+                                          ";
+                        }
+
+                        if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['ownerStatus'] == "failure") {
+                            echo " <li>
+                                               <div class='signUpToViewStatusBlock failure' title='к сожалению, собственник отказался от показа'>Отказ собственника</div>
+                                           </li>
+                                         ";
+                        }
+
+                        if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['ownerStatus'] == "inProgress") {
+                            echo " <li>
+                                             <div class='signUpToViewStatusBlock inProgress' title='оператор свяжется с Вами в ближайшее время'>Заявка отправлена</div>
+                                           </li>
+                                         ";
+                        }
+                    }
+                    ?>
+
                     <li>
                         <?php
                         echo $this->getHTMLforFavorites($propertyCharacteristic["id"], $favoritesPropertysId, "stringWithIcon");
                         ?>
                     </li>
+                    <!-- TODO: добавить функциональность!
+                    <li>
+                        <a href="#"> отправить по e-mail</a>
+                    </li>
+                    <li>
+                        <a href="#"> похожие объявления</a>
+                    </li>-->
                 </ul>
 
                 <div class="notEdited right">
@@ -581,74 +741,6 @@
 <!-- /end.footer -->
 
 <!-- scripts -->
-<!-- Загружаем библиотеку для работы с картой от Яндекса -->
-<script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
-<script>
-    /* Как только будет загружен API и готов DOM, выполняем инициализацию */
-    ymaps.ready(init);
-
-    function init() {
-        // Создание экземпляра карты и его привязка к контейнеру с
-        // заданным id ("mapForAdvertView")
-        // Получаем координаты объекта недвижимости
-        var coordX = $("#coordX").val();
-        var coordY = $("#coordY").val();
-
-        // Непосредственно инициализируем карту
-        if (coordX != "" && coordY != "") {
-            var map = new ymaps.Map('mapForAdvertView', {
-                // При инициализации карты, обязательно нужно указать
-                // ее центр и коэффициент масштабирования
-                center:[$("#coordX").val(), $("#coordY").val()],
-                zoom:16,
-                // Включим поведения по умолчанию (default) и,
-                // дополнительно, масштабирование колесом мыши.
-                // дополнительно включаем измеритель расстояний по клику левой кнопки мыши
-                behaviors:['default', 'scrollZoom', 'ruler']
-            });
-
-            // Добавляем на карту метку объекта недвижимости
-            currentPlacemark = new ymaps.Placemark([coordX, coordY]);
-            map.geoObjects.add(currentPlacemark);
-
-        } else {
-            var map = new ymaps.Map('mapForAdvertView', {
-                // При инициализации карты, обязательно нужно указать
-                // ее центр и коэффициент масштабирования
-                center:[56.829748, 60.617435], // Екатеринбург
-                zoom:11,
-                // Включим поведения по умолчанию (default) и,
-                // дополнительно, масштабирование колесом мыши.
-                // дополнительно включаем измеритель расстояний по клику левой кнопки мыши
-                behaviors:['default', 'scrollZoom', 'ruler']
-            });
-        }
-
-        /***** Добавляем элементы управления на карту *****/
-            // Для добавления элемента управления на карту используется поле controls, ссылающееся на
-            // коллекцию элементов управления картой. Добавление элемента в коллекцию производится с помощью метода add().
-            // В метод add можно передать строковый идентификатор элемента управления и его параметры.
-            // Список типов карты
-        map.controls.add('typeSelector');
-        // Кнопка изменения масштаба - компактный вариант
-        // Расположим её ниже и левее левого верхнего угла
-        map.controls.add('smallZoomControl', {
-            left:5,
-            top:55
-        });
-        // Стандартный набор кнопок
-        map.controls.add('mapTools');
-
-        // При переключении вкладки карту нужно перестраивать
-        $('#tabs').bind('tabsshow', reDrawMap);
-
-        /***** Функция перестроения карты - используется при изменении размеров блока *****/
-        function reDrawMap() {
-            //map.setCenter([56.829748, 60.617435]);
-            map.container.fitToViewport();
-        }
-    }
-</script>
 <!-- end scripts -->
 
 <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.

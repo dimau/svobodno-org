@@ -183,7 +183,7 @@
             </fieldset>
 
 
-        <fieldset id='fotoWrapperBlock' class="edited fullWidth private" style="min-width: 300px;">
+        <fieldset id='fotoWrapperBlock' class="edited fullWidth" style="min-width: 300px;">
             <legend
                 <?php if ($userCharacteristic['typeTenant']) echo 'title="Рекомендуем загрузить хотя бы 1 фотографию, которая в выгодном свете представит Вас перед собственником"'; ?>>
                 Фотографии

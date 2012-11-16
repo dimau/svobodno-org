@@ -111,7 +111,7 @@
         folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ../uploaded_files/3/ ',
         filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
         extension VARCHAR(5) NOT NULL COMMENT 'Расширение у файла фотографии',
-        filesizeMb FLOAT(1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой'
+        filesizeMb DEC(5, 1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой'
 )");
 
     echo "Статус создания таблицы tempFotos: ";
@@ -126,7 +126,7 @@
         folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ../uploaded_files/3/ ',
         filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
         extension VARCHAR(5) NOT NULL COMMENT 'Расширение у файла фотографии',
-        filesizeMb FLOAT(1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой',
+        filesizeMb DEC(5, 1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой',
         userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, которому соответствует данная фотография',
         status VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'У основной личной фотографии пользователя статус = основная, у остальных - пустой'
 )");
@@ -180,10 +180,10 @@
         typeOfBathrooms VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Санузел: совмещенный, раздельный или количество штук',
         typeOfBalcony VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип балкона, лоджии, эркера и количество',
         balconyGlazed VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Остекление балкона/лоджии',
-        roomSpace FLOAT(2) COMMENT 'Площадь комнаты в м2',
-        totalArea FLOAT(2) COMMENT 'Площадь общая в м2',
-        livingSpace FLOAT(2) COMMENT 'Площадь жилая в м2',
-        kitchenSpace FLOAT(2) COMMENT 'Площадь кухни в м2',
+        roomSpace DEC(7, 2) COMMENT 'Площадь комнаты в м2',
+        totalArea DEC(7, 2) COMMENT 'Площадь общая в м2',
+        livingSpace DEC(7, 2) COMMENT 'Площадь жилая в м2',
+        kitchenSpace DEC(7, 2) COMMENT 'Площадь кухни в м2',
         floor INT COMMENT 'Этаж, на котором расположена квартира, комната',
         totalAmountFloor INT COMMENT 'Общее количество этажей в доме, в котором расположена квартира, комната',
         numberOfFloor INT COMMENT 'Этажность дома, дачи, таунхауса',
@@ -199,17 +199,17 @@
         subwayStation VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Название станции метро рядом',
         distanceToMetroStation INT COMMENT 'Расстояние в минутах ходьбы до ближайшего метро',
         currency VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Валюта для рассчетов',
-        costOfRenting FLOAT(2) COMMENT 'Стоимость аренды в месяц в валюте, выбранной собственником',
-        realCostOfRenting FLOAT(2) COMMENT 'Стоимость аренды в месяц в рублях (при сохранении в БД стоимость аренды конвертируется в рубли, если она была указана в другой валюте). Это позволяет делать правильные выборки и сортировки из БД.',
+        costOfRenting DEC(8) COMMENT 'Стоимость аренды в месяц в валюте, выбранной собственником',
+        realCostOfRenting DEC(10, 2) COMMENT 'Стоимость аренды в месяц в рублях (при сохранении в БД стоимость аренды конвертируется в рубли, если она была указана в другой валюте). Это позволяет делать правильные выборки и сортировки из БД.',
         utilities VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Коммунальные услуги оплачиваются арендатором дополнительно: да или нет',
-        costInSummer FLOAT(2) COMMENT 'Стоимость комм. услуг летом',
-        costInWinter FLOAT(2) COMMENT 'Стоимость комм. услуг зимой',
+        costInSummer DEC(8) COMMENT 'Стоимость комм. услуг летом',
+        costInWinter DEC(8) COMMENT 'Стоимость комм. услуг зимой',
         electricPower VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Электроэнергия оплачивается дополнительно: да или нет',
         bail VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Залог: есть или нет',
-        bailCost FLOAT(2) COMMENT 'Величина залога в валюте для расчетов',
+        bailCost DEC(8) COMMENT 'Величина залога в валюте для расчетов',
         prepayment VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Предоплата в количестве месяцев - указывается строкой (например, 1 месяц) для простоты отображения и возможности числового сравнения',
-        compensationMoney FLOAT(2) COMMENT 'Единоразовая комиссия собственника в валюте для расчетов',
-        compensationPercent FLOAT(2) COMMENT 'Единоразовая комиссия собственника в процентах от месячной стоимости аренды',
+        compensationMoney DEC(10, 2) COMMENT 'Единоразовая комиссия в валюте для расчетов',
+        compensationPercent DEC(6, 2) COMMENT 'Единоразовая комиссия в процентах от месячной стоимости аренды',
         repair VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Текущее состояние ремонта',
         furnish VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Текущее состояние отделки',
         windows VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Материал окон',
@@ -234,7 +234,7 @@
         comment TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Свободный комментарий собственника',
         last_act INT(11) COMMENT 'Время последнего изменения объявления - будь-то время создания или время последнего редактирования. Используется для сортировки объявлений в разделе Мои объявления личного кабинета',
         reg_date INT(11) COMMENT 'Время создания объявления',
-        status VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не опубликовано' COMMENT 'Статус объявления: опубликовано или неопубликовано. Сразу после создания объявление становится неопубликованным',
+        status VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не опубликовано' COMMENT 'Статус объявления: опубликовано или не опубликовано. Сразу после создания объявление становится неопубликованным',
         visibleUsersId BLOB COMMENT 'Список id пользователей, которые заинтересовались данным объектом недвижимости при его текущей публикации. После того, как объявление снято с публикации, данный список сохраняется лишь в течение некоторого срока (что-то около 10 дней), после чего его восстановить уже нельзя',
         schemeOfWork VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'классический, улучшенный или оптимальный'
 )");
@@ -251,7 +251,7 @@
         folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ../uploaded_files/3/ ',
         filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
         extension VARCHAR(5) NOT NULL COMMENT 'Расширение у файла фотографии',
-        filesizeMb FLOAT(1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой',
+        filesizeMb DEC(5, 1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой',
         propertyId INT(11) NOT NULL COMMENT 'Идентификатор объекта недвижимости (или иначе объявления), к которому относится данная фотография',
         status VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'У основной фотографии объекта недвижимости статус = основная, у остальных - пустой'
 )");
@@ -384,7 +384,7 @@
 
     $DBlink->query("CREATE TABLE currencies (
         name VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Название валюты',
-        value FLOAT(2) COMMENT 'Текущий курс обмена данной валюты на рубли'
+        value DEC(7, 2) COMMENT 'Текущий курс обмена данной валюты на рубли'
 )");
 
     echo "Статус создания таблицы currencies: ";

@@ -58,13 +58,16 @@
             // Если идентификатор пользователя или объекта недвижимости неизвестен, то дальнейшие действия не имеют смысла
             if ($this->tenantId == "" || $this->propertyId == "") return FALSE;
 
+            // Подготовим параметры к записи в БД
+            $finalDateDB = $this->globFunc->dateFromViewToDB($this->finalDate);
+
             // Если у запроса на просмотр уже есть id, значит речь идет о редактировании данных, в противном случае - о создании нового запроса в БД
             if ($this->id != "") {
 
                 // Непосредственное сохранение данных о поисковом запросе
                 $stmt = $this->DBlink->stmt_init();
                 if (($stmt->prepare("UPDATE requestToView SET tenantId = ?, propertyId = ?, tenantTime = ?, tenantComment = ?, ownerStatus = ?, finalDate = ?, finalTimeHours = ?, finalTimeMinutes = ? WHERE id=?") === FALSE)
-                    OR ($stmt->bind_param("iissssssi", $this->tenantId, $this->propertyId, $this->tenantTime, $this->tenantComment, $this->ownerStatus, $this->finalDate, $this->finalTimeHours, $this->finalTimeMinutes, $this->id) === FALSE)
+                    OR ($stmt->bind_param("iissssssi", $this->tenantId, $this->propertyId, $this->tenantTime, $this->tenantComment, $this->ownerStatus, $finalDateDB, $this->finalTimeHours, $this->finalTimeMinutes, $this->id) === FALSE)
                     OR ($stmt->execute() === FALSE)
                     OR (($res = $stmt->affected_rows) === -1)
                     OR ($stmt->close() === FALSE)
@@ -81,7 +84,7 @@
                 // Непосредственное сохранение данных о поисковом запросе
                 $stmt = $this->DBlink->stmt_init();
                 if (($stmt->prepare("INSERT INTO requestToView (tenantId, propertyId, tenantTime, tenantComment, ownerStatus, finalDate, finalTimeHours, finalTimeMinutes) VALUES (?,?,?,?,?,?,?,?)") === FALSE)
-                    OR ($stmt->bind_param("iissssss", $this->tenantId, $this->propertyId, $this->tenantTime, $this->tenantComment, $statusForDB, $this->finalDate, $this->finalTimeHours, $this->finalTimeMinutes) === FALSE)
+                    OR ($stmt->bind_param("iissssss", $this->tenantId, $this->propertyId, $this->tenantTime, $this->tenantComment, $statusForDB, $finalDateDB, $this->finalTimeHours, $this->finalTimeMinutes) === FALSE)
                     OR ($stmt->execute() === FALSE)
                     OR (($res = $stmt->affected_rows) === -1)
                     OR ($res === 0)
@@ -90,6 +93,9 @@
                     // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
                     return FALSE;
                 }
+
+                // Если все прошло успешно, обновим соответствующих параметр статуса у текущего нашего объекта (модели)
+                $this->ownerStatus = $statusForDB;
 
             }
 
@@ -131,7 +137,7 @@
             if (isset($oneRequestToViewDataArr['tenantTime'])) $this->tenantTime = $oneRequestToViewDataArr['tenantTime'];
             if (isset($oneRequestToViewDataArr['tenantComment'])) $this->tenantComment = $oneRequestToViewDataArr['tenantComment'];
             if (isset($oneRequestToViewDataArr['ownerStatus'])) $this->ownerStatus = $oneRequestToViewDataArr['ownerStatus'];
-            if (isset($oneRequestToViewDataArr['finalDate'])) $this->finalDate = $oneRequestToViewDataArr['finalDate'];
+            if (isset($oneRequestToViewDataArr['finalDate'])) $this->finalDate = $this->globFunc->dateFromDBToView($oneRequestToViewDataArr['finalDate']);
             if (isset($oneRequestToViewDataArr['finalTimeHours'])) $this->finalTimeHours = $oneRequestToViewDataArr['finalTimeHours'];
             if (isset($oneRequestToViewDataArr['finalTimeMinutes'])) $this->finalTimeMinutes = $oneRequestToViewDataArr['finalTimeMinutes'];
 
@@ -142,6 +148,16 @@
         public function writeParamsFromPOST() {
             if (isset($_POST['convenientTime'])) $this->tenantTime = htmlspecialchars($_POST['convenientTime']);
             if (isset($_POST['comment'])) $this->tenantComment = htmlspecialchars($_POST['comment']);
+        }
+
+        // Валидация формы запроса на показ недвижимости
+        public function isParamsCorrect() {
+            // Подготовим массив для сохранения сообщений об ошибках
+            $errors = array();
+
+            if ($this->tenantTime == "") $errors[] = 'Укажите хотя бы 1 вариант удобного времени для просмотра недвижимости';
+
+            return $errors; // Возвращаем список ошибок, если все в порядке, то он будет пуст
         }
 
         // Возвращает ассоциированный массив с параметрами Запроса на просмотр

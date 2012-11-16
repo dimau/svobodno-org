@@ -1,5 +1,6 @@
 <?
     // Инициализируем используемые в шаблоне переменные
+    $url_initial = $dataArr['url_initial'];
     $isLoggedIn = $dataArr['isLoggedIn']; // Используется в templ_header.php
 ?>
 
@@ -56,16 +57,22 @@
     <div class="page_main_content">
         <div class="miniBlock">
             <div class="miniBlockHeader">
-                Вы успешно зарегистрировались на портале аренды недвижимости Svobodno.org!
+                Вы успешно зарегистрировались на портале Svobodno.org!
             </div>
             <div class="miniBlockContent">
                 <div class="text">
                     <p style="text-align: left;">
-                        Воспользуйтесь <a href="search.php">Поиском недвижимости</a>
+                        <?php
+                            if ($url_initial != "" && $url_initial != "http://svobodno.org/index.php" && $url_initial != "http://localhost/index.php") {
+                                echo "<a href='".$url_initial."'>Вернуться на страницу</a>, с которой Вы перешли к регистрации";
+                            } else {
+                                echo "Воспользоваться <a href='search.php'>Поиском недвижимости</a>";
+                            }
+                        ?>
                     </p>
 
                     <p style="text-align: left;">
-                        Либо перейдите в <a href="personal.php">Личный кабинет</a>
+                        Либо посетить <a href="personal.php">Личный кабинет</a>
                     </p>
                 </div>
             </div>

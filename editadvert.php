@@ -63,7 +63,7 @@
 
     if (isset($_POST['saveAdvertButton'])) {
 
-        $property->writeCharacteristicFromPOST();
+        $property->writeCharacteristicFromPOST("edit");
         $property->writeFotoInformationFromPOST();
 
         // Проверяем корректность данных объявления. Функции isAdvertCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае

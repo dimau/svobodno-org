@@ -19,12 +19,16 @@
     // Инициализируем модель для запросившего страницу пользователя
     $incomingUser = new IncomingUser($globFunc, $DBlink);
 
-    /********************************************************************************
+    // Попробуем получить адрес страницы, с которой пользователь попал на регистрацию
+    if (isset($_SESSION['url_initial'])) $url_initial = $_SESSION['url_initial']; else $url_initial = "";
+
+        /********************************************************************************
      * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
      *******************************************************************************/
 
     $view = new View($globFunc, $DBlink);
-    $view->generate("templ_successfullRegistration.php", array('isLoggedIn' => $incomingUser->login()));
+    $view->generate("templ_successfullRegistration.php", array('url_initial' => $url_initial,
+                                                               'isLoggedIn' => $incomingUser->login()));
 
     /********************************************************************************
      * Закрываем соединение с БД

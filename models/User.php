@@ -202,8 +202,7 @@
             ) {
                 $allFotos = array();
                 // Логируем ошибку
-                Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM tempFotos WHERE fileUploadId=".$this->fileUploadId."'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
-                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM tempFotos WHERE fileUploadId=".$this->fileUploadId."'. id логгера: User.php->saveFotoInformationToDB():1. Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
             } else {
 
                 // Пометим все члены массива признаком их получения из таблицы tempFotos
