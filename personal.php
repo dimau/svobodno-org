@@ -39,7 +39,7 @@
      ************************************************************************************/
 
     // Инициализируем полную модель пользователя
-    $user = new User($globFunc, $DBlink, $incomingUser);
+    $user = new User($globFunc, $DBlink, $incomingUser->getId());
 
     // Анкетные (основные персональные) данные пользователя
     $user->writeCharacteristicFromDB();
@@ -288,7 +288,8 @@
                                                 'propertyLightArr' => $propertyLightArr,
                                                 'favoritesPropertysId' => $incomingUser->getFavoritesPropertysId(),
                                                 'whatPage' => "forPersonalPage",
-                                                'tabsId' => $tabsId)); // Указывает вкладку (идентификатор), которая откроется при загрузке страницы
+                                                'tabsId' => $tabsId,
+                                                'mode' => "personal")); // Указывает вкладку (идентификатор), которая откроется при загрузке страницы
 
     /********************************************************************************
      * Закрываем соединение с БД

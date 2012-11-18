@@ -3,41 +3,12 @@
     $userCharacteristic = $dataArr['userCharacteristic']; // Но для данной страницы данный массив содержит только имя, отчество, фамилию, телефон пользователя
     $propertyCharacteristic = $dataArr['propertyCharacteristic'];
     $propertyFotoInformation = $dataArr['propertyFotoInformation'];
-    $isLoggedIn = $dataArr['isLoggedIn']; // Используется в templ_header.php
+    $isLoggedIn = $dataArr['isLoggedIn']; // Используется в templ_header.php и templ_signUpToViewItem.php
     $favoritesPropertysId = $dataArr['favoritesPropertysId'];
     $strHeaderOfPage = $dataArr['strHeaderOfPage'];
-    $signUpToViewData = $dataArr['signUpToViewData'];
-    $statusOfSaveParamsToDB = $dataArr['statusOfSaveParamsToDB'];
+    $signUpToViewData = $dataArr['signUpToViewData']; // Используется в templ_signUpToViewItem.php
+    $statusOfSaveParamsToDB = $dataArr['statusOfSaveParamsToDB']; // Используется в templ_signUpToViewItem.php
     $errors = $dataArr['errors'];
-
-    /**************************************
-     * Алгоритм выбора HTML оформления статуса Запроса на просмотр и модального окна для запроса на просмотр
-     *
-     * Пользователь не авторизован {
-     *      Кнопка Записаться на просмотр + модальное окно для неавторизованного пользователя
-     * }
-     * Пользователь авторизован {
-     *      Пользователь не является арендатором {
-     *          Кнопка Записаться на просмотр + модальное окно для пользователей не арендаторов
-     *      }
-     *      Пользователь является арендатором {
-     *          Для этого пользователя и этого объекта недвижимости еще не создано Запроса на просмотр {
-     *              Кнопка Записаться на просмотр + модальное окно с формой Записи на просмотр
-     *          }
-     *          Для этого пользователя и этого объекта недвижимости уже был создан Запрос на просмотр {
-     *              Статус Запроса = confirmed {
-     *                  Вместо кнопки Запроса инфа о времени просмотра + кнопка Изменить
-     *              }
-     *              Статус Запроса = failure {
-     *                  Вместо кнопки Запроса инфа об отказе собственника
-     *              }
-     *              Статус Запроса = inProgress {
-     *                  Вместо кнопки Запроса инфа о том, что Заявка обрабатывается
-     *              }
-     *          }
-     *      }
-     *}
-     **************************************/
 ?>
 
 <!DOCTYPE html>
@@ -247,48 +218,10 @@
                     ?>
 
                     <ul class="setOfInstructions">
-
                         <?php
-                        /* Оформляем пункт Меню о Заявке на просмотр */
-                            // Если при передаче Запроса на показ возникли ошибки
-                            if ($statusOfSaveParamsToDB === FALSE) {
-                                echo "  <li>
-                                            <div class='signUpToViewStatusBlock error'>Ошибка при отправке запроса<br>Попробуйте еще раз немного позже</div>
-                                        </li>
-                                     ";
-
-                            } else { // Если ошибок не было
-
-                                if ($isLoggedIn === FALSE || $userCharacteristic['typeTenant'] === FALSE || $signUpToViewData['ownerStatus'] == "") {
-                                    echo "  <li>
-                                                <button class='mainButton signUpToViewButton'>Записаться на просмотр</button>
-                                            </li>
-                                         ";
-                                }
-
-                                if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['ownerStatus'] == "confirmed") {
-                                    echo "  <li>
-                                                <div class='signUpToViewStatusBlock confirmed'>Просмотр<br>{$signUpToViewData['finalDate']} в {$signUpToViewData['finalTimeHours']}:{$signUpToViewData['finalTimeMinutes']}</div>
-                                            </li>
-                                          ";
-                                }
-
-                                if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['ownerStatus'] == "failure") {
-                                    echo " <li>
-                                               <div class='signUpToViewStatusBlock failure' title='к сожалению, собственник отказался от показа'>Отказ собственника</div>
-                                           </li>
-                                         ";
-                                }
-
-                                if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['ownerStatus'] == "inProgress") {
-                                    echo " <li>
-                                             <div class='signUpToViewStatusBlock inProgress' title='оператор свяжется с Вами в ближайшее время'>Заявка отправлена</div>
-                                           </li>
-                                         ";
-                                }
-                            }
+                            /* Оформляем пункт меню о Заявке на просмотр */
+                            include ("templates/templ_signUpToViewItem.php");
                         ?>
-
                         <li>
                             <?php
                             echo $this->getHTMLforFavorites($propertyCharacteristic["id"], $favoritesPropertysId, "stringWithIcon");
@@ -629,48 +562,10 @@
                 <div id="mapForAdvertView" style="width: 50%; min-width: 300px; height: 400px; float: left;"></div>
 
                 <ul class="setOfInstructions">
-
                     <?php
-                    /* Оформляем пункт Меню о Заявке на просмотр */
-                    // Если при передаче Запроса на показ возникли ошибки
-                    if ($statusOfSaveParamsToDB === FALSE) {
-                        echo "  <li>
-                                            <div class='signUpToViewStatusBlock error'>Ошибка при отправке запроса<br>Попробуйте еще раз немного позже</div>
-                                        </li>
-                                     ";
-
-                    } else { // Если ошибок не было
-
-                        if ($isLoggedIn === FALSE || $userCharacteristic['typeTenant'] === FALSE || $signUpToViewData['ownerStatus'] == "") {
-                            echo "  <li>
-                                                <button class='mainButton signUpToViewButton'>Записаться на просмотр</button>
-                                            </li>
-                                         ";
-                        }
-
-                        if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['ownerStatus'] == "confirmed") {
-                            echo "  <li>
-                                                <div class='signUpToViewStatusBlock confirmed'>Просмотр<br>{$signUpToViewData['finalDate']} в {$signUpToViewData['finalTimeHours']}:{$signUpToViewData['finalTimeMinutes']}</div>
-                                            </li>
-                                          ";
-                        }
-
-                        if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['ownerStatus'] == "failure") {
-                            echo " <li>
-                                               <div class='signUpToViewStatusBlock failure' title='к сожалению, собственник отказался от показа'>Отказ собственника</div>
-                                           </li>
-                                         ";
-                        }
-
-                        if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['ownerStatus'] == "inProgress") {
-                            echo " <li>
-                                             <div class='signUpToViewStatusBlock inProgress' title='оператор свяжется с Вами в ближайшее время'>Заявка отправлена</div>
-                                           </li>
-                                         ";
-                        }
-                    }
+                        /* Оформляем пункт меню о Заявке на просмотр */
+                        include ("templates/templ_signUpToViewItem.php");
                     ?>
-
                     <li>
                         <?php
                         echo $this->getHTMLforFavorites($propertyCharacteristic["id"], $favoritesPropertysId, "stringWithIcon");

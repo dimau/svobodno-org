@@ -14,10 +14,10 @@
     session_start();
 
     // Подключаем нужные модели и представления
-    include 'models/GlobFunc.php';
-    include 'models/Logger.php';
-    include 'models/IncomingUser.php';
-    include 'views/View.php';
+    include '../models/GlobFunc.php';
+    include '../models/Logger.php';
+    include '../models/IncomingUser.php';
+    include '../views/View.php';
 
     // Создаем объект-хранилище глобальных функций
     $globFunc = new GlobFunc();

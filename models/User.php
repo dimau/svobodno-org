@@ -67,7 +67,7 @@
 
         // КОНСТРУКТОР
         // В качестве входных параметров: $DBlink объект соединения с базой данных
-        public function __construct($globFunc = FALSE, $DBlink = FALSE, $incomingUser = FALSE)
+        public function __construct($globFunc = FALSE, $DBlink = FALSE, $userId = FALSE)
         {
             // Если объект с глобальными функциями получен - сделаем его доступным для всех методов класса
             if ($globFunc != FALSE) {
@@ -83,8 +83,8 @@
             $this->fileUploadId = $this->globFunc->generateCode(7);
 
             // Если мы собираемся инициализировать данную модель в соответствии с текущим пользователем, запросившим страницу, то запишем его ключевые параметры
-            if ($incomingUser != FALSE) {
-                $this->id = $incomingUser->getId();
+            if ($userId != FALSE) {
+                $this->id = $userId;
             }
 
         }

@@ -13,14 +13,19 @@ $(function () {
     $("#tabs").tabs("select", index);
 });
 
+//TODO: тест
+$(function () {
+    $("#tabs").tabs("disable", "tabs-2");
+});
+
 /***********************************************************
  * Вкладка Профиль
  ***********************************************************/
 
 /* Переключение на вкладке Профиль из режима просмотра в режим редактирования и обратно */
-$('#tabs-1 #notEditingProfileParametersBlock .setOfInstructions a').on('click', function () {
+$('#editProfileButton').on('click', function () {
     $("#notEditingProfileParametersBlock").css('display', 'none');
-    $("#editingProfileParametersBlock").css('display', '');
+    $("#editingProfileParametersBlock").css('display', 'block');
 });
 
 $('#editingProfileParametersBlock').on('submit', function () {
@@ -70,7 +75,6 @@ $(function () {
  ***********************************************************/
 
 // Блок редактируемых параметров поиска невидим в случае если пользователь уже является арендатором (у него есть поисковый запрос, данные которого и отображаются в нередактируемом виде (блок id="notEditingSearchParametersBlock"))
-// Важно, что сначала в видимом состоянии вычисляется нужная высота блока со списком районов, а только затем он вместе со всем блоком параметров поиска становится невидимым
 if ($('#extendedSearchParametersBlock').length) {
     if ($(".userType").attr('typeTenant') == "TRUE" && $(".userType").attr('correctEditSearchRequest') != "FALSE") $('#extendedSearchParametersBlock').css('display', 'none');
 }
@@ -118,9 +122,9 @@ function animals() {
 }
 
 /* Переключение на вкладке поиск из режима просмотра в режим редактирования и обратно */
-$('#tabs-4 #notEditingSearchParametersBlock .setOfInstructions a').on('click', function () {
-    $("#notEditingSearchParametersBlock").css('display', 'none');
-    $("#extendedSearchParametersBlock").css('display', '');
+$('#editSearchRequestButton').on('click', function () {
+    $("#notEditedSearchRequestBlock").css('display', 'none');
+    $("#extendedSearchParametersBlock").css('display', 'block');
 });
 
 /***********************************************************

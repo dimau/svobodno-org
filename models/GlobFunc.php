@@ -113,14 +113,30 @@
         }
 
         // Функция делает первый символ строки в верхнем регистре
-        function getFirstCharUpper($str)
-        {
-            $firstChar = mb_substr($str, 0, 1, 'UTF-8'); // Первая буква
-            $lastStr = mb_substr($str, 1); // Все кроме первой буквы
-            $firstChar = mb_strtoupper($firstChar, 'UTF-8');
-            $lastStr = mb_strtolower($lastStr, 'UTF-8');
-            $str = $firstChar . $lastStr;
-            return $str;
+        function getFirstCharUpper($str) {
+            $enc = 'utf-8';
+            return mb_strtoupper(mb_substr($str, 0, 1, $enc), $enc).mb_substr($str, 1, mb_strlen($str, $enc), $enc);
+        }
+
+        // Функция вычисляет возраст по дате рождения. Пример: echo calculate_age('27.01.2012');
+        function calculate_age($birthday) {
+
+            // Дата рождения
+            $dateOfBorn = substr($birthday, 0, 2);
+            // Месяц рождения
+            $monthOfBorn = substr($birthday, 3, 2);
+            // Год рождения
+            $yearOfBorn = substr($birthday, 6, 4);
+
+            // Вычислим разницу с текущим годом
+            $age = date('Y') - $yearOfBorn;
+
+            // Если день рождения еще не прошел в этом году, то уменьшим возраст на 1
+            if (date('m') < $monthOfBorn || (date('m') == $monthOfBorn && date('d') < $dateOfBorn)) {
+                $age--;
+            }
+
+            return $age;
         }
 
     }

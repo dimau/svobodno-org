@@ -174,6 +174,40 @@
             return $propertyLightArr;
         }
 
+        // Метод возвращает массив идентификаторов арендаторов, которые заинтересовались недвижимостью данного пользователя
+        // В случае невозможности получения такого массива возвращает FALSE
+        public function getAllVisibleUsersId() {
+
+            // Проверим, что пользователь авторизован и является собственником
+            if (!$this->login() || !$this->isOwner()) return FALSE;
+
+            // Получим из БД данные ($res) по пользователю с идентификатором = $this->id
+            $stmt = $this->DBlink->stmt_init();
+            if (($stmt->prepare("SELECT visibleUsersId FROM property WHERE userId = ?") === FALSE)
+                OR ($stmt->bind_param("s", $this->id) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($res = $stmt->get_result()) === FALSE)
+                OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+                OR ($stmt->close() === FALSE)
+            ) {
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                return FALSE;
+            }
+
+            // Инициализируем массив для возврата в качестве результата
+            $resultArr = array();
+
+            // Перебираем массив, полученный из БД и собираем все id в 1 массив - без повторов
+            foreach ($res as $value) {
+                if (($unser = unserialize($value['visibleUsersId'])) !== FALSE && is_array($unser)) {
+                    // При суммировании массивов в результате получаем массив, не содержащий повторяющихся элементов
+                    $resultArr = $resultArr + $unser;
+                }
+            }
+
+            return $resultArr;
+        }
+
         // Функция проверяет - залогинен ли пользователь сейчас (возвращает TRUE или FALSE).
         // И если пользователь залогинен, то обновляет его ключевые личные параметры (id, typeTenant, typeOwner) в соответствии с указанными в БД
         public function login()

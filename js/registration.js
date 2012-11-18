@@ -237,8 +237,7 @@ $(".submitButton").click(function() {
 function step1_validation() {
 
     var err = 0;
-// TODO: тест
-    /*
+
     // ФИО
     if ($('#surname').val() == '') {
         buildErrorMessageBlock ("surname", "Укажите фамилию");
@@ -328,7 +327,7 @@ function step1_validation() {
     if ($('#email').val() != '' && !/^(([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+\.)*([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]{2,5}$/.test($('#email').val())) {
         buildErrorMessageBlock ("email", "Попробуйте ввести e-mail еще раз или указать другой электронный адрес (e-mail не прошел проверку формата)");
         err++;
-    } */
+    }
 
     return err;
 
@@ -336,8 +335,7 @@ function step1_validation() {
 
 function step2_validation() {
     var err = 0;
-// TODO: тест
-    /*
+
     if ($('#currentStatusEducation').val() == '0' && $(".userType").attr('typeTenant') == 'TRUE') {
         buildErrorMessageBlock ("currentStatusEducation", "Укажите Ваше образование (текущий статус)");
         err++;
@@ -412,7 +410,7 @@ function step2_validation() {
     if ($('#cityOfBorn').val().length > 50) {
         buildErrorMessageBlock ("cityOfBorn", "Слишком длинное наименование города, в котором Вы родились (используйте не более 50 символов)");
         err++;
-    }*/
+    }
 
     return err;
 }
@@ -420,8 +418,6 @@ function step2_validation() {
 function step3_validation() {
     var err = 0;
 
-    // TODO: тест
-    /*
     if ($('#vkontakte').val().length > 100) {
         buildErrorMessageBlock ("vkontakte", "Указана слишком длинная ссылка на личную страницу Вконтакте (используйте не более 100 символов)");
         err++;
@@ -458,7 +454,7 @@ function step3_validation() {
     if ($('#tabs-3 #lic').length && $('#tabs-3 #lic').attr('checked') != "checked") {
         buildErrorMessageBlock ("lic", "Регистрация возможна только при согласии с условиями лицензионного соглашения");
         err++;
-    } */
+    }
 
     return err;
 }
@@ -466,8 +462,6 @@ function step3_validation() {
 function step4_validation() {
     var err = 0;
 
-    // TODO: тест
-    /*
     if (!/^\d{0,8}$/.test($('#minCost').val())) {
         buildErrorMessageBlock ("minCost", "Неправильный формат числа в поле минимальной величины арендной платы (проверьте: только числа, не более 8 символов)");
         err++;
@@ -506,7 +500,7 @@ function step4_validation() {
      if ($('#tabs-4 #lic').length && $('#tabs-4 #lic').attr('checked') != "checked") {
         buildErrorMessageBlock ("lic", "Регистрация возможна только при согласии с условиями лицензионного соглашения");
         err++;
-    } */
+    }
 
     return err;
 }
