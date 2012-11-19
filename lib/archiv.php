@@ -63,7 +63,7 @@
 
     // Получаем список пользователей, чьей недвижимостью интересовался наш пользователь ($userId) в качестве арендатора, и чьи анкеты он имеет право смотреть
     $visibleUsersIdOwners = array();
-    if ($rez = mysql_query("SELECT interestingPropertysId FROM searchrequests WHERE userId = '" . $userId . "'")) {
+    if ($rez = mysql_query("SELECT interestingPropertysId FROM searchRequests WHERE userId = '" . $userId . "'")) {
         if ($row = mysql_fetch_assoc($rez)) {
             $interestingPropertysId = unserialize($row['interestingPropertysId']);
 

@@ -133,6 +133,14 @@
     </div>
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
+            Логин собственника:
+        </div>
+        <div class="objectDescriptionBody">
+            <input name="ownerLogin" type="text" id="ownerLogin" size="15" value='<?php echo $propertyCharacteristic['ownerLogin'];?>'>
+        </div>
+    </div>
+    <div class="objectDescriptionItem">
+        <div class="objectDescriptionItemLabel">
             Тип объекта:
         </div>
         <div class="objectDescriptionBody">

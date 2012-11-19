@@ -54,8 +54,8 @@
         public $furnitureInKitchenExtra = "";
         public $appliances = array();
         public $appliancesExtra = "";
-        public $sexOfTenant = "";
-        public $relations = "";
+        public $sexOfTenant = array();
+        public $relations = array();
         public $children = "0";
         public $animals = "0";
         public $contactTelephonNumber = "";
@@ -80,6 +80,7 @@
 
         private $DBlink = FALSE; // Переменная для хранения объекта соединения с базой данных
         private $globFunc = FALSE; // Переменная для хранения глобальных функций
+        public $ownerLogin = ""; // Параметр содержит логин пользователя-собственника (необходим для того, чтобя выездные агенты могли создавать новые объявления и присваивать их ране зарегистрированным собственникам)
 
         // КОНСТРУКТОР
         public function __construct($globFunc = FALSE, $DBlink = FALSE, $propertyId = FALSE)
@@ -114,11 +115,36 @@
         // $typeOfProperty = "edit" - режим сохранения для редактируемых параметров объекта недвижимости
         // Кроме того, при успешной работе изменяет статус typeOwner пользователя (с id = userId) на TRUE
         // Возвращает TRUE, если данные успешно сохранены и FALSE в противном случае
-        public function saveCharacteristicToDB($typeOfProperty = "edit", $userId = "") {
+        public function saveCharacteristicToDB($typeOfProperty = "edit") {
 
-            // Вычислим id пользователя собственника данного объекта недвижимости (если создается не новое объявление, а идет редактирование ранее созданного)
+            // Перед тем как получить настоящий $userId, инициализируем переменную
+            $userId = "";
+
+            // Вычислим id пользователя-собственника данного объекта недвижимости (если создается не новое объявление, а идет редактирование ранее созданного)
             if ($typeOfProperty == "edit") {
                 $userId = $this->userId;
+            }
+
+            // Вычислим id пользователя-собственника данного объекта недвижимости (если создается новое объявление выездным специалистом со своего аккаунта)
+            if ($typeOfProperty == "new") {
+
+                $stmt = $this->DBlink->stmt_init();
+                if (($stmt->prepare("SELECT id FROM users WHERE login=?") === FALSE)
+                    OR ($stmt->bind_param("s", $this->ownerLogin) === FALSE)
+                    OR ($stmt->execute() === FALSE)
+                    OR (($res = $stmt->get_result()) === FALSE)
+                    OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+                    OR ($stmt->close() === FALSE)
+                ) {
+                    // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                    return FALSE;
+                }
+
+                if (!is_array($res) || count($res) != 1) {
+                    return FALSE;
+                }
+
+                $userId = $res[0]['id'];
             }
 
             // Если не указан id пользователя собственника, то дальнейшие действия не имеют смысла
@@ -143,7 +169,7 @@
             $tm = time();
             $last_act = $tm; // время последнего редактирования объявления
             $reg_date = $tm; // время регистрации ("рождения") объявления
-            $status = "не опубликовано"; // Присваивается только вновь созданному объявлению.
+            $status = "опубликовано"; // Присваивается только вновь созданному объявлению.
 
             // Проверяем в какой валюте сохраняется стоимость аренды, формируем переменную realCostOfRenting
             if ($this->currency == 'руб.') $realCostOfRenting = $this->costOfRenting;
@@ -569,7 +595,7 @@
         // $mode = "new" режим выбора POST параметров для создания пользователем-собственником (или моим обычным сотрудником) нового объявления
         // $mode = "edit" режим выбора POST параметров для редактирования пользователем-собственником ранее созданного объявления (отличается от режима "new" тем, что не принимает (игнорирует) через POST ряд параметров объекта, запрещенных для редактирования пользователем)
         public function writeCharacteristicFromPOST($mode = "edit") {
-
+            if (isset($_POST['ownerLogin']) && $mode == "new") $this->ownerLogin = htmlspecialchars($_POST['ownerLogin']);
             if (isset($_POST['typeOfObject']) && $mode == "new") $this->typeOfObject = htmlspecialchars($_POST['typeOfObject']);
             if (isset($_POST['dateOfEntry'])) $this->dateOfEntry = htmlspecialchars($_POST['dateOfEntry']);
             if (isset($_POST['termOfLease'])) $this->termOfLease = htmlspecialchars($_POST['termOfLease']);
@@ -648,6 +674,7 @@
 
             $result = array();
 
+            $result['ownerLogin'] = $this->ownerLogin;
             $result['typeOfObject'] = $this->typeOfObject;
             $result['dateOfEntry'] = $this->dateOfEntry;
             $result['termOfLease'] = $this->termOfLease;
@@ -739,11 +766,11 @@
         // $typeOfValidation = editAdvert - режим вторичной (при редактировании уже существующего объявления) проверки указанных пользователем параметров объекта недвижимости
         function isAdvertCorrect($typeOfValidation)
         {
-
             // Подготовим массив для сохранения сообщений об ошибках
             $errors = array();
 
             // Проверяем переменные
+            if ($typeOfValidation == "newAdvert" && $this->ownerLogin == "") $errors[] = 'Укажите логин пользователя-собственника';
             if ($this->typeOfObject == "0") $errors[] = 'Укажите тип объекта';
             if ($this->dateOfEntry == "") $errors[] = 'Укажите с какого числа арендатору можно въезжать в вашу недвижимость';
             if ($this->dateOfEntry != "") {
@@ -945,7 +972,7 @@
             return $errors; // Возвращаем список ошибок, если все в порядке, то он будет пуст
         }
 
-        // Используется при регистрации нового объекта недвижимости - позволяет получить идентификатор, используя адрес.
+        // Используется при регистрации нового объекта недвижимости - позволяет получить идентификатор, используя адрес (для дальнейшего сохранения фотографий объекта).
         // Полученный идентификатор также указывается в параметрах данного объекта
         public function getIdUseAddress() {
 

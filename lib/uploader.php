@@ -407,7 +407,7 @@
 
             // Сохраняем информацию о загруженной фотке в БД
             $stmt = $this->DBlink->stmt_init();
-            if (($stmt->prepare("INSERT INTO tempfotos (id, fileUploadId, folder, filename, extension, filesizeMb) VALUES (?,?,?,?,?,?)") === FALSE)
+            if (($stmt->prepare("INSERT INTO tempFotos (id, fileUploadId, folder, filename, extension, filesizeMb) VALUES (?,?,?,?,?,?)") === FALSE)
                 OR ($stmt->bind_param("sssssd", $filename, $_GET['fileuploadid'], $folder, $_GET['sourcefilename'], $extension, $sizeMb) === FALSE)
                 OR ($stmt->execute() === FALSE)
                 OR (($res = $stmt->affected_rows) === -1)

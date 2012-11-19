@@ -27,9 +27,6 @@
      * Проверка доступности страницы для данного пользователя
      ************************************************************************************/
 
-    //TODO: тест
-    //die(json_encode($_POST['uploadedFoto']));
-
     // Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
     if (!$incomingUser->login()) {
         header('Location: login.php');
@@ -62,7 +59,7 @@
         if (is_array($errors) && count($errors) == 0) {
 
             // Сохраняем новое объявление на текущего пользователя
-            $correctSaveCharacteristicToDB = $property->saveCharacteristicToDB("new", $incomingUser->getId());
+            $correctSaveCharacteristicToDB = $property->saveCharacteristicToDB("new");
 
             if ($correctSaveCharacteristicToDB) {
 

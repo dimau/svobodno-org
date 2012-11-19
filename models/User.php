@@ -529,7 +529,7 @@
 
             // Получим из БД данные ($res) по пользователю с идентификатором = $this->id
             $stmt = $this->DBlink->stmt_init();
-            if (($stmt->prepare("SELECT * FROM userfotos WHERE userId=?") === FALSE)
+            if (($stmt->prepare("SELECT * FROM userFotos WHERE userId=?") === FALSE)
                 OR ($stmt->bind_param("s", $this->id) === FALSE)
                 OR ($stmt->execute() === FALSE)
                 OR (($res = $stmt->get_result()) === FALSE)
@@ -564,7 +564,7 @@
 
             // Получим из БД данные ($res) по пользователю с идентификатором = $this->id
             $stmt = $this->DBlink->stmt_init();
-            if (($stmt->prepare("SELECT * FROM searchrequests WHERE userId=?") === FALSE)
+            if (($stmt->prepare("SELECT * FROM searchRequests WHERE userId=?") === FALSE)
                 OR ($stmt->bind_param("s", $this->id) === FALSE)
                 OR ($stmt->execute() === FALSE)
                 OR (($res = $stmt->get_result()) === FALSE)
@@ -628,7 +628,7 @@
 
             // Удалим данные поискового запроса по данному пользователю из БД
             $stmt = $this->DBlink->stmt_init();
-            if (($stmt->prepare("DELETE FROM searchrequests WHERE userId=?") === FALSE)
+            if (($stmt->prepare("DELETE FROM searchRequests WHERE userId=?") === FALSE)
                 OR ($stmt->bind_param("s", $this->id) === FALSE)
                 OR ($stmt->execute() === FALSE)
                 OR (($res = $stmt->affected_rows) === -1)

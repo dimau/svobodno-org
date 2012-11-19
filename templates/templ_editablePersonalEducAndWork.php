@@ -180,7 +180,7 @@
             </tr>
             <tr>
                 <td class="itemLabel">
-                    Коротко о себе и своих интересах:
+                    О себе и своих интересах:
                 </td>
                 <td class="itemRequired">
                 </td>

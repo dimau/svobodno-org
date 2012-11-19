@@ -53,7 +53,7 @@
 
             // Получим из БД данные ($res) по поисковому запросу пользователя с идентификатором = $this->id
             $stmt = $this->DBlink->stmt_init();
-            if (($stmt->prepare("SELECT * FROM searchrequests WHERE userId=?") === FALSE)
+            if (($stmt->prepare("SELECT * FROM searchRequests WHERE userId=?") === FALSE)
                 OR ($stmt->bind_param("s", $this->userId) === FALSE)
                 OR ($stmt->execute() === FALSE)
                 OR (($res = $stmt->get_result()) === FALSE)

@@ -58,7 +58,7 @@
             <div id="carousel">
                 <div class="carousel-feature">
                     <a href="#"><img class="carousel-image" alt="Image Caption"
-                                     src="uploaded_files\8\big\8191e133c5de9ac88f6e2044f9fa1492.jpeg"></a>
+                                     src="uploaded_files/8/big/8191e133c5de9ac88f6e2044f9fa1492.jpeg"></a>
 
                     <div class="carousel-caption">
                         <p>
@@ -69,7 +69,7 @@
                 </div>
                 <div class="carousel-feature">
                     <a href="#"><img class="carousel-image" alt="Image Caption"
-                                     src="uploaded_files\a\big\abc59f61571d0be307c5a055edb26d4b.jpeg"></a>
+                                     src="uploaded_files/a/big/abc59f61571d0be307c5a055edb26d4b.jpeg"></a>
 
                     <div class="carousel-caption">
                         <p>
@@ -80,7 +80,7 @@
                 </div>
                 <div class="carousel-feature">
                     <a href="#"><img class="carousel-image" alt="Image Caption"
-                                     src="uploaded_files\b\big\b5a2f24d0ed2160c95701a94e2d6a72c.jpeg"></a>
+                                     src="uploaded_files/b/big/b5a2f24d0ed2160c95701a94e2d6a72c.jpeg"></a>
 
                     <div class="carousel-caption">
                         <p>
@@ -93,7 +93,7 @@
                 </div>
                 <div class="carousel-feature">
                     <a href="#"><img class="carousel-image" alt="Image Caption"
-                                     src="uploaded_files\c\big\ccb661a47f3f25dc25ca154234728f62.jpeg"></a>
+                                     src="uploaded_files/c/big/ccb661a47f3f25dc25ca154234728f62.jpeg"></a>
 
                     <div class="carousel-caption">
                         <p>
@@ -103,7 +103,7 @@
                 </div>
                 <div class="carousel-feature">
                     <a href="#"><img class="carousel-image" alt="Image Caption"
-                                     src="uploaded_files\7\big\70bcdb9e7b9648f145d097ed72c33a28.jpeg"></a>
+                                     src="uploaded_files/7/big/70bcdb9e7b9648f145d097ed72c33a28.jpeg"></a>
 
                     <div class="carousel-caption">
                         <p>

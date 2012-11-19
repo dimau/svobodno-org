@@ -1,97 +1,72 @@
 <?php
-    include_once 'lib/connect.php'; //подключаемся к БД
-    include_once 'lib/function_global.php'; //подключаем файл с глобальными функциями
+    // Стартуем сессию с пользователем - сделать доступными переменные сессии
+    session_start();
+
+    // Подключаем нужные модели и представления
+    include 'models/GlobFunc.php';
+    include 'models/Logger.php';
+    include 'models/IncomingUser.php';
+    include 'views/View.php';
+    include 'models/User.php';
+
+    // Создаем объект-хранилище глобальных функций
+    $globFunc = new GlobFunc();
+
+    // Подключаемся к БД
+    $DBlink = $globFunc->connectToDB();
+    // Удалось ли подключиться к БД?
+    if ($DBlink == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
+
+    // Инициализируем модель для запросившего страницу пользователя
+    $incomingUser = new IncomingUser($globFunc, $DBlink);
+
+    $action = "";
+    if (isset($_GET['action']) && $_GET['action'] != "") {
+        $action = $_GET['action']; // Получаем команду из строки запроса
+    }
+
+    /*************************************************************************************
+     * Проверяем - может ли данный пользователь просматривать данную страницу
+     ************************************************************************************/
+
+    // Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
+    if (!$incomingUser->login()) {
+        header('Location: login.php');
+    }
 
     //TODO: ограничить доступ только администраторами
     //TODO: вкладками решать проблемы контроля доступа
-?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
+    /*************************************************************************************
+     * НОВЫЙ СОБСТВЕННИК: регистрация пользователя
+     ************************************************************************************/
 
-    <!-- Use the .htaccess and remove these lines to avoid edge case issues.
-         More info: h5bp.com/i/378 -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    if ($action == "registrationNewOwner") {
 
-    <title>Админка</title>
-    <meta name="description" content="Админка">
+        // Сначала "разавторизовываем" пользователя
+        if (!isset($_SESSION)) {
+            session_start();
+        }
+        unset($_SESSION['id']); //удаляем переменную сессии
+        $_SESSION = array();
+        session_unset();
+        session_destroy();
+        SetCookie("login", "", time() - 3600, '/'); //удаляем cookie с логином
+        SetCookie("password", "", time() - 3600, '/'); //удаляем cookie с паролем
 
-    <!-- Mobile viewport optimized: h5bp.com/viewport -->
-    <meta name="viewport" content="initialscale=1.0, width=device-width">
+        // Затем перекидываем его на страницу регистрации собственника
+        header("Location: registration.php?typeOwner=true");
+    }
 
-    <!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
+    /********************************************************************************
+     * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
+     *******************************************************************************/
 
-    <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
-    <link rel="stylesheet" href="css/main.css">
+    $view = new View($globFunc, $DBlink);
+    $view->generate("templ_adminpanel.php", array('isLoggedIn' => $incomingUser->login()));
 
-    <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <!-- Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера -->
-    <script>
-        if (typeof jQuery === 'undefined') document.write("<scr" + "ipt src='js/vendor/jquery-1.7.2.min.js'></scr" + "ipt>");
-    </script>
-    <!-- jQuery UI с моей темой оформления -->
-    <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
+    /********************************************************************************
+     * Закрываем соединение с БД
+     *******************************************************************************/
 
-</head>
-
-<body>
-<div class="page_without_footer">
-
-    <?php
-        // Сформируем и вставим заголовок страницы
-        include("templates/templ_header.php");
-    ?>
-
-    <div class="page_main_content">
-        <div class="headerOfPage">
-            Панель администратора
-        </div>
-        <div id="tabs">
-            <ul>
-                <li>
-                    <a href="#tabs-1">Новый собственник</a>
-                </li>
-                <li>
-                    <a href="#tabs-2">Поиск</a>
-                </li>
-            </ul>
-            <div id="tabs-1">
-                <a href="registration.php?typeOwner=true">Зарегистрировать нового пользователя</a>
-                <a href="newadvert.php">Создать новое объявление</a>
-
-                <div class="clearBoth"></div>
-            </div>
-            <!-- /end.tabs-1 -->
-            <div id="tabs-2">
-                А здесь форма поиска по БД
-            </div>
-            <!-- /end.tabs-2 -->
-        </div>
-    </div>
-    <!-- /end.page_main_content -->
-    <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
-    <div class="page-buffer"></div>
-</div>
-<!-- /end.page_without_footer -->
-<div class="footer">
-    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-143-16-15, e-mail: support@svobodno.org
-</div>
-<!-- /end.footer -->
-
-<!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
-<script src="js/main.js"></script>
-<!-- end scripts -->
-
-<!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.
-        mathiasbynens.be/notes/async-analytics-snippet -->
-<!-- <script>
-        var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
-        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-        g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
-        s.parentNode.insertBefore(g,s)}(document,'script'));
-        </script> -->
-</body>
-</html>
+    $globFunc->closeConnectToDB($DBlink);

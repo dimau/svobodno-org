@@ -1061,10 +1061,13 @@ td.bottom.right, th.bottom.right {
 
 .realtyObject td {
     position: relative; /* Чтобы абсолютно позиционированная ссылка Подробнее не уезжала из ячейки */
+    border-top: 2px solid silver;
+    border-bottom: 2px solid silver;
 }
 
 .realtyObject:hover td {
     border-top: 2px solid #6a9d02; /* Вместе с соответствующим правилом для tr класса realtyObject помогает сделать рамку нужного цвета при наведении курсора */
+    border-bottom: 2px solid #6a9d02;
 }
 
 /* Стили для команд управления объявлением в режиме Список + Карта */

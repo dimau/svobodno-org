@@ -109,7 +109,7 @@
             <br>
         </li>
         <li>
-            <span style="font-weight: bold;">Коротко о себе и своих интересах:</span>
+            <span style="font-weight: bold;">О себе и своих интересах:</span>
         </li>
         <li>
             <?php
