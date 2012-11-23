@@ -24,7 +24,8 @@
      *******************************************************************************/
 
     $view = new View($globFunc, $DBlink);
-    $view->generate("templ_index.php", array('isLoggedIn' => $incomingUser->login()));
+    $view->generate("templ_index.php", array('isLoggedIn' => $incomingUser->login(),
+                                             'amountUnreadMessages' => $incomingUser->getAmountUnreadMessages()));
 
     /********************************************************************************
      * Закрываем соединение с БД

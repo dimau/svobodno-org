@@ -109,7 +109,8 @@
                                                     'errors' => $errors,
                                                     'allDistrictsInCity' => $allDistrictsInCity,
                                                     'isLoggedIn' => $incomingUser->login(),
-                                                    'whatPage' => "forPersonalPage"));
+                                                    'whatPage' => "forPersonalPage",
+                                                    'amountUnreadMessages' => $incomingUser->getAmountUnreadMessages()));
 
     /********************************************************************************
      * Закрываем соединение с БД

@@ -906,7 +906,7 @@
             if (isset($this->speciality) && strlen($this->speciality) > 100) $errors[] = 'Слишком длинное название специальности (используйте не более 100 символов)';
             if ($this->kurs == "" && $this->currentStatusEducation == "сейчас учусь" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите курс обучения';
             if (isset($this->kurs) && strlen($this->kurs) > 30) $errors[] = 'Курс. Указана слишком длинная строка (используйте не более 30 символов)';
-            if ($this->ochnoZaochno == "0" && ($this->currentStatusEducation == "сейчас учусь" || $this->currentStatusEducation == "закончил") && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите форму обучения (очная, заочная)';
+            if ($this->ochnoZaochno == "0" && $this->currentStatusEducation == "сейчас учусь" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите форму обучения (очная, заочная)';
             if ($this->yearOfEnd == "" && $this->currentStatusEducation == "закончил" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите год окончания учебного заведения';
             if ($this->yearOfEnd != "" && !preg_match("/^[12]{1}[0-9]{3}$/", $this->yearOfEnd)) $errors[] = 'Укажите год окончания учебного заведения в формате: "гггг". Например: 2007';
 
@@ -994,6 +994,40 @@
                 $this->typeOwner = TRUE;
             }
 
+        }
+
+        // Получить все сообщения (новости) пользователя (в виде массива массивов)
+        // Сообщения сортируются следующим образом: наверху все непрочитанные, внизу прочитанные, каждая из категорий сортируется по времени появления: появившиеся позже сверху
+        public function getAllMessagesSorted() {
+
+            // Инициализируем массив, который вернем по окончанию выполнения метода
+            $messagesNewProperty = array();
+
+            // Получим сообщения по новым объектам недвижимости, соответствующим запросу, если наш пользователь - арендатор
+            if ($this->id != "" && $this->typeTenant === TRUE) {
+                $stmt = $this->DBlink->stmt_init();
+                if (($stmt->prepare("SELECT * FROM messagesNewProperty WHERE userId = ? ORDER BY isReaded DESC, timeIndex DESC") === FALSE)
+                    OR ($stmt->bind_param("s", $this->id) === FALSE)
+                    OR ($stmt->execute() === FALSE)
+                    OR (($messagesNewProperty = $stmt->get_result()) === FALSE)
+                    OR (($messagesNewProperty = $messagesNewProperty->fetch_all(MYSQLI_ASSOC)) === FALSE)
+                    OR ($stmt->close() === FALSE)
+                ) {
+                    $messagesNewProperty = array();
+                    // TODO: Логируем ошибку
+                }
+            }
+
+            // Преобразования над данными - чтобы обеспечить удобство работы на клиенте с ними
+            for ($i = 0; $i < count($messagesNewProperty); $i++) {
+                $messagesNewProperty[$i]['fotoArr'] = unserialize($messagesNewProperty[$i]['fotoArr']);
+            }
+
+            //TODO: реализовать получение новостей и из других таблиц
+
+            //TODO: когда будет несколько таблиц, Сортируем результат по статусу прочитанности и по времени появления
+
+            return $messagesNewProperty;
         }
 
     }

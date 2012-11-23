@@ -7,6 +7,7 @@
     $allDistrictsInCity = $dataArr['allDistrictsInCity'];
     $isLoggedIn = $dataArr['isLoggedIn'];
     $whatPage = $dataArr['whatPage'];
+    $amountUnreadMessages = $dataArr['amountUnreadMessages'];
 ?>
 
 <!DOCTYPE html>

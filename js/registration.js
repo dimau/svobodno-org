@@ -365,7 +365,7 @@ function step2_validation() {
             buildErrorMessageBlock ("kurs", "Указана слишком длинная строка (используйте не более 30 символов)");
             err++;
         }
-        if ($('#ochnoZaochno').val() == '0' && $(".userType").attr('typeTenant') == 'TRUE' && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  )) {
+        if ($('#ochnoZaochno').val() == '0' && $(".userType").attr('typeTenant') == 'TRUE' && $('#currentStatusEducation').val() == 'сейчас учусь') {
             buildErrorMessageBlock ("ochnoZaochno", "Укажите форму обучения (очная, заочная)");
             err++;
         }

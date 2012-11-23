@@ -76,13 +76,13 @@
                 }
 
                 // Получаем список id заинтересовавшихся арендаторов
-                $visibleUsersId = unserialize($this->allPropertiesCharacteristic[$i]['visibleUsersId']);
+                $tenantsWithSignUpToViewRequest = unserialize($this->allPropertiesCharacteristic[$i]['tenantsWithSignUpToViewRequest']);
                // Получаем имена и отчества заинтересовавшихся арендаторов
                // Составляем условие запроса к БД, указывая интересующие нас id объявлений
                $selectValue = "";
-               for ($j = 0; $j < count($visibleUsersId); $j++) {
-                   $selectValue .= " id = '" . $visibleUsersId[$j] . "'";
-                   if ($j < count($visibleUsersId) - 1) $selectValue .= " OR";
+               for ($j = 0; $j < count($tenantsWithSignUpToViewRequest); $j++) {
+                   $selectValue .= " id = '" . $tenantsWithSignUpToViewRequest[$j] . "'";
+                   if ($j < count($tenantsWithSignUpToViewRequest) - 1) $selectValue .= " OR";
                }
 
                 // Получим из БД данные о заинтересовавшихся арендаторах ($res) по объекту недвижимости

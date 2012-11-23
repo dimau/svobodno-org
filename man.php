@@ -66,15 +66,15 @@
     }
 
     // Получаем список пользователей, которые интересовались недвижимостью нашего пользователя ($incomingUser->getId). Он выступает в качестве собственника
-    $visibleUsersIdTenants = array();
+    $tenantsWithSignUpToViewRequest = array();
     // Формировать список имеет смысл только, если целевой пользователь на текущий момент времени является арендатором. В ином случае, доступ к анкете целевого пользователя для собственников - закрыт. Таким образом реализуется правило: собственник может видеть только анкеты тех пользователей, которые заинтересовались его недвижимостью и в текущий момент времени являются арендаторами (= имеют поисковый запрос)
     if ($user->typeTenant) {
-        if ($res = $incomingUser->getAllVisibleUsersId()) $visibleUsersIdTenants = $res;
+        if ($res = $incomingUser->getAllVisibleUsersId()) $tenantsWithSignUpToViewRequest = $res;
     }
 
     // Проверяем, есть ли среди этого списка текущий целевой пользователь ($targetUserId)
     // Проверка вынесена в отдельный блок, так как это позволяет одновременно проверить несколько условий на доступ к данной странице
-    if (!in_array($targetUserId, $visibleUsersIdTenants) && $incomingUser->getId() != $targetUserId) {
+    if (!in_array($targetUserId, $tenantsWithSignUpToViewRequest) && $incomingUser->getId() != $targetUserId) {
         header('Location: 404.html'); //TODO: реализовать страницу Отказано в доступе
     }
 
@@ -93,7 +93,8 @@
                                            'userSearchRequest' => $user->getSearchRequestData(),
                                            'strHeaderOfPage' => $strHeaderOfPage,
                                            'isLoggedIn' => $incomingUser->login(),
-                                           'mode' => "tenantForOwner"));
+                                           'mode' => "tenantForOwner",
+                                           'amountUnreadMessages' => $incomingUser->getAmountUnreadMessages()));
 
     /********************************************************************************
      * Закрываем соединение с БД

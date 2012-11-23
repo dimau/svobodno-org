@@ -46,7 +46,8 @@
 
     $view = new View($globFunc, $DBlink);
     $view->generate("templ_login.php", array('errors' => $errors,
-                                            'isLoggedIn' => $incomingUser->login()));
+                                            'isLoggedIn' => $incomingUser->login(),
+                                            'amountUnreadMessages' => $incomingUser->getAmountUnreadMessages()));
 
     /********************************************************************************
      * Закрываем соединение с БД

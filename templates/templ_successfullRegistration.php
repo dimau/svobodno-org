@@ -2,6 +2,7 @@
     // Инициализируем используемые в шаблоне переменные
     $url_initial = $dataArr['url_initial'];
     $isLoggedIn = $dataArr['isLoggedIn']; // Используется в templ_header.php
+    $amountUnreadMessages = $dataArr['amountUnreadMessages'];
 ?>
 
 <!DOCTYPE html>
@@ -63,7 +64,7 @@
                 <div class="text">
                     <p style="text-align: left;">
                         <?php
-                            if ($url_initial != "" && $url_initial != "http://svobodno.org/index.php" && $url_initial != "http://localhost/index.php") {
+                            if ($url_initial != "" && $url_initial != "http://svobodno.org/index.php" && $url_initial != "http://localhost/index.php" && $url_initial != "http://svobodno.org/" && $url_initial != "http://localhost/") {
                                 echo "<a href='".$url_initial."'>Вернуться на страницу</a>, с которой Вы перешли к регистрации";
                             } else {
                                 echo "Воспользоваться <a href='search.php'>Поиском недвижимости</a>";

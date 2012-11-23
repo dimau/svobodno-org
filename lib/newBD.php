@@ -49,6 +49,8 @@
     messages,
     requestToView,
     requestFromOwners,
+    messagesNewProperty,
+    messagesNewTenant,
     districts,
     currencies
     ");
@@ -141,14 +143,14 @@
     $DBlink->query("CREATE TABLE searchRequests (
         userId INT(11) NOT NULL PRIMARY KEY COMMENT 'Идентификатор пользователя, которому принадлежит данный поисковый запрос. Так как я считаю, что каждый пользователь может иметь только 1 поисковый запрос, то данное поле является ключом таблицы',
         typeOfObject VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип объекта, который ищет пользователь',
-        amountOfRooms BLOB,
+        amountOfRooms TEXT,
         adjacentRooms VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
         floor VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
         minCost INT NOT NULL,
         maxCost INT NOT NULL,
         pledge INT NOT NULL,
         prepayment VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Максимальная предоплата, которую готов внести арендатор, указана строкой в месяцах',
-        district BLOB COMMENT 'Список районов, в которых пользователь ищет недвижимость. Представляет собой сериализованный массив',
+        district TEXT COMMENT 'Список районов, в которых пользователь ищет недвижимость. Представляет собой сериализованный массив',
         withWho VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
         linksToFriends TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
         children VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
@@ -235,9 +237,11 @@
         last_act INT(11) COMMENT 'Время последнего изменения объявления - будь-то время создания или время последнего редактирования. Используется для сортировки объявлений в разделе Мои объявления личного кабинета',
         reg_date INT(11) COMMENT 'Время создания объявления',
         status VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'опубликовано' COMMENT 'Статус объявления: опубликовано или не опубликовано. Сразу после создания объявление становится неопубликованным',
-        visibleUsersId BLOB COMMENT 'Список id пользователей, которые заинтересовались данным объектом недвижимости при его текущей публикации. После того, как объявление снято с публикации, данный список сохраняется лишь в течение некоторого срока (что-то около 10 дней), после чего его восстановить уже нельзя',
-        schemeOfWork VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'классический, улучшенный или оптимальный'
-)");
+        tenantsWithSignUpToViewRequest BLOB COMMENT 'Список id пользователей, которые заинтересовались данным объектом недвижимости (отправили заявки на просмотр) при его текущей публикации. После того, как объявление снято с публикации, данный список сохраняется лишь в течение некоторого срока (что-то около 10 дней), после чего его восстановить уже нельзя',
+        earliestDate DATE COMMENT 'Хранит дату ближайшего показа, согласованную с собственником',
+        earliestTimeHours VARCHAR(2) COMMENT 'Хранит время (часы) ближайшего показа, согласованные с собственником',
+        earliestTimeMinutes VARCHAR(2) COMMENT 'Хранит время (минуты) ближайшего показа, согласованные с собственником'
+)"); /* TODO: возможно нужно отказаться от поля tenantsWithSignUpToViewRequest и напрямую получать сведения о заявках на просмотр (с ихстатусами) из соответствующей таблицы для каждого объекта недвижимости собственника */
 
     echo "Статус создания таблицы property: ";
     if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
@@ -257,22 +261,6 @@
 )");
 
     echo "Статус создания таблицы propertyFotos: ";
-    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
-
-    /****************************************************************************
-     * Создаем таблицу для хранения информации о СООБЩЕНИЯХ пользователей
-     ***************************************************************************/
-
-    $DBlink->query("CREATE TABLE messages (
-        id VARCHAR(32) NOT NULL PRIMARY KEY COMMENT 'Идентификатор сообщения (новости)',
-        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное сообщение',
-        typeMessage VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип сообщения: о новом кандидате в арендаторы, о новом объекте недвижимости для арендатора, о назначении времени просмотра объекта для собственника, о назначении времени просмотра объекта для арендатора, об изменении времени просмотра объекта для собственника, об изменении времени просмотра объекта для арендатора',
-        targetId INT(11) NOT NULL COMMENT 'Идентификатор пользователя (если речь идет о сообщении о новом кандидате в арендаторы), идентификатор объекта (если речь идет о новом объекте недвижимости для арендатора), идентификатор заявки на просмотр (если речь идет о новой заявке)',
-        additionalPropertyId INT(11) COMMENT 'Идентификатор объекта недвижимости, к которому данный арендатор проявил интерес. Заполняется только для сообщений типа О новом объекте недвижимости для арендатора',
-        status VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не прочитано' COMMENT 'Статус сообщения: прочитано, непрочитано, удалено. Сразу после создания сообщение становится не прочитанным'
-    )");
-
-    echo "Статус создания таблицы messages: ";
     if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
@@ -309,6 +297,94 @@
 
     echo "Статус создания таблицы requestFromOwners: ";
     if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
+
+
+
+    /****************************************************************************
+     * Создаем таблицы для хранения информации о СООБЩЕНИЯХ пользователей
+     ***************************************************************************/
+
+    // Сообщения (новости) для пользователей-арендаторов о появлении нового объекта недвижимости (объявления), которое удовлетворяет условиям поиска пользователя-арендатора
+    $DBlink->query("CREATE TABLE messagesNewProperty (
+        id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор сообщения (новости)',
+        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное сообщение',
+        timeIndex INT(11) NOT NULL COMMENT 'Время формирования сообщения (новости) - используется для сортировки новостей по времени появления',
+        messageType VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'newProperty' COMMENT 'Тип сообщения (новости). В данной таблице хранятся новости типа newProperty',
+        isReaded VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не прочитано' COMMENT 'Статус сообщения: прочитано, не прочитано. Сразу после создания сообщение становится непрочитанным',
+        fotoArr TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Массив массивов (по структуре совпадающий с uploadedFoto - это нужно, чтобы на основе этих данных могла работать функция getHTMLfotosWrapper), который включает в себя информацию только об 1 фотографии - основной',
+        targetId INT(11) NOT NULL COMMENT 'Идентификатор объекта недвижимости, которому посвящена новость',
+        typeOfObject VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип объекта: квартира, комната, дом, таунхаус, дача, гараж',
+        address VARCHAR(60) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Человеческое название улицы и номера дома',
+        currency VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Валюта для рассчетов',
+        costOfRenting DEC(8) COMMENT 'Стоимость аренды в месяц в валюте, выбранной собственником',
+        utilities VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Коммунальные услуги оплачиваются арендатором дополнительно: да или нет',
+        electricPower VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Электроэнергия оплачивается дополнительно: да или нет',
+        amountOfRooms VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Количество комнат в квартире, доме:',
+        adjacentRooms VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Наличие смежных комнат: да или нет',
+        amountOfAdjacentRooms VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Количество смежных комнат',
+        roomSpace DEC(7, 2) COMMENT 'Площадь комнаты в м2',
+        totalArea DEC(7, 2) COMMENT 'Площадь общая в м2',
+        livingSpace DEC(7, 2) COMMENT 'Площадь жилая в м2',
+        kitchenSpace DEC(7, 2) COMMENT 'Площадь кухни в м2',
+        totalAmountFloor INT COMMENT 'Общее количество этажей в доме, в котором расположена квартира, комната',
+        numberOfFloor INT COMMENT 'Этажность дома, дачи, таунхауса'
+    )");
+
+    echo "Статус создания таблицы с сообщениями о новых объектах недвижимости messagesNewProperty: ";
+    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
+    // Сообщения (новости) для пользователей-собственников о появлении нового претендента на аренду, отправившего заявку на просмотр недвижимости пользователя-собственника
+    $DBlink->query("CREATE TABLE messagesNewTenant (
+        id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор сообщения (новости)',
+        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное сообщение',
+        timeIndex INT(11) NOT NULL COMMENT 'Время формирования сообщения (новости) - используется для сортировки новостей по времени появления',
+        messageType VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'newTenant' COMMENT 'Тип сообщения (новости). В данной таблице хранятся новости типа newTenant',
+        isReaded VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не прочитано' COMMENT 'Статус сообщения: прочитано, не прочитано. Сразу после создания сообщение становится непрочитанным',
+        fotoArr TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Массив массивов (по структуре совпадающий с uploadedFoto - это нужно, чтобы на основе этих данных могла работать функция getHTMLfotosWrapper), который включает в себя информацию только об 1 фотографии - основной',
+        targetId INT(11) NOT NULL COMMENT 'Идентификатор потенциального арендатора, которому посвящена новость',
+        address VARCHAR(60) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Человеческое название улицы и номера дома',
+        apartmentNumber VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Номер квартиры, если комната в квартире, то с индексом для уникальности',
+        name VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Имя потенциального арендатора',
+        secondName VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Отчество потенциального арендатора',
+        surname VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Фамилия потенциального арендатора',
+        birthday DATE COMMENT 'День рождения потенциального арендатора - для вычисления возраста',
+        withWho VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Как (с кем) собирается снимать недвижимость арендатор',
+        children VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Арендатор собирается проживать с детьми',
+        animals VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Арендатор собирается проживать с домашними животными'
+    )");
+
+    echo "Статус создания таблицы с сообщениями о новых претендентах на аренду messagesNewTenant: ";
+    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
+    $DBlink->query("CREATE TABLE messagesRequestToViewConfirmed (
+        id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор сообщения (новости)',
+        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное сообщение',
+        timeIndex INT(11) NOT NULL COMMENT 'Время формирования сообщения (новости) - используется для сортировки новостей по времени появления',
+        messageType VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'requestToViewConfirmed' COMMENT 'Тип сообщения (новости). В данной таблице хранятся новости типа requestToViewConfirmed',
+        isReaded VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не прочитано' COMMENT 'Статус сообщения: прочитано, не прочитано. Сразу после создания сообщение становится непрочитанным',
+        fotoArr TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Массив массивов (по структуре совпадающий с uploadedFoto - это нужно, чтобы на основе этих данных могла работать функция getHTMLfotosWrapper), который включает в себя информацию только об 1 фотографии - основной',
+        targetId INT(11) NOT NULL COMMENT 'Идентификатор пользователя (если речь идет о сообщении о новом кандидате в арендаторы), идентификатор объекта (если речь идет о новом объекте недвижимости для арендатора), идентификатор заявки на просмотр (если речь идет о новой заявке)',
+
+    )");
+
+    echo "Статус создания таблицы с сообщениями о назначении даты и времени просмотра недвижимости messagesRequestToViewConfirmed: ";
+    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
+    $DBlink->query("CREATE TABLE messagesEditedTimeToView (
+        id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор сообщения (новости)',
+        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное сообщение',
+        timeIndex INT(11) NOT NULL COMMENT 'Время формирования сообщения (новости) - используется для сортировки новостей по времени появления',
+        messageType VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'editedTimeToView' COMMENT 'Тип сообщения (новости). В данной таблице хранятся новости типа editedTimeToView',
+        isReaded VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не прочитано' COMMENT 'Статус сообщения: прочитано, не прочитано. Сразу после создания сообщение становится непрочитанным',
+        fotoArr TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Массив массивов (по структуре совпадающий с uploadedFoto - это нужно, чтобы на основе этих данных могла работать функция getHTMLfotosWrapper), который включает в себя информацию только об 1 фотографии - основной',
+        targetId INT(11) NOT NULL COMMENT 'Идентификатор пользователя (если речь идет о сообщении о новом кандидате в арендаторы), идентификатор объекта (если речь идет о новом объекте недвижимости для арендатора), идентификатор заявки на просмотр (если речь идет о новой заявке)',
+
+    )");
+
+    echo "Статус создания таблицы с сообщениями о изменении времени просмотра недвижимости messagesEditedTimeToView: ";
+    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
 
     /****************************************************************************
      * Создаем таблицу для хранения списка районов каждого города присутствия сервиса

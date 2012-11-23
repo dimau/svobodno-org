@@ -97,7 +97,8 @@
                                                  'strHeaderOfPage' => $strHeaderOfPage,
                                                  'signUpToViewData' => $signUpToView->getParams(),
                                                  'statusOfSaveParamsToDB' => $statusOfSaveParamsToDB,
-                                                 'errors' => $errors));
+                                                 'errors' => $errors,
+                                                 'amountUnreadMessages' => $incomingUser->getAmountUnreadMessages()));
 
     /********************************************************************************
      * Закрываем соединение с БД

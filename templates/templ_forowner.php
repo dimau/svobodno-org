@@ -3,6 +3,7 @@
     $requestFromOwnerData = $dataArr['requestFromOwnerData'];
     $statusOfSaveParamsToDB = $dataArr['statusOfSaveParamsToDB'];
     $isLoggedIn = $dataArr['isLoggedIn']; // Используется в templ_header.php
+    $amountUnreadMessages = $dataArr['amountUnreadMessages'];
 ?>
 
 <!DOCTYPE html>

@@ -6,6 +6,7 @@
     $allDistrictsInCity = $dataArr['allDistrictsInCity'];
     $isLoggedIn = $dataArr['isLoggedIn'];
     $favoritesPropertysId = $dataArr['favoritesPropertysId'];
+    $amountUnreadMessages = $dataArr['amountUnreadMessages'];
 ?>
 
 <!DOCTYPE html>

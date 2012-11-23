@@ -48,7 +48,8 @@
     $view = new View($globFunc, $DBlink);
     $view->generate("templ_forowner.php", array('requestFromOwnerData' => $requestFromOwner->getRequestFromOwnerData(),
                                                 'statusOfSaveParamsToDB' => $statusOfSaveParamsToDB,
-                                                'isLoggedIn' => $incomingUser->login()));
+                                                'isLoggedIn' => $incomingUser->login(),
+                                                'amountUnreadMessages' => $incomingUser->getAmountUnreadMessages()));
 
     /********************************************************************************
      * Закрываем соединение с БД

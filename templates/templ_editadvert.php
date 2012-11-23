@@ -5,6 +5,7 @@
     $errors = $dataArr['errors'];
     $allDistrictsInCity = $dataArr['allDistrictsInCity'];
     $isLoggedIn = $dataArr['isLoggedIn']; // Используется в templ_header.php
+    $amountUnreadMessages = $dataArr['amountUnreadMessages'];
 ?>
 
 <!DOCTYPE html>

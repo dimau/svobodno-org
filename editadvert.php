@@ -110,7 +110,8 @@
                                                  'propertyFotoInformation' => $property->getFotoInformationData(),
                                                  'errors' => $errors,
                                                  'allDistrictsInCity' => $allDistrictsInCity,
-                                                 'isLoggedIn' => $incomingUser->login()));
+                                                 'isLoggedIn' => $incomingUser->login(),
+                                                 'amountUnreadMessages' => $incomingUser->getAmountUnreadMessages()));
 
     /********************************************************************************
      * Закрываем соединение с БД

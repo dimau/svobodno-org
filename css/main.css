@@ -584,6 +584,7 @@ td.bottom.right, th.bottom.right {
 .shadowText {
     font-size: 0.8em;
     color: #666666;
+    margin-bottom: 10px;
 }
 
 .bottomButton {
@@ -1106,6 +1107,14 @@ td.bottom.right, th.bottom.right {
    Стили для блоков краткого описания объявлений о недвижимости (Мои объявления) и новостей
    ========================================================================================================== */
 
+.setOfInstructions {
+    text-align: right;
+    float: right;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
 .news {
     border: 1px solid #336784;
     border-radius: 5px;
@@ -1121,6 +1130,15 @@ td.bottom.right, th.bottom.right {
     margin-bottom: 5px;
     font-weight: normal;
     line-height: 2em;
+}
+
+.news .listDescriptionSmall {
+    margin-left: 6px;
+    margin-bottom: 0px;
+}
+
+.news .setOfInstructions {
+    margin-right: 6px;
 }
 
 .advertForPersonalPage.published .newsHeader {
@@ -1141,14 +1159,6 @@ td.bottom.right, th.bottom.right {
     color: white;
     display: inline-block;
     margin-left: 1em;
-}
-
-.setOfInstructions {
-    text-align: right;
-    float: right;
-    list-style: none;
-    margin: 0;
-    padding: 0;
 }
 
 /* Стили для вкладки Новости личного кабинета */

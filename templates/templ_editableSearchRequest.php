@@ -398,6 +398,7 @@
                     </td>
                 </tr>
 
+                <?php if($whatPage == "forPersonalPage"): ?>
                 <tr class="additionalSearchConditions">
                     <td class="itemLabel" colspan="3">
                         Дополнительные условия поиска:
@@ -409,6 +410,8 @@
                                   rows="4"><?php echo $userSearchRequest['additionalDescriptionOfSearch'];?></textarea>
                     </td>
                 </tr>
+                <?php endif; ?>
+
             </tbody>
         </table>
     </fieldset>

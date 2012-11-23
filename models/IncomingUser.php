@@ -16,6 +16,7 @@
         private $favoritesPropertysId = array();
 
         private $isLoggedIn = NULL; // В переменную сохраняется функцией login() значение FALSE или TRUE после первого вызова на странице. Для уменьшения обращений к БД
+        private $amountUnreadMessages = ""; // В переменную функцией getAmountUnreadMessages() сохраняется количество непрочитанных сообщений пользователя
         private $DBlink = FALSE; // Переменная для хранения объекта соединения с базой данных
         private $globFunc = FALSE; // Переменная для хранения глобальных функций
 
@@ -35,6 +36,9 @@
 
             // Проверяем, авторизован ли пользователь, и если да, инициализируем параметры объекта (id, typeTenant, typeOwner...) соответствующими значениями из БД
             $this->login();
+
+            // Получим количество непрочитанных сообщений (новостей) для данного пользователя
+            $this->getAmountUnreadMessages();
 
             // Инициализируем переменные typeTenant и typeOwner
             $this->isTenant();
@@ -183,7 +187,7 @@
 
             // Получим из БД данные ($res) по пользователю с идентификатором = $this->id
             $stmt = $this->DBlink->stmt_init();
-            if (($stmt->prepare("SELECT visibleUsersId FROM property WHERE userId = ?") === FALSE)
+            if (($stmt->prepare("SELECT tenantsWithSignUpToViewRequest FROM property WHERE userId = ?") === FALSE)
                 OR ($stmt->bind_param("s", $this->id) === FALSE)
                 OR ($stmt->execute() === FALSE)
                 OR (($res = $stmt->get_result()) === FALSE)
@@ -199,13 +203,55 @@
 
             // Перебираем массив, полученный из БД и собираем все id в 1 массив - без повторов
             foreach ($res as $value) {
-                if (($unser = unserialize($value['visibleUsersId'])) !== FALSE && is_array($unser)) {
+                if (($unser = unserialize($value['tenantsWithSignUpToViewRequest'])) !== FALSE && is_array($unser)) {
                     // При суммировании массивов в результате получаем массив, не содержащий повторяющихся элементов
                     $resultArr = $resultArr + $unser;
                 }
             }
 
             return $resultArr;
+        }
+
+        // Возвращает количество непрочитанных сообщений (новостей) пользователя
+        public function getAmountUnreadMessages() {
+
+            // Если пользователь не авторизован (у него нет id), то возвращаем 0
+            if ($this->id == "") return 0;
+
+            // Если переменная, содержащая кол-во непрочитанных сообщений, уже проинициализирована, то возвращаем ее значение
+            if (isset($this->amountUnreadMessages) && $this->amountUnreadMessages != "") {
+                return $this->amountUnreadMessages;
+            }
+
+            // Если во время этой сессии уже подсчитали количество непрочитанных сообщений - вернем его
+            if (isset($_SESSION['amountUnreadMessages'])) {
+                $this->amountUnreadMessages = $_SESSION['amountUnreadMessages'];
+                return $_SESSION['amountUnreadMessages'];
+            }
+
+            // Инициализируем переменную для возвращения
+            $result = 0;
+
+            // Считаем количество непрочитанных сообщений пользователя
+            $res = $this->DBlink->query("SELECT COUNT(*) FROM messagesNewProperty WHERE userId = '".$this->id."' AND isReaded = 'не прочитано'");
+            if (($this->DBlink->errno)
+                OR (($res = $res->fetch_row()) === NULL)
+            ) {
+                //TODO: сделать логирование ошибки
+                $result = 0;
+            } else {
+                $result = $res[0];
+
+                // Сохраним результат в переменную сессии. Сохранение результата только в случае успеха позволит при загрузке следующей страницы переполучить значение для тех случаев, когда попытка подсчета закончилась неудачей
+                $_SESSION['amountUnreadMessages'] = $result;
+            }
+
+            //TODO: сделать подсчет количества сообщений и по другим таблицам сообщений
+
+            // Сохраним также результат в переменную объекта пользователя
+            $this->amountUnreadMessages = $result;
+
+            return $result;
         }
 
         // Функция проверяет - залогинен ли пользователь сейчас (возвращает TRUE или FALSE).

@@ -17,6 +17,8 @@
     $whatPage = $dataArr['whatPage']; // Режим в котором будет работать шаблон для редактирования поискового запроса (templ_editableSearchRequest.php)
     $tabsId = $dataArr['tabsId']; // Идентификатор вкладки, которая будет открыта по умолчанию после загрузки страницы
     $mode = $dataArr['mode']; // Режим в котором будет работать шаблон анкеты пользователя на вкладке №1 (templ_notEditedProfile.php)
+    $messagesArr = $dataArr['messagesArr']; // массив массивов, каждый из которых представляет инфу по 1-ому сообщению (новости пользователя)
+    $amountUnreadMessages = $dataArr['amountUnreadMessages'];
 ?>
 
 <!DOCTYPE html>
@@ -66,12 +68,6 @@
             /* Отступ слева для описания объекта в баллуне */
         .listDescriptionSmall.forBalloon {
             margin-left: 6px;
-        }
-
-            /* Отступы для описания объекта на вкладке Мои объявления */
-        .listDescriptionSmall.forMyAdverts {
-            margin-left: 6px;
-            margin-bottom: 0px;
         }
     </style>
 
@@ -149,7 +145,10 @@
                     <a href="#tabs-1">Профиль</a>
                 </li>
                 <li>
-                    <a href="#tabs-2">Сообщения (<span class='amountOfNewMessages' id="amountUnreadNews">15</span>)</a>
+                    <a href="#tabs-2">Сообщения<?php
+                        // Сколько сообщений не прочитано?
+                        if ($amountUnreadMessages != 0) echo " (<span class='amountOfNewMessages'>".$amountUnreadMessages."</span>)"; ?>
+                    </a>
                 </li>
                 <li>
                     <a href="#tabs-3">Мои объявления</a>
@@ -213,220 +212,10 @@
             <!-- /end.tabs-1 -->
 
             <div id="tabs-2">
-                <div class="shadowText">
-                    На этой вкладке располагается информация о важных событиях, случившихся на ресурсе Svobodno.org, как
-                    например:
-                    появление
-                    новых потенциальных арендаторов, заинтересовавшихся Вашим объявлением, или новых объявлений, которые
-                    подходят
-                    под
-                    Ваш запрос
-                </div>
-                <div class="news unread">
-                    <div class="newsHeader">
-                        Претендент на квартиру по адресу: улица Сибирский тракт 50 летия 107, кв 70.
-                        <div class="actionReaded">
-                            <a href="#">прочитал</a>
-                        </div>
-                        <div class="clearBoth"></div>
-                    </div>
-
-                    <div class="fotosWrapper">
-                        <div class="middleFotoWrapper">
-                            <img class="middleFoto" src="">
-                        </div>
-                    </div>
-                    <ul class="setOfInstructions">
-                        <li>
-                            <a href="#">подробнее</a>
-                        </li>
-                    </ul>
-                    <ul class="listDescriptionSmall">
-                        <li>
-                            <span class="headOfString">ФИО:</span>
-                            Ушаков Дмитрий Владимирович
-                        </li>
-                        <li>
-                            <span class="headOfString">Возраст:</span>
-                            25
-                        </li>
-                        <li>
-                            <span class="headOfString">Срок аренды:</span>
-                            долгосрочно
-                        </li>
-                        <li>
-                            <span class="headOfString">С кем жить:</span>
-                            несемейная пара
-                        </li>
-                        <li>
-                            <span class="headOfString">Дети:</span>
-                            нет
-                        </li>
-                        <li>
-                            <span class="headOfString">Животные:</span>
-                            нет
-                        </li>
-                        <li>
-                            <span class="headOfString">Телефон:</span>
-                            89221431615
-                        </li>
-                    </ul>
-                    <div class="clearBoth"></div>
-                </div>
-                <div class="news unread">
-                    <div class="newsHeader">
-                        Изменение статуса объявления
-                        <div class="actionReaded">
-                            <a href="#">прочитал</a>
-                        </div>
-                        <div class="clearBoth"></div>
-                    </div>
-                    <div class="fotosWrapper">
-                        <div class="middleFotoWrapper">
-                            <img class="middleFoto" src="">
-                        </div>
-                    </div>
-                    <ul class="setOfInstructions">
-                        <li>
-                            <a href="#">подробнее</a>
-                        </li>
-                    </ul>
-                    <ul class="listDescriptionSmall">
-                        <li>
-                            <span class="headOfString">Адрес объекта:</span>
-                            улица Шаумяна 107, кв 70
-                        </li>
-                        <li>
-                            <span class="headOfString">Статус изменен на:</span>
-                            <span style="color: green">объявление опубликовано</span>
-                        </li>
-                        <li>
-                            <span class="headOfString">Дата:</span>
-                            25.09.2012
-                        </li>
-                        <li>
-                            <span class="headOfString">Комментарий к статусу:</span>
-                            объявление опубликовано на ресурсе Svobodno.org, а также поставлено в очередь на
-                            автоматическую
-                            ежедневную
-                            публикацию на основных интернет-порталах города. Это обеспечит максимальный приток
-                            арендаторов, из
-                            которых
-                            Вы сможете выбрать наиболее ответственных и надежных
-                        </li>
-                    </ul>
-                    <div class="clearBoth"></div>
-                </div>
-                <div class="news">
-                    <div class="newsHeader">
-                        Претендент на квартиру по адресу: улица Сибирский тракт 50 летия 107, кв 70.
-                    </div>
-                    <div class="fotosWrapper">
-                        <div class="middleFotoWrapper">
-                            <img class="middleFoto" src="">
-                        </div>
-                    </div>
-                    <ul class="setOfInstructions">
-                        <li>
-                            <a href="#">подробнее</a>
-                        </li>
-                    </ul>
-                    <ul class="listDescriptionSmall">
-                        <li>
-                            <span class="headOfString">ФИО:</span>
-                            Ушаков Дмитрий Владимирович
-                        </li>
-                        <li>
-                            <span class="headOfString">Возраст:</span>
-                            25
-                        </li>
-                        <li>
-                            <span class="headOfString">Срок аренды:</span>
-                            долгосрочно
-                        </li>
-                        <li>
-                            <span class="headOfString">С кем жить:</span>
-                            несемейная пара
-                        </li>
-                        <li>
-                            <span class="headOfString">Дети:</span>
-                            нет
-                        </li>
-                        <li>
-                            <span class="headOfString">Животные:</span>
-                            нет
-                        </li>
-                        <li>
-                            <span class="headOfString">Телефон:</span>
-                            89221431615
-                        </li>
-                    </ul>
-                    <div class="clearBoth"></div>
-                </div>
-                <div class="news">
-                    <div class="newsHeader">
-                        Новое предложение по Вашему поиску
-                    </div>
-                    <div class="fotosWrapper">
-                        <div class="middleFotoWrapper">
-                            <img class="middleFoto" src="">
-                        </div>
-                    </div>
-                    <ul class="setOfInstructions">
-                        <li>
-                            <a href="#">подробнее</a>
-                        </li>
-                        <li>
-                            <a href="#">посмотреть на карте</a>
-                        </li>
-                    </ul>
-                    <ul class="listDescriptionSmall">
-                        <li>
-                            <span class="headOfString">Тип:</span> Квартира
-                        </li>
-                        <li>
-                            <span class="headOfString">Плата за аренду:</span> 15000 + коммунальные услуги от 1500 до
-                            2500 руб.
-                        </li>
-                        <li>
-                            <span class="headOfString">Единовременная комиссия:</span>
-                            <a href="#"> 3000 руб. (40%) собственнику</a>
-                        </li>
-                        <li>
-                            <span class="headOfString">Адрес:</span>
-                            улица Посадская 51
-                        </li>
-                        <li>
-                            <span class="headOfString">Количество комнат:</span>
-                            2, смежные
-                        </li>
-                        <li>
-                            <span class="headOfString">Площадь (жилая/общая):</span>
-                            22.4/34 м²
-                        </li>
-                        <li>
-                            <span class="headOfString">Этаж:</span>
-                            3 из 10
-                        </li>
-                        <li>
-                            <span class="headOfString">Срок сдачи:</span>
-                            долгосрочно
-                        </li>
-                        <li>
-                            <span class="headOfString">Мебель:</span>
-                            есть
-                        </li>
-                        <li>
-                            <span class="headOfString">Район:</span>
-                            Центр
-                        </li>
-                        <li>
-                            <span class="headOfString">Телефон собственника:</span>
-                            <a href="#">показать</a>
-                        </li>
-                    </ul>
-                    <div class="clearBoth"></div>
-                </div>
+                <?php
+                    // Формируем и выдаем HTML списка сообщений (новостей) пользователя
+                    echo $this->getHTMLforMessages($messagesArr);
+                ?>
             </div>
 
             <div id="tabs-3">
@@ -441,14 +230,13 @@
             </div>
 
             <div id="tabs-4">
-                <div class="shadowText">
-                    На этой вкладке Вы можете задать параметры, в соответствии с которыми ресурс Svobodno.org будет
-                    осуществлять
-                    автоматический поиск объявлений на портале и будет оповещать Вас о появлении новых объектов по
-                    указанному в профиле e-mail
-                </div>
 
                 <?php if ($userCharacteristic['typeTenant'] !== TRUE && $correctNewSearchRequest !== TRUE && $correctEditSearchRequest === NULL): ?>
+                <div class="shadowText">
+                    На этой вкладке Вы можете задать параметры недвижимости, в соответствии с которыми ресурс Svobodno.org будет
+                    осуществлять
+                    автоматический поиск объявлений на портале и будет оповещать Вас о появлении новых объектов.
+                </div>
                 <!-- Если пользователь еще не сформировал поисковый запрос (а значит не является арендатором) и он либо не нажимал на кнопку формирования запроса, либо нажимал, но не прошел проверку на полноту информации о пользователи, то ему доступна только кнопка формирования нового запроса. В ином случае будет отображаться сам поисковый запрос пользователя, либо форма для его заполнения -->
                 <form name="createSearchRequest" method="post">
                     <button type="submit" name="createSearchRequestButton" id='createSearchRequestButton'

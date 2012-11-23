@@ -176,92 +176,6 @@
         if ($correctNewSearchRequest === TRUE) $tabsId = "tabs-4"; else $tabsId = "tabs-1";
     }
 
-
-
-
-
-    /********************************************************************************
-     * СООБЩЕНИЯ. Наполнение шаблона из БД
-     *******************************************************************************/
-/*
-<div class='news advertForPersonalPage {statusEng}'>
-    <div class='newsHeader'>
-        <span class='advertHeaderAddress'>{typeOfObject} по адресу: {address}{apartmentNumber}</span>
-        <div class='advertHeaderStatus'>
-            статус: {status}
-        </div>
-    </div>
-    <div class='fotosWrapper'>
-        <div class='middleFotoWrapper'>
-            <img class='middleFoto' src='{urlFoto}'>
-        </div>
-    </div>
-    <ul class='setOfInstructions'>
-        {instructionPublish}
-        <li>
-            <a href='editadvert.php?propertyId={propertyId}'>редактировать</a>
-        </li>
-        <li>
-            <a href='objdescription.php?propertyId={propertyId}'>подробнее</a>
-        </li>
-        {instructionDelete}
-    </ul>
-    <ul class='listDescriptionSmall'>
-        <li>
-            <span class='headOfString' style='vertical-align: top;' title='Пользователи, запросившие контакты собственника по этому объявлению'>Возможные арендаторы:</span>{probableTenants}
-        </li>
-        <li>
-            <br>
-        </li>
-        <li>
-            <span class='headOfString'>Плата за аренду:</span> {costOfRenting} {currency} {utilities} {electricPower}
-        </li>
-        <li>
-            <span class='headOfString'>Залог:</span> {bail}
-        </li>
-        <li>
-            <span class='headOfString'>Предоплата:</span> {prepayment}
-        </li>
-        <li>
-            <span class='headOfString'>Единовременная комиссия:</span>
-            <span title='Предназначена для компенсации затрат собственника, связанных с поиском арендаторов'> {compensationMoney} {currency} ({compensationPercent}%) собственнику</span>
-        </li>
-        <li>
-            <span class='headOfString'>Срок аренды:</span> {termOfLease}, c {dateOfEntry} {dateOfCheckOut}
-        </li>
-        <li>
-            <span class='headOfString'>Адрес:</span> {address}
-        </li>
-         <li>
-            <span class='headOfString'>Район:</span> {district}
-        </li>
-        <li>
-            <span class='headOfString'>{amountOfRoomsName}</span> {amountOfRooms}{adjacentRooms}
-        </li>
-        <li>
-            <span class='headOfString'>Площадь ({areaNames}):</span> {areaValues} м²
-        </li>
-        <li>
-            <span class='headOfString'>{floorName}</span> {floor}
-        </li>
-        <li>
-            <span class='headOfString'>{furnitureName}</span> {furniture}
-        </li>
-        <li>
-            <span class='headOfString'>{repairName}</span> {repair}
-        </li>
-        <li>
-            <span class='headOfString'>{parkingName}</span> {parking}
-        </li>
-        <li>
-            <span class='headOfString'>Телефон собственника:</span>
-            {contactTelephonNumber}, <a href='{urlMan}'>{name} {secondName}</a>, c {timeForRingBegin} до {timeForRingEnd}
-        </li>
-    </ul>
-    <div class='clearBoth'></div>
-</div>
-"; */
-
     /***************************************************************************************************************
      * ИЗБРАННОЕ. Получаем данные по каждому избранному объявлению из БД (это позволит наполнить вкладку tabs-5)
      **************************************************************************************************************/
@@ -288,8 +202,10 @@
                                                 'propertyLightArr' => $propertyLightArr,
                                                 'favoritesPropertysId' => $incomingUser->getFavoritesPropertysId(),
                                                 'whatPage' => "forPersonalPage",
-                                                'tabsId' => $tabsId,
-                                                'mode' => "personal")); // Указывает вкладку (идентификатор), которая откроется при загрузке страницы
+                                                'tabsId' => $tabsId, // Указывает вкладку (идентификатор), которая откроется при загрузке страницы
+                                                'mode' => "personal",
+                                                'messagesArr' => $user->getAllMessagesSorted(),
+                                                'amountUnreadMessages' => $incomingUser->getAmountUnreadMessages()));
 
     /********************************************************************************
      * Закрываем соединение с БД

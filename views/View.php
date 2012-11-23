@@ -552,7 +552,7 @@
                         </li>
                     </ul>
                     <div class='advertActions'>
-                        <a class='linkToDescription' href='objdescription.php?propertyId={propertyId}' target='_blank'>подробнее</a>
+                        <a href='objdescription.php?propertyId={propertyId}' target='_blank'>подробнее</a>
                     </div>
                 </td>
             </tr>
@@ -651,7 +651,7 @@
             }
 
             // Производим заполнение шаблона строки (блока) shortList таблицы по данному объекту недвижимости
-            // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне баллуна
+            // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне
             $arrShortListTemplVar = array('{propertyId}', '{number}', '{actionFavorites}', '{imgFavorites}', '{fotosWrapper}', '{typeOfObject}', '{address}', '{costOfRenting}', '{currency}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{floorName}', '{floor}');
             // Копируем html-текст шаблона блока (строки таблицы)
             $currentAdvertShortList = str_replace($arrShortListTemplVar, $arrShortListReplace, $tmpl_shortAdvert);
@@ -839,7 +839,7 @@
                             <a href='objdescription.php?propertyId={propertyId}'>подробнее</a>
                         </li>
                     </ul>
-                    <ul class='listDescriptionSmall forMyAdverts'>
+                    <ul class='listDescriptionSmall'>
                         <li>
                             <span class='headOfString' style='vertical-align: top;' title='Пользователи, запросившие контакты собственника по этому объявлению'>Возможные арендаторы:</span>{probableTenants}
                         </li>
@@ -912,15 +912,15 @@
                 $arrMyAdvertReplace['instructionPublish'] = "";
                 $arrMyAdvertReplace['propertyId'] = "";
                 if ($allPropertiesCharacteristic[$i]['status'] == "опубликовано") {
-                    $arrMyAdvertReplace['instructionPublish'] = "<li><a href='personal.php?propertyId=".$allPropertiesCharacteristic[$i]['id']."&action=publicationOff'>снять с публикации</a></li>";
+                    $arrMyAdvertReplace['instructionPublish'] = "<li><a href='personal.php?propertyId=" . $allPropertiesCharacteristic[$i]['id'] . "&action=publicationOff'>снять с публикации</a></li>";
                 }
                 if ($allPropertiesCharacteristic[$i]['status'] == "не опубликовано") {
-                    $arrMyAdvertReplace['instructionPublish'] = "<li><a href='personal.php?propertyId=".$allPropertiesCharacteristic[$i]['id']."&action=publicationOn'>опубликовать</a></li>";
+                    $arrMyAdvertReplace['instructionPublish'] = "<li><a href='personal.php?propertyId=" . $allPropertiesCharacteristic[$i]['id'] . "&action=publicationOn'>опубликовать</a></li>";
                 }
                 $arrMyAdvertReplace['propertyId'] = $allPropertiesCharacteristic[$i]['id'];
 
                 /******* Список потенциальных арендаторов ******/
-               $arrMyAdvertReplace['probableTenants'] = "";
+                $arrMyAdvertReplace['probableTenants'] = "";
                 if ($allPropertiesTenantPretenders != FALSE) {
                     for ($j = 0; $j < count($allPropertiesTenantPretenders[$i]); $j++) {
                         // Перебираем данные по потенциальным арендаторам, проявившим интерес к данному объекту и добавляем их в строку $arrMyAdvertReplace['probableTenants']
@@ -997,5 +997,547 @@
             }
 
             return $briefOfAdverts;
+        }
+
+        /**
+         * Возвращает HTML всех блоков с новостями для Личного кабинета пользователя
+         *
+         * @param $messagesArr - массив ассоциированных массивов, каждый из которых представляет сведения по 1 новости
+         * @return string
+         */
+        public function getHTMLforMessages($messagesArr) {
+
+            // Если массив с сообщениями (новостями) пользователя не передан, то возвращаем пустую строку вместо HTML
+            if (!isset($messagesArr) || !is_array($messagesArr) || count($messagesArr) == 0) {
+                return "<div class='shadowText'>
+                            На этой вкладке располагается информация о важных событиях, случившихся на ресурсе Svobodno.org, как например: появление новых потенциальных арендаторов, заинтересовавшихся Вашим объявлением, или новых объявлений, которые подходят под Ваш запрос
+                        </div>";
+            }
+
+            // Инициализируем переменную, которую в итоге вернем в качестве результата выполнения метода
+            $allMessagesHTML = "";
+
+            // Перебираем все новости, формируя для каждой на основе шаблона, блок и, складывая в общий HTML
+            for ($i = 0; $i < count($messagesArr); $i++) {
+
+                if ($messagesArr[$i]['messageType'] == "newProperty") $allMessagesHTML .= $this->getHTMLforMessageNewProperty($messagesArr[$i]);
+                if ($messagesArr[$i]['messageType'] == "newTenant") $allMessagesHTML .= $this->getHTMLforMessageNewTenant($messagesArr[$i]);
+                if ($messagesArr[$i]['messageType'] == "requestToViewConfirmed") $allMessagesHTML .= $this->getHTMLforMessageRequestToViewConfirmed($messagesArr[$i]);
+                if ($messagesArr[$i]['messageType'] == "editedTimeToView") $allMessagesHTML .= $this->getHTMLforMessageEditedTimeToView($messagesArr[$i]);
+            }
+
+            return $allMessagesHTML;
+        }
+
+        /**
+         * Возвращает HTML для блока с описанием новости о новом объекте недвижимости
+         *
+         * @param $sourceArr - ассоциированный массив со сведениями о сообщении (новости)
+         * @return mixed|string
+         */
+        public function getHTMLforMessageNewProperty($sourceArr)
+        {
+            // Шаблон блока
+            $templ = "
+                <div class='news {unread}'>
+                    <div class='newsHeader'>
+                        Новое предложение по Вашему поиску
+                    </div>
+                    {fotosWrapper}
+                    <ul class='setOfInstructions'>
+                        <li>
+                            <a href='#'>прочитал</a>
+                        </li>
+                        <li>
+                            <a href='#'>удалить</a>
+                        </li>
+                        <li>
+                            <a href='objdescription.php?propertyId={propertyId}' target='_blank'>подробнее</a>
+                        </li>
+                    </ul>
+                    <ul class='listDescriptionSmall'>
+                        <li>
+                            <span class='headOfString'>{typeOfObject}</span> {address}
+                        </li>
+                        <li>
+                            <span class='headOfString'>Плата:</span> {costOfRenting} {currency}/мес.{utilities}
+                        </li>
+                        <li>
+                            <span class='headOfString'>{amountOfRoomsName}</span> {amountOfRooms}{adjacentRooms}
+                        </li>
+                        <li>
+                            <span class='headOfString'>Площадь:</span> {areaValues} м²
+                        </li>
+                        <li>
+                            <span class='headOfString'>{floorName}</span> {floor}
+                        </li>
+                    </ul>
+                    <div class='clearBoth'></div>
+                </div>
+            ";
+
+            // Если массив с параметрами сообщения (новости) не передан, то возвращаем пустую строку вместо HTML блока
+            if (!isset($sourceArr) || !is_array($sourceArr)) {
+                return "";
+            }
+
+            // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне
+            $valuesArr = array();
+
+            // Сообщение прочитано или не прочитано
+            $valuesArr['unread'] = "";
+            if (isset($sourceArr['isReaded']) && $sourceArr['isReaded'] == "не прочитано") $valuesArr['unread'] = "unread";
+
+            // Фото
+            $valuesArr['fotosWrapper'] = "";
+            $valuesArr['fotosWrapper'] = $this->getHTMLfotosWrapper("small", FALSE, FALSE, $sourceArr['fotoArr']);
+
+            // Идентификатор объекта
+            $valuesArr['propertyId'] = "";
+            if (isset($sourceArr['targetId'])) $valuesArr['propertyId'] = $sourceArr['targetId'];
+
+            // Тип
+            $valuesArr['typeOfObject'] = "";
+            if (isset($sourceArr['typeOfObject'])) $valuesArr['typeOfObject'] = $this->globFunc->getFirstCharUpper($sourceArr['typeOfObject']) . ":";
+
+            // Адрес
+            $valuesArr['address'] = "";
+            if (isset($sourceArr['address'])) $valuesArr['address'] = $sourceArr['address'];
+
+            // Стоимость
+            $valuesArr['costOfRenting'] = "";
+            if (isset($sourceArr['costOfRenting'])) $valuesArr['costOfRenting'] = $sourceArr['costOfRenting'];
+            $valuesArr['currency'] = "";
+            if (isset($sourceArr['currency'])) $valuesArr['currency'] = $sourceArr['currency'];
+            $valuesArr['utilities'] = "";
+            if (isset($sourceArr['utilities']) && $sourceArr['utilities'] == "да") $valuesArr['utilities'] = " <span style='white-space: nowrap;'>+ ком.усл.</span>";
+
+            // Комнаты
+            if (isset($sourceArr['amountOfRooms']) && $sourceArr['amountOfRooms'] != "0") {
+                $valuesArr['amountOfRoomsName'] = "Комнат:";
+                $valuesArr['amountOfRooms'] = $sourceArr['amountOfRooms'];
+            } else {
+                $valuesArr['amountOfRoomsName'] = "";
+                $valuesArr['amountOfRooms'] = "";
+            }
+            if (isset($sourceArr['adjacentRooms']) && $sourceArr['adjacentRooms'] == "да") {
+                if (isset($sourceArr['amountOfAdjacentRooms']) && $sourceArr['amountOfAdjacentRooms'] != "0") {
+                    $valuesArr['adjacentRooms'] = ", смежных: " . $sourceArr['amountOfAdjacentRooms'];
+                } else {
+                    $valuesArr['adjacentRooms'] = ", смежные";
+                }
+            } else {
+                $valuesArr['adjacentRooms'] = "";
+            }
+
+            // Площади помещений
+            $valuesArr['areaValues'] = "";
+            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "квартира" && $sourceArr['typeOfObject'] != "дом" && $sourceArr['typeOfObject'] != "таунхаус" && $sourceArr['typeOfObject'] != "дача" && $sourceArr['typeOfObject'] != "гараж") {
+                $valuesArr['areaValues'] .= $sourceArr['roomSpace'];
+            }
+            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "комната") {
+                $valuesArr['areaValues'] .= $sourceArr['totalArea'];
+            }
+            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "комната" && $sourceArr['typeOfObject'] != "гараж") {
+                $valuesArr['areaValues'] .= " / " . $sourceArr['livingSpace'];
+            }
+            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "дача" && $sourceArr['typeOfObject'] != "гараж") {
+                $valuesArr['areaValues'] .= " / " . $sourceArr['kitchenSpace'];
+            }
+
+            // Этаж
+            $valuesArr['floorName'] = "";
+            $valuesArr['floor'] = "";
+            if (isset($sourceArr['floor']) && isset($sourceArr['totalAmountFloor']) && $sourceArr['floor'] != "0" && $sourceArr['totalAmountFloor'] != "0") {
+                $valuesArr['floorName'] = "Этаж:";
+                $valuesArr['floor'] = $sourceArr['floor'] . " из " . $sourceArr['totalAmountFloor'];
+            }
+            if (isset($sourceArr['numberOfFloor']) && $sourceArr['numberOfFloor'] != "0") {
+                $valuesArr['floorName'] = "Этажность:";
+                $valuesArr['floor'] = $sourceArr['numberOfFloor'];
+            }
+
+            // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне
+            $stringForReplaceArr = array('{unread}', '{fotosWrapper}', '{propertyId}', '{typeOfObject}', '{address}', '{costOfRenting}', '{currency}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{floorName}', '{floor}');
+            // Заполнение шаблона
+            $resultHTML = str_replace($stringForReplaceArr, $valuesArr, $templ);
+
+            return $resultHTML;
+        }
+
+        /**
+         * Возвращает HTML для блока с описанием новости о новом претенденте на аренду недвижимости
+         *
+         * @param $sourceArr - ассоциированный массив со сведениями о сообщении (новости)
+         * @return mixed|string
+         */
+        public function getHTMLforMessageNewTenant($sourceArr)
+        {
+            // Шаблон блока
+            $templ = "
+                <div class='news {unread}'>
+                    <div class='newsHeader'>
+                        Новый претендент
+                    </div>
+                    На Вашу недвижимость: {address}{apartmentNumber}
+                    {fotosWrapper}
+                    <ul class='setOfInstructions'>
+                        <li>
+                            <a href='#'>прочитал</a>
+                        </li>
+                        <li>
+                            <a href='#'>удалить</a>
+                        </li>
+                        <li>
+                            <a href='man.php?compId={targetId}' target='_blank'>подробнее</a>
+                        </li>
+                    </ul>
+                    <ul class='listDescriptionSmall'>
+                        <li>
+                            <span class='headOfString'>ФИО:</span> {fio}
+                        </li>
+                        <li>
+                            <span class='headOfString'>Возраст:</span> {age}
+                        </li>
+                        <li>
+                            <span class='headOfString'>С кем:</span> {withWho}
+                        </li>
+                        <li>
+                            <span class='headOfString'>Дети:</span> {children}
+                        </li>
+                        <li>
+                            <span class='headOfString'>Домашние животные:</span> {animals}
+                        </li>
+                    </ul>
+                    <div class='clearBoth'></div>
+                </div>
+            ";
+
+            // Если массив с параметрами сообщения (новости) не передан, то возвращаем пустую строку вместо HTML блока
+            if (!isset($sourceArr) || !is_array($sourceArr)) {
+                return "";
+            }
+
+            // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне
+            $valuesArr = array();
+
+            // Сообщение прочитано или не прочитано
+            $valuesArr['unread'] = "";
+            if (isset($sourceArr['isReaded']) && $sourceArr['isReaded'] == "не прочитано") $valuesArr['unread'] = "unread";
+
+            // Адрес
+            $valuesArr['address'] = "";
+            if (isset($sourceArr['address'])) $valuesArr['address'] = $sourceArr['address'];
+            $valuesArr['apartmentNumber'] = "";
+            if (isset($sourceArr['apartmentNumber']) && $sourceArr['apartmentNumber'] != "") $valuesArr['apartmentNumber'] = ", № " . $sourceArr['apartmentNumber'];
+
+            // Фото
+            $valuesArr['fotosWrapper'] = "";
+            $valuesArr['fotosWrapper'] = $this->getHTMLfotosWrapper("small", FALSE, FALSE, $sourceArr['fotoArr']);
+
+            // Идентификатор объекта
+            $valuesArr['targetId'] = "";
+            if (isset($sourceArr['targetId'])) $valuesArr['targetId'] = $sourceArr['targetId'];
+
+            // ФИО
+            $valuesArr['fio'] = "";
+            if (isset($sourceArr['surname']) && isset($sourceArr['name']) && isset($sourceArr['secondName'])) $valuesArr['fio'] = $sourceArr['surname']." ".$sourceArr['name']." " .$sourceArr['secondName'];
+
+            // Возраст
+            $valuesArr['age'] = "";
+            if (isset($sourceArr['birthday'])) $valuesArr['age'] = $this->globFunc->calculate_age($sourceArr['birthday']);
+
+            // С кем
+            $valuesArr['withWho'] = "";
+            if (isset($sourceArr['withWho'])) $valuesArr['withWho'] = $sourceArr['withWho'];
+
+            // Дети
+            $valuesArr['children'] = "";
+            if (isset($sourceArr['children'])) $valuesArr['children'] = $sourceArr['children'];
+
+            // Домашние животные
+            $valuesArr['animals'] = "";
+            if (isset($sourceArr['animals'])) $valuesArr['animals'] = $sourceArr['animals'];
+
+            // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне
+            $stringForReplaceArr = array('{unread}', '{address}', '{apartmentNumber}', '{fotosWrapper}', '{targetId}', '{fio}', '{age}', '{withWho}', '{children}', '{animals}');
+            // Заполнение шаблона
+            $resultHTML = str_replace($stringForReplaceArr, $valuesArr, $templ);
+
+            return $resultHTML;
+        }
+
+        /**
+         * Возвращает HTML для блока с описанием новости о назначении даты и времени просмотра недвижимости
+         *
+         * @param $sourceArr - ассоциированный массив со сведениями о сообщении (новости)
+         * @return mixed|string
+         * TODO: реализовать
+         */
+        public function getHTMLforMessageRequestToViewConfirmed($sourceArr)
+        {
+            // Шаблон блока
+            $templ = "
+                <div class='news {unread}'>
+                    <div class='newsHeader'>
+                        Новое предложение по Вашему поиску
+                    </div>
+                    {fotosWrapper}
+                    <ul class='setOfInstructions'>
+                        <li>
+                            <a href='#'>прочитал</a>
+                        </li>
+                        <li>
+                            <a href='#'>удалить</a>
+                        </li>
+                        <li>
+                            <a href='objdescription.php?propertyId={propertyId}' target='_blank'>подробнее</a>
+                        </li>
+                    </ul>
+                    <ul class='listDescriptionSmall'>
+                        <li>
+                            <span class='headOfString'>{typeOfObject}</span> {address}
+                        </li>
+                        <li>
+                            <span class='headOfString'>Плата:</span> {costOfRenting} {currency}/мес.{utilities}
+                        </li>
+                        <li>
+                            <span class='headOfString'>{amountOfRoomsName}</span> {amountOfRooms}{adjacentRooms}
+                        </li>
+                        <li>
+                            <span class='headOfString'>Площадь:</span> {areaValues} м²
+                        </li>
+                        <li>
+                            <span class='headOfString'>{floorName}</span> {floor}
+                        </li>
+                    </ul>
+                    <div class='clearBoth'></div>
+                </div>
+            ";
+
+            // Если массив с параметрами сообщения (новости) не передан, то возвращаем пустую строку вместо HTML блока
+            if (!isset($sourceArr) || !is_array($sourceArr)) {
+                return "";
+            }
+
+            // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне
+            $valuesArr = array();
+
+            // Сообщение прочитано или не прочитано
+            $valuesArr['unread'] = "";
+            if (isset($sourceArr['isReaded']) && $sourceArr['isReaded'] == "не прочитано") $valuesArr['unread'] = "unread";
+
+            // Фото
+            $valuesArr['fotosWrapper'] = "";
+            $valuesArr['fotosWrapper'] = $this->getHTMLfotosWrapper("small", FALSE, FALSE, $sourceArr['fotoArr']);
+
+            // Идентификатор объекта
+            $valuesArr['propertyId'] = "";
+            if (isset($sourceArr['targetId'])) $valuesArr['propertyId'] = $sourceArr['targetId'];
+
+            // Тип
+            $valuesArr['typeOfObject'] = "";
+            if (isset($sourceArr['typeOfObject'])) $valuesArr['typeOfObject'] = $this->globFunc->getFirstCharUpper($sourceArr['typeOfObject']) . ":";
+
+            // Адрес
+            $valuesArr['address'] = "";
+            if (isset($sourceArr['address'])) $valuesArr['address'] = $sourceArr['address'];
+
+            // Стоимость
+            $valuesArr['costOfRenting'] = "";
+            if (isset($sourceArr['costOfRenting'])) $valuesArr['costOfRenting'] = $sourceArr['costOfRenting'];
+            $valuesArr['currency'] = "";
+            if (isset($sourceArr['currency'])) $valuesArr['currency'] = $sourceArr['currency'];
+            $valuesArr['utilities'] = "";
+            if (isset($sourceArr['utilities']) && $sourceArr['utilities'] == "да") $valuesArr['utilities'] = " <span style='white-space: nowrap;'>+ ком.усл.</span>";
+
+            // Комнаты
+            if (isset($sourceArr['amountOfRooms']) && $sourceArr['amountOfRooms'] != "0") {
+                $valuesArr['amountOfRoomsName'] = "Комнат:";
+                $valuesArr['amountOfRooms'] = $sourceArr['amountOfRooms'];
+            } else {
+                $valuesArr['amountOfRoomsName'] = "";
+                $valuesArr['amountOfRooms'] = "";
+            }
+            if (isset($sourceArr['adjacentRooms']) && $sourceArr['adjacentRooms'] == "да") {
+                if (isset($sourceArr['amountOfAdjacentRooms']) && $sourceArr['amountOfAdjacentRooms'] != "0") {
+                    $valuesArr['adjacentRooms'] = ", смежных: " . $sourceArr['amountOfAdjacentRooms'];
+                } else {
+                    $valuesArr['adjacentRooms'] = ", смежные";
+                }
+            } else {
+                $valuesArr['adjacentRooms'] = "";
+            }
+
+            // Площади помещений
+            $valuesArr['areaValues'] = "";
+            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "квартира" && $sourceArr['typeOfObject'] != "дом" && $sourceArr['typeOfObject'] != "таунхаус" && $sourceArr['typeOfObject'] != "дача" && $sourceArr['typeOfObject'] != "гараж") {
+                $valuesArr['areaValues'] .= $sourceArr['roomSpace'];
+            }
+            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "комната") {
+                $valuesArr['areaValues'] .= $sourceArr['totalArea'];
+            }
+            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "комната" && $sourceArr['typeOfObject'] != "гараж") {
+                $valuesArr['areaValues'] .= " / " . $sourceArr['livingSpace'];
+            }
+            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "дача" && $sourceArr['typeOfObject'] != "гараж") {
+                $valuesArr['areaValues'] .= " / " . $sourceArr['kitchenSpace'];
+            }
+
+            // Этаж
+            $valuesArr['floorName'] = "";
+            $valuesArr['floor'] = "";
+            if (isset($sourceArr['floor']) && isset($sourceArr['totalAmountFloor']) && $sourceArr['floor'] != "0" && $sourceArr['totalAmountFloor'] != "0") {
+                $valuesArr['floorName'] = "Этаж:";
+                $valuesArr['floor'] = $sourceArr['floor'] . " из " . $sourceArr['totalAmountFloor'];
+            }
+            if (isset($sourceArr['numberOfFloor']) && $sourceArr['numberOfFloor'] != "0") {
+                $valuesArr['floorName'] = "Этажность:";
+                $valuesArr['floor'] = $sourceArr['numberOfFloor'];
+            }
+
+            // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне
+            $stringForReplaceArr = array('{unread}', '{fotosWrapper}', '{propertyId}', '{typeOfObject}', '{address}', '{costOfRenting}', '{currency}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{floorName}', '{floor}');
+            // Заполнение шаблона
+            $resultHTML = str_replace($stringForReplaceArr, $valuesArr, $templ);
+
+            return $resultHTML;
+        }
+
+        /**
+         * Возвращает HTML для блока с описанием новости об изменении даты и времени просмотра недвижимости
+         *
+         * @param $sourceArr - ассоциированный массив со сведениями о сообщении (новости)
+         * @return mixed|string
+         * TODO: реализовать
+         */
+        public function getHTMLforMessageEditedTimeToView($sourceArr)
+        {
+            // Шаблон блока
+            $templ = "
+                <div class='news {unread}'>
+                    <div class='newsHeader'>
+                        Новое предложение по Вашему поиску
+                    </div>
+                    {fotosWrapper}
+                    <ul class='setOfInstructions'>
+                        <li>
+                            <a href='#'>прочитал</a>
+                        </li>
+                        <li>
+                            <a href='#'>удалить</a>
+                        </li>
+                        <li>
+                            <a href='objdescription.php?propertyId={propertyId}' target='_blank'>подробнее</a>
+                        </li>
+                    </ul>
+                    <ul class='listDescriptionSmall'>
+                        <li>
+                            <span class='headOfString'>{typeOfObject}</span> {address}
+                        </li>
+                        <li>
+                            <span class='headOfString'>Плата:</span> {costOfRenting} {currency}/мес.{utilities}
+                        </li>
+                        <li>
+                            <span class='headOfString'>{amountOfRoomsName}</span> {amountOfRooms}{adjacentRooms}
+                        </li>
+                        <li>
+                            <span class='headOfString'>Площадь:</span> {areaValues} м²
+                        </li>
+                        <li>
+                            <span class='headOfString'>{floorName}</span> {floor}
+                        </li>
+                    </ul>
+                    <div class='clearBoth'></div>
+                </div>
+            ";
+
+            // Если массив с параметрами сообщения (новости) не передан, то возвращаем пустую строку вместо HTML блока
+            if (!isset($sourceArr) || !is_array($sourceArr)) {
+                return "";
+            }
+
+            // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне
+            $valuesArr = array();
+
+            // Сообщение прочитано или не прочитано
+            $valuesArr['unread'] = "";
+            if (isset($sourceArr['isReaded']) && $sourceArr['isReaded'] == "не прочитано") $valuesArr['unread'] = "unread";
+
+            // Фото
+            $valuesArr['fotosWrapper'] = "";
+            $valuesArr['fotosWrapper'] = $this->getHTMLfotosWrapper("small", FALSE, FALSE, $sourceArr['fotoArr']);
+
+            // Идентификатор объекта
+            $valuesArr['propertyId'] = "";
+            if (isset($sourceArr['targetId'])) $valuesArr['propertyId'] = $sourceArr['targetId'];
+
+            // Тип
+            $valuesArr['typeOfObject'] = "";
+            if (isset($sourceArr['typeOfObject'])) $valuesArr['typeOfObject'] = $this->globFunc->getFirstCharUpper($sourceArr['typeOfObject']) . ":";
+
+            // Адрес
+            $valuesArr['address'] = "";
+            if (isset($sourceArr['address'])) $valuesArr['address'] = $sourceArr['address'];
+
+            // Стоимость
+            $valuesArr['costOfRenting'] = "";
+            if (isset($sourceArr['costOfRenting'])) $valuesArr['costOfRenting'] = $sourceArr['costOfRenting'];
+            $valuesArr['currency'] = "";
+            if (isset($sourceArr['currency'])) $valuesArr['currency'] = $sourceArr['currency'];
+            $valuesArr['utilities'] = "";
+            if (isset($sourceArr['utilities']) && $sourceArr['utilities'] == "да") $valuesArr['utilities'] = " <span style='white-space: nowrap;'>+ ком.усл.</span>";
+
+            // Комнаты
+            if (isset($sourceArr['amountOfRooms']) && $sourceArr['amountOfRooms'] != "0") {
+                $valuesArr['amountOfRoomsName'] = "Комнат:";
+                $valuesArr['amountOfRooms'] = $sourceArr['amountOfRooms'];
+            } else {
+                $valuesArr['amountOfRoomsName'] = "";
+                $valuesArr['amountOfRooms'] = "";
+            }
+            if (isset($sourceArr['adjacentRooms']) && $sourceArr['adjacentRooms'] == "да") {
+                if (isset($sourceArr['amountOfAdjacentRooms']) && $sourceArr['amountOfAdjacentRooms'] != "0") {
+                    $valuesArr['adjacentRooms'] = ", смежных: " . $sourceArr['amountOfAdjacentRooms'];
+                } else {
+                    $valuesArr['adjacentRooms'] = ", смежные";
+                }
+            } else {
+                $valuesArr['adjacentRooms'] = "";
+            }
+
+            // Площади помещений
+            $valuesArr['areaValues'] = "";
+            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "квартира" && $sourceArr['typeOfObject'] != "дом" && $sourceArr['typeOfObject'] != "таунхаус" && $sourceArr['typeOfObject'] != "дача" && $sourceArr['typeOfObject'] != "гараж") {
+                $valuesArr['areaValues'] .= $sourceArr['roomSpace'];
+            }
+            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "комната") {
+                $valuesArr['areaValues'] .= $sourceArr['totalArea'];
+            }
+            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "комната" && $sourceArr['typeOfObject'] != "гараж") {
+                $valuesArr['areaValues'] .= " / " . $sourceArr['livingSpace'];
+            }
+            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "дача" && $sourceArr['typeOfObject'] != "гараж") {
+                $valuesArr['areaValues'] .= " / " . $sourceArr['kitchenSpace'];
+            }
+
+            // Этаж
+            $valuesArr['floorName'] = "";
+            $valuesArr['floor'] = "";
+            if (isset($sourceArr['floor']) && isset($sourceArr['totalAmountFloor']) && $sourceArr['floor'] != "0" && $sourceArr['totalAmountFloor'] != "0") {
+                $valuesArr['floorName'] = "Этаж:";
+                $valuesArr['floor'] = $sourceArr['floor'] . " из " . $sourceArr['totalAmountFloor'];
+            }
+            if (isset($sourceArr['numberOfFloor']) && $sourceArr['numberOfFloor'] != "0") {
+                $valuesArr['floorName'] = "Этажность:";
+                $valuesArr['floor'] = $sourceArr['numberOfFloor'];
+            }
+
+            // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне
+            $stringForReplaceArr = array('{unread}', '{fotosWrapper}', '{propertyId}', '{typeOfObject}', '{address}', '{costOfRenting}', '{currency}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{floorName}', '{floor}');
+            // Заполнение шаблона
+            $resultHTML = str_replace($stringForReplaceArr, $valuesArr, $templ);
+
+            return $resultHTML;
         }
     }

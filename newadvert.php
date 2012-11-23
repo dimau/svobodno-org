@@ -69,6 +69,10 @@
                 // Сохраним информацию о фотографиях объекта недвижимости
                 $property->saveFotoInformationToDB();
 
+                // Формируем сообщения (новости) для арендаторов, под чей поисковый запрос подходит новый объект
+                // TODO: в будущем здесь нужно лишь куда-то писать команду на формирование новостей, чтобы пользователь не дожидался выполнения скрипта
+                $property->sendMessagesAboutNewProperty();
+
                 // Пересылаем пользователя на страницу с подробным описанием его объявления - хороший способ убедиться в том, что все данные указаны верно
                 header('Location: objdescription.php?propertyId='.$property->id);
 
@@ -91,7 +95,8 @@
                                                  'propertyFotoInformation' => $property->getFotoInformationData(),
                                                  'errors' => $errors,
                                                  'allDistrictsInCity' => $allDistrictsInCity,
-                                                 'isLoggedIn' => $incomingUser->login()));
+                                                 'isLoggedIn' => $incomingUser->login(),
+                                                 'amountUnreadMessages' => $incomingUser->getAmountUnreadMessages()));
 
     /********************************************************************************
      * Закрываем соединение с БД

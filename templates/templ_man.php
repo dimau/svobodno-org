@@ -6,6 +6,7 @@
     $strHeaderOfPage = $dataArr['strHeaderOfPage'];
     $isLoggedIn = $dataArr['isLoggedIn'];
     $mode = $dataArr['mode']; // Режим в котором будет работать шаблон анкеты пользователя (templ_notEditedProfile.php)
+    $amountUnreadMessages = $dataArr['amountUnreadMessages'];
 ?>
 
 <!DOCTYPE html>

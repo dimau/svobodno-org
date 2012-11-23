@@ -116,7 +116,7 @@
             if (isset($_GET['maxCost']) && preg_match("/^\d{0,8}$/", $_GET['maxCost'])) $this->maxCost = htmlspecialchars($_GET['maxCost']); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
             if (isset($_GET['pledge']) && preg_match("/^\d{0,8}$/", $_GET['pledge'])) $this->pledge = htmlspecialchars($_GET['pledge']); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
             if (isset($_GET['prepayment'])) $this->prepayment = htmlspecialchars($_GET['prepayment']);
-            if (isset($_GET['district']) && is_array($_GET['district'])) $this->district = $_GET['district'];
+            if (isset($_GET['district']) && is_array($_GET['district'])) $this->district = $_GET['district']; else $this->district = array();
             if (isset($_GET['withWho'])) $this->withWho = htmlspecialchars($_GET['withWho']);
             if (isset($_GET['children'])) $this->children = htmlspecialchars($_GET['children']);
             if (isset($_GET['animals'])) $this->animals = htmlspecialchars($_GET['animals']);
@@ -195,12 +195,12 @@
             // Ограничение на формат проживания (с кем собираетесь проживать)
             $searchLimits['withWho'] = "";
             if ($this->withWho == "0") $searchLimits['withWho'] = "";
-            if ($this->withWho == "самостоятельно") $searchLimits['withWho'] = "(relations LIKE '%один человек%' OR relations = '')";
-            if ($this->withWho == "семья") $searchLimits['withWho'] = "(relations LIKE '%семья%' OR relations = '')";
-            if ($this->withWho == "пара") $searchLimits['withWho'] = "(relations LIKE '%пара%' OR relations = '')";
-            if ($this->withWho == "2 мальчика") $searchLimits['withWho'] = "(relations LIKE '%2 мальчика%' OR relations = '')";
-            if ($this->withWho == "2 девочки") $searchLimits['withWho'] = "(relations LIKE '%2 девочки%' OR relations = '')";
-            if ($this->withWho == "со знакомыми") $searchLimits['withWho'] = "(relations LIKE '%группа людей%' OR relations = '')";
+            if ($this->withWho == "самостоятельно") $searchLimits['withWho'] = " (relations LIKE '%один человек%' OR relations = '')";
+            if ($this->withWho == "семья") $searchLimits['withWho'] = " (relations LIKE '%семья%' OR relations = '')";
+            if ($this->withWho == "пара") $searchLimits['withWho'] = " (relations LIKE '%пара%' OR relations = '')";
+            if ($this->withWho == "2 мальчика") $searchLimits['withWho'] = " (relations LIKE '%2 мальчика%' OR relations = '')";
+            if ($this->withWho == "2 девочки") $searchLimits['withWho'] = " (relations LIKE '%2 девочки%' OR relations = '')";
+            if ($this->withWho == "со знакомыми") $searchLimits['withWho'] = " (relations LIKE '%группа людей%' OR relations = '')";
 
             // Ограничение на проживание с детьми
             $searchLimits['children'] = "";

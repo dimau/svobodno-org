@@ -28,7 +28,8 @@
 
     $view = new View($globFunc, $DBlink);
     $view->generate("templ_successfullRegistration.php", array('url_initial' => $url_initial,
-                                                               'isLoggedIn' => $incomingUser->login()));
+                                                               'isLoggedIn' => $incomingUser->login(),
+                                                               'amountUnreadMessages' => $incomingUser->getAmountUnreadMessages()));
 
     /********************************************************************************
      * Закрываем соединение с БД

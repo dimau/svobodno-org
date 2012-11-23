@@ -9,6 +9,7 @@
     $signUpToViewData = $dataArr['signUpToViewData']; // Используется в templ_signUpToViewItem.php
     $statusOfSaveParamsToDB = $dataArr['statusOfSaveParamsToDB']; // Используется в templ_signUpToViewItem.php
     $errors = $dataArr['errors'];
+    $amountUnreadMessages = $dataArr['amountUnreadMessages'];
 ?>
 
 <!DOCTYPE html>

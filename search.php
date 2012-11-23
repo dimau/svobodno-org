@@ -65,7 +65,8 @@
                                               'userSearchRequest' => $searchRequest->getSearchRequestData(),
                                               'allDistrictsInCity' => $allDistrictsInCity,
                                               'isLoggedIn' => $incomingUser->login(),
-                                              'favoritesPropertysId' => $incomingUser->getFavoritesPropertysId()));
+                                              'favoritesPropertysId' => $incomingUser->getFavoritesPropertysId(),
+                                              'amountUnreadMessages' => $incomingUser->getAmountUnreadMessages()));
 
     /********************************************************************************
      * Закрываем соединение с БД
