@@ -2,25 +2,8 @@
 
     class View
     {
-
-        private $DBlink = FALSE; // Переменная для хранения объекта соединения с базой данных
-        private $globFunc = FALSE; // Переменная для хранения глобальных функций
-
         // КОНСТРУКТОР
-        public function __construct($globFunc = FALSE, $DBlink = FALSE)
-        {
-
-            // Если объект с глобальными функциями получен - сделаем его доступным для всех методов класса
-            if ($globFunc != FALSE) {
-                $this->globFunc = $globFunc;
-            }
-
-            // Если объект соединения с БД получен - сделаем его доступным для всех методов класса
-            if ($DBlink != FALSE) {
-                $this->DBlink = $DBlink;
-            }
-
-        }
+        public function __construct() {}
 
         // Генерация HTML страницы через заполнение шаблона $templ данными $dataArr
         public function generate($templ, $dataArr)
@@ -173,8 +156,8 @@
             }
 
             // Получаем данные из БД
-            $res = $this->DBlink->query("SELECT * FROM property WHERE" . $strWHERE . " ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting LIMIT 20");
-            if (($this->DBlink->errno)
+            $res = DBconnect::get()->query("SELECT * FROM property WHERE" . $strWHERE . " ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting LIMIT 20");
+            if ((DBconnect::get()->errno)
                 OR (($propertyFullArr = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
             ) {
                 // Логируем ошибку
@@ -183,7 +166,7 @@
             }
 
             // Превращаем полученный массив массивов в ассоциированный массив массивов, в качестве ключей - идентификаторы объектов недвижимости
-            for ($i = 0; $i < count($propertyFullArr); $i++) {
+            for ($i = 0, $s = count($propertyFullArr); $i < $s; $i++) {
                 $propertyFullArrNew[$propertyFullArr[$i]['id']] = $propertyFullArr[$i];
             }
 
@@ -199,7 +182,7 @@
             $number = 0;
 
             // Начинаем перебор каждого из полученных ранее объявлений для наполнения их данными шаблонов и получения красивых HTML-блоков для публикации на странице
-            for ($i = 0; $i < count($propertyLightArr); $i++) {
+            for ($i = 0, $s = count($propertyLightArr); $i < $s; $i++) {
 
                 // Вычисляем идентификатор текущего объявления
                 $currentPropertyId = $propertyLightArr[$i]['id'];
@@ -215,8 +198,8 @@
                 }
 
                 // Получаем фотографии объекта
-                $res = $this->DBlink->query("SELECT * FROM propertyFotos WHERE propertyId = '" . $currentPropertyId . "'");
-                if (($this->DBlink->errno)
+                $res = DBconnect::get()->query("SELECT * FROM propertyFotos WHERE propertyId = '" . $currentPropertyId . "'");
+                if ((DBconnect::get()->errno)
                     OR (($propertyFotosArr = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
                 ) {
                     // Логируем ошибку
@@ -277,8 +260,8 @@
             } else { // Если ничего не нашли
 
 
-                $res = $this->DBlink->query("SELECT COUNT(*) FROM property WHERE status = 'опубликовано'");
-                if (($this->DBlink->errno)
+                $res = DBconnect::get()->query("SELECT COUNT(*) FROM property WHERE status = 'опубликовано'");
+                if ((DBconnect::get()->errno)
                     OR (($amountOfRows = $res->fetch_row()) === NULL)
                 ) {
                     // Логируем ошибку
@@ -416,7 +399,7 @@
 
             // Тип
             $arrBalloonReplace['typeOfObject'] = "";
-            if (isset($oneProperty['typeOfObject'])) $arrBalloonReplace['typeOfObject'] = $this->globFunc->getFirstCharUpper($oneProperty['typeOfObject']) . ": ";
+            if (isset($oneProperty['typeOfObject'])) $arrBalloonReplace['typeOfObject'] = GlobFunc::getFirstCharUpper($oneProperty['typeOfObject']) . ": ";
 
             // Адрес
             $arrBalloonReplace['address'] = "";
@@ -591,7 +574,7 @@
 
             // Тип
             $arrShortListReplace['typeOfObject'] = "";
-            if (isset($oneProperty['typeOfObject'])) $arrShortListReplace['typeOfObject'] = $this->globFunc->getFirstCharUpper($oneProperty['typeOfObject']) . ":";
+            if (isset($oneProperty['typeOfObject'])) $arrShortListReplace['typeOfObject'] = GlobFunc::getFirstCharUpper($oneProperty['typeOfObject']) . ":";
 
             // Адрес
             $arrShortListReplace['address'] = "";
@@ -712,7 +695,7 @@
 
             // Тип
             $arrExtendedListReplace['typeOfObject'] = "<br><br>";
-            if (isset($oneProperty['typeOfObject'])) $arrExtendedListReplace['typeOfObject'] = $this->globFunc->getFirstCharUpper($oneProperty['typeOfObject']) . "<br><br>";
+            if (isset($oneProperty['typeOfObject'])) $arrExtendedListReplace['typeOfObject'] = GlobFunc::getFirstCharUpper($oneProperty['typeOfObject']) . "<br><br>";
 
             // Район
             $arrExtendedListReplace['district'] = "";
@@ -879,7 +862,7 @@
             // Создаем бриф для каждого объявления пользователя на основе шаблона (для вкладки МОИ ОБЪЯВЛЕНИЯ), и в цикле объединяем их в один HTML блок - $briefOfAdverts.
             // Если объявлений у пользователя несколько, то в переменную, содержащую весь HTML - $briefOfAdverts, записываем каждое из них последовательно
             $briefOfAdverts = "";
-            for ($i = 0; $i < count($allPropertiesCharacteristic); $i++) {
+            for ($i = 0, $s = count($allPropertiesCharacteristic); $i < $s; $i++) {
 
                 // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне
                 $arrMyAdvertReplace = array();
@@ -891,7 +874,7 @@
 
                 // В заголовке блока отображаем тип недвижимости, для красоты первую букву типа сделаем в верхнем регистре
                 $arrMyAdvertReplace['typeOfObject'] = "";
-                $arrMyAdvertReplace['typeOfObject'] = $this->globFunc->getFirstCharUpper($allPropertiesCharacteristic[$i]['typeOfObject']);
+                $arrMyAdvertReplace['typeOfObject'] = GlobFunc::getFirstCharUpper($allPropertiesCharacteristic[$i]['typeOfObject']);
 
                 // Адрес и номер квартиры, если он есть
                 $arrMyAdvertReplace['address'] = "";
@@ -922,7 +905,7 @@
                 /******* Список потенциальных арендаторов ******/
                 $arrMyAdvertReplace['probableTenants'] = "";
                 if ($allPropertiesTenantPretenders != FALSE) {
-                    for ($j = 0; $j < count($allPropertiesTenantPretenders[$i]); $j++) {
+                    for ($j = 0, $s1 = count($allPropertiesTenantPretenders[$i]); $j < $s1; $j++) {
                         // Перебираем данные по потенциальным арендаторам, проявившим интерес к данному объекту и добавляем их в строку $arrMyAdvertReplace['probableTenants']
                         // Формируем из имен и отчеств строку гиперссылок с ссылками на страницы арендаторов
                         if ($allPropertiesTenantPretenders[$i][$j]['typeTenant'] == "TRUE") { // Если данный пользователь (арендатор) еще ищет недвижимость
@@ -931,7 +914,7 @@
                         } else {
                             $arrMyAdvertReplace['probableTenants'] .= "<span title='Пользователь уже нашел недвижимость'>" . $allPropertiesTenantPretenders[$i][$j]['name'] . " " . $allPropertiesTenantPretenders[$i][$j]['secondName'] . "</span>";
                         }
-                        if ($j < count($allPropertiesCharacteristic[$i]) - 1) $arrMyAdvertReplace['probableTenants'] .= ", ";
+                        if ($j < $s1 - 1) $arrMyAdvertReplace['probableTenants'] .= ", ";
                     }
                 }
                 if ($arrMyAdvertReplace['probableTenants'] == "") $arrMyAdvertReplace['probableTenants'] = " <span title='Пока никто из арендаторов не проявил интереса к этому объявлению'>-</span>"; // Если нет ни одного потенциального арендатора
@@ -956,8 +939,8 @@
                 $arrMyAdvertReplace['dateOfEntry'] = "";
                 $arrMyAdvertReplace['dateOfCheckOut'] = "";
                 $arrMyAdvertReplace['termOfLease'] = $allPropertiesCharacteristic[$i]['termOfLease'];
-                $arrMyAdvertReplace['dateOfEntry'] = $this->globFunc->dateFromDBToView($allPropertiesCharacteristic[$i]['dateOfEntry']);
-                if ($allPropertiesCharacteristic[$i]['dateOfCheckOut'] != "0000-00-00") $arrMyAdvertReplace['dateOfCheckOut'] = " по " . $this->globFunc->dateFromDBToView($allPropertiesCharacteristic[$i]['dateOfCheckOut']);
+                $arrMyAdvertReplace['dateOfEntry'] = GlobFunc::dateFromDBToView($allPropertiesCharacteristic[$i]['dateOfEntry']);
+                if ($allPropertiesCharacteristic[$i]['dateOfCheckOut'] != "0000-00-00") $arrMyAdvertReplace['dateOfCheckOut'] = " по " . GlobFunc::dateFromDBToView($allPropertiesCharacteristic[$i]['dateOfCheckOut']);
 
                 // Мебель
                 $arrMyAdvertReplace['furnitureName'] = "";
@@ -1018,7 +1001,7 @@
             $allMessagesHTML = "";
 
             // Перебираем все новости, формируя для каждой на основе шаблона, блок и, складывая в общий HTML
-            for ($i = 0; $i < count($messagesArr); $i++) {
+            for ($i = 0, $s = count($messagesArr); $i < $s; $i++) {
 
                 if ($messagesArr[$i]['messageType'] == "newProperty") $allMessagesHTML .= $this->getHTMLforMessageNewProperty($messagesArr[$i]);
                 if ($messagesArr[$i]['messageType'] == "newTenant") $allMessagesHTML .= $this->getHTMLforMessageNewTenant($messagesArr[$i]);
@@ -1098,7 +1081,7 @@
 
             // Тип
             $valuesArr['typeOfObject'] = "";
-            if (isset($sourceArr['typeOfObject'])) $valuesArr['typeOfObject'] = $this->globFunc->getFirstCharUpper($sourceArr['typeOfObject']) . ":";
+            if (isset($sourceArr['typeOfObject'])) $valuesArr['typeOfObject'] = GlobFunc::getFirstCharUpper($sourceArr['typeOfObject']) . ":";
 
             // Адрес
             $valuesArr['address'] = "";
@@ -1245,7 +1228,7 @@
 
             // Возраст
             $valuesArr['age'] = "";
-            if (isset($sourceArr['birthday'])) $valuesArr['age'] = $this->globFunc->calculate_age($sourceArr['birthday']);
+            if (isset($sourceArr['birthday'])) $valuesArr['age'] = GlobFunc::calculate_age($sourceArr['birthday']);
 
             // С кем
             $valuesArr['withWho'] = "";
@@ -1337,7 +1320,7 @@
 
             // Тип
             $valuesArr['typeOfObject'] = "";
-            if (isset($sourceArr['typeOfObject'])) $valuesArr['typeOfObject'] = $this->globFunc->getFirstCharUpper($sourceArr['typeOfObject']) . ":";
+            if (isset($sourceArr['typeOfObject'])) $valuesArr['typeOfObject'] = GlobFunc::getFirstCharUpper($sourceArr['typeOfObject']) . ":";
 
             // Адрес
             $valuesArr['address'] = "";
@@ -1474,7 +1457,7 @@
 
             // Тип
             $valuesArr['typeOfObject'] = "";
-            if (isset($sourceArr['typeOfObject'])) $valuesArr['typeOfObject'] = $this->globFunc->getFirstCharUpper($sourceArr['typeOfObject']) . ":";
+            if (isset($sourceArr['typeOfObject'])) $valuesArr['typeOfObject'] = GlobFunc::getFirstCharUpper($sourceArr['typeOfObject']) . ":";
 
             // Адрес
             $valuesArr['address'] = "";

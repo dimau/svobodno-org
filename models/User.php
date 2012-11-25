@@ -62,25 +62,11 @@
         public $uploadedFoto = array(); // В переменной будет храниться информация о загруженных фотографиях. Представляет собой массив ассоциированных массивов
         public $primaryFotoId = "";
 
-        private $DBlink = FALSE; // Переменная для хранения объекта соединения с базой данных
-        private $globFunc = FALSE; // Переменная для хранения глобальных функций
-
         // КОНСТРУКТОР
-        // В качестве входных параметров: $DBlink объект соединения с базой данных
-        public function __construct($globFunc = FALSE, $DBlink = FALSE, $userId = FALSE)
+        public function __construct($userId = FALSE)
         {
-            // Если объект с глобальными функциями получен - сделаем его доступным для всех методов класса
-            if ($globFunc != FALSE) {
-                $this->globFunc = $globFunc;
-            }
-
-            // Если объект соединения с БД получен - сделаем его доступным для всех методов класса
-            if ($DBlink != FALSE) {
-                $this->DBlink = $DBlink;
-            }
-
             // Инициализируем переменную "сессии" для временного сохранения фотографий
-            $this->fileUploadId = $this->globFunc->generateCode(7);
+            $this->fileUploadId = GlobFunc::generateCode(7);
 
             // Если мы собираемся инициализировать данную модель в соответствии с текущим пользователем, запросившим страницу, то запишем его ключевые параметры
             if ($userId != FALSE) {
@@ -106,7 +92,7 @@
             if ($typeOfUser == "edit" && $this->id == "") return FALSE;
 
             // Корректируем дату дня рождения для того, чтобы сделать ее пригодной для сохранения в базу данных
-            $birthdayDB = $this->globFunc->dateFromViewToDB($this->birthday);
+            $birthdayDB = GlobFunc::dateFromViewToDB($this->birthday);
             // Получаем текущее время для сохранения в качестве даты регистрации и даты последнего действия
             $tm = time();
             $last_act = $tm;
@@ -129,7 +115,7 @@
             // Код для сохранения данных разный: для нового пользователя и при редактировании параметров существующего пользователя
             if ($typeOfUser == "new") {
 
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("INSERT INTO users (typeTenant,typeOwner,name,secondName,surname,sex,nationality,birthday,login,password,telephon,emailReg,email,currentStatusEducation,almamater,speciality,kurs,ochnoZaochno,yearOfEnd,statusWork,placeOfWork,workPosition,regionOfBorn,cityOfBorn,shortlyAboutMe,vkontakte,odnoklassniki,facebook,twitter,lic,last_act,reg_date,favoritesPropertysId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
                     OR ($stmt->bind_param("ssssssssssssssssssssssssssssssiis", $typeTenant, $typeOwner, $this->name, $this->secondName, $this->surname, $this->sex, $this->nationality, $birthdayDB, $this->login, $this->password, $this->telephon, $this->email, $this->email, $this->currentStatusEducation, $this->almamater, $this->speciality, $this->kurs, $this->ochnoZaochno, $this->yearOfEnd, $this->statusWork, $this->placeOfWork, $this->workPosition, $this->regionOfBorn, $this->cityOfBorn, $this->shortlyAboutMe, $this->vkontakte, $this->odnoklassniki, $this->facebook, $this->twitter, $this->lic, $last_act, $reg_date, $favoritesPropertysId) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -148,7 +134,7 @@
 
             if ($typeOfUser == "edit") {
 
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("UPDATE users SET name=?, secondName=?, surname=?, sex=?, nationality=?, birthday=?, password=?, telephon=?, email=?, currentStatusEducation=?, almamater=?, speciality=?, kurs=?, ochnoZaochno=?, yearOfEnd=?, statusWork=?, placeOfWork=?, workPosition=?, regionOfBorn=?, cityOfBorn=?, shortlyAboutMe=?, vkontakte=?, odnoklassniki=?, facebook=?, twitter=?, last_act=? WHERE id=?") === FALSE)
                     OR ($stmt->bind_param("sssssssssssssssssssssssssis", $this->name, $this->secondName, $this->surname, $this->sex, $this->nationality, $birthdayDB, $this->password, $this->telephon, $this->email, $this->currentStatusEducation, $this->almamater, $this->speciality, $this->kurs, $this->ochnoZaochno, $this->yearOfEnd, $this->statusWork, $this->placeOfWork, $this->workPosition, $this->regionOfBorn, $this->cityOfBorn, $this->shortlyAboutMe, $this->vkontakte, $this->odnoklassniki, $this->facebook, $this->twitter, $last_act, $this->id) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -192,7 +178,7 @@
             if ($this->id == "") return FALSE;
 
             // Получаем данные по всем фоткам с нашим $this->fileUploadId
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("SELECT * FROM tempFotos WHERE fileUploadId=?") === FALSE)
                 OR ($stmt->bind_param("s", $this->fileUploadId) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -202,11 +188,11 @@
             ) {
                 $allFotos = array();
                 // Логируем ошибку
-                Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM tempFotos WHERE fileUploadId=".$this->fileUploadId."'. id логгера: User.php->saveFotoInformationToDB():1. Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
+                Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM tempFotos WHERE fileUploadId=".$this->fileUploadId."'. id логгера: User.php->saveFotoInformationToDB():1. Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
             } else {
 
                 // Пометим все члены массива признаком их получения из таблицы tempFotos
-                for ($i = 0; $i < count($allFotos); $i++) {
+                for ($i = 0, $s = count($allFotos); $i < $s; $i++) {
                     $allFotos[$i]['fromTable'] = "tempFotos";
                 }
 
@@ -216,7 +202,7 @@
             // Но только для существующего - авторизованного пользователя (не для нового)
             if ($this->id != "") {
 
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("SELECT * FROM userFotos WHERE userId=?") === FALSE)
                     OR ($stmt->bind_param("s", $this->id) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -225,11 +211,11 @@
                     OR ($stmt->close() === FALSE)
                 ) {
                     // Логируем ошибку
-                    Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM userFotos WHERE userId=".$this->id."'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
+                    Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM userFotos WHERE userId=".$this->id."'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
                 } else {
 
                     // Пометим все члены массива признаком их получения из таблицы userFotos
-                    for ($i = 0; $i < count($res); $i++) {
+                    for ($i = 0, $s = count($res); $i < $s; $i++) {
                         $res[$i]['fromTable'] = "userFotos";
                     }
 
@@ -239,7 +225,7 @@
 
             // Перебираем все имеющиеся фотографии пользователя и актуализируем их параметры
             $primaryFotoExists = 0; // Инициализируем переменную, по которой после прохода по всем фотографиям, полученным в форме, сможем сказать была ли указана пользователем основная фотка (число - сколько фоток со статусом основная мы получили с клиента) или нет (0)
-            for ($i = 0; $i < count($allFotos); $i++) {
+            for ($i = 0, $s = count($allFotos); $i < $s; $i++) {
 
                 // Для сокращения количества запросов на UPDATE будем отмечать особым признаком те фотографии, по которым требуется выполнения этого запроса к БД
                 $allFotos[$i]['updated'] = FALSE;
@@ -273,7 +259,7 @@
 
             // Если пользователь не указал основное фото, то укажем первую попавшуюся фотографию (не помеченную на удаление) в качестве основной
             if ($primaryFotoExists == 0) {
-                for ($i = 0; $i < count($allFotos); $i++) {
+                for ($i = 0, $s = count($allFotos); $i < $s; $i++) {
                     // Если файл помечен на удаление, то ему статус основной не присваиваем
                     if ($allFotos[$i]['forRemove'] == TRUE) continue;
 
@@ -289,30 +275,30 @@
             }
 
             // Удаляем файлы фотографий (помеченных признаком удаления) с сервера
-            for ($i = 0; $i < count($allFotos); $i++) {
+            for ($i = 0, $s = count($allFotos); $i < $s; $i++) {
                 if ($allFotos[$i]['forRemove'] == FALSE) continue;
                 if ((unlink($allFotos[$i]['folder'] . '/small/' . $allFotos[$i]['id'] . "." . $allFotos[$i]['extension']) === FALSE)
                     OR unlink($allFotos[$i]['folder'] . '/middle/' . $allFotos[$i]['id'] . "." . $allFotos[$i]['extension'])
                     OR unlink($allFotos[$i]['folder'] . '/big/' . $allFotos[$i]['id'] . "." . $allFotos[$i]['extension'])
                 ) {
                     // Логируем ошибку
-                    Logger::getLogger($this->globFunc->loggerName)->log("Ошибка удаления файлов фотографий пользователя. Адрес: ".$allFotos[$i]['folder']."/big/".$allFotos[$i]['id'].".".$allFotos[$i]['extension']." Местонахождение кода: User->saveFotoInformationToDB(). ID пользователя: ".$this->id);
+                    Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка удаления файлов фотографий пользователя. Адрес: ".$allFotos[$i]['folder']."/big/".$allFotos[$i]['id'].".".$allFotos[$i]['extension']." Местонахождение кода: User->saveFotoInformationToDB(). ID пользователя: ".$this->id);
                 }
             }
 
             // Выполним запросы на UPDATE данных в userFotos
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if ($stmt->prepare("UPDATE userFotos SET status=? WHERE id=?") === FALSE) {
                 // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
             }
-            for ($i = 0; $i < count($allFotos); $i++) {
+            for ($i = 0, $s = count($allFotos); $i < $s; $i++) {
                 if ($allFotos[$i]['fromTable'] == "userFotos" && $allFotos[$i]['updated'] == TRUE && $allFotos[$i]['forRemove'] == FALSE) {
                     if (($stmt->bind_param("ss", $allFotos[$i]['status'], $allFotos[$i]['id']) === FALSE)
                         OR ($stmt->execute() === FALSE)
                         OR (($res = $stmt->affected_rows) === -1)
                     ) {
                         // Логируем ошибку
-                        Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE userFotos SET status=".$allFotos[$i]['status']." WHERE id=".$allFotos[$i]['id']."'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
+                        Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE userFotos SET status=".$allFotos[$i]['status']." WHERE id=".$allFotos[$i]['id']."'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
                     }
                 }
             }
@@ -324,7 +310,7 @@
             // на DELETE более ненужных фоток из userFotos
             $strINSERT = "";
             $strDELETE = "";
-            for ($i = 0; $i < $count = count($allFotos); $i++) {
+            for ($i = 0, $s = count($allFotos); $i < $s; $i++) {
 
                 if ($allFotos[$i]['fromTable'] == "tempFotos" && $allFotos[$i]['forRemove'] == FALSE) {
                     if ($strINSERT != "") $strINSERT .= ",";
@@ -341,35 +327,35 @@
             // Выполним сформированные запросы
             // INSERT
             if ($strINSERT != "") {
-                $this->DBlink->query("INSERT INTO userFotos (id, folder, filename, extension, filesizeMb, userId, status) VALUES " . $strINSERT);
-                if (($this->DBlink->errno)
-                    OR (($res = $this->DBlink->affected_rows) === -1)
+                DBconnect::get()->query("INSERT INTO userFotos (id, folder, filename, extension, filesizeMb, userId, status) VALUES " . $strINSERT);
+                if ((DBconnect::get()->errno)
+                    OR (($res = DBconnect::get()->affected_rows) === -1)
                     OR ($res === 0)
                 ) {
                     // Логируем ошибку
-                    Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO userFotos (id, folder, filename, extension, filesizeMb, userId, status) VALUES ".$strINSERT."'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
+                    Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO userFotos (id, folder, filename, extension, filesizeMb, userId, status) VALUES ".$strINSERT."'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
                 }
             }
             // DELETE
             if ($strDELETE != "") {
-                $this->DBlink->query("DELETE FROM userFotos WHERE " . $strDELETE);
-                if (($this->DBlink->errno)
-                    OR (($res = $this->DBlink->affected_rows) === -1)
+                DBconnect::get()->query("DELETE FROM userFotos WHERE " . $strDELETE);
+                if ((DBconnect::get()->errno)
+                    OR (($res = DBconnect::get()->affected_rows) === -1)
                 ) {
                     // Логируем ошибку
-                    Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM userFotos WHERE ".$strDELETE."'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
+                    Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM userFotos WHERE ".$strDELETE."'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
                 }
             }
 
             // Удаляем инфу о всех фотках с fileUploadId из tempFotos
             // TODO: Не очень безопасно (используется полученный с клиента fileUploadId)
             if ($this->fileUploadId != "") {
-                $this->DBlink->query("DELETE FROM tempFotos WHERE fileUploadId = '" . $this->fileUploadId . "'");
-                if (($this->DBlink->errno)
-                    OR ($this->DBlink->affected_rows === -1)
+                DBconnect::get()->query("DELETE FROM tempFotos WHERE fileUploadId = '" . $this->fileUploadId . "'");
+                if ((DBconnect::get()->errno)
+                    OR (DBconnect::get()->affected_rows === -1)
                 ) {
                     // Логируем ошибку
-                    Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM tempFotos WHERE fileUploadId = '" . $this->fileUploadId . "'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
+                    Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM tempFotos WHERE fileUploadId = '" . $this->fileUploadId . "'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: ".$stmt->errno." ".$stmt->error.". ID пользователя: ".$this->id);
                 }
             }
 
@@ -396,7 +382,7 @@
             if ($this->typeTenant === TRUE && $typeOfUser == "edit") {
 
                 // Непосредственное сохранение данных о поисковом запросе
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("UPDATE searchRequests SET userId=?, typeOfObject=?, amountOfRooms=?, adjacentRooms=?, floor=?, minCost=?, maxCost=?, pledge=?, prepayment=?, district=?, withWho=?, linksToFriends=?, children=?, howManyChildren=?, animals=?, howManyAnimals=?, termOfLease=?, additionalDescriptionOfSearch=?, interestingPropertysId=? WHERE userId=?") === FALSE)
                     OR ($stmt->bind_param("sssssiiissssssssssss", $this->id, $this->typeOfObject, $amountOfRoomsSerialized, $this->adjacentRooms, $this->floor, $this->minCost, $this->maxCost, $this->pledge, $this->prepayment, $districtSerialized, $this->withWho, $this->linksToFriends, $this->children, $this->howManyChildren, $this->animals, $this->howManyAnimals, $this->termOfLease, $this->additionalDescriptionOfSearch, $interestingPropertysIdSerialized, $this->id) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -410,7 +396,7 @@
             } else {
 
                 // Непосредственное сохранение данных о поисковом запросе
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, interestingPropertysId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
                     OR ($stmt->bind_param("sssssiiisssssssssss", $this->id, $this->typeOfObject, $amountOfRoomsSerialized, $this->adjacentRooms, $this->floor, $this->minCost, $this->maxCost, $this->pledge, $this->prepayment, $districtSerialized, $this->withWho, $this->linksToFriends, $this->children, $this->howManyChildren, $this->animals, $this->howManyAnimals, $this->termOfLease, $this->additionalDescriptionOfSearch, $interestingPropertysIdSerialized) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -423,7 +409,7 @@
                 }
 
                 // Обновляем статус пользователя - теперь он арендатор
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("UPDATE users SET typeTenant='TRUE' WHERE id=?") === FALSE)
                     OR ($stmt->bind_param("s", $this->id) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -449,7 +435,7 @@
             if ($this->id == "") return FALSE;
 
             // Получим из БД данные ($res) по пользователю с идентификатором = $this->id
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("SELECT * FROM users WHERE id=?") === FALSE)
                 OR ($stmt->bind_param("s", $this->id) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -487,7 +473,7 @@
             if (isset($oneUserDataArr['surname'])) $this->surname = $oneUserDataArr['surname'];
             if (isset($oneUserDataArr['sex'])) $this->sex = $oneUserDataArr['sex'];
             if (isset($oneUserDataArr['nationality'])) $this->nationality = $oneUserDataArr['nationality'];
-            if (isset($oneUserDataArr['birthday'])) $this->birthday = $this->globFunc->dateFromDBToView($oneUserDataArr['birthday']);
+            if (isset($oneUserDataArr['birthday'])) $this->birthday = GlobFunc::dateFromDBToView($oneUserDataArr['birthday']);
             if (isset($oneUserDataArr['login'])) $this->login = $oneUserDataArr['login'];
             if (isset($oneUserDataArr['password'])) $this->password = $oneUserDataArr['password'];
             if (isset($oneUserDataArr['telephon'])) $this->telephon = $oneUserDataArr['telephon'];
@@ -528,7 +514,7 @@
             if ($this->id == "") return FALSE;
 
             // Получим из БД данные ($res) по пользователю с идентификатором = $this->id
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("SELECT * FROM userFotos WHERE userId=?") === FALSE)
                 OR ($stmt->bind_param("s", $this->id) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -563,7 +549,7 @@
             if ($this->id == "" || $this->typeTenant === FALSE) return FALSE;
 
             // Получим из БД данные ($res) по пользователю с идентификатором = $this->id
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("SELECT * FROM searchRequests WHERE userId=?") === FALSE)
                 OR ($stmt->bind_param("s", $this->id) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -627,7 +613,7 @@
             if ($this->id == "") return FALSE;
 
             // Удалим данные поискового запроса по данному пользователю из БД
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("DELETE FROM searchRequests WHERE userId=?") === FALSE)
                 OR ($stmt->bind_param("s", $this->id) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -639,7 +625,7 @@
             }
 
             // Обновляем статус данного пользователю (он больше не арендатор)
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("UPDATE users SET typeTenant='FALSE' WHERE id=?") === FALSE)
                 OR ($stmt->bind_param("s", $this->id) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -873,7 +859,7 @@
             if (strlen($this->login) > 50) $errors[] = "Слишком длинный логин. Можно указать не более 50-ти символов";
             // Проверяем логин на занятость. Это нужно делать только прирегистрации, так как в дальнейшем логин пользователя невозможно изменить
             if ($this->login != "" && strlen($this->login) < 50 && $typeOfValidation == "registration") {
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("SELECT id FROM users WHERE login=?") === FALSE)
                     OR ($stmt->bind_param("s", $this->login) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -953,7 +939,7 @@
 
             if ($this->login == "") return FALSE;
 
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("SELECT id FROM users WHERE login=?") === FALSE)
                 OR ($stmt->bind_param("s", $this->login) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -1005,7 +991,7 @@
 
             // Получим сообщения по новым объектам недвижимости, соответствующим запросу, если наш пользователь - арендатор
             if ($this->id != "" && $this->typeTenant === TRUE) {
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("SELECT * FROM messagesNewProperty WHERE userId = ? ORDER BY isReaded DESC, timeIndex DESC") === FALSE)
                     OR ($stmt->bind_param("s", $this->id) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -1019,7 +1005,7 @@
             }
 
             // Преобразования над данными - чтобы обеспечить удобство работы на клиенте с ними
-            for ($i = 0; $i < count($messagesNewProperty); $i++) {
+            for ($i = 0, $s = count($messagesNewProperty); $i < $s; $i++) {
                 $messagesNewProperty[$i]['fotoArr'] = unserialize($messagesNewProperty[$i]['fotoArr']);
             }
 

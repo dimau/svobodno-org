@@ -128,7 +128,7 @@
     Редактирование объявления.
     <?php
     if ($propertyCharacteristic['apartmentNumber'] != "") $apartmentNumberInHeader = ", № " . $propertyCharacteristic['apartmentNumber']; else $apartmentNumberInHeader = "";
-    echo $this->globFunc->getFirstCharUpper($propertyCharacteristic['typeOfObject']) . " по адресу: " . $propertyCharacteristic['address'] . $apartmentNumberInHeader;
+    echo GlobFunc::getFirstCharUpper($propertyCharacteristic['typeOfObject']) . " по адресу: " . $propertyCharacteristic['address'] . $apartmentNumberInHeader;
     ?>
 </div>
 

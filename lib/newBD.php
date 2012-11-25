@@ -5,25 +5,18 @@
      */
 
     // Подключаем нужные модели и представления
-    include '../models/GlobFunc.php';
+    include '../models/DBconnect.php';
 
-    // Создаем объект-хранилище глобальных функций
-    $globFunc = new GlobFunc();
-
-    // Подключаемся к БД
-    $DBlink = $globFunc->connectToDB();
     // Удалось ли подключиться к БД?
-    if ($DBlink == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
+    if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
     // Функция возвращает "1", если операция над БД была выполнена успешно и FALSE с расшифровкой ошибки, если выполнить ее не удалось
     // $typeRes = "1" - выдача результата по отдельной операции с базой данных, крезультат по каждой из которых выводится в отдельную строку
     // $typeRes = "2" - выдача результата по набору однотипных операций с БД - в одну строку!
     function returnResultMySql($rez)
     {
-        global $DBlink;
-
         if ($rez == FALSE) {
-            echo " <span style='color: red;'>FALSE(".$DBlink->errno." ".$DBlink->error.")</span> ";
+            echo " <span style='color: red;'>FALSE(".DBconnect::get()->errno." ".DBconnect::get()->error.")</span> ";
         } else {
             echo 1;
         }
@@ -39,7 +32,7 @@
      * Чистим базу данных перед закачкой исходных данных
      ***************************************************************************/
 
-    $DBlink->query("DROP TABLE IF EXISTS
+    DBconnect::get()->query("DROP TABLE IF EXISTS
     users,
     tempFotos,
     userFotos,
@@ -56,12 +49,12 @@
     ");
 
     echo "Статус удаления старых таблиц: ";
-    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Создаем таблицу для хранения информации о ПОЛЬЗОВАТЕЛЯХ
      ***************************************************************************/
-    $DBlink->query("CREATE TABLE users (
+    DBconnect::get()->query("CREATE TABLE users (
         id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
         typeTenant VARCHAR(5) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Равен строке true, если пользователь в данный момент ищет недвижимость (является потенциальным арендатором), в том числе, обязательно имеет поисковый запрос',
         typeOwner VARCHAR(5) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Равен строке true, если пользователь указал хотя бы 1 объявление по сдаче в аренду недвижимости (является собственником)(не имеет значение - опубликованное или нет)',
@@ -101,13 +94,13 @@
 )");
 
     echo "Статус создания таблицы users: ";
-    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Создаем таблицу для временного хранения информации о ЗАГРУЖЕННЫХ при регистрации ФОТОГРАФИЯХ пользователей
      ***************************************************************************/
 
-    $DBlink->query("CREATE TABLE tempFotos (
+    DBconnect::get()->query("CREATE TABLE tempFotos (
         id VARCHAR(32) NOT NULL PRIMARY KEY COMMENT 'Содержит идентификатор фотографии, он же имя файла на сервере (без расширения)',
         fileUploadId VARCHAR(7) NOT NULL COMMENT 'фактически это такой идентификатор сессии заполнения формы регистрации. Позволяет добиться того, чтобы при перезагрузке формы (в случае, например, ошибок и пустых полей, незаполненных пользователем) данные о фотографиях не потерялись',
         folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ../uploaded_files/3/ ',
@@ -117,13 +110,13 @@
 )");
 
     echo "Статус создания таблицы tempFotos: ";
-    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Создаем таблицу для постоянного хранения информации о ФОТОГРАФИЯХ пользователей (только личные)
      ***************************************************************************/
 
-    $DBlink->query("CREATE TABLE userFotos (
+    DBconnect::get()->query("CREATE TABLE userFotos (
         id VARCHAR(32) NOT NULL PRIMARY KEY COMMENT 'Содержит идентификатор фотографии, он же имя файла на сервере (без расширения)',
         folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ../uploaded_files/3/ ',
         filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
@@ -134,13 +127,13 @@
 )");
 
     echo "Статус создания таблицы userFotos: ";
-    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Создаем таблицу для хранения информации о ПОИСКОВЫХ ЗАПРОСАХ пользователей
      ***************************************************************************/
 
-    $DBlink->query("CREATE TABLE searchRequests (
+    DBconnect::get()->query("CREATE TABLE searchRequests (
         userId INT(11) NOT NULL PRIMARY KEY COMMENT 'Идентификатор пользователя, которому принадлежит данный поисковый запрос. Так как я считаю, что каждый пользователь может иметь только 1 поисковый запрос, то данное поле является ключом таблицы',
         typeOfObject VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип объекта, который ищет пользователь',
         amountOfRooms TEXT,
@@ -163,13 +156,13 @@
 )");
 
     echo "Статус создания таблицы searchRequests: ";
-    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Создаем таблицу для хранения информации об ОБЪЕКТАХ НЕДВИЖИМОСТИ пользователей
      ***************************************************************************/
 
-    $DBlink->query("CREATE TABLE property (
+    DBconnect::get()->query("CREATE TABLE property (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор объекта недвижимости или объявления - можно его называть и так, и так',
         userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя (собственника), который указал данное объявление в системе и который сдает данный объект',
         typeOfObject VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип объекта: квартира, комната, дом, таунхаус, дача, гараж',
@@ -244,13 +237,13 @@
 )"); /* TODO: возможно нужно отказаться от поля tenantsWithSignUpToViewRequest и напрямую получать сведения о заявках на просмотр (с ихстатусами) из соответствующей таблицы для каждого объекта недвижимости собственника */
 
     echo "Статус создания таблицы property: ";
-    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Создаем таблицу для постоянного хранения информации о ФОТОГРАФИЯХ объектов недвижимости
      ***************************************************************************/
 
-    $DBlink->query("CREATE TABLE propertyFotos (
+    DBconnect::get()->query("CREATE TABLE propertyFotos (
         id VARCHAR(32) NOT NULL PRIMARY KEY,
         folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ../uploaded_files/3/ ',
         filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
@@ -261,13 +254,13 @@
 )");
 
     echo "Статус создания таблицы propertyFotos: ";
-    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Создаем таблицу для хранения информации о заявках на просмотр
      ***************************************************************************/
 
-    $DBlink->query("CREATE TABLE requestToView (
+    DBconnect::get()->query("CREATE TABLE requestToView (
        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор запроса на просмотр недвижимости',
        tenantId INT(11) NOT NULL COMMENT 'Идентификатор пользователя (арендатора), который отправил запрос на просмотр объекта недвижимости',
        propertyId INT(11) NOT NULL COMMENT 'Идентификатор объекта недвижимости, который желает посмотреть арендатор',
@@ -280,13 +273,13 @@
     )");
 
     echo "Статус создания таблицы requestToView: ";
-    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Создаем таблицу для хранения информации о заявках на сдачу в аренду недвижимости от собственников
      ***************************************************************************/
 
-    $DBlink->query("CREATE TABLE requestFromOwners (
+    DBconnect::get()->query("CREATE TABLE requestFromOwners (
        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор запроса на сдачу в аренду недвижимости',
        name VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Имя собственника - как к нему обращаться',
        telephon VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
@@ -296,7 +289,7 @@
     )");
 
     echo "Статус создания таблицы requestFromOwners: ";
-    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
 
 
@@ -306,7 +299,7 @@
      ***************************************************************************/
 
     // Сообщения (новости) для пользователей-арендаторов о появлении нового объекта недвижимости (объявления), которое удовлетворяет условиям поиска пользователя-арендатора
-    $DBlink->query("CREATE TABLE messagesNewProperty (
+    DBconnect::get()->query("CREATE TABLE messagesNewProperty (
         id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор сообщения (новости)',
         userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное сообщение',
         timeIndex INT(11) NOT NULL COMMENT 'Время формирования сообщения (новости) - используется для сортировки новостей по времени появления',
@@ -332,10 +325,10 @@
     )");
 
     echo "Статус создания таблицы с сообщениями о новых объектах недвижимости messagesNewProperty: ";
-    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     // Сообщения (новости) для пользователей-собственников о появлении нового претендента на аренду, отправившего заявку на просмотр недвижимости пользователя-собственника
-    $DBlink->query("CREATE TABLE messagesNewTenant (
+    DBconnect::get()->query("CREATE TABLE messagesNewTenant (
         id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор сообщения (новости)',
         userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное сообщение',
         timeIndex INT(11) NOT NULL COMMENT 'Время формирования сообщения (новости) - используется для сортировки новостей по времени появления',
@@ -355,9 +348,9 @@
     )");
 
     echo "Статус создания таблицы с сообщениями о новых претендентах на аренду messagesNewTenant: ";
-    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
-    $DBlink->query("CREATE TABLE messagesRequestToViewConfirmed (
+    DBconnect::get()->query("CREATE TABLE messagesRequestToViewConfirmed (
         id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор сообщения (новости)',
         userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное сообщение',
         timeIndex INT(11) NOT NULL COMMENT 'Время формирования сообщения (новости) - используется для сортировки новостей по времени появления',
@@ -369,9 +362,9 @@
     )");
 
     echo "Статус создания таблицы с сообщениями о назначении даты и времени просмотра недвижимости messagesRequestToViewConfirmed: ";
-    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
-    $DBlink->query("CREATE TABLE messagesEditedTimeToView (
+    DBconnect::get()->query("CREATE TABLE messagesEditedTimeToView (
         id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор сообщения (новости)',
         userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное сообщение',
         timeIndex INT(11) NOT NULL COMMENT 'Время формирования сообщения (новости) - используется для сортировки новостей по времени появления',
@@ -383,26 +376,26 @@
     )");
 
     echo "Статус создания таблицы с сообщениями о изменении времени просмотра недвижимости messagesEditedTimeToView: ";
-    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
 
     /****************************************************************************
      * Создаем таблицу для хранения списка районов каждого города присутствия сервиса
      ***************************************************************************/
 
-    $DBlink->query("CREATE TABLE districts (
+    DBconnect::get()->query("CREATE TABLE districts (
         name VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Название района, которое отображается пользователю',
         city VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Город, в котором расположен данный район'
 )");
 
     echo "Статус создания таблицы districts: ";
-    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Записываем в таблицу с районами инфу о районах
      ***************************************************************************/
 
-    $DBlink->query("INSERT INTO districts (name, city) VALUES
+    DBconnect::get()->query("INSERT INTO districts (name, city) VALUES
     ('Автовокзал (южный)', 'Екатеринбург'),
     ('Академический', 'Екатеринбург'),
     ('Ботанический', 'Екатеринбург'),
@@ -452,31 +445,31 @@
 ");
 
     echo "Статус записи инфы о районах в таблицу districts: ";
-    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Создаем таблицу для хранения курсов валют: доллара США и евро к рублю
      ***************************************************************************/
 
-    $DBlink->query("CREATE TABLE currencies (
+    DBconnect::get()->query("CREATE TABLE currencies (
         name VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Название валюты',
         value DEC(7, 2) COMMENT 'Текущий курс обмена данной валюты на рубли'
 )");
 
     echo "Статус создания таблицы currencies: ";
-    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /****************************************************************************
      * Записываем в таблицу с валютами текущие курсы
      ***************************************************************************/
 
-    $DBlink->query("INSERT INTO currencies (name, value) VALUES
+    DBconnect::get()->query("INSERT INTO currencies (name, value) VALUES
     ('дол. США', 31.22),
     ('евро', 40.17)
     ");
 
     echo "Статус записи инфы о валютах: ";
-    if ($DBlink->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     /**
      * Проверяем настройки PHP сервера
@@ -484,9 +477,11 @@
      * post_max_size = 100M
      * upload_max_filesize = 25M
      * memory_limit = 256M
+     * display_errors = Off
+     * все права для всех пользователей на каталог uploaded_files (чтобы можно было записывать новые фотографии и удалять старые)
      *
      * ini_set ("session.use_trans_sid", true); вроде как PHP сам умеет устанавливать id сессии либо в куки, либо в строку запроса (http://www.phpfaq.ru/sessions)
      */
 
     // Закрываем соединение с БД
-    $globFunc->closeConnectToDB($DBlink);
+    DBconnect::closeConnectToDB();

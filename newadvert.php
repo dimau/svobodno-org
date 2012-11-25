@@ -3,22 +3,18 @@
     session_start();
 
     // Подключаем нужные модели и представления
+    include 'models/DBconnect.php';
     include 'models/GlobFunc.php';
     include 'models/Logger.php';
     include 'models/IncomingUser.php';
     include 'views/View.php';
     include 'models/Property.php';
 
-    // Создаем объект-хранилище глобальных функций
-    $globFunc = new GlobFunc();
-
-    // Подключаемся к БД
-    $DBlink = $globFunc->connectToDB();
     // Удалось ли подключиться к БД?
-    if ($DBlink == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
+    if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
     // Инициализируем модель для запросившего страницу пользователя
-    $incomingUser = new IncomingUser($globFunc, $DBlink);
+    $incomingUser = new IncomingUser();
 
     // Инициализируем массив для хранения ошибок проверки данных объекта недвижимости
     $errors = array();
@@ -38,10 +34,10 @@
      * Инициализируем объект для работы с параметрами недвижимости
      ************************************************************************************/
 
-    $property = new Property($globFunc, $DBlink);
+    $property = new Property();
 
     // Готовим массив со списком районов в городе пользователя
-    $allDistrictsInCity = $globFunc->getAllDistrictsInCity("Екатеринбург");
+    $allDistrictsInCity = GlobFunc::getAllDistrictsInCity("Екатеринбург");
 
     /*************************************************************************************
      * Отправлена форма с параметрами объекта недвижимости
@@ -90,7 +86,7 @@
      * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
      *******************************************************************************/
 
-    $view = new View($globFunc, $DBlink);
+    $view = new View();
     $view->generate("templ_newadvert.php", array('propertyCharacteristic' => $property->getCharacteristicData(),
                                                  'propertyFotoInformation' => $property->getFotoInformationData(),
                                                  'errors' => $errors,
@@ -102,6 +98,6 @@
      * Закрываем соединение с БД
      *******************************************************************************/
 
-    $globFunc->closeConnectToDB($DBlink);
+    DBconnect::closeConnectToDB();
 
     //TODO: В будущем необходимо будет проверять личные данные пользователя на полноту для его работы в качестве собственника, если у него typeOwner != "true"

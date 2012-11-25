@@ -15,22 +15,10 @@
         /**
          * КОНСТРУКТОР
          *
-         * @param GlobFunc $globFunc
-         * @param mysqli $DBlink - объект соединения с базой данных
          * @param IncomingUser $incomingUser
          */
-        public function __construct($globFunc = FALSE, $DBlink = FALSE, $tenantId = "", $propertyId = "")
+        public function __construct($tenantId = "", $propertyId = "")
         {
-            // Если объект с глобальными функциями получен - сделаем его доступным для всех методов класса
-            if ($globFunc != FALSE) {
-                $this->globFunc = $globFunc;
-            }
-
-            // Если объект соединения с БД получен - сделаем его доступным для всех методов класса
-            if ($DBlink != FALSE) {
-                $this->DBlink = $DBlink;
-            }
-
             // Сохраняем id текущего пользователя (который выступает в качестве претендента на объект)
             if ($tenantId != "") {
                 $this->tenantId = $tenantId;
@@ -59,13 +47,13 @@
             if ($this->tenantId == "" || $this->propertyId == "") return FALSE;
 
             // Подготовим параметры к записи в БД
-            $finalDateDB = $this->globFunc->dateFromViewToDB($this->finalDate);
+            $finalDateDB = GlobFunc::dateFromViewToDB($this->finalDate);
 
             // Если у запроса на просмотр уже есть id, значит речь идет о редактировании данных, в противном случае - о создании нового запроса в БД
             if ($this->id != "") {
 
                 // Непосредственное сохранение данных о поисковом запросе
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("UPDATE requestToView SET tenantId = ?, propertyId = ?, tenantTime = ?, tenantComment = ?, ownerStatus = ?, finalDate = ?, finalTimeHours = ?, finalTimeMinutes = ? WHERE id=?") === FALSE)
                     OR ($stmt->bind_param("iissssssi", $this->tenantId, $this->propertyId, $this->tenantTime, $this->tenantComment, $this->ownerStatus, $finalDateDB, $this->finalTimeHours, $this->finalTimeMinutes, $this->id) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -82,7 +70,7 @@
                 $statusForDB = "inProgress";
 
                 // Непосредственное сохранение данных о поисковом запросе
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("INSERT INTO requestToView (tenantId, propertyId, tenantTime, tenantComment, ownerStatus, finalDate, finalTimeHours, finalTimeMinutes) VALUES (?,?,?,?,?,?,?,?)") === FALSE)
                     OR ($stmt->bind_param("iissssss", $this->tenantId, $this->propertyId, $this->tenantTime, $this->tenantComment, $statusForDB, $finalDateDB, $this->finalTimeHours, $this->finalTimeMinutes) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -109,7 +97,7 @@
             if ($this->tenantId == "" || $this->propertyId == "") return FALSE;
 
             // Получим из БД данные ($res) по запросу на просмотр, который нас интересуют (если он сохранен в БД)
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("SELECT * FROM requestToView WHERE tenantId=? AND propertyId=?") === FALSE)
                 OR ($stmt->bind_param("ss", $this->tenantId, $this->propertyId) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -137,7 +125,7 @@
             if (isset($oneRequestToViewDataArr['tenantTime'])) $this->tenantTime = $oneRequestToViewDataArr['tenantTime'];
             if (isset($oneRequestToViewDataArr['tenantComment'])) $this->tenantComment = $oneRequestToViewDataArr['tenantComment'];
             if (isset($oneRequestToViewDataArr['ownerStatus'])) $this->ownerStatus = $oneRequestToViewDataArr['ownerStatus'];
-            if (isset($oneRequestToViewDataArr['finalDate'])) $this->finalDate = $this->globFunc->dateFromDBToView($oneRequestToViewDataArr['finalDate']);
+            if (isset($oneRequestToViewDataArr['finalDate'])) $this->finalDate = GlobFunc::dateFromDBToView($oneRequestToViewDataArr['finalDate']);
             if (isset($oneRequestToViewDataArr['finalTimeHours'])) $this->finalTimeHours = $oneRequestToViewDataArr['finalTimeHours'];
             if (isset($oneRequestToViewDataArr['finalTimeMinutes'])) $this->finalTimeMinutes = $oneRequestToViewDataArr['finalTimeMinutes'];
 

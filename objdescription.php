@@ -19,6 +19,7 @@
     session_start();
 
     // Подключаем нужные модели и представления
+    include 'models/DBconnect.php';
     include 'models/GlobFunc.php';
     include 'models/Logger.php';
     include 'models/IncomingUser.php';
@@ -26,20 +27,15 @@
     include 'models/Property.php';
     include 'models/SignUpToView.php';
 
-    // Создаем объект-хранилище глобальных функций
-    $globFunc = new GlobFunc();
-
-    // Подключаемся к БД
-    $DBlink = $globFunc->connectToDB();
     // Удалось ли подключиться к БД?
-    if ($DBlink == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
+    if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
     // Инициализируем модель для запросившего страницу пользователя
-    $incomingUser = new IncomingUser($globFunc, $DBlink);
+    $incomingUser = new IncomingUser();
 
     // Инициализируем модель запроса на просмотр данного объекта данным пользователем.
     // Если он уже записался на просмотр, то в модели будут содержаться данные его запроса (время, комментарий...)
-    $signUpToView = new SignUpToView($globFunc, $DBlink, $incomingUser->getId(), $propertyId);
+    $signUpToView = new SignUpToView($incomingUser->getId(), $propertyId);
 
     // Инициализируем переменную для хранения информации об успешности/неуспешности отправки запроса на просмотр в БД
     $statusOfSaveParamsToDB = NULL;
@@ -51,7 +47,7 @@
      * Получаем данные объявления для просмотра, а также другие данные из БД
      ************************************************************************************/
 
-    $property = new Property($globFunc, $DBlink, $propertyId);
+    $property = new Property($propertyId);
 
     // Анкетные данные и данные о фотографиях объекта недвижимости
     $property->writeCharacteristicFromDB();
@@ -69,7 +65,7 @@
     /*************************************************************************************
      * Получаем заголовок страницы
      ************************************************************************************/
-    $strHeaderOfPage = $globFunc->getFirstCharUpper($property->typeOfObject)." по адресу: ".$property->address;
+    $strHeaderOfPage = GlobFunc::getFirstCharUpper($property->typeOfObject)." по адресу: ".$property->address;
 
     /************************************************************************************
      * НОВЫЙ ЗАПРОС НА ПРОСМОТР. Если пользователь отправил форму запроса на просмотр объекта
@@ -88,7 +84,7 @@
      * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
      *******************************************************************************/
 
-    $view = new View($globFunc, $DBlink);
+    $view = new View();
     $view->generate("templ_objdescription.php", array('userCharacteristic' => array('typeTenant' => $incomingUser->isTenant(), 'name' => $incomingUser->name, 'secondName' => $incomingUser->secondName, 'surname' => $incomingUser->surname, 'telephon' => $incomingUser->telephon),
                                                  'propertyCharacteristic' => $property->getCharacteristicData(),
                                                  'propertyFotoInformation' => $property->getFotoInformationData(),
@@ -104,4 +100,4 @@
      * Закрываем соединение с БД
      *******************************************************************************/
 
-    $globFunc->closeConnectToDB($DBlink);
+    DBconnect::closeConnectToDB();

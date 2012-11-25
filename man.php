@@ -19,25 +19,21 @@
     session_start();
 
     // Подключаем нужные модели и представления
+    include 'models/DBconnect.php';
     include 'models/GlobFunc.php';
     include 'models/Logger.php';
     include 'models/IncomingUser.php';
     include 'views/View.php';
     include 'models/User.php';
 
-    // Создаем объект-хранилище глобальных функций
-    $globFunc = new GlobFunc();
-
-    // Подключаемся к БД
-    $DBlink = $globFunc->connectToDB();
     // Удалось ли подключиться к БД?
-    if ($DBlink == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
+    if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
     // Инициализируем модель для запросившего страницу пользователя
-    $incomingUser = new IncomingUser($globFunc, $DBlink);
+    $incomingUser = new IncomingUser();
 
     // Инициализируем полную модель для целевого пользователя по его идентификатору из GET строки
-    $user = new User($globFunc, $DBlink, $targetUserId);
+    $user = new User($targetUserId);
     $user->writeCharacteristicFromDB();
     $user->writeSearchRequestFromDB();
     $user->writeFotoInformationFromDB();
@@ -87,7 +83,7 @@
      * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
      *******************************************************************************/
 
-    $view = new View($globFunc, $DBlink);
+    $view = new View();
     $view->generate("templ_man.php", array('userCharacteristic' => $user->getCharacteristicData(),
                                            'userFotoInformation' => $user->getFotoInformationData(),
                                            'userSearchRequest' => $user->getSearchRequestData(),
@@ -100,4 +96,4 @@
      * Закрываем соединение с БД
      *******************************************************************************/
 
-    $globFunc->closeConnectToDB($DBlink);
+    DBconnect::closeConnectToDB();

@@ -66,7 +66,7 @@
         <li>
             <span class="headOfString">Возраст:</span>
             <?php
-                echo $this->globFunc->calculate_age($userCharacteristic['birthday']);
+                echo GlobFunc::calculate_age($userCharacteristic['birthday']);
             ?>
         </li>
         <li>

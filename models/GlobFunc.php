@@ -1,68 +1,22 @@
 <?php
+    /* Статический класс, содержащий набор статических методов, часто используемых в самых разных местах серверных скриптов */
 
     class GlobFunc
     {
-
-        private $DBlink = FALSE; // Переменная для хранения объекта соединения с базой данных
-        public $loggerName = "test"; // Название логера (а также и название файла, в который сохраняется лог)
+        public static $loggerName = "test"; // Название логера (а также и название файла, в который сохраняется лог)
         // ВАЖНО: если изменяешь название логгера ($loggerName), то необходимо создать файл с ровно таким же именем и расширением .log в каталоге logs (корень проекта)
 
         // КОНСТРУКТОР
         public function __construct()
         {
-
         }
 
         // ДЕСТРУКТОР
         public function __destruct()
-        {
-
-        }
-
-        // Функция устанавливает соединение с БД и возвращает объект соединение в случае успеха. Если установить соединение не удалось - возвращает FALSE
-        public function connectToDB() {
-            // Устанавливаем соединение с базой данных и сохраняем его в объект $mysqli
-            $mysqli = new mysqli("localhost", "dimau1_dimau", "udvudv", "dimau1_homes");
-
-            // Проверим - удалось ли установить соединение
-            if (mysqli_connect_error()) {
-                // TODO: сохранить в лог ошибку подключения к БД: ('Ошибка подключения к базе данных (' . mysqli_connect_errno() . ') ' . mysqli_connect_error())
-                // TODO: сделать красивую страницу тех поддержки, на которую перенаправлять пользователя, если с БД связи нет
-                return FALSE;
-            }
-
-            // Устанавливаем кодировку
-            if (!$mysqli->set_charset("utf8")) {
-                // TODO: сохранить в лог ошибку изменения кодировки БД
-            }
-
-            // Если объект соединения с БД получен - сделаем его доступным для всех методов класса
-            $this->DBlink = $mysqli;
-
-            // Возвращаем объект - соединение с БД
-            return $mysqli;
-
-        }
-
-        // Функция закрывает соединение с БД
-        public function closeConnectToDB($DBlink = FALSE) {
-            if ($DBlink == FALSE) return FALSE;
-
-            if ($DBlink->close()) {
-
-                return TRUE;
-
-            } else {
-
-                // TODO: сохранить в лог ошибку закрытия соединения с БД
-                return FALSE;
-
-            }
-
-        }
+        {}
 
         //Функция для генерации случайной строки
-        public function generateCode($length = 6)
+        public static function generateCode($length = 6)
         {
             $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPRQSTUVWXYZ0123456789";
             $code = "";
@@ -76,10 +30,11 @@
         }
 
         // Функция возвращает массив массивов с названиями районов в городе $city
-        public function getAllDistrictsInCity($city) {
+        public static function getAllDistrictsInCity($city)
+        {
 
             // Получим из БД данные ($res) по пользователю с логином = $login
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("SELECT name FROM districts WHERE city=? ORDER BY name ASC") === FALSE)
                 OR ($stmt->bind_param("s", $city) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -95,7 +50,7 @@
         }
 
         // Преобразовывает дату из формата, пригодного для хранения в БД в формат, пригодный для отображения
-        public function dateFromDBToView($dateFromDB)
+        public static function dateFromDBToView($dateFromDB)
         {
             $date = substr($dateFromDB, 8, 2);
             $month = substr($dateFromDB, 5, 2);
@@ -104,7 +59,7 @@
         }
 
         // Преобразовывает дату из формата, пригодного для отображения в формат, пригодный для хранения в БД
-        public function dateFromViewToDB($dateFromView)
+        public static function dateFromViewToDB($dateFromView)
         {
             $date = substr($dateFromView, 0, 2);
             $month = substr($dateFromView, 3, 2);
@@ -113,14 +68,15 @@
         }
 
         // Функция делает первый символ строки в верхнем регистре
-        function getFirstCharUpper($str) {
+        public static function getFirstCharUpper($str)
+        {
             $enc = 'utf-8';
-            return mb_strtoupper(mb_substr($str, 0, 1, $enc), $enc).mb_substr($str, 1, mb_strlen($str, $enc), $enc);
+            return mb_strtoupper(mb_substr($str, 0, 1, $enc), $enc) . mb_substr($str, 1, mb_strlen($str, $enc), $enc);
         }
 
         // Функция вычисляет возраст по дате рождения. Пример: echo calculate_age('27.01.2012');
-        function calculate_age($birthday) {
-
+        public static function calculate_age($birthday)
+        {
             // Дата рождения
             $dateOfBorn = substr($birthday, 0, 2);
             // Месяц рождения

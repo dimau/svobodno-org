@@ -4,33 +4,29 @@
     session_start();
 
     // Подключаем нужные модели и представления
+    include '../models/DBconnect.php';
     include '../models/GlobFunc.php';
     include '../models/Logger.php';
     include '../models/IncomingUser.php';
 
-    // Создаем объект-хранилище глобальных функций
-    $globFunc = new GlobFunc();
-
-    // Подключаемся к БД
-    $DBlink = $globFunc->connectToDB();
     // Удалось ли подключиться к БД?
-    if ($DBlink == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
+    if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
     // Инициализируем модель для запросившего страницу пользователя
-    $incomingUser = new IncomingUser($globFunc, $DBlink);
+    $incomingUser = new IncomingUser();
 
     // Задаем список допустимых расширений для загружаемых файлов. Также расширение при начале загрузки проверяется в js файле vendor\fileuploader.js. Списки должны совпадать
     $allowedExtensions = array("jpeg", "JPEG", "jpg", "JPG", "png", "PNG", "gif", "GIF");
     // Задаем максимальный размер файла для загрузки в байтах
     $sizeLimit = 25 * 1024 * 1024;
 
-    $uploader = new qqFileUploader($allowedExtensions, $sizeLimit, $DBlink);
+    $uploader = new qqFileUploader($allowedExtensions, $sizeLimit);
 
     // Call handleUpload() with the name of the folder, relative to PHP's getcwd()
     $result = $uploader->handleUpload('../uploaded_files/', FALSE);
 
     // Закрываем соединение с БД
-    $globFunc->closeConnectToDB($DBlink);
+    DBconnect::closeConnectToDB();
 
     // to pass data through iframe you will need to encode all html tags
     echo htmlspecialchars(json_encode($result), ENT_NOQUOTES);
@@ -114,15 +110,13 @@
         private $allowedExtensions = array(); // Хранит ограничение на расширения файлов для загрузки. По умолчанию - нет ограничений
         private $sizeLimit = 10485760; // Хранит ограничение на максимальный объем файла для загрузки. По  умолчанию - 10485760 байт
         private $file;
-        private $DBlink = FALSE;
 
-        function __construct(array $allowedExtensions = array(), $sizeLimit = 10485760, $DBlink = FALSE)
+        function __construct(array $allowedExtensions = array(), $sizeLimit = 10485760)
         {
             $allowedExtensions = array_map("strtolower", $allowedExtensions);
 
             $this->allowedExtensions = $allowedExtensions;
             $this->sizeLimit = $sizeLimit;
-            $this->DBlink = $DBlink;
 
             $this->checkServerSettings();
 
@@ -399,14 +393,14 @@
         function saveInfToDB($folder, $filename, $size) {
 
             // Проверяем, что есть соединение с БД
-            if ($this->DBlink == FALSE) return FALSE;
+            if (DBconnect::get() == FALSE) return FALSE;
 
             // Готовим данные для сохранения в БД
             $sizeMb = round($size / 1024 / 1024, 1);
             $extension = 'jpeg';
 
             // Сохраняем информацию о загруженной фотке в БД
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("INSERT INTO tempFotos (id, fileUploadId, folder, filename, extension, filesizeMb) VALUES (?,?,?,?,?,?)") === FALSE)
                 OR ($stmt->bind_param("sssssd", $filename, $_GET['fileuploadid'], $folder, $_GET['sourcefilename'], $extension, $sizeMb) === FALSE)
                 OR ($stmt->execute() === FALSE)

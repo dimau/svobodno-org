@@ -13,7 +13,7 @@
                 <?php
                 if (isset($userSearchRequest['district']) && count($userSearchRequest['district']) != 0) { // Если район указан пользователем
                     echo "<tr><td>";
-                    for ($i = 0; $i < count($userSearchRequest['district']); $i++) { // Выводим названия всех районов, в которых ищет недвижимость пользователь
+                    for ($i = 0, $s = count($userSearchRequest['district']); $i < $s; $i++) { // Выводим названия всех районов, в которых ищет недвижимость пользователь
                         echo $userSearchRequest['district'][$i];
                         if ($i < count($userSearchRequest['district']) - 1) echo ", ";
                     }
@@ -44,7 +44,7 @@
                 <tr>
                     <td class="objectDescriptionItemLabel">Количество комнат:</td>
                     <td class="objectDescriptionBody"><span><?php
-                        if (isset($userSearchRequest['amountOfRooms']) && count($userSearchRequest['amountOfRooms']) != "0") for ($i = 0; $i < count($userSearchRequest['amountOfRooms']); $i++) {
+                        if (isset($userSearchRequest['amountOfRooms']) && count($userSearchRequest['amountOfRooms']) != "0") for ($i = 0, $s = count($userSearchRequest['amountOfRooms']); $i < $s; $i++) {
                             echo $userSearchRequest['amountOfRooms'][$i];
                             if ($i < count($userSearchRequest['amountOfRooms']) - 1) echo ", ";
                         } else echo "любое";

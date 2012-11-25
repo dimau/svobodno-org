@@ -4,12 +4,16 @@
     session_start();
 
     // Подключаем нужные модели и представления
+    include 'models/DBconnect.php';
     include 'models/GlobFunc.php';
     include 'models/Logger.php';
     include 'models/IncomingUser.php';
     include 'views/View.php';
     include 'models/User.php';
     include 'models/CollectionProperty.php';
+
+    // Удалось ли подключиться к БД?
+    if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
     // Вычисляем вкладку, которая будет открыта по умолчанию при загрузке страницы
     if (isset($_GET['tabsId'])) {
@@ -18,16 +22,8 @@
         $tabsId = "tabs-1";
     }
 
-    // Создаем объект-хранилище глобальных функций
-    $globFunc = new GlobFunc();
-
-    // Подключаемся к БД
-    $DBlink = $globFunc->connectToDB();
-    // Удалось ли подключиться к БД?
-    if ($DBlink == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
-
     // Инициализируем модель для запросившего страницу пользователя
-    $incomingUser = new IncomingUser($globFunc, $DBlink);
+    $incomingUser = new IncomingUser();
 
     // Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
     if (!$incomingUser->login()) {
@@ -39,7 +35,7 @@
      ************************************************************************************/
 
     // Инициализируем полную модель пользователя
-    $user = new User($globFunc, $DBlink, $incomingUser->getId());
+    $user = new User($incomingUser->getId());
 
     // Анкетные (основные персональные) данные пользователя
     $user->writeCharacteristicFromDB();
@@ -57,11 +53,11 @@
     if (!isset($_POST['saveProfileParameters'])) $user->writeFotoInformationFromDB();
 
     // Данные по объектам недвижимости данного пользователя (для которых он является собственником)
-    $collectionProperty = new CollectionProperty($globFunc, $DBlink);
+    $collectionProperty = new CollectionProperty();
     $collectionProperty->buildFromOwnerId($incomingUser->getId());
 
     // Готовим массив со списком районов в городе пользователя
-    $allDistrictsInCity = $globFunc->getAllDistrictsInCity("Екатеринбург");
+    $allDistrictsInCity = GlobFunc::getAllDistrictsInCity("Екатеринбург");
 
     // Инициализируем переменные корректности - используется при формировании нового Запроса на поиск
     $errors = array();
@@ -186,7 +182,7 @@
      * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
      *******************************************************************************/
 
-    $view = new View($globFunc, $DBlink);
+    $view = new View();
     $view->generate("templ_personal.php", array('userCharacteristic' => $user->getCharacteristicData(),
                                                 'userFotoInformation' => $user->getFotoInformationData(),
                                                 'userSearchRequest' => $user->getSearchRequestData(),
@@ -211,4 +207,4 @@
      * Закрываем соединение с БД
      *******************************************************************************/
 
-    $globFunc->closeConnectToDB($DBlink);
+    DBconnect::closeConnectToDB();

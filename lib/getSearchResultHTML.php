@@ -14,21 +14,17 @@
     session_start();
 
     // Подключаем нужные модели и представления
+    include '../models/DBconnect.php';
     include '../models/GlobFunc.php';
     include '../models/Logger.php';
     include '../models/IncomingUser.php';
     include '../views/View.php';
 
-    // Создаем объект-хранилище глобальных функций
-    $globFunc = new GlobFunc();
-
-    // Подключаемся к БД
-    $DBlink = $globFunc->connectToDB();
     // Удалось ли подключиться к БД?
-    if ($DBlink == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
+    if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
     // Инициализируем модель для запросившего страницу пользователя
-    $incomingUser = new IncomingUser($globFunc, $DBlink);
+    $incomingUser = new IncomingUser();
 
 
 
@@ -123,7 +119,7 @@
         $propertyFotosArr = array(); // Массив, в который запишем массивы, каждый из которых будет содержать данные по 1 фотке объекта
         $rezPropertyFotos = mysql_query("SELECT * FROM propertyFotos WHERE propertyId = '" . $propertyFullArr[$i]['id'] . "'");
         if ($rezPropertyFotos != FALSE) {
-            for ($j = 0; $j < mysql_num_rows($rezPropertyFotos); $j++) {
+            for ($j = 0, $s1 = mysql_num_rows($rezPropertyFotos); $j < $s1; $j++) {
                 $propertyFotosArr[] = mysql_fetch_assoc($rezPropertyFotos);
             }
         }

@@ -9,22 +9,9 @@
         public $commentOwner = "";
         private $userId = ""; // Хранит идентификатор пользователя, если обратившийся пользователь был авторизован
 
-        private $DBlink = FALSE; // Переменная для хранения объекта соединения с базой данных
-        private $globFunc = FALSE; // Переменная для хранения глобальных функций
-
         // КОНСТРУКТОР
-        public function __construct($globFunc = FALSE, $DBlink = FALSE, $incomingUser = FALSE)
+        public function __construct($incomingUser = FALSE)
         {
-            // Если объект с глобальными функциями получен - сделаем его доступным для всех методов класса
-            if ($globFunc != FALSE) {
-                $this->globFunc = $globFunc;
-            }
-
-            // Если объект соединения с БД получен - сделаем его доступным для всех методов класса
-            if ($DBlink != FALSE) {
-                $this->DBlink = $DBlink;
-            }
-
             // Если пользователь, перешедший на страницу формирования запроса авторизован - воспользуемся его данными (например, для автоматического заполнения части полей)
             if ($incomingUser != FALSE) {
                 $this->name = $incomingUser->name." ".$incomingUser->secondName;
@@ -35,9 +22,7 @@
 
         // ДЕСТРУКТОР
         public function __destruct()
-        {
-
-        }
+        {}
 
         // Сохраняет параметры запроса собственника в БД
         // Возвращает TRUE, если данные успешно сохранены и FALSE в противном случае
@@ -47,7 +32,7 @@
             if ($this->id != "") {
 
                 // Непосредственное сохранение данных о поисковом запросе
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("UPDATE requestFromOwners SET name = ?, telephon = ?, address = ?, commentOwner = ? WHERE id = ?") === FALSE)
                     OR ($stmt->bind_param("ssssi", $this->name, $this->telephon, $this->address, $this->commentOwner, $this->id) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -61,7 +46,7 @@
             } else {
 
                 // Непосредственное сохранение данных о поисковом запросе
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("INSERT INTO requestFromOwners (name, telephon, address, commentOwner, userId) VALUES (?,?,?,?,?)") === FALSE)
                     OR ($stmt->bind_param("sssss", $this->name, $this->telephon, $this->address, $this->commentOwner, $this->userId) === FALSE)
                     OR ($stmt->execute() === FALSE)

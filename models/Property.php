@@ -80,26 +80,13 @@
         public $uploadedFoto = array(); // В переменной будет храниться информация о загруженных фотографиях. Представляет собой массив ассоциированных массивов
         public $primaryFotoId = "";
 
-        private $DBlink = FALSE; // Переменная для хранения объекта соединения с базой данных
-        private $globFunc = FALSE; // Переменная для хранения глобальных функций
         public $ownerLogin = ""; // Параметр содержит логин пользователя-собственника (необходим для того, чтобя выездные агенты могли создавать новые объявления и присваивать их ране зарегистрированным собственникам)
 
         // КОНСТРУКТОР
-        public function __construct($globFunc = FALSE, $DBlink = FALSE, $propertyId = FALSE)
+        public function __construct($propertyId = FALSE)
         {
-
-            // Если объект с глобальными функциями получен - сделаем его доступным для всех методов класса
-            if ($globFunc != FALSE) {
-                $this->globFunc = $globFunc;
-            }
-
-            // Если объект соединения с БД получен - сделаем его доступным для всех методов класса
-            if ($DBlink != FALSE) {
-                $this->DBlink = $DBlink;
-            }
-
             // Инициализируем переменную "сессии" для временного сохранения фотографий
-            $this->fileUploadId = $this->globFunc->generateCode(7);
+            $this->fileUploadId = GlobFunc::generateCode(7);
 
             // Если конструктору передан идентификатор объекта недвижимости, запишем его в параметры объекта. Это позволит, например, инициализировать объект данными из БД
             if ($propertyId != FALSE) $this->id = $propertyId;
@@ -131,7 +118,7 @@
             // Вычислим id пользователя-собственника данного объекта недвижимости (если создается новое объявление выездным специалистом со своего аккаунта)
             if ($typeOfProperty == "new") {
 
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("SELECT id FROM users WHERE login=?") === FALSE)
                     OR ($stmt->bind_param("s", $this->ownerLogin) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -157,9 +144,9 @@
             if ($typeOfProperty != "edit" && $typeOfProperty != "new") return FALSE;
 
             // Корректируем даты для того, чтобы сделать их пригодными для сохранения в базу данных
-            $dateOfEntryForDB = $this->globFunc->dateFromViewToDB($this->dateOfEntry);
-            $dateOfCheckOutForDB = $this->globFunc->dateFromViewToDB($this->dateOfCheckOut);
-            $earliestDateForDB = $this->globFunc->dateFromViewToDB($this->earliestDate);
+            $dateOfEntryForDB = GlobFunc::dateFromViewToDB($this->dateOfEntry);
+            $dateOfCheckOutForDB = GlobFunc::dateFromViewToDB($this->dateOfCheckOut);
+            $earliestDateForDB = GlobFunc::dateFromViewToDB($this->earliestDate);
 
             // Для хранения массивов в БД, их необходимо сериализовать
             $furnitureInLivingAreaSerialized = serialize($this->furnitureInLivingArea);
@@ -178,7 +165,7 @@
             // Проверяем в какой валюте сохраняется стоимость аренды, формируем переменную realCostOfRenting
             if ($this->currency == 'руб.') $realCostOfRenting = $this->costOfRenting;
             if ($this->currency != 'руб.') {
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("SELECT value FROM currencies WHERE name=?") === FALSE)
                     OR ($stmt->bind_param("s", $this->currency) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -196,7 +183,7 @@
             // Пишем данные объекта недвижимости в БД.
             // Код для сохранения данных разный: для нового объявления и при редактировании параметров существующего объявления
             if ($typeOfProperty == "new") {
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("INSERT INTO property SET userId=?, typeOfObject=?, dateOfEntry=?, termOfLease=?, dateOfCheckOut=?, amountOfRooms=?, adjacentRooms=?, amountOfAdjacentRooms=?, typeOfBathrooms=?, typeOfBalcony=?, balconyGlazed=?, roomSpace=?, totalArea=?, livingSpace=?, kitchenSpace=?, floor=?, totalAmountFloor=?, numberOfFloor=?, concierge=?, intercom=?, parking=?, city=?, district=?, coordX=?, coordY=?, address=?, apartmentNumber=?, subwayStation=?, distanceToMetroStation=?, currency=?, costOfRenting=?, realCostOfRenting=?, utilities=?, costInSummer=?, costInWinter=?, electricPower=?, bail=?, bailCost=?, prepayment=?, compensationMoney=?, compensationPercent=?, repair=?, furnish=?, windows=?, internet=?, telephoneLine=?, cableTV=?, furnitureInLivingArea=?, furnitureInLivingAreaExtra=?, furnitureInKitchen=?, furnitureInKitchenExtra=?, appliances=?, appliancesExtra=?, sexOfTenant=?, relations=?, children=?, animals=?, contactTelephonNumber=?, timeForRingBegin=?, timeForRingEnd=?, checking=?, responsibility=?, comment=?, last_act=?, reg_date=?, status=?, tenantsWithSignUpToViewRequest=?, earliestDate=?, earliestTimeHours=?, earliestTimeMinutes=?") === FALSE)
                     OR ($stmt->bind_param("sssssssssssddddiiissssssssssisddsddssdsddssssssssssssssssssssssiisssss", $userId, $this->typeOfObject, $dateOfEntryForDB, $this->termOfLease, $dateOfCheckOutForDB, $this->amountOfRooms, $this->adjacentRooms, $this->amountOfAdjacentRooms, $this->typeOfBathrooms, $this->typeOfBalcony, $this->balconyGlazed, $this->roomSpace, $this->totalArea, $this->livingSpace, $this->kitchenSpace, $this->floor, $this->totalAmountFloor, $this->numberOfFloor, $this->concierge, $this->intercom, $this->parking, $this->city, $this->district, $this->coordX, $this->coordY, $this->address, $this->apartmentNumber, $this->subwayStation, $this->distanceToMetroStation, $this->currency, $this->costOfRenting, $realCostOfRenting, $this->utilities, $this->costInSummer, $this->costInWinter, $this->electricPower, $this->bail, $this->bailCost, $this->prepayment, $this->compensationMoney, $this->compensationPercent, $this->repair, $this->furnish, $this->windows, $this->internet, $this->telephoneLine, $this->cableTV, $furnitureInLivingAreaSerialized, $this->furnitureInLivingAreaExtra, $furnitureInKitchenSerialized, $this->furnitureInKitchenExtra, $appliancesSerialized, $this->appliancesExtra, $sexOfTenantImploded, $relationsImploded, $this->children, $this->animals, $this->contactTelephonNumber, $this->timeForRingBegin, $this->timeForRingEnd, $this->checking, $this->responsibility, $this->comment, $last_act, $reg_date, $status, $tenantsWithSignUpToViewRequestSerialized, $earliestDateForDB, $this->earliestTimeHours, $this->earliestTimeMinutes) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -210,7 +197,7 @@
             }
 
             if ($typeOfProperty == "edit") {
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("UPDATE property SET userId=?, typeOfObject=?, dateOfEntry=?, termOfLease=?, dateOfCheckOut=?, amountOfRooms=?, adjacentRooms=?, amountOfAdjacentRooms=?, typeOfBathrooms=?, typeOfBalcony=?, balconyGlazed=?, roomSpace=?, totalArea=?, livingSpace=?, kitchenSpace=?, floor=?, totalAmountFloor=?, numberOfFloor=?, concierge=?, intercom=?, parking=?, city=?, district=?, coordX=?, coordY=?, address=?, apartmentNumber=?, subwayStation=?, distanceToMetroStation=?, currency=?, costOfRenting=?, realCostOfRenting=?, utilities=?, costInSummer=?, costInWinter=?, electricPower=?, bail=?, bailCost=?, prepayment=?, compensationMoney=?, compensationPercent=?, repair=?, furnish=?, windows=?, internet=?, telephoneLine=?, cableTV=?, furnitureInLivingArea=?, furnitureInLivingAreaExtra=?, furnitureInKitchen=?, furnitureInKitchenExtra=?, appliances=?, appliancesExtra=?, sexOfTenant=?, relations=?, children=?, animals=?, contactTelephonNumber=?, timeForRingBegin=?, timeForRingEnd=?, checking=?, responsibility=?, comment=?, last_act=?, reg_date=?, status=?, tenantsWithSignUpToViewRequest=? earliestDate=?, earliestTimeHours=?, earliestTimeMinutes=? WHERE id=?") === FALSE)
                     OR ($stmt->bind_param("sssssssssssddddiiissssssssssisddsddssdsddssssssssssssssssssssssiissssss", $userId, $this->typeOfObject, $dateOfEntryForDB, $this->termOfLease, $dateOfCheckOutForDB, $this->amountOfRooms, $this->adjacentRooms, $this->amountOfAdjacentRooms, $this->typeOfBathrooms, $this->typeOfBalcony, $this->balconyGlazed, $this->roomSpace, $this->totalArea, $this->livingSpace, $this->kitchenSpace, $this->floor, $this->totalAmountFloor, $this->numberOfFloor, $this->concierge, $this->intercom, $this->parking, $this->city, $this->district, $this->coordX, $this->coordY, $this->address, $this->apartmentNumber, $this->subwayStation, $this->distanceToMetroStation, $this->currency, $this->costOfRenting, $realCostOfRenting, $this->utilities, $this->costInSummer, $this->costInWinter, $this->electricPower, $this->bail, $this->bailCost, $this->prepayment, $this->compensationMoney, $this->compensationPercent, $this->repair, $this->furnish, $this->windows, $this->internet, $this->telephoneLine, $this->cableTV, $furnitureInLivingAreaSerialized, $this->furnitureInLivingAreaExtra, $furnitureInKitchenSerialized, $this->furnitureInKitchenExtra, $appliancesSerialized, $this->appliancesExtra, $sexOfTenantImploded, $relationsImploded, $this->children, $this->animals, $this->contactTelephonNumber, $this->timeForRingBegin, $this->timeForRingEnd, $this->checking, $this->responsibility, $this->comment, $last_act, $this->reg_date, $this->status, $tenantsWithSignUpToViewRequestSerialized, $earliestDateForDB, $this->earliestTimeHours, $this->earliestTimeMinutes, $this->id) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -224,7 +211,7 @@
 
             // Если объявление новое - изменим статус пользователя (typeOwner), так как он теперь точно стал собственником
             if ($typeOfProperty == "new") {
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("UPDATE users SET typeOwner='TRUE' WHERE id=?") === FALSE)
                     OR ($stmt->bind_param("s", $userId) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -260,19 +247,19 @@
             // На всякий случай, проверим на массив
             if (!isset($this->uploadedFoto) || !is_array($this->uploadedFoto)) {
                 // Логируем ошибку
-                Logger::getLogger($this->globFunc->loggerName)->log("Ошибка: в параметре uploadedFoto находится не массив. id логгера: Property.php->saveFotoInformationToDB():1. ID объекта недвижимости: " . $this->id);
+                Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка: в параметре uploadedFoto находится не массив. id логгера: Property.php->saveFotoInformationToDB():1. ID объекта недвижимости: " . $this->id);
                 return FALSE;
             }
 
             // Для выполнения функция у объекта недвижимости обязательно должен быть id (то есть основные данные о нем уже занесены в БД)
             if ($this->id == "") {
                 // Логируем ошибку
-                Logger::getLogger($this->globFunc->loggerName)->log("Ошибка: обращение к методу записи параметров объекта в БД при отсутствующем id объекта недвижимости. id логгера: Property.php->saveFotoInformationToDB():2. ID объекта недвижимости: " . $this->id);
+                Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка: обращение к методу записи параметров объекта в БД при отсутствующем id объекта недвижимости. id логгера: Property.php->saveFotoInformationToDB():2. ID объекта недвижимости: " . $this->id);
                 return FALSE;
             }
 
             // Получаем данные по всем фоткам с нашим $this->fileUploadId
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("SELECT * FROM tempFotos WHERE fileUploadId=?") === FALSE)
                 OR ($stmt->bind_param("s", $this->fileUploadId) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -282,10 +269,10 @@
             ) {
                 $allFotos = array();
                 // Логируем ошибку
-                Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM tempFotos WHERE fileUploadId=" . $this->fileUploadId . "'. id логгера: Property.php->saveFotoInformationToDB():3. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID объекта недвижимости: " . $this->id);
+                Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM tempFotos WHERE fileUploadId=" . $this->fileUploadId . "'. id логгера: Property.php->saveFotoInformationToDB():3. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID объекта недвижимости: " . $this->id);
             } else {
                 // Пометим все члены массива признаком их получения из таблицы tempFotos
-                for ($i = 0; $i < count($allFotos); $i++) {
+                for ($i = 0, $s = count($allFotos); $i < $s; $i++) {
                     $allFotos[$i]['fromTable'] = "tempFotos";
                 }
             }
@@ -294,7 +281,7 @@
             // Но только для существующих объектов (имеющих id)
             if ($this->id != "") {
 
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("SELECT * FROM propertyFotos WHERE propertyId=?") === FALSE)
                     OR ($stmt->bind_param("s", $this->id) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -303,10 +290,10 @@
                     OR ($stmt->close() === FALSE)
                 ) {
                     // Логируем ошибку
-                    Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM propertyFotos WHERE propertyId=" . $this->id . "'. id логгера: Property.php->saveFotoInformationToDB():4. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID объекта недвижимости: " . $this->id);
+                    Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM propertyFotos WHERE propertyId=" . $this->id . "'. id логгера: Property.php->saveFotoInformationToDB():4. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID объекта недвижимости: " . $this->id);
                 } else {
                     // Пометим все члены массива признаком их получения из таблицы userFotos
-                    for ($i = 0; $i < count($res); $i++) {
+                    for ($i = 0, $s = count($res); $i < $s; $i++) {
                         $res[$i]['fromTable'] = "propertyFotos";
                     }
                     $allFotos = array_merge($allFotos, $res);
@@ -315,7 +302,7 @@
 
             // Перебираем все имеющиеся фотографии пользователя и актуализируем их параметры
             $primaryFotoExists = 0; // Инициализируем переменную, по которой после прохода по всем фотографиям, полученным в форме, сможем сказать была ли указана пользователем основная фотка (число - сколько фоток со статусом основная мы получили с клиента) или нет (0)
-            for ($i = 0; $i < count($allFotos); $i++) {
+            for ($i = 0, $s = count($allFotos); $i < $s; $i++) {
 
                 // Для сокращения количества запросов на UPDATE будем отмечать особым признаком те фотографии, по которым требуется выполнения этого запроса к БД
                 $allFotos[$i]['updated'] = FALSE;
@@ -349,7 +336,7 @@
 
             // Если пользователь не указал основное фото, то укажем первую попавшуюся фотографию (не помеченную на удаление) в качестве основной
             if ($primaryFotoExists == 0) {
-                for ($i = 0; $i < count($allFotos); $i++) {
+                for ($i = 0, $s = count($allFotos); $i < $s; $i++) {
                     // Если файл помечен на удаление, то ему статус основной не присваиваем
                     if ($allFotos[$i]['forRemove'] == TRUE) continue;
 
@@ -365,31 +352,31 @@
             }
 
             // Удаляем файлы фотографий (помеченных признаком удаления) с сервера
-            for ($i = 0; $i < count($allFotos); $i++) {
+            for ($i = 0, $s = count($allFotos); $i < $s; $i++) {
                 if ($allFotos[$i]['forRemove'] == FALSE) continue;
                 if ((unlink($allFotos[$i]['folder'] . '/small/' . $allFotos[$i]['id'] . "." . $allFotos[$i]['extension']) === FALSE)
                     OR unlink($allFotos[$i]['folder'] . '/middle/' . $allFotos[$i]['id'] . "." . $allFotos[$i]['extension'])
                     OR unlink($allFotos[$i]['folder'] . '/big/' . $allFotos[$i]['id'] . "." . $allFotos[$i]['extension'])
                 ) {
                     // Логируем ошибку
-                    Logger::getLogger($this->globFunc->loggerName)->log("Ошибка при удалении фотографий. id логгера: Property.php->saveFotoInformationToDB():5. Адреса фотографий (small, middle, big), которые не удалось удалить: " . $allFotos[$i]['folder'] . '/small/' . $allFotos[$i]['id'] . "." . $allFotos[$i]['extension'] . " ID объекта недвижимости: " . $this->id);
+                    Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка при удалении фотографий. id логгера: Property.php->saveFotoInformationToDB():5. Адреса фотографий (small, middle, big), которые не удалось удалить: " . $allFotos[$i]['folder'] . '/small/' . $allFotos[$i]['id'] . "." . $allFotos[$i]['extension'] . " ID объекта недвижимости: " . $this->id);
                 }
             }
 
             // Выполним запросы на UPDATE данных в propertyFotos
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if ($stmt->prepare("UPDATE propertyFotos SET status=? WHERE id=?") === FALSE) {
                 // Логируем ошибку
-                Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос prepare: 'UPDATE propertyFotos SET status=? WHERE id=?' id логгера: Property.php->saveFotoInformationToDB():6. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID объекта недвижимости: " . $this->id);
+                Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос prepare: 'UPDATE propertyFotos SET status=? WHERE id=?' id логгера: Property.php->saveFotoInformationToDB():6. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID объекта недвижимости: " . $this->id);
             }
-            for ($i = 0; $i < count($allFotos); $i++) {
+            for ($i = 0, $s = count($allFotos); $i < $s; $i++) {
                 if ($allFotos[$i]['fromTable'] == "propertyFotos" && $allFotos[$i]['updated'] == TRUE && $allFotos[$i]['forRemove'] == FALSE) {
                     if (($stmt->bind_param("ss", $allFotos[$i]['status'], $allFotos[$i]['id']) === FALSE)
                         OR ($stmt->execute() === FALSE)
                         OR (($res = $stmt->affected_rows) === -1)
                     ) {
                         // Логируем ошибку
-                        Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE propertyFotos SET status=" . $allFotos[$i]['status'] . " WHERE id=" . $allFotos[$i]['id'] . "' id логгера: Property.php->saveFotoInformationToDB():7. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID объекта недвижимости: " . $this->id);
+                        Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE propertyFotos SET status=" . $allFotos[$i]['status'] . " WHERE id=" . $allFotos[$i]['id'] . "' id логгера: Property.php->saveFotoInformationToDB():7. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID объекта недвижимости: " . $this->id);
                     }
                 }
             }
@@ -401,7 +388,7 @@
             // на DELETE более ненужных фоток из userFotos
             $strINSERT = "";
             $strDELETE = "";
-            for ($i = 0; $i < $count = count($allFotos); $i++) {
+            for ($i = 0, $s = count($allFotos); $i < $s; $i++) {
 
                 if ($allFotos[$i]['fromTable'] == "tempFotos" && $allFotos[$i]['forRemove'] == FALSE) {
                     if ($strINSERT != "") $strINSERT .= ",";
@@ -418,35 +405,35 @@
             // Выполним сформированные запросы
             // INSERT
             if ($strINSERT != "") {
-                $this->DBlink->query("INSERT INTO propertyFotos (id, folder, filename, extension, filesizeMb, propertyId, status) VALUES " . $strINSERT);
-                if (($this->DBlink->errno)
-                    OR (($res = $this->DBlink->affected_rows) === -1)
+                DBconnect::get()->query("INSERT INTO propertyFotos (id, folder, filename, extension, filesizeMb, propertyId, status) VALUES " . $strINSERT);
+                if ((DBconnect::get()->errno)
+                    OR (($res = DBconnect::get()->affected_rows) === -1)
                     OR ($res === 0)
                 ) {
                     // Логируем ошибку
-                    Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO propertyFotos (id, folder, filename, extension, filesizeMb, propertyId, status) VALUES " . $strINSERT . "' id логгера: Property.php->saveFotoInformationToDB():8. Выдаваемая ошибка: " . $this->DBlink->errno . " " . $this->DBlink->error . ". ID объекта недвижимости: " . $this->id);
+                    Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO propertyFotos (id, folder, filename, extension, filesizeMb, propertyId, status) VALUES " . $strINSERT . "' id логгера: Property.php->saveFotoInformationToDB():8. Выдаваемая ошибка: " . DBconnect::get()->errno . " " . DBconnect::get()->error . ". ID объекта недвижимости: " . $this->id);
                 }
             }
             // DELETE
             if ($strDELETE != "") {
-                $this->DBlink->query("DELETE FROM propertyFotos WHERE " . $strDELETE);
-                if (($this->DBlink->errno)
-                    OR (($res = $this->DBlink->affected_rows) === -1)
+                DBconnect::get()->query("DELETE FROM propertyFotos WHERE " . $strDELETE);
+                if ((DBconnect::get()->errno)
+                    OR (($res = DBconnect::get()->affected_rows) === -1)
                 ) {
                     // Логируем ошибку
-                    Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM propertyFotos WHERE " . $strDELETE . "' id логгера: Property.php->saveFotoInformationToDB():9. Выдаваемая ошибка: " . $this->DBlink->errno . " " . $this->DBlink->error . ". ID объекта недвижимости: " . $this->id);
+                    Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM propertyFotos WHERE " . $strDELETE . "' id логгера: Property.php->saveFotoInformationToDB():9. Выдаваемая ошибка: " . DBconnect::get()->errno . " " . DBconnect::get()->error . ". ID объекта недвижимости: " . $this->id);
                 }
             }
 
             // Удаляем инфу о всех фотках с fileUploadId из tempFotos
             // TODO: Не очень безопасно (используется полученный с клиента fileUploadId)
             if ($this->fileUploadId != "") {
-                $this->DBlink->query("DELETE FROM tempFotos WHERE fileUploadId = '" . $this->fileUploadId . "'");
-                if (($this->DBlink->errno)
-                    OR ($this->DBlink->affected_rows === -1)
+                DBconnect::get()->query("DELETE FROM tempFotos WHERE fileUploadId = '" . $this->fileUploadId . "'");
+                if ((DBconnect::get()->errno)
+                    OR (DBconnect::get()->affected_rows === -1)
                 ) {
                     // Логируем ошибку
-                    Logger::getLogger($this->globFunc->loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM tempFotos WHERE fileUploadId = '" . $this->fileUploadId . "' id логгера: Property.php->saveFotoInformationToDB():10. Выдаваемая ошибка: " . $this->DBlink->errno . " " . $this->DBlink->error . ". ID объекта недвижимости: " . $this->id);
+                    Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM tempFotos WHERE fileUploadId = '" . $this->fileUploadId . "' id логгера: Property.php->saveFotoInformationToDB():10. Выдаваемая ошибка: " . DBconnect::get()->errno . " " . DBconnect::get()->error . ". ID объекта недвижимости: " . $this->id);
                 }
             }
 
@@ -463,7 +450,7 @@
             if ($this->id == "") return FALSE;
 
             // Получим из БД данные ($res) по объекту недвижимости с идентификатором = $this->id
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("SELECT * FROM property WHERE id=?") === FALSE)
                 OR ($stmt->bind_param("s", $this->id) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -486,9 +473,9 @@
 
             // Если данные по пользователю есть в БД, присваиваем их соответствующим переменным, иначе - у них останутся значения по умолчанию.
             if (isset($onePropertyDataArr['typeOfObject'])) $this->typeOfObject = $onePropertyDataArr['typeOfObject'];
-            if (isset($onePropertyDataArr['dateOfEntry']) && $onePropertyDataArr['dateOfEntry'] != "0000-00-00") $this->dateOfEntry = $this->globFunc->dateFromDBToView($onePropertyDataArr['dateOfEntry']);
+            if (isset($onePropertyDataArr['dateOfEntry']) && $onePropertyDataArr['dateOfEntry'] != "0000-00-00") $this->dateOfEntry = GlobFunc::dateFromDBToView($onePropertyDataArr['dateOfEntry']);
             if (isset($onePropertyDataArr['termOfLease'])) $this->termOfLease = $onePropertyDataArr['termOfLease'];
-            if (isset($onePropertyDataArr['dateOfCheckOut']) && $onePropertyDataArr['dateOfCheckOut'] != "0000-00-00") $this->dateOfCheckOut = $this->globFunc->dateFromDBToView($onePropertyDataArr['dateOfCheckOut']);
+            if (isset($onePropertyDataArr['dateOfCheckOut']) && $onePropertyDataArr['dateOfCheckOut'] != "0000-00-00") $this->dateOfCheckOut = GlobFunc::dateFromDBToView($onePropertyDataArr['dateOfCheckOut']);
             if (isset($onePropertyDataArr['amountOfRooms'])) $this->amountOfRooms = $onePropertyDataArr['amountOfRooms'];
             if (isset($onePropertyDataArr['adjacentRooms'])) $this->adjacentRooms = $onePropertyDataArr['adjacentRooms'];
             if (isset($onePropertyDataArr['amountOfAdjacentRooms'])) $this->amountOfAdjacentRooms = $onePropertyDataArr['amountOfAdjacentRooms'];
@@ -546,7 +533,7 @@
             if (isset($onePropertyDataArr['checking'])) $this->checking = $onePropertyDataArr['checking'];
             if (isset($onePropertyDataArr['responsibility'])) $this->responsibility = $onePropertyDataArr['responsibility'];
             if (isset($onePropertyDataArr['comment'])) $this->comment = $onePropertyDataArr['comment'];
-            if (isset($onePropertyDataArr['earliestDate']) && $onePropertyDataArr['earliestDate'] != "0000-00-00") $this->earliestDate = $this->globFunc->dateFromDBToView($onePropertyDataArr['earliestDate']);
+            if (isset($onePropertyDataArr['earliestDate']) && $onePropertyDataArr['earliestDate'] != "0000-00-00") $this->earliestDate = GlobFunc::dateFromDBToView($onePropertyDataArr['earliestDate']);
             if (isset($onePropertyDataArr['earliestTimeHours'])) $this->earliestTimeHours = $onePropertyDataArr['earliestTimeHours'];
             if (isset($onePropertyDataArr['earliestTimeMinutes'])) $this->earliestTimeMinutes = $onePropertyDataArr['earliestTimeMinutes'];
 
@@ -570,7 +557,7 @@
             if ($this->id == "") return FALSE;
 
             // Получим из БД данные ($res) по объекту недвижимости с идентификатором = $this->id
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("SELECT * FROM propertyFotos WHERE propertyId=?") === FALSE)
                 OR ($stmt->bind_param("s", $this->id) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -805,7 +792,7 @@
 
             // Проверяем наличие хотя бы 1 фотографии объекта недвижимости
             if ($typeOfValidation == "newAdvert" && $this->fileUploadId != "") {
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("SELECT * FROM tempFotos WHERE fileuploadid=?") === FALSE)
                     OR ($stmt->bind_param("s", $this->fileUploadId) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -822,7 +809,7 @@
             }
             if ($typeOfValidation == "editAdvert") // Эта ветка выполняется, если валидации производятся при попытке редактирования параметров объекта недвижимости
             {
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("SELECT * FROM propertyFotos WHERE propertyId=?") === FALSE)
                     OR ($stmt->bind_param("s", $this->id) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -835,7 +822,7 @@
                     return $errors;
                 }
 
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("SELECT * FROM tempFotos WHERE fileuploadid=?") === FALSE)
                     OR ($stmt->bind_param("s", $this->fileUploadId) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -905,7 +892,7 @@
 
             // Убеждаемся что данный пользователь еще не публиковал объявлений по этому адресу. Не стоит позволять публиковать несколько разных объявлений одному человеку с привязкой к одному и тому же адресу
             if ($typeOfValidation == "newAdvert") {
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("SELECT * FROM property WHERE (address=? OR (coordX=? AND coordY=?)) AND apartmentNumber=?") === FALSE)
                     OR ($stmt->bind_param("ssss", $this->address, $this->coordX, $this->coordY, $this->apartmentNumber) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -992,7 +979,7 @@
         public function getIdUseAddress()
         {
 
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("SELECT id FROM property WHERE address=? AND coordX=? AND coordY=? AND apartmentNumber=?") === FALSE)
                 OR ($stmt->bind_param("ssss", $this->address, $this->coordX, $this->coordY, $this->apartmentNumber) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -1090,7 +1077,7 @@
             $searchLimits['withWho'] = "";
             if (isset($this->relations) && is_array($this->relations) && count($this->relations) != 0) {
                 $searchLimits['withWho'] = " (";
-                for ($i = 0; $i < count($this->relations); $i++) {
+                for ($i = 0, $s = count($this->relations); $i < $s; $i++) {
                     $searchLimits['withWho'] .= " withWho LIKE '%" . $this->relations[$i] . "%'";
                     if ($i < count($this->relations) - 1) $searchLimits['withWho'] .= " OR";
                 }
@@ -1129,8 +1116,8 @@
 
             // Получаем идентификаторы всех пользователей-арендаторов, чьим поисковым запросам соответствует данный объект недвижимости
             $targetUsers = array();
-            $res = $this->DBlink->query("SELECT userId FROM searchRequests WHERE" . $strWHERE);
-            if (($this->DBlink->errno)
+            $res = DBconnect::get()->query("SELECT userId FROM searchRequests WHERE" . $strWHERE);
+            if ((DBconnect::get()->errno)
                 OR (($targetUsers = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
             ) {
                 // Логируем ошибку
@@ -1145,7 +1132,7 @@
             $isReaded = "не прочитано";
             $fotoArrSerialized = serialize($this->uploadedFoto);
 
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("INSERT INTO messagesNewProperty (userId, timeIndex, messageType, isReaded, fotoArr, targetId, typeOfObject, address, currency, costOfRenting, utilities, electricPower, amountOfRooms, adjacentRooms, amountOfAdjacentRooms, roomSpace, totalArea, livingSpace, kitchenSpace, totalAmountFloor, numberOfFloor) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
                 OR ($stmt->bind_param("iisssisssssssssssssii", $currentTargetUser, $tm, $messageType, $isReaded, $fotoArrSerialized, $this->id, $this->typeOfObject, $this->address, $this->currency, $this->costOfRenting, $this->utilities, $this->electricPower, $this->amountOfRooms, $this->adjacentRooms, $this->amountOfAdjacentRooms, $this->roomSpace, $this->totalArea, $this->livingSpace, $this->kitchenSpace, $this->totalAmountFloor, $this->numberOfFloor) === FALSE)
             ) {
@@ -1153,7 +1140,7 @@
                 return FALSE;
             }
 
-            for ($i = 0; $i < count($targetUsers); $i++) {
+            for ($i = 0, $s = count($targetUsers); $i < $s; $i++) {
 
                 // Подставляем новый идентификатор пользователя-арендатора
                 $currentTargetUser = $targetUsers[$i]['userId'];

@@ -17,23 +17,10 @@
 
         private $isLoggedIn = NULL; // В переменную сохраняется функцией login() значение FALSE или TRUE после первого вызова на странице. Для уменьшения обращений к БД
         private $amountUnreadMessages = ""; // В переменную функцией getAmountUnreadMessages() сохраняется количество непрочитанных сообщений пользователя
-        private $DBlink = FALSE; // Переменная для хранения объекта соединения с базой данных
-        private $globFunc = FALSE; // Переменная для хранения глобальных функций
 
         // КОНСТРУКТОР
-        // В качестве входных параметров: $DBlink объект соединения с базой данных
-        public function __construct($globFunc = FALSE, $DBlink = FALSE)
+        public function __construct()
         {
-            // Если объект с глобальными функциями получен - сделаем его доступным для всех методов класса
-            if ($globFunc != FALSE) {
-                $this->globFunc = $globFunc;
-            }
-
-            // Если объект соединения с БД получен - сделаем его доступным для всех методов класса
-            if ($DBlink != FALSE) {
-                $this->DBlink = $DBlink;
-            }
-
             // Проверяем, авторизован ли пользователь, и если да, инициализируем параметры объекта (id, typeTenant, typeOwner...) соответствующими значениями из БД
             $this->login();
 
@@ -102,7 +89,7 @@
             $favoritesPropertysIdSerialized = serialize($this->favoritesPropertysId);
 
             // Сохраняем новые изменения в БД в таблицу поисковых запросов
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("UPDATE users SET favoritesPropertysId=? WHERE id=?") === FALSE)
                 OR ($stmt->bind_param("ss", $favoritesPropertysIdSerialized, $this->id) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -133,7 +120,7 @@
             $favoritesPropertysIdSerialized = serialize($this->favoritesPropertysId);
 
             // Сохраняем новые изменения в БД в таблицу поисковых запросов
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("UPDATE users SET favoritesPropertysId=? WHERE id=?") === FALSE)
                 OR ($stmt->bind_param("ss", $favoritesPropertysIdSerialized, $this->id) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -158,16 +145,16 @@
 
             // Собираем строку WHERE для поискового запроса к БД
             $strWHERE = " (";
-            for ($i = 0; $i < count($this->favoritesPropertysId); $i++) {
+            for ($i = 0, $s = count($this->favoritesPropertysId); $i < $s; $i++) {
                 $strWHERE .= " id = '" . $this->favoritesPropertysId[$i] . "'";
-                if ($i < count($this->favoritesPropertysId) - 1) $strWHERE .= " OR";
+                if ($i < $s - 1) $strWHERE .= " OR";
             }
             $strWHERE .= ") AND (status = 'опубликовано')"; //TODO: сделать особое отображение (засеренное) для не опубликованных объявлений, тогда можно будет снять это ограничение на показ пользователю в избранных только еще опубликованных объектов
 
             // Получаем данные из БД - ВСЕ объекты недвижимости, которые являются избранными для данного пользователя
             // В итоге получим массив ($propertyLightArr), каждый элемент которого представляет собой также массив значений конкретного объявления по недвижимости
-            $res = $this->DBlink->query("SELECT id, coordX, coordY FROM property WHERE".$strWHERE." ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting"); // Сортируем по стоимости аренды и не ограничиваем количество объявлений - все, добавленные в избранные
-            if (($this->DBlink->errno)
+            $res = DBconnect::get()->query("SELECT id, coordX, coordY FROM property WHERE".$strWHERE." ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting"); // Сортируем по стоимости аренды и не ограничиваем количество объявлений - все, добавленные в избранные
+            if ((DBconnect::get()->errno)
                 OR (($propertyLightArr = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
             ) {
                 // Логируем ошибку
@@ -186,7 +173,7 @@
             if (!$this->login() || !$this->isOwner()) return FALSE;
 
             // Получим из БД данные ($res) по пользователю с идентификатором = $this->id
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("SELECT tenantsWithSignUpToViewRequest FROM property WHERE userId = ?") === FALSE)
                 OR ($stmt->bind_param("s", $this->id) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -233,8 +220,8 @@
             $result = 0;
 
             // Считаем количество непрочитанных сообщений пользователя
-            $res = $this->DBlink->query("SELECT COUNT(*) FROM messagesNewProperty WHERE userId = '".$this->id."' AND isReaded = 'не прочитано'");
-            if (($this->DBlink->errno)
+            $res = DBconnect::get()->query("SELECT COUNT(*) FROM messagesNewProperty WHERE userId = '".$this->id."' AND isReaded = 'не прочитано'");
+            if ((DBconnect::get()->errno)
                 OR (($res = $res->fetch_row()) === NULL)
             ) {
                 //TODO: сделать логирование ошибки
@@ -278,7 +265,7 @@
             }
 
             // Получим из БД данные ($res) по пользователю с идентификатором сессии = $_SESSION['id'] или логином = $_COOKIE['login']
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("SELECT id, typeTenant, typeOwner, typeAdmin, name, secondName, surname, telephon, login, password, user_hash, favoritesPropertysId FROM users WHERE user_hash=? OR login=?") === FALSE)
                 OR ($stmt->bind_param("ss", $sessionId, $cookieLogin) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -374,7 +361,7 @@
                 $password = $_POST['password'];
 
                 // Получим из БД данные ($res) по пользователю с логином = $login
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("SELECT id, login, password FROM users WHERE login=?") === FALSE)
                     OR ($stmt->bind_param("s", $login) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -427,10 +414,10 @@
         private function newSession($userId)
         {
             // Генерируем случайное 32-х значное число - идентификатор сессии
-            $hash = md5($this->globFunc->generateCode(10));
+            $hash = md5(GlobFunc::generateCode(10));
 
             // Обновляем данные в БД по пользователю с id = $userId
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("UPDATE users SET user_hash=? WHERE id=?") === FALSE)
                 OR ($stmt->bind_param("ss", $hash, $userId) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -449,7 +436,7 @@
             $tm = time();
 
             // Обновляем данные в БД по пользователю с id = $userId
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("UPDATE users SET last_act=? WHERE id=?") === FALSE)
                 OR ($stmt->bind_param("ss", $tm, $userId) === FALSE)
                 OR ($stmt->execute() === FALSE)

@@ -22,28 +22,11 @@
         public $additionalDescriptionOfSearch = "";
         public $interestingPropertysId = array();
 
-        private $DBlink = FALSE; // Переменная для хранения объекта соединения с базой данных
-        private $globFunc = FALSE; // Переменная для хранения глобальных функций
-
         // КОНСТРУКТОР
-        public function __construct($globFunc = FALSE, $DBlink = FALSE)
-        {
-            // Если объект с глобальными функциями получен - сделаем его доступным для всех методов класса
-            if ($globFunc != FALSE) {
-                $this->globFunc = $globFunc;
-            }
-
-            // Если объект соединения с БД получен - сделаем его доступным для всех методов класса
-            if ($DBlink != FALSE) {
-                $this->DBlink = $DBlink;
-            }
-        }
+        public function __construct() {}
 
         // ДЕСТРУКТОР
-        public function __destruct()
-        {
-
-        }
+        public function __destruct() {}
 
         // Перезаписать параметры объекта данными поискового запроса пользователя с id, указанным в $this->userId
         public function writeParamsFromDB() {
@@ -52,7 +35,7 @@
             if ($this->userId == "") return FALSE;
 
             // Получим из БД данные ($res) по поисковому запросу пользователя с идентификатором = $this->id
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("SELECT * FROM searchRequests WHERE userId=?") === FALSE)
                 OR ($stmt->bind_param("s", $this->userId) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -140,7 +123,7 @@
             $searchLimits['amountOfRooms'] = "";
             if (count($this->amountOfRooms) != "0") {
                 $searchLimits['amountOfRooms'] = " (";
-                for ($i = 0; $i < count($this->amountOfRooms); $i++) {
+                for ($i = 0, $s = count($this->amountOfRooms); $i < $s; $i++) {
                     $searchLimits['amountOfRooms'] .= " amountOfRooms = '" . $this->amountOfRooms[$i] . "'";
                     if ($i < count($this->amountOfRooms) - 1) $searchLimits['amountOfRooms'] .= " OR";
                 }
@@ -185,7 +168,7 @@
             if (count($this->district) == 0) $searchLimits['district'] = "";
             if (count($this->district) != 0) {
                 $searchLimits['district'] = " (";
-                for ($i = 0; $i < count($this->district); $i++) {
+                for ($i = 0, $s = count($this->district); $i < $s; $i++) {
                     $searchLimits['district'] .= " district = '" . $this->district[$i] . "'";
                     if ($i < count($this->district) - 1) $searchLimits['district'] .= " OR";
                 }
@@ -232,8 +215,8 @@
             // Получаем данные из БД - ВСЕ объекты недвижимости, соответствующие поисковому запросу
             // Сортируем по стоимости аренды и не ограничиваем количество объявлений - все, подходящие под условия пользователя
             // В итоге получим массив ($propertyLightArr), каждый элемент которого представляет собой еще один массив значений конкретного объявления по недвижимости
-            $res = $this->DBlink->query("SELECT id, coordX, coordY FROM property WHERE".$strWHERE." ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting");
-            if (($this->DBlink->errno)
+            $res = DBconnect::get()->query("SELECT id, coordX, coordY FROM property WHERE".$strWHERE." ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting");
+            if ((DBconnect::get()->errno)
                 OR (($propertyLightArr = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
             ) {
                 // Логируем ошибку

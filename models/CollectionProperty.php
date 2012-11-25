@@ -10,22 +10,8 @@
         public $allPropertiesFotoInformation = array(); // 2-х мерный массив. Каждый член данного массива представляет фотографии по отдельному объекту недвижимости (позиции соответствуют позициям объектов в массиве $allPropertiesCharacteristic). Каждый член этого массива представляет собой массив массивов, каждый член которого содержит информацию по конкретной фотографии соответствующего объекта недвижимости
         public $allPropertiesTenantPretenders = array(); // 2-х мерный массив. Каждый член данного массива представляет данные потенциальных арендаторов по отдельному объекту недвижимости (позиции соответствуют позициям объектов в массиве $allPropertiesCharacteristic). Каждый член этого массива представляет собой массив массивов, каждый член которого содержит информацию по конкретному претенденту на аренду соответствующего объекта недвижимости
 
-        private $DBlink = FALSE; // Переменная для хранения объекта соединения с базой данных
-        private $globFunc = FALSE; // Переменная для хранения глобальных функций
-
         // КОНСТРУКТОР
-        public function __construct($globFunc = FALSE, $DBlink = FALSE) {
-
-            // Если объект с глобальными функциями получен - сделаем его доступным для всех методов класса
-            if ($globFunc != FALSE) {
-                $this->globFunc = $globFunc;
-            }
-
-            // Если объект соединения с БД получен - сделаем его доступным для всех методов класса
-            if ($DBlink != FALSE) {
-                $this->DBlink = $DBlink;
-            }
-        }
+        public function __construct() {}
 
         // ДЕСТРУКТОР
         public function __destruct() {
@@ -40,7 +26,7 @@
             if ($userId == FALSE) return FALSE;
 
             // Получаем данные по всем объектам недвижимости пользователя (в качестве собственника)
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("SELECT * FROM property WHERE userId=? ORDER BY status DESC, last_act DESC") === FALSE)
                 OR ($stmt->bind_param("s", $userId) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -56,10 +42,10 @@
             $this->allPropertiesCharacteristic = $res;
 
             // Получаем для каждого объекта недвижимости из коллекции данные по его фотографиям
-            for ($i = 0; $i < count($this->allPropertiesCharacteristic); $i++) {
+            for ($i = 0, $s = count($this->allPropertiesCharacteristic); $i < $s; $i++) {
 
                 // Получим из БД данные о фотографиях ($res) по объекту недвижимости
-                $stmt = $this->DBlink->stmt_init();
+                $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("SELECT * FROM propertyFotos WHERE propertyId=?") === FALSE)
                     OR ($stmt->bind_param("s", $this->allPropertiesCharacteristic[$i]['id']) === FALSE)
                     OR ($stmt->execute() === FALSE)
@@ -80,14 +66,14 @@
                // Получаем имена и отчества заинтересовавшихся арендаторов
                // Составляем условие запроса к БД, указывая интересующие нас id объявлений
                $selectValue = "";
-               for ($j = 0; $j < count($tenantsWithSignUpToViewRequest); $j++) {
+               for ($j = 0, $s1 = count($tenantsWithSignUpToViewRequest); $j < $s1; $j++) {
                    $selectValue .= " id = '" . $tenantsWithSignUpToViewRequest[$j] . "'";
-                   if ($j < count($tenantsWithSignUpToViewRequest) - 1) $selectValue .= " OR";
+                   if ($j < $s1 - 1) $selectValue .= " OR";
                }
 
                 // Получим из БД данные о заинтересовавшихся арендаторах ($res) по объекту недвижимости
-                $res = $this->DBlink->query("SELECT id, typeTenant, name, secondName FROM users WHERE ".$selectValue);
-                if (($this->DBlink->errno)
+                $res = DBconnect::get()->query("SELECT id, typeTenant, name, secondName FROM users WHERE ".$selectValue);
+                if ((DBconnect::get()->errno)
                     OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
                 ) {
                     // Логируем ошибку
@@ -147,7 +133,7 @@
             }
 
             // Внесем изменения в БД
-            $stmt = $this->DBlink->stmt_init();
+            $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("UPDATE property SET status = ? WHERE id = ?") === FALSE)
                 OR ($stmt->bind_param("ss", $status, $propertyId) === FALSE)
                 OR ($stmt->execute() === FALSE)
@@ -159,7 +145,7 @@
             }
 
             // Внесем изменения в текущие параметры модели
-            for ($i = 0; $i < count($this->allPropertiesCharacteristic); $i++) {
+            for ($i = 0, $s = count($this->allPropertiesCharacteristic); $i < $s; $i++) {
 
                 if ($this->allPropertiesCharacteristic[$i]['id'] == $propertyId) {
                     $this->allPropertiesCharacteristic[$i]['status'] = $status;

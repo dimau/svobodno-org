@@ -418,9 +418,9 @@
                                             if ($value != "") $furniture[] = $value; // Дополнительная проверка на пустоту нужна, так как пустая строчка воспринимается как один из членов массива
                                         }
 
-                                        for ($i = 0; $i < count($furniture); $i++) {
+                                        for ($i = 0, $s = count($furniture); $i < $s; $i++) {
                                             echo $furniture[$i];
-                                            if ($i < count($furniture) - 1) echo ",<br>"; // Если элемент в массиве не последний - добавляем запятую
+                                            if ($i < $s - 1) echo ",<br>"; // Если элемент в массиве не последний - добавляем запятую
                                         }
 
                                         // Если мебель не указана совсем - пишем слово "нет"
@@ -444,9 +444,9 @@
                                             if ($value != "") $furniture[] = $value; // Дополнительная проверка на пустоту нужна, так как пустая строчка воспринимается как один из членов массива
                                         }
 
-                                        for ($i = 0; $i < count($furniture); $i++) {
+                                        for ($i = 0, $s = count($furniture); $i < $s; $i++) {
                                             echo $furniture[$i];
-                                            if ($i < count($furniture) - 1) echo ",<br>"; // Если элемент в массиве не последний - добавляем запятую
+                                            if ($i < $s - 1) echo ",<br>"; // Если элемент в массиве не последний - добавляем запятую
                                         }
 
                                         // Если мебель не указана совсем - пишем слово "нет"
@@ -470,9 +470,9 @@
                                             if ($value != "") $furniture[] = $value; // Дополнительная проверка на пустоту нужна, так как пустая строчка воспринимается как один из членов массива
                                         }
 
-                                        for ($i = 0; $i < count($furniture); $i++) {
+                                        for ($i = 0, $s = count($furniture); $i < $s; $i++) {
                                             echo $furniture[$i];
-                                            if ($i < count($furniture) - 1) echo ",<br>"; // Если элемент в массиве не последний - добавляем запятую
+                                            if ($i < $s - 1) echo ",<br>"; // Если элемент в массиве не последний - добавляем запятую
                                         }
 
                                         // Если бытовая техника не указана совсем - пишем слово "нет"
@@ -508,9 +508,9 @@
                                     <td class="objectDescriptionItemLabel">Отношения между арендаторами:</td>
                                     <td class="objectDescriptionBody"><span>
                         <?php
-                                        for ($i = 0; $i < count($propertyCharacteristic['relations']); $i++) {
+                                        for ($i = 0, $s = count($propertyCharacteristic['relations']); $i < $s; $i++) {
                                             echo $propertyCharacteristic['relations'][$i];
-                                            if ($i < count($propertyCharacteristic['relations']) - 1) echo ",<br>"; // Если элемент в массиве не последний - добавляем запятую
+                                            if ($i < $s - 1) echo ",<br>"; // Если элемент в массиве не последний - добавляем запятую
                                         }
                                         ?>
                                                 </span></td>

@@ -3,22 +3,18 @@
     session_start();
 
     // Подключаем нужные модели и представления
+    include 'models/DBconnect.php';
     include 'models/GlobFunc.php';
     include 'models/Logger.php';
     include 'models/IncomingUser.php';
     include 'views/View.php';
     include 'models/User.php';
 
-    // Создаем объект-хранилище глобальных функций
-    $globFunc = new GlobFunc();
-
-    // Подключаемся к БД
-    $DBlink = $globFunc->connectToDB();
     // Удалось ли подключиться к БД?
-    if ($DBlink == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
+    if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
     // Инициализируем модель для запросившего страницу пользователя
-    $incomingUser = new IncomingUser($globFunc, $DBlink);
+    $incomingUser = new IncomingUser();
 
     // Проверим, быть может пользователь уже авторизирован. Если это так, перенаправим его на главную страницу сайта
     if ($incomingUser->login()) {
@@ -26,7 +22,7 @@
     }
 
     // Инициализируем полную модель неавторизованного пользователя
-    $user = new User($globFunc, $DBlink, FALSE);
+    $user = new User(FALSE);
     // На странице регистрации важно получить роль, в которой регистрируется пользователь - арендатор или собственник (от этого зависит набор обязательных для заполнения параметров). Инициализируем параметры модели typeTenant и typeOwner в соответствии с ролью регистрируемого пользователя
     $user->setTypeTenantOwnerFromGET();
 
@@ -34,7 +30,7 @@
     $errors = array();
 
     // Готовим массив со списком районов в городе пользователя
-    $allDistrictsInCity = $globFunc->getAllDistrictsInCity("Екатеринбург");
+    $allDistrictsInCity = GlobFunc::getAllDistrictsInCity("Екатеринбург");
 
     // Запоминаем в параметры сессии адрес URL, с которого на регистрацию пришел пользователь (это позволит вернуть его после регистрации на ту же страницу)
     if (isset($_SERVER['HTTP_REFERER'])) {
@@ -102,7 +98,7 @@
      * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
      *******************************************************************************/
 
-    $view = new View($globFunc, $DBlink);
+    $view = new View();
     $view->generate("templ_registration.php", array('userCharacteristic' => $user->getCharacteristicData(),
                                                     'userFotoInformation' => $user->getFotoInformationData(),
                                                     'userSearchRequest' => $user->getSearchRequestData(),
@@ -116,4 +112,4 @@
      * Закрываем соединение с БД
      *******************************************************************************/
 
-    $globFunc->closeConnectToDB($DBlink);
+    DBconnect::closeConnectToDB();
