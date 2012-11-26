@@ -18,6 +18,10 @@
         private $isLoggedIn = NULL; // В переменную сохраняется функцией login() значение FALSE или TRUE после первого вызова на странице. Для уменьшения обращений к БД
         private $amountUnreadMessages = ""; // В переменную функцией getAmountUnreadMessages() сохраняется количество непрочитанных сообщений пользователя
 
+        /* Данные параметры используются только для Личного кабинета, для вкладки с Избранными объектами */
+        private $propertyLightArr; // Массив массивов. После выполнения метода searchProperties содержит минимальные данные по ВСЕМ избранным объектам
+        private $propertyFullArr; // Массив массивов. После выполнения метода searchProperties содержит полные данные, включая фотографии, по нескольким первым в выборке объектам (количество указывается в качестве первого параметра к методу searchProperties)
+
         // КОНСТРУКТОР
         public function __construct()
         {
@@ -134,14 +138,44 @@
             return TRUE;
         }
 
-        // Метод возвращает массив массивов с краткими данными (id, coordX, coordY) об избранных объектах недвижимости
-        public function getPropertyLightArrForFavorites()
+        // Вычисляет массивы: 1. C краткими данными (id, coordX, coordY) о ВСЕХ избранных объектах недвижимости
+        // 2. Кроме того по первым $amountFullProperties объектам недвижимости вычисляет полные данные, даже с фотографиями.
+        // Объекты недвижимости отсортированы в обоих массивах по увеличению стоимости аренды с учетом коммунальных платежей
+        public function searchProperties($amountFullProperties)
         {
-            // Инициализируем массив, в который и сохраним всю информацию
-            $propertyLightArr = array();
+            // Получим минимальные данные (id, coordX, coordY) по всем объектам недвижимости, подходящим под параметры поискового запроса
+            $this->findPropertyLightArr();
+
+            // Получим полные данные по первым $amountFullProperties объектам недвижимости
+            $this->findPropertyFullArr($amountFullProperties);
+
+            // Если по каким-то объектам из $this->propertyLightArr получить полные данные не удалось, удалим их
+            if ($amountFullProperties <= count($this->propertyLightArr)) $limit = $amountFullProperties; else $limit = count($this->propertyLightArr);
+            $markForSort = FALSE; // Метка, говорящая, требуется ли пересортировка массиву $this->propertyLightArr (если будет удален хотя бы 1 элемент из него), или нет
+            for ($i = 0; $i < $limit; $i++) {
+                $markForRemove = TRUE;
+                foreach ($this->propertyFullArr as $value) {
+                    if ($this->propertyLightArr[$i]['id'] == $value['id']) {
+                        $markForRemove = FALSE;
+                        break;
+                    }
+                }
+                // Проверяем метку на удаление. Если для элемент $this->propertyLightArr[$i] не нашелся соответствующий в $this->propertyFullArr, значит не удалось получить данные по этому объекту недвижимости
+                if ($markForRemove) {
+                    unset($this->propertyLightArr[$i]);
+                    $markForSort = TRUE;
+                }
+            }
+            // Если был удален хотя бы 1 элемент, переиндексируем массив
+            if ($markForSort) $this->propertyLightArr = array_values($this->propertyLightArr);
+
+        }
+
+        // Метод записывает в параметр $this->propertyLightArr массив массивов, содержащий минимальные данные по всем объектам недвижимости, соответствующим данным условиям поиска
+        private function findPropertyLightArr() {
 
             // Убедимся, что список идентификаторов объектов недвижимости представляет собой массив и его длина не равна нулю
-            if (!is_array($this->favoritesPropertysId) || count($this->favoritesPropertysId) == 0) return $propertyLightArr;
+            if (!is_array($this->favoritesPropertysId) || count($this->favoritesPropertysId) == 0) $this->propertyLightArr = array();
 
             // Собираем строку WHERE для поискового запроса к БД
             $strWHERE = " (";
@@ -152,17 +186,49 @@
             $strWHERE .= ") AND (status = 'опубликовано')"; //TODO: сделать особое отображение (засеренное) для не опубликованных объявлений, тогда можно будет снять это ограничение на показ пользователю в избранных только еще опубликованных объектов
 
             // Получаем данные из БД - ВСЕ объекты недвижимости, которые являются избранными для данного пользователя
-            // В итоге получим массив ($propertyLightArr), каждый элемент которого представляет собой также массив значений конкретного объявления по недвижимости
-            $res = DBconnect::get()->query("SELECT id, coordX, coordY FROM property WHERE".$strWHERE." ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting"); // Сортируем по стоимости аренды и не ограничиваем количество объявлений - все, добавленные в избранные
+            // Сортируем по стоимости аренды и не ограничиваем количество объявлений - все, добавленные в избранные
+            // В итоге получим массив ($this->propertyLightArr), каждый элемент которого представляет собой также массив значений конкретного объявления по недвижимости
+            $res = DBconnect::get()->query("SELECT id, coordX, coordY FROM property WHERE".$strWHERE." ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting");
             if ((DBconnect::get()->errno)
-                OR (($propertyLightArr = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+                OR (($this->propertyLightArr = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
             ) {
                 // Логируем ошибку
                 //TODO: сделать логирование ошибки
-                return array();
+                $this->propertyLightArr = array();
             }
 
-            return $propertyLightArr;
+        }
+
+        // Метод записывает в параметр $this->propertyFullArr массив массивов, содержащий полные данные (в том числе с фото) по первым $amountFullProperties объектам недвижимости из массива $this->propertyLightArr
+        private function findPropertyFullArr($amountFullProperties) {
+
+            // Проверим входные параметры
+            if (!isset($amountFullProperties) || $amountFullProperties == 0) $this->propertyFullArr = array();
+
+            // Сколько всего будет объектов с полными данными в итоге
+            if ($amountFullProperties <= count($this->propertyLightArr)) $limit = $amountFullProperties; else $limit = count($this->propertyLightArr);
+
+            // Вычислим массив id объектов, по которым требуется получить полные данные
+            $propertiesIdForFullData = array();
+            for ($i = 0; $i < $limit; $i++) {
+                $propertiesIdForFullData[] = $this->propertyLightArr[$i]['id'];
+            }
+
+            // Получим массив с полными данными (в том числе с фото) по требующимся объявлениям
+            $this->propertyFullArr = DBconnect::getFullDataAboutProperties($propertiesIdForFullData);
+            // Если полные данные получить не удалось - запишем пустой массив в результат
+            if ($this->propertyFullArr == FALSE) $this->propertyFullArr = array();
+
+        }
+
+        // Возвращает массив массивов $this->propertyLightArr
+        public function getPropertyLightArr() {
+            return $this->propertyLightArr;
+        }
+
+        // Возвращает массив массивов $this->propertyFullArr
+        public function getPropertyFullArr() {
+            return $this->propertyFullArr;
         }
 
         // Метод возвращает массив идентификаторов арендаторов, которые заинтересовались недвижимостью данного пользователя

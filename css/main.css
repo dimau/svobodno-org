@@ -487,22 +487,6 @@ td, th {
     padding: 4px;
 }
 
-td.top.left, th.top.left {
-    border-top-left-radius: 5px;
-}
-
-td.bottom.left, th.bottom.left {
-    border-bottom-left-radius: 5px;
-}
-
-td.top.right, th.top.right {
-    border-top-right-radius: 5px;
-}
-
-td.bottom.right, th.bottom.right {
-    border-bottom-right-radius: 5px;
-}
-
 /* =============================================================================
    Chrome Frame Prompt
    ========================================================================== */
@@ -574,7 +558,7 @@ td.bottom.right, th.bottom.right {
 }
 
 /* =============================================================================
-   Полезные классы
+   ПОЛЕЗНЫЕ, ВСПОМОГАТЕЛЬНЫЕ классы
    ========================================================================== */
 
 .clearBoth {
@@ -591,6 +575,22 @@ td.bottom.right, th.bottom.right {
     float: right;
     margin: 7px 0px 0px 7px;
     text-align: center;
+}
+
+.top.left {
+    border-top-left-radius: 5px;
+}
+
+.bottom.left {
+    border-bottom-left-radius: 5px;
+}
+
+.top.right {
+    border-top-right-radius: 5px;
+}
+
+.bottom.right {
+    border-bottom-right-radius: 5px;
 }
 
 /* =============================================================================
@@ -1048,28 +1048,129 @@ td.bottom.right, th.bottom.right {
     float: left;
 }
 
+/* Стиль по умолчанию для отдельного объявления в списке */
 .realtyObject {
-    height: 50px;
-    border: 2px solid silver;
+    width: 100%;
+    /*height: 50px;*/
+    border-top: 2px solid silver;
+    border-right: 2px solid silver;
+    border-left: 2px solid silver;
     background-color: white;
     text-align: center;
 }
 
+/* Выделение объявления, над которым завис курсор зеленой рамочкой */
 .realtyObject:hover {
-    border: 2px solid #6a9d02;
+    border-top: 2px solid #6a9d02;
+    border-right: 2px solid #6a9d02;
+    border-left: 2px solid #6a9d02;
     cursor: pointer;
 }
 
-.realtyObject td {
-    position: relative; /* Чтобы абсолютно позиционированная ссылка Подробнее не уезжала из ячейки */
-    border-top: 2px solid silver;
+.realtyObject:hover + .realtyObject {
+    border-top: 2px solid #6a9d02;
+}
+
+.realtyObject:last-of-type {
     border-bottom: 2px solid silver;
 }
 
-.realtyObject:hover td {
-    border-top: 2px solid #6a9d02; /* Вместе с соответствующим правилом для tr класса realtyObject помогает сделать рамку нужного цвета при наведении курсора */
+.realtyObject:last-of-type:hover {
     border-bottom: 2px solid #6a9d02;
 }
+
+#headOfFullParametersList {
+    background-color: #ffffff;
+    border-top: 2px solid #336784;
+    border-left: 2px solid #336784;
+    border-right: 2px solid #336784;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    line-height: 2em;
+    color: #336784;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Особые стили для каждого типа данных, содержащихся в описании */
+.realtyObject .serviceMarks,
+#headOfFullParametersList .serviceMarks {
+    padding-top: 7px;
+    float: left;
+    width: 25px;
+}
+
+.realtyObject .overFotosWrapper,
+#headOfFullParametersList .overFotosWrapper {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    float: left;
+    width: 140px;
+}
+
+.realtyObject .mainContent,
+#headOfFullParametersList .mainContent {
+    position: relative; /* Чтобы абсолютно позиционированная ссылка Подробнее не уезжала из ячейки */
+    padding-top: 5px;
+    margin-left: 170px;
+    white-space: nowrap;
+}
+
+.realtyObject .mainContent .address,
+#headOfFullParametersList .address {
+    display: inline-block;
+    vertical-align: middle;
+    width: 35.75%;
+    white-space: normal;
+}
+
+.realtyObject .mainContent .amountOfRooms,
+#headOfFullParametersList .amountOfRooms {
+    display: inline-block;
+    vertical-align: middle;
+    width: 15.07%;
+    white-space: normal;
+}
+
+.realtyObject .mainContent .areaValues,
+#headOfFullParametersList .areaValues {
+    display: inline-block;
+    vertical-align: middle;
+    width: 14.89%;
+    white-space: normal;
+}
+
+.realtyObject .mainContent .floor,
+#headOfFullParametersList .floor {
+    display: inline-block;
+    vertical-align: middle;
+    width: 8.74%;
+    white-space: normal;
+}
+
+.realtyObject .mainContent .furniture,
+#headOfFullParametersList .furniture {
+    display: inline-block;
+    vertical-align: middle;
+    width: 12.28%;
+    white-space: normal;
+}
+
+.realtyObject .mainContent .costOfRenting,
+#headOfFullParametersList .costOfRenting {
+    display: inline-block;
+    vertical-align: middle;
+    width: 13.21%;
+    white-space: normal;
+}
+
+/* Стили для типа объекта и района в подробном описании объекта */
+.realtyObject .mainContent .address .typeOfObjectString,
+.realtyObject .mainContent .address .districtString {
+    font-size: 0.9em;
+    color: #808080;
+}
+
 
 /* Стили для команд управления объявлением в режиме Список + Карта */
 .advertActions {
@@ -1099,6 +1200,7 @@ td.bottom.right, th.bottom.right {
 }
 
 .headOfBalloon {
+    color: #336784;
     text-align: center;
     font-size: 1.2em;
 }

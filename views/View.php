@@ -137,261 +137,116 @@
 
         }
 
-        public function getSearchResultHTML($propertyLightArr = array(), $favoritesPropertysId = array(), $typeOfRequest = "search")
-        {
+        /**
+         * Возвращает HTML для блока с баллунами Яндекс карты
+         *
+         * @param $propertyFullArr - массив массивов, содержащий подробные сведения по объектам недвижимости, для которых и нужно построить список баллунов
+         * @param $favoritesPropertysId - массив идентификаторов избранных объектов пользователя
+         * @param $typeOfRequest - тип запроса ("search" - для страницы поиска, "favorites" - для личного кабинета, вкладка Избранное)
+         * @return string - возвращаем строку, содержащую HTML для списка баллунов
+         */
+        public function getMatterOfBalloonList($propertyFullArr, $favoritesPropertysId, $typeOfRequest) {
 
-            // Инициализируем переменную, в которую сложим весь HTML код результатов поиска
-            $searchResultHTML = "";
+            // Проверка входящих параметров
+            if (!isset($propertyFullArr) || !is_array($propertyFullArr)) return "";
 
-            // Собираем строку WHERE для поискового запроса к БД по полным данным для не более чем 20-ти первых объектов
-            $strWHERE = "";
-            if (count($propertyLightArr) < 20) $limit = count($propertyLightArr); else $limit = 20;
-            if ($limit != 0) {
-                $strWHERE = " (";
-                for ($i = 0; $i < $limit; $i++) {
-                    $strWHERE .= " id = '" . $propertyLightArr[$i]['id'] . "'";
-                    if ($i < $limit - 1) $strWHERE .= " OR";
-                }
-                $strWHERE .= ")";
+            // Инициализируем, если это нужно, список избранных объявлений так, чтобы функция не сломалась в непредвиденных ситуациях
+            if (!isset($favoritesPropertysId) || !is_array($favoritesPropertysId)) $favoritesPropertysId = array();
+
+            // Инициализируем переменную для хранения содержимого невидимого блока с HTML данными для всех баллунов
+            $matterOfBalloonList = "";
+
+            // Перебираем входящий массив ($propertyFullArr), создавая соответствующие баллуны для каждого объекта недвижимости
+            for ($i = 0; $i < count($propertyFullArr); $i++ ) {
+                // Получаем HTML для баллуна и добавляем его в общую копилку
+                $matterOfBalloonList .= $this->getFullBalloonHTML($propertyFullArr[$i], $favoritesPropertysId);
             }
 
-            // Получаем данные из БД
-            $res = DBconnect::get()->query("SELECT * FROM property WHERE" . $strWHERE . " ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting LIMIT 20");
-            if ((DBconnect::get()->errno)
-                OR (($propertyFullArr = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-            ) {
-                // Логируем ошибку
-                //TODO: сделать логирование ошибки
-                $propertyFullArr = array();
-            }
-
-            // Превращаем полученный массив массивов в ассоциированный массив массивов, в качестве ключей - идентификаторы объектов недвижимости
-            for ($i = 0, $s = count($propertyFullArr); $i < $s; $i++) {
-                $propertyFullArrNew[$propertyFullArr[$i]['id']] = $propertyFullArr[$i];
-            }
-
-            // Инициализируем переменные, в которые сложим HTML блоки каждого из объявлений.
-            $matterOfBalloonList = ""; // Содержимое невидимого блока с HTML данными для всех баллунов
-            $matterOfShortList = ""; // Содержимое таблицы объявлений с краткими данными по каждому из них
-            $matterOfFullParametersList = ""; // Содержимое таблицы объявлений с подробными данными по каждому из них
-
-            // Инициализируем счетчик общего количества опубликованных объявлений в базе. Пригодится только, если по условиям поиска не найдено ни одно объявление
-            $allAmountAdverts = "";
-
-            // Инициализируем счетчик объявлений
-            $number = 0;
-
-            // Начинаем перебор каждого из полученных ранее объявлений для наполнения их данными шаблонов и получения красивых HTML-блоков для публикации на странице
-            for ($i = 0, $s = count($propertyLightArr); $i < $s; $i++) {
-
-                // Вычисляем идентификатор текущего объявления
-                $currentPropertyId = $propertyLightArr[$i]['id'];
-
-                // Увеличиваем счетчик объявлений при каждом проходе
-                $number++;
-
-                // Для объектов, расположенных дальше 20-ого - только минимум данных для размещения метки на карте
-                if ($number > 20) {
-                    /************** Готовим минимальный баллун **************/
-                    $matterOfBalloonList .= $this->getLightBalloonHTML($propertyLightArr[$i]);
-                    continue;
-                }
-
-                // Получаем фотографии объекта
-                $res = DBconnect::get()->query("SELECT * FROM propertyFotos WHERE propertyId = '" . $currentPropertyId . "'");
-                if ((DBconnect::get()->errno)
-                    OR (($propertyFotosArr = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-                ) {
-                    // Логируем ошибку
-                    //TODO: сделать логирование ошибки
-                    $propertyFotosArr = array();
-                }
-
-                // Если у нам удалось ранее получить полные сведения по объекту $propertyLightArr[$i], то отрабатываем его, в противном случае - игнорируем.
-                // Кажется, что данное условие будет НЕ выполняться крайне редко - при сбоях в работе с БД, но для большей безопасности, думаю, не помещает такая проверка
-                if (isset($propertyFullArrNew[$currentPropertyId])) {
-
-                    /************** Готовим полный баллун **************/
-                    // Полученный HTML текст складываем в "копилочку"
-                    $matterOfBalloonList .= substr($this->getLightBalloonHTML($propertyLightArr[$i]), 0, -6); // Получаем минимальный баллун, который служит рамкой для полного баллуна. И сразу отрезаем </div> в конце строки
-                    $matterOfBalloonList .= $this->getFullBalloonHTML($propertyFullArrNew[$currentPropertyId], $propertyFotosArr, $favoritesPropertysId);
-                    $matterOfBalloonList .= "</div>"; // Возвращаем назад отрезанный ранее div
-
-                    /***** Готовим блок shortList таблицы для данного объекта недвижимости *****/
-                    // Полученный HTML текст складываем в "копилочку"
-                    $matterOfShortList .= $this->getShortListItemHTML($propertyFullArrNew[$currentPropertyId], $propertyFotosArr, $favoritesPropertysId, $number);
-
-                    /***** Готовим блок fullParametersList таблицы для данного объекта недвижимости *****/
-                    // Полученный HTML текст складываем в "копилочку"
-                    $matterOfFullParametersList .= $this->getFullParametersListItemHTML($propertyFullArrNew[$currentPropertyId], $propertyFotosArr, $favoritesPropertysId, $number);
-
-                }
-            }
-
-            // Складываем элементы управления для выбора формы представления результатов выдачи (карта, список, карта + список)
-            $searchResultHTML .= "
-        <div class='choiceViewSearchResult'>
-            <span id='expandList'><a href='#'>Список</a>&nbsp;&nbsp;&nbsp;</span><span id='listPlusMap'><a href='#'>Список +
-            карта</a>&nbsp;&nbsp;&nbsp;</span><span id='expandMap'><a href='#'>Карта</a></span>
-        </div>
-        <div id='resultOnSearchPage' style='height: 100%;'>
-            <div id='allBalloons' style='display: none;'>
-        ";
-
-            // Складываем содержимое блоков с баллунами для Яндекс карты
-            if ($matterOfBalloonList != "") {
-                $searchResultHTML .= $matterOfBalloonList; // Вставляем HTML-текст баллунов для Яндекс карты объявлений по недвижимости с короткими данными и данными для баллунов на Яндекс карте
-            } else {
-                // Если ничего не нашли то блок allBalloons будет пустым
-            }
-
-            // Закрываем блок с баллунами для Яндекс карты
-            $searchResultHTML .= "</div><!-- end allBalloons -->";
-
-            $searchResultHTML .= "
-        <!-- Информация об объектах, подходящих условиям поиска -->
-            <table class='listOfRealtyObjects' id='shortListOfRealtyObjects'>
-                <tbody>
-        ";
-
-            // Складываем содержимое таблицы объявлений с краткими сведениями по каждому объекту
-            if ($matterOfShortList != "") {
-                $searchResultHTML .= $matterOfShortList; // Вставляем HTML-текст объявлений по недвижимости с короткими данными и данными для баллунов на Яндекс карте
-            } else { // Если ничего не нашли
-
-
-                $res = DBconnect::get()->query("SELECT COUNT(*) FROM property WHERE status = 'опубликовано'");
-                if ((DBconnect::get()->errno)
-                    OR (($amountOfRows = $res->fetch_row()) === NULL)
-                ) {
-                    // Логируем ошибку
-                    //TODO: сделать логирование ошибки
-                    $allAmountAdverts = "";
-                } else {
-                    $allAmountAdverts = $amountOfRows[0];
-                }
-
-                // Выдаем вместо пустого результата:
-                $searchResultHTML .= $this->searchResultIsEmptyHTML($typeOfRequest, $allAmountAdverts);
-
-            }
-
-            // Закрываем таблицу объявлений с краткими сведениями
-            $searchResultHTML .= "</tbody></table>";
-
-            // Добавляем область показа карты и таблицу объявлений, содержащую подробные сведения по каждому объявлению
-            $searchResultHTML .= "
-            <!-- Область показа карты -->
-            <div id='map'></div>
-
-            <div class='clearBoth'></div>
-
-            <!-- Первоначально скрытый раздел с подробным списком объявлений-->
-            <div id='fullParametersListOfRealtyObjects' style='display: none;'>
-                <table class='listOfRealtyObjects' style='width: 100%; float:none;'>
-                    <thead id='headOfBigTable'
-                           style='background-color: #ffffff; line-height: 2em; border-bottom: 1px solid #000000;'>
-                        <tr class='listOfRealtyObjectsHeader'>
-                            <th class='top left'></th>
-                            <th>Фото</th>
-                            <th>Адрес</th>
-                            <th>Комнаты</th>
-                            <th>Площадь</th>
-                            <th>Этаж</th>
-                            <th>Мебель</th>
-                            <th class='top right'>Цена</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        ";
-
-            // Складываем содержимое таблицы объявлений с подробными сведениями по каждому объекту
-            if ($matterOfFullParametersList != "") {
-                $searchResultHTML .= $matterOfFullParametersList; // Формируем содержимое таблицы со списком объявлений и расширенными данными по ним
-            } else { // Если ничего не нашли
-                // Выдаем вместо пустого результата:
-                $searchResultHTML .= $this->searchResultIsEmptyHTML($typeOfRequest, $allAmountAdverts);
-            }
-
-            // Закрываем таблицу объявлений с подробными сведениями
-            $searchResultHTML .= "
-                    </tbody>
-                </table>
-            </div>
-        </div><!-- /end.resultOnSearchPage -->
-        ";
-
-            // Возвращаем HTML код со сведениями об искомых объектах недвижимости
-            return $searchResultHTML;
-
+            return $matterOfBalloonList;
         }
 
-        public function getLightBalloonHTML($oneProperty)
-        {
+        /**
+         * Возвращает HTML для списка объектов недвижимости с кратким описанием
+         *
+         * @param $propertyFullArr - массив массивов, содержащий подробные сведения по объектам недвижимости, для которых и нужно построить список
+         * @param $favoritesPropertysId - массив идентификаторов избранных объектов пользователя
+         * @param $typeOfRequest - тип запроса ("search" - для страницы поиска, "favorites" - для личного кабинета, вкладка Избранное)
+         * @return string - возвращаем строку, содержащую HTML для списка
+         */
+        public function getMatterOfShortList($propertyFullArr, $favoritesPropertysId, $typeOfRequest){
 
-            // Координаты объекта
-            $coordX = "";
-            if (isset($oneProperty['coordX'])) $coordX = $oneProperty['coordX'];
-            $coordY = "";
-            if (isset($oneProperty['coordY'])) $coordY = $oneProperty['coordY'];
+            // Проверка входящих параметров
+            if (!isset($propertyFullArr) || !is_array($propertyFullArr)) return "";
 
-            // Идентификатор объекта
-            $propertyId = "";
-            if (isset($oneProperty['id'])) $propertyId = $oneProperty['id'];
+            // Инициализируем, если это нужно, список избранных объявлений так, чтобы функция не сломалась в непредвиденных ситуациях
+            if (!isset($favoritesPropertysId) || !is_array($favoritesPropertysId)) $favoritesPropertysId = array();
 
-            $currentAdvertBalloonList = "<div class='balloonBlock' coordX='" . $coordX . "' coordY='" . $coordY . "' propertyId='" . $propertyId . "'></div>";
+            // Содержимое списка объявлений с краткими данными по каждому из них
+            $matterOfShortList = "";
 
-            return $currentAdvertBalloonList;
+            // Перебираем входящий массив ($propertyFullArr), создавая соответствующие блоки для каждого объекта недвижимости
+            for ($i = 0; $i < count($propertyFullArr); $i++ ) {
+                // Получаем HTML для блока и добавляем его в общую копилку
+                $matterOfShortList .= $this->getShortListItemHTML($propertyFullArr[$i], $favoritesPropertysId, $i + 1);
+            }
+
+            // Если не нашлось ни одного объекта - возвращаем специальное сообщение
+            if ($matterOfShortList == "") $matterOfShortList = $this->searchResultIsEmptyHTML($typeOfRequest);
+
+            return $matterOfShortList;
+        }
+
+        /**
+         * Возвращает HTML для списка объектов недвижимости с подробным описанием
+         *
+         * @param $propertyFullArr - массив массивов, содержащий подробные сведения по объектам недвижимости, для которых и нужно построить список
+         * @param $favoritesPropertysId - массив идентификаторов избранных объектов пользователя
+         * @param $typeOfRequest - тип запроса ("search" - для страницы поиска, "favorites" - для личного кабинета, вкладка Избранное)
+         * @return string - возвращаем строку, содержащую HTML для списка
+         */
+        public function getMatterOfFullParametersList($propertyFullArr, $favoritesPropertysId, $typeOfRequest){
+
+            // Проверка входящих параметров
+            if (!isset($propertyFullArr) || !is_array($propertyFullArr)) return "";
+
+            // Инициализируем, если это нужно, список избранных объявлений так, чтобы функция не сломалась в непредвиденных ситуациях
+            if (!isset($favoritesPropertysId) || !is_array($favoritesPropertysId)) $favoritesPropertysId = array();
+
+            // Содержимое списка объявлений с подробными данными по каждому из них
+            $matterOfFullParametersList = "";
+
+            // Перебираем входящий массив ($propertyFullArr), создавая соответствующие блоки для каждого объекта недвижимости
+            for ($i = 0; $i < count($propertyFullArr); $i++ ) {
+                // Получаем HTML для блока и добавляем его в общую копилку
+                $matterOfFullParametersList .= $this->getFullParametersListItemHTML($propertyFullArr[$i], $favoritesPropertysId, $i + 1);
+            }
+
+            // Если не нашлось ни одного объекта - возвращаем специальное сообщение
+            if ($matterOfFullParametersList == "") $matterOfFullParametersList = $this->searchResultIsEmptyHTML($typeOfRequest);
+
+            return $matterOfFullParametersList;
         }
 
         /**
          * Возвращает HTML для всплывающего баллуна на Яндекс карте с описанием объекта недвижимости
          *
          * @param $oneProperty - ассоциированный массив данных по конкретному объявлению
-         * @param bool $propertyFotosArr - массив массивов, каждый из которых содержит информацию о конкретной фотографии объекта
          * @param array $favoritesPropertysId - массив со списком идентификаторов избранных объектов текущего пользователя
          * @return mixed - строка HTML в соответствии с шаблоном баллуна
          */
-        public function getFullBalloonHTML($oneProperty, $propertyFotosArr = FALSE, $favoritesPropertysId = array())
+        public function getFullBalloonHTML($oneProperty, $favoritesPropertysId = array())
         {
-            // Шаблон для всплывающего баллуна с описанием объекта недвижимости на карте Яндекса
-            $tmpl_balloonContentBody = "
-            <div class='headOfBalloon'>{typeOfObject}{address}</div>
-            {fotosWrapper}
-            <ul class='listDescriptionSmall forBalloon'>
-                <li>
-                    <span class='headOfString'>Плата:</span> {costOfRenting} {currency} в месяц
-                </li>
-                <li>
-                    <span class='headOfString'>Ком. услуги:</span> {utilities}
-                </li>
-                <li>
-                    <span class='headOfString'>Комиссия:</span> {compensationMoney} {currency} ({compensationPercent}%)
-                </li>
-                <li>
-                    <span class='headOfString'>{amountOfRoomsName}</span> {amountOfRooms}{adjacentRooms}
-                </li>
-                <li>
-                    <span class='headOfString'>Площадь ({areaNames}):</span> {areaValues} м²
-                </li>
-                <li>
-                    <span class='headOfString'>{floorName}</span> {floor}
-                </li>
-                <li>
-                    <span class='headOfString'>{furnitureName}</span> {furniture}
-                </li>
-            </ul>
-            <div class='clearBoth'></div>
-            <div style='width:100%;'>
-                <a href='objdescription.php?propertyId={propertyId}' target='_blank'>подробнее</a>
-                <div style='float: right;'>
-                    {favorites}
-                </div>
-            </div>
-            ";
+            // Получим HTML шаблон блока из файла
+            $templ = file_get_contents('templates/searchResultBlocks/fullBalloonListItem.php');
 
             // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне баллуна
             $arrBalloonReplace = array();
+
+            // Координаты объекта
+            $arrBalloonReplace['coordX'] = "";
+            if (isset($oneProperty['coordX'])) $arrBalloonReplace['coordX'] = $oneProperty['coordX'];
+            $arrBalloonReplace['coordY'] = "";
+            if (isset($oneProperty['coordY'])) $arrBalloonReplace['coordY'] = $oneProperty['coordY'];
 
             // Идентификатор объекта
             $arrBalloonReplace['propertyId'] = "";
@@ -407,7 +262,7 @@
 
             // Фото
             $arrBalloonReplace['fotosWrapper'] = "";
-            $arrBalloonReplace['fotosWrapper'] = $this->getHTMLfotosWrapper("small", TRUE, FALSE, $propertyFotosArr);
+            $arrBalloonReplace['fotosWrapper'] = $this->getHTMLfotosWrapper("small", TRUE, FALSE, $oneProperty['propertyFotos']);
 
             // Все, что касается СТОИМОСТИ АРЕНДЫ
             $arrBalloonReplace['costOfRenting'] = "";
@@ -489,9 +344,9 @@
 
             // Производим заполнение шаблона баллуна
             // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне баллуна
-            $arrBalloonTemplVar = array('{propertyId}', '{typeOfObject}', '{address}', '{fotosWrapper}', '{costOfRenting}', '{currency}', '{utilities}', '{compensationMoney}', '{compensationPercent}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaNames}', '{areaValues}', '{floorName}', '{floor}', '{furnitureName}', '{furniture}', '{favorites}');
+            $arrBalloonTemplVar = array('{coordX}', '{coordY}', '{propertyId}', '{typeOfObject}', '{address}', '{fotosWrapper}', '{costOfRenting}', '{currency}', '{utilities}', '{compensationMoney}', '{compensationPercent}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaNames}', '{areaValues}', '{floorName}', '{floor}', '{furnitureName}', '{furniture}', '{favorites}');
             // Копируем html-текст шаблона баллуна
-            $currentAdvertBalloonList = str_replace($arrBalloonTemplVar, $arrBalloonReplace, $tmpl_balloonContentBody);
+            $currentAdvertBalloonList = str_replace($arrBalloonTemplVar, $arrBalloonReplace, $templ);
 
             return $currentAdvertBalloonList;
         }
@@ -500,168 +355,128 @@
          * Возвращает HTML для блока с картким описанием объекта недвижимости (используется при отображении результатов поиска Список + Карта)
          *
          * @param $oneProperty - ассоциированный массив данных по конкретному объявлению
-         * @param bool $propertyFotosArr - массив массивов, каждый из которых содержит информацию о конкретной фотографии объекта
          * @param array $favoritesPropertysId - массив со списком идентификаторов избранных объектов текущего пользователя
          * @param $number - указывает какое число нужно присвоить блоку для его нумераци в выдаче
          * @return mixed - строка HTML в соответствии с шаблоном блока с кратким описанием объекта недвижимости
          */
-        public function getShortListItemHTML($oneProperty, $propertyFotosArr = FALSE, $favoritesPropertysId = array(), $number)
+       public function getShortListItemHTML($oneProperty, $favoritesPropertysId = array(), $number)
+       {
+           // Получим HTML шаблон блока из файла
+           $tmpl_shortAdvert = file_get_contents('templates/searchResultBlocks/shortListItem.php');
+
+           // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне shortList строки таблицы
+           $arrShortListReplace = array();
+
+           // Идентификатор объекта
+           $arrShortListReplace['propertyId'] = "";
+           if (isset($oneProperty['id'])) $arrShortListReplace['propertyId'] = $oneProperty['id'];
+
+           // Порядковый номер объявления в выдаче
+           $arrShortListReplace['number'] = $number;
+
+           // Избранное
+           $arrShortListReplace['actionFavorites'] = "";
+           $arrShortListReplace['imgFavorites'] = "";
+           if (count($favoritesPropertysId) != 0) {
+               // Проверяем наличие данного объявления среди избранных у пользователя
+               if (in_array($arrShortListReplace['propertyId'], $favoritesPropertysId)) {
+                   $arrShortListReplace['actionFavorites'] = "removeFromFavorites";
+                   $arrShortListReplace['imgFavorites'] = "img/gold_star.png";
+               } else {
+                   $arrShortListReplace['actionFavorites'] = "addToFavorites";
+                   $arrShortListReplace['imgFavorites'] = "img/blue_star.png";
+               }
+           } else {
+               $arrShortListReplace['actionFavorites'] = "addToFavorites";
+               $arrShortListReplace['imgFavorites'] = "img/blue_star.png";
+           }
+
+           // Фото
+           $arrShortListReplace['fotosWrapper'] = "";
+           $arrShortListReplace['fotosWrapper'] = $this->getHTMLfotosWrapper("small", TRUE, TRUE, $oneProperty['propertyFotos']);
+
+           // Тип
+           $arrShortListReplace['typeOfObject'] = "";
+           if (isset($oneProperty['typeOfObject'])) $arrShortListReplace['typeOfObject'] = GlobFunc::getFirstCharUpper($oneProperty['typeOfObject']) . ":";
+
+           // Адрес
+           $arrShortListReplace['address'] = "";
+           if (isset($oneProperty['address'])) $arrShortListReplace['address'] = $oneProperty['address'];
+
+           // Стоимость
+           $arrShortListReplace['costOfRenting'] = "";
+           if (isset($oneProperty['costOfRenting'])) $arrShortListReplace['costOfRenting'] = $oneProperty['costOfRenting'];
+           $arrShortListReplace['currency'] = "";
+           if (isset($oneProperty['currency'])) $arrShortListReplace['currency'] = $oneProperty['currency'];
+           $arrShortListReplace['utilities'] = "";
+           if (isset($oneProperty['utilities']) && $oneProperty['utilities'] == "да") $arrShortListReplace['utilities'] = " <span style='white-space: nowrap;'>+ ком.усл.</span>";
+
+           // Комнаты
+           if (isset($oneProperty['amountOfRooms']) && $oneProperty['amountOfRooms'] != "0") {
+               $arrShortListReplace['amountOfRoomsName'] = "Комнат:";
+               $arrShortListReplace['amountOfRooms'] = $oneProperty['amountOfRooms'];
+           } else {
+               $arrShortListReplace['amountOfRoomsName'] = "";
+               $arrShortListReplace['amountOfRooms'] = "";
+           }
+           if (isset($oneProperty['adjacentRooms']) && $oneProperty['adjacentRooms'] == "да") {
+               if (isset($oneProperty['amountOfAdjacentRooms']) && $oneProperty['amountOfAdjacentRooms'] != "0") {
+                   $arrShortListReplace['adjacentRooms'] = ", смежных: " . $oneProperty['amountOfAdjacentRooms'];
+               } else {
+                   $arrShortListReplace['adjacentRooms'] = ", смежные";
+               }
+           } else {
+               $arrShortListReplace['adjacentRooms'] = "";
+           }
+
+           // Площади помещений
+           $arrShortListReplace['areaValues'] = "";
+           if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "квартира" && $oneProperty['typeOfObject'] != "дом" && $oneProperty['typeOfObject'] != "таунхаус" && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж") {
+               $arrShortListReplace['areaValues'] .= $oneProperty['roomSpace'];
+           }
+           if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната") {
+               $arrShortListReplace['areaValues'] .= $oneProperty['totalArea'];
+           }
+           if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната" && $oneProperty['typeOfObject'] != "гараж") {
+               $arrShortListReplace['areaValues'] .= " / " . $oneProperty['livingSpace'];
+           }
+           if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж") {
+               $arrShortListReplace['areaValues'] .= " / " . $oneProperty['kitchenSpace'];
+           }
+
+           // Этаж
+           $arrShortListReplace['floorName'] = "";
+           $arrShortListReplace['floor'] = "";
+           if (isset($oneProperty['floor']) && isset($oneProperty['totalAmountFloor']) && $oneProperty['floor'] != "0" && $oneProperty['totalAmountFloor'] != "0") {
+               $arrShortListReplace['floorName'] = "Этаж:";
+               $arrShortListReplace['floor'] = $oneProperty['floor'] . " из " . $oneProperty['totalAmountFloor'];
+           }
+           if (isset($oneProperty['numberOfFloor']) && $oneProperty['numberOfFloor'] != "0") {
+               $arrShortListReplace['floorName'] = "Этажность:";
+               $arrShortListReplace['floor'] = $oneProperty['numberOfFloor'];
+           }
+
+           // Производим заполнение шаблона строки (блока) shortList таблицы по данному объекту недвижимости
+           // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне
+           $arrShortListTemplVar = array('{propertyId}', '{number}', '{actionFavorites}', '{imgFavorites}', '{fotosWrapper}', '{typeOfObject}', '{address}', '{costOfRenting}', '{currency}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{floorName}', '{floor}');
+           // Копируем html-текст шаблона блока (строки таблицы)
+           $currentAdvertShortList = str_replace($arrShortListTemplVar, $arrShortListReplace, $tmpl_shortAdvert);
+
+           return $currentAdvertShortList;
+       }
+
+        /**
+         * Возвращает HTML для блока с подробным описанием объекта недвижимости (используется при отображении результатов поиска в режиме "Список")
+         *
+         * @param $oneProperty - ассоциированный массив данных по конкретному объявлению
+         * @param array $favoritesPropertysId - массив со списком идентификаторов избранных объектов текущего пользователя
+         * @param $number - указывает какое число нужно присвоить блоку для его нумераци в выдаче
+         * @return mixed - строка HTML в соответствии с шаблоном блока с подробным описанием объекта недвижимости
+         */
+        public function getFullParametersListItemHTML($oneProperty, $favoritesPropertysId = array(), $number)
         {
-            $tmpl_shortAdvert = "
-            <tr class='realtyObject' propertyId='{propertyId}'>
-                <td>
-            	    <div class='numberOfRealtyObject'>{number}</div>
-               	    <span class='{actionFavorites} aloneStar' propertyId='{propertyId}'><img src='{imgFavorites}'></span>
-               	</td>
-               	<td>
-               	    {fotosWrapper}
-                </td>
-                <td>
-                    <ul class='listDescriptionSmall'>
-                        <li>
-                            <span class='headOfString'>{typeOfObject}</span> {address}
-                        </li>
-                        <li>
-                            <span class='headOfString'>Плата:</span> {costOfRenting} {currency}/мес.{utilities}
-                        </li>
-                        <li>
-                            <span class='headOfString'>{amountOfRoomsName}</span> {amountOfRooms}{adjacentRooms}
-                        </li>
-                        <li>
-                            <span class='headOfString'>Площадь:</span> {areaValues} м²
-                        </li>
-                        <li>
-                            <span class='headOfString'>{floorName}</span> {floor}
-                        </li>
-                    </ul>
-                    <div class='advertActions'>
-                        <a href='objdescription.php?propertyId={propertyId}' target='_blank'>подробнее</a>
-                    </div>
-                </td>
-            </tr>
-        ";
-
-            // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне shortList строки таблицы
-            $arrShortListReplace = array();
-
-            // Идентификатор объекта
-            $arrShortListReplace['propertyId'] = "";
-            if (isset($oneProperty['id'])) $arrShortListReplace['propertyId'] = $oneProperty['id'];
-
-            // Порядковый номер объявления в выдаче
-            $arrShortListReplace['number'] = $number;
-
-            // Избранное
-            $arrShortListReplace['actionFavorites'] = "";
-            $arrShortListReplace['imgFavorites'] = "";
-            if (count($favoritesPropertysId) != 0) {
-                // Проверяем наличие данного объявления среди избранных у пользователя
-                if (in_array($arrShortListReplace['propertyId'], $favoritesPropertysId)) {
-                    $arrShortListReplace['actionFavorites'] = "removeFromFavorites";
-                    $arrShortListReplace['imgFavorites'] = "img/gold_star.png";
-                } else {
-                    $arrShortListReplace['actionFavorites'] = "addToFavorites";
-                    $arrShortListReplace['imgFavorites'] = "img/blue_star.png";
-                }
-            } else {
-                $arrShortListReplace['actionFavorites'] = "addToFavorites";
-                $arrShortListReplace['imgFavorites'] = "img/blue_star.png";
-            }
-
-            // Фото
-            $arrShortListReplace['fotosWrapper'] = "";
-            $arrShortListReplace['fotosWrapper'] = $this->getHTMLfotosWrapper("small", TRUE, TRUE, $propertyFotosArr);
-
-            // Тип
-            $arrShortListReplace['typeOfObject'] = "";
-            if (isset($oneProperty['typeOfObject'])) $arrShortListReplace['typeOfObject'] = GlobFunc::getFirstCharUpper($oneProperty['typeOfObject']) . ":";
-
-            // Адрес
-            $arrShortListReplace['address'] = "";
-            if (isset($oneProperty['address'])) $arrShortListReplace['address'] = $oneProperty['address'];
-
-            // Стоимость
-            $arrShortListReplace['costOfRenting'] = "";
-            if (isset($oneProperty['costOfRenting'])) $arrShortListReplace['costOfRenting'] = $oneProperty['costOfRenting'];
-            $arrShortListReplace['currency'] = "";
-            if (isset($oneProperty['currency'])) $arrShortListReplace['currency'] = $oneProperty['currency'];
-            $arrShortListReplace['utilities'] = "";
-            if (isset($oneProperty['utilities']) && $oneProperty['utilities'] == "да") $arrShortListReplace['utilities'] = " <span style='white-space: nowrap;'>+ ком.усл.</span>";
-
-            // Комнаты
-            if (isset($oneProperty['amountOfRooms']) && $oneProperty['amountOfRooms'] != "0") {
-                $arrShortListReplace['amountOfRoomsName'] = "Комнат:";
-                $arrShortListReplace['amountOfRooms'] = $oneProperty['amountOfRooms'];
-            } else {
-                $arrShortListReplace['amountOfRoomsName'] = "";
-                $arrShortListReplace['amountOfRooms'] = "";
-            }
-            if (isset($oneProperty['adjacentRooms']) && $oneProperty['adjacentRooms'] == "да") {
-                if (isset($oneProperty['amountOfAdjacentRooms']) && $oneProperty['amountOfAdjacentRooms'] != "0") {
-                    $arrShortListReplace['adjacentRooms'] = ", смежных: " . $oneProperty['amountOfAdjacentRooms'];
-                } else {
-                    $arrShortListReplace['adjacentRooms'] = ", смежные";
-                }
-            } else {
-                $arrShortListReplace['adjacentRooms'] = "";
-            }
-
-            // Площади помещений
-            $arrShortListReplace['areaValues'] = "";
-            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "квартира" && $oneProperty['typeOfObject'] != "дом" && $oneProperty['typeOfObject'] != "таунхаус" && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж") {
-                $arrShortListReplace['areaValues'] .= $oneProperty['roomSpace'];
-            }
-            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната") {
-                $arrShortListReplace['areaValues'] .= $oneProperty['totalArea'];
-            }
-            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната" && $oneProperty['typeOfObject'] != "гараж") {
-                $arrShortListReplace['areaValues'] .= " / " . $oneProperty['livingSpace'];
-            }
-            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж") {
-                $arrShortListReplace['areaValues'] .= " / " . $oneProperty['kitchenSpace'];
-            }
-
-            // Этаж
-            $arrShortListReplace['floorName'] = "";
-            $arrShortListReplace['floor'] = "";
-            if (isset($oneProperty['floor']) && isset($oneProperty['totalAmountFloor']) && $oneProperty['floor'] != "0" && $oneProperty['totalAmountFloor'] != "0") {
-                $arrShortListReplace['floorName'] = "Этаж:";
-                $arrShortListReplace['floor'] = $oneProperty['floor'] . " из " . $oneProperty['totalAmountFloor'];
-            }
-            if (isset($oneProperty['numberOfFloor']) && $oneProperty['numberOfFloor'] != "0") {
-                $arrShortListReplace['floorName'] = "Этажность:";
-                $arrShortListReplace['floor'] = $oneProperty['numberOfFloor'];
-            }
-
-            // Производим заполнение шаблона строки (блока) shortList таблицы по данному объекту недвижимости
-            // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне
-            $arrShortListTemplVar = array('{propertyId}', '{number}', '{actionFavorites}', '{imgFavorites}', '{fotosWrapper}', '{typeOfObject}', '{address}', '{costOfRenting}', '{currency}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{floorName}', '{floor}');
-            // Копируем html-текст шаблона блока (строки таблицы)
-            $currentAdvertShortList = str_replace($arrShortListTemplVar, $arrShortListReplace, $tmpl_shortAdvert);
-
-            return $currentAdvertShortList;
-        }
-
-        public function getFullParametersListItemHTML($oneProperty, $propertyFotosArr = FALSE, $favoritesPropertysId = array(), $number)
-        {
-            // Шаблон для блока (строки) с подробным описанием объекта недвижимости в таблице
-            $tmpl_extendedAdvert = "
-        <tr class='realtyObject' linkToDescription='objdescription.php?propertyId={propertyId}' propertyId='{propertyId}'>
-            <td>
-                <div class='numberOfRealtyObject'>{number}</div>
-                <span class='{actionFavorites} aloneStar' propertyId='{propertyId}'><img src='{imgFavorites}'></span>
-            </td>
-            <td>
-                {fotosWrapper}
-            </td>
-            <td>{typeOfObject}{district}{address}</td>
-            <td>{amountOfRooms}{adjacentRooms}</td>
-            <td>{areaValues}</td>
-            <td>{floor}</td>
-            <td>{furniture}</td>
-            <td>{costOfRenting}{utilities}{compensationMoney} ({compensationPercent}%)</td>
-        </tr>
-        ";
+            // Получим HTML шаблон блока из файла
+            $tmpl_extendedAdvert = file_get_contents('templates/searchResultBlocks/fullListItem.php');
 
             // Инициализируем массив, в который будут сохранены значения, используемые для замены констант в шаблоне
             $arrExtendedListReplace = array();
@@ -691,11 +506,11 @@
 
             // Фото
             $arrExtendedListReplace['fotosWrapper'] = "";
-            $arrExtendedListReplace['fotosWrapper'] = $this->getHTMLfotosWrapper("small", TRUE, TRUE, $propertyFotosArr);
+            $arrExtendedListReplace['fotosWrapper'] = $this->getHTMLfotosWrapper("small", TRUE, TRUE, $oneProperty['propertyFotos']);
 
             // Тип
-            $arrExtendedListReplace['typeOfObject'] = "<br><br>";
-            if (isset($oneProperty['typeOfObject'])) $arrExtendedListReplace['typeOfObject'] = GlobFunc::getFirstCharUpper($oneProperty['typeOfObject']) . "<br><br>";
+            $arrExtendedListReplace['typeOfObject'] = "<br>";
+            if (isset($oneProperty['typeOfObject'])) $arrExtendedListReplace['typeOfObject'] = GlobFunc::getFirstCharUpper($oneProperty['typeOfObject']) . "<br>";
 
             // Район
             $arrExtendedListReplace['district'] = "";
@@ -778,10 +593,21 @@
         }
 
         // Возвращает HTML, который нужно поместить на страницу при отсутствии результатов поиска
-        public function searchResultIsEmptyHTML($typeOfRequest, $allAmountAdverts)
+        public function searchResultIsEmptyHTML($typeOfRequest)
         {
-
             $searchResultHTML = "";
+
+            // Вычисляем сколько всего опубликовано объявлений
+            $res = DBconnect::get()->query("SELECT COUNT(*) FROM property WHERE status = 'опубликовано'");
+            if ((DBconnect::get()->errno)
+                OR (($amountOfRows = $res->fetch_row()) === NULL)
+            ) {
+                // Логируем ошибку
+                //TODO: сделать логирование ошибки
+                $allAmountAdverts = "";
+            } else {
+                $allAmountAdverts = $amountOfRows[0];
+            }
 
             if ($typeOfRequest == "search") $searchResultHTML .= "
                     <tr><td><div style='margin-top: 2em; margin-left: 1em;'>
@@ -797,7 +623,6 @@
                     ";
 
             return $searchResultHTML;
-
         }
 
         // Возвращает HTML для списка объектов недвижимости собственника

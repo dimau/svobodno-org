@@ -225,8 +225,6 @@ function init() {
     }
 
     function placeMarkers() {
-        // Получаем массив объектов, каждый из которых соответствует одному объявлению, в свою очередь соответствующему поисковому запросу пользователя. Массив включает в себя ВСЕ объекты из БД, которые соответствуют запросу пользователя
-        var realtyBalloons = getElementsByClass('balloonBlock', document.getElementById("allBalloons"));
 
         // Создаем кластеризатор. Который будет объединять в 1 метку близко расположенные метки и будет масштабироваться по клику
         cluster = new ymaps.Clusterer();
@@ -239,17 +237,11 @@ function init() {
         placemarks = [];
 
         // Перебираем данные для всех баллунов и готовим соответствующие метки на карту
-        for (var i = 0; i < realtyBalloons.length; i++) {
-
-            // Получаем описание и координаты очередного объекта недвижимости из атрибутов html объекта
-            //var balloonContentBodyVar = $(realtyBalloons[i]).html();
-            var realtyObjCoordX = $(realtyBalloons[i]).attr('coordX');
-            var realtyObjCoordY = $(realtyBalloons[i]).attr('coordY');
-            var realtyObjId = $(realtyBalloons[i]).attr('propertyid');
+        for (var i = 0; i < allProperties.length; i++) {
 
             // Создаем метку на основе координат
-            myPlacemark = new ymaps.Placemark([realtyObjCoordX, realtyObjCoordY], {
-                propertyid:realtyObjId,
+            myPlacemark = new ymaps.Placemark([allProperties[i]['coordX'], allProperties[i]['coordY']], {
+                propertyid:allProperties[i]['id'],
                 balloonContentBody:'Загрузка данных...' // Текст для индикации процесса загрузки (будет заменен на контент когда данные загрузятся)
             });
 
@@ -315,7 +307,7 @@ function init() {
 
 
     /* Вешаем обработчик на клик по строчке краткого списка - чтобы отобразить инфу в виде баллуна на карте */
-    $(document).on('click', "#shortListOfRealtyObjects tr.realtyObject", function (event) {
+    $(document).on('click', "#shortListOfRealtyObjects .realtyObject", function (event) {
         var target = event.target;
 
         var propertyId = $(this).attr('propertyId');

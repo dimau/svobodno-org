@@ -13,6 +13,7 @@
     $allDistrictsInCity = $dataArr['allDistrictsInCity'];
     $isLoggedIn = $dataArr['isLoggedIn'];
     $propertyLightArr = $dataArr['propertyLightArr'];
+    $propertyFullArr = $dataArr['propertyFullArr'];
     $favoritesPropertysId = $dataArr['favoritesPropertysId'];
     $whatPage = $dataArr['whatPage']; // Режим в котором будет работать шаблон для редактирования поискового запроса (templ_editableSearchRequest.php)
     $tabsId = $dataArr['tabsId']; // Идентификатор вкладки, которая будет открыта по умолчанию после загрузки страницы
@@ -71,23 +72,6 @@
         }
     </style>
 
-    <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <!-- Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера -->
-    <script>
-        if (typeof jQuery === 'undefined') document.write("<scr" + "ipt src='js/vendor/jquery-1.7.2.min.js'></scr" + "ipt>");
-    </script>
-    <!-- jQuery UI с моей темой оформления -->
-    <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
-    <!-- Русификатор виджета календарь -->
-    <script src="js/vendor/jquery.ui.datepicker-ru.js"></script>
-    <!-- Загрузчик фотографий на AJAX -->
-    <script src="js/vendor/fileuploader.js" type="text/javascript"></script>
-    <!-- ColorBox - плагин jQuery, позволяющий делать модальное окно для просмотра фотографий -->
-    <script src="js/vendor/jquery.colorbox-min.js"></script>
-    <!-- Загружаем библиотеку для работы с картой от Яндекса -->
-    <script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
-
 </head>
 
 <body>
@@ -133,6 +117,30 @@
     <?php
     // Модальное окно для незарегистрированных пользователей, которые нажимают на кнопку добавления в Избранное
     if ($isLoggedIn === FALSE) include "templates/templ_addToFavotitesDialog_ForLoggedOut.php";
+    ?>
+
+    <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <!-- Если jQuery с сервера Google недоступна, то загружаем с моего локального сервера -->
+    <script>
+        if (typeof jQuery === 'undefined') document.write("<scr" + "ipt src='js/vendor/jquery-1.7.2.min.js'></scr" + "ipt>");
+    </script>
+    <!-- jQuery UI с моей темой оформления -->
+    <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
+    <!-- Русификатор виджета календарь -->
+    <script src="js/vendor/jquery.ui.datepicker-ru.js"></script>
+    <!-- Загрузчик фотографий на AJAX -->
+    <script src="js/vendor/fileuploader.js" type="text/javascript"></script>
+    <!-- ColorBox - плагин jQuery, позволяющий делать модальное окно для просмотра фотографий -->
+    <script src="js/vendor/jquery.colorbox-min.js"></script>
+    <!-- Загружаем библиотеку для работы с картой от Яндекса -->
+    <script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
+
+    <?php
+        // Пока пользователь любуется заголовком страницы, а браузер загружает нужные библиотеки, вычислим представление для результатов поиска (избранных объявлений). Размещать же его на странице мы будем несколько позже
+        $matterOfBalloonList = $this->getMatterOfBalloonList($propertyFullArr, $favoritesPropertysId, "favorites");
+        $matterOfShortList = $this->getMatterOfShortList($propertyFullArr, $favoritesPropertysId, "favorites");
+        $matterOfFullParametersList = $this->getMatterOfFullParametersList($propertyFullArr, $favoritesPropertysId, "favorites");
     ?>
 
     <div class="page_main_content">
@@ -287,18 +295,12 @@
 
             </div>
             <!-- /end.tabs-4 -->
+
             <div id="tabs-5">
-
                 <?php
-                // Для целей ускорения загрузки перенес блок php кода сюда - это позволит браузеру грузить нужные библиотеки в то время, как сервер будет готовить представление для таблиц с данными об объектах недвижимости
-
-                /***************************************************************************************************************
-                 * Оформляем полученные объявления в красивый HTML для размещения на странице
-                 **************************************************************************************************************/
-                echo $this->getSearchResultHTML($propertyLightArr, $favoritesPropertysId, "favorites");
-
+                    // Размещаем на странице HTML для результатов поиска (списка избранных объектов недвижимости)
+                    include("templates/templ_searchResult.php");
                 ?>
-
             </div>
 
         </div>
@@ -321,6 +323,9 @@
     // Сервер сохранит в эту переменную данные о загруженных фотографиях в формате JSON
     // Переменная uploadedFoto содержит массив объектов, каждый из которых представляет информацию по 1 фотографии
     var uploadedFoto = JSON.parse('<?php echo json_encode($userFotoInformation['uploadedFoto']);?>');
+    // Сервер сохранит в эту переменную данные об объектах недвижимости в формате JSON
+    // Переменная allProperties содержит массив объектов, каждый из которых представляет информацию по 1 объявлению
+    var allProperties = JSON.parse('<?php echo json_encode($propertyLightArr);?>');
 </script>
 <script src="js/main.js"></script>
 <script src="js/personal.js"></script>

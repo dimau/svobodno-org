@@ -176,7 +176,7 @@
      * ИЗБРАННОЕ. Получаем данные по каждому избранному объявлению из БД (это позволит наполнить вкладку tabs-5)
      **************************************************************************************************************/
 
-    $propertyLightArr = $incomingUser->getPropertyLightArrForFavorites();
+    $incomingUser->searchProperties(20);
 
     /********************************************************************************
      * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
@@ -195,7 +195,8 @@
                                                 'correctEditProfileParameters' => $correctEditProfileParameters,
                                                 'allDistrictsInCity' => $allDistrictsInCity,
                                                 'isLoggedIn' => $incomingUser->login(),
-                                                'propertyLightArr' => $propertyLightArr,
+                                                'propertyLightArr' => $incomingUser->getPropertyLightArr(),
+                                                'propertyFullArr' => $incomingUser->getPropertyFullArr(),
                                                 'favoritesPropertysId' => $incomingUser->getFavoritesPropertysId(),
                                                 'whatPage' => "forPersonalPage",
                                                 'tabsId' => $tabsId, // Указывает вкладку (идентификатор), которая откроется при загрузке страницы

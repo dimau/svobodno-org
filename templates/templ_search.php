@@ -2,6 +2,7 @@
     // Инициализируем используемые в шаблоне переменные
     $whatPage = $dataArr['whatPage'];
     $propertyLightArr = $dataArr['propertyLightArr'];
+    $propertyFullArr = $dataArr['propertyFullArr'];
     $userSearchRequest = $dataArr['userSearchRequest'];
     $allDistrictsInCity = $dataArr['allDistrictsInCity'];
     $isLoggedIn = $dataArr['isLoggedIn'];
@@ -49,6 +50,15 @@
             margin-left: 6px;
         }
     </style>
+</head>
+
+<body>
+<div class="page_without_footer">
+
+    <?php
+        // Сформируем и вставим заголовок страницы
+        include("templates/templ_header.php");
+    ?>
 
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
@@ -63,17 +73,11 @@
     <!-- Загружаем библиотеку для работы с картой от Яндекса -->
     <script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
 
-</head>
-
-<body>
-<div class="page_without_footer">
-
     <?php
-        // Сформируем и вставим заголовок страницы
-        include("templates/templ_header.php");
-
-        // Для целей ускорения загрузки перенес блок php кода по формированию HTML результатов поиска сюда - это позволит браузеру грузить нужные библиотеки в то время, как сервер будет готовить представление для таблиц с данными об объектах недвижимости
-        $searchResultHTML = $this->getSearchResultHTML($propertyLightArr, $favoritesPropertysId, "search");
+        // Пока пользователь любуется заголовком страницы, а браузер загружает нужные библиотеки, вычислим представление для результатов поиска. Размещать же его на странице мы будем несколько позже
+        $matterOfBalloonList = $this->getMatterOfBalloonList($propertyFullArr, $favoritesPropertysId, "search");
+        $matterOfShortList = $this->getMatterOfShortList($propertyFullArr, $favoritesPropertysId, "search");
+        $matterOfFullParametersList = $this->getMatterOfFullParametersList($propertyFullArr, $favoritesPropertysId, "search");
     ?>
 
     <div class="page_main_content">
@@ -157,13 +161,10 @@
             </div>
             <!-- /end.tabs-2 -->
         </div>
-        <!-- /end.tabs -->
 
         <?php
-        /***************************************************************************************************************
-         * Размещаем на странице полученный с сервера HTML для результатов поиска
-         **************************************************************************************************************/
-        echo $searchResultHTML;
+            // Размещаем на странице HTML для результатов поиска
+            include("templates/templ_searchResult.php");
         ?>
 
         <?php
@@ -183,6 +184,11 @@
 <!-- /end.footer -->
 
 <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
+<script>
+    // Сервер сохранит в эту переменную данные об объектах недвижимости в формате JSON
+    // Переменная allProperties содержит массив объектов, каждый из которых представляет информацию по 1 объявлению
+    var allProperties = JSON.parse('<?php echo json_encode($propertyLightArr);?>');
+</script>
 <script src="js/main.js"></script>
 <script src="js/searchResult.js"></script>
 <script>
