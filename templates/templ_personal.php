@@ -1,27 +1,3 @@
-<?php
-    // Инициализируем используемые в шаблоне переменные
-    $userCharacteristic = $dataArr['userCharacteristic'];
-    $userFotoInformation = $dataArr['userFotoInformation'];
-    $userSearchRequest = $dataArr['userSearchRequest'];
-    $allPropertiesCharacteristic = $dataArr['allPropertiesCharacteristic'];
-    $allPropertiesFotoInformation = $dataArr['allPropertiesFotoInformation'];
-    $allPropertiesTenantPretenders = $dataArr['allPropertiesTenantPretenders'];
-    $errors = $dataArr['errors'];
-    $correctNewSearchRequest = $dataArr['correctNewSearchRequest'];
-    $correctEditSearchRequest = $dataArr['correctEditSearchRequest'];
-    $correctEditProfileParameters = $dataArr['correctEditProfileParameters'];
-    $allDistrictsInCity = $dataArr['allDistrictsInCity'];
-    $isLoggedIn = $dataArr['isLoggedIn'];
-    $propertyLightArr = $dataArr['propertyLightArr'];
-    $propertyFullArr = $dataArr['propertyFullArr'];
-    $favoritesPropertysId = $dataArr['favoritesPropertysId'];
-    $whatPage = $dataArr['whatPage']; // Режим в котором будет работать шаблон для редактирования поискового запроса (templ_editableSearchRequest.php)
-    $tabsId = $dataArr['tabsId']; // Идентификатор вкладки, которая будет открыта по умолчанию после загрузки страницы
-    $mode = $dataArr['mode']; // Режим в котором будет работать шаблон анкеты пользователя на вкладке №1 (templ_notEditedProfile.php)
-    $messagesArr = $dataArr['messagesArr']; // массив массивов, каждый из которых представляет инфу по 1-ому сообщению (новости пользователя)
-    $amountUnreadMessages = $dataArr['amountUnreadMessages'];
-?>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -138,9 +114,9 @@
 
     <?php
         // Пока пользователь любуется заголовком страницы, а браузер загружает нужные библиотеки, вычислим представление для результатов поиска (избранных объявлений). Размещать же его на странице мы будем несколько позже
-        $matterOfBalloonList = $this->getMatterOfBalloonList($propertyFullArr, $favoritesPropertysId, "favorites");
-        $matterOfShortList = $this->getMatterOfShortList($propertyFullArr, $favoritesPropertysId, "favorites");
-        $matterOfFullParametersList = $this->getMatterOfFullParametersList($propertyFullArr, $favoritesPropertysId, "favorites");
+        $matterOfBalloonList = View::getMatterOfBalloonList($propertyFullArr, $favoritesPropertysId, "favorites");
+        $matterOfShortList = View::getMatterOfShortList($propertyFullArr, $favoritesPropertysId, 1, "favorites");
+        $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullArr, $favoritesPropertysId, 1, "favorites");
     ?>
 
     <div class="page_main_content">
@@ -179,7 +155,7 @@
                     <?php
 
                     // Формируем и размещаем на странице блок для основной фотографии пользователя
-                    echo $this->getHTMLfotosWrapper("middle", TRUE, FALSE, $userFotoInformation['uploadedFoto']);
+                    echo View::getHTMLfotosWrapper("middle", TRUE, FALSE, $userFotoInformation['uploadedFoto']);
 
                     // Вставляем анкетные данные пользователя
                     include ("templates/templ_notEditedProfile.php");
@@ -222,7 +198,7 @@
             <div id="tabs-2">
                 <?php
                     // Формируем и выдаем HTML списка сообщений (новостей) пользователя
-                    echo $this->getHTMLforMessages($messagesArr);
+                    echo View::getHTMLforMessages($messagesArr);
                 ?>
             </div>
 
@@ -232,7 +208,7 @@
                 </a>
 
                 <?php
-                echo $this->getHTMLforOwnersCollectionProperty($allPropertiesCharacteristic, $allPropertiesFotoInformation, $allPropertiesTenantPretenders);
+                echo View::getHTMLforOwnersCollectionProperty($allPropertiesCharacteristic, $allPropertiesFotoInformation, $allPropertiesTenantPretenders);
                 ?>
 
             </div>

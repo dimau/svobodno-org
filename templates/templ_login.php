@@ -1,10 +1,3 @@
-<?php
-    // Инициализируем используемые в шаблоне переменные
-    $errors = $dataArr['errors'];
-    $isLoggedIn = $dataArr['isLoggedIn'];
-    $amountUnreadMessages = $dataArr['amountUnreadMessages'];
-?>
-
 <!DOCTYPE html>
 <html>
 <head>

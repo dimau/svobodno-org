@@ -60,10 +60,10 @@ class DBconnect
     // Функция возвращает подробные сведения по объектам недвижимости из БД
     // В случае ошибки возвращает FALSE, елси данные получить не удалось, то пустой массив
     // На входе - отсортированный массив id объектов недвижимости
+    // $mode - режим работы. "all" - выдать данные по всем объектам (вне зависимости опубликованы они или нет), "published" - выдать данные только по опубликованным объектам
     // На выходе - отсортированный в том же порядке массив ассоциативных массивов, каждый из которых содержит все параметры одного объекта, в том числе его фотографии
-    public static function getFullDataAboutProperties($propertiesId)
+    public static function getFullDataAboutProperties($propertiesId, $mode)
     {
-
         // Проверка входного массива
         if (!isset($propertiesId) || !is_array($propertiesId)) return FALSE;
 
@@ -79,6 +79,9 @@ class DBconnect
             if ($i < $limit - 1) $strWHERE .= " OR";
         }
         $strWHERE .= ")";
+
+        // Если требуется режим получения данных только по опубликованным объектам, то реализуем его
+        if ($mode == "published") $strWHERE .= " AND (status = 'опубликовано')";
 
         // Узнаем анкетные данные о наших объектах
         $res = DBconnect::get()->query("SELECT * FROM property WHERE" . $strWHERE);

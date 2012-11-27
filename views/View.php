@@ -1,19 +1,14 @@
 <?php
+	/* Статический класс, содержащий методы, используемые при формировании представления (HTML) */
 
     class View
     {
-        // КОНСТРУКТОР
-        public function __construct() {}
-
-        // Генерация HTML страницы через заполнение шаблона $templ данными $dataArr
-        public function generate($templ, $dataArr)
-        {
-            include "templates/" . $templ;
-        }
+        // КОНСТРУКТОР делаем недоступным для вызова - данный класс является статическим и не нуждается в создании экземпляров
+        private function __construct() {}
 
         // Метод возвращает блок (div) для отображения фотографии (и, если нужно, по клику галереи фотографий) пользователя
         // На входе: $sizeForPrimary - размер основной фотографии (small, middle, big); $isInteractive - нужно ли по клику включать галерею фотографий(TRUE- нужно, FALSE - нет), $forTable - блок будет размещаться в таблице? (если TRUE - блок центрируется)
-        public function getHTMLfotosWrapper($sizeForPrimary = "small", $isInteractive = FALSE, $forTable = FALSE, $uploadedFoto = FALSE)
+        public static function getHTMLfotosWrapper($sizeForPrimary = "small", $isInteractive = FALSE, $forTable = FALSE, $uploadedFoto = FALSE)
         {
 
             // Шаблон для формируемого HTML блока с фотографиями
@@ -93,7 +88,7 @@
         // Метод возвращает строку команды добавления в избранное или удаления из избранного в зависимости от ситуации
         // На входе: $propertyId - id объекта недвижимости, для которого формируется строка, $favoritesPropertysId - массив идентификаторов всех избранных объявлений недвижимости данного пользователя,
         // $typeOfHTML - задает используемый шаблон. Если = "onlyIcon" - выдается шаблон исключительно с иконкой избранного. Если = "stringWithIcon" - выдается строка и иконка избранного
-        public function getHTMLforFavorites($propertyId = 0, $favoritesPropertysId = array(), $typeOfHTML = "stringWithIcon")
+        public static function getHTMLforFavorites($propertyId = 0, $favoritesPropertysId = array(), $typeOfHTML = "stringWithIcon")
         {
 
             // Шаблон для формируемого HTML блока с командой добавления в избранное / удаления из избранного
@@ -145,7 +140,7 @@
          * @param $typeOfRequest - тип запроса ("search" - для страницы поиска, "favorites" - для личного кабинета, вкладка Избранное)
          * @return string - возвращаем строку, содержащую HTML для списка баллунов
          */
-        public function getMatterOfBalloonList($propertyFullArr, $favoritesPropertysId, $typeOfRequest) {
+        public static function getMatterOfBalloonList($propertyFullArr, $favoritesPropertysId, $typeOfRequest) {
 
             // Проверка входящих параметров
             if (!isset($propertyFullArr) || !is_array($propertyFullArr)) return "";
@@ -159,7 +154,7 @@
             // Перебираем входящий массив ($propertyFullArr), создавая соответствующие баллуны для каждого объекта недвижимости
             for ($i = 0; $i < count($propertyFullArr); $i++ ) {
                 // Получаем HTML для баллуна и добавляем его в общую копилку
-                $matterOfBalloonList .= $this->getFullBalloonHTML($propertyFullArr[$i], $favoritesPropertysId);
+                $matterOfBalloonList .= View::getFullBalloonHTML($propertyFullArr[$i], $favoritesPropertysId);
             }
 
             return $matterOfBalloonList;
@@ -170,10 +165,11 @@
          *
          * @param $propertyFullArr - массив массивов, содержащий подробные сведения по объектам недвижимости, для которых и нужно построить список
          * @param $favoritesPropertysId - массив идентификаторов избранных объектов пользователя
+         * @param $number - число, с которого нужно начать нумеровать по порядку объявления в формируемом списке
          * @param $typeOfRequest - тип запроса ("search" - для страницы поиска, "favorites" - для личного кабинета, вкладка Избранное)
          * @return string - возвращаем строку, содержащую HTML для списка
          */
-        public function getMatterOfShortList($propertyFullArr, $favoritesPropertysId, $typeOfRequest){
+        public static function getMatterOfShortList($propertyFullArr, $favoritesPropertysId, $number, $typeOfRequest){
 
             // Проверка входящих параметров
             if (!isset($propertyFullArr) || !is_array($propertyFullArr)) return "";
@@ -187,11 +183,11 @@
             // Перебираем входящий массив ($propertyFullArr), создавая соответствующие блоки для каждого объекта недвижимости
             for ($i = 0; $i < count($propertyFullArr); $i++ ) {
                 // Получаем HTML для блока и добавляем его в общую копилку
-                $matterOfShortList .= $this->getShortListItemHTML($propertyFullArr[$i], $favoritesPropertysId, $i + 1);
+                $matterOfShortList .= View::getShortListItemHTML($propertyFullArr[$i], $favoritesPropertysId, $number + $i);
             }
 
             // Если не нашлось ни одного объекта - возвращаем специальное сообщение
-            if ($matterOfShortList == "") $matterOfShortList = $this->searchResultIsEmptyHTML($typeOfRequest);
+            if ($matterOfShortList == "") $matterOfShortList = View::searchResultIsEmptyHTML($typeOfRequest);
 
             return $matterOfShortList;
         }
@@ -201,10 +197,11 @@
          *
          * @param $propertyFullArr - массив массивов, содержащий подробные сведения по объектам недвижимости, для которых и нужно построить список
          * @param $favoritesPropertysId - массив идентификаторов избранных объектов пользователя
+         * @param $number - число, с которого нужно начать нумеровать по порядку объявления в формируемом списке
          * @param $typeOfRequest - тип запроса ("search" - для страницы поиска, "favorites" - для личного кабинета, вкладка Избранное)
          * @return string - возвращаем строку, содержащую HTML для списка
          */
-        public function getMatterOfFullParametersList($propertyFullArr, $favoritesPropertysId, $typeOfRequest){
+        public static function getMatterOfFullParametersList($propertyFullArr, $favoritesPropertysId, $number, $typeOfRequest){
 
             // Проверка входящих параметров
             if (!isset($propertyFullArr) || !is_array($propertyFullArr)) return "";
@@ -218,11 +215,11 @@
             // Перебираем входящий массив ($propertyFullArr), создавая соответствующие блоки для каждого объекта недвижимости
             for ($i = 0; $i < count($propertyFullArr); $i++ ) {
                 // Получаем HTML для блока и добавляем его в общую копилку
-                $matterOfFullParametersList .= $this->getFullParametersListItemHTML($propertyFullArr[$i], $favoritesPropertysId, $i + 1);
+                $matterOfFullParametersList .= View::getFullParametersListItemHTML($propertyFullArr[$i], $favoritesPropertysId, $number + $i);
             }
 
             // Если не нашлось ни одного объекта - возвращаем специальное сообщение
-            if ($matterOfFullParametersList == "") $matterOfFullParametersList = $this->searchResultIsEmptyHTML($typeOfRequest);
+            if ($matterOfFullParametersList == "") $matterOfFullParametersList = View::searchResultIsEmptyHTML($typeOfRequest);
 
             return $matterOfFullParametersList;
         }
@@ -234,7 +231,7 @@
          * @param array $favoritesPropertysId - массив со списком идентификаторов избранных объектов текущего пользователя
          * @return mixed - строка HTML в соответствии с шаблоном баллуна
          */
-        public function getFullBalloonHTML($oneProperty, $favoritesPropertysId = array())
+        public static function getFullBalloonHTML($oneProperty, $favoritesPropertysId = array())
         {
             // Получим HTML шаблон блока из файла
             $templ = file_get_contents('templates/searchResultBlocks/fullBalloonListItem.php');
@@ -262,7 +259,7 @@
 
             // Фото
             $arrBalloonReplace['fotosWrapper'] = "";
-            $arrBalloonReplace['fotosWrapper'] = $this->getHTMLfotosWrapper("small", TRUE, FALSE, $oneProperty['propertyFotos']);
+            $arrBalloonReplace['fotosWrapper'] = View::getHTMLfotosWrapper("small", TRUE, FALSE, $oneProperty['propertyFotos']);
 
             // Все, что касается СТОИМОСТИ АРЕНДЫ
             $arrBalloonReplace['costOfRenting'] = "";
@@ -338,7 +335,7 @@
             }
 
             // Избранное
-            if (!($arrBalloonReplace['favorites'] = $this->getHTMLforFavorites($oneProperty['id'], $favoritesPropertysId, "stringWithIcon"))) {
+            if (!($arrBalloonReplace['favorites'] = View::getHTMLforFavorites($oneProperty['id'], $favoritesPropertysId, "stringWithIcon"))) {
                 $arrBalloonReplace['favorites'] = "";
             }
 
@@ -359,7 +356,7 @@
          * @param $number - указывает какое число нужно присвоить блоку для его нумераци в выдаче
          * @return mixed - строка HTML в соответствии с шаблоном блока с кратким описанием объекта недвижимости
          */
-       public function getShortListItemHTML($oneProperty, $favoritesPropertysId = array(), $number)
+       public static function getShortListItemHTML($oneProperty, $favoritesPropertysId = array(), $number)
        {
            // Получим HTML шаблон блока из файла
            $tmpl_shortAdvert = file_get_contents('templates/searchResultBlocks/shortListItem.php');
@@ -393,7 +390,7 @@
 
            // Фото
            $arrShortListReplace['fotosWrapper'] = "";
-           $arrShortListReplace['fotosWrapper'] = $this->getHTMLfotosWrapper("small", TRUE, TRUE, $oneProperty['propertyFotos']);
+           $arrShortListReplace['fotosWrapper'] = View::getHTMLfotosWrapper("small", TRUE, TRUE, $oneProperty['propertyFotos']);
 
            // Тип
            $arrShortListReplace['typeOfObject'] = "";
@@ -473,7 +470,7 @@
          * @param $number - указывает какое число нужно присвоить блоку для его нумераци в выдаче
          * @return mixed - строка HTML в соответствии с шаблоном блока с подробным описанием объекта недвижимости
          */
-        public function getFullParametersListItemHTML($oneProperty, $favoritesPropertysId = array(), $number)
+        public static function getFullParametersListItemHTML($oneProperty, $favoritesPropertysId = array(), $number)
         {
             // Получим HTML шаблон блока из файла
             $tmpl_extendedAdvert = file_get_contents('templates/searchResultBlocks/fullListItem.php');
@@ -506,7 +503,7 @@
 
             // Фото
             $arrExtendedListReplace['fotosWrapper'] = "";
-            $arrExtendedListReplace['fotosWrapper'] = $this->getHTMLfotosWrapper("small", TRUE, TRUE, $oneProperty['propertyFotos']);
+            $arrExtendedListReplace['fotosWrapper'] = View::getHTMLfotosWrapper("small", TRUE, TRUE, $oneProperty['propertyFotos']);
 
             // Тип
             $arrExtendedListReplace['typeOfObject'] = "<br>";
@@ -593,7 +590,7 @@
         }
 
         // Возвращает HTML, который нужно поместить на страницу при отсутствии результатов поиска
-        public function searchResultIsEmptyHTML($typeOfRequest)
+        public static function searchResultIsEmptyHTML($typeOfRequest)
         {
             $searchResultHTML = "";
 
@@ -626,7 +623,7 @@
         }
 
         // Возвращает HTML для списка объектов недвижимости собственника
-        public function getHTMLforOwnersCollectionProperty($allPropertiesCharacteristic = array(), $allPropertiesFotoInformation = FALSE, $allPropertiesTenantPretenders = FALSE)
+        public static function getHTMLforOwnersCollectionProperty($allPropertiesCharacteristic = array(), $allPropertiesFotoInformation = FALSE, $allPropertiesTenantPretenders = FALSE)
         {
             // Шаблон блока с описанием отдельного объекта недвижимости
             $tmpl_MyAdvert = "
@@ -714,7 +711,7 @@
                 // Фото
                 $arrMyAdvertReplace['fotosWrapper'] = "";
                 if ($allPropertiesFotoInformation != FALSE) $fotosArr = $allPropertiesFotoInformation[$i]; else $fotosArr = array();
-                $arrMyAdvertReplace['fotosWrapper'] = $this->getHTMLfotosWrapper("small", FALSE, FALSE, $fotosArr);
+                $arrMyAdvertReplace['fotosWrapper'] = View::getHTMLfotosWrapper("small", FALSE, FALSE, $fotosArr);
 
                 // Корректируем список инструкций, доступных пользователю
                 $arrMyAdvertReplace['instructionPublish'] = "";
@@ -813,7 +810,7 @@
          * @param $messagesArr - массив ассоциированных массивов, каждый из которых представляет сведения по 1 новости
          * @return string
          */
-        public function getHTMLforMessages($messagesArr) {
+        public static function getHTMLforMessages($messagesArr) {
 
             // Если массив с сообщениями (новостями) пользователя не передан, то возвращаем пустую строку вместо HTML
             if (!isset($messagesArr) || !is_array($messagesArr) || count($messagesArr) == 0) {
@@ -828,10 +825,10 @@
             // Перебираем все новости, формируя для каждой на основе шаблона, блок и, складывая в общий HTML
             for ($i = 0, $s = count($messagesArr); $i < $s; $i++) {
 
-                if ($messagesArr[$i]['messageType'] == "newProperty") $allMessagesHTML .= $this->getHTMLforMessageNewProperty($messagesArr[$i]);
-                if ($messagesArr[$i]['messageType'] == "newTenant") $allMessagesHTML .= $this->getHTMLforMessageNewTenant($messagesArr[$i]);
-                if ($messagesArr[$i]['messageType'] == "requestToViewConfirmed") $allMessagesHTML .= $this->getHTMLforMessageRequestToViewConfirmed($messagesArr[$i]);
-                if ($messagesArr[$i]['messageType'] == "editedTimeToView") $allMessagesHTML .= $this->getHTMLforMessageEditedTimeToView($messagesArr[$i]);
+                if ($messagesArr[$i]['messageType'] == "newProperty") $allMessagesHTML .= View::getHTMLforMessageNewProperty($messagesArr[$i]);
+                if ($messagesArr[$i]['messageType'] == "newTenant") $allMessagesHTML .= View::getHTMLforMessageNewTenant($messagesArr[$i]);
+                if ($messagesArr[$i]['messageType'] == "requestToViewConfirmed") $allMessagesHTML .= View::getHTMLforMessageRequestToViewConfirmed($messagesArr[$i]);
+                if ($messagesArr[$i]['messageType'] == "editedTimeToView") $allMessagesHTML .= View::getHTMLforMessageEditedTimeToView($messagesArr[$i]);
             }
 
             return $allMessagesHTML;
@@ -843,7 +840,7 @@
          * @param $sourceArr - ассоциированный массив со сведениями о сообщении (новости)
          * @return mixed|string
          */
-        public function getHTMLforMessageNewProperty($sourceArr)
+        public static function getHTMLforMessageNewProperty($sourceArr)
         {
             // Шаблон блока
             $templ = "
@@ -898,7 +895,7 @@
 
             // Фото
             $valuesArr['fotosWrapper'] = "";
-            $valuesArr['fotosWrapper'] = $this->getHTMLfotosWrapper("small", FALSE, FALSE, $sourceArr['fotoArr']);
+            $valuesArr['fotosWrapper'] = View::getHTMLfotosWrapper("small", FALSE, FALSE, $sourceArr['fotoArr']);
 
             // Идентификатор объекта
             $valuesArr['propertyId'] = "";
@@ -979,7 +976,7 @@
          * @param $sourceArr - ассоциированный массив со сведениями о сообщении (новости)
          * @return mixed|string
          */
-        public function getHTMLforMessageNewTenant($sourceArr)
+        public static function getHTMLforMessageNewTenant($sourceArr)
         {
             // Шаблон блока
             $templ = "
@@ -1041,7 +1038,7 @@
 
             // Фото
             $valuesArr['fotosWrapper'] = "";
-            $valuesArr['fotosWrapper'] = $this->getHTMLfotosWrapper("small", FALSE, FALSE, $sourceArr['fotoArr']);
+            $valuesArr['fotosWrapper'] = View::getHTMLfotosWrapper("small", FALSE, FALSE, $sourceArr['fotoArr']);
 
             // Идентификатор объекта
             $valuesArr['targetId'] = "";
@@ -1082,7 +1079,7 @@
          * @return mixed|string
          * TODO: реализовать
          */
-        public function getHTMLforMessageRequestToViewConfirmed($sourceArr)
+        public static function getHTMLforMessageRequestToViewConfirmed($sourceArr)
         {
             // Шаблон блока
             $templ = "
@@ -1137,7 +1134,7 @@
 
             // Фото
             $valuesArr['fotosWrapper'] = "";
-            $valuesArr['fotosWrapper'] = $this->getHTMLfotosWrapper("small", FALSE, FALSE, $sourceArr['fotoArr']);
+            $valuesArr['fotosWrapper'] = View::getHTMLfotosWrapper("small", FALSE, FALSE, $sourceArr['fotoArr']);
 
             // Идентификатор объекта
             $valuesArr['propertyId'] = "";
@@ -1219,7 +1216,7 @@
          * @return mixed|string
          * TODO: реализовать
          */
-        public function getHTMLforMessageEditedTimeToView($sourceArr)
+        public static function getHTMLforMessageEditedTimeToView($sourceArr)
         {
             // Шаблон блока
             $templ = "
@@ -1274,7 +1271,7 @@
 
             // Фото
             $valuesArr['fotosWrapper'] = "";
-            $valuesArr['fotosWrapper'] = $this->getHTMLfotosWrapper("small", FALSE, FALSE, $sourceArr['fotoArr']);
+            $valuesArr['fotosWrapper'] = View::getHTMLfotosWrapper("small", FALSE, FALSE, $sourceArr['fotoArr']);
 
             // Идентификатор объекта
             $valuesArr['propertyId'] = "";

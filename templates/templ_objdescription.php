@@ -1,17 +1,3 @@
-<?php
-    // Инициализируем используемые в шаблоне переменные
-    $userCharacteristic = $dataArr['userCharacteristic']; // Но для данной страницы данный массив содержит только имя, отчество, фамилию, телефон пользователя
-    $propertyCharacteristic = $dataArr['propertyCharacteristic'];
-    $propertyFotoInformation = $dataArr['propertyFotoInformation'];
-    $isLoggedIn = $dataArr['isLoggedIn']; // Используется в templ_header.php и templ_signUpToViewItem.php
-    $favoritesPropertysId = $dataArr['favoritesPropertysId'];
-    $strHeaderOfPage = $dataArr['strHeaderOfPage'];
-    $signUpToViewData = $dataArr['signUpToViewData']; // Используется в templ_signUpToViewItem.php
-    $statusOfSaveParamsToDB = $dataArr['statusOfSaveParamsToDB']; // Используется в templ_signUpToViewItem.php
-    $errors = $dataArr['errors'];
-    $amountUnreadMessages = $dataArr['amountUnreadMessages'];
-?>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -215,7 +201,7 @@
                 <div>
                     <?php
                     // Формируем и размещаем на странице блок для фотографий объекта недвижимости
-                    echo $this->getHTMLfotosWrapper("middle", TRUE, FALSE, $propertyFotoInformation['uploadedFoto']);
+                    echo View::getHTMLfotosWrapper("middle", TRUE, FALSE, $propertyFotoInformation['uploadedFoto']);
                     ?>
 
                     <ul class="setOfInstructions">
@@ -225,7 +211,7 @@
                         ?>
                         <li>
                             <?php
-                            echo $this->getHTMLforFavorites($propertyCharacteristic["id"], $favoritesPropertysId, "stringWithIcon");
+                            echo View::getHTMLforFavorites($propertyCharacteristic["id"], $favoritesPropertysId, "stringWithIcon");
                             ?>
                         </li>
                         <!-- TODO: добавить функциональность!
@@ -569,7 +555,7 @@
                     ?>
                     <li>
                         <?php
-                        echo $this->getHTMLforFavorites($propertyCharacteristic["id"], $favoritesPropertysId, "stringWithIcon");
+                        echo View::getHTMLforFavorites($propertyCharacteristic["id"], $favoritesPropertysId, "stringWithIcon");
                         ?>
                     </li>
                     <!-- TODO: добавить функциональность!

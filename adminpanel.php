@@ -58,9 +58,12 @@
      * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
      *******************************************************************************/
 
-    $view = new View();
-    $view->generate("templ_adminpanel.php", array('isLoggedIn' => $incomingUser->login(),
-                                                  'amountUnreadMessages' => $incomingUser->getAmountUnreadMessages()));
+    // Инициализируем используемые в шаблоне(ах) переменные
+    $isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
+    $amountUnreadMessages = $incomingUser->getAmountUnreadMessages();
+
+    // Подсоединяем нужный основной шаблон
+    include "templates/"."templ_adminpanel.php";
 
     /********************************************************************************
      * Закрываем соединение с БД

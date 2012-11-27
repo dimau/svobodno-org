@@ -29,44 +29,46 @@ var mapWrapper = document.getElementById("resultOnSearchPage");
 var mapWidth = 0;
 var mapLeftCoord = 0;
 
-$(window).scroll(function() {
+function changeMapPosition() {
 
     if (!$("#listPlusMap a").hasClass("inUse")) return true;
 
 // Если экран опустился ниже верхней границы карты, но карта не дошла до футера, то fixedTopBlock
 
-if (getPageScroll().top <= getCoords(mapWrapper).top) { // Если мы смотрим заголовок страницы
+    if (getPageScroll().top <= getCoords(mapWrapper).top) { // Если мы смотрим заголовок страницы
 
-    $(map).removeClass('fixedTopBlock');
-    $(map).removeClass('absoluteBottomBlock');
-
-    // Возвращаем исходные значения
-    $(map).css({'width': '', 'left': ''});
-
-} else { // Если мы проматали ниже заголовка страницы и верх карты достиг верха экрана
-
-    if (getPageScroll().top + map.offsetHeight >= getCoords(mapWrapper).top + mapWrapper.offsetHeight) { // Если мы дошли до подвала страницы
-
-    $(map).addClass('absoluteBottomBlock');
-    $(map).removeClass('fixedTopBlock');
-
-    // Возвращаем исходные значения
-    $(map).css({'width': '', 'left': ''});
-
-    } else { // Если мы просматриваем середину списка - фиксируем карту на экране
-
-        $(map).addClass('fixedTopBlock');
+        $(map).removeClass('fixedTopBlock');
         $(map).removeClass('absoluteBottomBlock');
 
-        // Важно оставить карту на экране в том же местоположении и той же ширины, что она была до прокрутки
-        $(map).css({'width': mapWidth, 'left': mapLeftCoord});
+        // Возвращаем исходные значения
+        $(map).css({'width': '', 'left': ''});
 
-    }
+    } else { // Если мы проматали ниже заголовка страницы и верх карты достиг верха экрана
+
+        if (getPageScroll().top + map.offsetHeight >= getCoords(mapWrapper).top + mapWrapper.offsetHeight) { // Если мы дошли до подвала страницы
+
+            $(map).addClass('absoluteBottomBlock');
+            $(map).removeClass('fixedTopBlock');
+
+            // Возвращаем исходные значения
+            $(map).css({'width': '', 'left': ''});
+
+        } else { // Если мы просматриваем середину списка - фиксируем карту на экране
+
+            $(map).addClass('fixedTopBlock');
+            $(map).removeClass('absoluteBottomBlock');
+
+            // Важно оставить карту на экране в том же местоположении и той же ширины, что она была до прокрутки
+            $(map).css({'width': mapWidth, 'left': mapLeftCoord});
+
+        }
 
     }
 
     return true;
-});
+}
+
+$(window).scroll(changeMapPosition);
 
 /**********************************************************************************
  * Подгрузка новых 20-ти объектов при прокрутке экрана со списком
@@ -80,29 +82,51 @@ function getNextRealtyObjects(lastRealtyObjectsId, lastNumber) {
     // Блокируем обработку прокрутки при загрузке данных с сервера
     blockOfScrollHandler = true;
 
+    // Проверяем корректность исходных данных
+    if (typeof lastRealtyObjectsId === "undefined" || typeof lastNumber === "undefined") return false;
+    if (allProperties.length == 0) return false;
+
     // Инициализируем массив для сохранения id объектов, по которым нам нужно получить с сервера данные
     var propertyIdArr = new Array();
 
-    // Формируем массив id объектов, по которым запросим данные с сервера
-    $("#allBalloons .balloonBlock[propertyId='" + lastRealtyObjectsId + "']").nextAll().slice(0, 20).each(function () {
-        propertyIdArr.push($(this).attr('propertyId'));
-    });
+    // Ищем позицию на которой в общем массиве стоит последний элемент, по которому загружены полные данные
+    var lastRealtyPosition = 0;
+    while (allProperties[lastRealtyPosition]['id'] != lastRealtyObjectsId) {
+        // Дошли до конца массива и не нашли..
+        if (lastRealtyPosition == allProperties.length - 1) return false;
+        lastRealtyPosition++;
+    }
 
-    // Запускаем вертушку, чтобы показать пользователю, что новые данные подгружаются TODO: вертушка загрузки
-    //$("#upBlock").css('display', 'block');
+    // Вычисляем массив идентификаторов объектов недвижимости, по которым запросим у сервера полные данные (это следующие 20 объектов или все до конца массива, если до конца массива осталось меньше 20 членов)
+    var i = 1;
+    while (i <= 20 && lastRealtyPosition + i < allProperties.length) {
+        propertyIdArr.push(allProperties[lastRealtyPosition + i]['id']);
+        i++;
+    }
 
-    jQuery.post("../lib/getSearchResultHTML.php", {"propertyId":propertyIdArr, "typeOperation":"FullData", "number":lastNumber}, function (data) {
+    // Запускаем вертушку, чтобы показать пользователю, что новые данные подгружаются
+    if ($("#shortListOfRealtyObjects").is(":visible")) $("#upBlockShortList").css('display', 'block');
+    if ($("#fullParametersListOfRealtyObjects").is(":visible")) $("#upBlockFullList").css('display', 'block');
+
+    jQuery.post("../getSearchResultHTML.php", {"propertyId":propertyIdArr, "typeOperation":"FullData", "number":lastNumber}, function (data) {
 
         // Дополняем таблицы, содержащие списки с краткими и подробными объявлениями
-        $("#shortListOfRealtyObjects tbody").append(data.matterOfShortList);
-        $("#fullParametersListOfRealtyObjects tbody").append(data.matterOfFullParametersList);
+        if (data.matterOfShortList != "") $("#shortListOfRealtyObjects").append(data.matterOfShortList);
+        if (data.matterOfFullParametersList != "") $("#fullParametersListOfRealtyObjects").append(data.matterOfFullParametersList);
 
-        // Присваиваем полученный HTML соответствующим баллунам
+        // Присваиваем полученный HTML соответствующим баллунам, если они не были созданы ранее
         for (i = 0; i < propertyIdArr.length; i++) {
-            $("#allBalloons .balloonBlock[propertyId='" + propertyIdArr[i] + "']").html(data.arrayOfBalloonList[propertyIdArr[i]]);
+            if (!$("#allBalloons .balloonBlock[propertyId='" + propertyIdArr[i] + "']").length && typeof data.arrayOfBalloonList[propertyIdArr[i]] != "undefined") {
+                $("#allBalloons").append(data.arrayOfBalloonList[propertyIdArr[i]]);
+            }
         }
 
-        //$("#upBlock").css('display', 'none'); TODO: вертушка загрузки Снимаем вертушку - данные успешно подгружены
+        // Убираем вертушку - новый контент для списков подгружен
+        $("#upBlockShortList").css('display', 'none');
+        $("#upBlockFullList").css('display', 'none');
+
+        // Актуализируем местоположение карты. Чтобы карта не сдвигалась после окончания загрузки новых блоков с данными в списки
+        changeMapPosition();
 
         /************* Активируем ColorBox для просмотра в модальном окне галереи фотографий по клику на миниатюре *************/
         // Это необходимо сделать для вновь загруженных объектов
@@ -127,6 +151,7 @@ function getNextRealtyObjects(lastRealtyObjectsId, lastNumber) {
 
     }, 'json');
 
+    return true;
 }
 
 $(window).scroll(function () {
@@ -140,19 +165,18 @@ $(window).scroll(function () {
     var screenHeight = $(window).height(); // Высота экрана пользователя
     var currentTopScroll = $(this).scrollTop(); // Текущая промотка экрана (количество пикселей, скрытое вверху страницы)
     // Текущая координата низа экрана относительно всего документа
-    var currentScreenBottom = 0;
-    currentScreenBottom = screenHeight + currentTopScroll;
+    var currentScreenBottom = screenHeight + currentTopScroll;
 
     // Вычисляем координату низа списка с объявлениями относительно всего документа. Либо подробного, либо с минимумом сведений - в зависимости от того, какой режим отображения результатов поиска выбран
     if ($("#shortListOfRealtyObjects").is(":visible")) {
         var listOfRealtyObjectsBottom = $("#shortListOfRealtyObjects").height() + $("#shortListOfRealtyObjects").offset().top;
-        var lastRealtyObjectsId = $("#shortListOfRealtyObjects tr:last").attr('propertyId');
-        var lastNumber = $("#shortListOfRealtyObjects tr:last .numberOfRealtyObject").html();
+        var lastRealtyObjectsId = $("#shortListOfRealtyObjects .realtyObject:last").attr('propertyId');
+        var lastNumber = $("#shortListOfRealtyObjects .realtyObject:last .numberOfRealtyObject").html();
     }
     if ($("#fullParametersListOfRealtyObjects").is(":visible")) {
         listOfRealtyObjectsBottom = $("#fullParametersListOfRealtyObjects").height() + $("#fullParametersListOfRealtyObjects").offset().top;
-        lastRealtyObjectsId = $("#fullParametersListOfRealtyObjects tr:last").attr('propertyId');
-        lastNumber = $("#fullParametersListOfRealtyObjects tr:last .numberOfRealtyObject").html();
+        lastRealtyObjectsId = $("#fullParametersListOfRealtyObjects .realtyObject:last").attr('propertyId');
+        lastNumber = $("#fullParametersListOfRealtyObjects .realtyObject:last .numberOfRealtyObject").html();
     }
 
     // Сколько пикселей осталось промотать пользователю, чтобы достигнуть низа списка объектов
@@ -160,8 +184,8 @@ $(window).scroll(function () {
 
     if (leftHeight < 400) { // Если до низа осталось меньше 400 пикселей - пытаемся подгрузить продолжение списка с сервера
 
-        // Дошли до конца списка? Если последний в проматываемом списке элемент совпадает с последним в списке allBalloons (а значит мы не получим от сервера продолжения), то запрос к серверу не отправляется - весь список на экране!
-        if ($("#allBalloons balloonBlock:last").attr('propertyId') == lastRealtyObjectsId) return true;
+        // Дошли до конца списка?
+        if (allProperties[allProperties.length - 1]['id'] == lastRealtyObjectsId) return true;
 
         getNextRealtyObjects(lastRealtyObjectsId, lastNumber);
     }
@@ -274,7 +298,6 @@ function init() {
                 // Обновляем поле "body" у properties метки
                 placemark.properties.set('balloonContentBody', balloonHTML);
 
-                // TODO: поправить: обработчик на клик по строчке краткого списка работает как надо - дает возможность открыть галерею фоток, а этот код дает возможность открыть только 1 фотку в галерее!
                 // Берем только что сформированный HTML баллуна и навешиваем на фотографии галерею colorBox
                 $("#map .fotosWrapper .gallery").removeClass('cboxElement').colorbox({ opacity: 0.7 , rel: currentFotoGalleryIndex, current: '№ {current} из {total}' });
                 currentFotoGalleryIndex++;
@@ -282,17 +305,22 @@ function init() {
             } else { // Если данные по этому объекту еще не были подгружены на страницу, то обращаемся к серверу
 
                 // Обращаемся к серверу за HTML баллуна, передаем серверу propertyid - идентификатор объекта недвижимости
-                jQuery.post("../lib/getSearchResultHTML.php", {"propertyId":new Array(propertyid), "typeOperation":"FullBalloons"}, function (data) {
+                jQuery.post("../getSearchResultHTML.php", {"propertyId":new Array(propertyid), "typeOperation":"FullBalloons"}, function (data) {
 
+                    //TODO: мы можем получить пустой массив data.arrayOfBalloonList, нужно проверять, что возможно обращение к данному элементу, иначе выдавать ошибку запроса в баллуне, чтобы пользователь понял, что ждать нечего
                     balloonHTML = data.arrayOfBalloonList[propertyid];
 
-                    // Обновляем поле "body" у properties метки
-                    if (balloonHTML != "") placemark.properties.set('balloonContentBody', balloonHTML);
+                    // Проверка на адекватность полученного HTML для баллуна
+                    if (balloonHTML != "") {
 
-                    // Также в случае успеха, сохраняем данные по баллуну для данного объекта на странице с целью уменьшения количества запросов к серверу
-                    $("#allBalloons .balloonBlock[propertyId='" + propertyid + "']").html(balloonHTML);
+                        // Обновляем поле "body" у properties метки
+                        placemark.properties.set('balloonContentBody', balloonHTML);
 
-                    // TODO: поправить: обработчик на клик по строчке краткого списка работает как надо - дает возможность открыть галерею фоток, а этот код дает возможность открыть только 1 фотку в галерее!
+                        // Также в случае успеха, сохраняем данные по баллуну для данного объекта на странице с целью уменьшения количества запросов к серверу
+                        $("#allBalloons").append(balloonHTML);
+
+                    }
+
                     // Берем только что сформированный HTML баллуна и навешиваем на фотографии галерею colorBox
                     $("#map .fotosWrapper .gallery").removeClass('cboxElement').colorbox({ opacity: 0.7 , rel: currentFotoGalleryIndex, current: '№ {current} из {total}' });
                     currentFotoGalleryIndex++;
@@ -304,7 +332,6 @@ function init() {
         }
 
     }
-
 
     /* Вешаем обработчик на клик по строчке краткого списка - чтобы отобразить инфу в виде баллуна на карте */
     $(document).on('click', "#shortListOfRealtyObjects .realtyObject", function (event) {

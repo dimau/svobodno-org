@@ -1,8 +1,3 @@
-<?php
-    // Инициализируем используемые в шаблоне переменные
-    $userCharacteristic = $dataArr['userCharacteristic'];
-?>
-
 <form method="post" name="signUpToViewDialog" id="signUpToViewDialog"
       title="Записаться на просмотр">
 

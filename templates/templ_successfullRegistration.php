@@ -1,10 +1,3 @@
-<?
-    // Инициализируем используемые в шаблоне переменные
-    $url_initial = $dataArr['url_initial'];
-    $isLoggedIn = $dataArr['isLoggedIn']; // Используется в templ_header.php
-    $amountUnreadMessages = $dataArr['amountUnreadMessages'];
-?>
-
 <!DOCTYPE html>
 <html>
 <head>

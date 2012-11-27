@@ -278,7 +278,7 @@
             }
 
             // Получим массив с полными данными (в том числе с фото) по требующимся объявлениям
-            $this->propertyFullArr = DBconnect::getFullDataAboutProperties($propertiesIdForFullData);
+            $this->propertyFullArr = DBconnect::getFullDataAboutProperties($propertiesIdForFullData, "all");
             // Если полные данные получить не удалось - запишем пустой массив в результат
             if ($this->propertyFullArr == FALSE) $this->propertyFullArr = array();
 

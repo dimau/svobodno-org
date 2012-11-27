@@ -1,8 +1,4 @@
 <?php
-    $userCharacteristic = $dataArr['userCharacteristic']; // Но для данной страницы данный массив содержит только имя, отчество, фамилию, телефон пользователя
-    $isLoggedIn = $dataArr['isLoggedIn'];
-    $signUpToViewData = $dataArr['signUpToViewData'];
-    $statusOfSaveParamsToDB = $dataArr['statusOfSaveParamsToDB'];
 
     /**************************************
      * Алгоритм выбора HTML оформления статуса Запроса на просмотр и модального окна для запроса на просмотр

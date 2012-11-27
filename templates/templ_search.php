@@ -1,15 +1,3 @@
-<?php
-    // Инициализируем используемые в шаблоне переменные
-    $whatPage = $dataArr['whatPage'];
-    $propertyLightArr = $dataArr['propertyLightArr'];
-    $propertyFullArr = $dataArr['propertyFullArr'];
-    $userSearchRequest = $dataArr['userSearchRequest'];
-    $allDistrictsInCity = $dataArr['allDistrictsInCity'];
-    $isLoggedIn = $dataArr['isLoggedIn'];
-    $favoritesPropertysId = $dataArr['favoritesPropertysId'];
-    $amountUnreadMessages = $dataArr['amountUnreadMessages'];
-?>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -75,9 +63,9 @@
 
     <?php
         // Пока пользователь любуется заголовком страницы, а браузер загружает нужные библиотеки, вычислим представление для результатов поиска. Размещать же его на странице мы будем несколько позже
-        $matterOfBalloonList = $this->getMatterOfBalloonList($propertyFullArr, $favoritesPropertysId, "search");
-        $matterOfShortList = $this->getMatterOfShortList($propertyFullArr, $favoritesPropertysId, "search");
-        $matterOfFullParametersList = $this->getMatterOfFullParametersList($propertyFullArr, $favoritesPropertysId, "search");
+        $matterOfBalloonList = View::getMatterOfBalloonList($propertyFullArr, $favoritesPropertysId, "search");
+        $matterOfShortList = View::getMatterOfShortList($propertyFullArr, $favoritesPropertysId, 1, "search");
+        $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullArr, $favoritesPropertysId, 1, "search");
     ?>
 
     <div class="page_main_content">

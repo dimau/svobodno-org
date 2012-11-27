@@ -1,13 +1,3 @@
-<?php
-    // Инициализируем используемые в шаблоне переменные
-    $propertyCharacteristic = $dataArr['propertyCharacteristic'];
-    $propertyFotoInformation = $dataArr['propertyFotoInformation'];
-    $errors = $dataArr['errors'];
-    $allDistrictsInCity = $dataArr['allDistrictsInCity'];
-    $isLoggedIn = $dataArr['isLoggedIn']; // Используется в templ_header.php
-    $amountUnreadMessages = $dataArr['amountUnreadMessages'];
-?>
-
 <!DOCTYPE html>
 <html>
 <head>

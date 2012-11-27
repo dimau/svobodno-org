@@ -1,9 +1,3 @@
-<?php
-    // Инициализируем используемые в шаблоне переменные
-    $isLoggedIn = $dataArr['isLoggedIn'];
-    $amountUnreadMessages = $dataArr['amountUnreadMessages'];
-?>
-
 <div class="header">
     <div class="nameOfServiceBox">
         <div>

@@ -1,14 +1,3 @@
-<?php
-    // Инициализируем используемые в шаблоне переменные
-    $userCharacteristic = $dataArr['userCharacteristic'];
-    $userFotoInformation = $dataArr['userFotoInformation'];
-    $userSearchRequest = $dataArr['userSearchRequest'];
-    $strHeaderOfPage = $dataArr['strHeaderOfPage'];
-    $isLoggedIn = $dataArr['isLoggedIn'];
-    $mode = $dataArr['mode']; // Режим в котором будет работать шаблон анкеты пользователя (templ_notEditedProfile.php)
-    $amountUnreadMessages = $dataArr['amountUnreadMessages'];
-?>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -68,7 +57,7 @@
                 <div id="notEditingProfileParametersBlock">
                     <?php
                         // Формируем и размещаем на странице блок для основной фотографии пользователя
-                        echo $this->getHTMLfotosWrapper("middle", TRUE, FALSE, $userFotoInformation['uploadedFoto']);
+                        echo View::getHTMLfotosWrapper("middle", TRUE, FALSE, $userFotoInformation['uploadedFoto']);
 
                         // Вставляем анкетные данные пользователя
                         include ("templates/templ_notEditedProfile.php");

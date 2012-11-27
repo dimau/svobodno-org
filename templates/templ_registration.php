@@ -1,15 +1,3 @@
-<?php
-    // Инициализируем используемые в шаблоне переменные
-    $userCharacteristic = $dataArr['userCharacteristic'];
-    $userFotoInformation = $dataArr['userFotoInformation'];
-    $userSearchRequest = $dataArr['userSearchRequest'];
-    $errors = $dataArr['errors'];
-    $allDistrictsInCity = $dataArr['allDistrictsInCity'];
-    $isLoggedIn = $dataArr['isLoggedIn'];
-    $whatPage = $dataArr['whatPage'];
-    $amountUnreadMessages = $dataArr['amountUnreadMessages'];
-?>
-
 <!DOCTYPE html>
 <html>
 <head>

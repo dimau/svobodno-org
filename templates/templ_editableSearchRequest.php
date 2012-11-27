@@ -1,11 +1,3 @@
-<?php
-    // Инициализируем используемые в шаблоне переменные
-    $whatPage = $dataArr['whatPage'];
-    $userSearchRequest = $dataArr['userSearchRequest'];
-    $allDistrictsInCity = $dataArr['allDistrictsInCity'];
-    $isLoggedIn = $dataArr['isLoggedIn'];
-?>
-
 <div id="extendedSearchParametersBlock">
         <fieldset class="edited left">
             <legend>

@@ -1,8 +1,3 @@
-<?php
-    // Инициализируем используемые в шаблоне переменные
-    $userSearchRequest = $dataArr['userSearchRequest'];
-?>
-
 <div id="notEditingSearchParametersBlock" class="objectDescription">
     <div id="notEditedDistricts" class="notEdited left">
         <div class="legend">

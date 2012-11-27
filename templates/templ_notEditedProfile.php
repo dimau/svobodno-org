@@ -1,9 +1,3 @@
-<?php
-    // Инициализируем используемые в шаблоне переменные
-    $userCharacteristic = $dataArr['userCharacteristic'];
-    $mode = $dataArr['mode']; // Режим отображения данных: personal - все анкетные данные пользователя (для личного использования), tenantForOwner - все анкетные данные кроме контактов (чтобы собственник не мог связаться с арендатором напрямую без нас)
-?>
-
 <div class="profileInformation">
     <ul class="listDescriptionBig">
         <li>

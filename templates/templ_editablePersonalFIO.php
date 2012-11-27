@@ -1,10 +1,3 @@
-<?php
-    // Инициализируем используемые в шаблоне переменные
-    $userCharacteristic = $dataArr['userCharacteristic'];
-    $userFotoInformation = $dataArr['userFotoInformation'];
-    $isLoggedIn = $dataArr['isLoggedIn'];
-?>
-
 <div class="descriptionFieldsetsWrapper">
         <fieldset class="edited left private">
             <legend>
