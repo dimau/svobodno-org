@@ -717,10 +717,10 @@
                 $arrMyAdvertReplace['instructionPublish'] = "";
                 $arrMyAdvertReplace['propertyId'] = "";
                 if ($allPropertiesCharacteristic[$i]['status'] == "опубликовано") {
-                    $arrMyAdvertReplace['instructionPublish'] = "<li><a href='personal.php?propertyId=" . $allPropertiesCharacteristic[$i]['id'] . "&action=publicationOff'>снять с публикации</a></li>";
+                    $arrMyAdvertReplace['instructionPublish'] = "<li><a href='personal.php?compId=".GlobFunc::idToCompId($allPropertiesCharacteristic[$i]['userId'])."&propertyId=" . $allPropertiesCharacteristic[$i]['id'] . "&action=publicationOff'>снять с публикации</a></li>";
                 }
                 if ($allPropertiesCharacteristic[$i]['status'] == "не опубликовано") {
-                    $arrMyAdvertReplace['instructionPublish'] = "<li><a href='personal.php?propertyId=" . $allPropertiesCharacteristic[$i]['id'] . "&action=publicationOn'>опубликовать</a></li>";
+                    $arrMyAdvertReplace['instructionPublish'] = "<li><a href='personal.php?compId=".GlobFunc::idToCompId($allPropertiesCharacteristic[$i]['userId'])."&propertyId=" . $allPropertiesCharacteristic[$i]['id'] . "&action=publicationOn'>опубликовать</a></li>";
                 }
                 $arrMyAdvertReplace['propertyId'] = $allPropertiesCharacteristic[$i]['id'];
 
@@ -731,7 +731,7 @@
                         // Перебираем данные по потенциальным арендаторам, проявившим интерес к данному объекту и добавляем их в строку $arrMyAdvertReplace['probableTenants']
                         // Формируем из имен и отчеств строку гиперссылок с ссылками на страницы арендаторов
                         if ($allPropertiesTenantPretenders[$i][$j]['typeTenant'] == "TRUE") { // Если данный пользователь (арендатор) еще ищет недвижимость
-                            $compId = $allPropertiesTenantPretenders[$i][$j]['id'] * 5 + 2;
+                            $compId = GlobFunc::idToCompId($allPropertiesTenantPretenders[$i][$j]['id']);
                             $arrMyAdvertReplace['probableTenants'] .= "<a href='man.php?compId=" . $compId . "'>" . $allPropertiesTenantPretenders[$i][$j]['name'] . " " . $allPropertiesTenantPretenders[$i][$j]['secondName'] . "</a>";
                         } else {
                             $arrMyAdvertReplace['probableTenants'] .= "<span title='Пользователь уже нашел недвижимость'>" . $allPropertiesTenantPretenders[$i][$j]['name'] . " " . $allPropertiesTenantPretenders[$i][$j]['secondName'] . "</span>";
@@ -1345,4 +1345,14 @@
 
             return $resultHTML;
         }
+
+		// Возвращает HTML для блока с описанием 1 пользователя для страницы поиска пользователей в Админке.
+		public static function getHTMLforAdminFindedUsers($user, $allProperties) {
+			include "templates/adminTemplates/templ_adminFindUserItem.php";
+		}
+
+		public static function getHTMLforAdminFindedUsersProperty($property) {
+			include "templates/adminTemplates/templ_adminFindUserPropertyItem.php";
+		}
+
     }

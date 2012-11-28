@@ -69,6 +69,17 @@
             return FALSE;
         }
 
+		// Является ли пользователь администратором. Если нет - вернет NULL, если является, вернет ассоциированный массив с правами доступа
+		public function isAdmin() {
+			if ($this->typeAdmin === NULL || $this->typeAdmin == FALSE) return FALSE;
+
+			if (substr($this->typeAdmin, 0, 1) == "1") $result['newOwner'] = TRUE; else $result['newOwner'] = FALSE;
+			if (substr($this->typeAdmin, 1, 1) == "1") $result['newAdvertAlien'] = TRUE; else $result['newAdvertAlien'] = FALSE;
+			if (substr($this->typeAdmin, 2, 1) == "1") $result['searchUser'] = TRUE; else $result['searchUser'] = FALSE;
+
+			return $result;
+		}
+
         // Метод возвращает id пользователя
         public function getId()
         {
@@ -428,7 +439,7 @@
 
                 // Получим из БД данные ($res) по пользователю с логином = $login
                 $stmt = DBconnect::get()->stmt_init();
-                if (($stmt->prepare("SELECT id, login, password FROM users WHERE login=?") === FALSE)
+                if (($stmt->prepare("SELECT id, typeTenant, typeOwner, typeAdmin, login, password FROM users WHERE login=?") === FALSE)
                     OR ($stmt->bind_param("s", $login) === FALSE)
                     OR ($stmt->execute() === FALSE)
                     OR (($res = $stmt->get_result()) === FALSE)
@@ -456,6 +467,17 @@
                         setcookie("password", md5($loginFromDB . $passwordFromDB), time() + 60 * 60 * 24 * 7);
                         $this->newSession($idFromDB);
                         $this->lastAct($idFromDB);
+
+						// Устанавливаем параметры объекта
+						if (isset($res[0]['typeTenant'])) {
+							if ($res[0]['typeTenant'] == "TRUE") $this->typeTenant = TRUE;
+							if ($res[0]['typeTenant'] == "FALSE") $this->typeTenant = FALSE;
+						}
+						if (isset($res[0]['typeOwner'])) {
+							if ($res[0]['typeOwner'] == "TRUE") $this->typeOwner = TRUE;
+							if ($res[0]['typeOwner'] == "FALSE") $this->typeOwner = FALSE;
+						}
+						if (isset($res[0]['typeAdmin'])) $this->typeAdmin = $res[0]['typeAdmin'];
 
                         return $error;
 

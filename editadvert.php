@@ -25,8 +25,7 @@ if (!$incomingUser->login()) {
  * Если в строке не указан идентификатор объявления для редактирования, то пересылаем пользователя в личный кабинет
  ************************************************************************************/
 
-$propertyId = "0";
-if (isset($_GET['propertyId'])) {
+if (isset($_GET['propertyId']) && $_GET['propertyId'] != "") {
 	$propertyId = $_GET['propertyId']; // Получаем идентификатор объявления для редактирования из строки запроса
 } else {
 	header('Location: personal.php?tabsId=3'); // Если в запросе не указан идентификатор объявления для редактирования, то пересылаем пользователя в личный кабинет к списку его объявлений
@@ -48,16 +47,19 @@ $allDistrictsInCity = GlobFunc::getAllDistrictsInCity("Екатеринбург"
 $errors = array();
 
 /**************************************************************************************************************
- * Проверяем, что пользователь имеет право редактировать данное объявление - он является собственником данного объекта недвижимости
+ * Проверяем, что пользователь имеет право редактировать данное объявление - он является собственником данного объекта недвижимости или админом
  **************************************************************************************************************/
 
-if ($property->userId != $incomingUser->getId()) header('Location: personal.php?tabsId=3');
+$isAdmin = $incomingUser->isAdmin();
+if ($property->userId != $incomingUser->getId() AND !($isAdmin && $isAdmin['searchUser'])) {
+	header('Location: personal.php?tabsId=3');
+}
 
 /*************************************************************************************
  * Если пользователь заполнил и отослал форму - проверяем ее
  ************************************************************************************/
 
-if (isset($_POST['saveAdvertButton'])) {
+if (isset($_GET['action']) && $_GET['action'] == "saveAdvert") {
 
 	$property->writeCharacteristicFromPOST("edit");
 	$property->writeFotoInformationFromPOST();
@@ -106,6 +108,7 @@ $isLoggedIn = $incomingUser->login(); // Используется в templ_heade
 $amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных сообщений пользователя
 $propertyCharacteristic = $property->getCharacteristicData();
 $propertyFotoInformation = $property->getFotoInformationData();
+$compId = $propertyCharacteristic['userId'];
 //$allDistrictsInCity
 //$errors
 

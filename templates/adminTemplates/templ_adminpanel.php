@@ -116,11 +116,35 @@
 
             <div class="section admin left" id="searchUserSection">
                 <div class="headerSection">Поиск пользователя</div>
-                <ul>
+				<form name="findUserForm" method="post" action="adminFindUser.php" target = "_blank">
+                <ul style="line-height: 2.5em; text-align: right;">
                     <li>
-                        <a href=""></a>
+                        <label>Фамилия</label> <input name="surname" id="surname" type="text" size="20">
+                    </li>
+                    <li>
+                        <label>Имя</label> <input name="name" id="name" type="text" size="20">
+                    </li>
+                    <li>
+                        <label>Отчество</label> <input name="secondName" id="secondName" type="text" size="20">
+                    </li>
+                    <li>
+                        <label>Логин</label> <input name='login' id='login' type="text" size="20">
+                    </li>
+                    <li>
+                        <label>Номер телефона (без 8-ки)</label> <input name="telephon" id="telephon" type="text" size="20">
+                    </li>
+                    <li>
+                        <label>E-mail</label> <input name="email" id="email" type="text" size="20">
+                    </li>
+					<div style="line-height: 0.7em;">-------------------------------------------------------</div>
+                    <li>
+                        <label>Адрес недвижимости</label> <input name="address" id="address" type="text" size="20">
+                    </li>
+                    <li>
+                        <button type="submit" name="findUserButton" id="findUserButton">Найти</button>
                     </li>
                 </ul>
+				</form>
                 <div class="clearBoth"></div>
             </div>
             <!-- /end.searchUserSection -->

@@ -122,7 +122,7 @@
     ?>
 </div>
 
-<form name="newAdvert" class="advertDescriptionEdit formWithFotos" method="post" enctype="multipart/form-data">
+<form action="editadvert.php?action=saveAdvert&propertyId=<?php echo $propertyCharacteristic['id'];?>" name="newAdvert" class="advertDescriptionEdit formWithFotos" method="post" enctype="multipart/form-data">
 <div class="advertDescriptionChapter" id="typeAndPeriodChapter">
     <div class="advertDescriptionChapterHeader">
         Тип и сроки
@@ -1298,7 +1298,7 @@
 </div>
 
 <div class="bottomButton">
-    <a href="personal.php?tabsId=3" style="margin-right: 10px;">Отмена</a>
+    <a href="personal.php?compId=<?php echo $compId;?>&tabsId=3" style="margin-right: 10px;">Отмена</a>
     <button type="submit" name="saveAdvertButton" id="saveAdvertButton" class="button mainButton">
         Сохранить
     </button>

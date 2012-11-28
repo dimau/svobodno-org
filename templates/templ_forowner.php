@@ -43,7 +43,7 @@
             Поможем сдать Вашу недвижимость!
         </div>
 
-        <div class="edited left" style="min-width: 430px; border: 2px solid #6A9D02; background-color: #ffffff;">
+        <div class="edited left simpleBlockForAnyContent" style="min-width: 430px;">
 
             <?php if ($statusOfSaveParamsToDB === FALSE || $statusOfSaveParamsToDB === NULL): ?>
             <form name="requestNewOwner" method="post">
@@ -117,8 +117,7 @@
 
         </div>
 
-        <div
-            style="float: left; width: 48.5%; min-width: 430px; margin-top: 10px; margin-bottom: 10px; margin-left: 1.4%; border: 2px solid #6A9D02; border-radius: 5px; background-color: #ffffff; padding: 5px; text-align: left;">
+        <div class="simpleBlockForAnyContent" style="float: left; width: 48.5%; min-width: 430px; margin-top: 10px; margin-bottom: 10px; margin-left: 1.4%; text-align: left;">
             <div class="localHeader">
                 Что будет дальше?
             </div>

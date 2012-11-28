@@ -163,7 +163,7 @@
                     ?>
                 </div>
                 <?php endif; ?>
-                <form method="post" name="profileParameters" id="editingProfileParametersBlock"
+                <form method="post" action="personal.php?compId=<?php echo $compId;?>&action=saveProfileParameters" name="profileParameters" id="editingProfileParametersBlock"
                       class="descriptionFieldsetsWrapper formWithFotos" enctype="multipart/form-data"
                       style='<?php if ($correctEditProfileParameters !== FALSE) echo "display: none;"?>'>
 
@@ -181,7 +181,7 @@
                     <div class="clearBoth"></div>
 
                     <div class="bottomButton">
-                        <a href="personal.php?tabsId=1" style="margin-right: 10px;">Отмена</a>
+                        <a href="personal.php?compId=<?php echo $compId; ?>&tabsId=1" style="margin-right: 10px;">Отмена</a>
                         <button type="submit" name="saveProfileParameters" id="saveProfileParameters" class="button">
                             Сохранить
                         </button>
@@ -222,7 +222,7 @@
                     автоматический поиск объявлений на портале и будет оповещать Вас о появлении новых объектов.
                 </div>
                 <!-- Если пользователь еще не сформировал поисковый запрос (а значит не является арендатором) и он либо не нажимал на кнопку формирования запроса, либо нажимал, но не прошел проверку на полноту информации о пользователи, то ему доступна только кнопка формирования нового запроса. В ином случае будет отображаться сам поисковый запрос пользователя, либо форма для его заполнения -->
-                <form name="createSearchRequest" method="post">
+                <form name="createSearchRequest" method="post" action="personal.php?compId=<?php echo $compId;?>&action=createSearchRequest">
                     <button type="submit" name="createSearchRequestButton" id='createSearchRequestButton'
                             class='left-bottom'>
                         Запрос на поиск
@@ -235,7 +235,7 @@
                 <div id="notEditedSearchRequestBlock">
                     <ul id="setOfInstructions" class="setOfInstructions">
                         <li><a id="editSearchRequestButton">редактировать</a></li>
-                        <li><a href="personal.php?action=deleteSearchRequest&tabsId=4"
+                        <li><a href="personal.php?compId=<?php echo $compId;?>&action=deleteSearchRequest&tabsId=4"
                                title="Удаляет запрос на поиск - кликните по этой ссылке, когда Вы найдете недвижимость">удалить</a>
                         </li>
                         <br>
@@ -249,7 +249,7 @@
 
                 <?php if ($userCharacteristic['typeTenant'] === TRUE || $correctNewSearchRequest === TRUE || $correctEditSearchRequest === FALSE): ?>
                 <!-- Если пользователь является арендатором, то вместе с отображением текущих параметров поискового запроса мы выдаем скрытую форму для их редактирования, также мы выдаем видимую форму для редактирования параметров поиска в случае, если пользователь нажал на кнопку Нового поискового запроса и проверка на корректность его данных Профиля профла успешно, а также в случае если пользователь корректировал данные поискового запроса, но они не прошли проверку -->
-                <form method="post" name="searchParameters" id="extendedSearchParametersBlock">
+                <form method="post" name="searchParameters" id="extendedSearchParametersBlock" action="personal.php?compId=<?php echo $compId;?>&action=saveSearchParameters">
 
                     <?php
                     // Подключим форму для ввода и редактирования данных о социальных сетях пользователя
@@ -258,7 +258,7 @@
 
                     <div class="clearBoth"></div>
                     <div class="bottomButton">
-                        <a href="personal.php?tabsId=4" style="margin-right: 10px;">Отмена</a>
+                        <a href="personal.php?compId=<?php echo $compId;?>&tabsId=4" style="margin-right: 10px;">Отмена</a>
                         <button type="submit" name="saveSearchParametersButton" id="saveSearchParametersButton"
                                 class="button">
                             Сохранить

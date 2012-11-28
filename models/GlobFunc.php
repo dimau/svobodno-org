@@ -15,6 +15,16 @@
         public function __destruct()
         {}
 
+		// Функция для скрытия реального id пользователя при передаче в GET параметрах
+		public static function idToCompId($id) {
+			return $id * 5 + 2;
+		}
+
+		// Возвращает реальный id пользователя из compId
+		public static function compIdToId($compId) {
+			return ($compId - 2) / 5;
+		}
+
         //Функция для генерации случайной строки
         public static function generateCode($length = 6)
         {
@@ -61,6 +71,8 @@
         // Преобразовывает дату из формата, пригодного для отображения в формат, пригодный для хранения в БД
         public static function dateFromViewToDB($dateFromView)
         {
+			if (!isset($dateFromView) || $dateFromView == "") return "0000-00-00";
+
             $date = substr($dateFromView, 0, 2);
             $month = substr($dateFromView, 3, 2);
             $year = substr($dateFromView, 6, 4);

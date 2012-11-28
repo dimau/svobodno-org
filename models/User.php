@@ -31,13 +31,13 @@
         public $facebook = "";
         public $twitter = "";
         public $lic = "";
-        private $id = "";
+		private $id = "";
         private $typeAdmin = NULL;
         private $emailReg = "";
         private $user_hash = "";
         private $last_act = "";
         private $reg_date = "";
-        private $favoritesPropertysId = array();
+        public $favoritesPropertysId = array();
 
         public $typeOfObject = "0";
         public $amountOfRooms = array();
@@ -76,10 +76,12 @@
         }
 
         // ДЕСТРУКТОР
-        public function __destruct()
-        {
+        public function __destruct() {}
 
-        }
+		// Метод возвращает id пользователя
+		public function getId() {
+			return $this->id;
+		}
 
         // Функция сохраняет личные параметры пользователя (текущие значения параметров данного объекта) в БД. Все параметры, кроме поискового запроса (у него отдельная функция)
         // $typeOfUser = "new" - режим сохранения для нового (регистрируемого пользователя)
@@ -114,6 +116,9 @@
             // Пишем данные пользователя в БД. При успехе в $res сохраняем TRUE, иначе - FALSE
             // Код для сохранения данных разный: для нового пользователя и при редактировании параметров существующего пользователя
             if ($typeOfUser == "new") {
+
+				// Для нового пользователя всегда тип собственника сбрасываем в FALSE (пока под этим пользователем не появится хотя бы 1 объявление)
+				$typeOwner = "FALSE";
 
                 $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("INSERT INTO users (typeTenant,typeOwner,name,secondName,surname,sex,nationality,birthday,login,password,telephon,emailReg,email,currentStatusEducation,almamater,speciality,kurs,ochnoZaochno,yearOfEnd,statusWork,placeOfWork,workPosition,regionOfBorn,cityOfBorn,shortlyAboutMe,vkontakte,odnoklassniki,facebook,twitter,lic,last_act,reg_date,favoritesPropertysId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
