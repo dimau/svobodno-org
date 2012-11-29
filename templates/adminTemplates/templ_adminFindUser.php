@@ -31,8 +31,21 @@
 
         .simpleBlockForAnyContent .content {
 			font-size: 1.1em;
-			color: #336784;
+			color: #6A9D02;
             font-weight: bold;
+        }
+
+		.simpleBlockForAnyContent .setOfInstructions {
+			float: left;
+			margin-left: 15px;
+			list-style: none;
+		}
+
+        .simpleBlockForAnyContent .setOfInstructions li {
+            display: inline-block;
+			margin-left: 10px;
+            margin-right: 10px;
+			font-size: 1em;
         }
 
     </style>

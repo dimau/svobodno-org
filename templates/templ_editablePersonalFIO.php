@@ -113,11 +113,11 @@
                                 Логин
                             </td>
                             <td class="itemRequired">
-                                <?php if (!$isLoggedIn) echo "*";?>
+                                <?php if ($mode == "registration") echo "*";?>
                             </td>
                             <td class="itemBody">
                                 <?php
-                                    if (!$isLoggedIn) {
+                                    if ($mode == "registration") {
                                         echo "<input type='text' name='login' id='login' maxlength='50' value='".$userCharacteristic['login']."'>";
                                     } else {
                                         echo $userCharacteristic['login'];

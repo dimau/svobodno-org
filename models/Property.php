@@ -1,8 +1,8 @@
 <?php
+/* Класс представляем собой полную модель объекта недвижимости (объявления) */
 
     class Property
     {
-
         public $typeOfObject = "0";
         public $dateOfEntry = "";
         public $termOfLease = "0";
@@ -67,6 +67,8 @@
         public $earliestDate = "";
         public $earliestTimeHours = "";
         public $earliestTimeMinutes = "";
+		public $adminComment = "";
+		public $completeness = "";
 
         public $realCostOfRenting = "";
         public $last_act = "";
@@ -94,10 +96,17 @@
         }
 
         // ДЕСТРУКТОР
-        public function __destruct()
-        {
+        public function __destruct() {}
 
-        }
+		// Устанавливает признак полноты для объекта
+		// $levelCompleteness = "0" объявление из чужой базы - мнимум требований к полноте
+		// $levelCompleteness = "1" объявление от собственника, который является нашим клиентом - максимальные требования к полноте
+		public function setCompleteness($levelCompleteness) {
+			// Проверка входных данных на адекватность
+			if ($levelCompleteness != "1" && $levelCompleteness != "0") return FALSE;
+			$this->completeness = $levelCompleteness;
+			return TRUE;
+		}
 
         // Функция сохраняет текущие параметры объекта недвижимости в БД
         // $typeOfProperty = "new" - режим сохранения для нового объекта недвижимости
@@ -106,9 +115,10 @@
         // Возвращает TRUE, если данные успешно сохранены и FALSE в противном случае
         public function saveCharacteristicToDB($typeOfProperty = "edit")
         {
-
-            // Перед тем как получить настоящий $userId, инициализируем переменную
-            $userId = "";
+			// Валидация необходимых исходных данных
+			if ($typeOfProperty != "new" && $typeOfProperty != "edit") return FALSE; // Если объявление не является ни новым, ни существующим - видимо какая-то ошибка была допущена при передаче параметров методу
+			if ($typeOfProperty == "new" && $this->ownerLogin == "") return FALSE;
+			if ($typeOfProperty == "edit" && $this->userId == "") return FALSE;
 
             // Вычислим id пользователя-собственника данного объекта недвижимости (если создается не новое объявление, а идет редактирование ранее созданного)
             if ($typeOfProperty == "edit") {
@@ -140,9 +150,6 @@
             // Если не указан id пользователя собственника, то дальнейшие действия не имеют смысла
             if ($userId == "") return FALSE;
 
-            // Если объявление не является ни новым, ни существующим - видимо какая-то ошибка была допущена при передаче параметров методу
-            if ($typeOfProperty != "edit" && $typeOfProperty != "new") return FALSE;
-
             // Корректируем даты для того, чтобы сделать их пригодными для сохранения в базу данных
             $dateOfEntryForDB = GlobFunc::dateFromViewToDB($this->dateOfEntry);
             $dateOfCheckOutForDB = GlobFunc::dateFromViewToDB($this->dateOfCheckOut);
@@ -160,7 +167,12 @@
             $tm = time();
             $last_act = $tm; // время последнего редактирования объявления
             $reg_date = $tm; // время регистрации ("рождения") объявления
-            $status = "опубликовано"; // Присваивается только вновь созданному объявлению.
+            if ($this->status != "опубликовано" && $this->status != "не опубликовано") { // На всякий случай (возможно, будет полезно для нового объявления) будем проверять заполненность поля со статусом
+				$this->status = "опубликовано";
+			}
+			if ($this->completeness != "0" && $this->completeness != "1") { // На всякий случай (возможно, будет полезно для нового объявления) будем проверять заполненность поля с признаком полноты данных об объекте
+				$this->completeness = "1";
+			}
 
             // Проверяем в какой валюте сохраняется стоимость аренды, формируем переменную realCostOfRenting
             if ($this->currency == 'руб.') $realCostOfRenting = $this->costOfRenting;
@@ -184,8 +196,8 @@
             // Код для сохранения данных разный: для нового объявления и при редактировании параметров существующего объявления
             if ($typeOfProperty == "new") {
                 $stmt = DBconnect::get()->stmt_init();
-                if (($stmt->prepare("INSERT INTO property SET userId=?, typeOfObject=?, dateOfEntry=?, termOfLease=?, dateOfCheckOut=?, amountOfRooms=?, adjacentRooms=?, amountOfAdjacentRooms=?, typeOfBathrooms=?, typeOfBalcony=?, balconyGlazed=?, roomSpace=?, totalArea=?, livingSpace=?, kitchenSpace=?, floor=?, totalAmountFloor=?, numberOfFloor=?, concierge=?, intercom=?, parking=?, city=?, district=?, coordX=?, coordY=?, address=?, apartmentNumber=?, subwayStation=?, distanceToMetroStation=?, currency=?, costOfRenting=?, realCostOfRenting=?, utilities=?, costInSummer=?, costInWinter=?, electricPower=?, bail=?, bailCost=?, prepayment=?, compensationMoney=?, compensationPercent=?, repair=?, furnish=?, windows=?, internet=?, telephoneLine=?, cableTV=?, furnitureInLivingArea=?, furnitureInLivingAreaExtra=?, furnitureInKitchen=?, furnitureInKitchenExtra=?, appliances=?, appliancesExtra=?, sexOfTenant=?, relations=?, children=?, animals=?, contactTelephonNumber=?, timeForRingBegin=?, timeForRingEnd=?, checking=?, responsibility=?, comment=?, last_act=?, reg_date=?, status=?, tenantsWithSignUpToViewRequest=?, earliestDate=?, earliestTimeHours=?, earliestTimeMinutes=?") === FALSE)
-                    OR ($stmt->bind_param("sssssssssssddddiiissssssssssisddsddssdsddssssssssssssssssssssssiisssss", $userId, $this->typeOfObject, $dateOfEntryForDB, $this->termOfLease, $dateOfCheckOutForDB, $this->amountOfRooms, $this->adjacentRooms, $this->amountOfAdjacentRooms, $this->typeOfBathrooms, $this->typeOfBalcony, $this->balconyGlazed, $this->roomSpace, $this->totalArea, $this->livingSpace, $this->kitchenSpace, $this->floor, $this->totalAmountFloor, $this->numberOfFloor, $this->concierge, $this->intercom, $this->parking, $this->city, $this->district, $this->coordX, $this->coordY, $this->address, $this->apartmentNumber, $this->subwayStation, $this->distanceToMetroStation, $this->currency, $this->costOfRenting, $realCostOfRenting, $this->utilities, $this->costInSummer, $this->costInWinter, $this->electricPower, $this->bail, $this->bailCost, $this->prepayment, $this->compensationMoney, $this->compensationPercent, $this->repair, $this->furnish, $this->windows, $this->internet, $this->telephoneLine, $this->cableTV, $furnitureInLivingAreaSerialized, $this->furnitureInLivingAreaExtra, $furnitureInKitchenSerialized, $this->furnitureInKitchenExtra, $appliancesSerialized, $this->appliancesExtra, $sexOfTenantImploded, $relationsImploded, $this->children, $this->animals, $this->contactTelephonNumber, $this->timeForRingBegin, $this->timeForRingEnd, $this->checking, $this->responsibility, $this->comment, $last_act, $reg_date, $status, $tenantsWithSignUpToViewRequestSerialized, $earliestDateForDB, $this->earliestTimeHours, $this->earliestTimeMinutes) === FALSE)
+                if (($stmt->prepare("INSERT INTO property SET userId=?, typeOfObject=?, dateOfEntry=?, termOfLease=?, dateOfCheckOut=?, amountOfRooms=?, adjacentRooms=?, amountOfAdjacentRooms=?, typeOfBathrooms=?, typeOfBalcony=?, balconyGlazed=?, roomSpace=?, totalArea=?, livingSpace=?, kitchenSpace=?, floor=?, totalAmountFloor=?, numberOfFloor=?, concierge=?, intercom=?, parking=?, city=?, district=?, coordX=?, coordY=?, address=?, apartmentNumber=?, subwayStation=?, distanceToMetroStation=?, currency=?, costOfRenting=?, realCostOfRenting=?, utilities=?, costInSummer=?, costInWinter=?, electricPower=?, bail=?, bailCost=?, prepayment=?, compensationMoney=?, compensationPercent=?, repair=?, furnish=?, windows=?, internet=?, telephoneLine=?, cableTV=?, furnitureInLivingArea=?, furnitureInLivingAreaExtra=?, furnitureInKitchen=?, furnitureInKitchenExtra=?, appliances=?, appliancesExtra=?, sexOfTenant=?, relations=?, children=?, animals=?, contactTelephonNumber=?, timeForRingBegin=?, timeForRingEnd=?, checking=?, responsibility=?, comment=?, last_act=?, reg_date=?, status=?, tenantsWithSignUpToViewRequest=?, earliestDate=?, earliestTimeHours=?, earliestTimeMinutes=?, adminComment=?, completeness=?") === FALSE)
+                    OR ($stmt->bind_param("sssssssssssddddiiissssssssssisddsddssdsddssssssssssssssssssssssiisssssss", $userId, $this->typeOfObject, $dateOfEntryForDB, $this->termOfLease, $dateOfCheckOutForDB, $this->amountOfRooms, $this->adjacentRooms, $this->amountOfAdjacentRooms, $this->typeOfBathrooms, $this->typeOfBalcony, $this->balconyGlazed, $this->roomSpace, $this->totalArea, $this->livingSpace, $this->kitchenSpace, $this->floor, $this->totalAmountFloor, $this->numberOfFloor, $this->concierge, $this->intercom, $this->parking, $this->city, $this->district, $this->coordX, $this->coordY, $this->address, $this->apartmentNumber, $this->subwayStation, $this->distanceToMetroStation, $this->currency, $this->costOfRenting, $realCostOfRenting, $this->utilities, $this->costInSummer, $this->costInWinter, $this->electricPower, $this->bail, $this->bailCost, $this->prepayment, $this->compensationMoney, $this->compensationPercent, $this->repair, $this->furnish, $this->windows, $this->internet, $this->telephoneLine, $this->cableTV, $furnitureInLivingAreaSerialized, $this->furnitureInLivingAreaExtra, $furnitureInKitchenSerialized, $this->furnitureInKitchenExtra, $appliancesSerialized, $this->appliancesExtra, $sexOfTenantImploded, $relationsImploded, $this->children, $this->animals, $this->contactTelephonNumber, $this->timeForRingBegin, $this->timeForRingEnd, $this->checking, $this->responsibility, $this->comment, $last_act, $reg_date, $this->status, $tenantsWithSignUpToViewRequestSerialized, $earliestDateForDB, $this->earliestTimeHours, $this->earliestTimeMinutes, $this->adminComment, $this->completeness) === FALSE)
                     OR ($stmt->execute() === FALSE)
                     OR (($res = $stmt->affected_rows) === -1)
                     OR ($res === 0)
@@ -198,8 +210,8 @@
 
             if ($typeOfProperty == "edit") {
                 $stmt = DBconnect::get()->stmt_init();
-                if (($stmt->prepare("UPDATE property SET userId=?, typeOfObject=?, dateOfEntry=?, termOfLease=?, dateOfCheckOut=?, amountOfRooms=?, adjacentRooms=?, amountOfAdjacentRooms=?, typeOfBathrooms=?, typeOfBalcony=?, balconyGlazed=?, roomSpace=?, totalArea=?, livingSpace=?, kitchenSpace=?, floor=?, totalAmountFloor=?, numberOfFloor=?, concierge=?, intercom=?, parking=?, city=?, district=?, coordX=?, coordY=?, address=?, apartmentNumber=?, subwayStation=?, distanceToMetroStation=?, currency=?, costOfRenting=?, realCostOfRenting=?, utilities=?, costInSummer=?, costInWinter=?, electricPower=?, bail=?, bailCost=?, prepayment=?, compensationMoney=?, compensationPercent=?, repair=?, furnish=?, windows=?, internet=?, telephoneLine=?, cableTV=?, furnitureInLivingArea=?, furnitureInLivingAreaExtra=?, furnitureInKitchen=?, furnitureInKitchenExtra=?, appliances=?, appliancesExtra=?, sexOfTenant=?, relations=?, children=?, animals=?, contactTelephonNumber=?, timeForRingBegin=?, timeForRingEnd=?, checking=?, responsibility=?, comment=?, last_act=?, reg_date=?, status=?, tenantsWithSignUpToViewRequest=?, earliestDate=?, earliestTimeHours=?, earliestTimeMinutes=? WHERE id=?") === FALSE)
-                    OR ($stmt->bind_param("sssssssssssddddiiissssssssssisddsddssdsddssssssssssssssssssssssiissssss", $userId, $this->typeOfObject, $dateOfEntryForDB, $this->termOfLease, $dateOfCheckOutForDB, $this->amountOfRooms, $this->adjacentRooms, $this->amountOfAdjacentRooms, $this->typeOfBathrooms, $this->typeOfBalcony, $this->balconyGlazed, $this->roomSpace, $this->totalArea, $this->livingSpace, $this->kitchenSpace, $this->floor, $this->totalAmountFloor, $this->numberOfFloor, $this->concierge, $this->intercom, $this->parking, $this->city, $this->district, $this->coordX, $this->coordY, $this->address, $this->apartmentNumber, $this->subwayStation, $this->distanceToMetroStation, $this->currency, $this->costOfRenting, $realCostOfRenting, $this->utilities, $this->costInSummer, $this->costInWinter, $this->electricPower, $this->bail, $this->bailCost, $this->prepayment, $this->compensationMoney, $this->compensationPercent, $this->repair, $this->furnish, $this->windows, $this->internet, $this->telephoneLine, $this->cableTV, $furnitureInLivingAreaSerialized, $this->furnitureInLivingAreaExtra, $furnitureInKitchenSerialized, $this->furnitureInKitchenExtra, $appliancesSerialized, $this->appliancesExtra, $sexOfTenantImploded, $relationsImploded, $this->children, $this->animals, $this->contactTelephonNumber, $this->timeForRingBegin, $this->timeForRingEnd, $this->checking, $this->responsibility, $this->comment, $last_act, $this->reg_date, $this->status, $tenantsWithSignUpToViewRequestSerialized, $earliestDateForDB, $this->earliestTimeHours, $this->earliestTimeMinutes, $this->id) === FALSE)
+                if (($stmt->prepare("UPDATE property SET userId=?, typeOfObject=?, dateOfEntry=?, termOfLease=?, dateOfCheckOut=?, amountOfRooms=?, adjacentRooms=?, amountOfAdjacentRooms=?, typeOfBathrooms=?, typeOfBalcony=?, balconyGlazed=?, roomSpace=?, totalArea=?, livingSpace=?, kitchenSpace=?, floor=?, totalAmountFloor=?, numberOfFloor=?, concierge=?, intercom=?, parking=?, city=?, district=?, coordX=?, coordY=?, address=?, apartmentNumber=?, subwayStation=?, distanceToMetroStation=?, currency=?, costOfRenting=?, realCostOfRenting=?, utilities=?, costInSummer=?, costInWinter=?, electricPower=?, bail=?, bailCost=?, prepayment=?, compensationMoney=?, compensationPercent=?, repair=?, furnish=?, windows=?, internet=?, telephoneLine=?, cableTV=?, furnitureInLivingArea=?, furnitureInLivingAreaExtra=?, furnitureInKitchen=?, furnitureInKitchenExtra=?, appliances=?, appliancesExtra=?, sexOfTenant=?, relations=?, children=?, animals=?, contactTelephonNumber=?, timeForRingBegin=?, timeForRingEnd=?, checking=?, responsibility=?, comment=?, last_act=?, reg_date=?, status=?, tenantsWithSignUpToViewRequest=?, earliestDate=?, earliestTimeHours=?, earliestTimeMinutes=?, adminComment=?, completeness=? WHERE id=?") === FALSE)
+                    OR ($stmt->bind_param("sssssssssssddddiiissssssssssisddsddssdsddssssssssssssssssssssssiissssssss", $userId, $this->typeOfObject, $dateOfEntryForDB, $this->termOfLease, $dateOfCheckOutForDB, $this->amountOfRooms, $this->adjacentRooms, $this->amountOfAdjacentRooms, $this->typeOfBathrooms, $this->typeOfBalcony, $this->balconyGlazed, $this->roomSpace, $this->totalArea, $this->livingSpace, $this->kitchenSpace, $this->floor, $this->totalAmountFloor, $this->numberOfFloor, $this->concierge, $this->intercom, $this->parking, $this->city, $this->district, $this->coordX, $this->coordY, $this->address, $this->apartmentNumber, $this->subwayStation, $this->distanceToMetroStation, $this->currency, $this->costOfRenting, $realCostOfRenting, $this->utilities, $this->costInSummer, $this->costInWinter, $this->electricPower, $this->bail, $this->bailCost, $this->prepayment, $this->compensationMoney, $this->compensationPercent, $this->repair, $this->furnish, $this->windows, $this->internet, $this->telephoneLine, $this->cableTV, $furnitureInLivingAreaSerialized, $this->furnitureInLivingAreaExtra, $furnitureInKitchenSerialized, $this->furnitureInKitchenExtra, $appliancesSerialized, $this->appliancesExtra, $sexOfTenantImploded, $relationsImploded, $this->children, $this->animals, $this->contactTelephonNumber, $this->timeForRingBegin, $this->timeForRingEnd, $this->checking, $this->responsibility, $this->comment, $last_act, $this->reg_date, $this->status, $tenantsWithSignUpToViewRequestSerialized, $earliestDateForDB, $this->earliestTimeHours, $this->earliestTimeMinutes, $this->adminComment, $this->completeness, $this->id) === FALSE)
                     OR ($stmt->execute() === FALSE)
                     OR (($res = $stmt->affected_rows) === -1)
                     OR ($stmt->close() === FALSE)
@@ -223,7 +235,6 @@
             }
 
             return TRUE;
-
         }
 
         // Функция сохраняет актуальные данные о фотографиях пользователя в БД. Если какие-то из ранее загруженных фотографий были удалены пользователем (помечены в браузере на удаление), то функция удаляет их с сервера и из БД
@@ -536,6 +547,8 @@
             if (isset($onePropertyDataArr['earliestDate']) && $onePropertyDataArr['earliestDate'] != "0000-00-00") $this->earliestDate = GlobFunc::dateFromDBToView($onePropertyDataArr['earliestDate']);
             if (isset($onePropertyDataArr['earliestTimeHours'])) $this->earliestTimeHours = $onePropertyDataArr['earliestTimeHours'];
             if (isset($onePropertyDataArr['earliestTimeMinutes'])) $this->earliestTimeMinutes = $onePropertyDataArr['earliestTimeMinutes'];
+			if (isset($onePropertyDataArr['adminComment'])) $this->adminComment = $onePropertyDataArr['adminComment'];
+			if (isset($onePropertyDataArr['completeness'])) $this->completeness = $onePropertyDataArr['completeness'];
 
             if (isset($onePropertyDataArr['realCostOfRenting'])) $this->realCostOfRenting = $onePropertyDataArr['realCostOfRenting'];
             if (isset($onePropertyDataArr['last_act'])) $this->last_act = $onePropertyDataArr['last_act'];
@@ -590,7 +603,8 @@
         public function writeCharacteristicFromPOST($mode = "edit")
         {
             if (isset($_POST['ownerLogin']) && $mode == "new") $this->ownerLogin = htmlspecialchars($_POST['ownerLogin']);
-            if (isset($_POST['typeOfObject']) && $mode == "new") $this->typeOfObject = htmlspecialchars($_POST['typeOfObject']);
+			if (isset($_POST['status']) && $mode == "new") $this->status = htmlspecialchars($_POST['status']);
+			if (isset($_POST['typeOfObject']) && $mode == "new") $this->typeOfObject = htmlspecialchars($_POST['typeOfObject']);
             if (isset($_POST['dateOfEntry'])) $this->dateOfEntry = htmlspecialchars($_POST['dateOfEntry']);
             if (isset($_POST['termOfLease'])) $this->termOfLease = htmlspecialchars($_POST['termOfLease']);
             if (isset($_POST['dateOfCheckOut'])) $this->dateOfCheckOut = htmlspecialchars($_POST['dateOfCheckOut']);
@@ -653,7 +667,7 @@
             if (isset($_POST['earliestDate'])) $this->earliestDate = htmlspecialchars($_POST['earliestDate']);
             if (isset($_POST['earliestTimeHours'])) $this->earliestTimeHours = htmlspecialchars($_POST['earliestTimeHours']);
             if (isset($_POST['earliestTimeMinutes'])) $this->earliestTimeMinutes = htmlspecialchars($_POST['earliestTimeMinutes']);
-
+			if (isset($_POST['adminComment'])) $this->adminComment = htmlspecialchars($_POST['adminComment']);
         }
 
         // Записать в качестве данных о фотографиях соответствующую информацию из POST запроса
@@ -738,6 +752,8 @@
             $result['earliestDate'] = $this->earliestDate;
             $result['earliestTimeHours'] = $this->earliestTimeHours;
             $result['earliestTimeMinutes'] = $this->earliestTimeMinutes;
+			$result['adminComment'] = $this->adminComment;
+			$result['completeness'] = $this->completeness;
 
             $result['realCostOfRenting'] = $this->realCostOfRenting;
             $result['last_act'] = $this->last_act;
@@ -768,6 +784,10 @@
         // $typeOfValidation = editAdvert - режим вторичной (при редактировании уже существующего объявления) проверки указанных пользователем параметров объекта недвижимости
         function isAdvertCorrect($typeOfValidation)
         {
+			// Если признак полноты у объекта = 0, то не применяем к нему никаких требований по данным. По умолчанию считаем его верным
+			// Правильнее конечно все-таки разобраться с каждым правилом валидации и некоторые из них применять к объявлению, как это сделано с alien пользователями в классе User
+			if ($this->completeness == "0") return array();
+
             // Подготовим массив для сохранения сообщений об ошибках
             $errors = array();
 

@@ -93,10 +93,10 @@
                 <div class="headerSection">Новый собственник</div>
                 <ul>
                     <li>
-                        <a href="adminpanel.php?action=registrationNewOwner">Зарегистрировать нового собственника</a>
+                        <a href="adminpanel.php?action=registrationNewOwner" target="_blank">Зарегистрировать нового собственника</a>
                     </li>
                     <li>
-                        <a href="newadvert.php">Создать новое объявление</a>
+                        <a href="newadvert.php" target="_blank">Создать новое объявление</a>
                     </li>
                 </ul>
                 <div class="clearBoth"></div>
@@ -107,7 +107,10 @@
                 <div class="headerSection">Новое объявление (чужое)</div>
                 <ul>
                     <li>
-                        <a href="">Завести нового чужого собственника и его объявление</a>
+                        <a href="registration.php?typeOwner=true&alienOwner=true" target="_blank">Новый чужой собственник</a>
+                    </li>
+                    <li>
+                        <a href="newadvert.php?alienOwner=true" target="_blank">Новое чужое объявление</a>
                     </li>
                 </ul>
                 <div class="clearBoth"></div>

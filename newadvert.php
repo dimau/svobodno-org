@@ -31,7 +31,7 @@ if (!$incomingUser->login()) {
 // Если пользователь не является администратором, то доступ к странице ему запрещен - разавторизуем его и перекинем на главную (в идеале нужно перекидывать на login.php)
 // Кроме того, проверяем, что у данного администратора есть право на создание новых объектов недвижимости
 $isAdmin = $incomingUser->isAdmin();
-if (!$isAdmin || !$isAdmin['newOwner']) {
+if (!$isAdmin['newOwner'] && !$isAdmin['newAdvertAlien']) {
 	header('Location: out.php');
 }
 
@@ -54,6 +54,12 @@ if (isset($_POST['saveAdvertButton'])) {
 	$property->writeFotoInformationFromPOST();
 
 	// Проверяем корректность данных нового объявления. Функции isAdvertCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
+	// Если мы имеем дело с созданием нового чужого объявления администратором, то проверки данных происходят по упрощенному способу: isAdvertCorrect() чувствительна к свойству полноты ($property->setCompleteness)
+	if ($isAdmin['newAdvertAlien'] && isset($_GET['alienOwner']) && $_GET['alienOwner'] == "true") {
+		$property->setCompleteness("0");
+	} else {
+		$property->setCompleteness("1");
+	}
 	$errors = $property->isAdvertCorrect("newAdvert");
 
 	// Если данные, указанные пользователем, корректны, запишем объявление в базу данных
@@ -72,7 +78,7 @@ if (isset($_POST['saveAdvertButton'])) {
 
 			// Формируем сообщения (новости) для арендаторов, под чей поисковый запрос подходит новый объект
 			// TODO: в будущем здесь нужно лишь куда-то писать команду на формирование новостей, чтобы пользователь не дожидался выполнения скрипта
-			$property->sendMessagesAboutNewProperty();
+			if ($property->status == "опубликовано") $property->sendMessagesAboutNewProperty();
 
 			// Пересылаем пользователя на страницу с подробным описанием его объявления - хороший способ убедиться в том, что все данные указаны верно
 			header('Location: objdescription.php?propertyId=' . $property->id);
@@ -98,6 +104,7 @@ $propertyCharacteristic = $property->getCharacteristicData();
 $propertyFotoInformation = $property->getFotoInformationData();
 //$errors
 //$allDistrictsInCity
+//$isAdmin
 
 // Подсоединяем нужный основной шаблон
 include "templates/"."templ_newadvert.php";

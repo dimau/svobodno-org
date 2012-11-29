@@ -1,5 +1,4 @@
 <?php
-
 /*************************************************************************************
  * Если в строке не указан идентификатор объявления, то пересылаем пользователя на спец. страницу
  ************************************************************************************/
@@ -62,7 +61,7 @@ $property->writeFotoInformationFromDB();
 $isAdmin = $incomingUser->isAdmin();
 if ($property->status == "не опубликовано"
 	AND $property->userId != $incomingUser->getId()
-	AND !($isAdmin && $isAdmin['searchUser']))
+	AND !$isAdmin['searchUser'])
 {
 	header('Location: 404.html');
 }

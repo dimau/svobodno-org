@@ -32,7 +32,8 @@ if (isset($_POST['buttonSubmit'])) {
 	if (is_array($errors) && count($errors) == 0) // Если нет ошибок - пользователь успешно авторизован, понимаем, куда теперь его нужно переслать
 	{
 		// Если авторизовавшийся пользователь администратор, то пересылаем его а админку
-		if ($incomingUser->isAdmin()) {
+		$isAdmin = $incomingUser->isAdmin();
+		if ($isAdmin['newOwner'] || $isAdmin['newAdvertAlien'] || $isAdmin['searchUser']) {
 			header('Location: adminpanel.php');
 		} else { // Если авторизовавшийся пользователь не администратор, то пересылаем его в личный кабинет
 			header('Location: personal.php');

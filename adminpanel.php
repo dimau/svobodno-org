@@ -30,7 +30,8 @@ if (!$incomingUser->login()) {
 }
 
 // Если пользователь не является администратором, то доступ к странице ему запрещен - разавторизуем его и перекинем на главную (в идеале нужно перекидывать на login.php)
-if (!$incomingUser->isAdmin()) {
+$isAdmin = $incomingUser->isAdmin();
+if (!$isAdmin['newOwner'] && !$isAdmin['newAdvertAlien'] && !$isAdmin['searchUser']) {
 	header('Location: out.php');
 }
 

@@ -11,7 +11,7 @@ $(function () {
         minDate:new Date(1900, 0, 1),
         maxDate:new Date(2004, 11, 31),
         defaultDate:new Date(1987, 0, 27),
-        yearRange:"1900:2004",
+        yearRange:"1900:2004"
     });
     $("#birthday").datepicker($.datepicker.regional["ru"]);
 
@@ -76,10 +76,13 @@ if ($('#userMistakesBlock ol').html() != "") {
  * Блок с валидациями и выдачей ошибок
  *****************************************************************/
 
-// Отображение ошибок при клике на вкладку
+// Общедостыпная переменная, содержащая флаг - нужна ли валидация полей ввода при показе новой вкладки (tabsshow)
+var validationIsNeeded;
+
+// Принимает решение - нужно ли выполнить валидацию вновь открываемой вкладки или нет
 $('#tabs ul li a').click(function (event) {
     // Получаем номер кликнутой вкладки
-    currentTabId = $(this).attr("href").slice(-1) - 1;
+    var currentTabId = $(this).attr("href").slice(-1) - 1;
 
     // Получаем список всех недоступных вкладок
     var disabled = $("#tabs").tabs("option", "disabled");
@@ -87,44 +90,39 @@ $('#tabs ul li a').click(function (event) {
     // Если кликнутая вкладка недоступна - ничего не делаем
     if (disabled.indexOf(currentTabId) != -1) {
         // Значит кликнутая вкладка относится к недоступным - ничего не делаем
+        validationIsNeeded = false;
         return false;
     }
 
     // Если кликнутая вкладка совпадает с текущей отображаемой, то ничего не делаем
     if (currentTabId == $("#tabs").tabs().tabs('option', 'selected')) {
+        validationIsNeeded = false;
         return false;
     }
 
-    // Удаляем все блоки с ошибками
-    $(".errorBlock").remove();
+    // Если мы имеем дело с админом, который регистрирует чужого собственника, то ничего не делаем
+    if (isAlienOwnerRegistration) {
+        validationIsNeeded = false;
+        return false;
+    }
 
-    // Взводим флаг - требуется валидация при показе новой вкладки
+    // В иных случаях взводим флаг - требуется валидация при показе новой вкладки
     validationIsNeeded = true;
 
 });
 
 // Так как по событию клика вкладка еще не отображается, то проверка вкладки и отображение ошибок возможно только после наступления события tabsshow
 $('#tabs').bind('tabsshow', function () {
+
+    // Удаляем на странице все отображаемые блоки с ошибками
+    $(".errorBlock").remove();
+
     if (validationIsNeeded) {
         // Получаем номер текущей вкладки
         currentTabId = $("#tabs").tabs().tabs('option', 'selected');
 
         // Проводим валидацию вновь открытой вкладки, чтобы отобразить имеющиеся на ней ошибки
-        var errOnTab = 0;
-        switch (currentTabId) {
-            case 0:
-                errOnTab = step1_validation();
-                break;
-            case 1:
-                errOnTab = step2_validation();
-                break;
-            case 2:
-                errOnTab = step3_validation();
-                break;
-            case 3:
-                errOnTab = step4_validation();
-                break;
-        }
+        executeValidation("registration", currentTabId);
 
         // Снимаем флаг о том, что требуется валидация при показе новой вкладки
         validationIsNeeded = false;
@@ -133,42 +131,35 @@ $('#tabs').bind('tabsshow', function () {
 
 // Обработка клика по кнопке Назад
 $(".backButton").click(function() {
-    // Удаляем все блоки с ошибками
-    $(".errorBlock").remove();
 
     // Получаем номер текущей вкладки
     currentTabId = $("#tabs").tabs().tabs('option', 'selected');
 
     // Взводим флаг - требуется валидация при показе новой вкладки
-    validationIsNeeded = true;
+    // Если мы имеем дело с админом, который регистрирует чужого собственника, то не проводим проверок
+    if (isAlienOwnerRegistration) {
+        validationIsNeeded = false;
+    } else {
+        validationIsNeeded = true;
+    }
 
     // Меняем выбранную вкладку
     $("#tabs").tabs().tabs('select', currentTabId - 1);
 
     return false;
-
 });
 
 // Обработка клика по кнопке Далее
 $(".forwardButton").click(function() {
-    // Удаляем все блоки с ошибками
-    $(".errorBlock").remove();
 
     // Получаем номер текущей вкладки
     currentTabId = $("#tabs").tabs().tabs('option', 'selected');
 
-   // Вызываем функцию валидации для этой вкладки
+    // Вызываем функцию валидации для этой вкладки
+    // Если мы имеем дело с админом, который регистрирует чужого собственника, то не проводим проверок
     var errOnTab = 0;
-    switch (currentTabId) {
-        case 0:
-            errOnTab = step1_validation();
-            break;
-        case 1:
-            errOnTab = step2_validation();
-            break;
-        case 2:
-            errOnTab = step3_validation();
-            break;
+    if (!isAlienOwnerRegistration) {
+        errOnTab = executeValidation("registration", currentTabId);
     }
 
     // Проверяем, есть ли ошибки на этой вкладке
@@ -179,50 +170,49 @@ $(".forwardButton").click(function() {
     }
 
     return false;
-
 });
 
 // Обработка клика по кнопке Отправить (submitButton)
 $(".submitButton").click(function() {
 
-    // Удаляем все блоки с ошибками
-    $(".errorBlock").remove();
-
     // Получаем номер текущей вкладки
     currentTabId = $("#tabs").tabs().tabs('option', 'selected');
 
     // Вызываем функцию валидации для всех вкладок по очереди, если на какой-то обнаружим ошибки, то останавливаем валидацию и оставляем пользователя на этой вкладке
+    // Если мы имеем дело с админом, который регистрирует чужого собственника, то не проводим проверок
     var errOnTab = 0;
+    if (!isAlienOwnerRegistration) {
     switch (currentTabId) {
         case 2:
             $("#tabs").tabs().tabs('select', 0);
-            errOnTab = step1_validation();
+            errOnTab = executeValidation("registration", 0);
             if (errOnTab != 0)  break;
 
             $("#tabs").tabs().tabs('select', 1);
-            errOnTab = step2_validation();
+            errOnTab = executeValidation("registration", 1);
             if (errOnTab != 0)  break;
 
             $("#tabs").tabs().tabs('select', 2);
-            errOnTab = step3_validation();
-
+            errOnTab = executeValidation("registration", 2);
             break;
+
         case 3:
             $("#tabs").tabs().tabs('select', 0);
-            errOnTab = step1_validation();
+            errOnTab = executeValidation("registration", 0);
             if (errOnTab != 0)  break;
 
             $("#tabs").tabs().tabs('select', 1);
-            errOnTab = step2_validation();
+            errOnTab = executeValidation("registration", 1);
             if (errOnTab != 0)  break;
 
             $("#tabs").tabs().tabs('select', 2);
-            errOnTab = step3_validation();
+            errOnTab = executeValidation("registration", 2);
             if (errOnTab != 0)  break;
 
             $("#tabs").tabs().tabs('select', 3);
-            errOnTab = step4_validation();
+            errOnTab = executeValidation("registration", 3);
             break;
+    }
     }
 
     // Проверяем, есть ли ошибки на какой-либо вкладке
@@ -233,8 +223,38 @@ $(".submitButton").click(function() {
 
 });
 
+// Производит валидацию вкладки, номер которой передан в качестве параметра
+// pageName - имя страницы, на которой производится валидация
+// tabNumber - дополнительный параметр, указывающий на номер вкладки на странице (можно воспринимать как идентификатор блока параметров, которым требуется валидация на данной странице)
+function executeValidation(pageName, tabNumber) {
+
+    // Инициализируем переменную для хранения количества найденных ошибок
+    var errors = 0;
+
+    // Удаляем на странице все отображаемые блоки с ошибками
+    $(".errorBlock").remove();
+
+    switch (tabNumber) {
+        case 0:
+            errors = personalFIO_validation();
+            break;
+        case 1:
+            errors = personalEducAndWork_validation();
+            break;
+        case 2:
+            errors = personalSocial_validation();
+            break;
+        case 3:
+            errors = searchRequest_validation();
+            break;
+    }
+
+    // Возвращаем количество ошибок
+    return errors;
+}
+
 // Функции валидации для каждой вкладки
-function step1_validation() {
+function personalFIO_validation() {
 
     var err = 0;
 
@@ -320,7 +340,7 @@ function step1_validation() {
             err++;
         }
     }
-    if ($('#email').val() == '' && $(".userType").attr('typeTenant') == 'TRUE') {
+    if ($('#email').val() == '' && typeTenant) {
         buildErrorMessageBlock ("email", "Укажите e-mail");
         err++;
     }
@@ -333,15 +353,15 @@ function step1_validation() {
 
 }
 
-function step2_validation() {
+function personalEducAndWork_validation() {
     var err = 0;
 
-    if ($('#currentStatusEducation').val() == '0' && $(".userType").attr('typeTenant') == 'TRUE') {
+    if ($('#currentStatusEducation').val() == '0' && typeTenant) {
         buildErrorMessageBlock ("currentStatusEducation", "Укажите Ваше образование (текущий статус)");
         err++;
     } else {
         // Образование
-        if ($('#almamater').val() == '' && $(".userType").attr('typeTenant') == 'TRUE' && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  )) {
+        if ($('#almamater').val() == '' && typeTenant && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  )) {
             buildErrorMessageBlock ("almamater", "Укажите учебное заведение");
             err++;
         }
@@ -349,7 +369,7 @@ function step2_validation() {
             buildErrorMessageBlock ("almamater", "Слишком длинное название учебного заведения (используйте не более 100 символов)");
             err++;
         }
-        if ($('#speciality').val() == '' && $(".userType").attr('typeTenant') == 'TRUE' && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  )) {
+        if ($('#speciality').val() == '' && typeTenant && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  )) {
             buildErrorMessageBlock ("speciality", "Укажите специальность");
             err++;
         }
@@ -357,7 +377,7 @@ function step2_validation() {
             buildErrorMessageBlock ("speciality", "Слишком длинное название специальности (используйте не более 100 символов)");
             err++;
         }
-        if ($('#kurs').val() == '' && $(".userType").attr('typeTenant') == 'TRUE' && $('#currentStatusEducation').val() == 'сейчас учусь') {
+        if ($('#kurs').val() == '' && typeTenant && $('#currentStatusEducation').val() == 'сейчас учусь') {
             buildErrorMessageBlock ("kurs", "Укажите курс обучения");
             err++;
         }
@@ -365,11 +385,11 @@ function step2_validation() {
             buildErrorMessageBlock ("kurs", "Указана слишком длинная строка (используйте не более 30 символов)");
             err++;
         }
-        if ($('#ochnoZaochno').val() == '0' && $(".userType").attr('typeTenant') == 'TRUE' && $('#currentStatusEducation').val() == 'сейчас учусь') {
+        if ($('#ochnoZaochno').val() == '0' && typeTenant && $('#currentStatusEducation').val() == 'сейчас учусь') {
             buildErrorMessageBlock ("ochnoZaochno", "Укажите форму обучения (очная, заочная)");
             err++;
         }
-        if ($('#yearOfEnd').val() == '' && $(".userType").attr('typeTenant') == 'TRUE' && $('#currentStatusEducation').val() == 'закончил') {
+        if ($('#yearOfEnd').val() == '' && typeTenant && $('#currentStatusEducation').val() == 'закончил') {
             buildErrorMessageBlock ("yearOfEnd", "Укажите год окончания учебного заведения");
             err++;
         }
@@ -380,11 +400,11 @@ function step2_validation() {
     }
 
     // Работа
-    if ($('#statusWork').val() == '0' && $(".userType").attr('typeTenant') == 'TRUE') {
+    if ($('#statusWork').val() == '0' && typeTenant) {
         buildErrorMessageBlock ("statusWork", "Укажите статус занятости");
         err++;
     } else {
-        if ($('#placeOfWork').val() == '' && $("#statusWork").val() == 'работаю' && $(".userType").attr('typeTenant') == 'TRUE') {
+        if ($('#placeOfWork').val() == '' && $("#statusWork").val() == 'работаю' && typeTenant) {
             buildErrorMessageBlock ("placeOfWork", "Укажите Ваше место работы (название организации)");
             err++;
         }
@@ -392,7 +412,7 @@ function step2_validation() {
             buildErrorMessageBlock ("placeOfWork", "Слишком длинное наименование места работы (используйте не более 100 символов)");
             err++;
         }
-        if ($('#workPosition').val() == '' && $("#statusWork").val() == 'работаю' && $(".userType").attr('typeTenant') == 'TRUE') {
+        if ($('#workPosition').val() == '' && $("#statusWork").val() == 'работаю' && typeTenant) {
             buildErrorMessageBlock ("workPosition", "Укажите Вашу должность");
             err++;
         }
@@ -415,7 +435,7 @@ function step2_validation() {
     return err;
 }
 
-function step3_validation() {
+function personalSocial_validation() {
     var err = 0;
 
     if ($('#vkontakte').val().length > 100) {
@@ -459,7 +479,7 @@ function step3_validation() {
     return err;
 }
 
-function step4_validation() {
+function searchRequest_validation() {
     var err = 0;
 
     if (!/^\d{0,8}$/.test($('#minCost').val())) {

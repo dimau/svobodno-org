@@ -73,11 +73,11 @@ $searchRequest->searchProperties(20);
 // Инициализируем используемые в шаблоне(ах) переменные
 $isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
 $amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных сообщений пользователя
-$whatPage = "forSearchPage";
 $propertyLightArr = $searchRequest->getPropertyLightArr();
 $propertyFullArr = $searchRequest->getPropertyFullArr();
 $userSearchRequest = $searchRequest->getSearchRequestData();
 $favoritesPropertysId = $incomingUser->getFavoritesPropertysId();
+$mode = "search"; // Режим, согласно которому будут работать некоторые шаблоны
 //$allDistrictsInCity
 
 // Подсоединяем нужный основной шаблон

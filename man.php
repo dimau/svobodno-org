@@ -1,5 +1,4 @@
 <?php
-
 /*************************************************************************************
  * Инициализация нужных моделей
  ************************************************************************************/
@@ -71,7 +70,7 @@ if ($user->typeTenant) {
 $isAdmin = $incomingUser->isAdmin();
 if (!in_array($targetUserId, $tenantsWithSignUpToViewRequest)
 	AND $incomingUser->getId() != $targetUserId
-	AND !($isAdmin && $isAdmin['searchUser'])) {
+	AND !$isAdmin['searchUser']) {
 	header('Location: 404.html'); //TODO: реализовать страницу Отказано в доступе
 }
 

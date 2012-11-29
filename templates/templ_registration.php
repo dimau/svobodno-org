@@ -63,9 +63,6 @@
 <body>
 <div class="page_without_footer">
 
-<!-- Добавялем невидимый input для того, чтобы передать тип пользователя (собственник/арендатор) - это используется в JS для простановки обязательности полей для заполнения -->
-<input type='hidden' class='userType' typeTenant='<?php if ($userCharacteristic['typeTenant']) echo "TRUE"; else echo "FALSE";?>' typeOwner='<?php if ($userCharacteristic['typeOwner']) echo "TRUE"; else echo "FALSE";?>'>
-
 <!-- Всплывающее поле для отображения списка ошибок, полученных при проверке данных на сервере (PHP)-->
 <div id="userMistakesBlock" class="ui-widget">
     <div class="ui-state-highlight ui-corner-all">
@@ -257,9 +254,13 @@
 
 <!-- JavaScript -->
 <script>
-    // Сервер сохранит в эту переменную данные о загруженных фотографиях в формате JSON
-    // Переменная uploadedFoto содержит массив объектов, каждый из которых представляет информацию по 1 фотографии
-    var uploadedFoto = JSON.parse('<?php echo json_encode($userFotoInformation['uploadedFoto']);?>');
+	var typeTenant = <?php if ($userCharacteristic['typeTenant']) echo "true"; else echo "false"; // Является ли регистрируемый пользователь арендатором ?>;
+	var typeOwner = <?php if ($userCharacteristic['typeOwner']) echo "true"; else echo "false"; // Является ли регистрируемый пользователь собственником ?>;
+    var isAlienOwnerRegistration = <?php if ($isAlienOwnerRegistration) echo "true"; else echo "false"; // Если регистрируется новый чужой собственник, то JS проверки на заполненность полей не проводятся ?>;
+	var uploadedFoto = JSON.parse('<?php echo json_encode($userFotoInformation['uploadedFoto']);
+	// Сервер сохранит в эту переменную данные о загруженных фотографиях в формате JSON
+	// Переменная uploadedFoto содержит массив объектов, каждый из которых представляет информацию по 1 фотографии
+	?>');
 </script>
 <script src="js/main.js"></script>
 <script src="js/registration.js"></script>

@@ -33,7 +33,7 @@ if (!$incomingUser->login()) {
 // Если пользователь не является администратором, то доступ к странице ему запрещен - разавторизуем его и перекинем на главную (в идеале нужно перекидывать на login.php)
 // Кроме того, проверяем, что у данного администратора есть право на поиск пользователей и вход в их Личные кабинеты
 $isAdmin = $incomingUser->isAdmin();
-if (!$isAdmin || !$isAdmin['searchUser']) {
+if (!$isAdmin['searchUser']) {
 	header('Location: out.php');
 }
 
@@ -113,7 +113,7 @@ if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondNa
 	// Получим информацию по объектам недвижимости, которые принадлежат найденным пользователям
 	// В итоге получим массив ($allProperties), каждый элемент которого представляет собой еще один массив параметров конкретного объекта недвижимости, принадлежащего одному из найденных выше пользователей
 	if ($strWHERE != "") {
-		$res = DBconnect::get()->query("SELECT id, userId, typeOfObject, address, apartmentNumber FROM property WHERE".$strWHERE);
+		$res = DBconnect::get()->query("SELECT id, userId, typeOfObject, address, apartmentNumber, adminComment, completeness FROM property WHERE".$strWHERE);
 		if ((DBconnect::get()->errno)
 			OR (($allProperties = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
 		) {
@@ -143,7 +143,7 @@ if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondNa
 	// Количество результатов ограничено первыми 20-тью, чтобы не перегружать БД
 	// В итоге получим массив ($allProperties), каждый элемент которого представляет собой еще один массив параметров конкретного объекта недвижимости
 	if ($strWHERE != "") {
-		$res = DBconnect::get()->query("SELECT id, userId, typeOfObject, address, apartmentNumber FROM property WHERE".$strWHERE." LIMIT 20");
+		$res = DBconnect::get()->query("SELECT id, userId, typeOfObject, address, apartmentNumber, adminComment, completeness FROM property WHERE".$strWHERE." LIMIT 20");
 		if ((DBconnect::get()->errno)
 			OR (($allProperties = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
 		) {

@@ -132,6 +132,17 @@
     </div>
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
+            Статус опубликованности (если выбрать "опубликовать", то будет произведена рассылка о новом объекте по арендаторам):
+        </div>
+        <div class="objectDescriptionBody">
+            <select name="status" id="status">
+                <option value="опубликовано" <?php if ($propertyCharacteristic['status'] == "опубликовано") echo "selected";?>>опубликовать</option>
+                <option value="не опубликовано" <?php if ($propertyCharacteristic['status'] == "не опубликовано") echo "selected";?>>не публиковать</option>
+            </select>
+        </div>
+    </div>
+    <div class="objectDescriptionItem">
+        <div class="objectDescriptionItemLabel">
             Тип объекта:
         </div>
         <div class="objectDescriptionBody">
@@ -1315,6 +1326,17 @@
             <textarea name="comment" maxlength="2000" rows="7" cols="43"><?php echo $propertyCharacteristic['comment'];?></textarea>
         </div>
     </div>
+
+	<?php if ($isAdmin['newOwner'] || $isAdmin['newAdvertAlien'] || $isAdmin['searchUser']): ?>
+    <div class="objectDescriptionItem">
+        <div class="objectDescriptionItemLabel">
+            КОММЕНТАРИЙ ДЛЯ СОТРУДНИКОВ:
+        </div>
+        <div class="objectDescriptionBody" style="min-width: 330px">
+            <textarea name="adminComment" maxlength="2000" rows="7" cols="43"><?php echo $propertyCharacteristic['adminComment'];?></textarea>
+        </div>
+    </div>
+	<?php endif; ?>
 </div>
 
 <div class="bottomButton">

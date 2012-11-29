@@ -15,7 +15,7 @@
 		Пароль: <span class='content'><?php echo $user['password']; ?></span>
     </div>
 
-	<ul>
+	<div style="margin-left: 40px;">
 		<?php
 		foreach ($allProperties as $value) {
 			if ($value['userId'] == $user['id']) {
@@ -23,5 +23,5 @@
 			}
 		}
 		?>
-	</ul>
+	</div>
 </div>

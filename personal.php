@@ -1,5 +1,4 @@
 <?php
-
 // Стартуем сессию с пользователем - сделать доступными переменные сессии
 session_start();
 
@@ -33,7 +32,7 @@ if (!$incomingUser->login()) {
 // Если пользователь является администратором, то проверяем GET параметр compId - возможно админ хочет поработать с Личным кабинетом от имени другого пользователя
 // Кроме того, проверяем, что у данного администратора есть право на поиск пользователей и вход в их Личные кабинеты: $isAdmin['searchUser'] == TRUE
 $isAdmin = $incomingUser->isAdmin();
-if ($isAdmin && $isAdmin['searchUser'] && isset($_GET['compId'])) {
+if ($isAdmin['searchUser'] && isset($_GET['compId'])) {
 	$userId = GlobFunc::compIdToId($_GET['compId']);
 } else {
 	$userId = $incomingUser->getId();
@@ -203,8 +202,7 @@ $allPropertiesTenantPretenders = $collectionProperty->getAllPropertiesTenantPret
 $propertyLightArr = $incomingUser->getPropertyLightArr();
 $propertyFullArr = $incomingUser->getPropertyFullArr();
 $favoritesPropertysId = $incomingUser->getFavoritesPropertysId();
-$whatPage = "forPersonalPage"; // Режим в котором будет работать шаблон для редактирования поискового запроса (templ_editableSearchRequest.php)
-$mode = "personal"; // Режим в котором будет работать шаблон анкеты пользователя на вкладке №1 (templ_notEditedProfile.php)
+$mode = "personal"; // Режим в котором будут работать ряд шаблонов: анкеты пользователя на вкладке №1 (templ_notEditedProfile.php), шаблон для редактирования поискового запроса (templ_editableSearchRequest.php)
 $messagesArr = $user->getAllMessagesSorted(); // массив массивов, каждый из которых представляет инфу по 1-ому сообщению (новости пользователя)
 $compId = GlobFunc::idToCompId($userId);
 //$errors

@@ -69,9 +69,10 @@
             return FALSE;
         }
 
-		// Является ли пользователь администратором. Если нет - вернет NULL, если является, вернет ассоциированный массив с правами доступа
+		// Является ли пользователь администратором. Возвращает ассоциированный массив с правами доступа
+		// Если пользователь не является администратором, то все права у него будут с флагами FALSE
 		public function isAdmin() {
-			if ($this->typeAdmin === NULL || $this->typeAdmin == FALSE) return FALSE;
+			if ($this->typeAdmin === NULL || $this->typeAdmin == FALSE) return array('newOwner' => FALSE, 'newAdvertAlien' => FALSE, 'searchUser' => FALSE);
 
 			if (substr($this->typeAdmin, 0, 1) == "1") $result['newOwner'] = TRUE; else $result['newOwner'] = FALSE;
 			if (substr($this->typeAdmin, 1, 1) == "1") $result['newAdvertAlien'] = TRUE; else $result['newAdvertAlien'] = FALSE;

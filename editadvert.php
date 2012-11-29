@@ -51,7 +51,7 @@ $errors = array();
  **************************************************************************************************************/
 
 $isAdmin = $incomingUser->isAdmin();
-if ($property->userId != $incomingUser->getId() AND !($isAdmin && $isAdmin['searchUser'])) {
+if ($property->userId != $incomingUser->getId() AND !$isAdmin['searchUser']) {
 	header('Location: personal.php?tabsId=3');
 }
 
@@ -111,6 +111,7 @@ $propertyFotoInformation = $property->getFotoInformationData();
 $compId = $propertyCharacteristic['userId'];
 //$allDistrictsInCity
 //$errors
+//$isAdmin
 
 // Подсоединяем нужный основной шаблон
 include "templates/" . "templ_editadvert.php";

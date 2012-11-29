@@ -62,6 +62,8 @@
         // Преобразовывает дату из формата, пригодного для хранения в БД в формат, пригодный для отображения
         public static function dateFromDBToView($dateFromDB)
         {
+			if (!isset($dateFromDB) || $dateFromDB == "" || $dateFromDB == "0000-00-00") return "";
+
             $date = substr($dateFromDB, 8, 2);
             $month = substr($dateFromDB, 5, 2);
             $year = substr($dateFromDB, 0, 4);
@@ -89,6 +91,8 @@
         // Функция вычисляет возраст по дате рождения. Пример: echo calculate_age('27.01.2012');
         public static function calculate_age($birthday)
         {
+			if (!isset($birthday) || $birthday == "" || $birthday = "00.00.0000") return "";
+
             // Дата рождения
             $dateOfBorn = substr($birthday, 0, 2);
             // Месяц рождения

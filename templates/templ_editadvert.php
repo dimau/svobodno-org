@@ -1295,6 +1295,17 @@
             <textarea name="comment" maxlength="2000" rows="7" cols="43"><?php echo $propertyCharacteristic['comment'];?></textarea>
         </div>
     </div>
+
+	<?php if ($isAdmin['newOwner'] || $isAdmin['newAdvertAlien'] || $isAdmin['searchUser']): ?>
+    <div class="objectDescriptionItem">
+        <div class="objectDescriptionItemLabel">
+            КОММЕНТАРИЙ ДЛЯ СОТРУДНИКОВ:
+        </div>
+        <div class="objectDescriptionBody" style="min-width: 330px">
+            <textarea name="adminComment" maxlength="2000" rows="7" cols="43"><?php echo $propertyCharacteristic['adminComment'];?></textarea>
+        </div>
+    </div>
+	<?php endif; ?>
 </div>
 
 <div class="bottomButton">

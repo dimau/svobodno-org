@@ -16,8 +16,9 @@ if (DBconnect::get() == FALSE) die('Ошибка подключения к ба�
 // Инициализируем модель для запросившего страницу пользователя
 $incomingUser = new IncomingUser();
 
-// Проверим, быть может пользователь уже авторизирован. Если это так, перенаправим его на главную страницу сайта
-if ($incomingUser->login()) {
+$isAdmin = $incomingUser->isAdmin();
+// Проверим, быть может пользователь уже авторизирован. Если это так и он не является администратором, перенаправим его на главную страницу сайта
+if ($incomingUser->login() && !$isAdmin['newOwner'] && !$isAdmin['newAdvertAlien']) {
 	header('Location: personal.php');
 }
 
@@ -42,6 +43,13 @@ if (isset($_SERVER['HTTP_REFERER'])) {
 	}
 }
 
+// Возможно администратор хочет зарегистрировать чужого собственника? Если это так, то применяем минимум проверок к данным о регистрируемом пользователе
+if ($isAdmin['newAdvertAlien'] && isset($_GET['alienOwner']) && $_GET['alienOwner'] == "true") {
+	$isAlienOwnerRegistration = TRUE;
+} else {
+	$isAlienOwnerRegistration = FALSE;
+}
+
 /********************************************************************************
  * ОТПРАВЛЕНА ФОРМА РЕГИСТРАЦИИ
  *******************************************************************************/
@@ -54,7 +62,12 @@ if (isset($_POST['submitButton'])) {
 	$user->writeSearchRequestFromPOST();
 
 	// Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
-	$errors = $user->userDataCorrect("registration");
+	// Если мы имеем дело с созданием нового чужого объявления администратором, то проводим минимальную проверку данных
+	if ($isAlienOwnerRegistration) {
+		$errors = $user->userDataCorrect("newAlienOwner");
+	} else {
+		$errors = $user->userDataCorrect("registration");
+	}
 
 	// Если данные, указанные пользователем, корректны, запишем их в базу данных
 	if (is_array($errors) && count($errors) == 0) {
@@ -77,7 +90,13 @@ if (isset($_POST['submitButton'])) {
 			}
 
 			/******* Авторизовываем пользователя *******/
-			$correctEnter = $incomingUser->enter();
+			// Если админ заводил нового пользователя, то авторизация под новым пользователем нам не нужна
+			if ($isAdmin['newOwner'] || $isAdmin['newAdvertAlien'] || $isAdmin['searchUser']) {
+				$correctEnter = array();
+			} else {
+				$correctEnter = $incomingUser->enter();
+			}
+
 			if (count($correctEnter) == 0) //если нет ошибок, отправляем уже авторизованного пользователя на страницу успешной регистрации
 			{
 				header('Location: successfullRegistration.php');
@@ -104,7 +123,8 @@ $amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Колич�
 $userCharacteristic = $user->getCharacteristicData();
 $userFotoInformation = $user->getFotoInformationData();
 $userSearchRequest = $user->getSearchRequestData();
-$whatPage = "forPersonalPage";
+$mode = "registration";
+//$isAlienOwnerRegistration
 //$errors
 //$allDistrictsInCity
 

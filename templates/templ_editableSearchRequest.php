@@ -260,7 +260,7 @@
                         Как собираетесь проживать
                     </td>
                     <?php
-                        if ($whatPage == "forSearchPage") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
+                        if ($mode == "search") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
                     ?>
                     <td class="itemBody">
                         <select name="withWho" id="withWho">
@@ -302,7 +302,7 @@
                         Дети
                     </td>
                     <?php
-                        if ($whatPage == "forSearchPage") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
+                        if ($mode == "search") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
                     ?>
                     <td class="itemBody">
                         <select name="children" id="children">
@@ -340,7 +340,7 @@
                         Домашние животные
                     </td>
                     <?php
-                        if ($whatPage == "forSearchPage") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
+                        if ($mode == "search") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
                     ?>
                     <td class="itemBody">
                         <select name="animals" id="animals">
@@ -373,7 +373,7 @@
                         Срок аренды
                     </td>
                     <?php
-                        if ($whatPage == "forSearchPage") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
+                        if ($mode == "search") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
                     ?>
                     <td class="itemBody">
                         <select name="termOfLease" id="termOfLease">
@@ -390,7 +390,7 @@
                     </td>
                 </tr>
 
-                <?php if($whatPage == "forPersonalPage"): ?>
+                <?php if($mode == "registration" || $mode == "personal"): ?>
                 <tr class="additionalSearchConditions">
                     <td class="itemLabel" colspan="3">
                         Дополнительные условия поиска:
