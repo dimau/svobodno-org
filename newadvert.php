@@ -53,14 +53,15 @@ if (isset($_POST['saveAdvertButton'])) {
 	$property->writeCharacteristicFromPOST("new");
 	$property->writeFotoInformationFromPOST();
 
-	// Проверяем корректность данных нового объявления. Функции isAdvertCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
-	// Если мы имеем дело с созданием нового чужого объявления администратором, то проверки данных происходят по упрощенному способу: isAdvertCorrect() чувствительна к свойству полноты ($property->setCompleteness)
+	// Проверяем корректность данных нового объявления. Функции propertyDataValidate() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
+	// Если мы имеем дело с созданием нового чужого объявления администратором, то проверки данных происходят по упрощенному способу
 	if ($isAdmin['newAdvertAlien'] && isset($_GET['alienOwner']) && $_GET['alienOwner'] == "true") {
 		$property->setCompleteness("0");
+		$errors = $property->propertyDataValidate("newAlienAdvert");
 	} else {
 		$property->setCompleteness("1");
+		$errors = $property->propertyDataValidate("newAdvert");
 	}
-	$errors = $property->isAdvertCorrect("newAdvert");
 
 	// Если данные, указанные пользователем, корректны, запишем объявление в базу данных
 	if (is_array($errors) && count($errors) == 0) {

@@ -159,8 +159,8 @@
             $furnitureInLivingAreaSerialized = serialize($this->furnitureInLivingArea);
             $furnitureInKitchenSerialized = serialize($this->furnitureInKitchen);
             $appliancesSerialized = serialize($this->appliances);
-            $sexOfTenantImploded = implode("_", $this->sexOfTenant);
-            $relationsImploded = implode("_", $this->relations);
+            $sexOfTenantSerialized = serialize($this->sexOfTenant);
+            $relationsSerialized = serialize($this->relations);
             $tenantsWithSignUpToViewRequestSerialized = serialize($this->tenantsWithSignUpToViewRequest);
 
             // Довычисляем значения переменных, которые понадобятся при сохранении новой записи в БД или при ее модификации
@@ -197,7 +197,7 @@
             if ($typeOfProperty == "new") {
                 $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("INSERT INTO property SET userId=?, typeOfObject=?, dateOfEntry=?, termOfLease=?, dateOfCheckOut=?, amountOfRooms=?, adjacentRooms=?, amountOfAdjacentRooms=?, typeOfBathrooms=?, typeOfBalcony=?, balconyGlazed=?, roomSpace=?, totalArea=?, livingSpace=?, kitchenSpace=?, floor=?, totalAmountFloor=?, numberOfFloor=?, concierge=?, intercom=?, parking=?, city=?, district=?, coordX=?, coordY=?, address=?, apartmentNumber=?, subwayStation=?, distanceToMetroStation=?, currency=?, costOfRenting=?, realCostOfRenting=?, utilities=?, costInSummer=?, costInWinter=?, electricPower=?, bail=?, bailCost=?, prepayment=?, compensationMoney=?, compensationPercent=?, repair=?, furnish=?, windows=?, internet=?, telephoneLine=?, cableTV=?, furnitureInLivingArea=?, furnitureInLivingAreaExtra=?, furnitureInKitchen=?, furnitureInKitchenExtra=?, appliances=?, appliancesExtra=?, sexOfTenant=?, relations=?, children=?, animals=?, contactTelephonNumber=?, timeForRingBegin=?, timeForRingEnd=?, checking=?, responsibility=?, comment=?, last_act=?, reg_date=?, status=?, tenantsWithSignUpToViewRequest=?, earliestDate=?, earliestTimeHours=?, earliestTimeMinutes=?, adminComment=?, completeness=?") === FALSE)
-                    OR ($stmt->bind_param("sssssssssssddddiiissssssssssisddsddssdsddssssssssssssssssssssssiisssssss", $userId, $this->typeOfObject, $dateOfEntryForDB, $this->termOfLease, $dateOfCheckOutForDB, $this->amountOfRooms, $this->adjacentRooms, $this->amountOfAdjacentRooms, $this->typeOfBathrooms, $this->typeOfBalcony, $this->balconyGlazed, $this->roomSpace, $this->totalArea, $this->livingSpace, $this->kitchenSpace, $this->floor, $this->totalAmountFloor, $this->numberOfFloor, $this->concierge, $this->intercom, $this->parking, $this->city, $this->district, $this->coordX, $this->coordY, $this->address, $this->apartmentNumber, $this->subwayStation, $this->distanceToMetroStation, $this->currency, $this->costOfRenting, $realCostOfRenting, $this->utilities, $this->costInSummer, $this->costInWinter, $this->electricPower, $this->bail, $this->bailCost, $this->prepayment, $this->compensationMoney, $this->compensationPercent, $this->repair, $this->furnish, $this->windows, $this->internet, $this->telephoneLine, $this->cableTV, $furnitureInLivingAreaSerialized, $this->furnitureInLivingAreaExtra, $furnitureInKitchenSerialized, $this->furnitureInKitchenExtra, $appliancesSerialized, $this->appliancesExtra, $sexOfTenantImploded, $relationsImploded, $this->children, $this->animals, $this->contactTelephonNumber, $this->timeForRingBegin, $this->timeForRingEnd, $this->checking, $this->responsibility, $this->comment, $last_act, $reg_date, $this->status, $tenantsWithSignUpToViewRequestSerialized, $earliestDateForDB, $this->earliestTimeHours, $this->earliestTimeMinutes, $this->adminComment, $this->completeness) === FALSE)
+                    OR ($stmt->bind_param("sssssssssssddddiiissssssssssisddsddssdsddssssssssssssssssssssssiisssssss", $userId, $this->typeOfObject, $dateOfEntryForDB, $this->termOfLease, $dateOfCheckOutForDB, $this->amountOfRooms, $this->adjacentRooms, $this->amountOfAdjacentRooms, $this->typeOfBathrooms, $this->typeOfBalcony, $this->balconyGlazed, $this->roomSpace, $this->totalArea, $this->livingSpace, $this->kitchenSpace, $this->floor, $this->totalAmountFloor, $this->numberOfFloor, $this->concierge, $this->intercom, $this->parking, $this->city, $this->district, $this->coordX, $this->coordY, $this->address, $this->apartmentNumber, $this->subwayStation, $this->distanceToMetroStation, $this->currency, $this->costOfRenting, $realCostOfRenting, $this->utilities, $this->costInSummer, $this->costInWinter, $this->electricPower, $this->bail, $this->bailCost, $this->prepayment, $this->compensationMoney, $this->compensationPercent, $this->repair, $this->furnish, $this->windows, $this->internet, $this->telephoneLine, $this->cableTV, $furnitureInLivingAreaSerialized, $this->furnitureInLivingAreaExtra, $furnitureInKitchenSerialized, $this->furnitureInKitchenExtra, $appliancesSerialized, $this->appliancesExtra, $sexOfTenantSerialized, $relationsSerialized, $this->children, $this->animals, $this->contactTelephonNumber, $this->timeForRingBegin, $this->timeForRingEnd, $this->checking, $this->responsibility, $this->comment, $last_act, $reg_date, $this->status, $tenantsWithSignUpToViewRequestSerialized, $earliestDateForDB, $this->earliestTimeHours, $this->earliestTimeMinutes, $this->adminComment, $this->completeness) === FALSE)
                     OR ($stmt->execute() === FALSE)
                     OR (($res = $stmt->affected_rows) === -1)
                     OR ($res === 0)
@@ -211,7 +211,7 @@
             if ($typeOfProperty == "edit") {
                 $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("UPDATE property SET userId=?, typeOfObject=?, dateOfEntry=?, termOfLease=?, dateOfCheckOut=?, amountOfRooms=?, adjacentRooms=?, amountOfAdjacentRooms=?, typeOfBathrooms=?, typeOfBalcony=?, balconyGlazed=?, roomSpace=?, totalArea=?, livingSpace=?, kitchenSpace=?, floor=?, totalAmountFloor=?, numberOfFloor=?, concierge=?, intercom=?, parking=?, city=?, district=?, coordX=?, coordY=?, address=?, apartmentNumber=?, subwayStation=?, distanceToMetroStation=?, currency=?, costOfRenting=?, realCostOfRenting=?, utilities=?, costInSummer=?, costInWinter=?, electricPower=?, bail=?, bailCost=?, prepayment=?, compensationMoney=?, compensationPercent=?, repair=?, furnish=?, windows=?, internet=?, telephoneLine=?, cableTV=?, furnitureInLivingArea=?, furnitureInLivingAreaExtra=?, furnitureInKitchen=?, furnitureInKitchenExtra=?, appliances=?, appliancesExtra=?, sexOfTenant=?, relations=?, children=?, animals=?, contactTelephonNumber=?, timeForRingBegin=?, timeForRingEnd=?, checking=?, responsibility=?, comment=?, last_act=?, reg_date=?, status=?, tenantsWithSignUpToViewRequest=?, earliestDate=?, earliestTimeHours=?, earliestTimeMinutes=?, adminComment=?, completeness=? WHERE id=?") === FALSE)
-                    OR ($stmt->bind_param("sssssssssssddddiiissssssssssisddsddssdsddssssssssssssssssssssssiissssssss", $userId, $this->typeOfObject, $dateOfEntryForDB, $this->termOfLease, $dateOfCheckOutForDB, $this->amountOfRooms, $this->adjacentRooms, $this->amountOfAdjacentRooms, $this->typeOfBathrooms, $this->typeOfBalcony, $this->balconyGlazed, $this->roomSpace, $this->totalArea, $this->livingSpace, $this->kitchenSpace, $this->floor, $this->totalAmountFloor, $this->numberOfFloor, $this->concierge, $this->intercom, $this->parking, $this->city, $this->district, $this->coordX, $this->coordY, $this->address, $this->apartmentNumber, $this->subwayStation, $this->distanceToMetroStation, $this->currency, $this->costOfRenting, $realCostOfRenting, $this->utilities, $this->costInSummer, $this->costInWinter, $this->electricPower, $this->bail, $this->bailCost, $this->prepayment, $this->compensationMoney, $this->compensationPercent, $this->repair, $this->furnish, $this->windows, $this->internet, $this->telephoneLine, $this->cableTV, $furnitureInLivingAreaSerialized, $this->furnitureInLivingAreaExtra, $furnitureInKitchenSerialized, $this->furnitureInKitchenExtra, $appliancesSerialized, $this->appliancesExtra, $sexOfTenantImploded, $relationsImploded, $this->children, $this->animals, $this->contactTelephonNumber, $this->timeForRingBegin, $this->timeForRingEnd, $this->checking, $this->responsibility, $this->comment, $last_act, $this->reg_date, $this->status, $tenantsWithSignUpToViewRequestSerialized, $earliestDateForDB, $this->earliestTimeHours, $this->earliestTimeMinutes, $this->adminComment, $this->completeness, $this->id) === FALSE)
+                    OR ($stmt->bind_param("sssssssssssddddiiissssssssssisddsddssdsddssssssssssssssssssssssiissssssss", $userId, $this->typeOfObject, $dateOfEntryForDB, $this->termOfLease, $dateOfCheckOutForDB, $this->amountOfRooms, $this->adjacentRooms, $this->amountOfAdjacentRooms, $this->typeOfBathrooms, $this->typeOfBalcony, $this->balconyGlazed, $this->roomSpace, $this->totalArea, $this->livingSpace, $this->kitchenSpace, $this->floor, $this->totalAmountFloor, $this->numberOfFloor, $this->concierge, $this->intercom, $this->parking, $this->city, $this->district, $this->coordX, $this->coordY, $this->address, $this->apartmentNumber, $this->subwayStation, $this->distanceToMetroStation, $this->currency, $this->costOfRenting, $realCostOfRenting, $this->utilities, $this->costInSummer, $this->costInWinter, $this->electricPower, $this->bail, $this->bailCost, $this->prepayment, $this->compensationMoney, $this->compensationPercent, $this->repair, $this->furnish, $this->windows, $this->internet, $this->telephoneLine, $this->cableTV, $furnitureInLivingAreaSerialized, $this->furnitureInLivingAreaExtra, $furnitureInKitchenSerialized, $this->furnitureInKitchenExtra, $appliancesSerialized, $this->appliancesExtra, $sexOfTenantSerialized, $relationsSerialized, $this->children, $this->animals, $this->contactTelephonNumber, $this->timeForRingBegin, $this->timeForRingEnd, $this->checking, $this->responsibility, $this->comment, $last_act, $this->reg_date, $this->status, $tenantsWithSignUpToViewRequestSerialized, $earliestDateForDB, $this->earliestTimeHours, $this->earliestTimeMinutes, $this->adminComment, $this->completeness, $this->id) === FALSE)
                     OR ($stmt->execute() === FALSE)
                     OR (($res = $stmt->affected_rows) === -1)
                     OR ($stmt->close() === FALSE)
@@ -534,8 +534,8 @@
             if (isset($onePropertyDataArr['furnitureInKitchenExtra'])) $this->furnitureInKitchenExtra = $onePropertyDataArr['furnitureInKitchenExtra'];
             if (isset($onePropertyDataArr['appliances'])) $this->appliances = unserialize($onePropertyDataArr['appliances']);
             if (isset($onePropertyDataArr['appliancesExtra'])) $this->appliancesExtra = $onePropertyDataArr['appliancesExtra'];
-            if (isset($onePropertyDataArr['sexOfTenant'])) $this->sexOfTenant = explode("_", $onePropertyDataArr['sexOfTenant']);
-            if (isset($onePropertyDataArr['relations'])) $this->relations = explode("_", $onePropertyDataArr['relations']);
+            if (isset($onePropertyDataArr['sexOfTenant'])) $this->sexOfTenant = unserialize($onePropertyDataArr['sexOfTenant']);
+            if (isset($onePropertyDataArr['relations'])) $this->relations = unserialize($onePropertyDataArr['relations']);
             if (isset($onePropertyDataArr['children'])) $this->children = $onePropertyDataArr['children'];
             if (isset($onePropertyDataArr['animals'])) $this->animals = $onePropertyDataArr['animals'];
             if (isset($onePropertyDataArr['contactTelephonNumber'])) $this->contactTelephonNumber = $onePropertyDataArr['contactTelephonNumber'];
@@ -782,13 +782,11 @@
 
         // $typeOfValidation = newAdvert - режим первичной (для нового объявления) проверки указанных пользователем параметров объекта недвижимости
         // $typeOfValidation = editAdvert - режим вторичной (при редактировании уже существующего объявления) проверки указанных пользователем параметров объекта недвижимости
-        function isAdvertCorrect($typeOfValidation)
+        // $typeOfValidation = newAlienAdvert - режим проверки параметров нового объявления из чужой базы по минимуму - так как о чужих объектах обычно мало информации.
+		// $typeOfValidation = editAlienAdvert - режим проверки параметров ранее созданного и записанного в БД объявления из чужой базы. По минимуму - так как о чужих объектах обычно мало информации.
+		public function propertyDataValidate($typeOfValidation)
         {
-			// Если признак полноты у объекта = 0, то не применяем к нему никаких требований по данным. По умолчанию считаем его верным
-			// Правильнее конечно все-таки разобраться с каждым правилом валидации и некоторые из них применять к объявлению, как это сделано с alien пользователями в классе User
-			if ($this->completeness == "0") return array();
-
-            // Подготовим массив для сохранения сообщений об ошибках
+			// Подготовим массив для сохранения сообщений об ошибках
             $errors = array();
 
             // Проверяем переменные
@@ -1178,5 +1176,41 @@
 
             return TRUE;
         }
+
+		// Возвращает массив, содержащий список недвижимости в жилой зоне: включая как чекбокс элементы ($furnitureInLivingArea), так и элементы списка extra ($furnitureInLivingAreaExtra)
+		public function getFurnitureInLivingAreaAll() {
+			// Мебель в жилой зоне, отмеченная галочками
+			$furnitureInLivingArea = $this->furnitureInLivingArea;
+			// Скидываем в массив всю мебель, которая была добавлена вручную
+			$furnitureInLivingArea = array_merge($furnitureInLivingArea, explode(', ', $this->furnitureInLivingAreaExtra));
+			// Дополнительная проверка на пустоту нужна, так как пустая строчка после explode воспринимается как один из членов массива
+			$furnitureInLivingArea = array_filter($furnitureInLivingArea, function($el){ return !empty($el);});
+
+			return $furnitureInLivingArea;
+		}
+
+		// Возвращает массив, содержащий список недвижимости в жилой зоне: включая как чекбокс элементы ($furnitureInKitchen), так и элементы списка extra ($furnitureInKitchenExtra)
+		public function getFurnitureInKitchenAll() {
+			// Мебель на кухне, отмеченная галочками
+			$furnitureInKitchen = $this->furnitureInKitchen;
+			// Скидываем в массив всю мебель, которая была добавлена вручную
+			$furnitureInKitchen = array_merge($furnitureInKitchen, explode(', ', $this->furnitureInKitchenExtra));
+			// Дополнительная проверка на пустоту нужна, так как пустая строчка после explode воспринимается как один из членов массива
+			$furnitureInKitchen = array_filter($furnitureInKitchen, function($el){ return !empty($el);});
+
+			return $furnitureInKitchen;
+		}
+
+		// Возвращает массив, содержащий список недвижимости в жилой зоне: включая как чекбокс элементы ($appliances), так и элементы списка extra ($appliancesExtra)
+		public function getAppliancesAll() {
+			// Бытовая техника, отмеченная галочками
+			$appliances = $this->appliances;
+			// Скидываем в массив всю бытовую технику, которая была добавлена вручную
+			$appliances = array_merge($appliances, explode(', ', $this->appliancesExtra));
+			// Дополнительная проверка на пустоту нужна, так как пустая строчка после explode воспринимается как один из членов массива
+			$appliances = array_filter($appliances, function($el){ return !empty($el);});
+
+			return $appliances;
+		}
 
     }

@@ -56,6 +56,12 @@
             color: red;
             font-weight: bold;
         }
+
+        .furnitureList {
+            margin: 0;
+            padding: 0;
+            list-style: square;
+        }
     </style>
 
 </head>
@@ -232,14 +238,11 @@ include("templates/templ_header.php");
 
 </div>
 
-
 <?php
 // Подключаем нужное модальное окно для Запроса на просмотр
-
 if ($isLoggedIn === FALSE) include "templates/templ_signUpToViewDialog_ForLoggedOut.php";
 if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] !== TRUE) include "templates/templ_signUpToViewDialog_ForOwner.php";
 if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include "templates/templ_signUpToViewDialog_ForTenant.php";
-
 ?>
 
 <div class="objectDescription">
@@ -250,6 +253,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
     </div>
     <table>
         <tbody>
+
 		<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['amountOfRooms'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
@@ -260,6 +264,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
             </td>
         </tr>
 			<?php endif; ?>
+
 		<?php if ($propertyCharacteristic['amountOfRooms'] != "0" && $propertyCharacteristic['amountOfRooms'] != "1" && $propertyCharacteristic['adjacentRooms'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
@@ -270,6 +275,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
             </td>
         </tr>
 			<?php endif; ?>
+
 		<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "комната" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['adjacentRooms'] != "0" && $propertyCharacteristic['adjacentRooms'] != "нет" && $propertyCharacteristic['amountOfRooms'] != "0" && $propertyCharacteristic['amountOfRooms'] != "1" && $propertyCharacteristic['amountOfRooms'] != "2" && $propertyCharacteristic['amountOfAdjacentRooms'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
@@ -280,6 +286,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
             </td>
         </tr>
 			<?php endif; ?>
+
 		<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['typeOfBathrooms'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
@@ -290,6 +297,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
             </td>
         </tr>
 			<?php endif; ?>
+
 		<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['typeOfBalcony'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
@@ -300,6 +308,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
             </td>
         </tr>
 			<?php endif; ?>
+
 		<?php if ($propertyCharacteristic['typeOfBalcony'] != "0" && $propertyCharacteristic['typeOfBalcony'] != "нет" && $propertyCharacteristic['typeOfBalcony'] != "эркер" && $propertyCharacteristic['typeOfBalcony'] != "2 эркера и более" && $propertyCharacteristic['balconyGlazed'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
@@ -310,6 +319,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
             </td>
         </tr>
 			<?php endif; ?>
+
 		<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "квартира" && $propertyCharacteristic['typeOfObject'] != "дом" && $propertyCharacteristic['typeOfObject'] != "таунхаус" && $propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['roomSpace'] != "0.00"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
@@ -320,6 +330,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
             </td>
         </tr>
 			<?php endif; ?>
+
 		<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "комната" && $propertyCharacteristic['totalArea'] != "0.00"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
@@ -330,6 +341,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
             </td>
         </tr>
 			<?php endif; ?>
+
 		<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "комната" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['livingSpace'] != "0.00"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
@@ -340,6 +352,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
             </td>
         </tr>
 			<?php endif; ?>
+
 		<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['kitchenSpace'] != "0.00"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
@@ -350,6 +363,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
             </td>
         </tr>
 			<?php endif; ?>
+
         </tbody>
     </table>
 </div>
@@ -360,12 +374,14 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
     </div>
     <table>
         <tbody>
+
 		<?php if ($propertyCharacteristic['costOfRenting'] != "" && $propertyCharacteristic['costOfRenting'] != "0"): ?>
         <tr>
             <td class="objectDescriptionItemLabel">Плата за аренду:</td>
             <td class="objectDescriptionBody"><?php echo "<span>" . $propertyCharacteristic['costOfRenting'] . "</span>" . " " . $propertyCharacteristic['currency'] . " в месяц" ?></td>
         </tr>
 			<?php endif; ?>
+
 		<?php if ($propertyCharacteristic['compensationMoney'] != "" && $propertyCharacteristic['currency'] != "" && $propertyCharacteristic['compensationPercent'] != "" && $propertyCharacteristic['compensationMoney'] != "0" && $propertyCharacteristic['currency'] != "0" && $propertyCharacteristic['compensationPercent'] != "0.00"): ?>
         <tr>
             <td class="objectDescriptionItemLabel">
@@ -376,6 +392,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
             </td>
         </tr>
 			<?php endif; ?>
+
 		<?php if ($propertyCharacteristic['utilities'] != "" && $propertyCharacteristic['utilities'] != "0"): ?>
         <tr>
             <td class="objectDescriptionItemLabel">
@@ -391,6 +408,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
             </td>
         </tr>
 			<?php endif; ?>
+
 		<?php if ($propertyCharacteristic['electricPower'] == "да"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
@@ -401,6 +419,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
             </td>
         </tr>
 			<?php endif; ?>
+
 		<?php if ($propertyCharacteristic['bail'] != "" && $propertyCharacteristic['bail'] != "0"): ?>
         <tr>
             <td class="objectDescriptionItemLabel">Залог:</td>
@@ -410,6 +429,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
             </td>
         </tr>
 			<?php endif; ?>
+
 		<?php if ($propertyCharacteristic['prepayment'] != "" && $propertyCharacteristic['prepayment'] != "0"): ?>
         <tr>
             <td class="objectDescriptionItemLabel">
@@ -420,6 +440,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
             </td>
         </tr>
 			<?php endif; ?>
+
         </tbody>
     </table>
 </div>
@@ -579,15 +600,16 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
 			<?php endif; ?>
 
 		<?php if ($propertyCharacteristic['termOfLease'] != "0" && $propertyCharacteristic['termOfLease'] != "длительный срок" && $propertyCharacteristic['dateOfCheckOut'] != "" && $propertyCharacteristic['dateOfCheckOut'] != "0000-00-00"): ?>
-			<tr>
-				<td class='objectDescriptionItemLabel'>
-					Крайний срок выезда:
-				</td>
-				<td class='objectDescriptionBody'>
-					<span><?php echo $propertyCharacteristic['dateOfCheckOut']; ?></span>
-				</td>
-			</tr>
+        <tr>
+            <td class='objectDescriptionItemLabel'>
+                Крайний срок выезда:
+            </td>
+            <td class='objectDescriptionBody'>
+                <span><?php echo $propertyCharacteristic['dateOfCheckOut']; ?></span>
+            </td>
+        </tr>
 			<?php endif; ?>
+
         </tbody>
     </table>
 </div>
@@ -599,36 +621,40 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
     </div>
     <table>
         <tbody>
+
 			<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['internet'] != "" && $propertyCharacteristic['internet'] != "0"): ?>
-				<tr>
-					<td class='objectDescriptionItemLabel'>
-						Интернет:
-					</td>
-					<td class='objectDescriptionBody'>
-						<span><?php echo $propertyCharacteristic['internet']; ?></span>
-					</td>
-				</tr>
+        <tr>
+            <td class='objectDescriptionItemLabel'>
+                Интернет:
+            </td>
+            <td class='objectDescriptionBody'>
+                <span><?php echo $propertyCharacteristic['internet']; ?></span>
+            </td>
+        </tr>
 			<?php endif; ?>
+
 			<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['telephoneLine'] != "" && $propertyCharacteristic['telephoneLine'] != "0"): ?>
-				<tr>
-					<td class='objectDescriptionItemLabel'>
-						Телефон:
-					</td>
-					<td class='objectDescriptionBody'>
-						<span><?php echo $propertyCharacteristic['telephoneLine']; ?></span>
-					</td>
-				</tr>
+        <tr>
+            <td class='objectDescriptionItemLabel'>
+                Телефон:
+            </td>
+            <td class='objectDescriptionBody'>
+                <span><?php echo $propertyCharacteristic['telephoneLine']; ?></span>
+            </td>
+        </tr>
 			<?php endif; ?>
+
 			<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['cableTV'] != "" && $propertyCharacteristic['cableTV'] != "0"): ?>
-				<tr>
-					<td class='objectDescriptionItemLabel'>
-						Кабельное ТВ:
-					</td>
-					<td class='objectDescriptionBody'>
-						<span><?php echo $propertyCharacteristic['cableTV']; ?></span>
-					</td>
-				</tr>
+        <tr>
+            <td class='objectDescriptionItemLabel'>
+                Кабельное ТВ:
+            </td>
+            <td class='objectDescriptionBody'>
+                <span><?php echo $propertyCharacteristic['cableTV']; ?></span>
+            </td>
+        </tr>
 			<?php endif; ?>
+
         </tbody>
     </table>
 </div>
@@ -641,84 +667,73 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
     </div>
     <table>
         <tbody>
+
+			<?php if (is_array($furnitureInLivingArea) && (count($furnitureInLivingArea) != 0 || $propertyCharacteristic['completeness'] == "1")): ?>
         <tr>
-            <td class="objectDescriptionItemLabel">Мебель в жилой зоне:</td>
-            <td class="objectDescriptionBody"><span>
-                                                    <?php
-				$furniture = array(); // Инициализируем переменную для хранения списка мебели
-				// Скидываем в массив $furniture всю мебель, которую собственник отметил галочками
-				foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
-					$furniture[] = $value;
-				}
-
-				// Скидываем в массив $furniture всю мебель, которую собственник добавил вручную
-				$furnitureInLivingAreaExtraArr = explode(', ', $propertyCharacteristic['furnitureInLivingAreaExtra']);
-				foreach ($furnitureInLivingAreaExtraArr as $value) {
-					if ($value != "") $furniture[] = $value; // Дополнительная проверка на пустоту нужна, так как пустая строчка воспринимается как один из членов массива
-				}
-
-				for ($i = 0, $s = count($furniture); $i < $s; $i++) {
-					echo $furniture[$i];
-					if ($i < $s - 1) echo ",<br>"; // Если элемент в массиве не последний - добавляем запятую
-				}
-
-				// Если мебель не указана совсем - пишем слово "нет"
-				if (count($furniture) == 0) echo "нет";
-				?>
-                                                </span></td>
+            <td class="objectDescriptionItemLabel">
+                Мебель в жилой зоне:
+            </td>
+            <td class="objectDescriptionBody">
+                <ul class="furnitureList">
+					<?php foreach ($furnitureInLivingArea as $value): ?>
+                    <li>
+						<?php echo $value; ?>
+                    </li>
+					<?php endforeach; ?>
+					<?php if ($propertyCharacteristic['completeness'] == "1" && count($furnitureInLivingArea) == 0): ?>
+                    <li>
+                        <span>нет</span>
+                    </li>
+					<?php endif; ?>
+                </ul>
+            </td>
         </tr>
+			<?php endif; ?>
+
+			<?php if (is_array($furnitureInKitchen) && (count($furnitureInKitchen) != 0 || $propertyCharacteristic['completeness'] == "1")): ?>
         <tr>
-            <td class="objectDescriptionItemLabel">Мебель на кухне:</td>
-            <td class="objectDescriptionBody"><span>
-                                                    <?php
-				$furniture = array(); // Инициализируем переменную для хранения списка мебели
-				// Скидываем в массив $furniture всю мебель, которую собственник отметил галочками
-				foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
-					$furniture[] = $value;
-				}
-
-				// Скидываем в массив $furniture всю мебель, которую собственник добавил вручную
-				$furnitureInKitchenExtraArr = explode(', ', $propertyCharacteristic['furnitureInKitchenExtra']);
-				foreach ($furnitureInKitchenExtraArr as $value) {
-					if ($value != "") $furniture[] = $value; // Дополнительная проверка на пустоту нужна, так как пустая строчка воспринимается как один из членов массива
-				}
-
-				for ($i = 0, $s = count($furniture); $i < $s; $i++) {
-					echo $furniture[$i];
-					if ($i < $s - 1) echo ",<br>"; // Если элемент в массиве не последний - добавляем запятую
-				}
-
-				// Если мебель не указана совсем - пишем слово "нет"
-				if (count($furniture) == 0) echo "нет";
-				?>
-                                                </span></td>
+            <td class="objectDescriptionItemLabel">
+                Мебель на кухне:
+            </td>
+            <td class="objectDescriptionBody">
+                <ul class="furnitureList">
+					<?php foreach ($furnitureInKitchen as $value): ?>
+                    <li>
+						<?php echo $value; ?>
+                    </li>
+					<?php endforeach; ?>
+					<?php if ($propertyCharacteristic['completeness'] == "1" && count($furnitureInKitchen) == 0): ?>
+                    <li>
+                        <span>нет</span>
+                    </li>
+					<?php endif; ?>
+                </ul>
+            </td>
         </tr>
+			<?php endif; ?>
+
+			<?php if (is_array($appliances) && (count($appliances) != 0 || $propertyCharacteristic['completeness'] == "1")): ?>
         <tr>
-            <td class="objectDescriptionItemLabel">Бытовая техника:</td>
-            <td class="objectDescriptionBody"><span>
-                                                    <?php
-				$furniture = array(); // Инициализируем переменную для хранения списка бытовой техники
-				// Скидываем в массив $furniture всю бытовую технику, которую собственник отметил галочками
-				foreach ($propertyCharacteristic['appliances'] as $value) {
-					$furniture[] = $value;
-				}
-
-				// Скидываем в массив $furniture всю бытовую технику, которую собственник добавил вручную
-				$appliancesExtraArr = explode(', ', $propertyCharacteristic['appliancesExtra']);
-				foreach ($appliancesExtraArr as $value) {
-					if ($value != "") $furniture[] = $value; // Дополнительная проверка на пустоту нужна, так как пустая строчка воспринимается как один из членов массива
-				}
-
-				for ($i = 0, $s = count($furniture); $i < $s; $i++) {
-					echo $furniture[$i];
-					if ($i < $s - 1) echo ",<br>"; // Если элемент в массиве не последний - добавляем запятую
-				}
-
-				// Если бытовая техника не указана совсем - пишем слово "нет"
-				if (count($furniture) == 0) echo "нет";
-				?>
-                                                </span></td>
+            <td class="objectDescriptionItemLabel">
+                Бытовая техника:
+            </td>
+            <td class="objectDescriptionBody">
+                <ul class="furnitureList">
+					<?php foreach ($appliances as $value): ?>
+                    <li>
+						<?php echo $value; ?>
+                    </li>
+					<?php endforeach; ?>
+					<?php if ($propertyCharacteristic['completeness'] == "1" && count($appliances) == 0): ?>
+                    <li>
+                        <span>нет</span>
+                    </li>
+					<?php endif; ?>
+                </ul>
+            </td>
         </tr>
+			<?php endif; ?>
+
         </tbody>
     </table>
 </div>
@@ -731,39 +746,69 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
     </div>
     <table>
         <tbody>
-        <tr>
-            <td class="objectDescriptionItemLabel">Пол:</td>
-            <td class="objectDescriptionBody"><span>
-                        <?php
-				// Если собственник указал только один пол в качестве предпочтительного, то выводим его на страницу
-				if (count($propertyCharacteristic['sexOfTenant']) == 1) echo $propertyCharacteristic['sexOfTenant'][0];
 
-				// Если указаны оба пола - пишем фразу "не имеет значения"
-				if (count($propertyCharacteristic['sexOfTenant']) == 2) echo "не имеет значения";
-				?>
-												</span></td>
-        </tr>
+			<?php if (is_array($propertyCharacteristic['sexOfTenant']) && (count($propertyCharacteristic['sexOfTenant']) != 0 || $propertyCharacteristic['completeness'] == "1")): ?>
         <tr>
-            <td class="objectDescriptionItemLabel">Отношения между арендаторами:</td>
-            <td class="objectDescriptionBody"><span>
-                        <?php
-				for ($i = 0, $s = count($propertyCharacteristic['relations']); $i < $s; $i++) {
-					echo $propertyCharacteristic['relations'][$i];
-					if ($i < $s - 1) echo ",<br>"; // Если элемент в массиве не последний - добавляем запятую
-				}
-				?>
-                                                </span></td>
-        </tr>
-        <tr>
-            <td class="objectDescriptionItemLabel">Дети:</td>
+            <td class="objectDescriptionItemLabel">
+                Пол:
+            </td>
             <td class="objectDescriptionBody">
-                <span><?php echo $propertyCharacteristic['children']; ?></span></td>
+                <ul class="furnitureList">
+					<?php if (count($propertyCharacteristic['sexOfTenant']) == 2): // Если указаны оба пола - пишем фразу "не имеет значения" ?>
+                    <li>
+                        <span>не имеет значения</span>
+                    </li>
+					<?php else: // Если собственник указал только один пол в качестве предпочтительного, то выводим его на страницу ?>
+					<?php foreach ($propertyCharacteristic['sexOfTenant'] as $value): ?>
+                        <li>
+							<?php echo $value; ?>
+                        </li>
+						<?php endforeach; ?>
+					<?php endif; ?>
+                </ul>
+            </td>
         </tr>
+			<?php endif; ?>
+
+			<?php if (is_array($propertyCharacteristic['relations']) && (count($propertyCharacteristic['relations']) != 0 || $propertyCharacteristic['completeness'] == "1")): ?>
         <tr>
-            <td class="objectDescriptionItemLabel">Животные:</td>
+            <td class="objectDescriptionItemLabel">
+                Отношения между арендаторами:
+            </td>
             <td class="objectDescriptionBody">
-                <span><?php echo $propertyCharacteristic['animals']; ?></span></td>
+                <ul class="furnitureList">
+					<?php foreach ($propertyCharacteristic['relations'] as $value): ?>
+                    <li>
+						<?php echo $value; ?>
+                    </li>
+					<?php endforeach; ?>
+                </ul>
+            </td>
         </tr>
+			<?php endif; ?>
+
+			<?php if ($propertyCharacteristic['children'] != "" && $propertyCharacteristic['children'] != "0"): ?>
+        <tr>
+            <td class="objectDescriptionItemLabel">
+                Дети:
+            </td>
+            <td class="objectDescriptionBody">
+                <span><?php echo $propertyCharacteristic['children']; ?></span>
+            </td>
+        </tr>
+			<?php endif; ?>
+
+			<?php if ($propertyCharacteristic['animals'] != "" && $propertyCharacteristic['animals'] != "0"): ?>
+        <tr>
+            <td class="objectDescriptionItemLabel">
+                Животные:
+            </td>
+            <td class="objectDescriptionBody">
+                <span><?php echo $propertyCharacteristic['animals']; ?></span>
+            </td>
+        </tr>
+			<?php endif; ?>
+
         </tbody>
     </table>
 </div>
@@ -775,21 +820,40 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
     </div>
     <table>
         <tbody>
+
+		<?php if ($propertyCharacteristic['checking'] != "" && $propertyCharacteristic['checking'] != "0"): ?>
         <tr>
-            <td class="objectDescriptionItemLabel">Где проживает собственник:
+            <td class="objectDescriptionItemLabel">
+                Где проживает собственник:
             </td>
             <td class="objectDescriptionBody">
-                <span><?php echo $propertyCharacteristic['checking']; ?></span></td>
+                <span><?php echo $propertyCharacteristic['checking']; ?></span>
+            </td>
         </tr>
+			<?php endif; ?>
+
+		<?php if ($propertyCharacteristic['responsibility'] != "" && $propertyCharacteristic['responsibility'] != "0"): ?>
         <tr>
-            <td class="objectDescriptionItemLabel">Ответственность за состояние и ремонт:
+            <td class="objectDescriptionItemLabel">
+                Ответственность за состояние и ремонт:
             </td>
             <td class="objectDescriptionBody">
-                <span><?php echo $propertyCharacteristic['responsibility']; ?></span></td>
+                <span><?php echo $propertyCharacteristic['responsibility']; ?></span>
+            </td>
         </tr>
-		<?php
-		if ($propertyCharacteristic['comment'] != "") echo "<tr><td class='objectDescriptionItemLabel'>Дополнительный комментарий:</td><td class='objectDescriptionBody'><span>" . $propertyCharacteristic['comment'] . "</span></td></tr>";
-		?>
+			<?php endif; ?>
+
+		<?php if ($propertyCharacteristic['comment'] != ""): ?>
+        <tr>
+            <td class='objectDescriptionItemLabel'>
+                Дополнительный комментарий:
+            </td>
+            <td class='objectDescriptionBody'>
+                <span><?php echo $propertyCharacteristic['comment']; ?></span>
+            </td>
+        </tr>
+			<?php endif; ?>
+
         </tbody>
     </table>
 </div>
@@ -828,21 +892,25 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
         <table>
             <tbody>
             <tr>
-                <td class="objectDescriptionItemLabel">Город:</td>
+                <td class="objectDescriptionItemLabel">
+					Город:
+				</td>
                 <td class="objectDescriptionBody">
                     <span><?php echo $propertyCharacteristic['city'];?></span>
                 </td>
             </tr>
             <tr>
-                <td class="objectDescriptionItemLabel">Район:</td>
-                <td class="objectDescriptionBody"><span>
-                                                <?php
-					if (isset($propertyCharacteristic['district'])) echo $propertyCharacteristic['district'];
-					?>
-                                            </span></td>
+                <td class="objectDescriptionItemLabel">
+					Район:
+				</td>
+                <td class="objectDescriptionBody">
+					<span><?php if ($propertyCharacteristic['district'] != "" && $propertyCharacteristic['district'] != "0") echo $propertyCharacteristic['district'];?></span>
+				</td>
             </tr>
             <tr>
-                <td class="objectDescriptionItemLabel">Адрес:</td>
+                <td class="objectDescriptionItemLabel">
+					Адрес:
+				</td>
                 <td class="objectDescriptionBody">
                     <span><?php echo $propertyCharacteristic['address'];?></span>
                 </td>

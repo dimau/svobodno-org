@@ -251,7 +251,7 @@
 
             // Тип
             $arrBalloonReplace['typeOfObject'] = "";
-            if (isset($oneProperty['typeOfObject'])) $arrBalloonReplace['typeOfObject'] = GlobFunc::getFirstCharUpper($oneProperty['typeOfObject']) . ": ";
+            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "0") $arrBalloonReplace['typeOfObject'] = GlobFunc::getFirstCharUpper($oneProperty['typeOfObject']) . ": ";
 
             // Адрес
             $arrBalloonReplace['address'] = "";
@@ -263,15 +263,31 @@
 
             // Все, что касается СТОИМОСТИ АРЕНДЫ
             $arrBalloonReplace['costOfRenting'] = "";
-            if (isset($oneProperty['costOfRenting'])) $arrBalloonReplace['costOfRenting'] = $oneProperty['costOfRenting'];
-            $arrBalloonReplace['currency'] = "";
-            if (isset($oneProperty['currency'])) $arrBalloonReplace['currency'] = $oneProperty['currency'];
-            $arrBalloonReplace['utilities'] = "";
-            if (isset($oneProperty['utilities']) && $oneProperty['utilities'] == "да") $arrBalloonReplace['utilities'] = "от " . $oneProperty['costInSummer'] . " до " . $oneProperty['costInWinter'] . " " . $oneProperty['currency'] . " в месяц"; else $arrBalloonReplace['utilities'] = "нет";
-            $arrBalloonReplace['compensationMoney'] = "";
-            if (isset($oneProperty['compensationMoney'])) $arrBalloonReplace['compensationMoney'] = $oneProperty['compensationMoney'];
-            $arrBalloonReplace['compensationPercent'] = "";
-            if (isset($oneProperty['compensationPercent'])) $arrBalloonReplace['compensationPercent'] = $oneProperty['compensationPercent'];
+			$arrBalloonReplace['currency'] = "";
+			$arrBalloonReplace['costOfRentingName'] = "";
+            if ($oneProperty['costOfRenting'] != "" && $oneProperty['costOfRenting'] != "0" && $oneProperty['currency'] != "" && $oneProperty['currency'] != "0") {
+				$arrBalloonReplace['costOfRenting'] = $oneProperty['costOfRenting'];
+				$arrBalloonReplace['currency'] = $oneProperty['currency']."/мес.";
+				$arrBalloonReplace['costOfRentingName'] = "Плата:";
+			}
+			$arrBalloonReplace['utilities'] = "";
+			$arrBalloonReplace['utilitiesName'] = "";
+			if ($oneProperty['utilities'] == "да" && $arrBalloonReplace['currency'] != "0" && ($oneProperty['costInSummer'] != "0" && $oneProperty['costInWinter'] != "0")) {
+				$arrBalloonReplace['utilities'] = "от " . $oneProperty['costInSummer'] . " до " . $oneProperty['costInWinter'] . " " . $oneProperty['currency'] . " в месяц";
+				$arrBalloonReplace['utilitiesName'] = "Ком. услуги:";
+			}
+			if ($oneProperty['utilities'] == "да" && $arrBalloonReplace['currency'] != "0" && ($oneProperty['costInSummer'] == "0" || $oneProperty['costInWinter'] == "0")) {
+				$arrBalloonReplace['utilities'] = "оплачиваются дополнительно";
+				$arrBalloonReplace['utilitiesName'] = "Ком. услуги:";
+			}
+			if ($oneProperty['utilities'] == "нет") {
+				$arrBalloonReplace['utilities'] = "включены в стоимость";
+				$arrBalloonReplace['utilitiesName'] = "Ком. услуги:";
+			}
+			$arrBalloonReplace['compensationMoney'] = "";
+			if (isset($oneProperty['compensationMoney'])) $arrBalloonReplace['compensationMoney'] = $oneProperty['compensationMoney'];
+			$arrBalloonReplace['compensationPercent'] = "";
+			if (isset($oneProperty['compensationPercent'])) $arrBalloonReplace['compensationPercent'] = $oneProperty['compensationPercent'];
 
             // Комнаты
             if (isset($oneProperty['amountOfRooms']) && $oneProperty['amountOfRooms'] != "0") {
@@ -292,24 +308,31 @@
             }
 
             // Площади помещений
-            $arrBalloonReplace['areaNames'] = "";
+            $arrBalloonReplace['areaNames'] = "Площадь (";
             $arrBalloonReplace['areaValues'] = "";
-            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "квартира" && $oneProperty['typeOfObject'] != "дом" && $oneProperty['typeOfObject'] != "таунхаус" && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж") {
+			$arrBalloonReplace['areaValuesMeasure'] = "";
+            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "квартира" && $oneProperty['typeOfObject'] != "дом" && $oneProperty['typeOfObject'] != "таунхаус" && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж" && $oneProperty['roomSpace'] != "0.00") {
                 $arrBalloonReplace['areaNames'] .= "комнаты";
                 $arrBalloonReplace['areaValues'] .= $oneProperty['roomSpace'];
             }
-            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната") {
+            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната" && $oneProperty['totalArea'] != "0.00") {
                 $arrBalloonReplace['areaNames'] .= "общая";
                 $arrBalloonReplace['areaValues'] .= $oneProperty['totalArea'];
             }
-            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната" && $oneProperty['typeOfObject'] != "гараж") {
+            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната" && $oneProperty['typeOfObject'] != "гараж" && $oneProperty['livingSpace'] != "0.00") {
                 $arrBalloonReplace['areaNames'] .= "/жилая";
                 $arrBalloonReplace['areaValues'] .= " / " . $oneProperty['livingSpace'];
             }
-            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж") {
+            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж" && $oneProperty['kitchenSpace'] != "0.00") {
                 $arrBalloonReplace['areaNames'] .= "/кухни";
                 $arrBalloonReplace['areaValues'] .= " / " . $oneProperty['kitchenSpace'];
             }
+			if ($arrBalloonReplace['areaNames'] == "Площадь (") {
+				$arrBalloonReplace['areaNames'] = "";
+			} else {
+				$arrBalloonReplace['areaNames'] .= "):";
+				$arrBalloonReplace['areaValuesMeasure'] = "м²";
+			}
 
             // Этаж
             $arrBalloonReplace['floorName'] = "";
@@ -326,12 +349,15 @@
             // Мебель
             $arrBalloonReplace['furnitureName'] = "";
             $arrBalloonReplace['furniture'] = "";
-            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "0" && $oneProperty['typeOfObject'] != "гараж") {
-                $arrBalloonReplace['furnitureName'] = "Мебель:";
-                if ((isset($oneProperty['furnitureInLivingArea']) && count(unserialize($oneProperty['furnitureInLivingArea'])) != 0) || (isset($oneProperty['furnitureInLivingAreaExtra']) && $oneProperty['furnitureInLivingAreaExtra'] != "")) $arrBalloonReplace['furniture'] = "есть в жилой зоне";
-                if ((isset($oneProperty['furnitureInKitchen']) && count(unserialize($oneProperty['furnitureInKitchen'])) != 0) || (isset($oneProperty['furnitureInKitchenExtra']) && $oneProperty['furnitureInKitchenExtra'] != "")) if ($arrBalloonReplace['furniture'] == "") $arrBalloonReplace['furniture'] = "есть на кухне"; else $arrBalloonReplace['furniture'] .= ", есть на кухне";
-                if ((isset($oneProperty['appliances']) && count(unserialize($oneProperty['appliances'])) != 0) || (isset($oneProperty['appliancesExtra']) && $oneProperty['appliancesExtra'] != "")) if ($arrBalloonReplace['furniture'] == "") $arrBalloonReplace['furniture'] = "есть бытовая техника"; else $arrBalloonReplace['furniture'] .= ", есть бытовая техника";
-                if ($arrBalloonReplace['furniture'] == "") $arrBalloonReplace['furniture'] = "нет";
+			$furnitureInLivingArea = unserialize($oneProperty['furnitureInLivingArea']);
+			$furnitureInKitchen = unserialize($oneProperty['furnitureInKitchen']);
+			$appliances = unserialize($oneProperty['appliances']);
+            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "0" && $oneProperty['typeOfObject'] != "гараж" && !($oneProperty['completeness'] == "0" && count($furnitureInLivingArea) == 0 && count($furnitureInKitchen) == 0 && count($appliances) == 0 && $oneProperty['furnitureInLivingAreaExtra'] == "" && $oneProperty['furnitureInKitchenExtra'] == "" && $oneProperty['appliancesExtra'] == "")) {
+				$arrBalloonReplace['furnitureName'] = "Мебель:";
+				if ((isset($oneProperty['furnitureInLivingArea']) && count($furnitureInLivingArea) != 0) || (isset($oneProperty['furnitureInLivingAreaExtra']) && $oneProperty['furnitureInLivingAreaExtra'] != "")) $arrBalloonReplace['furniture'] = "есть в жилой зоне";
+				if ((isset($oneProperty['furnitureInKitchen']) && count($furnitureInKitchen) != 0) || (isset($oneProperty['furnitureInKitchenExtra']) && $oneProperty['furnitureInKitchenExtra'] != "")) if ($arrBalloonReplace['furniture'] == "") $arrBalloonReplace['furniture'] = "есть на кухне"; else $arrBalloonReplace['furniture'] .= ", есть на кухне";
+				if ((isset($oneProperty['appliances']) && count($appliances) != 0) || (isset($oneProperty['appliancesExtra']) && $oneProperty['appliancesExtra'] != "")) if ($arrBalloonReplace['furniture'] == "") $arrBalloonReplace['furniture'] = "есть бытовая техника"; else $arrBalloonReplace['furniture'] .= ", есть бытовая техника";
+				if ($arrBalloonReplace['furniture'] == "") $arrBalloonReplace['furniture'] = "нет";
             }
 
             // Избранное
@@ -341,7 +367,7 @@
 
             // Производим заполнение шаблона баллуна
             // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне баллуна
-            $arrBalloonTemplVar = array('{coordX}', '{coordY}', '{propertyId}', '{typeOfObject}', '{address}', '{fotosWrapper}', '{costOfRenting}', '{currency}', '{utilities}', '{compensationMoney}', '{compensationPercent}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaNames}', '{areaValues}', '{floorName}', '{floor}', '{furnitureName}', '{furniture}', '{favorites}');
+            $arrBalloonTemplVar = array('{coordX}', '{coordY}', '{propertyId}', '{typeOfObject}', '{address}', '{fotosWrapper}', '{costOfRenting}', '{currency}', '{costOfRentingName}', '{utilities}', '{utilitiesName}', '{compensationMoney}', '{compensationPercent}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaNames}', '{areaValues}', '{areaValuesMeasure}', '{floorName}', '{floor}', '{furnitureName}', '{furniture}', '{favorites}');
             // Копируем html-текст шаблона баллуна
             $currentAdvertBalloonList = str_replace($arrBalloonTemplVar, $arrBalloonReplace, $templ);
 
@@ -394,7 +420,7 @@
 
            // Тип
            $arrShortListReplace['typeOfObject'] = "";
-           if (isset($oneProperty['typeOfObject'])) $arrShortListReplace['typeOfObject'] = GlobFunc::getFirstCharUpper($oneProperty['typeOfObject']) . ":";
+           if ($oneProperty['typeOfObject'] != "" && $oneProperty['typeOfObject'] != "0") $arrShortListReplace['typeOfObject'] = GlobFunc::getFirstCharUpper($oneProperty['typeOfObject']) . ":";
 
            // Адрес
            $arrShortListReplace['address'] = "";
@@ -402,11 +428,15 @@
 
            // Стоимость
            $arrShortListReplace['costOfRenting'] = "";
-           if (isset($oneProperty['costOfRenting'])) $arrShortListReplace['costOfRenting'] = $oneProperty['costOfRenting'];
-           $arrShortListReplace['currency'] = "";
-           if (isset($oneProperty['currency'])) $arrShortListReplace['currency'] = $oneProperty['currency'];
+		   $arrShortListReplace['currency'] = "";
+		   $arrShortListReplace['costOfRentingName'] = "";
+           if (isset($oneProperty['costOfRenting']) && $oneProperty['costOfRenting'] != "" && $oneProperty['costOfRenting'] != "0" && isset($oneProperty['currency']) && $oneProperty['currency'] != "" && $oneProperty['currency'] != "0") {
+			   $arrShortListReplace['costOfRenting'] = $oneProperty['costOfRenting'];
+			   $arrShortListReplace['currency'] = $oneProperty['currency']."/мес.";
+		   }
            $arrShortListReplace['utilities'] = "";
            if (isset($oneProperty['utilities']) && $oneProperty['utilities'] == "да") $arrShortListReplace['utilities'] = " <span style='white-space: nowrap;'>+ ком.усл.</span>";
+			if ($arrShortListReplace['costOfRenting'] != "") $arrShortListReplace['costOfRentingName'] = "Плата:";
 
            // Комнаты
            if (isset($oneProperty['amountOfRooms']) && $oneProperty['amountOfRooms'] != "0") {
@@ -428,18 +458,24 @@
 
            // Площади помещений
            $arrShortListReplace['areaValues'] = "";
-           if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "квартира" && $oneProperty['typeOfObject'] != "дом" && $oneProperty['typeOfObject'] != "таунхаус" && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж") {
+		   $arrShortListReplace['areaValuesName'] = "";
+		   $arrShortListReplace['areaValuesMeasure'] = "";
+           if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "квартира" && $oneProperty['typeOfObject'] != "дом" && $oneProperty['typeOfObject'] != "таунхаус" && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж" && $oneProperty['roomSpace'] != "0.00") {
                $arrShortListReplace['areaValues'] .= $oneProperty['roomSpace'];
            }
-           if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната") {
+           if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната" && $oneProperty['totalArea'] != "0.00") {
                $arrShortListReplace['areaValues'] .= $oneProperty['totalArea'];
            }
-           if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната" && $oneProperty['typeOfObject'] != "гараж") {
+           if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната" && $oneProperty['typeOfObject'] != "гараж" && $oneProperty['livingSpace'] != "0.00") {
                $arrShortListReplace['areaValues'] .= " / " . $oneProperty['livingSpace'];
            }
-           if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж") {
+           if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж" && $oneProperty['kitchenSpace'] != "0.00") {
                $arrShortListReplace['areaValues'] .= " / " . $oneProperty['kitchenSpace'];
            }
+		   if ($arrShortListReplace['areaValues'] != "") {
+			   $arrShortListReplace['areaValuesName'] = "Площадь:";
+			   $arrShortListReplace['areaValuesMeasure'] = "м²";
+		   }
 
            // Этаж
            $arrShortListReplace['floorName'] = "";
@@ -455,7 +491,7 @@
 
            // Производим заполнение шаблона строки (блока) shortList таблицы по данному объекту недвижимости
            // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне
-           $arrShortListTemplVar = array('{propertyId}', '{number}', '{actionFavorites}', '{imgFavorites}', '{fotosWrapper}', '{typeOfObject}', '{address}', '{costOfRenting}', '{currency}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{floorName}', '{floor}');
+           $arrShortListTemplVar = array('{propertyId}', '{number}', '{actionFavorites}', '{imgFavorites}', '{fotosWrapper}', '{typeOfObject}', '{address}', '{costOfRenting}', '{currency}', '{costOfRentingName}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{areaValuesName}', '{areaValuesMeasure}', '{floorName}', '{floor}');
            // Копируем html-текст шаблона блока (строки таблицы)
            $currentAdvertShortList = str_replace($arrShortListTemplVar, $arrShortListReplace, $tmpl_shortAdvert);
 
@@ -511,7 +547,7 @@
 
             // Район
             $arrExtendedListReplace['district'] = "";
-            if (isset($oneProperty['district'])) $arrExtendedListReplace['district'] = $oneProperty['district'] . "<br>";
+            if (isset($oneProperty['district']) && $oneProperty['district'] != "0") $arrExtendedListReplace['district'] = $oneProperty['district'] . "<br>";
 
             // Адрес
             $arrExtendedListReplace['address'] = "";
@@ -521,7 +557,7 @@
             if (isset($oneProperty['amountOfRooms']) && $oneProperty['amountOfRooms'] != "0") {
                 $arrExtendedListReplace['amountOfRooms'] = "<span title='количество комнат'>" . $oneProperty['amountOfRooms'] . "</span><br>";
             } else {
-                $arrExtendedListReplace['amountOfRooms'] = "<span title='количество комнат'>-</span><br>";
+                $arrExtendedListReplace['amountOfRooms'] = "<span title='нет данных о количестве комнат'>-</span><br>";
             }
             if (isset($oneProperty['adjacentRooms']) && $oneProperty['adjacentRooms'] == "да") {
                 if (isset($oneProperty['amountOfAdjacentRooms']) && $oneProperty['amountOfAdjacentRooms'] != "0") {
@@ -535,18 +571,19 @@
 
             // Площади помещений
             $arrExtendedListReplace['areaValues'] = "";
-            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "квартира" && $oneProperty['typeOfObject'] != "дом" && $oneProperty['typeOfObject'] != "таунхаус" && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж") {
+            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "квартира" && $oneProperty['typeOfObject'] != "дом" && $oneProperty['typeOfObject'] != "таунхаус" && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж" && $oneProperty['roomSpace'] != "" && $oneProperty['roomSpace'] != "0.00") {
                 $arrExtendedListReplace['areaValues'] .= "<span title='площадь комнаты'>" . $oneProperty['roomSpace'] . " м²</span><br>";
             }
-            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната") {
+            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната" && $oneProperty['totalArea'] != "" && $oneProperty['totalArea'] != "0.00") {
                 $arrExtendedListReplace['areaValues'] .= "<span title='общая площадь'>" . $oneProperty['totalArea'] . " м²</span><br>";
             }
-            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната" && $oneProperty['typeOfObject'] != "гараж") {
+            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната" && $oneProperty['typeOfObject'] != "гараж" && $oneProperty['livingSpace'] != "" && $oneProperty['livingSpace'] != "0.00") {
                 $arrExtendedListReplace['areaValues'] .= "<span title='жилая площадь'>" . $oneProperty['livingSpace'] . " м²</span><br>";
             }
-            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж") {
+            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж" && $oneProperty['kitchenSpace'] != "" && $oneProperty['kitchenSpace'] != "0.00") {
                 $arrExtendedListReplace['areaValues'] .= "<span title='площадь кухни'>" . $oneProperty['kitchenSpace'] . " м²</span><br>";
             }
+			if ($arrExtendedListReplace['areaValues'] == "") $arrExtendedListReplace['areaValues'] = "<span title='нет данных о площади'>-</span>";
 
             // Этаж
             $arrExtendedListReplace['floor'] = "";
@@ -556,29 +593,34 @@
             if (isset($oneProperty['numberOfFloor']) && $oneProperty['numberOfFloor'] != "0") {
                 $arrExtendedListReplace['floor'] = "<span title='этажность дома'>" . $oneProperty['numberOfFloor'] . "</span>";
             }
-            if ($arrExtendedListReplace['floor'] == "") $arrExtendedListReplace['floor'] = "<span title='этаж'>-</span>";
+            if ($arrExtendedListReplace['floor'] == "") $arrExtendedListReplace['floor'] = "<span title='нет данных об этаже'>-</span>";
 
             // Мебель
             $arrExtendedListReplace['furniture'] = "";
-            if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "0" && $oneProperty['typeOfObject'] != "гараж") {
-                if ((isset($oneProperty['furnitureInLivingArea']) && count(unserialize($oneProperty['furnitureInLivingArea'])) != 0) || (isset($oneProperty['furnitureInLivingAreaExtra']) && $oneProperty['furnitureInLivingAreaExtra'] != "")) $arrExtendedListReplace['furniture'] .= "<span title='наличие мебели в жилой зоне'>+</span><br>"; else $arrExtendedListReplace['furniture'] .= "<span title='наличие мебели в жилой зоне'>-</span><br>";
-                if ((isset($oneProperty['furnitureInKitchen']) && count(unserialize($oneProperty['furnitureInKitchen'])) != 0) || (isset($oneProperty['furnitureInKitchenExtra']) && $oneProperty['furnitureInKitchenExtra'] != "")) $arrExtendedListReplace['furniture'] .= "<span title='наличие мебели на кухне'>+</span><br>"; else $arrExtendedListReplace['furniture'] .= "<span title='наличие мебели на кухне'>-</span><br>";
-                if ((isset($oneProperty['appliances']) && count(unserialize($oneProperty['appliances'])) != 0) || (isset($oneProperty['appliancesExtra']) && $oneProperty['appliancesExtra'] != "")) $arrExtendedListReplace['furniture'] .= "<span title='наличие бытовой техники'>+</span><br>"; else $arrExtendedListReplace['furniture'] .= "<span title='наличие бытовой техники'>-</span><br>";
-            } else {
-                $arrExtendedListReplace['furniture'] = "<span title='наличие мебели и бытовой техники'>-<br>-<br>-</span>";
+			$furnitureInLivingArea = unserialize($oneProperty['furnitureInLivingArea']);
+			$furnitureInKitchen = unserialize($oneProperty['furnitureInKitchen']);
+			$appliances = unserialize($oneProperty['appliances']);
+            if ($oneProperty['typeOfObject'] == "0" || $oneProperty['typeOfObject'] == "гараж" || ($oneProperty['completeness'] == "0" && count($furnitureInLivingArea) == 0 && count($furnitureInKitchen) == 0 && count($appliances) == 0 && $oneProperty['furnitureInLivingAreaExtra'] == "" && $oneProperty['furnitureInKitchenExtra'] == "" && $oneProperty['appliancesExtra'] == "")) {
+				$arrExtendedListReplace['furniture'] = "<span title='нет данных о мебели и бытовой технике'>-</span>";
+			} else {
+				if (count($furnitureInLivingArea) != 0 || $oneProperty['furnitureInLivingAreaExtra'] != "") $arrExtendedListReplace['furniture'] .= "<span title='с мебелью в жилой зоне'>+</span><br>"; else $arrExtendedListReplace['furniture'] .= "<span title='без мебели в жилой зоне'>-</span><br>";
+				if (count($furnitureInKitchen) != 0 || $oneProperty['furnitureInKitchenExtra'] != "") $arrExtendedListReplace['furniture'] .= "<span title='с мебелью на кухне'>+</span><br>"; else $arrExtendedListReplace['furniture'] .= "<span title='без мебели на кухне'>-</span><br>";
+				if (count($appliances) != 0 || $oneProperty['appliancesExtra'] != "") $arrExtendedListReplace['furniture'] .= "<span title='с бытовой техникой'>+</span><br>"; else $arrExtendedListReplace['furniture'] .= "<span title='без бытовой техники'>-</span><br>";
             }
 
             // Все, что касается СТОИМОСТИ АРЕНДЫ
             $arrExtendedListReplace['costOfRenting'] = "";
-            if (isset($oneProperty['costOfRenting']) && isset($oneProperty['currency'])) $arrExtendedListReplace['costOfRenting'] = "<span title='стоимость аренды в месяц'>" . $oneProperty['costOfRenting'] . " " . $oneProperty['currency'] . "</span><br>";
+            if ($oneProperty['costOfRenting'] != "" && $oneProperty['costOfRenting'] != "0" && $oneProperty['currency'] != "" && $oneProperty['currency'] != "0") $arrExtendedListReplace['costOfRenting'] = "<span title='стоимость аренды в месяц'>" . $oneProperty['costOfRenting'] . " " . $oneProperty['currency'] . "</span><br>";
             $arrExtendedListReplace['utilities'] = "";
-            if (isset($oneProperty['utilities']) && $oneProperty['utilities'] == "да") $arrExtendedListReplace['utilities'] = "<span title='коммунальные услуги оплачиваются дополнительно'>+ ком. усл.</span><br>";
-            $arrExtendedListReplace['compensationMoney'] = "";
+            if ($oneProperty['utilities'] == "да") $arrExtendedListReplace['utilities'] = "<span title='коммунальные услуги оплачиваются дополнительно'>+ ком. усл.</span><br>";
+			$arrExtendedListReplace['compensationMoney'] = "";
             $arrExtendedListReplace['compensationPercent'] = "";
-            if (isset($oneProperty['compensationMoney']) && isset($oneProperty['compensationPercent']) && isset($oneProperty['currency'])) {
+            if ($oneProperty['compensationMoney'] != "" && $oneProperty['compensationMoney'] != "0.00" && $oneProperty['compensationPercent'] != "" && $oneProperty['compensationPercent'] != "0.00" && $oneProperty['currency'] != "" && $oneProperty['currency'] != "0") {
                 $arrExtendedListReplace['compensationMoney'] = "<span title='единоразовая комиссия при заключении договора'>" . $oneProperty['compensationMoney'] . " " . $oneProperty['currency'];
-                $arrExtendedListReplace['compensationPercent'] = $oneProperty['compensationPercent'] . "</span>";
-            }
+                $arrExtendedListReplace['compensationPercent'] = "(". $oneProperty['compensationPercent'] . "%)</span>";
+            } else {
+				$arrExtendedListReplace['compensationMoney'] = "<span title='нет данных о цене'>-</span>";
+			}
 
             // Производим заполнение шаблона строки (блока) fullParametersList таблицы по данному объекту недвижимости
             // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне баллуна

@@ -65,7 +65,7 @@
                 Введите логин и пароль
             </div>
             <div class="miniBlockContent">
-                <form name="loginParol" method="post">
+                <form name="loginParol" method="post" action="login.php?action=signIn">
                     <table>
                         <tbody>
                             <tr>

@@ -3,10 +3,10 @@
     {fotosWrapper}
     <ul class='listDescriptionSmall forBalloon'>
         <li>
-            <span class='headOfString'>Плата:</span> {costOfRenting} {currency} в месяц
+            <span class='headOfString'>{costOfRentingName}</span> {costOfRenting} {currency}
         </li>
         <li>
-            <span class='headOfString'>Ком. услуги:</span> {utilities}
+            <span class='headOfString'>{utilitiesName}</span> {utilities}
         </li>
         <li>
             <span class='headOfString'>Комиссия:</span> {compensationMoney} {currency} ({compensationPercent}%)
@@ -15,7 +15,7 @@
             <span class='headOfString'>{amountOfRoomsName}</span> {amountOfRooms}{adjacentRooms}
         </li>
         <li>
-            <span class='headOfString'>Площадь ({areaNames}):</span> {areaValues} м²
+            <span class='headOfString'>{areaNames}</span> {areaValues} {areaValuesMeasure}
         </li>
         <li>
             <span class='headOfString'>{floorName}</span> {floor}

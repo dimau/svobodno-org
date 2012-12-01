@@ -34,14 +34,10 @@
             // Инициализируем переменные typeTenant и typeOwner
             $this->isTenant();
             $this->isOwner();
-
         }
 
         // ДЕСТРУКТОР
-        public function __destruct()
-        {
-
-        }
+        public function __destruct() {}
 
         // Является ли пользователь арендатором (то есть имеет действующий поисковый запрос или регистрируется в качестве арендатора)
         public function isTenant()
@@ -461,15 +457,7 @@
 
                     if ($passwordFromDB == $password) // Cравниваем указанный пользователем пароль с паролем из БД
                     {
-                        // Пишем логин и хэшированный пароль в cookie, также создаём переменную сессии
-                        setcookie("login", "", time() - 1, '/');
-                        setcookie("password", "", time() - 1, '/');
-                        setcookie("login", $loginFromDB, time() + 60 * 60 * 24 * 7);
-                        setcookie("password", md5($loginFromDB . $passwordFromDB), time() + 60 * 60 * 24 * 7);
-                        $this->newSession($idFromDB);
-                        $this->lastAct($idFromDB);
-
-						// Устанавливаем параметры объекта
+						// Сохраняем ключевые параметры пользователя, полученные из БД в параметры объекта
 						if (isset($res[0]['typeTenant'])) {
 							if ($res[0]['typeTenant'] == "TRUE") $this->typeTenant = TRUE;
 							if ($res[0]['typeTenant'] == "FALSE") $this->typeTenant = FALSE;
@@ -479,6 +467,14 @@
 							if ($res[0]['typeOwner'] == "FALSE") $this->typeOwner = FALSE;
 						}
 						if (isset($res[0]['typeAdmin'])) $this->typeAdmin = $res[0]['typeAdmin'];
+
+                        // Пишем логин и хэшированный пароль в cookie, также создаём переменную сессии
+                        setcookie("login", "", time() - 1, '/');
+                        setcookie("password", "", time() - 1, '/');
+                        setcookie("login", $loginFromDB, time() + 60 * 60 * 24 * 7);
+                        setcookie("password", md5($loginFromDB . $passwordFromDB), time() + 60 * 60 * 24 * 7);
+                        $this->newSession($idFromDB);
+                        $this->lastAct($idFromDB);
 
                         return $error;
 

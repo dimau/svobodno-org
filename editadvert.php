@@ -64,8 +64,13 @@ if (isset($_GET['action']) && $_GET['action'] == "saveAdvert") {
 	$property->writeCharacteristicFromPOST("edit");
 	$property->writeFotoInformationFromPOST();
 
-	// Проверяем корректность данных объявления. Функции isAdvertCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
-	$errors = $property->isAdvertCorrect("editAdvert");
+	// Проверяем корректность данных объявления. Функции propertyDataValidate() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
+	// Если мы имеем дело с редактированием чужого объявления администратором, то проверки данных происходят по упрощенному способу
+	if ($property->completeness == "0") {
+		$errors = $property->propertyDataValidate("editAlienAdvert");
+	} else {
+		$errors = $property->propertyDataValidate("editAdvert");
+	}
 
 	// Если данные, указанные пользователем, корректны, сохраним данные объявления в базу данных
 	if (is_array($errors) && count($errors) == 0) {

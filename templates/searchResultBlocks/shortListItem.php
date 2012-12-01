@@ -12,13 +12,13 @@
                 <span class='headOfString'>{typeOfObject}</span> {address}
             </li>
             <li>
-                <span class='headOfString'>Плата:</span> {costOfRenting} {currency}/мес.{utilities}
+                <span class='headOfString'>{costOfRentingName}</span> {costOfRenting} {currency} {utilities}
             </li>
             <li>
                 <span class='headOfString'>{amountOfRoomsName}</span> {amountOfRooms}{adjacentRooms}
             </li>
             <li>
-                <span class='headOfString'>Площадь:</span> {areaValues} м²
+                <span class='headOfString'>{areaValuesName}</span> {areaValues} {areaValuesMeasure}
             </li>
             <li>
                 <span class='headOfString'>{floorName}</span> {floor}

@@ -49,7 +49,13 @@ $errors = array();
 $property = new Property($propertyId);
 
 // Анкетные данные и данные о фотографиях объекта недвижимости
-$property->writeCharacteristicFromDB();
+$statusOfWriteCharacteristicFromDB = $property->writeCharacteristicFromDB();
+// Если получить данные по объекты недвижимости из БД не удалось, то скорее всего не верно указан id объекта, перенаправляем пользователя на 404 страницу
+if ($statusOfWriteCharacteristicFromDB == FALSE) {
+	header('Location: 404.html');
+}
+
+// Если анкетные данные по объекту недвижимости получить удалось - получим инфу о его фотках
 $property->writeFotoInformationFromDB();
 
 /*************************************************************************************
@@ -97,6 +103,9 @@ $propertyCharacteristic = $property->getCharacteristicData();
 $propertyFotoInformation = $property->getFotoInformationData();
 $favoritesPropertysId = $incomingUser->getFavoritesPropertysId();
 $signUpToViewData = $signUpToView->getParams(); // Используется в templ_signUpToViewItem.php
+$furnitureInLivingArea = $property->getFurnitureInLivingAreaAll();
+$furnitureInKitchen = $property->getFurnitureInKitchenAll();
+$appliances = $property->getAppliancesAll();
 //$strHeaderOfPage
 //$statusOfSaveParamsToDB // Используется в templ_signUpToViewItem.php
 //$errors
