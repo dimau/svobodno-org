@@ -64,7 +64,7 @@
 
         function getName()
         {
-            return $_GET['qqfile'];
+            return htmlspecialchars($_GET['qqfile'], ENT_QUOTES);
         }
 
         function getSize()
@@ -402,7 +402,7 @@
             // Сохраняем информацию о загруженной фотке в БД
             $stmt = DBconnect::get()->stmt_init();
             if (($stmt->prepare("INSERT INTO tempFotos (id, fileUploadId, folder, filename, extension, filesizeMb) VALUES (?,?,?,?,?,?)") === FALSE)
-                OR ($stmt->bind_param("sssssd", $filename, $_GET['fileuploadid'], $folder, $_GET['sourcefilename'], $extension, $sizeMb) === FALSE)
+                OR ($stmt->bind_param("sssssd", $filename, htmlspecialchars($_GET['fileuploadid'], ENT_QUOTES), $folder, htmlspecialchars($_GET['sourcefilename'], ENT_QUOTES), $extension, $sizeMb) === FALSE)
                 OR ($stmt->execute() === FALSE)
                 OR (($res = $stmt->affected_rows) === -1)
                 OR ($res === 0)

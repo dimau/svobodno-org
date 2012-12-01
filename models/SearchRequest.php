@@ -84,29 +84,35 @@
         }
 
         // Инициализировать параметры поискового запроса данными из POST запроса пользователя (форма быстрого поиска)
-        public function writeParamsFastFromPOST() {
-            if (isset($_GET['typeOfObjectFast'])) $this->typeOfObject = htmlspecialchars($_GET['typeOfObjectFast']);
-            if (isset($_GET['districtFast']) && $_GET['districtFast'] != "0") $this->district = array($_GET['districtFast']);
+        public function writeParamsFastFromGET() {
+            if (isset($_GET['typeOfObjectFast'])) $this->typeOfObject = htmlspecialchars($_GET['typeOfObjectFast'], ENT_QUOTES);
+            if (isset($_GET['districtFast']) && $_GET['districtFast'] != "0") $this->district = array(htmlspecialchars($_GET['districtFast'], ENT_QUOTES));
             if (isset($_GET['districtFast']) && $_GET['districtFast'] == "0") $this->district = array();
-            if (isset($_GET['minCostFast']) && preg_match("/^\d{0,8}$/", $_GET['minCostFast'])) $this->minCost = htmlspecialchars($_GET['minCostFast']); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
-            if (isset($_GET['maxCostFast']) && preg_match("/^\d{0,8}$/", $_GET['maxCostFast'])) $this->maxCost = htmlspecialchars($_GET['maxCostFast']); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
+            if (isset($_GET['minCostFast']) && preg_match("/^\d{0,8}$/", $_GET['minCostFast'])) $this->minCost = htmlspecialchars($_GET['minCostFast'], ENT_QUOTES); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
+            if (isset($_GET['maxCostFast']) && preg_match("/^\d{0,8}$/", $_GET['maxCostFast'])) $this->maxCost = htmlspecialchars($_GET['maxCostFast'], ENT_QUOTES); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
         }
 
         // Инициализировать параметры поискового запроса данными из POST запроса пользователя (форма поиска с подробными параметрами)
-        public function writeParamsExtendedFromPOST() {
-            if (isset($_GET['typeOfObject'])) $this->typeOfObject = htmlspecialchars($_GET['typeOfObject']);
-            if (isset($_GET['amountOfRooms']) && is_array($_GET['amountOfRooms'])) $this->amountOfRooms = $_GET['amountOfRooms'];
-            if (isset($_GET['adjacentRooms'])) $this->adjacentRooms = htmlspecialchars($_GET['adjacentRooms']);
-            if (isset($_GET['floor'])) $this->floor = htmlspecialchars($_GET['floor']);
-            if (isset($_GET['minCost']) && preg_match("/^\d{0,8}$/", $_GET['minCost'])) $this->minCost = htmlspecialchars($_GET['minCost']); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
-            if (isset($_GET['maxCost']) && preg_match("/^\d{0,8}$/", $_GET['maxCost'])) $this->maxCost = htmlspecialchars($_GET['maxCost']); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
-            if (isset($_GET['pledge']) && preg_match("/^\d{0,8}$/", $_GET['pledge'])) $this->pledge = htmlspecialchars($_GET['pledge']); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
-            if (isset($_GET['prepayment'])) $this->prepayment = htmlspecialchars($_GET['prepayment']);
-            if (isset($_GET['district']) && is_array($_GET['district'])) $this->district = $_GET['district']; else $this->district = array();
-            if (isset($_GET['withWho'])) $this->withWho = htmlspecialchars($_GET['withWho']);
-            if (isset($_GET['children'])) $this->children = htmlspecialchars($_GET['children']);
-            if (isset($_GET['animals'])) $this->animals = htmlspecialchars($_GET['animals']);
-            if (isset($_GET['termOfLease'])) $this->termOfLease = htmlspecialchars($_GET['termOfLease']);
+        public function writeParamsExtendedFromGET() {
+            if (isset($_GET['typeOfObject'])) $this->typeOfObject = htmlspecialchars($_GET['typeOfObject'], ENT_QUOTES);
+            if (isset($_GET['amountOfRooms']) && is_array($_GET['amountOfRooms'])) {
+				$this->amountOfRooms = array();
+				foreach ($_GET['amountOfRooms'] as $value) $this->amountOfRooms[] = htmlspecialchars($value, ENT_QUOTES);
+			} else $this->amountOfRooms = array();
+            if (isset($_GET['adjacentRooms'])) $this->adjacentRooms = htmlspecialchars($_GET['adjacentRooms'], ENT_QUOTES);
+            if (isset($_GET['floor'])) $this->floor = htmlspecialchars($_GET['floor'], ENT_QUOTES);
+            if (isset($_GET['minCost']) && preg_match("/^\d{0,8}$/", $_GET['minCost'])) $this->minCost = htmlspecialchars($_GET['minCost'], ENT_QUOTES); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
+            if (isset($_GET['maxCost']) && preg_match("/^\d{0,8}$/", $_GET['maxCost'])) $this->maxCost = htmlspecialchars($_GET['maxCost'], ENT_QUOTES); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
+            if (isset($_GET['pledge']) && preg_match("/^\d{0,8}$/", $_GET['pledge'])) $this->pledge = htmlspecialchars($_GET['pledge'], ENT_QUOTES); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
+            if (isset($_GET['prepayment'])) $this->prepayment = htmlspecialchars($_GET['prepayment'], ENT_QUOTES);
+            if (isset($_GET['district']) && is_array($_GET['district'])) {
+				$this->district = array();
+				foreach ($_GET['district'] as $value) $this->district[] = htmlspecialchars($value, ENT_QUOTES);
+			} else $this->district = array();
+            if (isset($_GET['withWho'])) $this->withWho = htmlspecialchars($_GET['withWho'], ENT_QUOTES);
+            if (isset($_GET['children'])) $this->children = htmlspecialchars($_GET['children'], ENT_QUOTES);
+            if (isset($_GET['animals'])) $this->animals = htmlspecialchars($_GET['animals'], ENT_QUOTES);
+            if (isset($_GET['termOfLease'])) $this->termOfLease = htmlspecialchars($_GET['termOfLease'], ENT_QUOTES);
         }
 
         // Вычисляет массивы: 1. C краткими данными (id, coordX, coordY) о ВСЕХ объектах недвижимости, соответствующих параметрам поискового запроса

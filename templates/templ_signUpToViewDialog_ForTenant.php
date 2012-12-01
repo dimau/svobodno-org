@@ -1,5 +1,4 @@
-<form method="post" name="signUpToViewDialog" id="signUpToViewDialog"
-      title="Записаться на просмотр">
+<form method="post" name="signUpToViewDialog" id="signUpToViewDialog" action="objdescription.php?action=signUpToView<?php echo "&propertyId=".$propertyCharacteristic['id'];?>" title="Записаться на просмотр">
 
     <table>
         <tbody>

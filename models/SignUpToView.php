@@ -134,8 +134,8 @@
 
         // Записать в качестве параметров запроса на просмотр значения, полученные через POST
         public function writeParamsFromPOST() {
-            if (isset($_POST['convenientTime'])) $this->tenantTime = htmlspecialchars($_POST['convenientTime']);
-            if (isset($_POST['comment'])) $this->tenantComment = htmlspecialchars($_POST['comment']);
+            if (isset($_POST['convenientTime'])) $this->tenantTime = htmlspecialchars($_POST['convenientTime'], ENT_QUOTES);
+            if (isset($_POST['comment'])) $this->tenantComment = htmlspecialchars($_POST['comment'], ENT_QUOTES);
         }
 
         // Валидация формы запроса на показ недвижимости

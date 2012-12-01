@@ -30,9 +30,9 @@
 
     // Получаем идентификатор объявления, которое пользователь хочет добавить/удалить в Избранное и действие, которое нужно совершить с объявлением (добавить в избранное или удалить)
     $propertyId = "";
-    if (isset($_POST['propertyId'])) $propertyId = $_POST['propertyId']; else accessDenied();
+    if (isset($_POST['propertyId'])) $propertyId = htmlspecialchars($_POST['propertyId'], ENT_QUOTES); else accessDenied();
     $action = "";
-    if (isset($_POST['action'])) $action = $_POST['action']; else accessDenied();
+    if (isset($_POST['action'])) $action = htmlspecialchars($_POST['action'], ENT_QUOTES); else accessDenied();
 
     // Если требуемое действие = Добавить в избранное, то записываем id объявления в БД, в поле favoritesPropertysId пользователя - тем самым фиксируем, что он добавил данное объявление к себе в избранные
     if ($action == "addToFavorites") {

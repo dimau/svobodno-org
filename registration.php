@@ -24,13 +24,6 @@ if ($incomingUser->login() && !$isAdmin['newOwner'] && !$isAdmin['newAdvertAlien
 	header('Location: personal.php');
 }
 
-// Возможно администратор хочет зарегистрировать чужого собственника? Если это так, то применяем минимум проверок к данным о регистрируемом пользователе
-if ($isAdmin['newAdvertAlien'] && isset($_GET['alienOwner']) && $_GET['alienOwner'] == "true") {
-	$isAlienOwnerRegistration = TRUE;
-} else {
-	$isAlienOwnerRegistration = FALSE;
-}
-
 // Инициализируем полную модель неавторизованного пользователя
 $user = new User(FALSE);
 // На странице регистрации важно получить роль, в которой регистрируется пользователь - арендатор или собственник (от этого зависит набор обязательных для заполнения параметров). Инициализируем параметры модели typeTenant и typeOwner в соответствии с ролью регистрируемого пользователя
@@ -41,6 +34,19 @@ $errors = array();
 
 // Готовим массив со списком районов в городе пользователя
 $allDistrictsInCity = GlobFunc::getAllDistrictsInCity("Екатеринбург");
+
+/*************************************************************************************
+ * ПОЛУЧИМ GET ПАРАМЕТРЫ
+ * Для защиты от XSS атаки и для использования в коде более простого имени для переменной
+ ************************************************************************************/
+
+// Команда пользователя
+$action = "";
+if (isset($_GET['action'])) $action = htmlspecialchars($_GET['action'], ENT_QUOTES);
+
+// Режим регистрации собственника из чужой базы
+$alienOwner = "";
+if (isset($_GET['alienOwner'])) $alienOwner = htmlspecialchars($_GET['alienOwner'], ENT_QUOTES);
 
 /********************************************************************************
  * ОТКУДА К НАМ ПРИШЕЛ ПОЛЬЗОВАТЕЛЬ
@@ -63,7 +69,7 @@ if (isset($_SESSION['url_initial']) && !preg_match('~((http://svobodno.org)|(htt
  * ОТПРАВЛЕНА ФОРМА РЕГИСТРАЦИИ
  *******************************************************************************/
 
-if (isset($_POST['submitButton'])) {
+if ($action == "registration") {
 
 	// Записываем POST параметры в параметры объекта пользователя
 	$user->writeCharacteristicFromPOST();
@@ -72,7 +78,7 @@ if (isset($_POST['submitButton'])) {
 
 	// Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
 	// Если мы имеем дело с созданием нового чужого объявления администратором, то проводим минимальную проверку данных
-	if ($isAlienOwnerRegistration) {
+	if ($isAdmin['newAdvertAlien'] && $alienOwner == "true") {
 		$errors = $user->userDataCorrect("newAlienOwner");
 	} else {
 		$errors = $user->userDataCorrect("registration");
@@ -133,7 +139,8 @@ $userCharacteristic = $user->getCharacteristicData();
 $userFotoInformation = $user->getFotoInformationData();
 $userSearchRequest = $user->getSearchRequestData();
 $mode = "registration";
-//$isAlienOwnerRegistration
+//$alienOwner
+//$isAdmin
 //$errors
 //$allDistrictsInCity
 

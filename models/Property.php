@@ -602,72 +602,87 @@
         // $mode = "edit" режим выбора POST параметров для редактирования пользователем-собственником ранее созданного объявления (отличается от режима "new" тем, что не принимает (игнорирует) через POST ряд параметров объекта, запрещенных для редактирования пользователем)
         public function writeCharacteristicFromPOST($mode = "edit")
         {
-            if (isset($_POST['ownerLogin']) && $mode == "new") $this->ownerLogin = htmlspecialchars($_POST['ownerLogin']);
-			if (isset($_POST['status']) && $mode == "new") $this->status = htmlspecialchars($_POST['status']);
-			if (isset($_POST['typeOfObject']) && $mode == "new") $this->typeOfObject = htmlspecialchars($_POST['typeOfObject']);
-            if (isset($_POST['dateOfEntry'])) $this->dateOfEntry = htmlspecialchars($_POST['dateOfEntry']);
-            if (isset($_POST['termOfLease'])) $this->termOfLease = htmlspecialchars($_POST['termOfLease']);
-            if (isset($_POST['dateOfCheckOut'])) $this->dateOfCheckOut = htmlspecialchars($_POST['dateOfCheckOut']);
-            if (isset($_POST['amountOfRooms'])) $this->amountOfRooms = htmlspecialchars($_POST['amountOfRooms']);
-            if (isset($_POST['adjacentRooms'])) $this->adjacentRooms = htmlspecialchars($_POST['adjacentRooms']);
-            if (isset($_POST['amountOfAdjacentRooms'])) $this->amountOfAdjacentRooms = htmlspecialchars($_POST['amountOfAdjacentRooms']);
-            if (isset($_POST['typeOfBathrooms'])) $this->typeOfBathrooms = htmlspecialchars($_POST['typeOfBathrooms']);
-            if (isset($_POST['typeOfBalcony'])) $this->typeOfBalcony = htmlspecialchars($_POST['typeOfBalcony']);
-            if (isset($_POST['balconyGlazed'])) $this->balconyGlazed = htmlspecialchars($_POST['balconyGlazed']);
-            if (isset($_POST['roomSpace'])) $this->roomSpace = htmlspecialchars($_POST['roomSpace']);
-            if (isset($_POST['totalArea'])) $this->totalArea = htmlspecialchars($_POST['totalArea']);
-            if (isset($_POST['livingSpace'])) $this->livingSpace = htmlspecialchars($_POST['livingSpace']);
-            if (isset($_POST['kitchenSpace'])) $this->kitchenSpace = htmlspecialchars($_POST['kitchenSpace']);
-            if (isset($_POST['floor']) && $mode == "new") $this->floor = htmlspecialchars($_POST['floor']);
-            if (isset($_POST['totalAmountFloor']) && $mode == "new") $this->totalAmountFloor = htmlspecialchars($_POST['totalAmountFloor']);
-            if (isset($_POST['numberOfFloor']) && $mode == "new") $this->numberOfFloor = htmlspecialchars($_POST['numberOfFloor']);
-            if (isset($_POST['concierge'])) $this->concierge = htmlspecialchars($_POST['concierge']);
-            if (isset($_POST['intercom'])) $this->intercom = htmlspecialchars($_POST['intercom']);
-            if (isset($_POST['parking'])) $this->parking = htmlspecialchars($_POST['parking']);
-            if (isset($_POST['district']) && $mode == "new") $this->district = htmlspecialchars($_POST['district']);
-            if (isset($_POST['coordX']) && $mode == "new") $this->coordX = htmlspecialchars($_POST['coordX']);
-            if (isset($_POST['coordY']) && $mode == "new") $this->coordY = htmlspecialchars($_POST['coordY']);
-            if (isset($_POST['address']) && $mode == "new") $this->address = htmlspecialchars($_POST['address']);
-            if (isset($_POST['apartmentNumber']) && $mode == "new") $this->apartmentNumber = htmlspecialchars($_POST['apartmentNumber']);
-            if (isset($_POST['subwayStation'])) $this->subwayStation = htmlspecialchars($_POST['subwayStation']);
-            if (isset($_POST['distanceToMetroStation'])) $this->distanceToMetroStation = htmlspecialchars($_POST['distanceToMetroStation']);
-            if (isset($_POST['currency'])) $this->currency = htmlspecialchars($_POST['currency']);
-            if (isset($_POST['costOfRenting'])) $this->costOfRenting = htmlspecialchars($_POST['costOfRenting']);
-            if (isset($_POST['utilities'])) $this->utilities = htmlspecialchars($_POST['utilities']);
-            if (isset($_POST['costInSummer'])) $this->costInSummer = htmlspecialchars($_POST['costInSummer']);
-            if (isset($_POST['costInWinter'])) $this->costInWinter = htmlspecialchars($_POST['costInWinter']);
-            if (isset($_POST['electricPower'])) $this->electricPower = htmlspecialchars($_POST['electricPower']);
-            if (isset($_POST['bail'])) $this->bail = htmlspecialchars($_POST['bail']);
-            if (isset($_POST['bailCost'])) $this->bailCost = htmlspecialchars($_POST['bailCost']);
-            if (isset($_POST['prepayment'])) $this->prepayment = htmlspecialchars($_POST['prepayment']);
-            if (isset($_POST['compensationMoney']) && $mode == "new") $this->compensationMoney = htmlspecialchars($_POST['compensationMoney']);
-            if (isset($_POST['compensationPercent']) && $mode == "new") $this->compensationPercent = htmlspecialchars($_POST['compensationPercent']);
-            if (isset($_POST['repair'])) $this->repair = htmlspecialchars($_POST['repair']);
-            if (isset($_POST['furnish'])) $this->furnish = htmlspecialchars($_POST['furnish']);
-            if (isset($_POST['windows'])) $this->windows = htmlspecialchars($_POST['windows']);
-            if (isset($_POST['internet'])) $this->internet = htmlspecialchars($_POST['internet']);
-            if (isset($_POST['telephoneLine'])) $this->telephoneLine = htmlspecialchars($_POST['telephoneLine']);
-            if (isset($_POST['cableTV'])) $this->cableTV = htmlspecialchars($_POST['cableTV']);
-            if (isset($_POST['furnitureInLivingArea'])) $this->furnitureInLivingArea = $_POST['furnitureInLivingArea']; else $this->furnitureInLivingArea = array(); // Если пользователь отправил форму и не отметил ни одного предмета мебели, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
-            if (isset($_POST['furnitureInLivingAreaExtra'])) $this->furnitureInLivingAreaExtra = htmlspecialchars($_POST['furnitureInLivingAreaExtra']);
-            if (isset($_POST['furnitureInKitchen'])) $this->furnitureInKitchen = $_POST['furnitureInKitchen']; else $this->furnitureInKitchen = array(); // Если пользователь отправил форму и не отметил ни одного предмета мебели, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
-            if (isset($_POST['furnitureInKitchenExtra'])) $this->furnitureInKitchenExtra = htmlspecialchars($_POST['furnitureInKitchenExtra']);
-            if (isset($_POST['appliances'])) $this->appliances = $_POST['appliances']; else $this->appliances = array(); // Если пользователь отправил форму и не отметил ни одного предмета бытовой техники, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
-            if (isset($_POST['appliancesExtra'])) $this->appliancesExtra = htmlspecialchars($_POST['appliancesExtra']);
-            if (isset($_POST['sexOfTenant'])) $this->sexOfTenant = $_POST['sexOfTenant']; else $this->sexOfTenant = array(); // Если пользователь отправил форму и не отметил ни одного допустимого пола для одиночного арендатора, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
-            if (isset($_POST['relations'])) $this->relations = $_POST['relations']; else $this->relations = array(); // Если пользователь отправил форму и не отметил ни одного допустимого вида отношений между арендаторами, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
-            if (isset($_POST['children'])) $this->children = htmlspecialchars($_POST['children']);
-            if (isset($_POST['animals'])) $this->animals = htmlspecialchars($_POST['animals']);
-            if (isset($_POST['contactTelephonNumber'])) $this->contactTelephonNumber = htmlspecialchars($_POST['contactTelephonNumber']);
-            if (isset($_POST['timeForRingBegin'])) $this->timeForRingBegin = htmlspecialchars($_POST['timeForRingBegin']);
-            if (isset($_POST['timeForRingEnd'])) $this->timeForRingEnd = htmlspecialchars($_POST['timeForRingEnd']);
-            if (isset($_POST['checking'])) $this->checking = htmlspecialchars($_POST['checking']);
-            if (isset($_POST['responsibility'])) $this->responsibility = htmlspecialchars($_POST['responsibility']);
-            if (isset($_POST['comment'])) $this->comment = htmlspecialchars($_POST['comment']);
-            if (isset($_POST['earliestDate'])) $this->earliestDate = htmlspecialchars($_POST['earliestDate']);
-            if (isset($_POST['earliestTimeHours'])) $this->earliestTimeHours = htmlspecialchars($_POST['earliestTimeHours']);
-            if (isset($_POST['earliestTimeMinutes'])) $this->earliestTimeMinutes = htmlspecialchars($_POST['earliestTimeMinutes']);
-			if (isset($_POST['adminComment'])) $this->adminComment = htmlspecialchars($_POST['adminComment']);
+            if (isset($_POST['ownerLogin']) && $mode == "new") $this->ownerLogin = htmlspecialchars($_POST['ownerLogin'], ENT_QUOTES);
+			if (isset($_POST['status']) && $mode == "new") $this->status = htmlspecialchars($_POST['status'], ENT_QUOTES);
+			if (isset($_POST['typeOfObject']) && $mode == "new") $this->typeOfObject = htmlspecialchars($_POST['typeOfObject'], ENT_QUOTES);
+            if (isset($_POST['dateOfEntry'])) $this->dateOfEntry = htmlspecialchars($_POST['dateOfEntry'], ENT_QUOTES);
+            if (isset($_POST['termOfLease'])) $this->termOfLease = htmlspecialchars($_POST['termOfLease'], ENT_QUOTES);
+            if (isset($_POST['dateOfCheckOut'])) $this->dateOfCheckOut = htmlspecialchars($_POST['dateOfCheckOut'], ENT_QUOTES);
+            if (isset($_POST['amountOfRooms'])) $this->amountOfRooms = htmlspecialchars($_POST['amountOfRooms'], ENT_QUOTES);
+            if (isset($_POST['adjacentRooms'])) $this->adjacentRooms = htmlspecialchars($_POST['adjacentRooms'], ENT_QUOTES);
+            if (isset($_POST['amountOfAdjacentRooms'])) $this->amountOfAdjacentRooms = htmlspecialchars($_POST['amountOfAdjacentRooms'], ENT_QUOTES);
+            if (isset($_POST['typeOfBathrooms'])) $this->typeOfBathrooms = htmlspecialchars($_POST['typeOfBathrooms'], ENT_QUOTES);
+            if (isset($_POST['typeOfBalcony'])) $this->typeOfBalcony = htmlspecialchars($_POST['typeOfBalcony'], ENT_QUOTES);
+            if (isset($_POST['balconyGlazed'])) $this->balconyGlazed = htmlspecialchars($_POST['balconyGlazed'], ENT_QUOTES);
+            if (isset($_POST['roomSpace'])) $this->roomSpace = htmlspecialchars($_POST['roomSpace'], ENT_QUOTES);
+            if (isset($_POST['totalArea'])) $this->totalArea = htmlspecialchars($_POST['totalArea'], ENT_QUOTES);
+            if (isset($_POST['livingSpace'])) $this->livingSpace = htmlspecialchars($_POST['livingSpace'], ENT_QUOTES);
+            if (isset($_POST['kitchenSpace'])) $this->kitchenSpace = htmlspecialchars($_POST['kitchenSpace'], ENT_QUOTES);
+            if (isset($_POST['floor']) && $mode == "new") $this->floor = htmlspecialchars($_POST['floor'], ENT_QUOTES);
+            if (isset($_POST['totalAmountFloor']) && $mode == "new") $this->totalAmountFloor = htmlspecialchars($_POST['totalAmountFloor'], ENT_QUOTES);
+            if (isset($_POST['numberOfFloor']) && $mode == "new") $this->numberOfFloor = htmlspecialchars($_POST['numberOfFloor'], ENT_QUOTES);
+            if (isset($_POST['concierge'])) $this->concierge = htmlspecialchars($_POST['concierge'], ENT_QUOTES);
+            if (isset($_POST['intercom'])) $this->intercom = htmlspecialchars($_POST['intercom'], ENT_QUOTES);
+            if (isset($_POST['parking'])) $this->parking = htmlspecialchars($_POST['parking'], ENT_QUOTES);
+            if (isset($_POST['district']) && $mode == "new") $this->district = htmlspecialchars($_POST['district'], ENT_QUOTES);
+            if (isset($_POST['coordX']) && $mode == "new") $this->coordX = htmlspecialchars($_POST['coordX'], ENT_QUOTES);
+            if (isset($_POST['coordY']) && $mode == "new") $this->coordY = htmlspecialchars($_POST['coordY'], ENT_QUOTES);
+            if (isset($_POST['address']) && $mode == "new") $this->address = htmlspecialchars($_POST['address'], ENT_QUOTES);
+            if (isset($_POST['apartmentNumber']) && $mode == "new") $this->apartmentNumber = htmlspecialchars($_POST['apartmentNumber'], ENT_QUOTES);
+            if (isset($_POST['subwayStation'])) $this->subwayStation = htmlspecialchars($_POST['subwayStation'], ENT_QUOTES);
+            if (isset($_POST['distanceToMetroStation'])) $this->distanceToMetroStation = htmlspecialchars($_POST['distanceToMetroStation'], ENT_QUOTES);
+            if (isset($_POST['currency'])) $this->currency = htmlspecialchars($_POST['currency'], ENT_QUOTES);
+            if (isset($_POST['costOfRenting'])) $this->costOfRenting = htmlspecialchars($_POST['costOfRenting'], ENT_QUOTES);
+            if (isset($_POST['utilities'])) $this->utilities = htmlspecialchars($_POST['utilities'], ENT_QUOTES);
+            if (isset($_POST['costInSummer'])) $this->costInSummer = htmlspecialchars($_POST['costInSummer'], ENT_QUOTES);
+            if (isset($_POST['costInWinter'])) $this->costInWinter = htmlspecialchars($_POST['costInWinter'], ENT_QUOTES);
+            if (isset($_POST['electricPower'])) $this->electricPower = htmlspecialchars($_POST['electricPower'], ENT_QUOTES);
+            if (isset($_POST['bail'])) $this->bail = htmlspecialchars($_POST['bail'], ENT_QUOTES);
+            if (isset($_POST['bailCost'])) $this->bailCost = htmlspecialchars($_POST['bailCost'], ENT_QUOTES);
+            if (isset($_POST['prepayment'])) $this->prepayment = htmlspecialchars($_POST['prepayment'], ENT_QUOTES);
+            if (isset($_POST['compensationMoney']) && $mode == "new") $this->compensationMoney = htmlspecialchars($_POST['compensationMoney'], ENT_QUOTES);
+            if (isset($_POST['compensationPercent']) && $mode == "new") $this->compensationPercent = htmlspecialchars($_POST['compensationPercent'], ENT_QUOTES);
+            if (isset($_POST['repair'])) $this->repair = htmlspecialchars($_POST['repair'], ENT_QUOTES);
+            if (isset($_POST['furnish'])) $this->furnish = htmlspecialchars($_POST['furnish'], ENT_QUOTES);
+            if (isset($_POST['windows'])) $this->windows = htmlspecialchars($_POST['windows'], ENT_QUOTES);
+            if (isset($_POST['internet'])) $this->internet = htmlspecialchars($_POST['internet'], ENT_QUOTES);
+            if (isset($_POST['telephoneLine'])) $this->telephoneLine = htmlspecialchars($_POST['telephoneLine'], ENT_QUOTES);
+            if (isset($_POST['cableTV'])) $this->cableTV = htmlspecialchars($_POST['cableTV'], ENT_QUOTES);
+            if (isset($_POST['furnitureInLivingArea']) && is_array($_POST['furnitureInLivingArea'])) {
+				$this->furnitureInLivingArea = array();
+				foreach ($_POST['furnitureInLivingArea'] as $value) $this->furnitureInLivingArea[] = htmlspecialchars($value, ENT_QUOTES);
+			} else $this->furnitureInLivingArea = array(); // Если пользователь отправил форму и не отметил ни одного предмета мебели, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
+            if (isset($_POST['furnitureInLivingAreaExtra'])) $this->furnitureInLivingAreaExtra = htmlspecialchars($_POST['furnitureInLivingAreaExtra'], ENT_QUOTES);
+            if (isset($_POST['furnitureInKitchen']) && is_array($_POST['furnitureInKitchen'])) {
+				$this->furnitureInKitchen = array();
+				foreach ($_POST['furnitureInKitchen'] as $value) $this->furnitureInKitchen[] = htmlspecialchars($value, ENT_QUOTES);
+			} else $this->furnitureInKitchen = array(); // Если пользователь отправил форму и не отметил ни одного предмета мебели, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
+            if (isset($_POST['furnitureInKitchenExtra'])) $this->furnitureInKitchenExtra = htmlspecialchars($_POST['furnitureInKitchenExtra'], ENT_QUOTES);
+            if (isset($_POST['appliances']) && is_array($_POST['appliances'])) {
+				$this->appliances = array();
+				foreach ($_POST['appliances'] as $value) $this->appliances[] = htmlspecialchars($value, ENT_QUOTES);
+			} else $this->appliances = array(); // Если пользователь отправил форму и не отметил ни одного предмета бытовой техники, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
+            if (isset($_POST['appliancesExtra'])) $this->appliancesExtra = htmlspecialchars($_POST['appliancesExtra'], ENT_QUOTES);
+            if (isset($_POST['sexOfTenant']) && is_array($_POST['sexOfTenant'])) {
+				$this->sexOfTenant = array();
+				foreach ($_POST['sexOfTenant'] as $value) $this->sexOfTenant[] = htmlspecialchars($value, ENT_QUOTES);
+			} else $this->sexOfTenant = array(); // Если пользователь отправил форму и не отметил ни одного допустимого пола для одиночного арендатора, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
+            if (isset($_POST['relations']) && is_array($_POST['relations'])) {
+				$this->relations = array();
+				foreach ($_POST['relations'] as $value) $this->relations[] = htmlspecialchars($value, ENT_QUOTES);
+			} else $this->relations = array(); // Если пользователь отправил форму и не отметил ни одного допустимого вида отношений между арендаторами, то обязательно нужно явно присвоить этой переменной пустой массив, иначе изменение не вступит в силу, а возьмется старое значение из БД
+            if (isset($_POST['children'])) $this->children = htmlspecialchars($_POST['children'], ENT_QUOTES);
+            if (isset($_POST['animals'])) $this->animals = htmlspecialchars($_POST['animals'], ENT_QUOTES);
+            if (isset($_POST['contactTelephonNumber'])) $this->contactTelephonNumber = htmlspecialchars($_POST['contactTelephonNumber'], ENT_QUOTES);
+            if (isset($_POST['timeForRingBegin'])) $this->timeForRingBegin = htmlspecialchars($_POST['timeForRingBegin'], ENT_QUOTES);
+            if (isset($_POST['timeForRingEnd'])) $this->timeForRingEnd = htmlspecialchars($_POST['timeForRingEnd'], ENT_QUOTES);
+            if (isset($_POST['checking'])) $this->checking = htmlspecialchars($_POST['checking'], ENT_QUOTES);
+            if (isset($_POST['responsibility'])) $this->responsibility = htmlspecialchars($_POST['responsibility'], ENT_QUOTES);
+            if (isset($_POST['comment'])) $this->comment = htmlspecialchars($_POST['comment'], ENT_QUOTES);
+            if (isset($_POST['earliestDate'])) $this->earliestDate = htmlspecialchars($_POST['earliestDate'], ENT_QUOTES);
+            if (isset($_POST['earliestTimeHours'])) $this->earliestTimeHours = htmlspecialchars($_POST['earliestTimeHours'], ENT_QUOTES);
+            if (isset($_POST['earliestTimeMinutes'])) $this->earliestTimeMinutes = htmlspecialchars($_POST['earliestTimeMinutes'], ENT_QUOTES);
+			if (isset($_POST['adminComment'])) $this->adminComment = htmlspecialchars($_POST['adminComment'], ENT_QUOTES);
         }
 
         // Записать в качестве данных о фотографиях соответствующую информацию из POST запроса
@@ -675,16 +690,14 @@
         {
             //TODO: убедиться, что если на клиенте удалить все фотки, то при перезагрузке они снова не появятся (из-за того, что $uploadedFoto не придет в POST параметрах и останется предыдущая версия - которая не будет перезатерта)
 
-            if (isset($_POST['fileUploadId'])) $this->fileUploadId = $_POST['fileUploadId'];
+            if (isset($_POST['fileUploadId'])) $this->fileUploadId = htmlspecialchars($_POST['fileUploadId'], ENT_QUOTES);
             if (isset($_POST['uploadedFoto'])) $this->uploadedFoto = json_decode($_POST['uploadedFoto'], TRUE); // Массив объектов со сведениями о загруженных фотографиях сериализуется в JSON формат на клиенте и передается как содержимое атрибута value одного единственного INPUT hidden
-            if (isset($_POST['primaryFotoRadioButton'])) $this->primaryFotoId = htmlspecialchars($_POST['primaryFotoRadioButton']);
-
+            if (isset($_POST['primaryFotoRadioButton'])) $this->primaryFotoId = htmlspecialchars($_POST['primaryFotoRadioButton'], ENT_QUOTES);
         }
 
         // Получить ассоциированный массив с данными анкеты объекта недвижимости (для использования в представлении)
         public function getCharacteristicData()
         {
-
             $result = array();
 
             $result['ownerLogin'] = $this->ownerLogin;

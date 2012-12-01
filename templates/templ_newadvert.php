@@ -117,7 +117,7 @@
     Новое объявление
 </div>
 
-<form method="post" name="newAdvert" class="advertDescriptionEdit formWithFotos" enctype="multipart/form-data">
+<form name="newAdvert" class="advertDescriptionEdit formWithFotos" method="post" enctype="multipart/form-data" action="newadvert.php?action=saveAdvert<?php if ($isAdmin['newAdvertAlien'] && $alienOwner == "true") echo "&alienOwner=true";?>">
 <div class="advertDescriptionChapter" id="typeAndPeriodChapter">
     <div class="advertDescriptionChapterHeader">
         Тип и сроки

@@ -353,6 +353,11 @@ FileETag None
 <IfModule mod_rewrite.c>
   Options +FollowSymlinks
   RewriteEngine On
+  # Следующие 5 строк - попытка защиты от xss атак предложенная в конце статьи: http://lifeexample.ru/razrabotka-i-optimizacia-saita/xss-uyazvimost-i-zashhita-ot-xss.html
+  RewriteCond %{QUERY_STRING} (\<|%3C).*script.*(\>|%3E) [NC,OR]
+  RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
+  RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2})
+  RewriteRule ^(.*)$ index.php [F,L]
 # RewriteBase /
 </IfModule>
 

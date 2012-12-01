@@ -65,10 +65,10 @@
 
         // Инициализировать параметры запроса данными из POST запроса пользователя
         public function writeParamsFromPOST() {
-            if (isset($_POST['name'])) $this->name = htmlspecialchars($_POST['name']);
-            if (isset($_POST['telephon'])) $this->telephon = htmlspecialchars($_POST['telephon']);
-            if (isset($_POST['address'])) $this->address = htmlspecialchars($_POST['address']);
-            if (isset($_POST['commentOwner'])) $this->commentOwner = htmlspecialchars($_POST['commentOwner']);
+            if (isset($_POST['name'])) $this->name = htmlspecialchars($_POST['name'], ENT_QUOTES);
+            if (isset($_POST['telephon'])) $this->telephon = htmlspecialchars($_POST['telephon'], ENT_QUOTES);
+            if (isset($_POST['address'])) $this->address = htmlspecialchars($_POST['address'], ENT_QUOTES);
+            if (isset($_POST['commentOwner'])) $this->commentOwner = htmlspecialchars($_POST['commentOwner'], ENT_QUOTES);
         }
 
         // Возвращает ассоциированный массив с данными о запросе собственника на новое объявление

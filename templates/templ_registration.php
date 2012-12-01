@@ -120,8 +120,7 @@
     <div class="clearBoth"></div>
 </div>
 
-<form name="personalInformation" id="personalInformationForm" class="formWithFotos" method="post"
-      enctype="multipart/form-data">
+<form name="personalInformation" id="personalInformationForm" class="formWithFotos" method="post" enctype="multipart/form-data" action="registration.php?action=registration<?php if ($isAdmin['newAdvertAlien'] && $alienOwner == "true") echo "&alienOwner=true";?>">
 <div id="tabs">
 <ul>
     <li>
@@ -256,7 +255,7 @@
 <script>
 	var typeTenant = <?php if ($userCharacteristic['typeTenant']) echo "true"; else echo "false"; // Является ли регистрируемый пользователь арендатором ?>;
 	var typeOwner = <?php if ($userCharacteristic['typeOwner']) echo "true"; else echo "false"; // Является ли регистрируемый пользователь собственником ?>;
-    var isAlienOwnerRegistration = <?php if ($isAlienOwnerRegistration) echo "true"; else echo "false"; // Если регистрируется новый чужой собственник, то JS проверки на заполненность полей не проводятся ?>;
+    var isAlienOwnerRegistration = <?php if ($isAdmin['newAdvertAlien'] && $alienOwner == "true") echo "true"; else echo "false"; // Если регистрируется новый чужой собственник, то JS проверки на заполненность полей не проводятся ?>;
 	var uploadedFoto = JSON.parse('<?php echo json_encode($userFotoInformation['uploadedFoto']);
 	// Сервер сохранит в эту переменную данные о загруженных фотографиях в формате JSON
 	// Переменная uploadedFoto содержит массив объектов, каждый из которых представляет информацию по 1 фотографии

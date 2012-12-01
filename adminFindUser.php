@@ -41,13 +41,13 @@ if (!$isAdmin['searchUser']) {
  * ПОЛУЧИМ ДАННЫЕ ЗАПРОСА НА ПОИСК ПОЛЬЗОВАТЕЛЯ
  *******************************************************************************/
 
-if (isset($_POST['surname'])) $goalUser['surname'] = htmlspecialchars($_POST['surname']);
-if (isset($_POST['name'])) $goalUser['name'] = htmlspecialchars($_POST['name']);
-if (isset($_POST['secondName'])) $goalUser['secondName'] = htmlspecialchars($_POST['secondName']);
-if (isset($_POST['login'])) $goalUser['login'] = htmlspecialchars($_POST['login']);
-if (isset($_POST['telephon'])) $goalUser['telephon'] = htmlspecialchars($_POST['telephon']);
-if (isset($_POST['email'])) $goalUser['email'] = htmlspecialchars($_POST['email']);
-if (isset($_POST['address'])) $goalUser['address'] = htmlspecialchars($_POST['address']);
+if (isset($_POST['surname'])) $goalUser['surname'] = htmlspecialchars($_POST['surname'], ENT_QUOTES);
+if (isset($_POST['name'])) $goalUser['name'] = htmlspecialchars($_POST['name'], ENT_QUOTES);
+if (isset($_POST['secondName'])) $goalUser['secondName'] = htmlspecialchars($_POST['secondName'], ENT_QUOTES);
+if (isset($_POST['login'])) $goalUser['login'] = htmlspecialchars($_POST['login'], ENT_QUOTES);
+if (isset($_POST['telephon'])) $goalUser['telephon'] = htmlspecialchars($_POST['telephon'], ENT_QUOTES);
+if (isset($_POST['email'])) $goalUser['email'] = htmlspecialchars($_POST['email'], ENT_QUOTES);
+if (isset($_POST['address'])) $goalUser['address'] = htmlspecialchars($_POST['address'], ENT_QUOTES);
 
 /********************************************************************************
  * ПОЛУЧАЕМ РЕЗУЛЬТАТЫ ПОИСКА ИЗ БД

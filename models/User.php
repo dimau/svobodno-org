@@ -664,36 +664,36 @@ class User
 	public function writeCharacteristicFromPOST() {
 		//TODO: не проверять и не менять $_POST['login'], если происходит редактирование существующего пользователя (теоретически можно через POST параметр заслать новый логин и метод его поменяет для ранее зарегистрированного пользователя)
 
-		if (isset($_POST['name'])) $this->name = htmlspecialchars($_POST['name']);
-		if (isset($_POST['secondName'])) $this->secondName = htmlspecialchars($_POST['secondName']);
-		if (isset($_POST['surname'])) $this->surname = htmlspecialchars($_POST['surname']);
-		if (isset($_POST['sex'])) $this->sex = htmlspecialchars($_POST['sex']);
-		if (isset($_POST['nationality'])) $this->nationality = htmlspecialchars($_POST['nationality']);
-		if (isset($_POST['birthday'])) $this->birthday = htmlspecialchars($_POST['birthday']);
-		if (isset($_POST['login'])) $this->login = htmlspecialchars($_POST['login']);
-		if (isset($_POST['password'])) $this->password = htmlspecialchars($_POST['password']);
-		if (isset($_POST['telephon'])) $this->telephon = htmlspecialchars($_POST['telephon']);
-		if (isset($_POST['email'])) $this->email = htmlspecialchars($_POST['email']);
+		if (isset($_POST['name'])) $this->name = htmlspecialchars($_POST['name'], ENT_QUOTES);
+		if (isset($_POST['secondName'])) $this->secondName = htmlspecialchars($_POST['secondName'], ENT_QUOTES);
+		if (isset($_POST['surname'])) $this->surname = htmlspecialchars($_POST['surname'], ENT_QUOTES);
+		if (isset($_POST['sex'])) $this->sex = htmlspecialchars($_POST['sex'], ENT_QUOTES);
+		if (isset($_POST['nationality'])) $this->nationality = htmlspecialchars($_POST['nationality'], ENT_QUOTES);
+		if (isset($_POST['birthday'])) $this->birthday = htmlspecialchars($_POST['birthday'], ENT_QUOTES);
+		if (isset($_POST['login'])) $this->login = htmlspecialchars($_POST['login'], ENT_QUOTES);
+		if (isset($_POST['password'])) $this->password = htmlspecialchars($_POST['password'], ENT_QUOTES);
+		if (isset($_POST['telephon'])) $this->telephon = htmlspecialchars($_POST['telephon'], ENT_QUOTES);
+		if (isset($_POST['email'])) $this->email = htmlspecialchars($_POST['email'], ENT_QUOTES);
 
-		if (isset($_POST['currentStatusEducation'])) $this->currentStatusEducation = htmlspecialchars($_POST['currentStatusEducation']);
-		if (isset($_POST['almamater'])) $this->almamater = htmlspecialchars($_POST['almamater']);
-		if (isset($_POST['speciality'])) $this->speciality = htmlspecialchars($_POST['speciality']);
-		if (isset($_POST['kurs'])) $this->kurs = htmlspecialchars($_POST['kurs']);
-		if (isset($_POST['ochnoZaochno'])) $this->ochnoZaochno = htmlspecialchars($_POST['ochnoZaochno']);
-		if (isset($_POST['yearOfEnd'])) $this->yearOfEnd = htmlspecialchars($_POST['yearOfEnd']);
-		if (isset($_POST['statusWork'])) $this->statusWork = htmlspecialchars($_POST['statusWork']);
-		if (isset($_POST['placeOfWork'])) $this->placeOfWork = htmlspecialchars($_POST['placeOfWork']);
-		if (isset($_POST['workPosition'])) $this->workPosition = htmlspecialchars($_POST['workPosition']);
-		if (isset($_POST['regionOfBorn'])) $this->regionOfBorn = htmlspecialchars($_POST['regionOfBorn']);
-		if (isset($_POST['cityOfBorn'])) $this->cityOfBorn = htmlspecialchars($_POST['cityOfBorn']);
-		if (isset($_POST['shortlyAboutMe'])) $this->shortlyAboutMe = htmlspecialchars($_POST['shortlyAboutMe']);
+		if (isset($_POST['currentStatusEducation'])) $this->currentStatusEducation = htmlspecialchars($_POST['currentStatusEducation'], ENT_QUOTES);
+		if (isset($_POST['almamater'])) $this->almamater = htmlspecialchars($_POST['almamater'], ENT_QUOTES);
+		if (isset($_POST['speciality'])) $this->speciality = htmlspecialchars($_POST['speciality'], ENT_QUOTES);
+		if (isset($_POST['kurs'])) $this->kurs = htmlspecialchars($_POST['kurs'], ENT_QUOTES);
+		if (isset($_POST['ochnoZaochno'])) $this->ochnoZaochno = htmlspecialchars($_POST['ochnoZaochno'], ENT_QUOTES);
+		if (isset($_POST['yearOfEnd'])) $this->yearOfEnd = htmlspecialchars($_POST['yearOfEnd'], ENT_QUOTES);
+		if (isset($_POST['statusWork'])) $this->statusWork = htmlspecialchars($_POST['statusWork'], ENT_QUOTES);
+		if (isset($_POST['placeOfWork'])) $this->placeOfWork = htmlspecialchars($_POST['placeOfWork'], ENT_QUOTES);
+		if (isset($_POST['workPosition'])) $this->workPosition = htmlspecialchars($_POST['workPosition'], ENT_QUOTES);
+		if (isset($_POST['regionOfBorn'])) $this->regionOfBorn = htmlspecialchars($_POST['regionOfBorn'], ENT_QUOTES);
+		if (isset($_POST['cityOfBorn'])) $this->cityOfBorn = htmlspecialchars($_POST['cityOfBorn'], ENT_QUOTES);
+		if (isset($_POST['shortlyAboutMe'])) $this->shortlyAboutMe = htmlspecialchars($_POST['shortlyAboutMe'], ENT_QUOTES);
 
-		if (isset($_POST['vkontakte'])) $this->vkontakte = htmlspecialchars($_POST['vkontakte']);
-		if (isset($_POST['odnoklassniki'])) $this->odnoklassniki = htmlspecialchars($_POST['odnoklassniki']);
-		if (isset($_POST['facebook'])) $this->facebook = htmlspecialchars($_POST['facebook']);
-		if (isset($_POST['twitter'])) $this->twitter = htmlspecialchars($_POST['twitter']);
+		if (isset($_POST['vkontakte'])) $this->vkontakte = htmlspecialchars($_POST['vkontakte'], ENT_QUOTES);
+		if (isset($_POST['odnoklassniki'])) $this->odnoklassniki = htmlspecialchars($_POST['odnoklassniki'], ENT_QUOTES);
+		if (isset($_POST['facebook'])) $this->facebook = htmlspecialchars($_POST['facebook'], ENT_QUOTES);
+		if (isset($_POST['twitter'])) $this->twitter = htmlspecialchars($_POST['twitter'], ENT_QUOTES);
 
-		if (isset($_POST['lic'])) $this->lic = htmlspecialchars($_POST['lic']);
+		if (isset($_POST['lic'])) $this->lic = htmlspecialchars($_POST['lic'], ENT_QUOTES);
 
 	}
 
@@ -701,33 +701,38 @@ class User
 	public function writeFotoInformationFromPOST() {
 		//TODO: убедиться, что если на клиенте удалить все фотки, то при перезагрузке они снова не появятся (из-за того, что $uploadedFoto не придет в POST параметрах и останется предыдущая версия - которая не будет перезатерта)
 
-		if (isset($_POST['fileUploadId'])) $this->fileUploadId = $_POST['fileUploadId'];
+		if (isset($_POST['fileUploadId'])) $this->fileUploadId = htmlspecialchars($_POST['fileUploadId'], ENT_QUOTES);
 		if (isset($_POST['uploadedFoto'])) $this->uploadedFoto = json_decode($_POST['uploadedFoto'], TRUE); // Массив объектов со сведениями о загруженных фотографиях сериализуется в JSON формат на клиенте и передается как содержимое атрибута value одного единственного INPUT hidden
-		if (isset($_POST['primaryFotoRadioButton'])) $this->primaryFotoId = htmlspecialchars($_POST['primaryFotoRadioButton']);
+		if (isset($_POST['primaryFotoRadioButton'])) $this->primaryFotoId = htmlspecialchars($_POST['primaryFotoRadioButton'], ENT_QUOTES);
 
 	}
 
 	// Записать в качестве параметров user-а значения, полученные через POST запрос
 	public function writeSearchRequestFromPOST() {
 
-		if (isset($_POST['typeOfObject'])) $this->typeOfObject = htmlspecialchars($_POST['typeOfObject']);
-		if (isset($_POST['amountOfRooms']) && is_array($_POST['amountOfRooms'])) $this->amountOfRooms = $_POST['amountOfRooms']; else $this->amountOfRooms = array(); // Если пользователь отправил форму submit, и в параметрах нет значения amountOfRooms, значит пользователь не отметил ни один чекбокс из группы, чему соответствует пустой массив
-		if (isset($_POST['district']) && is_array($_POST['district'])) $this->district = $_POST['district']; else $this->district = array(); // Если пользователь отправил форму submit, и в параметрах нет значения district, значит пользователь не отметил ни один чекбокс из группы, чему соответствует пустой массив
-		if (isset($_POST['adjacentRooms'])) $this->adjacentRooms = htmlspecialchars($_POST['adjacentRooms']);
-		if (isset($_POST['floor'])) $this->floor = htmlspecialchars($_POST['floor']);
-		if (isset($_POST['minCost'])) $this->minCost = htmlspecialchars($_POST['minCost']);
-		if (isset($_POST['maxCost'])) $this->maxCost = htmlspecialchars($_POST['maxCost']);
-		if (isset($_POST['pledge'])) $this->pledge = htmlspecialchars($_POST['pledge']);
-		if (isset($_POST['prepayment'])) $this->prepayment = htmlspecialchars($_POST['prepayment']);
-		if (isset($_POST['withWho'])) $this->withWho = htmlspecialchars($_POST['withWho']);
-		if (isset($_POST['linksToFriends'])) $this->linksToFriends = htmlspecialchars($_POST['linksToFriends']);
-		if (isset($_POST['children'])) $this->children = htmlspecialchars($_POST['children']);
-		if (isset($_POST['howManyChildren'])) $this->howManyChildren = htmlspecialchars($_POST['howManyChildren']);
-		if (isset($_POST['animals'])) $this->animals = htmlspecialchars($_POST['animals']);
-		if (isset($_POST['howManyAnimals'])) $this->howManyAnimals = htmlspecialchars($_POST['howManyAnimals']);
-		if (isset($_POST['termOfLease'])) $this->termOfLease = htmlspecialchars($_POST['termOfLease']);
-		if (isset($_POST['additionalDescriptionOfSearch'])) $this->additionalDescriptionOfSearch = htmlspecialchars($_POST['additionalDescriptionOfSearch']);
-
+		if (isset($_POST['typeOfObject'])) $this->typeOfObject = htmlspecialchars($_POST['typeOfObject'], ENT_QUOTES);
+		if (isset($_POST['amountOfRooms']) && is_array($_POST['amountOfRooms'])) {
+			$this->amountOfRooms = array();
+			foreach ($_POST['amountOfRooms'] as $value) $this->amountOfRooms[] = htmlspecialchars($value, ENT_QUOTES);
+		} else $this->amountOfRooms = array(); // Если пользователь отправил форму submit, и в параметрах нет значения amountOfRooms, значит пользователь не отметил ни один чекбокс из группы, чему соответствует пустой массив
+		if (isset($_POST['district']) && is_array($_POST['district'])) {
+			$this->district = array();
+			foreach ($_POST['district'] as $value) $this->district[] = htmlspecialchars($value, ENT_QUOTES);
+		} else $this->district = array(); // Если пользователь отправил форму submit, и в параметрах нет значения district, значит пользователь не отметил ни один чекбокс из группы, чему соответствует пустой массив
+		if (isset($_POST['adjacentRooms'])) $this->adjacentRooms = htmlspecialchars($_POST['adjacentRooms'], ENT_QUOTES);
+		if (isset($_POST['floor'])) $this->floor = htmlspecialchars($_POST['floor'], ENT_QUOTES);
+		if (isset($_POST['minCost'])) $this->minCost = htmlspecialchars($_POST['minCost'], ENT_QUOTES);
+		if (isset($_POST['maxCost'])) $this->maxCost = htmlspecialchars($_POST['maxCost'], ENT_QUOTES);
+		if (isset($_POST['pledge'])) $this->pledge = htmlspecialchars($_POST['pledge'], ENT_QUOTES);
+		if (isset($_POST['prepayment'])) $this->prepayment = htmlspecialchars($_POST['prepayment'], ENT_QUOTES);
+		if (isset($_POST['withWho'])) $this->withWho = htmlspecialchars($_POST['withWho'], ENT_QUOTES);
+		if (isset($_POST['linksToFriends'])) $this->linksToFriends = htmlspecialchars($_POST['linksToFriends'], ENT_QUOTES);
+		if (isset($_POST['children'])) $this->children = htmlspecialchars($_POST['children'], ENT_QUOTES);
+		if (isset($_POST['howManyChildren'])) $this->howManyChildren = htmlspecialchars($_POST['howManyChildren'], ENT_QUOTES);
+		if (isset($_POST['animals'])) $this->animals = htmlspecialchars($_POST['animals'], ENT_QUOTES);
+		if (isset($_POST['howManyAnimals'])) $this->howManyAnimals = htmlspecialchars($_POST['howManyAnimals'], ENT_QUOTES);
+		if (isset($_POST['termOfLease'])) $this->termOfLease = htmlspecialchars($_POST['termOfLease'], ENT_QUOTES);
+		if (isset($_POST['additionalDescriptionOfSearch'])) $this->additionalDescriptionOfSearch = htmlspecialchars($_POST['additionalDescriptionOfSearch'], ENT_QUOTES);
 	}
 
 	// Получить ассоциированный массив с данными Анкеты (Характеристики) пользователя (для использования в представлении)
@@ -785,7 +790,6 @@ class User
 		$result['primaryFotoId'] = $this->primaryFotoId;
 
 		return $result;
-
 	}
 
 	// Получить ассоциированный массив с данными о поисковом запросе пользователя (для использования в представлении)
