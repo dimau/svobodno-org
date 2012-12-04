@@ -32,7 +32,7 @@ if (isset($_SESSION['url_initial']) && preg_match('~^((http://svobodno.org)|(htt
 
 // Инициализируем используемые в шаблоне(ах) переменные
 $isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных сообщений пользователя
+$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 //$url_initial
 
 // Подсоединяем нужный основной шаблон

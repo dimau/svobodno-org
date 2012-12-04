@@ -129,8 +129,8 @@
                     <a href="#tabs-1">Профиль</a>
                 </li>
                 <li>
-                    <a href="#tabs-2">Сообщения<?php
-                        // Сколько сообщений не прочитано?
+                    <a href="#tabs-2">Уведомления<?php
+                        // Сколько уведомлений не прочитано?
                         if ($amountUnreadMessages != 0) echo " (<span class='amountOfNewMessages'>".$amountUnreadMessages."</span>)"; ?>
                     </a>
                 </li>
@@ -158,7 +158,7 @@
                     echo View::getHTMLfotosWrapper("middle", TRUE, FALSE, $userFotoInformation['uploadedFoto']);
 
                     // Вставляем анкетные данные пользователя
-                    include ("templates/templ_notEditedProfile.php");
+                    include ("templates/notEditableBlocks/templ_notEditedProfile.php");
 
                     ?>
                 </div>
@@ -169,13 +169,13 @@
 
                     <?php
                     // Подключим форму для ввода и редактирования данных о ФИО, логине, контактах пользователя, а также о фотографиях
-                    include "templates/templ_editablePersonalFIO.php";
+                    include "templates/editableBlocks/templ_editablePersonalFIO.php";
 
                     // Подключим форму для ввода и редактирования данных об образовании, работе и месте рождения
-                    include "templates/templ_editablePersonalEducAndWork.php";
+                    include "templates/editableBlocks/templ_editablePersonalEducAndWork.php";
 
                     // Подключим форму для ввода и редактирования данных о социальных сетях пользователя
-                    include "templates/templ_editablePersonalSocial.php";
+                    include "templates/editableBlocks/templ_editablePersonalSocial.php";
                     ?>
 
                     <div class="clearBoth"></div>
@@ -197,7 +197,7 @@
 
             <div id="tabs-2">
                 <?php
-                    // Формируем и выдаем HTML списка сообщений (новостей) пользователя
+                    // Формируем и выдаем HTML списка уведомлений пользователя
                     echo View::getHTMLforMessages($messagesArr);
                 ?>
             </div>
@@ -242,7 +242,7 @@
                     </ul>
                     <?php
                     // Шаблон для представления нередактируемых параметров поисковго запроса пользователя
-                    include ("templ_notEditedSearchRequest.php");
+                    include ("templates/notEditableBlocks/templ_notEditedSearchRequest.php");
                     ?>
                 </div>
                 <?php endif;?>
@@ -253,7 +253,7 @@
 
                     <?php
                     // Подключим форму для ввода и редактирования данных о социальных сетях пользователя
-                    include "templates/templ_editableSearchRequest.php";
+                    include "templates/editableBlocks/templ_editableSearchRequest.php";
                     ?>
 
                     <div class="clearBoth"></div>
@@ -275,7 +275,7 @@
             <div id="tabs-5">
                 <?php
                     // Размещаем на странице HTML для результатов поиска (списка избранных объектов недвижимости)
-                    include("templates/templ_searchResult.php");
+                    include("templates/searchResultBlocks/templ_searchResult.php");
                 ?>
             </div>
 

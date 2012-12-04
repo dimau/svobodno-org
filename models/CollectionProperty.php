@@ -61,13 +61,13 @@
                     $this->allPropertiesFotoInformation[$i] = $res;
                 }
 
-                // Получаем список id заинтересовавшихся арендаторов
-                $tenantsWithSignUpToViewRequest = unserialize($this->allPropertiesCharacteristic[$i]['tenantsWithSignUpToViewRequest']);
+                // Получаем список id заинтересовавшихся арендаторов (кроме id заинтересовавшегося арендатора в массив попадает вся информация по каждому запросу на просмотр)
+				$allRequestToViewProperty = DBconnect::getAllRequestToViewForProperties($this->allPropertiesCharacteristic[$i]['id']);
                // Получаем имена и отчества заинтересовавшихся арендаторов
                // Составляем условие запроса к БД, указывая интересующие нас id объявлений
                $selectValue = "";
-               for ($j = 0, $s1 = count($tenantsWithSignUpToViewRequest); $j < $s1; $j++) {
-                   $selectValue .= " id = '" . $tenantsWithSignUpToViewRequest[$j] . "'";
+               for ($j = 0, $s1 = count($allRequestToViewProperty); $j < $s1; $j++) {
+                   $selectValue .= " id = '" . $allRequestToViewProperty[$j]['tenantId'] . "'";
                    if ($j < $s1 - 1) $selectValue .= " OR";
                }
 
@@ -87,7 +87,6 @@
 
             // Возвращаем количество успешно созданных объектов
             return count($this->allPropertiesCharacteristic);
-
         }
 
         // Возвращем allPropertiesCharacteristic

@@ -69,7 +69,7 @@ $searchRequest->searchProperties(20);
 
 // Инициализируем используемые в шаблоне(ах) переменные
 $isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных сообщений пользователя
+$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 $propertyLightArr = $searchRequest->getPropertyLightArr();
 $propertyFullArr = $searchRequest->getPropertyFullArr();
 $userSearchRequest = $searchRequest->getSearchRequestData();

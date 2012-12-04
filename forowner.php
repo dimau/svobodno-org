@@ -43,7 +43,7 @@ if (isset($_POST['submitButton'])) {
 
 // Инициализируем используемые в шаблоне(ах) переменные
 $isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных сообщений пользователя
+$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 $requestFromOwnerData = $requestFromOwner->getRequestFromOwnerData();
 //$statusOfSaveParamsToDB
 

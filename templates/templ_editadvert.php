@@ -723,164 +723,164 @@
         <div class="objectDescriptionBody">
             <ul>
                 <li>
-                    <input type="checkbox" name="furnitureInLivingArea[]" value="диван раскладной"
+                    <label><input type="checkbox" name="furnitureInLivingArea[]" value="диван раскладной"
                         <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
                         if ($value == "диван раскладной") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> диван раскладной
+                        ?>> диван раскладной</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInLivingArea[]"
+                    <label><input type="checkbox" name="furnitureInLivingArea[]"
                            value="диван нераскладной" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
                         if ($value == "диван нераскладной") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> диван нераскладной
+                        ?>> диван нераскладной</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInLivingArea[]"
+                    <label><input type="checkbox" name="furnitureInLivingArea[]"
                            value="кровать одноместная" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
                         if ($value == "кровать одноместная") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> кровать одноместная
+                        ?>> кровать одноместная</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInLivingArea[]"
+                    <label><input type="checkbox" name="furnitureInLivingArea[]"
                            value="кровать двухместная" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
                         if ($value == "кровать двухместная") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> кровать двухместная
+                        ?>> кровать двухместная</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInLivingArea[]"
+                    <label><input type="checkbox" name="furnitureInLivingArea[]"
                            value="кровать детская" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
                         if ($value == "кровать детская") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> кровать детская
+                        ?>> кровать детская</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInLivingArea[]"
+                    <label><input type="checkbox" name="furnitureInLivingArea[]"
                            value="стол письменный" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
                         if ($value == "стол письменный") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> стол письменный
+                        ?>> стол письменный</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInLivingArea[]"
+                    <label><input type="checkbox" name="furnitureInLivingArea[]"
                            value="стол компьютерный" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
                         if ($value == "стол компьютерный") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> стол компьютерный
+                        ?>> стол компьютерный</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInLivingArea[]"
+                    <label><input type="checkbox" name="furnitureInLivingArea[]"
                            value="стол журнальный" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
                         if ($value == "стол журнальный") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> стол журнальный
+                        ?>> стол журнальный</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInLivingArea[]"
+                    <label><input type="checkbox" name="furnitureInLivingArea[]"
                            value="стол раскладной" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
                         if ($value == "стол раскладной") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> стол раскладной
+                        ?>> стол раскладной</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInLivingArea[]"
+                    <label><input type="checkbox" name="furnitureInLivingArea[]"
                            value="кресло раскладное" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
                         if ($value == "кресло раскладное") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> кресло раскладное
+                        ?>> кресло раскладное</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInLivingArea[]"
+                    <label><input type="checkbox" name="furnitureInLivingArea[]"
                            value="кресло нераскладное" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
                         if ($value == "кресло нераскладное") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> кресло нераскладное
+                        ?>> кресло нераскладное</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInLivingArea[]"
+                    <label><input type="checkbox" name="furnitureInLivingArea[]"
                            value="стулья и табуретки" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
                         if ($value == "стулья и табуретки") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> стулья и табуретки
+                        ?>> стулья и табуретки</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInLivingArea[]"
+                    <label><input type="checkbox" name="furnitureInLivingArea[]"
                            value="стенка" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
                         if ($value == "стенка") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> стенка
+                        ?>> стенка</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInLivingArea[]"
+                    <label><input type="checkbox" name="furnitureInLivingArea[]"
                            value="шкаф для одежды" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
                         if ($value == "шкаф для одежды") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> шкаф для одежды
+                        ?>> шкаф для одежды</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInLivingArea[]"
+                    <label><input type="checkbox" name="furnitureInLivingArea[]"
                            value="шкаф-купе" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
                         if ($value == "шкаф-купе") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> шкаф-купе
+                        ?>> шкаф-купе</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInLivingArea[]"
+                    <label><input type="checkbox" name="furnitureInLivingArea[]"
                            value="комод" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
                         if ($value == "комод") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> комод
+                        ?>> комод</label>
                 </li>
                 <li>
                     <input type="text" name="furnitureInLivingAreaExtra" maxlength="254"
@@ -896,64 +896,64 @@
         <div class="objectDescriptionBody">
             <ul>
                 <li>
-                    <input type="checkbox" name="furnitureInKitchen[]"
+                    <label><input type="checkbox" name="furnitureInKitchen[]"
                            value="стол обеденный" <?php foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
                         if ($value == "стол обеденный") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> стол обеденный
+                        ?>> стол обеденный</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInKitchen[]"
+                    <label><input type="checkbox" name="furnitureInKitchen[]"
                            value="стулья, табуретки" <?php foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
                         if ($value == "стулья, табуретки") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> стулья, табуретки
+                        ?>> стулья, табуретки</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInKitchen[]"
+                    <label><input type="checkbox" name="furnitureInKitchen[]"
                            value="диван" <?php foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
                         if ($value == "диван") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> диван
+                        ?>> диван</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInKitchen[]"
+                    <label><input type="checkbox" name="furnitureInKitchen[]"
                            value="кухонный гарнитур" <?php foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
                         if ($value == "кухонный гарнитур") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> кухонный гарнитур
+                        ?>> кухонный гарнитур</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInKitchen[]"
+                    <label><input type="checkbox" name="furnitureInKitchen[]"
                            value="шкафчики навесные" <?php foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
                         if ($value == "шкафчики навесные") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> шкафчики навесные
+                        ?>> шкафчики навесные</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="furnitureInKitchen[]"
+                    <label><input type="checkbox" name="furnitureInKitchen[]"
                            value="шкафчики напольные" <?php foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
                         if ($value == "шкафчики напольные") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> шкафчики напольные
+                        ?>> шкафчики напольные</label>
                 </li>
                 <li>
                     <input type="text" name="furnitureInKitchenExtra" maxlength="254"
@@ -969,92 +969,92 @@
         <div class="objectDescriptionBody">
             <ul>
                 <li>
-                    <input type="checkbox" name="appliances[]"
+                    <label><input type="checkbox" name="appliances[]"
                            value="холодильник" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
                         if ($value == "холодильник") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> холодильник
+                        ?>> холодильник</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="appliances[]"
+                    <label><input type="checkbox" name="appliances[]"
                            value="микроволновая печь" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
                         if ($value == "микроволновая печь") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> микроволновая печь
+                        ?>> микроволновая печь</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="appliances[]" value="телевизор" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
+                    <label><input type="checkbox" name="appliances[]" value="телевизор" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
                         if ($value == "телевизор") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> телевизор
+                        ?>> телевизор</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="appliances[]"
+                    <label><input type="checkbox" name="appliances[]"
                            value="стиральная машина (автомат)" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
                         if ($value == "стиральная машина (автомат)") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> стиральная машина (автомат)
+                        ?>> стиральная машина (автомат)</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="appliances[]"
+                    <label><input type="checkbox" name="appliances[]"
                            value="стиральная машина (не автомат)" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
                         if ($value == "стиральная машина (не автомат)") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> стиральная машина (не автомат)
+                        ?>> стиральная машина (не автомат)</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="appliances[]"
+                    <label><input type="checkbox" name="appliances[]"
                            value="нагреватель воды" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
                         if ($value == "нагреватель воды") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> нагреватель воды
+                        ?>> нагреватель воды</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="appliances[]" value="пылесос" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
+                    <label><input type="checkbox" name="appliances[]" value="пылесос" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
                         if ($value == "пылесос") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> пылесос
+                        ?>> пылесос</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="appliances[]"
+                    <label><input type="checkbox" name="appliances[]"
                            value="кондиционер" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
                         if ($value == "кондиционер") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> кондиционер
+                        ?>> кондиционер</label>
                 </li>
                 <li>
-                    <input type="checkbox" name="appliances[]"
+                    <label><input type="checkbox" name="appliances[]"
                            value="охранная сигнализация" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
                         if ($value == "охранная сигнализация") {
                             echo "checked";
                             break;
                         }
                     }
-                        ?>> охранная сигнализация
+                        ?>> охранная сигнализация</label>
                 </li>
                 <li>
                     <input type="text" name="appliancesExtra" maxlength="254"
@@ -1074,23 +1074,23 @@
             Пол:
         </div>
         <div class="objectDescriptionBody">
-            <input type="checkbox" name="sexOfTenant[]" value="мужчина" <?php foreach ($propertyCharacteristic['sexOfTenant'] as $value) {
+            <label><input type="checkbox" name="sexOfTenant[]" value="мужчина" <?php foreach ($propertyCharacteristic['sexOfTenant'] as $value) {
                 if ($value == "мужчина") {
                     echo "checked";
                     break;
                 }
             }
                 ?>>
-            мужчина
+            мужчина</label>
             <br>
-            <input type="checkbox" name="sexOfTenant[]" value="женщина" <?php foreach ($propertyCharacteristic['sexOfTenant'] as $value) {
+            <label><input type="checkbox" name="sexOfTenant[]" value="женщина" <?php foreach ($propertyCharacteristic['sexOfTenant'] as $value) {
                 if ($value == "женщина") {
                     echo "checked";
                     break;
                 }
             }
                 ?>>
-            женщина
+            женщина</label>
         </div>
     </div>
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
@@ -1098,59 +1098,59 @@
             Отношения между арендаторами:
         </div>
         <div class="objectDescriptionBody">
-            <input type="checkbox" name="relations[]" value="один человек" <?php foreach ($propertyCharacteristic['relations'] as $value) {
+            <label><input type="checkbox" name="relations[]" value="один человек" <?php foreach ($propertyCharacteristic['relations'] as $value) {
                 if ($value == "один человек") {
                     echo "checked";
                     break;
                 }
             }
                 ?>>
-            один человек
+            один человек</label>
             <br>
-            <input type="checkbox" name="relations[]" value="семья" <?php foreach ($propertyCharacteristic['relations'] as $value) {
+            <label><input type="checkbox" name="relations[]" value="семья" <?php foreach ($propertyCharacteristic['relations'] as $value) {
                 if ($value == "семья") {
                     echo "checked";
                     break;
                 }
             }
                 ?>>
-            семья
+            семья</label>
             <br>
-            <input type="checkbox" name="relations[]" value="пара" <?php foreach ($propertyCharacteristic['relations'] as $value) {
+            <label><input type="checkbox" name="relations[]" value="пара" <?php foreach ($propertyCharacteristic['relations'] as $value) {
                 if ($value == "пара") {
                     echo "checked";
                     break;
                 }
             }
                 ?>>
-            пара
+            пара</label>
             <br>
-            <input type="checkbox" name="relations[]" value="2 мальчика" <?php foreach ($propertyCharacteristic['relations'] as $value) {
+            <label><input type="checkbox" name="relations[]" value="2 мальчика" <?php foreach ($propertyCharacteristic['relations'] as $value) {
                 if ($value == "2 мальчика") {
                     echo "checked";
                     break;
                 }
             }
                 ?>>
-            2 мальчика
+            2 мальчика</label>
             <br>
-            <input type="checkbox" name="relations[]" value="2 девочки" <?php foreach ($propertyCharacteristic['relations'] as $value) {
+            <label><input type="checkbox" name="relations[]" value="2 девочки" <?php foreach ($propertyCharacteristic['relations'] as $value) {
                 if ($value == "2 девочки") {
                     echo "checked";
                     break;
                 }
             }
                 ?>>
-            2 девочки
+            2 девочки</label>
             <br>
-            <input type="checkbox" name="relations[]" value="группа людей" <?php foreach ($propertyCharacteristic['relations'] as $value) {
+            <label><input type="checkbox" name="relations[]" value="группа людей" <?php foreach ($propertyCharacteristic['relations'] as $value) {
                 if ($value == "группа людей") {
                     echo "checked";
                     break;
                 }
             }
                 ?>>
-            группа людей
+            группа людей</label>
         </div>
     </div>
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">

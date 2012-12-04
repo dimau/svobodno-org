@@ -31,12 +31,14 @@ if (isset($_GET['action'])) $action = htmlspecialchars($_GET['action'], ENT_QUOT
 // Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
 if (!$incomingUser->login()) {
 	header('Location: login.php');
+	exit();
 }
 
 // Если пользователь не является администратором, то доступ к странице ему запрещен - разавторизуем его и перекинем на главную (в идеале нужно перекидывать на login.php)
 $isAdmin = $incomingUser->isAdmin();
 if (!$isAdmin['newOwner'] && !$isAdmin['newAdvertAlien'] && !$isAdmin['searchUser']) {
 	header('Location: out.php');
+	exit();
 }
 
 /*************************************************************************************
@@ -58,6 +60,7 @@ if ($action == "registrationNewOwner") {
 
 	// Затем перекидываем его на страницу регистрации собственника
 	header("Location: registration.php?typeOwner=true");
+	exit();
 }
 
 /********************************************************************************

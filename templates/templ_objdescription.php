@@ -218,7 +218,7 @@ include("templates/templ_header.php");
     <ul class="setOfInstructions">
 		<?php
 		/* Оформляем пункт меню о Заявке на просмотр */
-		include ("templates/templ_signUpToViewItem.php");
+		include ("templates/signUpToViewBlocks/templ_signUpToViewItem.php");
 		?>
         <li>
 			<?php
@@ -240,9 +240,9 @@ include("templates/templ_header.php");
 
 <?php
 // Подключаем нужное модальное окно для Запроса на просмотр
-if ($isLoggedIn === FALSE) include "templates/templ_signUpToViewDialog_ForLoggedOut.php";
-if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] !== TRUE) include "templates/templ_signUpToViewDialog_ForOwner.php";
-if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include "templates/templ_signUpToViewDialog_ForTenant.php";
+if ($isLoggedIn === FALSE) include "templates/signUpToViewBlocks/templ_signUpToViewDialog_ForLoggedOut.php";
+if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] !== TRUE) include "templates/signUpToViewBlocks/templ_signUpToViewDialog_ForOwner.php";
+if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include "templates/signUpToViewBlocks/templ_signUpToViewDialog_ForTenant.php";
 ?>
 
 <div class="objectDescription">
@@ -868,7 +868,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
     <ul class="setOfInstructions">
 		<?php
 		/* Оформляем пункт меню о Заявке на просмотр */
-		include ("templates/templ_signUpToViewItem.php");
+		include ("templates/signUpToViewBlocks/templ_signUpToViewItem.php");
 		?>
         <li>
 			<?php

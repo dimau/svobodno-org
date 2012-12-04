@@ -20,6 +20,7 @@ $incomingUser = new IncomingUser();
 // Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
 if (!$incomingUser->login()) {
 	header('Location: login.php');
+	exit();
 }
 
 /*************************************************************************************
@@ -33,7 +34,7 @@ if (isset($_GET['action'])) $action = htmlspecialchars($_GET['action'], ENT_QUOT
 
 // Идентификатор объекта для просмотра
 $propertyId = "";
-if (isset($_GET['propertyId'])) $propertyId = htmlspecialchars($_GET['propertyId'], ENT_QUOTES);
+if (isset($_GET['propertyId'])) $propertyId = intval(htmlspecialchars($_GET['propertyId'], ENT_QUOTES));
 
 // Вкладка, которая будет открыта по умолчанию при загрузке страницы
 $tabsId = "tabs-1";
@@ -41,11 +42,11 @@ if (isset($_GET['tabsId'])) $tabsId = htmlspecialchars($_GET['tabsId'], ENT_QUOT
 
 // Скрытый идентификатор целевого пользователя (передается только если админ хочет поработать в его личном кабинете)
 $compId = "";
-if (isset($_GET['compId'])) $compId = htmlspecialchars($_GET['compId'], ENT_QUOTES);
+if (isset($_GET['compId'])) $compId = intval(htmlspecialchars($_GET['compId'], ENT_QUOTES));
 
 // Проверяем, что у администратора есть право на поиск пользователей и вход в их Личные кабинеты: $isAdmin['searchUser'] == TRUE
 $isAdmin = $incomingUser->isAdmin();
-if ($isAdmin['searchUser'] && $compId != "" && is_int($compId)) {
+if ($isAdmin['searchUser'] && $compId != "" && $compId != 0) {
 	$userId = GlobFunc::compIdToId($compId);
 } else {
 	$userId = $incomingUser->getId();
@@ -130,7 +131,7 @@ if ($action == "saveProfileParameters") {
  * ПУБЛИКАЦИЯ ОБЪЯВЛЕНИЯ. Если пользователь отправил команду на публикацию одного из своих объявлений
  *******************************************************************************/
 
-if ($action == "publicationOn" && $propertyId != "" && is_int($propertyId)) {
+if ($action == "publicationOn" && $propertyId != "" && $propertyId != 0) {
 
 	// Проверяем: имеет ли данный пользователь право на выполнение изменения статуса объявления
 	if ($collectionProperty->hasPropertyId($propertyId)) {
@@ -145,7 +146,7 @@ if ($action == "publicationOn" && $propertyId != "" && is_int($propertyId)) {
  * СНЯТИЕ С ПУБЛИКАЦИИ ОБЪЯВЛЕНИЯ. Если пользователь отправил команду на снятие с публикации одного из своих объявлений
  *******************************************************************************/
 
-if ($action == "publicationOff" && $propertyId != "" && is_int($propertyId)) {
+if ($action == "publicationOff" && $propertyId != "" && $propertyId != 0) {
 
 	// Проверяем: имеет ли данный пользователь право на выполнение изменения статуса объявления
 	if ($collectionProperty->hasPropertyId($propertyId)) {
@@ -205,7 +206,7 @@ $incomingUser->searchProperties(20);
 
 // Инициализируем используемые в шаблоне(ах) переменные
 $isLoggedIn = $incomingUser->login(); // Используется в templ_header.php (при просмотре страницы админом, показывает его статус, а не того пользователя, чьи данные он смотрит)
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных сообщений пользователя (при просмотре админом - показывает количество непросмотренных сообщений админа)
+$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя (при просмотре админом - показывает количество непросмотренных уведомлений админа)
 $userCharacteristic = $user->getCharacteristicData();
 $userFotoInformation = $user->getFotoInformationData();
 $userSearchRequest = $user->getSearchRequestData();
@@ -216,7 +217,7 @@ $propertyLightArr = $incomingUser->getPropertyLightArr();
 $propertyFullArr = $incomingUser->getPropertyFullArr();
 $favoritesPropertysId = $incomingUser->getFavoritesPropertysId();
 $mode = "personal"; // Режим в котором будут работать ряд шаблонов: анкеты пользователя на вкладке №1 (templ_notEditedProfile.php), шаблон для редактирования поискового запроса (templ_editableSearchRequest.php)
-$messagesArr = $user->getAllMessagesSorted(); // массив массивов, каждый из которых представляет инфу по 1-ому сообщению (новости пользователя)
+$messagesArr = $user->getAllMessagesSorted(); // массив массивов, каждый из которых представляет инфу по 1-ому уведомлению пользователя
 $compId = GlobFunc::idToCompId($userId);
 //$errors
 //$correctNewSearchRequest

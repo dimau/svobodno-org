@@ -230,13 +230,12 @@
         last_act INT(11) COMMENT 'Время последнего изменения объявления - будь-то время создания или время последнего редактирования. Используется для сортировки объявлений в разделе Мои объявления личного кабинета',
         reg_date INT(11) COMMENT 'Время создания объявления',
         status VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'опубликовано' COMMENT 'Статус объявления: опубликовано или не опубликовано. Сразу после создания объявление становится неопубликованным',
-        tenantsWithSignUpToViewRequest TEXT COMMENT 'Список id пользователей, которые заинтересовались данным объектом недвижимости (отправили заявки на просмотр) при его текущей публикации. После того, как объявление снято с публикации, данный список сохраняется лишь в течение некоторого срока (что-то около 10 дней), после чего его восстановить уже нельзя',
         earliestDate DATE COMMENT 'Хранит дату ближайшего показа, согласованную с собственником',
         earliestTimeHours VARCHAR(2) COMMENT 'Хранит время (часы) ближайшего показа, согласованные с собственником',
         earliestTimeMinutes VARCHAR(2) COMMENT 'Хранит время (минуты) ближайшего показа, согласованные с собственником',
         adminComment TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Комментарий сотрудников компании - админов',
 		completeness VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Признак полноты данных об объекте (значения: 1/0). Если объявление получено из чужой базы, то его полнота устанавливается в 0 (то есть никаких особых требований к полноте не предъявляется). Если с данным объектом проведена полная работа и получены полные и достоверные данные, то его полнота устанавливается в 1 (при редактировании данных мы требуем соблюдения их полноты)'
-)"); /* TODO: возможно нужно отказаться от поля tenantsWithSignUpToViewRequest и напрямую получать сведения о заявках на просмотр (с ихстатусами) из соответствующей таблицы для каждого объекта недвижимости собственника */
+)");
 
     echo "Статус создания таблицы property: ";
     if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
@@ -268,7 +267,7 @@
        propertyId INT(11) NOT NULL COMMENT 'Идентификатор объекта недвижимости, который желает посмотреть арендатор',
        tenantTime VARCHAR(200) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Дата и время, которые указал арендатор в качестве желаемых (удобных) по этому запросу',
        tenantComment VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Комментарий арендатора к запросу на просмотр',
-       ownerStatus VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Ответ собственника на запрос показа его недвижимости данному претенденту: confirmed - подтверждает, время показа указано в полях finalDate и т.д.; failure - отказ собственника от показа объекта данному претенденту; inProgress - ответ от собственника еще не получен',
+       status VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Ответ собственника на запрос показа его недвижимости данному претенденту: confirmed - подтверждает, время показа указано в полях finalDate и т.д.; failure - отказ собственника от показа объекта данному претенденту; inProgress - ответ от собственника еще не получен',
        finalDate DATE COMMENT 'Хранит дату показа, согласованную с собственником и арендатором',
        finalTimeHours VARCHAR(2) COMMENT 'Хранит время (часы) показа, согласованные с собственником и арендатором',
        finalTimeMinutes VARCHAR(2) COMMENT 'Хранит время (минуты) показа, согласованные с собственником и арендатором'
@@ -297,16 +296,16 @@
 
 
     /****************************************************************************
-     * Создаем таблицы для хранения информации о СООБЩЕНИЯХ пользователей
+     * Создаем таблицы для хранения информации об УВЕДОМЛЕНИЯХ пользователей
      ***************************************************************************/
 
-    // Сообщения (новости) для пользователей-арендаторов о появлении нового объекта недвижимости (объявления), которое удовлетворяет условиям поиска пользователя-арендатора
+    // Уведомления для пользователей-арендаторов о появлении нового объекта недвижимости (объявления), которое удовлетворяет условиям поиска пользователя-арендатора
     DBconnect::get()->query("CREATE TABLE messagesNewProperty (
-        id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор сообщения (новости)',
-        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное сообщение',
-        timeIndex INT(11) NOT NULL COMMENT 'Время формирования сообщения (новости) - используется для сортировки новостей по времени появления',
-        messageType VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'newProperty' COMMENT 'Тип сообщения (новости). В данной таблице хранятся новости типа newProperty',
-        isReaded VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не прочитано' COMMENT 'Статус сообщения: прочитано, не прочитано. Сразу после создания сообщение становится непрочитанным',
+        id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор уведомления',
+        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное уведомление',
+        timeIndex INT(11) NOT NULL COMMENT 'Время формирования уведомления - используется для сортировки новостей по времени появления',
+        messageType VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'newProperty' COMMENT 'Тип уведомления. В данной таблице хранятся новости типа newProperty',
+        isReaded VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не прочитано' COMMENT 'Статус уведомления: прочитано, не прочитано. Сразу после создания уведомления становится непрочитанным',
         fotoArr TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Массив массивов (по структуре совпадающий с uploadedFoto - это нужно, чтобы на основе этих данных могла работать функция getHTMLfotosWrapper), который включает в себя информацию только об 1 фотографии - основной',
         targetId INT(11) NOT NULL COMMENT 'Идентификатор объекта недвижимости, которому посвящена новость',
         typeOfObject VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип объекта: квартира, комната, дом, таунхаус, дача, гараж',
@@ -326,16 +325,16 @@
         numberOfFloor INT COMMENT 'Этажность дома, дачи, таунхауса'
     )");
 
-    echo "Статус создания таблицы с сообщениями о новых объектах недвижимости messagesNewProperty: ";
+    echo "Статус создания таблицы с уведомлениями о новых объектах недвижимости messagesNewProperty: ";
     if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
-    // Сообщения (новости) для пользователей-собственников о появлении нового претендента на аренду, отправившего заявку на просмотр недвижимости пользователя-собственника
+    // Уведомления для пользователей-собственников о появлении нового претендента на аренду, отправившего заявку на просмотр недвижимости пользователя-собственника
     DBconnect::get()->query("CREATE TABLE messagesNewTenant (
-        id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор сообщения (новости)',
-        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное сообщение',
-        timeIndex INT(11) NOT NULL COMMENT 'Время формирования сообщения (новости) - используется для сортировки новостей по времени появления',
-        messageType VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'newTenant' COMMENT 'Тип сообщения (новости). В данной таблице хранятся новости типа newTenant',
-        isReaded VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не прочитано' COMMENT 'Статус сообщения: прочитано, не прочитано. Сразу после создания сообщение становится непрочитанным',
+        id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор уведомления',
+        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное уведомление',
+        timeIndex INT(11) NOT NULL COMMENT 'Время формирования уведомления - используется для сортировки новостей по времени появления',
+        messageType VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'newTenant' COMMENT 'Тип уведомления. В данной таблице хранятся новости типа newTenant',
+        isReaded VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не прочитано' COMMENT 'Статус уведомления: прочитано, не прочитано. Сразу после создания уведомления становится непрочитанным',
         fotoArr TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Массив массивов (по структуре совпадающий с uploadedFoto - это нужно, чтобы на основе этих данных могла работать функция getHTMLfotosWrapper), который включает в себя информацию только об 1 фотографии - основной',
         targetId INT(11) NOT NULL COMMENT 'Идентификатор потенциального арендатора, которому посвящена новость',
         address VARCHAR(60) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Человеческое название улицы и номера дома',
@@ -349,36 +348,36 @@
         animals VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Арендатор собирается проживать с домашними животными'
     )");
 
-    echo "Статус создания таблицы с сообщениями о новых претендентах на аренду messagesNewTenant: ";
+    echo "Статус создания таблицы с уведомлениями о новых претендентах на аренду messagesNewTenant: ";
     if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
-    DBconnect::get()->query("CREATE TABLE messagesRequestToViewConfirmed (
-        id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор сообщения (новости)',
-        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное сообщение',
-        timeIndex INT(11) NOT NULL COMMENT 'Время формирования сообщения (новости) - используется для сортировки новостей по времени появления',
-        messageType VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'requestToViewConfirmed' COMMENT 'Тип сообщения (новости). В данной таблице хранятся новости типа requestToViewConfirmed',
-        isReaded VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не прочитано' COMMENT 'Статус сообщения: прочитано, не прочитано. Сразу после создания сообщение становится непрочитанным',
+  /*  DBconnect::get()->query("CREATE TABLE messagesRequestToViewConfirmed (
+        id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор уведомления',
+        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное уведомление',
+        timeIndex INT(11) NOT NULL COMMENT 'Время формирования уведомления - используется для сортировки новостей по времени появления',
+        messageType VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'requestToViewConfirmed' COMMENT 'Тип уведомления. В данной таблице хранятся новости типа requestToViewConfirmed',
+        isReaded VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не прочитано' COMMENT 'Статус уведомления: прочитано, не прочитано. Сразу после создания уведомление становится непрочитанным',
         fotoArr TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Массив массивов (по структуре совпадающий с uploadedFoto - это нужно, чтобы на основе этих данных могла работать функция getHTMLfotosWrapper), который включает в себя информацию только об 1 фотографии - основной',
-        targetId INT(11) NOT NULL COMMENT 'Идентификатор пользователя (если речь идет о сообщении о новом кандидате в арендаторы), идентификатор объекта (если речь идет о новом объекте недвижимости для арендатора), идентификатор заявки на просмотр (если речь идет о новой заявке)',
+        targetId INT(11) NOT NULL COMMENT 'Идентификатор пользователя (если речь идет об уведомлении о новом кандидате в арендаторы), идентификатор объекта (если речь идет о новом объекте недвижимости для арендатора), идентификатор заявки на просмотр (если речь идет о новой заявке)',
 
     )");
 
-    echo "Статус создания таблицы с сообщениями о назначении даты и времени просмотра недвижимости messagesRequestToViewConfirmed: ";
+    echo "Статус создания таблицы с уведомлениями о назначении даты и времени просмотра недвижимости messagesRequestToViewConfirmed: ";
     if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     DBconnect::get()->query("CREATE TABLE messagesEditedTimeToView (
-        id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор сообщения (новости)',
-        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное сообщение',
-        timeIndex INT(11) NOT NULL COMMENT 'Время формирования сообщения (новости) - используется для сортировки новостей по времени появления',
-        messageType VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'editedTimeToView' COMMENT 'Тип сообщения (новости). В данной таблице хранятся новости типа editedTimeToView',
-        isReaded VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не прочитано' COMMENT 'Статус сообщения: прочитано, не прочитано. Сразу после создания сообщение становится непрочитанным',
+        id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор уведомления',
+        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное уведомление',
+        timeIndex INT(11) NOT NULL COMMENT 'Время формирования уведомления - используется для сортировки новостей по времени появления',
+        messageType VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'editedTimeToView' COMMENT 'Тип уведомления. В данной таблице хранятся новости типа editedTimeToView',
+        isReaded VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не прочитано' COMMENT 'Статус уведомления: прочитано, не прочитано. Сразу после создания уведомление становится непрочитанным',
         fotoArr TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Массив массивов (по структуре совпадающий с uploadedFoto - это нужно, чтобы на основе этих данных могла работать функция getHTMLfotosWrapper), который включает в себя информацию только об 1 фотографии - основной',
-        targetId INT(11) NOT NULL COMMENT 'Идентификатор пользователя (если речь идет о сообщении о новом кандидате в арендаторы), идентификатор объекта (если речь идет о новом объекте недвижимости для арендатора), идентификатор заявки на просмотр (если речь идет о новой заявке)',
+        targetId INT(11) NOT NULL COMMENT 'Идентификатор пользователя (если речь идет об уведомлении о новом кандидате в арендаторы), идентификатор объекта (если речь идет о новом объекте недвижимости для арендатора), идентификатор заявки на просмотр (если речь идет о новой заявке)',
 
     )");
 
-    echo "Статус создания таблицы с сообщениями о изменении времени просмотра недвижимости messagesEditedTimeToView: ";
-    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+    echo "Статус создания таблицы с уведомлениями о изменении времени просмотра недвижимости messagesEditedTimeToView: ";
+    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);  */
 
 
     /****************************************************************************
@@ -476,12 +475,13 @@
     /**
      * Проверяем настройки PHP сервера
      * В файле php.ini нужно установить ограничения на максимальный размер загружаемых файлов:
-     * post_max_size = 100M
-     * upload_max_filesize = 25M
-     * memory_limit = 256M
-     * display_errors = Off
+     * post_max_size = 100M 	// Максимальный размер в МБ для POST запроса пользователя
+     * upload_max_filesize = 25M // Максимальный размер файла, закачивать который разрешает php для пользователя
+     * memory_limit = 256M	// Максимальный размер оперативной памяти, которую сервер может выделить для выполнения 1 сценария PHP
+     * display_errors = Off		// Запрещает PHP отображать предупреждения и ошибки на экране
      * все права для всех пользователей на каталог uploaded_files (чтобы можно было записывать новые фотографии и удалять старые)
-     *
+     * date.timezone = Asia/Yekaterinburg // Необходимо установить временную зону по умолчанию
+	 *
      * ini_set ("session.use_trans_sid", true); вроде как PHP сам умеет устанавливать id сессии либо в куки, либо в строку запроса (http://www.phpfaq.ru/sessions)
      */
 

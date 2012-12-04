@@ -22,6 +22,7 @@ $isAdmin = $incomingUser->isAdmin();
 // Проверим, быть может пользователь уже авторизирован. Если это так и он не является администратором, перенаправим его на главную страницу сайта
 if ($incomingUser->login() && !$isAdmin['newOwner'] && !$isAdmin['newAdvertAlien']) {
 	header('Location: personal.php');
+	exit();
 }
 
 // Инициализируем полную модель неавторизованного пользователя
@@ -115,6 +116,8 @@ if ($action == "registration") {
 			if (count($correctEnter) == 0) //если нет ошибок, отправляем уже авторизованного пользователя на страницу успешной регистрации
 			{
 				header('Location: successfullRegistration.php');
+				exit();
+
 			} else {
 				// TODO:что-то нужно делать в случае, если возникли ошибки при авторизации во время регистрации - как минимум вывести их текст во всплывающем окошке
 			}
@@ -134,7 +137,7 @@ if ($action == "registration") {
 
 // Инициализируем используемые в шаблоне(ах) переменные
 $isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных сообщений пользователя
+$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 $userCharacteristic = $user->getCharacteristicData();
 $userFotoInformation = $user->getFotoInformationData();
 $userSearchRequest = $user->getSearchRequestData();

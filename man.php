@@ -23,14 +23,15 @@ $incomingUser = new IncomingUser();
 
 // Получаем идентификатор интересующего (целевого) пользователя
 $compId = "";
-if (isset($_GET['compId'])) $compId = htmlspecialchars($_GET['compId'], ENT_QUOTES);
+if (isset($_GET['compId'])) $compId = intval(htmlspecialchars($_GET['compId'], ENT_QUOTES));
 
 // Вычисляем истинный идентификатор целевого пользователя из $compId
 $targetUserId = "0";
-if ($compId != "" && is_int($compId)) {
+if ($compId != "" && $compId != 0) {
 	$targetUserId = GlobFunc::compIdToId($compId); // Получаем идентификатор пользователя для показа его страницы
 } else { // Если в строке GET запроса не указан идентификатор интересующего (целевого) пользователя, то пересылаем нашего пользователя на спец. страницу
 	header('Location: 404.html');
+	exit();
 }
 
 /*************************************************************************************
@@ -64,23 +65,25 @@ $user->writeFotoInformationFromDB();
 // Если пользователь не авторизован, то он не сможет посмотреть ни одной анкеты
 if (!$incomingUser->login()) {
 	header('Location: 404.html'); //TODO: реализовать страницу Отказано в доступе
+	exit();
 }
 
 // Получаем список пользователей, которые интересовались недвижимостью нашего пользователя ($incomingUser->getId). Он выступает в качестве собственника
-$tenantsWithSignUpToViewRequest = array();
+$tenantsWithRequestToView = array();
 // Формировать список имеет смысл только, если целевой пользователь на текущий момент времени является арендатором. В ином случае, доступ к анкете целевого пользователя для собственников - закрыт. Таким образом реализуется правило: собственник может видеть только анкеты тех пользователей, которые заинтересовались его недвижимостью и в текущий момент времени являются арендаторами (= имеют поисковый запрос)
 if ($user->typeTenant) {
-	if ($res = $incomingUser->getAllVisibleUsersId()) $tenantsWithSignUpToViewRequest = $res;
+	$tenantsWithRequestToView = $incomingUser->getAllTenantsId();
 }
 
 // Проверяем, есть ли среди этого списка текущий целевой пользователь ($targetUserId)
 // Проверка вынесена в отдельный блок, так как это позволяет одновременно проверить несколько условий на доступ к данной странице
 // Админы имеют доступ к странице всегда
 $isAdmin = $incomingUser->isAdmin();
-if (!in_array($targetUserId, $tenantsWithSignUpToViewRequest)
+if (!in_array($targetUserId, $tenantsWithRequestToView)
 	AND $incomingUser->getId() != $targetUserId
 	AND !$isAdmin['searchUser']) {
 	header('Location: 404.html'); //TODO: реализовать страницу Отказано в доступе
+	exit();
 }
 
 /********************************************************************************
@@ -89,7 +92,7 @@ if (!in_array($targetUserId, $tenantsWithSignUpToViewRequest)
 
 // Инициализируем используемые в шаблоне(ах) переменные
 $isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных сообщений пользователя
+$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 $userCharacteristic = $user->getCharacteristicData();
 $userFotoInformation = $user->getFotoInformationData();
 $userSearchRequest = $user->getSearchRequestData();

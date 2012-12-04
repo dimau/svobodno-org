@@ -10,7 +10,6 @@
         // На входе: $sizeForPrimary - размер основной фотографии (small, middle, big); $isInteractive - нужно ли по клику включать галерею фотографий(TRUE- нужно, FALSE - нет), $forTable - блок будет размещаться в таблице? (если TRUE - блок центрируется)
         public static function getHTMLfotosWrapper($sizeForPrimary = "small", $isInteractive = FALSE, $forTable = FALSE, $uploadedFoto = FALSE)
         {
-
             // Шаблон для формируемого HTML блока с фотографиями
             $templ = "
                 <div class='fotosWrapper {isInteractive} {forTable}'>
@@ -56,6 +55,8 @@
                 // Если у пользователя нет фото - присваиваем картинку по умолчанию
                 $arrForReplace['urlFotoPrimary'] = "uploaded_files/1/" . $arrForReplace['size'] . "/1c1dfa378d4d9caaa93703c0b89f4077.jpeg";
                 $arrForReplace['hrefFotoPrimary'] = "uploaded_files/1/big/1c1dfa378d4d9caaa93703c0b89f4077.jpeg";
+				// А также делаем фотографию по умолчанию не интерактивной - в ее кликабельности нет смысла
+				$arrForReplace['isInteractive'] = "fotoNonInteractive";
             } else {
                 // Если у пользователя есть фото - найдем среди них основное. А из неосновных сделаем hidden блоки для галереи
                 foreach ($uploadedFoto as $value) {
@@ -82,7 +83,6 @@
             $fotosWrapperHTML = str_replace($arrTemplVar, $arrForReplace, $templ);
 
             return $fotosWrapperHTML;
-
         }
 
         // Метод возвращает строку команды добавления в избранное или удаления из избранного в зависимости от ситуации
@@ -665,63 +665,15 @@
         }
 
         // Возвращает HTML для списка объектов недвижимости собственника
-        public static function getHTMLforOwnersCollectionProperty($allPropertiesCharacteristic = array(), $allPropertiesFotoInformation = FALSE, $allPropertiesTenantPretenders = FALSE)
+        public static function getHTMLforOwnersCollectionProperty($allPropertiesCharacteristic, $allPropertiesFotoInformation, $allPropertiesTenantPretenders)
         {
-            // Шаблон блока с описанием отдельного объекта недвижимости
-            $tmpl_MyAdvert = "
-                <div class='news advertForPersonalPage {statusEng}'>
-                    <div class='newsHeader'>
-                        <span class='advertHeaderAddress'>{typeOfObject} по адресу: {address}{apartmentNumber}</span>
-                        <div class='advertHeaderStatus'>
-                            статус: {status}
-                        </div>
-                    </div>
-                    {fotosWrapper}
-                    <ul class='setOfInstructions'>
-                        {instructionPublish}
-                        <li>
-                            <a href='editadvert.php?propertyId={propertyId}'>редактировать</a>
-                        </li>
-                        <li>
-                            <a href='objdescription.php?propertyId={propertyId}'>подробнее</a>
-                        </li>
-                    </ul>
-                    <ul class='listDescriptionSmall'>
-                        <li>
-                            <span class='headOfString' style='vertical-align: top;' title='Пользователи, запросившие контакты собственника по этому объявлению'>Возможные арендаторы:</span>{probableTenants}
-                        </li>
-                        <li>
-                            <br>
-                        </li>
-                        <li>
-                            <span class='headOfString'>Плата за аренду:</span> {costOfRenting} {currency} {utilities} {electricPower}
-                        </li>
-                        <li>
-                            <span class='headOfString'>Залог:</span> {bail}
-                        </li>
-                        <li>
-                            <span class='headOfString'>Предоплата:</span> {prepayment}
-                        </li>
-                        <li>
-                            <span class='headOfString'>Срок аренды:</span> {termOfLease}, c {dateOfEntry} {dateOfCheckOut}
-                        </li>
-                        <li>
-                            <span class='headOfString'>{furnitureName}</span> {furniture}
-                        </li>
-                        <li>
-                            <span class='headOfString'>{repairName}</span> {repair}
-                        </li>
-                        <li>
-                            <span class='headOfString'>Контактный телефон:</span>
-                            {contactTelephonNumber}, c {timeForRingBegin} до {timeForRingEnd}
-                        </li>
-                    </ul>
-                    <div class='clearBoth'></div>
-                </div>
-            ";
+			// Валидируем входные данные
+			// Проверяем наличие хотя бы 1 объекта недвижимости, в противном случае отдаем пустую HTML строку
+			if (!isset($allPropertiesCharacteristic) || !isset($allPropertiesFotoInformation) || !isset($allPropertiesTenantPretenders)) return "";
+            if (!is_array($allPropertiesCharacteristic) || count($allPropertiesCharacteristic) == 0 || !is_array($allPropertiesFotoInformation) || !is_array($allPropertiesTenantPretenders)) return "";
 
-            // Проверяем наличие хотя бы 1 объекта недвижимости, в противном случае отдаем пустую HTML строку
-            if (count($allPropertiesCharacteristic) == 0) return "";
+			// Получим из файла HTML шаблон блока для описания отдельного объекта недвижимости
+			$tmpl_MyAdvert = file_get_contents('templates/templ_descriptionPropertyForOwner.php');
 
             // Создаем бриф для каждого объявления пользователя на основе шаблона (для вкладки МОИ ОБЪЯВЛЕНИЯ), и в цикле объединяем их в один HTML блок - $briefOfAdverts.
             // Если объявлений у пользователя несколько, то в переменную, содержащую весь HTML - $briefOfAdverts, записываем каждое из них последовательно
@@ -752,7 +704,7 @@
 
                 // Фото
                 $arrMyAdvertReplace['fotosWrapper'] = "";
-                if ($allPropertiesFotoInformation != FALSE) $fotosArr = $allPropertiesFotoInformation[$i]; else $fotosArr = array();
+                if (isset($allPropertiesFotoInformation[$i])) $fotosArr = $allPropertiesFotoInformation[$i]; else $fotosArr = array();
                 $arrMyAdvertReplace['fotosWrapper'] = View::getHTMLfotosWrapper("small", FALSE, FALSE, $fotosArr);
 
                 // Корректируем список инструкций, доступных пользователю
@@ -768,13 +720,13 @@
 
                 /******* Список потенциальных арендаторов ******/
                 $arrMyAdvertReplace['probableTenants'] = "";
-                if ($allPropertiesTenantPretenders != FALSE) {
+                if (isset($allPropertiesTenantPretenders[$i]) && is_array($allPropertiesTenantPretenders[$i])) {
                     for ($j = 0, $s1 = count($allPropertiesTenantPretenders[$i]); $j < $s1; $j++) {
                         // Перебираем данные по потенциальным арендаторам, проявившим интерес к данному объекту и добавляем их в строку $arrMyAdvertReplace['probableTenants']
                         // Формируем из имен и отчеств строку гиперссылок с ссылками на страницы арендаторов
                         if ($allPropertiesTenantPretenders[$i][$j]['typeTenant'] == "TRUE") { // Если данный пользователь (арендатор) еще ищет недвижимость
                             $compId = GlobFunc::idToCompId($allPropertiesTenantPretenders[$i][$j]['id']);
-                            $arrMyAdvertReplace['probableTenants'] .= "<a href='man.php?compId=" . $compId . "'>" . $allPropertiesTenantPretenders[$i][$j]['name'] . " " . $allPropertiesTenantPretenders[$i][$j]['secondName'] . "</a>";
+                            $arrMyAdvertReplace['probableTenants'] .= '<a target="_blank" href="man.php?compId=' . $compId . '">' . $allPropertiesTenantPretenders[$i][$j]['name'] . " " . $allPropertiesTenantPretenders[$i][$j]['secondName'] . "</a>";
                         } else {
                             $arrMyAdvertReplace['probableTenants'] .= "<span title='Пользователь уже нашел недвижимость'>" . $allPropertiesTenantPretenders[$i][$j]['name'] . " " . $allPropertiesTenantPretenders[$i][$j]['secondName'] . "</span>";
                         }
@@ -854,7 +806,7 @@
          */
         public static function getHTMLforMessages($messagesArr) {
 
-            // Если массив с сообщениями (новостями) пользователя не передан, то возвращаем пустую строку вместо HTML
+            // Если массив с уведомлениями пользователя не передан, то возвращаем пустую строку вместо HTML
             if (!isset($messagesArr) || !is_array($messagesArr) || count($messagesArr) == 0) {
                 return "<div class='shadowText'>
                             На этой вкладке располагается информация о важных событиях, случившихся на ресурсе Svobodno.org, как например: появление новых потенциальных арендаторов, заинтересовавшихся Вашим объявлением, или новых объявлений, которые подходят под Ваш запрос
@@ -868,9 +820,9 @@
             for ($i = 0, $s = count($messagesArr); $i < $s; $i++) {
 
                 if ($messagesArr[$i]['messageType'] == "newProperty") $allMessagesHTML .= View::getHTMLforMessageNewProperty($messagesArr[$i]);
-                if ($messagesArr[$i]['messageType'] == "newTenant") $allMessagesHTML .= View::getHTMLforMessageNewTenant($messagesArr[$i]);
+              /*  if ($messagesArr[$i]['messageType'] == "newTenant") $allMessagesHTML .= View::getHTMLforMessageNewTenant($messagesArr[$i]);
                 if ($messagesArr[$i]['messageType'] == "requestToViewConfirmed") $allMessagesHTML .= View::getHTMLforMessageRequestToViewConfirmed($messagesArr[$i]);
-                if ($messagesArr[$i]['messageType'] == "editedTimeToView") $allMessagesHTML .= View::getHTMLforMessageEditedTimeToView($messagesArr[$i]);
+                if ($messagesArr[$i]['messageType'] == "editedTimeToView") $allMessagesHTML .= View::getHTMLforMessageEditedTimeToView($messagesArr[$i]); */
             }
 
             return $allMessagesHTML;
@@ -879,51 +831,15 @@
         /**
          * Возвращает HTML для блока с описанием новости о новом объекте недвижимости
          *
-         * @param $sourceArr - ассоциированный массив со сведениями о сообщении (новости)
+         * @param $sourceArr - ассоциированный массив со сведениями об уведомлении
          * @return mixed|string
          */
         public static function getHTMLforMessageNewProperty($sourceArr)
         {
-            // Шаблон блока
-            $templ = "
-                <div class='news {unread}'>
-                    <div class='newsHeader'>
-                        Новое предложение по Вашему поиску
-                    </div>
-                    {fotosWrapper}
-                    <ul class='setOfInstructions'>
-                        <li>
-                            <a href='#'>прочитал</a>
-                        </li>
-                        <li>
-                            <a href='#'>удалить</a>
-                        </li>
-                        <li>
-                            <a href='objdescription.php?propertyId={propertyId}' target='_blank'>подробнее</a>
-                        </li>
-                    </ul>
-                    <ul class='listDescriptionSmall'>
-                        <li>
-                            <span class='headOfString'>{typeOfObject}</span> {address}
-                        </li>
-                        <li>
-                            <span class='headOfString'>Плата:</span> {costOfRenting} {currency}/мес.{utilities}
-                        </li>
-                        <li>
-                            <span class='headOfString'>{amountOfRoomsName}</span> {amountOfRooms}{adjacentRooms}
-                        </li>
-                        <li>
-                            <span class='headOfString'>Площадь:</span> {areaValues} м²
-                        </li>
-                        <li>
-                            <span class='headOfString'>{floorName}</span> {floor}
-                        </li>
-                    </ul>
-                    <div class='clearBoth'></div>
-                </div>
-            ";
+			// Получим HTML шаблон блока из файла
+			$templ = file_get_contents('templates/messagesBlocks/templ_messageNewProperty.php');
 
-            // Если массив с параметрами сообщения (новости) не передан, то возвращаем пустую строку вместо HTML блока
+            // Если массив с параметрами уведомления не передан, то возвращаем пустую строку вместо HTML блока
             if (!isset($sourceArr) || !is_array($sourceArr)) {
                 return "";
             }
@@ -931,7 +847,7 @@
             // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне
             $valuesArr = array();
 
-            // Сообщение прочитано или не прочитано
+            // Уведомление прочитано или не прочитано
             $valuesArr['unread'] = "";
             if (isset($sourceArr['isReaded']) && $sourceArr['isReaded'] == "не прочитано") $valuesArr['unread'] = "unread";
 
@@ -945,17 +861,17 @@
 
             // Тип
             $valuesArr['typeOfObject'] = "";
-            if (isset($sourceArr['typeOfObject'])) $valuesArr['typeOfObject'] = GlobFunc::getFirstCharUpper($sourceArr['typeOfObject']) . ":";
+            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "0") $valuesArr['typeOfObject'] = GlobFunc::getFirstCharUpper($sourceArr['typeOfObject']) . ":";
 
             // Адрес
             $valuesArr['address'] = "";
-            if (isset($sourceArr['address'])) $valuesArr['address'] = $sourceArr['address'];
+            if (isset($sourceArr['address']) && $sourceArr['address'] != "") $valuesArr['address'] = $sourceArr['address'];
 
             // Стоимость
             $valuesArr['costOfRenting'] = "";
-            if (isset($sourceArr['costOfRenting'])) $valuesArr['costOfRenting'] = $sourceArr['costOfRenting'];
+            if (isset($sourceArr['costOfRenting']) && $sourceArr['costOfRenting'] != "" && $sourceArr['costOfRenting'] != "0.00") $valuesArr['costOfRenting'] = $sourceArr['costOfRenting'];
             $valuesArr['currency'] = "";
-            if (isset($sourceArr['currency'])) $valuesArr['currency'] = $sourceArr['currency'];
+            if (isset($sourceArr['currency']) && $sourceArr['currency'] != "0") $valuesArr['currency'] = $sourceArr['currency']."/мес.";
             $valuesArr['utilities'] = "";
             if (isset($sourceArr['utilities']) && $sourceArr['utilities'] == "да") $valuesArr['utilities'] = " <span style='white-space: nowrap;'>+ ком.усл.</span>";
 
@@ -979,18 +895,24 @@
 
             // Площади помещений
             $valuesArr['areaValues'] = "";
-            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "квартира" && $sourceArr['typeOfObject'] != "дом" && $sourceArr['typeOfObject'] != "таунхаус" && $sourceArr['typeOfObject'] != "дача" && $sourceArr['typeOfObject'] != "гараж") {
+			$valuesArr['areaValuesName'] = "";
+			$valuesArr['areaValuesMeasure'] = "";
+            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "квартира" && $sourceArr['typeOfObject'] != "дом" && $sourceArr['typeOfObject'] != "таунхаус" && $sourceArr['typeOfObject'] != "дача" && $sourceArr['typeOfObject'] != "гараж" && $sourceArr['roomSpace'] != "0.00") {
                 $valuesArr['areaValues'] .= $sourceArr['roomSpace'];
             }
-            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "комната") {
+            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "комната" && $sourceArr['totalArea'] != "0.00") {
                 $valuesArr['areaValues'] .= $sourceArr['totalArea'];
             }
-            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "комната" && $sourceArr['typeOfObject'] != "гараж") {
+            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "комната" && $sourceArr['typeOfObject'] != "гараж" && $sourceArr['livingSpace'] != "0.00") {
                 $valuesArr['areaValues'] .= " / " . $sourceArr['livingSpace'];
             }
-            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "дача" && $sourceArr['typeOfObject'] != "гараж") {
+            if (isset($sourceArr['typeOfObject']) && $sourceArr['typeOfObject'] != "дача" && $sourceArr['typeOfObject'] != "гараж" && $sourceArr['kitchenSpace'] != "0.00") {
                 $valuesArr['areaValues'] .= " / " . $sourceArr['kitchenSpace'];
             }
+			if ($valuesArr['areaValues'] != "") {
+				$valuesArr['areaValuesName'] = "Площадь:";
+				$valuesArr['areaValuesMeasure'] = "м²";
+			}
 
             // Этаж
             $valuesArr['floorName'] = "";
@@ -1005,7 +927,7 @@
             }
 
             // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне
-            $stringForReplaceArr = array('{unread}', '{fotosWrapper}', '{propertyId}', '{typeOfObject}', '{address}', '{costOfRenting}', '{currency}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{floorName}', '{floor}');
+            $stringForReplaceArr = array('{unread}', '{fotosWrapper}', '{propertyId}', '{typeOfObject}', '{address}', '{costOfRenting}', '{currency}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{areaValuesName}', '{areaValuesMeasure}', '{floorName}', '{floor}');
             // Заполнение шаблона
             $resultHTML = str_replace($stringForReplaceArr, $valuesArr, $templ);
 
@@ -1015,10 +937,10 @@
         /**
          * Возвращает HTML для блока с описанием новости о новом претенденте на аренду недвижимости
          *
-         * @param $sourceArr - ассоциированный массив со сведениями о сообщении (новости)
+         * @param $sourceArr - ассоциированный массив со сведениями об уведомлении
          * @return mixed|string
          */
-        public static function getHTMLforMessageNewTenant($sourceArr)
+       /* public static function getHTMLforMessageNewTenant($sourceArr)
         {
             // Шаблон блока
             $templ = "
@@ -1060,7 +982,7 @@
                 </div>
             ";
 
-            // Если массив с параметрами сообщения (новости) не передан, то возвращаем пустую строку вместо HTML блока
+            // Если массив с параметрами уведомления не передан, то возвращаем пустую строку вместо HTML блока
             if (!isset($sourceArr) || !is_array($sourceArr)) {
                 return "";
             }
@@ -1068,7 +990,7 @@
             // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне
             $valuesArr = array();
 
-            // Сообщение прочитано или не прочитано
+            // Уведомление прочитано или не прочитано
             $valuesArr['unread'] = "";
             if (isset($sourceArr['isReaded']) && $sourceArr['isReaded'] == "не прочитано") $valuesArr['unread'] = "unread";
 
@@ -1117,11 +1039,11 @@
         /**
          * Возвращает HTML для блока с описанием новости о назначении даты и времени просмотра недвижимости
          *
-         * @param $sourceArr - ассоциированный массив со сведениями о сообщении (новости)
+         * @param $sourceArr - ассоциированный массив со сведениями об уведомлении
          * @return mixed|string
          * TODO: реализовать
          */
-        public static function getHTMLforMessageRequestToViewConfirmed($sourceArr)
+    /*    public static function getHTMLforMessageRequestToViewConfirmed($sourceArr)
         {
             // Шаблон блока
             $templ = "
@@ -1162,7 +1084,7 @@
                 </div>
             ";
 
-            // Если массив с параметрами сообщения (новости) не передан, то возвращаем пустую строку вместо HTML блока
+            // Если массив с параметрами уведомления не передан, то возвращаем пустую строку вместо HTML блока
             if (!isset($sourceArr) || !is_array($sourceArr)) {
                 return "";
             }
@@ -1170,7 +1092,7 @@
             // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне
             $valuesArr = array();
 
-            // Сообщение прочитано или не прочитано
+            // Уведомление прочитано или не прочитано
             $valuesArr['unread'] = "";
             if (isset($sourceArr['isReaded']) && $sourceArr['isReaded'] == "не прочитано") $valuesArr['unread'] = "unread";
 
@@ -1254,11 +1176,11 @@
         /**
          * Возвращает HTML для блока с описанием новости об изменении даты и времени просмотра недвижимости
          *
-         * @param $sourceArr - ассоциированный массив со сведениями о сообщении (новости)
+         * @param $sourceArr - ассоциированный массив со сведениями об уведомлении
          * @return mixed|string
          * TODO: реализовать
          */
-        public static function getHTMLforMessageEditedTimeToView($sourceArr)
+    /*    public static function getHTMLforMessageEditedTimeToView($sourceArr)
         {
             // Шаблон блока
             $templ = "
@@ -1299,7 +1221,7 @@
                 </div>
             ";
 
-            // Если массив с параметрами сообщения (новости) не передан, то возвращаем пустую строку вместо HTML блока
+            // Если массив с параметрами уведомления не передан, то возвращаем пустую строку вместо HTML блока
             if (!isset($sourceArr) || !is_array($sourceArr)) {
                 return "";
             }
@@ -1307,7 +1229,7 @@
             // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне
             $valuesArr = array();
 
-            // Сообщение прочитано или не прочитано
+            // Уведомление прочитано или не прочитано
             $valuesArr['unread'] = "";
             if (isset($sourceArr['isReaded']) && $sourceArr['isReaded'] == "не прочитано") $valuesArr['unread'] = "unread";
 
@@ -1386,7 +1308,7 @@
             $resultHTML = str_replace($stringForReplaceArr, $valuesArr, $templ);
 
             return $resultHTML;
-        }
+        } */
 
 		// Возвращает HTML для блока с описанием 1 пользователя для страницы поиска пользователей в Админке.
 		public static function getHTMLforAdminFindedUsers($user, $allProperties) {

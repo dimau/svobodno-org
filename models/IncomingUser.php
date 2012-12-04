@@ -16,7 +16,7 @@
         private $favoritesPropertysId = array();
 
         private $isLoggedIn = NULL; // В переменную сохраняется функцией login() значение FALSE или TRUE после первого вызова на странице. Для уменьшения обращений к БД
-        private $amountUnreadMessages = ""; // В переменную функцией getAmountUnreadMessages() сохраняется количество непрочитанных сообщений пользователя
+        private $amountUnreadMessages = ""; // В переменную функцией getAmountUnreadMessages() сохраняется количество непрочитанных уведомлений пользователя
 
         /* Данные параметры используются только для Личного кабинета, для вкладки с Избранными объектами */
         private $propertyLightArr; // Массив массивов. После выполнения метода searchProperties содержит минимальные данные по ВСЕМ избранным объектам
@@ -28,7 +28,7 @@
             // Проверяем, авторизован ли пользователь, и если да, инициализируем параметры объекта (id, typeTenant, typeOwner...) соответствующими значениями из БД
             $this->login();
 
-            // Получим количество непрочитанных сообщений (новостей) для данного пользователя
+            // Получим количество непрочитанных уведомлений (новостей) для данного пользователя
             $this->getAmountUnreadMessages();
 
             // Инициализируем переменные typeTenant и typeOwner
@@ -240,15 +240,15 @@
         }
 
         // Метод возвращает массив идентификаторов арендаторов, которые заинтересовались недвижимостью данного пользователя
-        // В случае невозможности получения такого массива возвращает FALSE
-        public function getAllVisibleUsersId() {
+        // Если ничего не найдено или произошла ошибка, вернет пустой массив
+        public function getAllTenantsId() {
 
             // Проверим, что пользователь авторизован и является собственником
-            if (!$this->login() || !$this->isOwner()) return FALSE;
+            if (!$this->login() || !$this->isOwner()) return array();
 
-            // Получим из БД данные ($res) по пользователю с идентификатором = $this->id
+            // Получим из БД данные о всех объектах недвижимости собственника
             $stmt = DBconnect::get()->stmt_init();
-            if (($stmt->prepare("SELECT tenantsWithSignUpToViewRequest FROM property WHERE userId = ?") === FALSE)
+            if (($stmt->prepare("SELECT id FROM property WHERE userId = ?") === FALSE)
                 OR ($stmt->bind_param("s", $this->id) === FALSE)
                 OR ($stmt->execute() === FALSE)
                 OR (($res = $stmt->get_result()) === FALSE)
@@ -256,35 +256,44 @@
                 OR ($stmt->close() === FALSE)
             ) {
                 // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-                return FALSE;
+                return array();
             }
 
-            // Инициализируем массив для возврата в качестве результата
-            $resultArr = array();
+			// Соберем все идентификаторы в одномерный массив
+			$propertiesId = array();
+			foreach ($res as $value) {
+				$propertiesId[] = $value['id'];
+			}
 
-            // Перебираем массив, полученный из БД и собираем все id в 1 массив - без повторов
-            foreach ($res as $value) {
-                if (($unser = unserialize($value['tenantsWithSignUpToViewRequest'])) !== FALSE && is_array($unser)) {
-                    // При суммировании массивов в результате получаем массив, не содержащий повторяющихся элементов
-                    $resultArr = $resultArr + $unser;
-                }
+			// Получим все заявки на просмотр для этих объектов недвижимости
+			$allRequestToView = DBconnect::getAllRequestToViewForProperties($propertiesId);
+
+            // Перебираем массив, полученный из БД и собираем все id арендаторов, отправивших заявки на просмотр, в одномерный массив - без повторов
+            $tenantsId = array();
+			foreach ($allRequestToView as $value) {
+				$tenantsId[] = $value['tenantId'];
             }
 
-            return $resultArr;
+			// Уберем повторяющиеся элементы
+			$tenantsId = array_unique($tenantsId);
+			sort($tenantsId);
+
+			// Вернем одномерный массив, состоящий из идентификаторов арендаторов, отправивших запрос на просмотр одного из объектов недвижимости данного пользователя (собственника)
+            return $tenantsId;
         }
 
-        // Возвращает количество непрочитанных сообщений (новостей) пользователя
+        // Возвращает количество непрочитанных уведомлений пользователя
         public function getAmountUnreadMessages() {
 
             // Если пользователь не авторизован (у него нет id), то возвращаем 0
             if ($this->id == "") return 0;
 
-            // Если переменная, содержащая кол-во непрочитанных сообщений, уже проинициализирована, то возвращаем ее значение
+            // Если переменная, содержащая кол-во непрочитанных уведомлений, уже проинициализирована, то возвращаем ее значение
             if (isset($this->amountUnreadMessages) && $this->amountUnreadMessages != "") {
                 return $this->amountUnreadMessages;
             }
 
-            // Если во время этой сессии уже подсчитали количество непрочитанных сообщений - вернем его
+            // Если во время этой сессии уже подсчитали количество непрочитанных уведомлений - вернем его
             if (isset($_SESSION['amountUnreadMessages'])) {
                 $this->amountUnreadMessages = $_SESSION['amountUnreadMessages'];
                 return $_SESSION['amountUnreadMessages'];
@@ -293,7 +302,7 @@
             // Инициализируем переменную для возвращения
             $result = 0;
 
-            // Считаем количество непрочитанных сообщений пользователя
+            // Считаем количество непрочитанных уведомлений пользователя
             $res = DBconnect::get()->query("SELECT COUNT(*) FROM messagesNewProperty WHERE userId = '".$this->id."' AND isReaded = 'не прочитано'");
             if ((DBconnect::get()->errno)
                 OR (($res = $res->fetch_row()) === NULL)
@@ -307,7 +316,7 @@
                 $_SESSION['amountUnreadMessages'] = $result;
             }
 
-            //TODO: сделать подсчет количества сообщений и по другим таблицам сообщений
+            //TODO: сделать подсчет количества уведомлений и по другим таблицам уведомлений
 
             // Сохраним также результат в переменную объекта пользователя
             $this->amountUnreadMessages = $result;

@@ -36,13 +36,11 @@
 
     // Если требуемое действие = Добавить в избранное, то записываем id объявления в БД, в поле favoritesPropertysId пользователя - тем самым фиксируем, что он добавил данное объявление к себе в избранные
     if ($action == "addToFavorites") {
-
         if (!$incomingUser->addFavoritesPropertysId($propertyId)) accessDenied();
     }
 
     // Если требуемое действие = Удалить из избранного, то удаляем id объявления из БД, из поля favoritesPropertysId пользователя
     if ($action == "removeFromFavorites") {
-
         if (!$incomingUser->removeFavoritesPropertysId($propertyId)) accessDenied();
     }
 

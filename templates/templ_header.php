@@ -43,8 +43,8 @@
 
             if ($isLoggedIn) echo "<li class='separator'></li>"; else echo "<li class='right separator'></li>";
 
-            if ($isLoggedIn) { // Пункт меню "Сообщения" выдается только авторизованным пользователям
-                // Сколько сообщений не прочитано?
+            if ($isLoggedIn) { // Пункт меню "Уведомления" выдается только авторизованным пользователям
+                // Сколько уведомлений не прочитано?
                 if ($amountUnreadMessages == 0) {
                     $amountUnreadMessagesText = "";
                 } else {
@@ -52,9 +52,9 @@
                 }
 
                 if ($_SERVER['PHP_SELF'] == "/fortenant.php") { // TODO: поменять ссылку, на которую нужно переходить fortenant - cltkfnm c gjvjom. JS правильное выделение ссылки при нахождении на вкладке новости
-                    echo ("<li class='selected choice' style='width:" . $width[3] . "%'><span>Сообщения".$amountUnreadMessagesText."</span>");
+                    echo ("<li class='selected choice' style='width:" . $width[3] . "%'><span>Уведомления".$amountUnreadMessagesText."</span>");
                 } else {
-                    echo ("<li class='choice' style='width:" . $width[3] . "%'><a href='personal.php?tabsId=2'>Сообщения".$amountUnreadMessagesText."</a>");
+                    echo ("<li class='choice' style='width:" . $width[3] . "%'><a href='personal.php?tabsId=2'>Уведомления".$amountUnreadMessagesText."</a>");
                 }
 
                 echo "<li class='right separator'></li>";

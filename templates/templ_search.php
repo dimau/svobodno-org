@@ -135,7 +135,7 @@
 
                     <?php
                         // Форма с параметрами поиска
-                        include "templates/templ_editableSearchRequest.php";
+                        include "templates/editableBlocks/templ_editableSearchRequest.php";
                     ?>
 
                     <div class="bottomButton">
@@ -152,7 +152,7 @@
 
         <?php
             // Размещаем на странице HTML для результатов поиска
-            include("templates/templ_searchResult.php");
+            include("templates/searchResultBlocks/templ_searchResult.php");
         ?>
 
         <?php

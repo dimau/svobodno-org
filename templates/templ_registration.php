@@ -149,7 +149,7 @@
 
     <?php
         // Подключим форму для ввода и редактирования данных о ФИО, логине, контактах пользователя, а также о фотографиях
-        include "templates/templ_editablePersonalFIO.php";
+        include "templates/editableBlocks/templ_editablePersonalFIO.php";
     ?>
 
     <div class="bottomControls">
@@ -166,7 +166,7 @@
 
     <?php
         // Подключим форму для ввода и редактирования данных об образовании, работе и месте рождения
-        include "templates/templ_editablePersonalEducAndWork.php";
+        include "templates/editableBlocks/templ_editablePersonalEducAndWork.php";
     ?>
 
     <div class="bottomControls">
@@ -184,7 +184,7 @@
 
     <?php
         // Подключим форму для ввода и редактирования данных о социальных сетях пользователя
-        include "templates/templ_editablePersonalSocial.php";
+        include "templates/editableBlocks/templ_editablePersonalSocial.php";
     ?>
 
     <?php if ($userCharacteristic['typeTenant']): ?>
@@ -217,7 +217,7 @@
 
     <?php
         // Подключим форму для ввода и редактирования данных о поисковом запросе пользователя
-        include "templates/templ_editableSearchRequest.php";
+        include "templates/editableBlocks/templ_editableSearchRequest.php";
     ?>
 
     <div class="bottomControls">

@@ -837,17 +837,21 @@ class User
 			if ($this->name == "") $errors[] = 'Укажите имя';
 		}
 		if (strlen($this->name) > 50) $errors[] = 'Слишком длинное имя. Можно указать не более 50-ти символов';
+
 		if ($typeOfValidation == "registration" || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest" || $typeOfValidation == "validateProfileParameters") {
 			if ($this->secondName == "") $errors[] = 'Укажите отчество';
 		}
 		if (strlen($this->secondName) > 50) $errors[] = 'Слишком длинное отчество. Можно указать не более 50-ти символов';
+
 		if ($typeOfValidation == "registration" || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest" || $typeOfValidation == "validateProfileParameters") {
 			if ($this->surname == "") $errors[] = 'Укажите фамилию';
 		}
 		if (strlen($this->surname) > 50) $errors[] = 'Слишком длинная фамилия. Можно указать не более 50-ти символов';
+
 		if ($typeOfValidation == "registration" || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest" || $typeOfValidation == "validateProfileParameters") {
 			if ($this->sex == "0") $errors[] = 'Укажите пол';
 		}
+
 		if ($typeOfValidation == "registration" || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest" || $typeOfValidation == "validateProfileParameters") {
 			if ($this->nationality == "0") $errors[] = 'Укажите внешность';
 		}
@@ -883,11 +887,13 @@ class User
 				}
 			}
 		}
+
 		if ($this->password == "") $errors[] = 'Укажите пароль';
 
 		if ($typeOfValidation == "registration" || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest" || $typeOfValidation == "validateProfileParameters") {
 			if ($this->telephon == "") $errors[] = 'Укажите контактный (мобильный) телефон';
 		}
+
 		if ($this->telephon != "") {
 			if (!preg_match('/^[0-9]{10}$/', $this->telephon)) $errors[] = 'Укажите, пожалуйста, Ваш мобильный номер без 8-ки, например: 9226470019';
 		}
@@ -901,21 +907,42 @@ class User
 		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest") {
 			if ($this->currentStatusEducation == "0") $errors[] = 'Укажите Ваше образование (текущий статус)';
 		}
-		if ($this->almamater == "" && ($this->currentStatusEducation == "сейчас учусь" || $this->currentStatusEducation == "закончил") && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите учебное заведение';
+		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest") {
+			if ($this->almamater == "" && ($this->currentStatusEducation == "сейчас учусь" || $this->currentStatusEducation == "закончил")) $errors[] = 'Укажите учебное заведение';
+		}
 		if (isset($this->almamater) && strlen($this->almamater) > 100) $errors[] = 'Слишком длинное название учебного заведения (используйте не более 100 символов)';
-		if ($this->speciality == "" && ($this->currentStatusEducation == "сейчас учусь" || $this->currentStatusEducation == "закончил") && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите специальность';
+
+		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest") {
+			if ($this->speciality == "" && ($this->currentStatusEducation == "сейчас учусь" || $this->currentStatusEducation == "закончил")) $errors[] = 'Укажите специальность';
+		}
 		if (isset($this->speciality) && strlen($this->speciality) > 100) $errors[] = 'Слишком длинное название специальности (используйте не более 100 символов)';
-		if ($this->kurs == "" && $this->currentStatusEducation == "сейчас учусь" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите курс обучения';
+
+		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest") {
+			if ($this->kurs == "" && $this->currentStatusEducation == "сейчас учусь") $errors[] = 'Укажите курс обучения';
+		}
 		if (isset($this->kurs) && strlen($this->kurs) > 30) $errors[] = 'Курс. Указана слишком длинная строка (используйте не более 30 символов)';
-		if ($this->ochnoZaochno == "0" && $this->currentStatusEducation == "сейчас учусь" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите форму обучения (очная, заочная)';
-		if ($this->yearOfEnd == "" && $this->currentStatusEducation == "закончил" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите год окончания учебного заведения';
+
+		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest") {
+			if ($this->ochnoZaochno == "0" && $this->currentStatusEducation == "сейчас учусь") $errors[] = 'Укажите форму обучения (очная, заочная)';
+		}
+		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest") {
+			if ($this->yearOfEnd == "" && $this->currentStatusEducation == "закончил") $errors[] = 'Укажите год окончания учебного заведения';
+		}
 		if ($this->yearOfEnd != "" && !preg_match("/^[12]{1}[0-9]{3}$/", $this->yearOfEnd)) $errors[] = 'Укажите год окончания учебного заведения в формате: "гггг". Например: 2007';
 
 		// Проверки для блока "Работа"
-		if ($this->statusWork == "0" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите статус занятости';
-		if ($this->placeOfWork == "" && $this->statusWork == "работаю" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите Ваше место работы (название организации)';
+		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest") {
+			if ($this->statusWork == "0") $errors[] = 'Укажите статус занятости';
+		}
+
+		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest") {
+			if ($this->placeOfWork == "" && $this->statusWork == "работаю") $errors[] = 'Укажите Ваше место работы (название организации)';
+		}
 		if (isset($this->placeOfWork) && strlen($this->placeOfWork) > 100) $errors[] = 'Слишком длинное наименование места работы (используйте не более 100 символов)';
-		if ($this->workPosition == "" && $this->statusWork == "работаю" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите Вашу должность';
+
+		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateSearchRequest") {
+			if ($this->workPosition == "" && $this->statusWork == "работаю") $errors[] = 'Укажите Вашу должность';
+		}
 		if (isset($this->workPosition) && strlen($this->workPosition) > 100) $errors[] = 'Слишком длинное название должности (используйте не более 100 символов)';
 
 		// Проверки для блока "Коротко о себе"
@@ -933,17 +960,35 @@ class User
 		if (strlen($this->twitter) > 0 && !preg_match("/twitter\.com/", $this->twitter)) $errors[] = 'Укажите, пожалуйста, Вашу настоящую личную страницу в Twitter, либо оставьте поле пустым (ссылка должна содержать строчку "twitter.com")';
 
 		// Проверки для блока "Параметры поиска"
-		if ((($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest") && !preg_match("/^\d{0,8}$/", $this->minCost)) $errors[] = 'Неправильный формат числа в поле минимальной величины арендной платы (проверьте: только числа, не более 8 символов)';
-		if ((($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest") && !preg_match("/^\d{0,8}$/", $this->maxCost)) $errors[] = 'Неправильный формат числа в поле максимальной величины арендной платы (проверьте: только числа, не более 8 символов)';
-		if ((($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest") && !preg_match("/^\d{0,8}$/", $this->pledge)) $errors[] = 'Неправильный формат числа в поле максимальной величины залога (проверьте: только числа, не более 8 символов)';
-		if ((($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest") && $this->minCost > $this->maxCost) $errors[] = 'Минимальная стоимость аренды не может быть больше, чем максимальная. Исправьте поля, в которых указаны Ваши требования к диапазону стоимости аренды';
-		if ($this->withWho == "0" && $this->typeOfObject != "гараж" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите, как Вы собираетесь проживать в арендуемой недвижимости (с кем)';
-		if ($this->children == "0" && $this->typeOfObject != "гараж" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите, собираетесь ли Вы проживать вместе с детьми или без них';
-		if ($this->animals == "0" && $this->typeOfObject != "гараж" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите, собираетесь ли Вы проживать вместе с животными или без них';
-		if ($this->termOfLease == "0" && (($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest")) $errors[] = 'Укажите предполагаемый срок аренды';
+		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest") {
+			if (!preg_match("/^\d{0,8}$/", $this->minCost)) $errors[] = 'Неправильный формат числа в поле минимальной величины арендной платы (проверьте: только числа, не более 8 символов)';
+		}
+		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest") {
+			if (!preg_match("/^\d{0,8}$/", $this->maxCost)) $errors[] = 'Неправильный формат числа в поле максимальной величины арендной платы (проверьте: только числа, не более 8 символов)';
+		}
+		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest") {
+			if (!preg_match("/^\d{0,8}$/", $this->pledge)) $errors[] = 'Неправильный формат числа в поле максимальной величины залога (проверьте: только числа, не более 8 символов)';
+		}
+		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest") {
+			if ($this->minCost > $this->maxCost) $errors[] = 'Минимальная стоимость аренды не может быть больше, чем максимальная. Исправьте поля, в которых указаны Ваши требования к диапазону стоимости аренды';
+		}
+		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest") {
+			if ($this->withWho == "0" && $this->typeOfObject != "гараж") $errors[] = 'Укажите, как Вы собираетесь проживать в арендуемой недвижимости (с кем)';
+		}
+		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest") {
+			if ($this->children == "0" && $this->typeOfObject != "гараж") $errors[] = 'Укажите, собираетесь ли Вы проживать вместе с детьми или без них';
+		}
+		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest") {
+			if ($this->animals == "0" && $this->typeOfObject != "гараж") $errors[] = 'Укажите, собираетесь ли Вы проживать вместе с животными или без них';
+		}
+		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || $typeOfValidation == "validateSearchRequest") {
+			if ($this->termOfLease == "0") $errors[] = 'Укажите предполагаемый срок аренды';
+		}
 
 		// Проверка согласия пользователя с лицензией
-		if ($typeOfValidation == "registration" && $this->lic != "yes") $errors[] = 'Регистрация возможна только при согласии с условиями лицензионного соглашения'; //приняты ли правила
+		if ($typeOfValidation == "registration") {
+			if ($this->lic != "yes") $errors[] = 'Регистрация возможна только при согласии с условиями лицензионного соглашения';
+		}
 
 		return $errors; // Возвращаем список ошибок, если все в порядке, то он будет пуст
 	}
@@ -996,14 +1041,14 @@ class User
 
 	}
 
-	// Получить все сообщения (новости) пользователя (в виде массива массивов)
-	// Сообщения сортируются следующим образом: наверху все непрочитанные, внизу прочитанные, каждая из категорий сортируется по времени появления: появившиеся позже сверху
+	// Получить все уведомления пользователя (в виде массива массивов)
+	// Уведомления сортируются следующим образом: наверху все непрочитанные, внизу прочитанные, каждая из категорий сортируется по времени появления: появившиеся позже сверху
 	public function getAllMessagesSorted() {
 
 		// Инициализируем массив, который вернем по окончанию выполнения метода
 		$messagesNewProperty = array();
 
-		// Получим сообщения по новым объектам недвижимости, соответствующим запросу, если наш пользователь - арендатор
+		// Получим уведомления по новым объектам недвижимости, соответствующим запросу, если наш пользователь - арендатор
 		if ($this->id != "" && $this->typeTenant === TRUE) {
 			$stmt = DBconnect::get()->stmt_init();
 			if (($stmt->prepare("SELECT * FROM messagesNewProperty WHERE userId = ? ORDER BY isReaded DESC, timeIndex DESC") === FALSE)

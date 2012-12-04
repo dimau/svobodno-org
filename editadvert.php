@@ -19,6 +19,7 @@ $incomingUser = new IncomingUser();
 // Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
 if (!$incomingUser->login()) {
 	header('Location: login.php');
+	exit();
 }
 
 /*************************************************************************************
@@ -32,10 +33,10 @@ if (isset($_GET['action'])) $action = htmlspecialchars($_GET['action'], ENT_QUOT
 
 // Получаем идентификатор объявления для редактирования из строки запроса
 $propertyId = "";
-if (isset($_GET['propertyId'])) $propertyId = htmlspecialchars($_GET['propertyId'], ENT_QUOTES);
+if (isset($_GET['propertyId'])) $propertyId = intval(htmlspecialchars($_GET['propertyId'], ENT_QUOTES));
 
 // Если в строке не указан идентификатор объявления для редактирования, то пересылаем пользователя в личный кабинет
-if ($propertyId == "" || !is_int($propertyId)) {
+if ($propertyId == "" || $propertyId == 0) {
 	header('Location: personal.php?tabsId=3');
 	exit();
 }
@@ -62,6 +63,7 @@ $errors = array();
 $isAdmin = $incomingUser->isAdmin();
 if ($property->userId != $incomingUser->getId() AND !$isAdmin['searchUser']) {
 	header('Location: personal.php?tabsId=3');
+	exit();
 }
 
 /*************************************************************************************
@@ -96,6 +98,7 @@ if ($action == "saveAdvert") {
 
 				// Пересылаем пользователя на страницу с подробным описанием его объявления - хороший способ убедиться в том, что все данные указаны верно
 				header('Location: objdescription.php?propertyId=' . $property->id);
+				exit();
 
 			} else {
 
@@ -119,7 +122,7 @@ if ($action == "saveAdvert") {
 
 // Инициализируем используемые в шаблоне(ах) переменные
 $isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных сообщений пользователя
+$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 $propertyCharacteristic = $property->getCharacteristicData();
 $propertyFotoInformation = $property->getFotoInformationData();
 $compId = $propertyCharacteristic['userId'];

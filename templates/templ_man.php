@@ -60,7 +60,7 @@
                         echo View::getHTMLfotosWrapper("middle", TRUE, FALSE, $userFotoInformation['uploadedFoto']);
 
                         // Вставляем анкетные данные пользователя
-                        include ("templates/templ_notEditedProfile.php");
+                        include ("templates/notEditableBlocks/templ_notEditedProfile.php");
                     ?>
                 </div>
                 <div class="clearBoth"></div>
@@ -78,7 +78,7 @@
                 </div>
                 <?php
                     // Шаблон для представления нередактируемых параметров поисковго запроса пользователя
-                    include ("templ_notEditedSearchRequest.php");
+                    include ("templates/notEditableBlocks/templ_notEditedSearchRequest.php");
                 ?>
                 <?php endif;?>
             </div>

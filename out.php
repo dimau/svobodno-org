@@ -12,3 +12,4 @@
     SetCookie("login", "", time() - 3600, '/'); //удаляем cookie с логином
     SetCookie("password", "", time() - 3600, '/'); //удаляем cookie с паролем
     header("Location: index.php"); //перенаправляем на главную страницу сайта
+	exit();

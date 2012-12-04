@@ -10,11 +10,12 @@ if (isset($_GET['action'])) $action = htmlspecialchars($_GET['action'], ENT_QUOT
 
 // Идентификатор объекта для просмотра
 $propertyId = "";
-if (isset($_GET['propertyId'])) $propertyId = htmlspecialchars($_GET['propertyId'], ENT_QUOTES);
+if (isset($_GET['propertyId'])) $propertyId = intval(htmlspecialchars($_GET['propertyId'], ENT_QUOTES));
 
 // Если в запросе не указан идентификатор объявления для редактирования, то пересылаем пользователя на спец страницу
-if ($propertyId == "" || !is_int($propertyId)) {
+if ($propertyId == "" || $propertyId == 0) {
 	header('Location: 404.html');
+	exit();
 }
 
 /*************************************************************************************
@@ -80,6 +81,7 @@ if ($property->status == "не опубликовано"
 	AND !$isAdmin['searchUser'])
 {
 	header('Location: 404.html');
+	exit();
 }
 //TODO: реализовать соответствующую 404 страницу
 
@@ -94,6 +96,7 @@ if ($action == "signUpToView") {
 	$statusOfSaveParamsToDB = $signUpToView->saveParamsToDB(); // вне зависимости от полноты заполнения формы (корректности) она будет отправлена на сервер и обработана. Это решение связано с тем, что сложно отобразить на клиенте пользователю - что он не заполнил поле в модальном окне, лень это реализовывать
 
 	//TODO: оповестить оператора о новом запросе на просмотр
+	//TODO: новость для собственника о новом претенденте
 }
 
 /********************************************************************************
@@ -102,7 +105,7 @@ if ($action == "signUpToView") {
 
 // Инициализируем используемые в шаблоне(ах) переменные
 $isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных сообщений пользователя
+$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 $userCharacteristic = array('typeTenant' => $incomingUser->isTenant(), 'name' => $incomingUser->name, 'secondName' => $incomingUser->secondName, 'surname' => $incomingUser->surname, 'telephon' => $incomingUser->telephon); // Но для данной страницы данный массив содержит только имя, отчество, фамилию, телефон пользователя
 $propertyCharacteristic = $property->getCharacteristicData();
 $propertyFotoInformation = $property->getFotoInformationData();

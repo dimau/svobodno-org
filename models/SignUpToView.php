@@ -7,7 +7,7 @@
         public $propertyId = "";
         public $tenantTime = "";
         public $tenantComment = "";
-        public $ownerStatus = "";
+        public $status = "";
         public $finalDate = "";
         public $finalTimeHours = "";
         public $finalTimeMinutes = "";
@@ -54,8 +54,8 @@
 
                 // Непосредственное сохранение данных о поисковом запросе
                 $stmt = DBconnect::get()->stmt_init();
-                if (($stmt->prepare("UPDATE requestToView SET tenantId = ?, propertyId = ?, tenantTime = ?, tenantComment = ?, ownerStatus = ?, finalDate = ?, finalTimeHours = ?, finalTimeMinutes = ? WHERE id=?") === FALSE)
-                    OR ($stmt->bind_param("iissssssi", $this->tenantId, $this->propertyId, $this->tenantTime, $this->tenantComment, $this->ownerStatus, $finalDateDB, $this->finalTimeHours, $this->finalTimeMinutes, $this->id) === FALSE)
+                if (($stmt->prepare("UPDATE requestToView SET tenantId = ?, propertyId = ?, tenantTime = ?, tenantComment = ?, status = ?, finalDate = ?, finalTimeHours = ?, finalTimeMinutes = ? WHERE id=?") === FALSE)
+                    OR ($stmt->bind_param("iissssssi", $this->tenantId, $this->propertyId, $this->tenantTime, $this->tenantComment, $this->status, $finalDateDB, $this->finalTimeHours, $this->finalTimeMinutes, $this->id) === FALSE)
                     OR ($stmt->execute() === FALSE)
                     OR (($res = $stmt->affected_rows) === -1)
                     OR ($stmt->close() === FALSE)
@@ -71,7 +71,7 @@
 
                 // Непосредственное сохранение данных о поисковом запросе
                 $stmt = DBconnect::get()->stmt_init();
-                if (($stmt->prepare("INSERT INTO requestToView (tenantId, propertyId, tenantTime, tenantComment, ownerStatus, finalDate, finalTimeHours, finalTimeMinutes) VALUES (?,?,?,?,?,?,?,?)") === FALSE)
+                if (($stmt->prepare("INSERT INTO requestToView (tenantId, propertyId, tenantTime, tenantComment, status, finalDate, finalTimeHours, finalTimeMinutes) VALUES (?,?,?,?,?,?,?,?)") === FALSE)
                     OR ($stmt->bind_param("iissssss", $this->tenantId, $this->propertyId, $this->tenantTime, $this->tenantComment, $statusForDB, $finalDateDB, $this->finalTimeHours, $this->finalTimeMinutes) === FALSE)
                     OR ($stmt->execute() === FALSE)
                     OR (($res = $stmt->affected_rows) === -1)
@@ -83,7 +83,7 @@
                 }
 
                 // Если все прошло успешно, обновим соответствующих параметр статуса у текущего нашего объекта (модели)
-                $this->ownerStatus = $statusForDB;
+                $this->status = $statusForDB;
 
             }
 
@@ -124,7 +124,7 @@
             if (isset($oneRequestToViewDataArr['propertyId'])) $this->propertyId = $oneRequestToViewDataArr['propertyId'];
             if (isset($oneRequestToViewDataArr['tenantTime'])) $this->tenantTime = $oneRequestToViewDataArr['tenantTime'];
             if (isset($oneRequestToViewDataArr['tenantComment'])) $this->tenantComment = $oneRequestToViewDataArr['tenantComment'];
-            if (isset($oneRequestToViewDataArr['ownerStatus'])) $this->ownerStatus = $oneRequestToViewDataArr['ownerStatus'];
+            if (isset($oneRequestToViewDataArr['status'])) $this->status = $oneRequestToViewDataArr['status'];
             if (isset($oneRequestToViewDataArr['finalDate'])) $this->finalDate = GlobFunc::dateFromDBToView($oneRequestToViewDataArr['finalDate']);
             if (isset($oneRequestToViewDataArr['finalTimeHours'])) $this->finalTimeHours = $oneRequestToViewDataArr['finalTimeHours'];
             if (isset($oneRequestToViewDataArr['finalTimeMinutes'])) $this->finalTimeMinutes = $oneRequestToViewDataArr['finalTimeMinutes'];
@@ -158,7 +158,7 @@
             $result['propertyId'] = $this->propertyId;
             $result['tenantTime'] = $this->tenantTime;
             $result['tenantComment'] = $this->tenantComment;
-            $result['ownerStatus'] = $this->ownerStatus;
+            $result['status'] = $this->status;
             $result['finalDate'] = $this->finalDate;
             $result['finalTimeHours'] = $this->finalTimeHours;
             $result['finalTimeMinutes'] = $this->finalTimeMinutes;

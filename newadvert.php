@@ -26,6 +26,7 @@ $errors = array();
 // Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
 if (!$incomingUser->login()) {
 	header('Location: login.php');
+	exit();
 }
 
 // Если пользователь не является администратором, то доступ к странице ему запрещен - разавторизуем его и перекинем на главную (в идеале нужно перекидывать на login.php)
@@ -33,6 +34,7 @@ if (!$incomingUser->login()) {
 $isAdmin = $incomingUser->isAdmin();
 if (!$isAdmin['newOwner'] && !$isAdmin['newAdvertAlien']) {
 	header('Location: out.php');
+	exit();
 }
 
 /*************************************************************************************
@@ -90,12 +92,13 @@ if ($action == "saveAdvert") {
 			// Сохраним информацию о фотографиях объекта недвижимости
 			$property->saveFotoInformationToDB();
 
-			// Формируем сообщения (новости) для арендаторов, под чей поисковый запрос подходит новый объект
+			// Формируем уведомления для арендаторов, под чей поисковый запрос подходит новый объект
 			// TODO: в будущем здесь нужно лишь куда-то писать команду на формирование новостей, чтобы пользователь не дожидался выполнения скрипта
 			if ($property->status == "опубликовано") $property->sendMessagesAboutNewProperty();
 
 			// Пересылаем пользователя на страницу с подробным описанием его объявления - хороший способ убедиться в том, что все данные указаны верно
 			header('Location: objdescription.php?propertyId=' . $property->id);
+			exit();
 
 		} else {
 
@@ -113,7 +116,7 @@ if ($action == "saveAdvert") {
 
 // Инициализируем используемые в шаблоне(ах) переменные
 $isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных сообщений пользователя
+$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 $propertyCharacteristic = $property->getCharacteristicData();
 $propertyFotoInformation = $property->getFotoInformationData();
 //$errors

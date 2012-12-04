@@ -37,28 +37,28 @@
 
     } else { // Если ошибок не было
 
-        if ($isLoggedIn === FALSE || $userCharacteristic['typeTenant'] === FALSE || $signUpToViewData['ownerStatus'] == "") {
+        if ($isLoggedIn === FALSE || $userCharacteristic['typeTenant'] === FALSE || $signUpToViewData['status'] == "") {
             echo "  <li>
                         <button class='mainButton signUpToViewButton'>Записаться на просмотр</button>
                     </li>
                  ";
         }
 
-        if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['ownerStatus'] == "confirmed") {
+        if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['status'] == "confirmed") {
             echo "  <li>
                         <div class='signUpToViewStatusBlock confirmed'>Просмотр<br>{$signUpToViewData['finalDate']} в {$signUpToViewData['finalTimeHours']}:{$signUpToViewData['finalTimeMinutes']}</div>
                     </li>
                  ";
         }
 
-        if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['ownerStatus'] == "failure") {
+        if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['status'] == "failure") {
             echo " <li>
                        <div class='signUpToViewStatusBlock failure' title='к сожалению, собственник отказался от показа'>Отказ собственника</div>
                    </li>
                  ";
         }
 
-        if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['ownerStatus'] == "inProgress") {
+        if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE && $signUpToViewData['status'] == "inProgress") {
             echo " <li>
                        <div class='signUpToViewStatusBlock inProgress' title='оператор свяжется с Вами в ближайшее время'>Заявка отправлена</div>
                    </li>
