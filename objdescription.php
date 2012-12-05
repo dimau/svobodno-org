@@ -32,7 +32,7 @@ include 'models/Logger.php';
 include 'models/IncomingUser.php';
 include 'views/View.php';
 include 'models/Property.php';
-include 'models/SignUpToView.php';
+include 'models/RequestToView.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
@@ -45,7 +45,7 @@ $isAdmin = $incomingUser->isAdmin();
 
 // Инициализируем модель запроса на просмотр данного объекта данным пользователем.
 // Если он уже записался на просмотр, то в модели будут содержаться данные его запроса (время, комментарий...)
-$signUpToView = new SignUpToView($incomingUser->getId(), $propertyId);
+$signUpToView = new RequestToView($incomingUser->getId(), $propertyId);
 
 // Инициализируем переменную для хранения информации об успешности/неуспешности отправки запроса на просмотр в БД
 $statusOfSaveParamsToDB = NULL;

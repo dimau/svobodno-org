@@ -3,14 +3,13 @@
     session_start();
 
     // Подключаем нужные модели и представления
-    include '../models/DBconnect.php';
-    include '../models/GlobFunc.php';
-    include '../models/Logger.php';
-    include '../models/IncomingUser.php';
-    include '../views/View.php';
+    include 'models/DBconnect.php';
+    include 'models/GlobFunc.php';
+    include 'models/Logger.php';
+    include 'models/IncomingUser.php';
 
     // Удалось ли подключиться к БД?
-    if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
+    if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.'); // TODO: Вернуть ошибку
 
     // Инициализируем модель для запросившего страницу пользователя
     $incomingUser = new IncomingUser();

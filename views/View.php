@@ -1309,14 +1309,4 @@
 
             return $resultHTML;
         } */
-
-		// Возвращает HTML для блока с описанием 1 пользователя для страницы поиска пользователей в Админке.
-		public static function getHTMLforAdminFindedUsers($user, $allProperties) {
-			include "templates/adminTemplates/templ_adminFindUserItem.php";
-		}
-
-		public static function getHTMLforAdminFindedUsersProperty($property) {
-			include "templates/adminTemplates/templ_adminFindUserPropertyItem.php";
-		}
-
     }

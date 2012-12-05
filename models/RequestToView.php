@@ -1,6 +1,7 @@
 <?php
+/* Класс представляет собой модель Запроса на просмотр */
 
-    class SignUpToView
+    class RequestToView
     {
         private $id = "";
         public $tenantId = "";
@@ -17,7 +18,7 @@
          *
          * @param IncomingUser $incomingUser
          */
-        public function __construct($tenantId = "", $propertyId = "")
+        public function __construct($tenantId = "", $propertyId = "", $requestId = "")
         {
             // Сохраняем id текущего пользователя (который выступает в качестве претендента на объект)
             if ($tenantId != "") {
@@ -29,15 +30,17 @@
                 $this->propertyId = $propertyId;
             }
 
+			// Сохраняем id запроса на просмотр
+			if ($requestId != "") {
+				$this->id = $requestId;
+			}
+
             // Если по данному пользователю и объекту уже заводился запрос на просмотр - запишем его данные в параметры объекта
             $this->writeParamsFromDB();
         }
 
         // ДЕСТРУКТОР
-        public function __destruct()
-        {
-
-        }
+        public function __destruct() {}
 
         // Сохраняет параметры запроса на показ в БД
         // Возвращает TRUE, если данные успешно сохранены и FALSE в противном случае
@@ -94,20 +97,37 @@
         public function writeParamsFromDB()
         {
             // Если идентификатор пользователя или объекта недвижимости неизвестен, то дальнейшие действия не имеют смысла
-            if ($this->tenantId == "" || $this->propertyId == "") return FALSE;
+            if (($this->tenantId == "" || $this->propertyId == "") && $this->id == "") return FALSE;
 
-            // Получим из БД данные ($res) по запросу на просмотр, который нас интересуют (если он сохранен в БД)
-            $stmt = DBconnect::get()->stmt_init();
-            if (($stmt->prepare("SELECT * FROM requestToView WHERE tenantId=? AND propertyId=?") === FALSE)
-                OR ($stmt->bind_param("ss", $this->tenantId, $this->propertyId) === FALSE)
-                OR ($stmt->execute() === FALSE)
-                OR (($res = $stmt->get_result()) === FALSE)
-                OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-                OR ($stmt->close() === FALSE)
-            ) {
-                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-                return FALSE;
-            }
+			// Получим из БД данные ($res) по запросу на просмотр, который нас интересуют (если он сохранен в БД)
+			if ($this->id != "") {
+				$stmt = DBconnect::get()->stmt_init();
+				if (($stmt->prepare("SELECT * FROM requestToView WHERE id=?") === FALSE)
+					OR ($stmt->bind_param("s", $this->id) === FALSE)
+					OR ($stmt->execute() === FALSE)
+					OR (($res = $stmt->get_result()) === FALSE)
+					OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+					OR ($stmt->close() === FALSE)
+				) {
+					// TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+					return FALSE;
+				}
+			}
+
+			// Получим из БД данные ($res) по запросу на просмотр, который нас интересуют (если он сохранен в БД)
+			if ($this->tenantId != "" && $this->propertyId != "" && $this->id == "") {
+				$stmt = DBconnect::get()->stmt_init();
+				if (($stmt->prepare("SELECT * FROM requestToView WHERE tenantId=? AND propertyId=?") === FALSE)
+					OR ($stmt->bind_param("ss", $this->tenantId, $this->propertyId) === FALSE)
+					OR ($stmt->execute() === FALSE)
+					OR (($res = $stmt->get_result()) === FALSE)
+					OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+					OR ($stmt->close() === FALSE)
+				) {
+					// TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+					return FALSE;
+				}
+			}
 
             // Если получено меньше или больше одной строки из БД, то сообщаем об ошибке
             if (!is_array($res) || count($res) != 1) {

@@ -111,4 +111,11 @@
             return $age;
         }
 
+		// Вспомогательная функция для AJAX запросов - отказ в доступе
+		public static function accessDenied() {
+			header('Content-Type: text/xml; charset=UTF-8');
+			echo "<xml><span status='denied'></span></xml>";
+			exit();
+		}
+
     }

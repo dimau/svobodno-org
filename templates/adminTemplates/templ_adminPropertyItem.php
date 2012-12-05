@@ -1,4 +1,7 @@
-<div style="margin: 10px 0 10px 0;"><div><div style="float: left;"><span><?php echo $property['typeOfObject']; ?>:</span>
+<div style="margin: 10px 0 10px 0;">
+    <div>
+        <div style="float: left;">
+            <span><?php echo $property['typeOfObject']; ?>:</span>
 			<span class="content">
 				<?php
 				echo $property['address'];

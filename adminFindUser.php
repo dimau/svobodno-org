@@ -10,7 +10,6 @@ include 'models/GlobFunc.php';
 include 'models/Logger.php';
 include 'models/IncomingUser.php';
 include 'views/View.php';
-include 'models/User.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
@@ -20,6 +19,9 @@ $incomingUser = new IncomingUser();
 
 // Инициализируем ассоциативный массив, в который будем складывать все параметры искомого пользователя
 $goalUser = array();
+
+// Уточняем - имеет ли пользователь права админа.
+$isAdmin = $incomingUser->isAdmin();
 
 /*************************************************************************************
  * Проверяем - может ли данный пользователь просматривать данную страницу
@@ -33,7 +35,6 @@ if (!$incomingUser->login()) {
 
 // Если пользователь не является администратором, то доступ к странице ему запрещен - разавторизуем его и перекинем на главную (в идеале нужно перекидывать на login.php)
 // Кроме того, проверяем, что у данного администратора есть право на поиск пользователей и вход в их Личные кабинеты
-$isAdmin = $incomingUser->isAdmin();
 if (!$isAdmin['searchUser']) {
 	header('Location: out.php');
 	exit();
@@ -58,6 +59,7 @@ if (isset($_POST['address'])) $goalUser['address'] = htmlspecialchars($_POST['ad
 // Инициализируем массивы для хранения результатов
 $allUsers = array();
 $allProperties = array();
+$allRequestsToView = array();
 
 // ЗАПРОС К ТАБЛИЦЕ USERS. Если хотя одно поле из тех, что связаны с параметрами пользователя, а не его недвижимости заполнено
 if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondName'] != "" || $goalUser['login'] != "" || $goalUser['telephon'] != "" || $goalUser['email'] != "") {
@@ -112,6 +114,27 @@ if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondNa
 		}
 	}
 
+	// Получим информацию по заявкам на просмотр от найденных пользователей
+	// Часть WHERE у данного запроса к таблице requestToView аналогична ранее собранному $strWHERE с той лишь разницей, что вместо userId используется tenantId
+	$strWHEREForRequestToView = str_replace("userId", "tenantId", $strWHERE);
+	if ($strWHEREForRequestToView != "") {
+		$res = DBconnect::get()->query("SELECT id, tenantId, propertyId, status FROM requestToView WHERE".$strWHEREForRequestToView);
+		if ((DBconnect::get()->errno)
+			OR (($allRequestsToView = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+		) {
+			// Логируем ошибку
+			//TODO: сделать логирование ошибки
+			$allRequestsToView = array();
+		}
+	}
+
+	// Все полученные заявки на просмотр нужно дополнить информацией об адресах - для этого добавим в строку $strWHERE условия по нужным нам объектам
+	if (is_array($allRequestsToView) && count($allRequestsToView) != 0) {
+		foreach ($allRequestsToView as $value) {
+			if ($strWHERE != "") $strWHERE .= " OR (id = '" . $value['propertyId'] . "')"; else $strWHERE .= " (id = '" . $value['propertyId'] . "')";
+		}
+	}
+
 	// Получим информацию по объектам недвижимости, которые принадлежат найденным пользователям
 	// В итоге получим массив ($allProperties), каждый элемент которого представляет собой еще один массив параметров конкретного объекта недвижимости, принадлежащего одному из найденных выше пользователей
 	if ($strWHERE != "") {
@@ -122,6 +145,17 @@ if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondNa
 			// Логируем ошибку
 			//TODO: сделать логирование ошибки
 			$allProperties = array();
+		}
+	}
+
+	// Дополним данные о заявках на просмотр информацией об адресе соответствующего объекта (на который поступила заявка)
+	for ($i = 0, $s = count($allRequestsToView); $i < $s; $i++) {
+		foreach ($allProperties as $property) {
+			if ($allRequestsToView[$i]['propertyId'] == $property['id']) {
+				$allRequestsToView[$i]['address'] = $property['address'];
+				$allRequestsToView[$i]['apartmentNumber'] = $property['apartmentNumber'];
+				break;
+			}
 		}
 	}
 
@@ -142,10 +176,10 @@ if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondNa
 	}
 
 	// Получим информацию по объектам недвижимости, чьи адреса похожи на тот, что указал администратор
-	// Количество результатов ограничено первыми 20-тью, чтобы не перегружать БД
+	// Количество результатов ограничено первыми 40-ка, чтобы не перегружать БД
 	// В итоге получим массив ($allProperties), каждый элемент которого представляет собой еще один массив параметров конкретного объекта недвижимости
 	if ($strWHERE != "") {
-		$res = DBconnect::get()->query("SELECT id, userId, typeOfObject, address, apartmentNumber, adminComment, completeness FROM property WHERE".$strWHERE." LIMIT 20");
+		$res = DBconnect::get()->query("SELECT id, userId, typeOfObject, address, apartmentNumber, adminComment, completeness FROM property WHERE".$strWHERE." LIMIT 40");
 		if ((DBconnect::get()->errno)
 			OR (($allProperties = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
 		) {
@@ -183,8 +217,9 @@ if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondNa
 		}
 	}
 
+	// Если поиск производится по адресу недвижимости, то в выдаче будут только пользователи-собственники. Скорее всего у них запросов на просмотр (если только они одновременно не сдают и не снимают жилье), поэтому поиск по заявкам не будем осуществлять
+	$allRequestsToView = array();
 }
-
 
 /********************************************************************************
  * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
@@ -192,6 +227,7 @@ if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondNa
 
 //$allUsers  массив, каждый элемент которого представляет собой еще один массив параметров конкретного пользователя
 //$allProperties  массив, каждый элемент которого представляет собой еще один массив параметров конкретного объекта недвижимости, принадлежащего одному из найденных пользователей
+//$allRequestsToView	массив, каждый элемент которого представляет собой еще один массив параметров конкретной заявки на просмотр, принадлежащего одному из найденных пользователей
 
 // Подсоединяем нужный основной шаблон
 include "templates/" . "adminTemplates/templ_adminFindUser.php";

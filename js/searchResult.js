@@ -108,7 +108,7 @@ function getNextRealtyObjects(lastRealtyObjectsId, lastNumber) {
     if ($("#shortListOfRealtyObjects").is(":visible")) $("#upBlockShortList").css('display', 'block');
     if ($("#fullParametersListOfRealtyObjects").is(":visible")) $("#upBlockFullList").css('display', 'block');
 
-    jQuery.post("../getSearchResultHTML.php", {"propertyId":propertyIdArr, "typeOperation":"FullData", "number":lastNumber}, function (data) {
+    jQuery.post("../AJAXSearchResultHTML.php", {"propertyId":propertyIdArr, "typeOperation":"FullData", "number":lastNumber}, function (data) {
 
         // Дополняем таблицы, содержащие списки с краткими и подробными объявлениями
         if (data.matterOfShortList != "") $("#shortListOfRealtyObjects").append(data.matterOfShortList);
@@ -305,7 +305,7 @@ function init() {
             } else { // Если данные по этому объекту еще не были подгружены на страницу, то обращаемся к серверу
 
                 // Обращаемся к серверу за HTML баллуна, передаем серверу propertyid - идентификатор объекта недвижимости
-                jQuery.post("../getSearchResultHTML.php", {"propertyId":new Array(propertyid), "typeOperation":"FullBalloons"}, function (data) {
+                jQuery.post("../AJAXSearchResultHTML.php", {"propertyId":new Array(propertyid), "typeOperation":"FullBalloons"}, function (data) {
 
                     //TODO: мы можем получить пустой массив data.arrayOfBalloonList, нужно проверять, что возможно обращение к данному элементу, иначе выдавать ошибку запроса в баллуне, чтобы пользователь понял, что ждать нечего
                     balloonHTML = data.arrayOfBalloonList[propertyid];

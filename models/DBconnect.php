@@ -172,6 +172,87 @@ class DBconnect
 		return $res;
 	}
 
+	// Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одному из пользователей. Если ничего не найдено или произошла ошибка, вернет пустой массив
+	// На входе - идентификатор пользователя, либо массив идентификаторов пользователей, по которым нужно получить данные
+	// ВНИМАНИЕ: массивы могут быть расположены не в том же порядке, в каком идентификаторы располагались во входном массиве
+	public static function getAllDataAboutCharacteristicUsers($usersId) {
+
+		// Проверка входящих параметров
+		if (!isset($usersId)) return array();
+		if (is_array($usersId) && count($usersId) == 0) return array();
+
+		// Если нам на вход дали единичный идентификатор, то приведем его к виду массива
+		if (!is_array($usersId)) $usersId = array($usersId);
+
+		// Для надежности преобразование к целому типу членов массива и их проверка
+		for ($i = 0, $s = count($usersId); $i < $s; $i++) {
+			$usersId[$i] = intval($usersId[$i]);
+			if ($usersId[$i] == 0) return array();	// Если преобразование дало 0, значит один из членов массива не является идентификатором объекта недвижимости - входные данные некорректны
+		}
+
+		// Соберем условие для получения данных из БД
+		$strWHERE = " (";
+		for ($i = 0, $s = count($usersId); $i < $s; $i++) {
+			$strWHERE .= " id = '" . $usersId[$i] . "'";
+			if ($i < $s - 1) $strWHERE .= " OR";
+		}
+		$strWHERE .= " )";
+
+		// Получаем данные из БД
+		$res = DBconnect::get()->query("SELECT * FROM users WHERE".$strWHERE);
+		if ((DBconnect::get()->errno)
+			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+		) {
+			// Логируем ошибку
+			//TODO: сделать логирование ошибки
+			return array();
+		}
+
+		// Вернем результат
+		return $res;
+	}
+
+	// Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одному из объектов недвижимости. Если ничего не найдено или произошла ошибка, вернет пустой массив
+	// На входе - идентификатор объекта недвижимости, либо массив идентификаторов объектов недвижимости, по которым нужно получить данные
+	// ВНИМАНИЕ: массивы могут быть расположены не в том же порядке, в каком идентификаторы располагались во входном массиве
+	public static function getAllDataAboutCharacteristicProperties($propertiesId) {
+
+		// Проверка входящих параметров
+		if (!isset($propertiesId)) return array();
+		if (is_array($propertiesId) && count($propertiesId) == 0) return array();
+
+		// Если нам на вход дали единичный идентификатор, то приведем его к виду массива
+		if (!is_array($propertiesId)) $propertiesId = array($propertiesId);
+
+		// Для надежности преобразование к целому типу членов массива и их проверка
+		for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
+			$propertiesId[$i] = intval($propertiesId[$i]);
+			if ($propertiesId[$i] == 0) return array();	// Если преобразование дало 0, значит один из членов массива не является идентификатором объекта недвижимости - входные данные некорректны
+		}
+
+		// Соберем условие для получения данных из БД
+		$strWHERE = " (";
+		for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
+			$strWHERE .= " id = '" . $propertiesId[$i] . "'";
+			if ($i < $s - 1) $strWHERE .= " OR";
+		}
+		$strWHERE .= " )";
+
+		// Получаем данные из БД
+		$res = DBconnect::get()->query("SELECT * FROM property WHERE".$strWHERE);
+		if ((DBconnect::get()->errno)
+			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+		) {
+			// Логируем ошибку
+			//TODO: сделать логирование ошибки
+			return array();
+		}
+
+		// Вернем результат
+		return $res;
+	}
+
+
 	// Конструктор не используется (но чтобы его нельзя было вызвать снаружи защищен модификатором private), так как он возвращает объект класса DBconnect, а мне в переменной $connect нужен объект класса mysqli
 	private function __construct() {
 	}

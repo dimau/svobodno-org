@@ -4,13 +4,13 @@
     session_start();
 
     // Подключаем нужные модели и представления
-    include '../models/DBconnect.php';
-    include '../models/GlobFunc.php';
-    include '../models/Logger.php';
-    include '../models/IncomingUser.php';
+    include 'models/DBconnect.php';
+    include 'models/GlobFunc.php';
+    include 'models/Logger.php';
+    include 'models/IncomingUser.php';
 
     // Удалось ли подключиться к БД?
-    if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
+    if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.'); // TODO: Вернуть ошибку
 
     // Инициализируем модель для запросившего страницу пользователя
     $incomingUser = new IncomingUser();
@@ -23,7 +23,7 @@
     $uploader = new qqFileUploader($allowedExtensions, $sizeLimit);
 
     // Call handleUpload() with the name of the folder, relative to PHP's getcwd()
-    $result = $uploader->handleUpload('../uploaded_files/', FALSE);
+    $result = $uploader->handleUpload('uploaded_files/', FALSE);
 
     // Закрываем соединение с БД
     DBconnect::closeConnectToDB();
@@ -376,10 +376,11 @@
             // Сохранение целевой фотографии в формате jpeg в целевой каталог
             if (imagejpeg($foto_dst, $urlForSave, 85)) {
 
-                // Преобразуем $uploadDirectory = '../uploaded_files/' к виду, который нужно сохранить в БД. То есть путь нужно показать относительно корня проекта, а не относительно текущего каталога расположения uploader.php
-                $uploadDirectoryFromCore = substr($uploadDirectory, 3);
+                // Преобразуем $uploadDirectory = 'uploaded_files/' к виду, который нужно сохранить в БД. То есть путь нужно показать относительно корня проекта, а не относительно текущего каталога расположения AJAXuploader.php
+                // После переноса файла в корень проекта в преобразовании отпала необходимость
+				// $uploadDirectoryFromCore = substr($uploadDirectory, 3);
 
-                return array('folder' => $uploadDirectoryFromCore . $subDirectory,
+                return array('folder' => $uploadDirectory . $subDirectory,
                              'ext'    => "jpeg");
 
             } else {
