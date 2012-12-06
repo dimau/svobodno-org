@@ -40,8 +40,7 @@
 
     <ul class="setOfInstructions">
         <li>
-            <a target="_blank"
-               href='adminRequestToView.php?propertyId=<?php echo $requestToView['propertyId'];?>&requestToViewId=<?php echo $requestToView['id'];?>'>подробнее</a>
+            <a target="_blank" href='adminRequestToView.php?propertyId=<?php echo $requestToView['propertyId'];?>&requestToViewId=<?php echo $requestToView['id'];?>'>подробнее</a>
         </li>
     </ul>
 

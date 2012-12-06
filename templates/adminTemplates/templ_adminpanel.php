@@ -164,10 +164,19 @@
             <!-- /end.requestFromOwnerSection -->
 
             <div class="section admin left" id="signUpToViewSection">
-                <div class="headerSection">Запросы на просмотр</div>
+                <div class="headerSection">Заявки на просмотр</div>
                 <ul>
                     <li>
-                        <a href=""></a>
+                        <a target="_blank" href="adminAllRequestsToView.php?action=Новая">Новые заявки</a>
+                    </li>
+                    <li>
+                        <a target="_blank" href="adminAllRequestsToView.php?action=Назначен просмотр">Назначен просмотр</a>
+                    </li>
+                    <li>
+                        <a target="_blank" href="adminAllRequestsToView.php?action=Отложена">Отложенные заявки</a>
+                    </li>
+                    <li>
+                        <a target="_blank" href="adminAllRequestsToView.php?action=Успешный просмотр">Успешные просмотры</a>
                     </li>
                 </ul>
                 <div class="clearBoth"></div>

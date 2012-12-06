@@ -5,8 +5,8 @@
 
 	<div style="margin-left: 40px;">
 		<?php
-		foreach ($allProperties as $property) {
-			if ($property['userId'] == $user['id']) {
+		foreach ($allProperties as $propertyCharacteristic) {
+			if ($propertyCharacteristic['userId'] == $userCharacteristic['id']) {
 				include "templates/adminTemplates/templ_adminPropertyItem.php";
 			}
 		}
@@ -18,7 +18,7 @@
     <div style="margin-left: 40px;">
 		<?php
 		foreach ($allRequestsToView as $requestToView) {
-			if ($requestToView['tenantId'] == $user['id']) {
+			if ($requestToView['tenantId'] == $userCharacteristic['id']) {
 				include "templates/adminTemplates/templ_adminRequestToViewItem.php";
 			}
 		}

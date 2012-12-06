@@ -38,6 +38,11 @@
                 return FALSE;
             }
 
+			// Преобразуем данные для нормального отображения (по аналогии с приведением данных к нормальному виду в классе Property - writeCharacteristicFromDB)
+			for ($i = 0, $s = count($res); $i < $s; $i++) {
+				$res[$i]['earliestDate'] = GlobFunc::dateFromDBToView($res[$i]['earliestDate']);
+			}
+
             // Записываем результат в переменную объекта
             $this->allPropertiesCharacteristic = $res;
 

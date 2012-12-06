@@ -67,6 +67,11 @@
             $date = substr($dateFromDB, 8, 2);
             $month = substr($dateFromDB, 5, 2);
             $year = substr($dateFromDB, 0, 4);
+
+			// Валидация чисел
+			if ($date < "01" || $date > "31" || $month < "01" || $month > "12" || $year < "1800" || $year > "2100") return "";
+
+			// Если все хорошо - возвращаем нормальную дату для сохранения в БД
             return $date . "." . $month . "." . $year;
         }
 
@@ -78,6 +83,11 @@
             $date = substr($dateFromView, 0, 2);
             $month = substr($dateFromView, 3, 2);
             $year = substr($dateFromView, 6, 4);
+
+			// Валидация чисел
+			if ($date < "01" || $date > "31" || $month < "01" || $month > "12" || $year < "1800" || $year > "2100") return "0000-00-00";
+
+			// Если все хорошо - возвращаем нормальную дату для сохранения в БД
             return $year . "." . $month . "." . $date;
         }
 

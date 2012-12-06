@@ -70,7 +70,7 @@
         </div>
 
         <ul id="allUsers">
-			<?php foreach ($allUsers as $user): ?>
+			<?php foreach ($allUsers as $userCharacteristic): ?>
             <li>
 				<?php
 				// Возвращает HTML для блока с описанием 1 пользователя
@@ -99,6 +99,7 @@
 
 <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
 <script src="js/main.js"></script>
+<script src="js/admin.js"></script>
 <!-- end scripts -->
 
 <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.

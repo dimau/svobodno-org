@@ -43,11 +43,11 @@
             font-size: 1em;
         }
 
-		/* Используется для выделения описания той заявки на просмотр, что интересует админа */
-		.highlightedBlock {
-			padding: 5px;
-			border: 2px solid red;
-		}
+            /* Используется для выделения описания той заявки на просмотр, что интересует админа */
+        .highlightedBlock {
+            padding: 5px;
+            border: 2px solid red;
+        }
 
     </style>
 
@@ -66,37 +66,14 @@
 <div class="page_without_footer">
     <div class="page_main_content">
         <div class="headerOfPage">
-            Панель администратора -> Заявка на просмотр
+            Панель администратора -> Все заявки на просмотр со статусом "<?php echo $action;?>"
         </div>
 
         <div class="simpleBlockForAnyContent">
-
-            <div style="float: left; width: 49%;">
-				<?php
-				// Шаблон для сведений о собственнике
-				include "templates/adminTemplates/templ_adminUserItem.php";
-				?>
-            </div>
-
-            <div style="float: right; width: 49%;">
-				<?php
-				// Шаблон для сведений об объекте недвижимости
-				include "templates/adminTemplates/templ_adminPropertyItem.php";
-				?>
-            </div>
-
-            <div class="clearBoth"></div>
+			<?php foreach ($allRequestsToView as $requestToView): ?>
+			<?php include "templates/adminTemplates/templ_adminRequestToViewDetailedItem.php"; ?>
             <hr>
-
-            <div style="margin-left: 40px;">
-				<?php foreach ($allRequestsToView as $requestToView): ?>
-					<div class="<?php if ($requestToView['id'] == $requestToViewId) echo "highlightedBlock";?>">
-						<?php include "templates/adminTemplates/templ_adminRequestToViewDetailedItem.php";?>
-					</div>
-                	<hr>
-				<?php endforeach; ?>
-            </div>
-
+			<?php endforeach; ?>
         </div>
 
     </div>

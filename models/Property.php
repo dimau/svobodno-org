@@ -90,7 +90,6 @@ class Property
 
 		// Если конструктору передан идентификатор объекта недвижимости, запишем его в параметры объекта. Это позволит, например, инициализировать объект данными из БД
 		if ($propertyId != FALSE) $this->id = $propertyId;
-
 	}
 
 	// ДЕСТРУКТОР
@@ -1328,6 +1327,43 @@ class Property
 		});
 
 		return $appliances;
+	}
+
+	/**
+	 * Устанавливает или меняет ближайшую дату просмотра у данного объекта.
+	 * Но метод не сохраняет данные в БД - для этого нужно вызвать $this->saveCharacteristicToDB
+	 *
+	 * @param $earliestDate - новая дата просмотра в формате: 27.01.1987
+	 * @param $earliestTimeHours - новый час просмотра в 24-х часовом формате
+	 * @param $earliestTimeMinutes - новые минуты просмотра (от 0 до 59)
+	 * @return bool - возвращает TRUE в случае успеха и FALSE в случае, если дата просмотра в БД не была изменена по каким-либо причинам
+	 */
+	public function changeEarliestDate($earliestDate, $earliestTimeHours, $earliestTimeMinutes) {
+
+		// Валидация наличия входящих данных
+		if (!isset($earliestDate) OR
+			!isset($earliestTimeHours) OR
+			!isset($earliestTimeMinutes))
+		{ return FALSE;}
+
+		// Преобразование входящих данных
+		$earliestDate = GlobFunc::dateFromDBToView(GlobFunc::dateFromViewToDB($earliestDate)); // Такое преобразование позволяет убедиться в том, что дата по формату соответствует всем критериям
+
+		// Валидация достоверности входящих данных
+		if ($earliestDate == "0000-00-00" OR
+			$earliestDate == "" OR
+			$earliestTimeHours < "00" OR
+			$earliestTimeHours > "23" OR
+			$earliestTimeMinutes < "00" OR
+			$earliestTimeMinutes > "59")
+		{return FALSE;}
+
+		// Изменим параметры даты и времени ближайшего просмотра
+		$this->earliestDate = $earliestDate;
+		$this->earliestTimeHours = $earliestTimeHours;
+		$this->earliestTimeMinutes = $earliestTimeMinutes;
+
+		return TRUE;
 	}
 
 }
