@@ -178,6 +178,12 @@
                     <li>
                         <a target="_blank" href="adminAllRequestsToView.php?action=Успешный просмотр">Успешные просмотры</a>
                     </li>
+                    <li>
+                        <a target="_blank" href="adminAllProperties.php?action=allWithEarliestDate" style="font-weight: bold;">Ближайшие просмотры</a>
+                    </li>
+                    <li>
+                        <a target="_blank" href="adminAllProperties.php?action=allRemovedWithRequestsToView" style="font-weight: bold;">Недозакрытые объявления</a>
+                    </li>
                 </ul>
                 <div class="clearBoth"></div>
             </div>

@@ -84,7 +84,7 @@ function addToFavorites() {
     var propertyId = 0;
     propertyId = $(self).attr('propertyId');
 
-    jQuery.post("AJAXchangeFavorites.php", {"propertyId": propertyId, "action": "addToFavorites"}, function (data) {
+    jQuery.post("AJAXChangeFavorites.php", {"propertyId": propertyId, "action": "addToFavorites"}, function (data) {
         $(data).find("span[status='successful']").each(function () {
             // Изменяем соответствующим образом вид команды
             $("span.addToFavorites[propertyId='" + propertyId + "']").removeClass("addToFavorites").addClass("removeFromFavorites");
@@ -106,7 +106,7 @@ function removeFromFavorites() {
     var propertyId = 0;
     propertyId = $(self).attr('propertyId');
 
-    jQuery.post("AJAXchangeFavorites.php", {"propertyId": propertyId, "action": "removeFromFavorites"}, function (data) {
+    jQuery.post("AJAXChangeFavorites.php", {"propertyId": propertyId, "action": "removeFromFavorites"}, function (data) {
         $(data).find("span[status='successful']").each(function () {
             // Изменяем соответствующим образом вид команды
             $("span.removeFromFavorites[propertyId='" + propertyId + "']").removeClass("removeFromFavorites").addClass("addToFavorites");
@@ -160,8 +160,8 @@ $(document).ready(function () {
 function createUploader() {
     var uploader = new qq.FileUploader({
         element: document.getElementById('file-uploader'),
-        action: '../AJAXuploader.php',
-        allowedExtensions: ["jpeg", "JPEG", "jpg", "JPG", "png", "PNG", "gif", "GIF"], // Также расширения нужно менять в файле AJAXuploader.php
+        action: '../AJAXUploader.php',
+        allowedExtensions: ["jpeg", "JPEG", "jpg", "JPG", "png", "PNG", "gif", "GIF"], // Также расширения нужно менять в файле AJAXUploader.php
         sizeLimit: 25 * 1024 * 1024,
         debug: false,
         // О каждом загруженном файле информацию передаем на сервер через переменные - для сохранения в БД
@@ -174,7 +174,7 @@ function createUploader() {
         //extraDropzones: [qq.getByClass(document, 'qq-upload-extra-drop-area')[0]]
     });
 
-    // Важно, что в конце файла AJAXuploader.php располагается функция handleUpload, в которой есть и мой код, работающий на сервере при получении файла
+    // Важно, что в конце файла AJAXUploader.php располагается функция handleUpload, в которой есть и мой код, работающий на сервере при получении файла
 
     // Сформируем зеленые блоки для уже загруженных фотографий руками, чтобы пользователя не путать
     createUploadedFilesBlocks(uploader);

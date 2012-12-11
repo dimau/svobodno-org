@@ -1,5 +1,5 @@
 <?php
-/* Страница администратора для отображения данных о всем множестве заявок на просмотр, сгруппированных по статусу, либо иному признаку */
+/* Страница администратора для отображения данных о всем множестве объектов недвижимости, выделенных по некоторому признаку, например, все объекты, у которых назначен показ */
 
 // Стартуем сессию с пользователем - сделать доступными переменные сессии
 session_start();
@@ -9,6 +9,7 @@ include 'models/DBconnect.php';
 include 'models/GlobFunc.php';
 include 'models/Logger.php';
 include 'models/IncomingUser.php';
+include 'models/CollectionProperty.php';
 include 'views/View.php';
 
 // Удалось ли подключиться к БД?
@@ -47,50 +48,39 @@ $action = "";
 if (isset($_GET['action'])) $action = htmlspecialchars($_GET['action'], ENT_QUOTES);
 
 /********************************************************************************
- * ВСЕ ЗАЯВКИ НА ПРОСМОТР СО СТАТУСОМ = $action
+ * ИНИЦИАЛИЗИРУЕМ МОДЕЛЬ ДЛЯ КОЛЛЕКЦИИ ОБЪЕКТОВ НЕДВИЖИМОСТИ
  *******************************************************************************/
 
-$allRequestsToView = DBconnect::selectRequestsToViewForStatus($action);
+$collectionProperty = new CollectionProperty();
 
 /********************************************************************************
- * ПОЛУЧИМ СВЕДЕНИЯ ОБ АРЕНДАТОРАХ, ПОДАВШИХ НАЙДЕННЫЕ ЗАЯВКИ
+ * ВСЕ ОБЪЕКТЫ НЕДВИЖИМОСТИ, ПО КОТОРЫМ НАЗНАЧЕН ПРОСМОТР (в порядке возрастания даты/времени показа)
  *******************************************************************************/
 
-// Выделим идентификаторы всех арендаторов, отправивших заявки на просмотр
-$allTenants = array();
-foreach ($allRequestsToView as $value) {
-	$allTenants[] = $value['tenantId'];
-}
-
-// Получим полные данные по всем этим арендаторам
-$allTenants = DBconnect::getAllDataAboutCharacteristicUsers($allTenants);
-
-// Дополним сведения о заявках на просмотр недостающими данными об их отправителях
-for ($i = 0, $s = count($allRequestsToView); $i < $s; $i++) {
-	foreach ($allTenants as $value) {
-		if ($allRequestsToView[$i]['tenantId'] == $value['id']) {
-			$allRequestsToView[$i]['name'] = $value['name'];
-			$allRequestsToView[$i]['secondName'] = $value['secondName'];
-			$allRequestsToView[$i]['surname'] = $value['surname'];
-			break;
-		}
-	}
+if ($action == "allWithEarliestDate") {
+	$collectionProperty->buildAllWithEarliestDate();
+	$strHeaderOfPage = "Все объекты с назначенной датой просмотра";
 }
 
 /********************************************************************************
- * ПОЛУЧИМ СВЕДЕНИЯ ОБ ОБЪЕКТАХ, НА ПРОСОМОТР КОТОРЫХ НАЦЕЛЕНЫ НАЙДЕННЫЕ ЗАЯВКИ
+ * ВСЕ СНЯТЫЕ С ПУБЛИКАЦИИ ОБЪЕКТЫ НЕДВИЖИМОСТИ, ПО КОТОРЫМ ЕСТЬ ЗАЯВКИ НА ПРОСМОТР (статус = Назначен просмотр)
  *******************************************************************************/
+
+if ($action == "allRemovedWithRequestsToView") {
+	$collectionProperty->buildAllUnpublishedWithRequestToView();
+	$strHeaderOfPage = "Снятые с публикации объекты, по которым остались активные заявки на просмотр";
+}
 
 /********************************************************************************
  * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
  *******************************************************************************/
 
 // Инициализируем используемые в шаблоне(ах) переменные
-//$allRequestsToView	массив, каждый элемент которого представляет собой еще один массив параметров конкретной заявки на просмотр
-//$action	статус заявок на просмотр, выборку которых производим
+$allPropertiesCharacteristic = $collectionProperty->getAllPropertiesCharacteristic();
+//$strHeaderOfPage
 
 // Подсоединяем нужный основной шаблон
-include "templates/" . "adminTemplates/templ_adminAllRequestsToView.php";
+include "templates/" . "adminTemplates/templ_adminAllProperties.php";
 
 /********************************************************************************
  * Закрываем соединение с БД

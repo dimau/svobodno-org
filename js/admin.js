@@ -1,38 +1,39 @@
 /* JS сценарии, используемые на страницах админки */
 $(document).ready(function () {
 
+    /*** Работа с статусом заявки на просмотр ***/
     // Обработчик клика по статусу запроса на просмотр
     $(".statusAnchor").on('click', startEditStatusOfRequestToView);
-
-    // Обработчик клика по ссылке для изменения удобного времени просмотра арендатора
-    $(".tenantTimeAnchor").on('click', startEditTenantTimeOfRequestToView);
-
-    // Обработчик клика по ссылке для изменения комментария арендатора
-    $(".tenantCommentAnchor").on('click', startEditTenantCommentOfRequestToView);
-
-    // Обработчик клика по ссылке для изменения ближайшей даты и времени просмотра
-    $(".earliestDateAnchor").on('click', startEditEarliestDate);
-
     // Обработчик выбора нового статуса в селекте
     $(".statusSelect").on('change', changeStatusOfRequestToView);
 
+    /*** Работа с удобным временем просмотра для арендатора ***/
+    // Обработчик клика по ссылке для изменения удобного времени просмотра арендатора
+    $(".tenantTimeAnchor").on('click', startEditTenantTimeOfRequestToView);
     // Обработчик клика по кнопка сохранения удобного времени просмотра арендатора
     $(".tenantTimeSaveButton").on('click', changeTenantTimeOfRequestToView);
-
-    // Обработчик клика по кнопка сохранения комментария арендатора
-    $(".tenantCommentSaveButton").on('click', changeTenantCommentOfRequestToView);
-
-    // Обработчик клика по кнопка сохранения измененной даты и времени ближайшего просмотра
-    $(".earliestDateSaveButton").on('click', changeEarliestDate);
-
     // Обработчик клика по кнопка отмены изменения удобного времени просмотра арендатора
     $(".tenantTimeCancelButton").on('click', cancelEditTenantTimeOfRequestToView);
 
+    /*** Работа с комментарием к заявке на просмотр от арендатора ***/
+    // Обработчик клика по ссылке для изменения комментария арендатора
+    $(".tenantCommentAnchor").on('click', startEditTenantCommentOfRequestToView);
+    // Обработчик клика по кнопка сохранения комментария арендатора
+    $(".tenantCommentSaveButton").on('click', changeTenantCommentOfRequestToView);
     // Обработчик клика по кнопка отмены изменения комментария арендатора
     $(".tenantCommentCancelButton").on('click', cancelEditTenantCommentOfRequestToView);
 
+    /*** Работа с ближайшей датой просмотра объекта ***/
+    // Обработчик клика по ссылке для изменения ближайшей даты и времени просмотра
+    $(".earliestDateAnchor").on('click', startEditEarliestDate);
+    // Обработчик клика по кнопка сохранения измененной даты и времени ближайшего просмотра
+    $(".earliestDateSaveButton").on('click', changeEarliestDate);
     // Обработчик клика по кнопка отмены изменения ближайшей даты и времени просмотра
     $(".earliestDateCancelButton").on('click', cancelEditEarliestDate);
+
+    /*** Снятие с просмотра объявления (перенос в архивную базу для чужих) ***/
+    //$(".unpublishAdvert").on('click', unpublishAdvert);
+
 
     // Показывает форму редактирования для статуса запроса на просмотр
     // В качестве this - элемент управления активирующий форму редактирования
@@ -247,4 +248,30 @@ $(document).ready(function () {
         // Скрываем блок для редактирования комментария арендатора
         $(".earliestDateEditBlock", propertyBlock).css('display', 'none');
     }
+
+    // Отправляет и обрабатывает ответ AJAX запроса для снятия объекта с публикации (его переноса в архивную БД для чужих объявлений)
+    // В качестве this - элемент управления по событию которого и выполняется действие
+    /*function unpublishAdvert() {
+
+        // Получим головной элемент описания данного объекта недвижимости (класса propertyBlock)
+        var propertyBlock = $(this).closest(".propertyBlock");
+
+        // Получим id объекта недвижимости
+        var propertyId = propertyBlock.attr('propertyId');
+
+        // Непосредственная работа с AJAX запросом
+        jQuery.post("AJAXChangePropertyData.php", {"propertyId": propertyId, "action": "unpublishAdvert"}, function (data) {
+            $(data).find("span[status='successful']").each(function () {
+                // Изменяем соответствующим образом текст даты ближайшего просмотра и его видимость
+                $(".unpublishAdvert", propertyBlock).html(earliestDate);
+                $(".earliestTimeHoursText", propertyBlock).html(earliestTimeHours);
+                $(".earliestTimeMinutesText", propertyBlock).html(earliestTimeMinutes);
+                $(".earliestDateFullText", propertyBlock).css('display', '');
+                $(".earliestDateEditBlock", propertyBlock).css('display', 'none');
+            });
+            $(data).find("span[status='denied']").each(function () {
+                /* Если вдруг нужно будет что-то выдавать при получении отказа в добавлении в избранное, то закодить здесь */
+    /*        });
+        }, "xml");
+    }*/
 });

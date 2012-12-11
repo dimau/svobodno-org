@@ -711,10 +711,10 @@
                 $arrMyAdvertReplace['instructionPublish'] = "";
                 $arrMyAdvertReplace['propertyId'] = "";
                 if ($allPropertiesCharacteristic[$i]['status'] == "опубликовано") {
-                    $arrMyAdvertReplace['instructionPublish'] = "<li><a href='personal.php?compId=".GlobFunc::idToCompId($allPropertiesCharacteristic[$i]['userId'])."&propertyId=" . $allPropertiesCharacteristic[$i]['id'] . "&action=publicationOff'>снять с публикации</a></li>";
+                    $arrMyAdvertReplace['instructionPublish'] = "<li><a href='personal.php?compId=".GlobFunc::idToCompId($allPropertiesCharacteristic[$i]['userId'])."&propertyId=" . $allPropertiesCharacteristic[$i]['id'] . "&action=unpublishAdvert'>снять с публикации</a></li>";
                 }
                 if ($allPropertiesCharacteristic[$i]['status'] == "не опубликовано") {
-                    $arrMyAdvertReplace['instructionPublish'] = "<li><a href='personal.php?compId=".GlobFunc::idToCompId($allPropertiesCharacteristic[$i]['userId'])."&propertyId=" . $allPropertiesCharacteristic[$i]['id'] . "&action=publicationOn'>опубликовать</a></li>";
+                    $arrMyAdvertReplace['instructionPublish'] = "<li><a href='personal.php?compId=".GlobFunc::idToCompId($allPropertiesCharacteristic[$i]['userId'])."&propertyId=" . $allPropertiesCharacteristic[$i]['id'] . "&action=publishAdvert'>опубликовать</a></li>";
                 }
                 $arrMyAdvertReplace['propertyId'] = $allPropertiesCharacteristic[$i]['id'];
 
@@ -1069,7 +1069,7 @@
                             <a href='#'>удалить</a>
                         </li>
                         <li>
-                            <a href='objdescription.php?propertyId={propertyId}' target='_blank'>подробнее</a>
+                            <a href='property.php?propertyId={propertyId}' target='_blank'>подробнее</a>
                         </li>
                     </ul>
                     <ul class='listDescriptionSmall'>
@@ -1206,7 +1206,7 @@
                             <a href='#'>удалить</a>
                         </li>
                         <li>
-                            <a href='objdescription.php?propertyId={propertyId}' target='_blank'>подробнее</a>
+                            <a href='property.php?propertyId={propertyId}' target='_blank'>подробнее</a>
                         </li>
                     </ul>
                     <ul class='listDescriptionSmall'>

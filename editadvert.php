@@ -97,7 +97,7 @@ if ($action == "saveAdvert") {
 			if ($correctSaveFotoInformationToDB) {
 
 				// Пересылаем пользователя на страницу с подробным описанием его объявления - хороший способ убедиться в том, что все данные указаны верно
-				header('Location: objdescription.php?propertyId=' . $property->id);
+				header('Location: property.php?propertyId=' . $property->id);
 				exit();
 
 			} else {

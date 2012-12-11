@@ -14,9 +14,7 @@
         public function __construct() {}
 
         // ДЕСТРУКТОР
-        public function __destruct() {
-
-        }
+        public function __destruct() {}
 
         // Метод создает коллекцию объектов по id собственника
         // Возвращает количество созданных объектов, либо FALSE в случае ошибки
@@ -67,7 +65,7 @@
                 }
 
                 // Получаем список id заинтересовавшихся арендаторов (кроме id заинтересовавшегося арендатора в массив попадает вся информация по каждому запросу на просмотр)
-				$allRequestToViewProperty = DBconnect::getAllRequestToViewForProperties($this->allPropertiesCharacteristic[$i]['id']);
+				$allRequestToViewProperty = DBconnect::selectRequestsToViewForProperties($this->allPropertiesCharacteristic[$i]['id']);
                // Получаем имена и отчества заинтересовавшихся арендаторов
                // Составляем условие запроса к БД, указывая интересующие нас id объявлений
                $selectValue = "";
@@ -93,6 +91,76 @@
             // Возвращаем количество успешно созданных объектов
             return count($this->allPropertiesCharacteristic);
         }
+
+		// Метод создает коллекцию всех объектов, у которых установлена дата ближайшего просмотра
+		// Возвращает количество созданных объектов, либо FALSE в случае ошибки
+		public function buildAllWithEarliestDate() {
+			// Получаем данные
+			$stmt = DBconnect::get()->stmt_init();
+			if (($stmt->prepare("SELECT id, typeOfObject, address, apartmentNumber, completeness, status, earliestDate, earliestTimeHours, earliestTimeMinutes, adminComment FROM property WHERE earliestDate != '0000-00-00' ORDER BY earliestDate ASC, earliestTimeHours ASC, earliestTimeMinutes ASC") === FALSE)
+				OR ($stmt->execute() === FALSE)
+				OR (($res = $stmt->get_result()) === FALSE)
+				OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+				OR ($stmt->close() === FALSE)
+			) {
+				// TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+				return FALSE;
+			}
+
+			// Преобразуем данные для нормального отображения (по аналогии с приведением данных к нормальному виду в классе Property - writeCharacteristicFromDB)
+			for ($i = 0, $s = count($res); $i < $s; $i++) {
+				$res[$i]['earliestDate'] = GlobFunc::dateFromDBToView($res[$i]['earliestDate']);
+			}
+
+			// Записываем результат в переменную объекта
+			$this->allPropertiesCharacteristic = $res;
+
+			// Возвращаем количество успешно созданных объектов
+			return count($this->allPropertiesCharacteristic);
+		}
+
+		// Метод создает коллекцию всех объектов, снятых с публикации, но по которым остались заявки на просмотр со статусом = Новая, Назначен просмотр или Отложена (то есть нужно сообщить арендаторам о том, что объект сдан/снят с публикации)
+		public function buildAllUnpublishedWithRequestToView() {
+
+			// Получим данные по всем заявкам на просмотр со статусом "Назначен просмотр"
+			$allRequestToView = DBconnect::selectRequestsToViewForStatus("Новая");
+			$allRequestToView = array_merge($allRequestToView, DBconnect::selectRequestsToViewForStatus("Назначен просмотр"));
+			$allRequestToView = array_merge($allRequestToView, DBconnect::selectRequestsToViewForStatus("Отложена"));
+
+			// Выделим id объектов недвижимости из всех полученных заявок
+			$allPropertiesId = array();
+			foreach ($allRequestToView as $value) {
+				$allPropertiesId[] = $value['propertyId'];
+			}
+			$allPropertiesId = array_unique($allPropertiesId);
+
+			// Составляем строку запроса
+			$strWHERE = "";
+			foreach ($allPropertiesId as $value) {
+				if ($strWHERE != "") $strWHERE .= " OR id = " . $value; else $strWHERE .= " id = " . $value;
+			}
+
+			// Получаем данные
+			$res = DBconnect::get()->query("SELECT id, typeOfObject, address, apartmentNumber, status, earliestDate, earliestTimeHours, earliestTimeMinutes, adminComment, completeness FROM property WHERE status = 'не опубликовано' AND (".$strWHERE.")");
+			if ((DBconnect::get()->errno)
+				OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+			) {
+				// Логируем ошибку
+				//TODO: сделать логирование ошибки
+				return FALSE;
+			}
+
+			// Преобразуем данные для нормального отображения (по аналогии с приведением данных к нормальному виду в классе Property - writeCharacteristicFromDB)
+			for ($i = 0, $s = count($res); $i < $s; $i++) {
+				$res[$i]['earliestDate'] = GlobFunc::dateFromDBToView($res[$i]['earliestDate']);
+			}
+
+			// Записываем результат в переменную объекта
+			$this->allPropertiesCharacteristic = $res;
+
+			// Возвращаем количество успешно созданных объектов
+			return count($this->allPropertiesCharacteristic);
+		}
 
         // Возвращем allPropertiesCharacteristic
         public function getAllPropertiesCharacteristic() {
@@ -123,9 +191,23 @@
         // Функция присваивает статус опубликовано объекту с id = $propertyId
         // Если все сделать удалось, возвращает TRUE, иначе FALSE
         public function setPublicationStatus($newStatus, $propertyId) {
+			/**
+			 * Алгоритм работы следующий
+			 *
+			 * Если статус объекта меняется на "опубликован", то:
+			 *
+			 *
+			 * Если статус объекта меняется на "не опубликован", то:
+			 * 	1. Изменить статус объекта на "не опубликован" в БД
+			 * 	2. Очистить дату и время ближайшего показа в БД
+			 * 	3. Если есть заявки на его просмотр со статусом (Новая, Назначен просмотр, Отложена), то сообщить о них оператору - необходимо вручную изменить статус, предварительно созвонившись с арендаторами
+			 * 	4. Удалить все уведомления (типа Новый подходящий объект)
+			 * 	5. Очистить дату въезда и выезда у объекта
+			 *
+			 */
 
-            // Проверяем: имеет ли данный пользователь право на выполнение изменения статуса объявления
-            if (!$this->hasPropertyId($propertyId)) return FALSE;
+			// Проверяем: имеет ли данный пользователь право на выполнение изменения статуса объявления
+			if (!$this->hasPropertyId($propertyId)) return FALSE;
 
             // Какой статус присвоим объявлению
             if ($newStatus == "опубликовано") {

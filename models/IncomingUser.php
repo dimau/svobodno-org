@@ -266,7 +266,7 @@
 			}
 
 			// Получим все заявки на просмотр для этих объектов недвижимости
-			$allRequestToView = DBconnect::getAllRequestToViewForProperties($propertiesId);
+			$allRequestToView = DBconnect::selectRequestsToViewForProperties($propertiesId);
 
             // Перебираем массив, полученный из БД и собираем все id арендаторов, отправивших заявки на просмотр, в одномерный массив - без повторов
             $tenantsId = array();

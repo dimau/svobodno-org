@@ -9,6 +9,7 @@ include 'models/Logger.php';
 include 'models/IncomingUser.php';
 include 'views/View.php';
 include 'models/User.php';
+include 'models/Property.php';
 include 'models/CollectionProperty.php';
 
 // Удалось ли подключиться к БД?
@@ -63,13 +64,7 @@ $user = new User($userId);
 $user->writeCharacteristicFromDB();
 
 // Данные поискового запроса
-if ($action == 'deleteSearchRequest') {
-	// Если пользователь пожелал удалить поисковый запрос, то это нужно сделать вместо получения данных из БД
-	$user->removeSearchRequest();
-} else {
-	// Иначе получим данные из БД по поисковому запросу данного пользователя в параметры объекта $user
-	$user->writeSearchRequestFromDB();
-}
+$user->writeSearchRequestFromDB();
 
 // Информация о фотографиях пользователя. Метод вызывается во всех случаях, кроме того, когда пользователь отредактировал свои личные параметры и нажал на кнопку "Сохранить"
 if ($action != "saveProfileParameters") $user->writeFotoInformationFromDB();
@@ -131,11 +126,19 @@ if ($action == "saveProfileParameters") {
  * ПУБЛИКАЦИЯ ОБЪЯВЛЕНИЯ. Если пользователь отправил команду на публикацию одного из своих объявлений
  *******************************************************************************/
 
-if ($action == "publicationOn" && $propertyId != "" && $propertyId != 0) {
+if ($action == "publishAdvert" && $propertyId != "" && $propertyId != 0) {
 
 	// Проверяем: имеет ли данный пользователь право на выполнение изменения статуса объявления
 	if ($collectionProperty->hasPropertyId($propertyId)) {
-		$collectionProperty->setPublicationStatus("опубликовано", $propertyId);
+
+		// Создаем специльный объект для работы с данным объявлением
+		$property = new Property($propertyId);
+		if ($property->writeCharacteristicFromDB()) {
+			$property->publishAdvert();
+		}
+
+		// Переинициализируем коллекцию объектов недвижимости данного пользователя
+		$collectionProperty->buildFromOwnerId($user->getId());
 	}
 
 	// По умолчанию откроем вкладку 3 (Мои объявления)
@@ -146,11 +149,19 @@ if ($action == "publicationOn" && $propertyId != "" && $propertyId != 0) {
  * СНЯТИЕ С ПУБЛИКАЦИИ ОБЪЯВЛЕНИЯ. Если пользователь отправил команду на снятие с публикации одного из своих объявлений
  *******************************************************************************/
 
-if ($action == "publicationOff" && $propertyId != "" && $propertyId != 0) {
+if ($action == "unpublishAdvert" && $propertyId != "" && $propertyId != 0) {
 
 	// Проверяем: имеет ли данный пользователь право на выполнение изменения статуса объявления
 	if ($collectionProperty->hasPropertyId($propertyId)) {
-		$collectionProperty->setPublicationStatus("не опубликовано", $propertyId);
+
+		// Создаем специльный объект для работы с данным объявлением
+		$property = new Property($propertyId);
+		if ($property->writeCharacteristicFromDB()) {
+			$property->unpublishAdvert();
+		}
+
+		// Переинициализируем коллекцию объектов недвижимости данного пользователя
+		$collectionProperty->buildFromOwnerId($user->getId());
 	}
 
 	// По умолчанию откроем вкладку 3 (Мои объявления)
@@ -181,6 +192,14 @@ if ($action == "saveSearchParameters") {
 }
 
 /********************************************************************************
+ * УДАЛЕНИЕ УСЛОВИЙ ПОИСКА
+ *******************************************************************************/
+
+if ($action == 'deleteSearchRequest') {
+	$user->removeSearchRequest();
+}
+
+/********************************************************************************
  * ЗАПРОС НА СОЗДАНИЕ УСЛОВИЙ ПОИСКА. Если пользователь нажал на кнопку Формирования нового поискового запроса
  *******************************************************************************/
 
@@ -196,6 +215,10 @@ if ($action == "createSearchRequest") {
 
 /***************************************************************************************************************
  * ИЗБРАННОЕ. Получаем данные по каждому избранному объявлению из БД (это позволит наполнить вкладку tabs-5)
+ *
+ * Объявления, добавленные в избранное пропадают автоматически из списка после того, как объявление становится неопубликованным или удаляется
+ * Но если это же объявление будет опубликовано вновь, то в списке избранного опять оно же у пользователей арендаторов появится.
+ * это позволяет арендатору, который вновь стал искать недвижимость сразу в избранном увидеть те объекты, которые ему когда-то нравились и в данный момент сдаются. Скорее всего, ему один из этих объектов и может подойти
  **************************************************************************************************************/
 
 $incomingUser->searchProperties(20);
@@ -206,7 +229,6 @@ $incomingUser->searchProperties(20);
 
 // Инициализируем используемые в шаблоне(ах) переменные
 $isLoggedIn = $incomingUser->login(); // Используется в templ_header.php (при просмотре страницы админом, показывает его статус, а не того пользователя, чьи данные он смотрит)
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя (при просмотре админом - показывает количество непросмотренных уведомлений админа)
 $userCharacteristic = $user->getCharacteristicData();
 $userFotoInformation = $user->getFotoInformationData();
 $userSearchRequest = $user->getSearchRequestData();
@@ -218,6 +240,7 @@ $propertyFullArr = $incomingUser->getPropertyFullArr();
 $favoritesPropertysId = $incomingUser->getFavoritesPropertysId();
 $mode = "personal"; // Режим в котором будут работать ряд шаблонов: анкеты пользователя на вкладке №1 (templ_notEditedProfile.php), шаблон для редактирования поискового запроса (templ_editableSearchRequest.php)
 $messagesArr = $user->getAllMessagesSorted(); // массив массивов, каждый из которых представляет инфу по 1-ому уведомлению пользователя
+$amountUnreadMessages = count($messagesArr); // В отличие от других страниц в Личном кабинете мы можем использовать для подсчета гарантированно точный способ - реально пересчитать количество уведомлений, которые будут выдаваться на странице. Количество непрочитанных уведомлений пользователя (при просмотре админом - показывает количество непросмотренных уведомлений админа)
 $compId = GlobFunc::idToCompId($userId);
 //$errors
 //$correctNewSearchRequest

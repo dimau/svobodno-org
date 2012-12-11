@@ -26,7 +26,7 @@
     </ul>
     <div class='clearBoth'></div>
     <div style='width:100%;'>
-        <a href='objdescription.php?propertyId={propertyId}' target='_blank'>подробнее</a>
+        <a href='property.php?propertyId={propertyId}' target='_blank'>подробнее</a>
         <div style='float: right;'>
             {favorites}
         </div>

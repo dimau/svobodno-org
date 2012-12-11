@@ -119,7 +119,7 @@ $strHeaderOfPage = GlobFunc::getFirstCharUpper($property->typeOfObject) . " по
 //$errors
 
 // Подсоединяем нужный основной шаблон
-include "templates/"."templ_objdescription.php";
+include "templates/"."templ_property.php";
 
 /********************************************************************************
  * Закрываем соединение с БД

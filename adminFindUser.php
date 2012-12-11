@@ -138,7 +138,7 @@ if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondNa
 	// Получим информацию по объектам недвижимости, которые принадлежат найденным пользователям
 	// В итоге получим массив ($allProperties), каждый элемент которого представляет собой еще один массив параметров конкретного объекта недвижимости, принадлежащего одному из найденных выше пользователей
 	if ($strWHERE != "") {
-		$res = DBconnect::get()->query("SELECT id, userId, typeOfObject, address, apartmentNumber, earliestDate, earliestTimeHours, earliestTimeMinutes, adminComment, completeness FROM property WHERE".$strWHERE);
+		$res = DBconnect::get()->query("SELECT id, userId, typeOfObject, address, apartmentNumber, status, earliestDate, earliestTimeHours, earliestTimeMinutes, adminComment, completeness FROM property WHERE".$strWHERE);
 		if ((DBconnect::get()->errno)
 			OR (($allProperties = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
 		) {
@@ -184,7 +184,7 @@ if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondNa
 	// Количество результатов ограничено первыми 40-ка, чтобы не перегружать БД
 	// В итоге получим массив ($allProperties), каждый элемент которого представляет собой еще один массив параметров конкретного объекта недвижимости
 	if ($strWHERE != "") {
-		$res = DBconnect::get()->query("SELECT id, userId, typeOfObject, address, apartmentNumber, earliestDate, earliestTimeHours, earliestTimeMinutes, adminComment, completeness FROM property WHERE".$strWHERE." LIMIT 40");
+		$res = DBconnect::get()->query("SELECT id, userId, typeOfObject, address, apartmentNumber, status, earliestDate, earliestTimeHours, earliestTimeMinutes, adminComment, completeness FROM property WHERE".$strWHERE." LIMIT 40");
 		if ((DBconnect::get()->errno)
 			OR (($allProperties = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
 		) {

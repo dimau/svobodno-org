@@ -1,5 +1,13 @@
 <?php
-/* Класс представляем собой полную модель объекта недвижимости (объявления) */
+/**
+ * Класс представляем собой полную модель объекта недвижимости (объявления)
+ *
+ * Схема работы с объектами класса:
+ * 1. Инициализация (в качестве параметра конструктору можно передать id объекта). При этом параметры объекта устанавливаются по умолчанию (пустые значения)
+ * 2. Записать в параметры объекта нужные данные. С помощью методов write записать в параметры объекта данные из БД или POST
+ * 3. Выполнить манипуляции с объектом и его параметрами
+ * 4. Записать изменившиеся значения параметров объекта в БД
+ */
 
 class Property
 {
@@ -83,7 +91,14 @@ class Property
 
 	public $ownerLogin = ""; // Параметр содержит логин пользователя-собственника (необходим для того, чтобя выездные агенты могли создавать новые объявления и присваивать их ране зарегистрированным собственникам)
 
-	// КОНСТРУКТОР
+	/**
+	 * КОНСТРУКТОР
+	 *
+	 * Конструктор всегда инициализирует параметры объекта пустыми значениями.
+	 * Если объект создается под существующее объявление, то нужно сразу указать id этого объекта недвижимости (в параметрах конструктора)
+	 * Инициализация объекта параметрами существующего объявления выделена в отдельные методы (writeCharacteristicFrom.., writeFotoInformationFrom..), что позволяет убедиться в их успешном выполнении (получении данных из БД или из POST), а также выполнить инициализацию только тех параметров, которые понадобятся в работе с этим объектом (характеристика и/или данные о фотографиях). Ну и кроме того, это позволяет инициализировать объект параметрами как из БД, так и из POST запроса по выбору.
+	 * @param bool $propertyId - идентификатор существующего (записанного ранее в БД) объекта недвижимости - используется при инициализации объекта под заранее известный, ранее заведенный в БД объект недвижимости
+	 */
 	public function __construct($propertyId = FALSE) {
 		// Инициализируем переменную "сессии" для временного сохранения фотографий
 		$this->fileUploadId = GlobFunc::generateCode(7);
@@ -96,15 +111,7 @@ class Property
 	public function __destruct() {
 	}
 
-	// Устанавливает признак полноты для объекта
-	// $levelCompleteness = "0" объявление из чужой базы - мнимум требований к полноте
-	// $levelCompleteness = "1" объявление от собственника, который является нашим клиентом - максимальные требования к полноте
-	public function setCompleteness($levelCompleteness) {
-		// Проверка входных данных на адекватность
-		if ($levelCompleteness != "1" && $levelCompleteness != "0") return FALSE;
-		$this->completeness = $levelCompleteness;
-		return TRUE;
-	}
+
 
 	// Функция сохраняет текущие параметры объекта недвижимости в БД
 	// $typeOfProperty = "new" - режим сохранения для нового объекта недвижимости
@@ -449,6 +456,8 @@ class Property
 		return TRUE;
 	}
 
+
+
 	// Метод читает данные объекта недвижимости из БД и записывает их в параметры данного объекта
 	public function writeCharacteristicFromDB() {
 		// Если идентификатор объекта недвижимости неизвестен, то дальнейшие действия не имеют смысла
@@ -685,6 +694,8 @@ class Property
 		if (isset($_POST['primaryFotoRadioButton'])) $this->primaryFotoId = htmlspecialchars($_POST['primaryFotoRadioButton'], ENT_QUOTES);
 	}
 
+
+
 	// Получить ассоциированный массив с данными анкеты объекта недвижимости (для использования в представлении)
 	public function getCharacteristicData() {
 		$result = array();
@@ -779,6 +790,62 @@ class Property
 		return $result;
 
 	}
+
+	// Возвращает массив, содержащий список недвижимости в жилой зоне: включая как чекбокс элементы ($furnitureInLivingArea), так и элементы списка extra ($furnitureInLivingAreaExtra)
+	public function getFurnitureInLivingAreaAll() {
+		// Мебель в жилой зоне, отмеченная галочками
+		$furnitureInLivingArea = $this->furnitureInLivingArea;
+		// Скидываем в массив всю мебель, которая была добавлена вручную
+		$furnitureInLivingArea = array_merge($furnitureInLivingArea, explode(', ', $this->furnitureInLivingAreaExtra));
+		// Дополнительная проверка на пустоту нужна, так как пустая строчка после explode воспринимается как один из членов массива
+		$furnitureInLivingArea = array_filter($furnitureInLivingArea, function ($el) {
+			return !empty($el);
+		});
+
+		return $furnitureInLivingArea;
+	}
+
+	// Возвращает массив, содержащий список недвижимости в жилой зоне: включая как чекбокс элементы ($furnitureInKitchen), так и элементы списка extra ($furnitureInKitchenExtra)
+	public function getFurnitureInKitchenAll() {
+		// Мебель на кухне, отмеченная галочками
+		$furnitureInKitchen = $this->furnitureInKitchen;
+		// Скидываем в массив всю мебель, которая была добавлена вручную
+		$furnitureInKitchen = array_merge($furnitureInKitchen, explode(', ', $this->furnitureInKitchenExtra));
+		// Дополнительная проверка на пустоту нужна, так как пустая строчка после explode воспринимается как один из членов массива
+		$furnitureInKitchen = array_filter($furnitureInKitchen, function ($el) {
+			return !empty($el);
+		});
+
+		return $furnitureInKitchen;
+	}
+
+	// Возвращает массив, содержащий список недвижимости в жилой зоне: включая как чекбокс элементы ($appliances), так и элементы списка extra ($appliancesExtra)
+	public function getAppliancesAll() {
+		// Бытовая техника, отмеченная галочками
+		$appliances = $this->appliances;
+		// Скидываем в массив всю бытовую технику, которая была добавлена вручную
+		$appliances = array_merge($appliances, explode(', ', $this->appliancesExtra));
+		// Дополнительная проверка на пустоту нужна, так как пустая строчка после explode воспринимается как один из членов массива
+		$appliances = array_filter($appliances, function ($el) {
+			return !empty($el);
+		});
+
+		return $appliances;
+	}
+
+
+
+	// Устанавливает признак полноты для объекта
+	// $levelCompleteness = "0" объявление из чужой базы - мнимум требований к полноте
+	// $levelCompleteness = "1" объявление от собственника, который является нашим клиентом - максимальные требования к полноте
+	public function setCompleteness($levelCompleteness) {
+		// Проверка входных данных на адекватность
+		if ($levelCompleteness != "1" && $levelCompleteness != "0") return FALSE;
+		$this->completeness = $levelCompleteness;
+		return TRUE;
+	}
+
+
 
 	// $typeOfValidation = newAdvert - режим первичной (для нового объявления) проверки указанных пользователем параметров объекта недвижимости
 	// $typeOfValidation = editAdvert - режим вторичной (при редактировании уже существующего объявления) проверки указанных пользователем параметров объекта недвижимости
@@ -1287,48 +1354,6 @@ class Property
 		return TRUE;
 	}
 
-	// Возвращает массив, содержащий список недвижимости в жилой зоне: включая как чекбокс элементы ($furnitureInLivingArea), так и элементы списка extra ($furnitureInLivingAreaExtra)
-	public function getFurnitureInLivingAreaAll() {
-		// Мебель в жилой зоне, отмеченная галочками
-		$furnitureInLivingArea = $this->furnitureInLivingArea;
-		// Скидываем в массив всю мебель, которая была добавлена вручную
-		$furnitureInLivingArea = array_merge($furnitureInLivingArea, explode(', ', $this->furnitureInLivingAreaExtra));
-		// Дополнительная проверка на пустоту нужна, так как пустая строчка после explode воспринимается как один из членов массива
-		$furnitureInLivingArea = array_filter($furnitureInLivingArea, function ($el) {
-			return !empty($el);
-		});
-
-		return $furnitureInLivingArea;
-	}
-
-	// Возвращает массив, содержащий список недвижимости в жилой зоне: включая как чекбокс элементы ($furnitureInKitchen), так и элементы списка extra ($furnitureInKitchenExtra)
-	public function getFurnitureInKitchenAll() {
-		// Мебель на кухне, отмеченная галочками
-		$furnitureInKitchen = $this->furnitureInKitchen;
-		// Скидываем в массив всю мебель, которая была добавлена вручную
-		$furnitureInKitchen = array_merge($furnitureInKitchen, explode(', ', $this->furnitureInKitchenExtra));
-		// Дополнительная проверка на пустоту нужна, так как пустая строчка после explode воспринимается как один из членов массива
-		$furnitureInKitchen = array_filter($furnitureInKitchen, function ($el) {
-			return !empty($el);
-		});
-
-		return $furnitureInKitchen;
-	}
-
-	// Возвращает массив, содержащий список недвижимости в жилой зоне: включая как чекбокс элементы ($appliances), так и элементы списка extra ($appliancesExtra)
-	public function getAppliancesAll() {
-		// Бытовая техника, отмеченная галочками
-		$appliances = $this->appliances;
-		// Скидываем в массив всю бытовую технику, которая была добавлена вручную
-		$appliances = array_merge($appliances, explode(', ', $this->appliancesExtra));
-		// Дополнительная проверка на пустоту нужна, так как пустая строчка после explode воспринимается как один из членов массива
-		$appliances = array_filter($appliances, function ($el) {
-			return !empty($el);
-		});
-
-		return $appliances;
-	}
-
 	/**
 	 * Устанавливает или меняет ближайшую дату просмотра у данного объекта.
 	 * Но метод не сохраняет данные в БД - для этого нужно вызвать $this->saveCharacteristicToDB
@@ -1346,17 +1371,22 @@ class Property
 			!isset($earliestTimeMinutes))
 		{ return FALSE;}
 
-		// Преобразование входящих данных
-		$earliestDate = GlobFunc::dateFromDBToView(GlobFunc::dateFromViewToDB($earliestDate)); // Такое преобразование позволяет убедиться в том, что дата по формату соответствует всем критериям
+		// Если переданы пустые значения, то нужно сбросить дату/время ближайшего просмотра (это нормальный рабочий вариант входящих значений)
+		// Если переданы не пустые значения - хорошень их провалидируем
+		if ($earliestDate != "" || $earliestTimeHours != "" || $earliestTimeMinutes != "") {
 
-		// Валидация достоверности входящих данных
-		if ($earliestDate == "0000-00-00" OR
-			$earliestDate == "" OR
-			$earliestTimeHours < "00" OR
-			$earliestTimeHours > "23" OR
-			$earliestTimeMinutes < "00" OR
-			$earliestTimeMinutes > "59")
-		{return FALSE;}
+			// Преобразование входящих данных
+			$earliestDate = GlobFunc::dateFromDBToView(GlobFunc::dateFromViewToDB($earliestDate)); // Такое преобразование позволяет убедиться в том, что дата по формату соответствует всем критериям
+
+			// Валидация достоверности входящих данных
+			if ($earliestDate == "0000-00-00" OR
+				$earliestDate == "" OR
+				$earliestTimeHours < "00" OR
+				$earliestTimeHours > "23" OR
+				$earliestTimeMinutes < "00" OR
+				$earliestTimeMinutes > "59")
+			{return FALSE;}
+		}
 
 		// Изменим параметры даты и времени ближайшего просмотра
 		$this->earliestDate = $earliestDate;
@@ -1366,4 +1396,74 @@ class Property
 		return TRUE;
 	}
 
+	/**
+	 * Снимает с публикации объявление (для чужих объявлений - переносит в архивную базу)
+	 * 	1. Изменить статус объекта на "не опубликовано" в БД
+	 * 	2. Очистить дату и время ближайшего показа в БД
+	 * 	3. Очистить дату въезда и выезда у объекта
+	 * 	4. Удалить все уведомления (типа Новый подходящий объект)
+	 * 	Важно, что, если по данному удаленному объекту есть заявки на просмотр со статусом (Новая, Назначен просмотр, Отложена), то оператор увидит информацию о таких удаленных объявлениях и их заявках в админке (по ссылке "Недозакрытые объявления") - оператору необходимо вручную изменить статус у таких заявок, предварительно созвонившись с арендаторами и предупредив их, что объект уже не сдается
+	 *	Если по объекту недвижимости назначен просмотр, то его невозможно снять с публикации - сначала нужно скинуть дату просмотра
+	 *  TODO: реализовать отображение в браузере сообщения о запрете действия при клике на Снять с публикации (если назначена дата ближайшего просмотра)
+	 *
+	 * @return bool - возвращает TRUE в случае успеха и FALSE в противном случае
+	 */
+	public function unpublishAdvert() {
+
+		// Валидация начальных данных
+		if ($this->id == "" || $this->status == "" || $this->completeness == "") return FALSE;
+
+		// Если по объекту назначен ближайший просмотр, то его нельзя снять с публикации
+		if ($this->earliestDate != "" && $this->earliestDate != "0000-00-00") return FALSE;
+
+		// Меняем параметры объекта
+		$this->status = "не опубликовано";
+		$this->earliestDate = "";
+		$this->earliestTimeHours = "";
+		$this->earliestTimeMinutes = "";
+		$this->dateOfEntry = "";
+		$this->dateOfCheckOut = "";
+
+		// Сохраняем изменения в БД
+		if (!$this->saveCharacteristicToDB("edit")) return FALSE;
+
+		// Удалим уведомления типа "Новый подходящий объект", касающиеся этого объекта
+		if (!DBconnect::deleteMessagesNewPropertyForProperty($this->id)) return FALSE;
+
+		return TRUE;
+	}
+
+	/**
+	 * Делает объявление опубликованным
+	 *  1. Проверить сведения на достаточность для публикации
+	 * 	2. Изменить статус объекта на "опубликовано" в БД
+	 *  3. Оповестить арендаторов о появлении подходящего объекта
+	 *  Размер комиссии оставить тем-же?? Пока не меняет размер комиссии
+	 *  Важно, что при публикации объявления пересчитывается его реальная стоимость аренды
+	 */
+	public function publishAdvert() {
+
+		// Валидация начальных данных
+		if ($this->id == "" || $this->status == "" || $this->completeness == "") return FALSE;
+
+		// Проверяем корректность данных объявления. Функции propertyDataValidate() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
+		// Если мы имеем дело с редактированием чужого объявления администратором, то проверки данных происходят по упрощенному способу
+		if ($this->completeness == "0") {
+			$errors = $this->propertyDataValidate("editAlienAdvert");
+		} else {
+			$errors = $this->propertyDataValidate("editAdvert");
+		}
+		if (count($errors) != 0) return FALSE;
+
+		// Меняем параметры объекта
+		$this->status = "опубликовано";
+
+		// Сохраняем изменения в БД. При этом пересчитывается реальная стоимость аренды (если она была указана валюте и даже в рублях)
+		if (!$this->saveCharacteristicToDB("edit")) return FALSE;
+
+		// Разослать по потенциальным арендаторам уведомление о том, что сдается интересный им объект
+		$this->sendMessagesAboutNewProperty();
+
+		return TRUE;
+	}
 }

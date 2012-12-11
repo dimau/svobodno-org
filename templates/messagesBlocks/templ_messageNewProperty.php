@@ -11,7 +11,7 @@
             <a href='#'>удалить</a>
         </li>
         <li>
-            <a href='objdescription.php?propertyId={propertyId}' target='_blank'>подробнее</a>
+            <a href='property.php?propertyId={propertyId}' target='_blank'>подробнее</a>
         </li>
     </ul>
     <ul class='listDescriptionSmall'>

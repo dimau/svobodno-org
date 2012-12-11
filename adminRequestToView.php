@@ -62,7 +62,7 @@ if ($propertyId == "" || $propertyId == 0) {
  * ПОЛУЧИМ ВСЕ ЗАЯВКИ НА ПРОСМОТР ЭТОГО ОБЪЕКТА ($propertyId)
  *******************************************************************************/
 
-$allRequestsToView = DBconnect::getAllRequestToViewForProperties($propertyId);
+$allRequestsToView = DBconnect::selectRequestsToViewForProperties($propertyId);
 
 /********************************************************************************
  * ПОЛУЧИМ СВЕДЕНИЯ ОБ АРЕНДАТОРАХ, ПОДАВШИХ ЗАЯВКИ НА ПРОСМОТР ЭТОГО ОБЪЕКТА ($propertyId)

@@ -34,8 +34,8 @@
     if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
     // Заполняем таблицу о поисковых запросах пользователей
-    DBconnect::get()->query("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, interestingPropertysId) VALUES
-(2, 'квартира', 'a:2:{i:0;s:1:\"1\";i:1;s:1:\"2\";}', 'не имеет значения', 'не первый и не последний', 11000, 20000, 15000, 'нет', 'a:3:{i:0;s:24:\"Ботанический\";i:1;s:6:\"ВИЗ\";i:2;s:17:\"Юго-запад\";}', 'пара', 'Анна Дрей', 'без детей', '', 'без животных', '', 'длительный срок', 'Рядом с парком, чтобы бегать утром можно было на свежем воздухе.', 0x613a303a7b7d)
+    DBconnect::get()->query("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch) VALUES
+(2, 'квартира', 'a:2:{i:0;s:1:\"1\";i:1;s:1:\"2\";}', 'не имеет значения', 'не первый и не последний', 11000, 20000, 15000, 'нет', 'a:3:{i:0;s:24:\"Ботанический\";i:1;s:6:\"ВИЗ\";i:2;s:17:\"Юго-запад\";}', 'пара', 'Анна Дрей', 'без детей', '', 'без животных', '', 'длительный срок', 'Рядом с парком, чтобы бегать утром можно было на свежем воздухе.')
 ");
 
     echo "Статус регистрации поисковых запросов пользователей: ";

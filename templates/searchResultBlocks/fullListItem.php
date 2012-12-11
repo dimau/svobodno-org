@@ -1,4 +1,4 @@
-<div class='realtyObject' linkToDescription='objdescription.php?propertyId={propertyId}' propertyId='{propertyId}'>
+<div class='realtyObject' linkToDescription='property.php?propertyId={propertyId}' propertyId='{propertyId}'>
     <div class="serviceMarks">
         <div class='numberOfRealtyObject'>{number}</div>
         <span class='{actionFavorites} aloneStar' propertyId='{propertyId}'><img src='{imgFavorites}'></span>

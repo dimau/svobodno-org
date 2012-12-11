@@ -12,7 +12,7 @@
             <a href='editadvert.php?propertyId={propertyId}'>редактировать</a>
         </li>
         <li>
-            <a href='objdescription.php?propertyId={propertyId}'>подробнее</a>
+            <a href='property.php?propertyId={propertyId}'>подробнее</a>
         </li>
     </ul>
     <ul class='listDescriptionSmall'>

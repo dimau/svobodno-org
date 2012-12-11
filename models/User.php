@@ -1,4 +1,13 @@
 <?php
+/**
+ * Класс представляем собой полную модель пользователя
+ *
+ * Схема работы с объектами класса:
+ * 1. Инициализация (в качестве параметра конструктору можно передать id пользователя). При этом параметры объекта устанавливаются по умолчанию (пустые значения)
+ * 2. Записать в параметры объекта нужные данные. С помощью методов write записать в параметры объекта данные из БД или POST
+ * 3. Выполнить манипуляции с объектом и его параметрами
+ * 4. Записать изменившиеся значения параметров объекта в БД
+ */
 
 class User
 {
@@ -56,13 +65,19 @@ class User
 	public $howManyAnimals = "";
 	public $termOfLease = "0";
 	public $additionalDescriptionOfSearch = "";
-	public $interestingPropertysId = array();
 
 	public $fileUploadId = "";
 	public $uploadedFoto = array(); // В переменной будет храниться информация о загруженных фотографиях. Представляет собой массив ассоциированных массивов
 	public $primaryFotoId = "";
 
-	// КОНСТРУКТОР
+	/**
+	 * КОНСТРУКТОР
+	 *
+	 * Конструктор всегда инициализирует параметры объекта пустыми значениями.
+	 * Если объект создается под существующего пользователя, то нужно сразу указать id этого пользователя (в параметрах конструктора)
+	 * Инициализация объекта параметрами существующего пользователя выделена в отдельные методы (writeCharacteristicFrom.., writeFotoInformationFrom.., writeSearchRequestFrom..), что позволяет убедиться в их успешном выполнении (получении данных из БД или из POST), а также выполнить инициализацию только тех параметров, которые понадобятся в работе с этим объектом (характеристика и/или данные о фотографиях и/или данные о поисковом запросе). Ну и кроме того, это позволяет инициализировать объект параметрами как из БД, так и из POST запроса по выбору.
+	 * @param bool $userId - идентификатор существующего (записанного ранее в БД) пользователя - используется при инициализации объекта под заранее известного, ранее заведенного в БД пользователя
+	 */
 	public function __construct($userId = FALSE) {
 		// Инициализируем переменную "сессии" для временного сохранения фотографий
 		$this->fileUploadId = GlobFunc::generateCode(7);
@@ -75,8 +90,7 @@ class User
 	}
 
 	// ДЕСТРУКТОР
-	public function __destruct() {
-	}
+	public function __destruct() {}
 
 	// Метод возвращает id пользователя
 	public function getId() {
@@ -180,49 +194,21 @@ class User
 		if ($this->id == "") return FALSE;
 
 		// Получаем данные по всем фоткам с нашим $this->fileUploadId
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("SELECT * FROM tempFotos WHERE fileUploadId=?") === FALSE)
-			OR ($stmt->bind_param("s", $this->fileUploadId) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($allFotos = $stmt->get_result()) === FALSE)
-			OR (($allFotos = $allFotos->fetch_all(MYSQLI_ASSOC)) === FALSE)
-			OR ($stmt->close() === FALSE)
-		) {
-			$allFotos = array();
-			// Логируем ошибку
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM tempFotos WHERE fileUploadId=" . $this->fileUploadId . "'. id логгера: User.php->saveFotoInformationToDB():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: " . $this->id);
-		} else {
-
-			// Пометим все члены массива признаком их получения из таблицы tempFotos
-			for ($i = 0, $s = count($allFotos); $i < $s; $i++) {
-				$allFotos[$i]['fromTable'] = "tempFotos";
-			}
-
+		$allFotos = DBconnect::selectPhotosForFileUploadId($this->fileUploadId);
+		// Пометим все члены массива признаком их получения из таблицы tempFotos
+		for ($i = 0, $s = count($allFotos); $i < $s; $i++) {
+			$allFotos[$i]['fromTable'] = "tempFotos";
 		}
 
 		// Получаем данные по всем фоткам пользователя (с идентификатором $this->id)
 		// Но только для существующего - авторизованного пользователя (не для нового)
 		if ($this->id != "") {
-
-			$stmt = DBconnect::get()->stmt_init();
-			if (($stmt->prepare("SELECT * FROM userFotos WHERE userId=?") === FALSE)
-				OR ($stmt->bind_param("s", $this->id) === FALSE)
-				OR ($stmt->execute() === FALSE)
-				OR (($res = $stmt->get_result()) === FALSE)
-				OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-				OR ($stmt->close() === FALSE)
-			) {
-				// Логируем ошибку
-				Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM userFotos WHERE userId=" . $this->id . "'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: " . $this->id);
-			} else {
-
-				// Пометим все члены массива признаком их получения из таблицы userFotos
-				for ($i = 0, $s = count($res); $i < $s; $i++) {
-					$res[$i]['fromTable'] = "userFotos";
-				}
-
-				$allFotos = array_merge($allFotos, $res);
+			$res = DBconnect::selectPhotosForUser($this->id);
+			// Пометим все члены массива признаком их получения из таблицы userFotos
+			for ($i = 0, $s = count($res); $i < $s; $i++) {
+				$res[$i]['fromTable'] = "userFotos";
 			}
+			$allFotos = array_merge($allFotos, $res);
 		}
 
 		// Перебираем все имеющиеся фотографии пользователя и актуализируем их параметры
@@ -350,20 +336,12 @@ class User
 		}
 
 		// Удаляем инфу о всех фотках с fileUploadId из tempFotos
-		// TODO: Не очень безопасно (используется полученный с клиента fileUploadId)
-		if ($this->fileUploadId != "") {
-			DBconnect::get()->query("DELETE FROM tempFotos WHERE fileUploadId = '" . $this->fileUploadId . "'");
-			if ((DBconnect::get()->errno)
-				OR (DBconnect::get()->affected_rows === -1)
-			) {
-				// Логируем ошибку
-				Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM tempFotos WHERE fileUploadId = '" . $this->fileUploadId . "'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: " . $this->id);
-			}
-		}
+		DBconnect::deletePhotosForFileUploadId($this->fileUploadId);
 
 		// Приведем в соответствие с данными из БД наш массив с фотографиями $this->uploadedFotos
-		$this->writeFotoInformationFromDB();
+		if (!$this->writeFotoInformationFromDB()) return FALSE;
 
+		return TRUE;
 	}
 
 	// Функция для сохранения параметров поискового запроса пользователя
@@ -378,14 +356,13 @@ class User
 		// Преобразование формата инфы об искомом кол-ве комнат и районах, так как MySQL не умеет хранить массивы
 		$amountOfRoomsSerialized = serialize($this->amountOfRooms);
 		$districtSerialized = serialize($this->district);
-		$interestingPropertysIdSerialized = serialize($this->interestingPropertysId);
 
 		if ($this->typeTenant === TRUE && $typeOfUser == "edit") {
 
 			// Непосредственное сохранение данных о поисковом запросе
 			$stmt = DBconnect::get()->stmt_init();
-			if (($stmt->prepare("UPDATE searchRequests SET userId=?, typeOfObject=?, amountOfRooms=?, adjacentRooms=?, floor=?, minCost=?, maxCost=?, pledge=?, prepayment=?, district=?, withWho=?, linksToFriends=?, children=?, howManyChildren=?, animals=?, howManyAnimals=?, termOfLease=?, additionalDescriptionOfSearch=?, interestingPropertysId=? WHERE userId=?") === FALSE)
-				OR ($stmt->bind_param("sssssiiissssssssssss", $this->id, $this->typeOfObject, $amountOfRoomsSerialized, $this->adjacentRooms, $this->floor, $this->minCost, $this->maxCost, $this->pledge, $this->prepayment, $districtSerialized, $this->withWho, $this->linksToFriends, $this->children, $this->howManyChildren, $this->animals, $this->howManyAnimals, $this->termOfLease, $this->additionalDescriptionOfSearch, $interestingPropertysIdSerialized, $this->id) === FALSE)
+			if (($stmt->prepare("UPDATE searchRequests SET userId=?, typeOfObject=?, amountOfRooms=?, adjacentRooms=?, floor=?, minCost=?, maxCost=?, pledge=?, prepayment=?, district=?, withWho=?, linksToFriends=?, children=?, howManyChildren=?, animals=?, howManyAnimals=?, termOfLease=?, additionalDescriptionOfSearch=? WHERE userId=?") === FALSE)
+				OR ($stmt->bind_param("sssssiiisssssssssss", $this->id, $this->typeOfObject, $amountOfRoomsSerialized, $this->adjacentRooms, $this->floor, $this->minCost, $this->maxCost, $this->pledge, $this->prepayment, $districtSerialized, $this->withWho, $this->linksToFriends, $this->children, $this->howManyChildren, $this->animals, $this->howManyAnimals, $this->termOfLease, $this->additionalDescriptionOfSearch, $this->id) === FALSE)
 				OR ($stmt->execute() === FALSE)
 				OR (($res = $stmt->affected_rows) === -1)
 				OR ($stmt->close() === FALSE)
@@ -398,8 +375,8 @@ class User
 
 			// Непосредственное сохранение данных о поисковом запросе
 			$stmt = DBconnect::get()->stmt_init();
-			if (($stmt->prepare("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, interestingPropertysId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
-				OR ($stmt->bind_param("sssssiiisssssssssss", $this->id, $this->typeOfObject, $amountOfRoomsSerialized, $this->adjacentRooms, $this->floor, $this->minCost, $this->maxCost, $this->pledge, $this->prepayment, $districtSerialized, $this->withWho, $this->linksToFriends, $this->children, $this->howManyChildren, $this->animals, $this->howManyAnimals, $this->termOfLease, $this->additionalDescriptionOfSearch, $interestingPropertysIdSerialized) === FALSE)
+			if (($stmt->prepare("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
+				OR ($stmt->bind_param("sssssiiissssssssss", $this->id, $this->typeOfObject, $amountOfRoomsSerialized, $this->adjacentRooms, $this->floor, $this->minCost, $this->maxCost, $this->pledge, $this->prepayment, $districtSerialized, $this->withWho, $this->linksToFriends, $this->children, $this->howManyChildren, $this->animals, $this->howManyAnimals, $this->termOfLease, $this->additionalDescriptionOfSearch) === FALSE)
 				OR ($stmt->execute() === FALSE)
 				OR (($res = $stmt->affected_rows) === -1)
 				OR ($res === 0)
@@ -410,19 +387,9 @@ class User
 			}
 
 			// Обновляем статус пользователя - теперь он арендатор
-			$stmt = DBconnect::get()->stmt_init();
-			if (($stmt->prepare("UPDATE users SET typeTenant='TRUE' WHERE id=?") === FALSE)
-				OR ($stmt->bind_param("s", $this->id) === FALSE)
-				OR ($stmt->execute() === FALSE)
-				OR (($res = $stmt->affected_rows) === -1)
-				OR ($stmt->close() === FALSE)
-			) {
-				// TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-				return FALSE;
-			}
+			if (!DBconnect::updateUserCharacteristicTypeUser($this->id, "typeTenant", "TRUE")) return FALSE;
 
 			$this->typeTenant = TRUE;
-
 		}
 
 		return TRUE;
@@ -597,29 +564,36 @@ class User
 		if (isset($oneUserDataArr['howManyAnimals'])) $this->howManyAnimals = $oneUserDataArr['howManyAnimals'];
 		if (isset($oneUserDataArr['termOfLease'])) $this->termOfLease = $oneUserDataArr['termOfLease'];
 		if (isset($oneUserDataArr['additionalDescriptionOfSearch'])) $this->additionalDescriptionOfSearch = $oneUserDataArr['additionalDescriptionOfSearch'];
-		if (isset($oneUserDataArr['interestingPropertysId'])) $this->interestingPropertysId = unserialize($oneUserDataArr['interestingPropertysId']);
 
 		return TRUE;
 
 	}
 
-	// Метод удаляет параметры поискового запроса пользователя из БД, сбрасывает соответствующие настройки объекта на "по-умолчанию", а также меняет статус isTenant на FALSE.
+	/**
+	 * Метод удаляет параметры поискового запроса пользователя из БД, сбрасывает соответствующие настройки объекта на "по-умолчанию", а также меняет статус isTenant на FALSE.
+	 * 	1. Проверяем, что у данного пользователя нет заявок на просмотр со статусом "Назначен просмотр", в противном случае, не позволяем удалять поисковый запрос
+	 *  2. Удаляем параметры поискового запроса пользователя из БД
+	 * 	3. Сбрасывает статус арендатора на FALSE (значение typeTenant в таблице users)
+	 * 	4. Удаляет все уведомления типа "Новый подходящий объект недвижимости"
+	 * 	5. Удаляет все заявки на просмотр, кроме имеющих статус "Успешный просмотр", чтобы мы знали кто какую недвижимость снимает через нас
+	 * 	6. Изменяем параметры текущего объекта
+	 * При этом нетронутым остается список избранных объектов пользователя - он ему пригодиться в следующий раз
+	 *
+	 * @return bool возвращает TRUE если все удачно и FALSE, если выполнить операцию не удалось
+	 */
 	public function removeSearchRequest() {
 
 		// Проверка на наличие id пользователя
 		if ($this->id == "") return FALSE;
 
-		// Удалим данные поискового запроса по данному пользователю из БД
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("DELETE FROM searchRequests WHERE userId=?") === FALSE)
-			OR ($stmt->bind_param("s", $this->id) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->affected_rows) === -1)
-			OR ($stmt->close() === FALSE)
-		) {
-			// TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-			return FALSE;
+		// Убеждаемся, что у арендатора нет заявок на просмотр со статусом "Назначен просмотр"
+		$allRequestsToView = DBconnect::selectRequestsToViewForTenants($this->id);
+		foreach ($allRequestsToView as $value) {
+			if ($value['status'] == "Назначен просмотр") return FALSE;
 		}
+
+		// Удалим данные поискового запроса по данному пользователю из БД
+		if (!DBconnect::deleteSearchRequestsForUser($this->id)) return FALSE;
 
 		// Обновляем статус данного пользователю (он больше не арендатор)
 		$stmt = DBconnect::get()->stmt_init();
@@ -632,6 +606,12 @@ class User
 			// TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
 			return FALSE;
 		}
+
+		// Удалим все уведомления типа "Новый подходящий объект недвижимости" у данного арендатора
+		DBconnect::deleteMessagesNewPropertyForUser($this->id);
+
+		// Удалим все заявки на просмотр данного пользователя, кроме имеющих статус "Успешный просмотр"
+		DBconnect::deleteRequestsToViewForTenant($this->id);
 
 		// Внесем соответствующие изменения в статус объекта пользователя
 		$this->typeTenant = "FALSE";
@@ -654,10 +634,8 @@ class User
 		$this->howManyAnimals = "";
 		$this->termOfLease = "0";
 		$this->additionalDescriptionOfSearch = "";
-		$this->interestingPropertysId = array();
 
 		return TRUE;
-
 	}
 
 	// Записать в качестве параметров user-а значения, полученные через POST запрос
@@ -814,7 +792,6 @@ class User
 		$result['howManyAnimals'] = $this->howManyAnimals;
 		$result['termOfLease'] = $this->termOfLease;
 		$result['additionalDescriptionOfSearch'] = $this->additionalDescriptionOfSearch;
-		$result['interestingPropertysId'] = $this->interestingPropertysId;
 
 		return $result;
 	}

@@ -25,7 +25,7 @@
             </li>
         </ul>
         <div class='advertActions'>
-            <a href='objdescription.php?propertyId={propertyId}' target='_blank'>подробнее</a>
+            <a href='property.php?propertyId={propertyId}' target='_blank'>подробнее</a>
         </div>
         <div class="clearBoth"></div>
     </div>

@@ -10,6 +10,7 @@
 				}
 				?>
 			</span>
+			<?php echo " [".$propertyCharacteristic['status']."]"; ?>
         </div>
 
         <ul class="setOfInstructions">
@@ -17,7 +18,7 @@
                 <a href='editadvert.php?propertyId=<?php echo $propertyCharacteristic['id'];?>'>редактировать</a>
             </li>
             <li>
-                <a href='objdescription.php?propertyId=<?php echo $propertyCharacteristic['id'];?>'>подробнее</a>
+                <a href='property.php?propertyId=<?php echo $propertyCharacteristic['id'];?>'>подробнее</a>
             </li>
             <li>
                 <a target="_blank" href='adminRequestToView.php?propertyId=<?php echo $propertyCharacteristic['id'];?>'>заявки на просмотр</a>
@@ -31,6 +32,7 @@
         <div class="clearBoth"></div>
     </div>
 
+	<?php if ($propertyCharacteristic['status'] == "опубликовано"): ?>
     <div style="margin-left: 30px;">
         <a class="earliestDateAnchor" style="cursor: pointer;">Дата просмотра:</a>
         <span class="earliestDateFullText">
@@ -50,6 +52,7 @@
             </div>
         </div>
     </div>
+	<?php endif;?>
 
 	<?php if (isset($propertyCharacteristic['adminComment']) && $propertyCharacteristic['adminComment'] != ""): ?>
     <div style="margin-left: 30px;;">
