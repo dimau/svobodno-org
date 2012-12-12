@@ -305,7 +305,7 @@ class Property
 				// Логируем ошибку
 				Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM propertyFotos WHERE propertyId=" . $this->id . "'. id логгера: Property.php->saveFotoInformationToDB():4. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID объекта недвижимости: " . $this->id);
 			} else {
-				// Пометим все члены массива признаком их получения из таблицы userFotos
+				// Пометим все члены массива признаком их получения из таблицы propertyFotos
 				for ($i = 0, $s = count($res); $i < $s; $i++) {
 					$res[$i]['fromTable'] = "propertyFotos";
 				}
@@ -397,15 +397,15 @@ class Property
 
 		// Для уменьшения запросов к БД соберем 2 общих запроса на изменение сразу всех нужных строк
 		// Соберем условия WHERE для SQL запросов к БД:
-		// на INSERT новых строк в userFotos
-		// на DELETE более ненужных фоток из userFotos
+		// на INSERT новых строк в propertyFotos
+		// на DELETE более ненужных фоток из propertyFotos
 		$strINSERT = "";
 		$strDELETE = "";
 		for ($i = 0, $s = count($allFotos); $i < $s; $i++) {
 
 			if ($allFotos[$i]['fromTable'] == "tempFotos" && $allFotos[$i]['forRemove'] == FALSE) {
 				if ($strINSERT != "") $strINSERT .= ",";
-				$strINSERT .= "('" . $allFotos[$i]['id'] . "','" . $allFotos[$i]['folder'] . "','" . $allFotos[$i]['filename'] . "','" . $allFotos[$i]['extension'] . "','" . $allFotos[$i]['filesizeMb'] . "','" . $this->id . "','" . $allFotos[$i]['status'] . "')";
+				$strINSERT .= "('" . $allFotos[$i]['id'] . "','" . $allFotos[$i]['folder'] . "','" . $allFotos[$i]['filename'] . "','" . $allFotos[$i]['extension'] . "','" . $allFotos[$i]['filesizeMb'] . "','" . $this->id . "','" . $allFotos[$i]['status'] . "','" . $allFotos[$i]['regDate'] . "')";
 			}
 
 			if ($allFotos[$i]['forRemove'] == TRUE) {
@@ -418,13 +418,13 @@ class Property
 		// Выполним сформированные запросы
 		// INSERT
 		if ($strINSERT != "") {
-			DBconnect::get()->query("INSERT INTO propertyFotos (id, folder, filename, extension, filesizeMb, propertyId, status) VALUES " . $strINSERT);
+			DBconnect::get()->query("INSERT INTO propertyFotos (id, folder, filename, extension, filesizeMb, propertyId, status, regDate) VALUES " . $strINSERT);
 			if ((DBconnect::get()->errno)
 				OR (($res = DBconnect::get()->affected_rows) === -1)
 				OR ($res === 0)
 			) {
 				// Логируем ошибку
-				Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO propertyFotos (id, folder, filename, extension, filesizeMb, propertyId, status) VALUES " . $strINSERT . "' id логгера: Property.php->saveFotoInformationToDB():8. Выдаваемая ошибка: " . DBconnect::get()->errno . " " . DBconnect::get()->error . ". ID объекта недвижимости: " . $this->id);
+				Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO propertyFotos (id, folder, filename, extension, filesizeMb, propertyId, status, regDate) VALUES " . $strINSERT . "' id логгера: Property.php->saveFotoInformationToDB():8. Выдаваемая ошибка: " . DBconnect::get()->errno . " " . DBconnect::get()->error . ". ID объекта недвижимости: " . $this->id);
 			}
 		}
 		// DELETE

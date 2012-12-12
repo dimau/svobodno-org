@@ -32,6 +32,26 @@
 <body>
 <div class="page_without_footer">
 
+    <!-- Всплывающее поле для отображения списка ошибок, полученных при проверке данных на сервере (PHP)-->
+    <div id="userMistakesBlock" class="ui-widget">
+        <div class="ui-state-highlight ui-corner-all">
+            <div>
+                <p>
+                    <span class="icon-mistake ui-icon ui-icon-info"></span>
+                <span
+                        id="userMistakesText">Для продолжения, пожалуйста, дополните или исправьте следующие данные:</span>
+                </p>
+                <ol><?php
+					if (is_array($errors) && count($errors) != 0) {
+						foreach ($errors as $key => $value) {
+							echo "<li>$value</li>";
+						}
+					}
+					?></ol>
+            </div>
+        </div>
+    </div>
+
     <?php
         // Сформируем и вставим заголовок страницы
         include("templates/templ_header.php");
@@ -45,8 +65,8 @@
 
         <div class="edited left simpleBlockForAnyContent" style="min-width: 430px;">
 
-            <?php if ($statusOfSaveParamsToDB === FALSE || $statusOfSaveParamsToDB === NULL): ?>
-            <form name="requestNewOwner" method="post">
+            <?php if (!isset($errors) || (is_array($errors) && count($errors) != 0)): ?>
+            <form name="requestFromOwnerForm" id="requestFromOwnerForm" method="post" action="forowner.php?action=takeRequest">
                 <table>
                     <tbody>
                         <tr>
@@ -57,7 +77,7 @@
                                 *
                             </td>
                             <td class="itemBody">
-                                <input type="text" name="name" maxlength="100" value="<?php echo $requestFromOwnerData['name']; ?>">
+                                <input type="text" name="name" id="name" maxlength="100" value="<?php echo $requestFromOwnerData['name']; ?>">
                             </td>
                         </tr>
                         <tr>
@@ -68,7 +88,7 @@
                                 *
                             </td>
                             <td class="itemBody">
-                                <input type="text" name="telephon" maxlength="20" value="<?php echo $requestFromOwnerData['telephon']; ?>">
+                                <input type="text" name="telephon" id="telephon" maxlength="20" value="<?php echo $requestFromOwnerData['telephon']; ?>">
                             </td>
                         </tr>
                         <tr>
@@ -79,7 +99,7 @@
                                 *
                             </td>
                             <td class="itemBody">
-                                <input type="text" name="address" maxlength="60" value="<?php echo $requestFromOwnerData['address']; ?>">
+                                <input type="text" name="address" id="address" maxlength="60" value="<?php echo $requestFromOwnerData['address']; ?>">
                             </td>
                         </tr>
                         <tr>
@@ -99,7 +119,7 @@
                 </table>
 
                 <div class="bottomButton">
-                    <button type="submit" name="submitButton" class="button mainButton">
+                    <button type="submit" name="submitButton" id="submitButton" class="button mainButton">
                         Отправить заявку
                     </button>
                 </div>
@@ -108,7 +128,7 @@
             </form>
             <?php endif; ?>
 
-            <?php if ($statusOfSaveParamsToDB === TRUE): ?>
+            <?php if (is_array($errors) && count($errors) == 0): ?>
             <div>
                 <span style="font-size: 0.9em;">Запрос успешно передан</span><br><br>
                 <span>Спасибо за Ваше доверие, мы приложим все усилия, чтобы его оправдать!</span>
@@ -160,6 +180,16 @@
 
 <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
 <script src="js/main.js"></script>
+<script>
+	// JS проверка формы перед отправкой на сервер
+    $("#requestFromOwnerForm").on('submit', function() {
+        if (executeValidation("forowner") != 0) {
+			return false;
+        } else {
+			return true;
+        }
+    });
+</script>
 <!-- end scripts -->
 
 <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.

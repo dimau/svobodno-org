@@ -19,20 +19,35 @@ $incomingUser = new IncomingUser();
 // Инициализируем модель для работ с запросом на новое объявление от собственника
 $requestFromOwner = new RequestFromOwner($incomingUser);
 
-// Инициализируем переменную, в которую будет сохранен статус записи запроса собственника в БД
-$statusOfSaveParamsToDB = NULL;
+// Инициализируем переменную для сохранения ошибок, связанных с обработкой заявки собственника (которые не позволили ее принять)
+$errors = NULL;
+
+/*************************************************************************************
+ * ПОЛУЧИМ GET ПАРАМЕТРЫ
+ * Для защиты от XSS атаки и для использования в коде более простого имени для переменной
+ ************************************************************************************/
+
+// Команда пользователя
+$action = "";
+if (isset($_GET['action'])) $action = htmlspecialchars($_GET['action'], ENT_QUOTES);
 
 /********************************************************************************
  * ЗАПРОС НА ПОДАЧУ ОБЪЯВЛЕНИЯ. Если пользователь отправил заполненную форму заявки на подачу объявления
  *******************************************************************************/
 
-if (isset($_POST['submitButton'])) {
+if ($action == "takeRequest") {
+
 	$requestFromOwner->writeParamsFromPOST();
 
-	//TODO: проверять данные на заполненность
+	$errors = $requestFromOwner->requestFromOwnerDataValidate();
 
-	// Сохраняем запрос собственника в БД
-	$statusOfSaveParamsToDB = $requestFromOwner->saveParamsToDB();
+	if (is_array($errors) && count($errors) == 0) {
+		// Сохраняем запрос собственника в БД
+		if (!$requestFromOwner->saveParamsToDB()) {
+			// Сохранении данных в БД не прошло - заявка не принята
+			$errors[] = 'К сожалению, при сохранении данных произошла ошибка: попробуйте еще раз или сообщите нам о Вашей недвижимости по телефону: 8-922-143-16-15';
+		}
+	}
 
 	//TODO: оповестить опрератора о новом запросе собственника
 }
@@ -45,7 +60,7 @@ if (isset($_POST['submitButton'])) {
 $isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
 $amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 $requestFromOwnerData = $requestFromOwner->getRequestFromOwnerData();
-//$statusOfSaveParamsToDB
+//$errors
 
 // Подсоединяем нужный основной шаблон
 include "templates/"."templ_forowner.php";

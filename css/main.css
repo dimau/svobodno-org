@@ -1232,6 +1232,10 @@ td, th {
     padding: 0;
 }
 
+.setOfInstructions a {
+    cursor: pointer;
+}
+
 .news {
     border: 1px solid #336784;
     border-radius: 5px;

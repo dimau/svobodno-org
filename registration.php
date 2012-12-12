@@ -88,10 +88,8 @@ if ($action == "registration") {
 	// Если данные, указанные пользователем, корректны, запишем их в базу данных
 	if (is_array($errors) && count($errors) == 0) {
 
-		$correctSaveCharacteristicToDB = $user->saveCharacteristicToDB("new");
-
 		// Если сохранение Личных данных пользователя прошло успешно, то считаем, что пользователь уже зарегистрирован, выполняем сохранение в БД остальных данных (фотографии и поисковый запрос)
-		if ($correctSaveCharacteristicToDB) {
+		if ($user->saveCharacteristicToDB("new")) {
 
 			// Узнаем id пользователя - необходимо при сохранении информации о фотке в постоянную базу
 			$user->getIdUseLogin();

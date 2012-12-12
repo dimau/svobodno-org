@@ -3,12 +3,37 @@
  * ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ: инициализация
  **********************************************************************/
 
-var currentFotoGalleryIndex = 1; // Инкрементный, уникальный. Используется для того, чтобы объединять на странице фотографии в отдельные галереи. Например, если на странице поиска много объектов недвижимости, то и фотки каждого отдельно взятого объекта должны быть проинициализированы как уникальная галерея через colorBox.
+// Инкрементный, уникальный. Используется для того, чтобы объединять на странице фотографии в отдельные галереи. Например, если на странице поиска много объектов недвижимости, то и фотки каждого отдельно взятого объекта должны быть проинициализированы как уникальная галерея через colorBox.
+var currentFotoGalleryIndex = 1;
+
+// Инициализируем флаг - нужна ли валидация вкладки при ее появлении
+var validationIsNeeded = false;
 
 /**********************************************************************
- * ГЛАВНОЕ МЕНЮ: делаем красивые (равномерные) отступы внутри плашки меню
+ * ВЕШАЕМ ОБРАБОТЧИКИ СОБЫТИЙ
  **********************************************************************/
 
+// ГЛАВНОЕ МЕНЮ: делаем красивые (равномерные) отступы внутри плашки меню
+$(document).ready(changeMenuSeparatorWidth);
+$(window).resize(changeMenuSeparatorWidth);
+
+// jQUERY UI: инициализация элементов по умолчанию
+$(document).ready(initJQueryUI);
+
+// Добавление в Избранное по клику на звезде
+$(document).on('click', '.addToFavorites', addToFavorites);
+
+// Удаление из избранного по клику на звезде
+$(document).on('click', '.removeFromFavorites', removeFromFavorites);
+
+// Активируем ColorBox для просмотра в модальном окне галереи фотографий по клику на миниатюре
+$(document).ready(initColorBox);
+
+/**********************************************************************
+ * ФУНКЦИИ ОБРАБОТЧИКИ СОБЫТИЙ
+ **********************************************************************/
+
+// Функция для выравнивания отступов внутри плашки главного меню
 function changeMenuSeparatorWidth() {
     // Выясняем ширину области меню
     var menuWidth = $(".menu").width();
@@ -35,45 +60,9 @@ function changeMenuSeparatorWidth() {
         $(this).width(separatorWidth);
     })
 }
-$(document).ready(changeMenuSeparatorWidth);
-$(window).resize(changeMenuSeparatorWidth);
 
-/**********************************************************************
- * jQUERY UI: инициализация элементов по умолчанию
- **********************************************************************/
-
-$(document).ready(function() {
-    /* Инициализируем отображение вкладок при помощи jQuery UI */
-    $("#tabs").tabs();
-
-    // Активируем аккордеон, установим возможность сворачиваться одновременно всем вкладкам, установим параметр, который будет позволять высоте вкладки автоматически подстраиваться под размер содержимого. При запуске аккордеона закроем все вкладки
-    $(".accordion").accordion({
-        collapsible:true,
-        autoHeight:false
-    });
-    $(".accordion").accordion("activate", false);
-
-    // Активируем кнопки через jQuery UI
-    $("button, a.button, input.button").button();
-
-    // Если на странице есть модальнео окно для незарегистрированного пользователя, который нажал на кнопку Добавить в избранное, то активируем его
-    $("#addToFavoritesDialog").dialog({
-        autoOpen:false,
-        modal:true,
-        width:600,
-        dialogClass:"edited"
-    });
-
-});
-
-/**********************************************************************
- * ИЗБРАННОЕ: добавление, удаление
- **********************************************************************/
-
-// Навешиваем обработчик клика по добавлению в избранные
-$(document).on('click', '.addToFavorites', addToFavorites);
+// Обработчик события клика по добавлению в избранное
 function addToFavorites() {
-
     // Если пользователь незарегистрирован (а значит скрипт на сервере поместил в документ блок #addToFavoritesDialog), то выдаем модальное окно с информацией о необходимости регистрации
     if ($("#addToFavoritesDialog").length) {
         $("#addToFavoritesDialog").dialog("open");
@@ -99,8 +88,7 @@ function addToFavorites() {
     return false;
 }
 
-// Навешиваем обработчик клика по удалению из избранного
-$(document).on('click', '.removeFromFavorites', removeFromFavorites);
+// Обработчик события клика по удалению из избранного
 function removeFromFavorites() {
     var self = this;
     var propertyId = 0;
@@ -121,11 +109,8 @@ function removeFromFavorites() {
     return false;
 }
 
-/**********************************************************************
- * Активируем ColorBox для просмотра в модальном окне галереи фотографий по клику на миниатюре
- **********************************************************************/
-
-$(document).ready(function () {
+// Функция для инициализации colorBox блоков на странице
+function initColorBox() {
     // Соберем на странице все блоки с фотографиями
     var allFotosWrappers = document.getElementsByClassName('fotosWrapper');
 
@@ -139,7 +124,42 @@ $(document).ready(function () {
         currentFotoGalleryIndex++;
     }
 
-});
+}
+
+// Функция для инициализации оформления элементов с помощью jQuery UI
+function initJQueryUI() {
+    /* Инициализируем отображение вкладок при помощи jQuery UI */
+    $("#tabs").tabs();
+
+    // Активируем аккордеон, установим возможность сворачиваться одновременно всем вкладкам, установим параметр, который будет позволять высоте вкладки автоматически подстраиваться под размер содержимого. При запуске аккордеона закроем все вкладки
+    $(".accordion").accordion({
+        collapsible:true,
+        autoHeight:false
+    });
+    $(".accordion").accordion("activate", false);
+
+    // Активируем кнопки через jQuery UI
+    $("button, a.button, input.button").button();
+
+    // Если на странице есть модальнео окно для незарегистрированного пользователя, который нажал на кнопку Добавить в избранное, то активируем его
+    $("#addToFavoritesDialog").dialog({
+        autoOpen:false,
+        modal:true,
+        width:600,
+        dialogClass:"edited"
+    });
+}
+
+/*****************************************************************
+ * Отображение найденных ошибок при валидации данных на сервере (PHP)
+ *****************************************************************/
+
+if ($('#userMistakesBlock ol').html() != "") {
+    $('#userMistakesBlock').on('click', function () {
+        $(this).slideUp(800);
+    });
+    $('#userMistakesBlock').css('display', 'block');
+}
 
 /*****************************************************************
  * ФОТОГРАФИИ: загрузка и редактирование
@@ -381,13 +401,11 @@ function notavailability() {
 }
 
 /**********************************************************************************
- * Функция для ФОРМИРОВАНИЯ И ОТОБРАЖЕНИЯ СООБЩЕНИЯ ОБ ОШИБКЕ над элементом ввода.
+ * ВАЛИДАЦИЯ ПОЛЕЙ ВВОДА В БРАУЗЕРЕ: функции, используемые при валидации введенных пользователем данных и отображения ошибок
  *********************************************************************************/
 
-// Используется при валидации формы регистрации пользователя
 // inputId - идентификатор элемента управления (select, input..)
 // errorText - сообщение об ошибке, которое нужно отобразить
-
 function buildErrorMessageBlock (inputId, errorText) {
     var divErrorBlock = document.createElement('div');
     var divErrorContent = document.createElement('div');
@@ -429,5 +447,342 @@ $("input[type=text], input[type=password], select, textarea").on('focus', functi
     });
 });
 
-// Инициализируем флаг - нужна ли валидация вкладки при ее появлении
-var validationIsNeeded = false;
+// Производит валидацию вкладки, номер которой передан в качестве параметра
+// pageName - имя страницы, на которой производится валидация
+// tabNumber - дополнительный параметр, указывающий на номер вкладки на странице (можно воспринимать как идентификатор блока параметров, которым требуется валидация на данной странице)
+function executeValidation(pageName, tabNumber) {
+
+    // Инициализируем переменную для хранения количества найденных ошибок
+    var errors = 0;
+
+    // Удаляем на странице все отображаемые блоки с ошибками
+    $(".errorBlock").remove();
+
+    if (pageName == "registration") {
+        switch (tabNumber) {
+            case 0:
+                errors = personalFIO_validation();
+                break;
+            case 1:
+                errors = personalEducAndWork_validation();
+                break;
+            case 2:
+                errors = personalSocial_validation();
+                break;
+            case 3:
+                errors = searchRequest_validation();
+                break;
+        }
+    }
+
+    if (pageName == "forowner") {
+        errors = requestFromOwner_validation();
+    }
+
+    // Возвращаем количество ошибок
+    return errors;
+}
+
+// Функция валидации для основных данных пользователя
+function personalFIO_validation() {
+
+    var err = 0;
+
+    // ФИО
+    if ($('#surname').val() == '') {
+        buildErrorMessageBlock ("surname", "Укажите фамилию");
+        err++;
+    }
+    if ($('#surname').val().length > 50) {
+        buildErrorMessageBlock ("surname", "Слишком длинная фамилия. Можно указать не более 50-ти символов");
+        err++;
+    }
+    if ($('#name').val() == '') {
+        buildErrorMessageBlock ("name", "Укажите имя");
+        err++;
+    }
+    if ($('#name').val().length > 50) {
+        buildErrorMessageBlock ("name", "Слишком длинное имя. Можно указать не более 50-ти символов");
+        err++;
+    }
+    if ($('#secondName').val() == '') {
+        buildErrorMessageBlock ("secondName", "Укажите отчество");
+        err++;
+    }
+    if ($('#secondName').val().length > 50) {
+        buildErrorMessageBlock ("secondName", "Слишком длинное отчество. Можно указать не более 50-ти символов");
+        err++;
+    }
+
+    // Пол, внешность, ДР
+    if ($('#sex').val() == '0') {
+        buildErrorMessageBlock ("sex", "Укажите пол");
+        err++;
+    }
+    if ($('#nationality').val() == '0') {
+        buildErrorMessageBlock ("nationality", "Укажите внешность");
+        err++;
+    }
+    if ($('#birthday').val() == '') {
+        buildErrorMessageBlock ("birthday", "Укажите дату рождения");
+        err++;
+    } else {
+        if (!/^\d\d.\d\d.\d\d\d\d$/.test($('#birthday').val())) {
+            buildErrorMessageBlock ("birthday", "Неправильный формат даты рождения, должен быть: дд.мм.гггг, например: 01.01.1980");
+            err++;
+        } else {
+            if ($('#birthday').val().slice(0, 2) < "01" || $('#birthday').val().slice(0, 2) > "31") {
+                buildErrorMessageBlock ("birthday", "Проверьте дату Дня рождения (допустимо от 01 до 31)");
+                err++;
+            }
+            if ($('#birthday').val().slice(3, 5) < "01" || $('#birthday').val().slice(3, 5) > "12") {
+                buildErrorMessageBlock ("birthday", "Проверьте месяц Дня рождения (допустимо от 01 до 12)");
+                err++;
+            }
+            if ($('#birthday').val().slice(6) < "1800" || $('#birthday').val().slice(6) > "2100") {
+                buildErrorMessageBlock ("birthday", "Проверьте год Дня рождения (допустимо от 1800 до 2100)");
+                err++;
+            }
+        }
+    }
+
+    // Логин и пароль
+    if ($('#login').val() == '') {
+        buildErrorMessageBlock ("login", "Укажите логин");
+        err++;
+    }
+    if ($('#login').val().length > 50) {
+        buildErrorMessageBlock ("login", "Слишком длинный логин. Можно указать не более 50-ти символов");
+        err++;
+    }
+    if ($('#password').val() == '') {
+        buildErrorMessageBlock ("password", "Укажите пароль");
+        err++;
+    }
+
+    // Телефон и e-mail
+    if ($('#telephon').val() == '') {
+        buildErrorMessageBlock ("telephon", "Укажите контактный (мобильный) телефон");
+        err++;
+    } else {
+        if (!/^[0-9]{10}$/.test($('#telephon').val())) {
+            buildErrorMessageBlock ("telephon", "Укажите, пожалуйста, Ваш мобильный номер без 8-ки, например: 9226470019");
+            err++;
+        }
+    }
+    if ($('#email').val() == '' && typeTenant) {
+        buildErrorMessageBlock ("email", "Укажите e-mail");
+        err++;
+    }
+    if ($('#email').val() != '' && !/^(([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+\.)*([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]{2,5}$/.test($('#email').val())) {
+        buildErrorMessageBlock ("email", "Попробуйте ввести e-mail еще раз или указать другой электронный адрес (e-mail не прошел проверку формата)");
+        err++;
+    }
+
+    return err;
+}
+// Функция валидации для данных об образовании и работе
+function personalEducAndWork_validation() {
+    var err = 0;
+
+    if ($('#currentStatusEducation').val() == '0' && typeTenant) {
+        buildErrorMessageBlock ("currentStatusEducation", "Укажите Ваше образование (текущий статус)");
+        err++;
+    } else {
+        // Образование
+        if ($('#almamater').val() == '' && typeTenant && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  )) {
+            buildErrorMessageBlock ("almamater", "Укажите учебное заведение");
+            err++;
+        }
+        if ($('#almamater').val().length > 100) {
+            buildErrorMessageBlock ("almamater", "Слишком длинное название учебного заведения (используйте не более 100 символов)");
+            err++;
+        }
+        if ($('#speciality').val() == '' && typeTenant && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  )) {
+            buildErrorMessageBlock ("speciality", "Укажите специальность");
+            err++;
+        }
+        if ($('#speciality').val().length > 100) {
+            buildErrorMessageBlock ("speciality", "Слишком длинное название специальности (используйте не более 100 символов)");
+            err++;
+        }
+        if ($('#kurs').val() == '' && typeTenant && $('#currentStatusEducation').val() == 'сейчас учусь') {
+            buildErrorMessageBlock ("kurs", "Укажите курс обучения");
+            err++;
+        }
+        if ($('#kurs').val().length > 30) {
+            buildErrorMessageBlock ("kurs", "Указана слишком длинная строка (используйте не более 30 символов)");
+            err++;
+        }
+        if ($('#ochnoZaochno').val() == '0' && typeTenant && $('#currentStatusEducation').val() == 'сейчас учусь') {
+            buildErrorMessageBlock ("ochnoZaochno", "Укажите форму обучения (очная, заочная)");
+            err++;
+        }
+        if ($('#yearOfEnd').val() == '' && typeTenant && $('#currentStatusEducation').val() == 'закончил') {
+            buildErrorMessageBlock ("yearOfEnd", "Укажите год окончания учебного заведения");
+            err++;
+        }
+        if ($('#yearOfEnd').val() != '' && !/^[12]{1}[0-9]{3}$/.test($('#yearOfEnd').val())) {
+            buildErrorMessageBlock ("yearOfEnd", "Укажите год окончания учебного заведения в формате: \"гггг\". Например: 2007");
+            err++;
+        }
+    }
+
+    // Работа
+    if ($('#statusWork').val() == '0' && typeTenant) {
+        buildErrorMessageBlock ("statusWork", "Укажите статус занятости");
+        err++;
+    } else {
+        if ($('#placeOfWork').val() == '' && $("#statusWork").val() == 'работаю' && typeTenant) {
+            buildErrorMessageBlock ("placeOfWork", "Укажите Ваше место работы (название организации)");
+            err++;
+        }
+        if ($('#placeOfWork').val().length > 100) {
+            buildErrorMessageBlock ("placeOfWork", "Слишком длинное наименование места работы (используйте не более 100 символов)");
+            err++;
+        }
+        if ($('#workPosition').val() == '' && $("#statusWork").val() == 'работаю' && typeTenant) {
+            buildErrorMessageBlock ("workPosition", "Укажите Вашу должность");
+            err++;
+        }
+        if ($('#workPosition').val().length > 100) {
+            buildErrorMessageBlock ("workPosition", "Слишком длинное название должности (используйте не более 100 символов)");
+            err++;
+        }
+    }
+
+    // Коротко о себе
+    if ($('#regionOfBorn').val().length > 50) {
+        buildErrorMessageBlock ("regionOfBorn", "Слишком длинное наименование региона, в котором Вы родились (используйте не более 50 символов)");
+        err++;
+    }
+    if ($('#cityOfBorn').val().length > 50) {
+        buildErrorMessageBlock ("cityOfBorn", "Слишком длинное наименование города, в котором Вы родились (используйте не более 50 символов)");
+        err++;
+    }
+
+    return err;
+}
+// Функция валидации для данных о социальных сетях пользователя
+function personalSocial_validation() {
+    var err = 0;
+
+    if ($('#vkontakte').val().length > 100) {
+        buildErrorMessageBlock ("vkontakte", "Указана слишком длинная ссылка на личную страницу Вконтакте (используйте не более 100 символов)");
+        err++;
+    }
+    if ($('#vkontakte').val() != '' && !/vk\.com/.test($('#vkontakte').val())) {
+        buildErrorMessageBlock ("vkontakte", "Укажите, пожалуйста, Вашу настоящую личную страницу Вконтакте, либо оставьте поле пустым (ссылка должна содержать строчку \"vk.com\")");
+        err++;
+    }
+    if ($('#odnoklassniki').val().length > 100) {
+        buildErrorMessageBlock ("odnoklassniki", "Указана слишком длинная ссылка на личную страницу в Одноклассниках (используйте не более 100 символов)");
+        err++;
+    }
+    if ($('#odnoklassniki').val() != '' && !/www\.odnoklassniki\.ru\/profile\//.test($('#odnoklassniki').val())) {
+        buildErrorMessageBlock ("odnoklassniki", "Укажите, пожалуйста, Вашу настоящую личную страницу в Одноклассниках, либо оставьте поле пустым (ссылка должна содержать строчку \"www.odnoklassniki.ru/profile/\")");
+        err++;
+    }
+    if ($('#facebook').val().length > 100) {
+        buildErrorMessageBlock ("facebook", "Указана слишком длинная ссылка на личную страницу на Facebook (используйте не более 100 символов)");
+        err++;
+    }
+    if ($('#facebook').val() != '' && !/www\.facebook\.com\/profile\.php/.test($('#facebook').val())) {
+        buildErrorMessageBlock ("facebook", "Укажите, пожалуйста, Вашу настоящую личную страницу на Facebook, либо оставьте поле пустым (ссылка должна содержать строчку с \"www.facebook.com/profile.php\")");
+        err++;
+    }
+    if ($('#twitter').val().length > 100) {
+        buildErrorMessageBlock ("twitter", "Указана слишком длинная ссылка на личную страницу в Twitter (используйте не более 100 символов)");
+        err++;
+    }
+    if ($('#twitter').val() != '' && !/twitter\.com/.test($('#twitter').val())) {
+        buildErrorMessageBlock ("twitter", "Укажите, пожалуйста, Вашу настоящую личную страницу в Twitter, либо оставьте поле пустым (ссылка должна содержать строчку \"twitter.com\")");
+        err++;
+    }
+
+    if ($('#tabs-3 #lic').length && $('#tabs-3 #lic').attr('checked') != "checked") {
+        buildErrorMessageBlock ("lic", "Регистрация возможна только при согласии с условиями лицензионного соглашения");
+        err++;
+    }
+
+    return err;
+}
+// Функция валидации для параметров поискового запроса пользователя
+function searchRequest_validation() {
+    var err = 0;
+
+    if (!/^\d{0,8}$/.test($('#minCost').val())) {
+        buildErrorMessageBlock ("minCost", "Неправильный формат числа в поле минимальной величины арендной платы (проверьте: только числа, не более 8 символов)");
+        err++;
+    }
+    if (!/^\d{0,8}$/.test($('#maxCost').val())) {
+        buildErrorMessageBlock ("maxCost", "Неправильный формат числа в поле максимальной величины арендной платы (проверьте: только числа, не более 8 символов)");
+        err++;
+    }
+    if (!/^\d{0,8}$/.test($('#pledge').val())) {
+        buildErrorMessageBlock ("pledge", "Неправильный формат числа в поле максимальной величины залога (проверьте: только числа, не более 8 символов)");
+        err++;
+    }
+
+    if ($('#minCost').val() > $('#maxCost').val()) {
+        buildErrorMessageBlock ("#minCost", "Минимальная стоимость аренды не может быть больше, чем максимальная. Исправьте поля, в которых указаны Ваши требования к диапазону стоимости аренды");
+        err++;
+    }
+
+    if ($('#withWho').val() == "0" && $('#typeOfObject').val() != "гараж") {
+        buildErrorMessageBlock ("withWho", "Укажите, как Вы собираетесь проживать в арендуемой недвижимости (с кем)");
+        err++;
+    }
+    if ($('#children').val() == "0" && $('#typeOfObject').val() != "гараж") {
+        buildErrorMessageBlock ("children", "Укажите, собираетесь ли Вы проживать вместе с детьми или без них");
+        err++;
+    }
+    if ($('#animals').val() == "0" && $('#typeOfObject').val() != "гараж") {
+        buildErrorMessageBlock ("animals", "Укажите, собираетесь ли Вы проживать вместе с животными или без них");
+        err++;
+    }
+    if ($('#termOfLease').val() == "0") {
+        buildErrorMessageBlock ("termOfLease", "Укажите предполагаемый срок аренды");
+        err++;
+    }
+
+    if ($('#tabs-4 #lic').length && $('#tabs-4 #lic').attr('checked') != "checked") {
+        buildErrorMessageBlock ("lic", "Регистрация возможна только при согласии с условиями лицензионного соглашения");
+        err++;
+    }
+
+    return err;
+}
+// Функция валидации для параметров заявки собственника
+function requestFromOwner_validation() {
+    var err = 0;
+
+    if ($('#name').val() == '') {
+        buildErrorMessageBlock ("name", "Укажите Ваше имя");
+        err++;
+    }
+    if ($('#name').val().length > 100) {
+        buildErrorMessageBlock ("name", "Используйте не более 100 символов");
+        err++;
+    }
+
+    if ($('#telephon').val() == '') {
+        buildErrorMessageBlock ("telephon", "Укажите Ваш контактный номер телефона");
+        err++;
+    }
+    if ($('#telephon').val().length > 20) {
+        buildErrorMessageBlock ("telephon", "Используйте не более 20 цифр, например: 9225468392");
+        err++;
+    }
+
+    if ($('#address').val() == '') {
+        buildErrorMessageBlock ("address", "Укажите адрес недвижимости");
+        err++;
+    }
+    if ($('#address').val().length > 60) {
+        buildErrorMessageBlock ("address", "Используйте не более 60-ти символов");
+        err++;
+    }
+
+    return err;
+}

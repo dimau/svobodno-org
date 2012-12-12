@@ -8,12 +8,13 @@
         public $address = "";
         public $commentOwner = "";
         private $userId = ""; // Хранит идентификатор пользователя, если обратившийся пользователь был авторизован
+		public $regDate = "";
 
         // КОНСТРУКТОР
-        public function __construct($incomingUser = FALSE)
+        public function __construct($incomingUser)
         {
             // Если пользователь, перешедший на страницу формирования запроса авторизован - воспользуемся его данными (например, для автоматического заполнения части полей)
-            if ($incomingUser != FALSE) {
+            if (isset($incomingUser) && $incomingUser->login()) {
                 $this->name = $incomingUser->name." ".$incomingUser->secondName;
                 $this->telephon = $incomingUser->telephon;
                 $this->userId = $incomingUser->getId();
@@ -31,10 +32,9 @@
             // Если у запроса на просмотр уже есть id, значит речь идет о редактировании данных, в противном случае - о создании нового запроса в БД
             if ($this->id != "") {
 
-                // Непосредственное сохранение данных о поисковом запросе
                 $stmt = DBconnect::get()->stmt_init();
-                if (($stmt->prepare("UPDATE requestFromOwners SET name = ?, telephon = ?, address = ?, commentOwner = ? WHERE id = ?") === FALSE)
-                    OR ($stmt->bind_param("ssssi", $this->name, $this->telephon, $this->address, $this->commentOwner, $this->id) === FALSE)
+                if (($stmt->prepare("UPDATE requestFromOwners SET name = ?, telephon = ?, address = ?, commentOwner = ?, userId = ?, regDate = ? WHERE id = ?") === FALSE)
+                    OR ($stmt->bind_param("ssssiii", $this->name, $this->telephon, $this->address, $this->commentOwner, $this->userId, $this->regDate, $this->id) === FALSE)
                     OR ($stmt->execute() === FALSE)
                     OR (($res = $stmt->affected_rows) === -1)
                     OR ($stmt->close() === FALSE)
@@ -45,10 +45,12 @@
 
             } else {
 
-                // Непосредственное сохранение данных о поисковом запросе
+				// Вычислим время регистрации заявки от собственника на сайте
+				$this->regDate = time();
+
                 $stmt = DBconnect::get()->stmt_init();
-                if (($stmt->prepare("INSERT INTO requestFromOwners (name, telephon, address, commentOwner, userId) VALUES (?,?,?,?,?)") === FALSE)
-                    OR ($stmt->bind_param("sssss", $this->name, $this->telephon, $this->address, $this->commentOwner, $this->userId) === FALSE)
+                if (($stmt->prepare("INSERT INTO requestFromOwners (name, telephon, address, commentOwner, userId, regDate) VALUES (?,?,?,?,?,?)") === FALSE)
+                    OR ($stmt->bind_param("ssssii", $this->name, $this->telephon, $this->address, $this->commentOwner, $this->userId, $this->regDate) === FALSE)
                     OR ($stmt->execute() === FALSE)
                     OR (($res = $stmt->affected_rows) === -1)
                     OR ($res === 0)
@@ -71,6 +73,24 @@
             if (isset($_POST['commentOwner'])) $this->commentOwner = htmlspecialchars($_POST['commentOwner'], ENT_QUOTES);
         }
 
+		// Валидация параметров запроса собственника
+		public function requestFromOwnerDataValidate() {
+			// Подготовим массив для сохранения сообщений об ошибках
+			$errors = array();
+
+			if ($this->name == "") $errors[] = 'Укажите Ваше имя';
+			if (strlen($this->name) > 100) $errors[] = 'Слишком длинное имя. Используйте не более 100 символов';
+
+			if ($this->telephon == "") $errors[] = 'Укажите Ваш контактный номер телефона';
+			if (strlen($this->telephon) > 20) $errors[] = 'Слишком длинный номер телефона. Используйте не более 20 цифр, например: 9225468392';
+
+			if ($this->address == "") $errors[] = 'Укажите адрес недвижимости';
+			if (strlen($this->address) > 60) $errors[] = 'Указан слишком длинный адрес (используйте не более 60 символов)';
+
+			// Возвращаем список ошибок, если все в порядке, то он будет пуст
+			return $errors;
+		}
+
         // Возвращает ассоциированный массив с данными о запросе собственника на новое объявление
         public function getRequestFromOwnerData() {
             $result = array();
@@ -80,6 +100,8 @@
             $result['telephon'] = $this->telephon;
             $result['address'] = $this->address;
             $result['commentOwner'] = $this->commentOwner;
+			$result['userId'] = $this->userId;
+			$result['regDate'] = $this->regDate;
 
             return $result;
         }

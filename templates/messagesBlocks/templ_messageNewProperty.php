@@ -1,14 +1,14 @@
-<div class='news {unread}'>
+<div class='news {unread}' messageType="newProperty" messageId="{messageId}">
     <div class='newsHeader'>
         Новое предложение по Вашему поиску
     </div>
     {fotosWrapper}
     <ul class='setOfInstructions'>
         <li>
-            <a href='#'>прочитал</a>
+            <a class="isReadedTrueMessage">прочитал</a>
         </li>
         <li>
-            <a href='#'>удалить</a>
+            <a class="removeMessage">удалить</a>
         </li>
         <li>
             <a href='property.php?propertyId={propertyId}' target='_blank'>подробнее</a>
@@ -19,7 +19,7 @@
             <span class='headOfString'>{typeOfObject}</span> {address}
         </li>
         <li>
-            <span class='headOfString'>Плата:</span> {costOfRenting} {currency}{utilities}
+            <span class='headOfString'>{costOfRentingName}</span> {costOfRenting} {currency}{utilities}
         </li>
         <li>
             <span class='headOfString'>{amountOfRoomsName}</span> {amountOfRooms}{adjacentRooms}

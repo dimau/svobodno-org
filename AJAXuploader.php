@@ -393,28 +393,24 @@
         // Функция сохраняет данные о файле фотографии в Базу данных - в таблицу tempFotos
         function saveInfToDB($folder, $filename, $size) {
 
-            // Проверяем, что есть соединение с БД
-            if (DBconnect::get() == FALSE) return FALSE;
-
             // Готовим данные для сохранения в БД
             $sizeMb = round($size / 1024 / 1024, 1);
             $extension = 'jpeg';
+			$regDate = time();
 
             // Сохраняем информацию о загруженной фотке в БД
-            $stmt = DBconnect::get()->stmt_init();
-            if (($stmt->prepare("INSERT INTO tempFotos (id, fileUploadId, folder, filename, extension, filesizeMb) VALUES (?,?,?,?,?,?)") === FALSE)
-                OR ($stmt->bind_param("sssssd", $filename, htmlspecialchars($_GET['fileuploadid'], ENT_QUOTES), $folder, htmlspecialchars($_GET['sourcefilename'], ENT_QUOTES), $extension, $sizeMb) === FALSE)
-                OR ($stmt->execute() === FALSE)
-                OR (($res = $stmt->affected_rows) === -1)
-                OR ($res === 0)
-                OR ($stmt->close() === FALSE)
-            ) {
-                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-                return FALSE;
-            }
+			$res = DBconnect::insertPhotoForFileUploadId(array(
+				'id' => $filename,
+				'fileUploadId' => $_GET['fileuploadid'],
+				'folder' => $folder,
+				'filename' => $_GET['sourcefilename'],
+				'extension' => $extension,
+				'filesizeMb' => $sizeMb,
+				'regDate' => $regDate
+				)
+			);
 
-            return TRUE;
-
+			return $res;
         }
 
         // Функция для очистки памяти

@@ -20,6 +20,7 @@
         public $howManyAnimals = "";
         public $termOfLease = "0";
         public $additionalDescriptionOfSearch = "";
+		public $regDate = "";
 
         private $propertyLightArr; // Массив массивов. После выполнения метода searchProperties содержит минимальные данные по ВСЕМ объектам, соответствующим условиям поиска
         private $propertyFullArr; // Массив массивов. После выполнения метода searchProperties содержит полные данные, включая фотографии, по нескольким первым в выборке объектам (количество указывается в качестве первого параметра к методу searchProperties)
@@ -77,6 +78,7 @@
             if (isset($oneSearchRequestDataArr['howManyAnimals'])) $this->howManyAnimals = $oneSearchRequestDataArr['howManyAnimals'];
             if (isset($oneSearchRequestDataArr['termOfLease'])) $this->termOfLease = $oneSearchRequestDataArr['termOfLease'];
             if (isset($oneSearchRequestDataArr['additionalDescriptionOfSearch'])) $this->additionalDescriptionOfSearch = $oneSearchRequestDataArr['additionalDescriptionOfSearch'];
+			if (isset($oneSearchRequestDataArr['regDate'])) $this->regDate = $oneSearchRequestDataArr['regDate'];
 
             return TRUE;
         }
@@ -320,8 +322,8 @@
             $result['howManyAnimals'] = $this->howManyAnimals;
             $result['termOfLease'] = $this->termOfLease;
             $result['additionalDescriptionOfSearch'] = $this->additionalDescriptionOfSearch;
+			$result['regDate'] = $this->regDate;
 
             return $result;
-
         }
     }

@@ -91,6 +91,11 @@
             return $year . "." . $month . "." . $date;
         }
 
+		// Преобразовывает дату из формата таймстамп, пригодного для хранения в БД в формат, пригодный для отображения
+		public static function timestampFromDBToView($timestamp) {
+			return date('d-m-Y G:i', $timestamp);
+		}
+
         // Функция делает первый символ строки в верхнем регистре
         public static function getFirstCharUpper($str)
         {

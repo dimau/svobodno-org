@@ -52,6 +52,47 @@ $("#currentStatusEducation").change(notavailability);
 $("#statusWork").change(notavailability);
 $("#typeOfObject").change(notavailability);
 
+/*****************************************************************
+ * Вкладка Уведомления
+ *****************************************************************/
+
+$(document).ready(function() {
+    // Вешаем обработчик на клик по ссылке "прочитано" на уведомлении
+    $(".isReadedTrueMessage").click(isReadedTrueMessage);
+
+    // Вешаем обработчик на клик по ссылке удалить уведомление
+    $(".removeMessage").click(removeMessage);
+});
+
+// Обработчик события клика по ссылке прочитано - делает уведомление прочитанным
+function isReadedTrueMessage() {
+    // Получим головной элемент уведомления (класса news)
+    var messageBlock = $(this).closest(".news");
+
+    // Проведем изменения в интерфейсе
+    $(messageBlock).removeClass("unread");
+    $(this).remove(); // удаляет ссылку "прочитано"
+
+    // Получим id уведомления
+    var messageId = messageBlock.attr('messageId');
+    // Получим тип уведомления
+    var messageType = messageBlock.attr('messageType');
+
+    jQuery.post("AJAXChangeMessages.php", {"messageId": messageId, "messageType": messageType, "action": "isReadedTrue"}, function (data) {
+        $(data).find("span[status='successful']").each(function () {
+            /* Если вдруг нужно будет что-то выдавать при получении положительного ответа, то закодить здесь */
+        });
+        $(data).find("span[status='denied']").each(function () {
+            /* Если вдруг нужно будет что-то выдавать при получении отказа в добавлении в избранное, то закодить здесь */
+        });
+    }, "xml");
+}
+
+// Обработчик события - удаляет уведомление
+function removeMessage() {
+
+}
+
 /***********************************************************
  * Вкладка Мои объявления
  ***********************************************************/

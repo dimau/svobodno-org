@@ -1,63 +1,61 @@
 <?php
-    /**
-     * Формирует необходимую для работы сайта базу данных со всей структурой и таблицами
-     * При изменении структуры таблиц в этом файле или в БД, не забудь соответствующим образом изменить проверку валидности введенных пользователем данных на JS и на PHP, а также запрос на сохранение данных в БД при регистрации и другие запросы к БД
-     */
+/**
+ * Формирует необходимую для работы сайта базу данных со всей структурой и таблицами
+ * При изменении структуры таблиц в этом файле или в БД, не забудь соответствующим образом изменить проверку валидности введенных пользователем данных на JS и на PHP, а также запрос на сохранение данных в БД при регистрации и другие запросы к БД
+ */
 
-    // Подключаем нужные модели и представления
-    include '../models/DBconnect.php';
+// Подключаем нужные модели и представления
+include '../models/DBconnect.php';
 
-    // Удалось ли подключиться к БД?
-    if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
+// Удалось ли подключиться к БД?
+if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
-    // Функция возвращает "1", если операция над БД была выполнена успешно и FALSE с расшифровкой ошибки, если выполнить ее не удалось
-    // $typeRes = "1" - выдача результата по отдельной операции с базой данных, крезультат по каждой из которых выводится в отдельную строку
-    // $typeRes = "2" - выдача результата по набору однотипных операций с БД - в одну строку!
-    function returnResultMySql($rez)
-    {
-        if ($rez == FALSE) {
-            echo " <span style='color: red;'>FALSE(".DBconnect::get()->errno." ".DBconnect::get()->error.")</span> ";
-        } else {
-            echo 1;
-        }
-        echo "<br>";
-    }
+// Функция возвращает "1", если операция над БД была выполнена успешно и FALSE с расшифровкой ошибки, если выполнить ее не удалось
+// $typeRes = "1" - выдача результата по отдельной операции с базой данных, крезультат по каждой из которых выводится в отдельную строку
+// $typeRes = "2" - выдача результата по набору однотипных операций с БД - в одну строку!
+function returnResultMySql($rez) {
+	if ($rez == FALSE) {
+		echo " <span style='color: red;'>FALSE(" . DBconnect::get()->errno . " " . DBconnect::get()->error . ")</span> ";
+	} else {
+		echo 1;
+	}
+	echo "<br>";
+}
 
-    // Текущая версия PHP на сервере
-    //echo 'Current PHP version: '.phpversion().'<br>';
-    // Вывести подробную информацию о PHP
-    //echo phpinfo()."<br><br>";
+// Текущая версия PHP на сервере
+//echo 'Current PHP version: '.phpversion().'<br>';
+// Вывести подробную информацию о PHP
+//echo phpinfo()."<br><br>";
 
-    /***************************************************************************
-     * Чистим базу данных перед закачкой исходных данных
-     ***************************************************************************/
+/***************************************************************************
+ * Чистим базу данных перед закачкой исходных данных
+ ***************************************************************************/
 
-    DBconnect::get()->query("DROP TABLE IF EXISTS
-    users,
-    tempFotos,
-    userFotos,
-    searchRequests,
-    property,
-    propertyFotos,
-    messages,
-    requestToView,
-    requestFromOwners,
-    messagesNewProperty,
-    messagesNewTenant,
-    districts,
-    currencies
-    ");
+DBconnect::get()->query("DROP TABLE IF EXISTS
+users,
+property,
+tempFotos,
+userFotos,
+propertyFotos,
+searchRequests,
+requestToView,
+requestFromOwners,
+messagesNewProperty,
+messagesNewTenant,
+districts,
+currencies
+");
 
-    echo "Удаление старых таблиц: ";
-    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+echo "Удаление старых таблиц: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
-    /****************************************************************************
-     * ХАРАКТЕРИСТИКИ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ
-	 *
-	 * Данная таблица с течением времени только увеличивается - мы накапливаем базу собственников и арендаторов
-	 * Алгоритмов по очистке таблицы не предусмотрено
-     ***************************************************************************/
-    DBconnect::get()->query("CREATE TABLE users (
+/****************************************************************************
+ * ХАРАКТЕРИСТИКИ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ
+ *
+ * Данная таблица с течением времени только увеличивается - мы накапливаем базу собственников и арендаторов
+ * Алгоритмов по очистке таблицы не предусмотрено
+ ***************************************************************************/
+DBconnect::get()->query("CREATE TABLE users (
         id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
         typeTenant VARCHAR(5) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Равен строке true, если пользователь в данный момент ищет недвижимость (является потенциальным арендатором), в том числе, обязательно имеет поисковый запрос',
         typeOwner VARCHAR(5) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Равен строке true, если пользователь указал хотя бы 1 объявление по сдаче в аренду недвижимости (является собственником)(не имеет значение - опубликованное или нет)',
@@ -96,90 +94,19 @@
         favoritesPropertysId TEXT COMMENT 'Список id объектов недвижимости, которые данный пользователь добавил в избранные'
 )");
 
-    echo "users: ";
-    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+echo "users: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
-    /****************************************************************************
-	 * ВРЕМЕННОЕ ХРАНЕНИЕ ФОТОГРАФИЙ
-	 *
-     * Создаем таблицу для временного хранения информации о загруженных фотографиях (при регистрации пользователей и при заведении новых объявлений)
-	 * TODO: необходимо в будущем реализовать периодическую чистку базы и удаление соответствующих файлов
-     ***************************************************************************/
+/****************************************************************************
+ * ОБЪЕКТЫ НЕДВИЖИМОСТИ (ОБЪЯВЛЕНИЯ)
+ *
+ * Содержит информацию как по нашим объектам недвижимости (анкеты которых заполнил специалист компании),
+ * так и по чужим объявлениям (полученным из чужих баз собственников)
+ * Свои объявления с течением времени только накапливаются (не удаляются и не переносятся)
+ * TODO: Чужие объявления периодически переносятся в архивную таблицу с такой же структурой
+ ***************************************************************************/
 
-    DBconnect::get()->query("CREATE TABLE tempFotos (
-        id VARCHAR(32) NOT NULL PRIMARY KEY COMMENT 'Содержит идентификатор фотографии, он же имя файла на сервере (без расширения)',
-        fileUploadId VARCHAR(7) NOT NULL COMMENT 'фактически это такой идентификатор сессии заполнения формы регистрации. Позволяет добиться того, чтобы при перезагрузке формы (в случае, например, ошибок и пустых полей, незаполненных пользователем) данные о фотографиях не потерялись',
-        folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ../uploaded_files/3/ ',
-        filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
-        extension VARCHAR(5) NOT NULL COMMENT 'Расширение у файла фотографии',
-        filesizeMb DEC(5, 1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой'
-)");
-
-    echo "tempFotos: ";
-    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
-
-    /****************************************************************************
-	 * ФОТОГРАФИИ ПОЛЬЗОВАТЕЛЕЙ
-	 *
-     * Данная таблица с течением времени только увеличивается вместе с накоплением базы собственников и арендаторов
-	 * Алгоритмов по очистке таблицы не предусмотрено
-     ***************************************************************************/
-
-    DBconnect::get()->query("CREATE TABLE userFotos (
-        id VARCHAR(32) NOT NULL PRIMARY KEY COMMENT 'Содержит идентификатор фотографии, он же имя файла на сервере (без расширения)',
-        folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ../uploaded_files/3/ ',
-        filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
-        extension VARCHAR(5) NOT NULL COMMENT 'Расширение у файла фотографии',
-        filesizeMb DEC(5, 1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой',
-        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, которому соответствует данная фотография',
-        status VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'У основной личной фотографии пользователя статус = основная, у остальных - пустой'
-)");
-
-    echo "userFotos: ";
-    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
-
-    /****************************************************************************
-	 * ПОИСКОВЫЕ ЗАПРОСЫ
-	 *
-     * Для каждого пользователя может быть заведен только 1 поисковый запрос.
-	 * По окончанию поиска пользователь может удалить поисковый запрос.
-	 * Соответствующая запись будет удалена из таблицы
-     ***************************************************************************/
-
-    DBconnect::get()->query("CREATE TABLE searchRequests (
-        userId INT(11) NOT NULL PRIMARY KEY COMMENT 'Идентификатор пользователя, которому принадлежит данный поисковый запрос. Так как я считаю, что каждый пользователь может иметь только 1 поисковый запрос, то данное поле является ключом таблицы',
-        typeOfObject VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип объекта, который ищет пользователь',
-        amountOfRooms TEXT,
-        adjacentRooms VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
-        floor VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
-        minCost INT NOT NULL,
-        maxCost INT NOT NULL,
-        pledge INT NOT NULL,
-        prepayment VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Максимальная предоплата, которую готов внести арендатор, указана строкой в месяцах',
-        district TEXT COMMENT 'Список районов, в которых пользователь ищет недвижимость. Представляет собой сериализованный массив',
-        withWho VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
-        linksToFriends TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
-        children VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
-        howManyChildren TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
-        animals VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
-        howManyAnimals TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
-        termOfLease VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
-        additionalDescriptionOfSearch TEXT CHARACTER SET utf8 COLLATE utf8_general_ci
-)");
-
-    echo "searchRequests: ";
-    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
-
-    /****************************************************************************
-	 * ОБЪЕКТЫ НЕДВИЖИМОСТИ (ОБЪЯВЛЕНИЯ)
-	 *
-     * Содержит информацию как по нашим объектам недвижимости (анкеты которых заполнил специалист компании),
-	 * так и по чужим объявлениям (полученным из чужих баз собственников)
-	 * Свои объявления с течением времени только накапливаются (не удаляются и не переносятся)
-	 * TODO: Чужие объявления периодически переносятся в архивную таблицу с такой же структурой
-     ***************************************************************************/
-
-    DBconnect::get()->query("CREATE TABLE property (
+DBconnect::get()->query("CREATE TABLE property (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор объекта недвижимости или объявления - можно его называть и так, и так',
         userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя (собственника), который указал данное объявление в системе и который сдает данный объект',
         typeOfObject VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип объекта: квартира, комната, дом, таунхаус, дача, гараж',
@@ -254,37 +181,112 @@
 		completeness VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Признак полноты данных об объекте (значения: 1/0). Если объявление получено из чужой базы, то его полнота устанавливается в 0 (то есть никаких особых требований к полноте не предъявляется). Если с данным объектом проведена полная работа и получены полные и достоверные данные, то его полнота устанавливается в 1 (при редактировании данных мы требуем соблюдения их полноты)'
 )");
 
-    echo "property: ";
-    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+echo "property: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
-    /****************************************************************************
-     * ФОТОГРАФИИ ОБЪЕКТОВ НЕДВИЖИМОСТИ
-	 *
-	 * Данная таблица с течением времени увеличивается вместе с накоплением базы своих объявлений
-	 * TODO: При переносе объявления чужой базы также осуществляется перенос информации о фотографиях этого объявления в архивную таблицу
-     ***************************************************************************/
+/****************************************************************************
+ * ВРЕМЕННОЕ ХРАНЕНИЕ ФОТОГРАФИЙ
+ *
+ * Создаем таблицу для временного хранения информации о загруженных фотографиях (при регистрации пользователей и при заведении новых объявлений)
+ * TODO: необходимо в будущем реализовать периодическую чистку базы и удаление соответствующих файлов
+ ***************************************************************************/
 
-    DBconnect::get()->query("CREATE TABLE propertyFotos (
-        id VARCHAR(32) NOT NULL PRIMARY KEY,
-        folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ../uploaded_files/3/ ',
-        filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
-        extension VARCHAR(5) NOT NULL COMMENT 'Расширение у файла фотографии',
-        filesizeMb DEC(5, 1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой',
-        propertyId INT(11) NOT NULL COMMENT 'Идентификатор объекта недвижимости (или иначе объявления), к которому относится данная фотография',
-        status VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'У основной фотографии объекта недвижимости статус = основная, у остальных - пустой'
+DBconnect::get()->query("CREATE TABLE tempFotos (
+id VARCHAR(32) NOT NULL PRIMARY KEY COMMENT 'Содержит идентификатор фотографии, он же имя файла на сервере (без расширения)',
+fileUploadId VARCHAR(7) NOT NULL COMMENT 'фактически это такой идентификатор сессии заполнения формы регистрации. Позволяет добиться того, чтобы при перезагрузке формы (в случае, например, ошибок и пустых полей, незаполненных пользователем) данные о фотографиях не потерялись',
+folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ../uploaded_files/3/ ',
+filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
+extension VARCHAR(5) NOT NULL COMMENT 'Расширение у файла фотографии',
+filesizeMb DEC(5, 1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой',
+regDate INT(11) COMMENT 'Дата и время сохранения фотографии на сервере'
 )");
 
-    echo "propertyFotos: ";
-    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+echo "tempFotos: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
-    /****************************************************************************
-     * ЗАЯВКИ НА ПРОСМОТР
-	 *
-	 * TODO: Заявки на просмотр, относящиеся к тому или иному арендатору, удаляются вместе с его поисковым запросом по окончанию поиска
-	 * TODO: В будущем добавить поле isDeletedTenant и isDeletedOwner в которые записывает true, когда соответственно арендатор удалит свой поисковый запрос, и собственник снимет с публикации объявление. Это позволит показывать заявку только арендатору или только собственнику раздельно. Когда и поисоквый запрос, в рамках которого была создана заявка удален и объект на который она была создана снят с публикации, то такая заявка также должна быть удалена сборщиком мусора в БД.
-     ***************************************************************************/
+/****************************************************************************
+ * ФОТОГРАФИИ ПОЛЬЗОВАТЕЛЕЙ
+ *
+ * Данная таблица с течением времени только увеличивается вместе с накоплением базы собственников и арендаторов
+ * Алгоритмов по очистке таблицы не предусмотрено
+ ***************************************************************************/
 
-    DBconnect::get()->query("CREATE TABLE requestToView (
+DBconnect::get()->query("CREATE TABLE userFotos (
+id VARCHAR(32) NOT NULL PRIMARY KEY COMMENT 'Содержит идентификатор фотографии, он же имя файла на сервере (без расширения)',
+folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ../uploaded_files/3/ ',
+filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
+extension VARCHAR(5) NOT NULL COMMENT 'Расширение у файла фотографии',
+filesizeMb DEC(5, 1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой',
+userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, которому соответствует данная фотография',
+status VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'У основной личной фотографии пользователя статус = основная, у остальных - пустой',
+regDate INT(11) COMMENT 'Дата и время сохранения фотографии на сервере'
+)");
+
+echo "userFotos: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
+/****************************************************************************
+ * ФОТОГРАФИИ ОБЪЕКТОВ НЕДВИЖИМОСТИ
+ *
+ * Данная таблица с течением времени увеличивается вместе с накоплением базы своих объявлений
+ * TODO: При переносе объявления чужой базы также осуществляется перенос информации о фотографиях этого объявления в архивную таблицу
+ ***************************************************************************/
+
+DBconnect::get()->query("CREATE TABLE propertyFotos (
+id VARCHAR(32) NOT NULL PRIMARY KEY,
+folder VARCHAR(255) NOT NULL COMMENT 'Адрес каталога (кроме каталога, указывающего на размер фотографии), в котором расположен файл фотографии. Например: ../uploaded_files/3/ ',
+filename VARCHAR(255) NOT NULL COMMENT 'Человеческое имя файла, с которым он был загружен с машины пользователя',
+extension VARCHAR(5) NOT NULL COMMENT 'Расширение у файла фотографии',
+filesizeMb DEC(5, 1) NOT NULL COMMENT 'Размер фотографии в Мб с точностью до 1 цифры после запятой',
+propertyId INT(11) NOT NULL COMMENT 'Идентификатор объекта недвижимости (или иначе объявления), к которому относится данная фотография',
+status VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'У основной фотографии объекта недвижимости статус = основная, у остальных - пустой',
+regDate INT(11) COMMENT 'Дата и время сохранения фотографии на сервере'
+)");
+
+echo "propertyFotos: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
+/****************************************************************************
+ * ПОИСКОВЫЕ ЗАПРОСЫ
+ *
+ * Для каждого пользователя может быть заведен только 1 поисковый запрос.
+ * По окончанию поиска пользователь может удалить поисковый запрос.
+ * Соответствующая запись будет удалена из таблицы
+ ***************************************************************************/
+
+DBconnect::get()->query("CREATE TABLE searchRequests (
+        userId INT(11) NOT NULL PRIMARY KEY COMMENT 'Идентификатор пользователя, которому принадлежит данный поисковый запрос. Так как я считаю, что каждый пользователь может иметь только 1 поисковый запрос, то данное поле является ключом таблицы',
+        typeOfObject VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип объекта, который ищет пользователь',
+        amountOfRooms TEXT,
+        adjacentRooms VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        floor VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        minCost INT NOT NULL,
+        maxCost INT NOT NULL,
+        pledge INT NOT NULL,
+        prepayment VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Максимальная предоплата, которую готов внести арендатор, указана строкой в месяцах',
+        district TEXT COMMENT 'Список районов, в которых пользователь ищет недвижимость. Представляет собой сериализованный массив',
+        withWho VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        linksToFriends TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+        children VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        howManyChildren TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+        animals VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        howManyAnimals TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+        termOfLease VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
+        additionalDescriptionOfSearch TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+        regDate INT(11) COMMENT 'Дата и время создания поискового запроса'
+)");
+
+echo "searchRequests: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
+/****************************************************************************
+ * ЗАЯВКИ НА ПРОСМОТР
+ *
+ * TODO: Заявки на просмотр, относящиеся к тому или иному арендатору, удаляются вместе с его поисковым запросом по окончанию поиска
+ * TODO: В будущем добавить поле isDeletedTenant и isDeletedOwner в которые записывает true, когда соответственно арендатор удалит свой поисковый запрос, и собственник снимет с публикации объявление. Это позволит показывать заявку только арендатору или только собственнику раздельно. Когда и поисоквый запрос, в рамках которого была создана заявка удален и объект на который она была создана снят с публикации, то такая заявка также должна быть удалена сборщиком мусора в БД.
+ ***************************************************************************/
+
+DBconnect::get()->query("CREATE TABLE requestToView (
        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор запроса на просмотр недвижимости',
        tenantId INT(11) NOT NULL COMMENT 'Идентификатор пользователя (арендатора), который отправил запрос на просмотр объекта недвижимости',
        propertyId INT(11) NOT NULL COMMENT 'Идентификатор объекта недвижимости, который желает посмотреть арендатор',
@@ -293,36 +295,37 @@
        status VARCHAR(30) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Текущий статус заявки на просмотр: 1.[Новая] Отправлена арендатором. Ожидает действий оператора. 2.[Ошибка при отправке] Ошибка при отправке. Если не удалось успешно обработать на сервере – заявка не сформирована в БД 3.[Назначен просмотр] Арендатор и собственник подтвердили дату и время просмотра 4.[Отложена] Дата ближайшего просмотра не подходит арендатору, но объект нравится 5.[Объект уже сдан] Отказ собственника – объект уже сдан 6.[Отказ собственника] Не нравится арендатор 7.[Отменена] (арендатор отказался от просмотра, при этом заявка не удаляется – чтобы арендатор при поиске видел, что от просмотра данного объекта он уже отказался и заново записаться не мог) 8.[Безуспешный просмотр] Просмотр проведен безуспешно 9.[Успешный просмотр] Просмотр проведен успешно – арендатор заключил договор'
     )");
 
-    echo "requestToView: ";
-    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+echo "requestToView: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
-    /****************************************************************************
-     * ЗАЯВКИ ОТ СОБСТВЕННИКОВ
-	 *
-	 * Таблица хранит данные по необработанным заявкам от собственников - для них нужно формировать объявления
-     ***************************************************************************/
+/****************************************************************************
+ * ЗАЯВКИ ОТ СОБСТВЕННИКОВ
+ *
+ * Таблица хранит данные по необработанным заявкам от собственников - для них нужно формировать объявления
+ ***************************************************************************/
 
-    DBconnect::get()->query("CREATE TABLE requestFromOwners (
+DBconnect::get()->query("CREATE TABLE requestFromOwners (
        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор запроса на сдачу в аренду недвижимости',
        name VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Имя собственника - как к нему обращаться',
        telephon VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
        address VARCHAR(60) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Человеческое назва',
        commentOwner TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Комментарий собственника к запросу',
-       userId INT(11) COMMENT 'Идентификатор обратившегося пользователя. Не пуст, если с новым объявлением к нам обращается уже авторизованный пользователь'
+       userId INT(11) COMMENT 'Идентификатор обратившегося пользователя. Не пуст, если с новым объявлением к нам обращается уже авторизованный пользователь',
+       regDate INT(11) COMMENT 'Дата и время подачи заявки собственником'
     )");
 
-    echo "requestFromOwners: ";
-    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+echo "requestFromOwners: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
-    /****************************************************************************
-     * УВЕДОМЛЕНИЯ ТИПА "НОВЫЙ ПОДХОДЯЩИЙ ОБЪЕКТ НЕДВИЖИМОСТИ"
-	 *
-	 * Для повышения эффекивности (сокращения обращений к БД) содержит в себе всю нужную информацию по соответствующему объекту недвижимости
-	 * TODO: Уведомления удаляются при удалении соответствующих поисковых запросов, а также при снятии с публикации соответствующих объявлений
-     ***************************************************************************/
+/****************************************************************************
+ * УВЕДОМЛЕНИЯ ТИПА "НОВЫЙ ПОДХОДЯЩИЙ ОБЪЕКТ НЕДВИЖИМОСТИ"
+ *
+ * Для повышения эффекивности (сокращения обращений к БД) содержит в себе всю нужную информацию по соответствующему объекту недвижимости
+ * TODO: Уведомления удаляются при удалении соответствующих поисковых запросов, а также при снятии с публикации соответствующих объявлений
+ ***************************************************************************/
 
-    // Уведомления для пользователей-арендаторов о появлении нового объекта недвижимости (объявления), которое удовлетворяет условиям поиска пользователя-арендатора
-    DBconnect::get()->query("CREATE TABLE messagesNewProperty (
+// Уведомления для пользователей-арендаторов о появлении нового объекта недвижимости (объявления), которое удовлетворяет условиям поиска пользователя-арендатора
+DBconnect::get()->query("CREATE TABLE messagesNewProperty (
         id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор уведомления',
         userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное уведомление',
         timeIndex INT(11) NOT NULL COMMENT 'Время формирования уведомления - используется для сортировки новостей по времени появления',
@@ -347,18 +350,18 @@
         numberOfFloor INT COMMENT 'Этажность дома, дачи, таунхауса'
     )");
 
-    echo "messagesNewProperty: ";
-    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+echo "messagesNewProperty: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
-	/****************************************************************************
- 	* УВЕДОМЛЕНИЯ ТИПА "НОВЫЙ ПРЕТЕНДЕНТ НА НЕДВИЖИМОСТЬ"
- 	*
- 	* Для повышения эффекивности (сокращения обращений к БД) содержит в себе всю нужную информацию по соответствующему объекту недвижимости и претенденту
-	* TODO: Уведомления должны будут удаляться после снятия с публикации объявления
- 	***************************************************************************/
+/****************************************************************************
+ * УВЕДОМЛЕНИЯ ТИПА "НОВЫЙ ПРЕТЕНДЕНТ НА НЕДВИЖИМОСТЬ"
+ *
+ * Для повышения эффекивности (сокращения обращений к БД) содержит в себе всю нужную информацию по соответствующему объекту недвижимости и претенденту
+ * TODO: Уведомления должны будут удаляться после снятия с публикации объявления
+ ***************************************************************************/
 
-    // Уведомления для пользователей-собственников о появлении нового претендента на аренду, отправившего заявку на просмотр недвижимости пользователя-собственника
-    DBconnect::get()->query("CREATE TABLE messagesNewTenant (
+// Уведомления для пользователей-собственников о появлении нового претендента на аренду, отправившего заявку на просмотр недвижимости пользователя-собственника
+DBconnect::get()->query("CREATE TABLE messagesNewTenant (
         id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор уведомления',
         userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное уведомление',
         timeIndex INT(11) NOT NULL COMMENT 'Время формирования уведомления - используется для сортировки новостей по времени появления',
@@ -377,54 +380,25 @@
         animals VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Арендатор собирается проживать с домашними животными'
     )");
 
-    echo "messagesNewTenant: ";
-    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+echo "messagesNewTenant: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
-  /*  DBconnect::get()->query("CREATE TABLE messagesRequestToViewConfirmed (
-        id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор уведомления',
-        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное уведомление',
-        timeIndex INT(11) NOT NULL COMMENT 'Время формирования уведомления - используется для сортировки новостей по времени появления',
-        messageType VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'requestToViewConfirmed' COMMENT 'Тип уведомления. В данной таблице хранятся новости типа requestToViewConfirmed',
-        isReaded VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не прочитано' COMMENT 'Статус уведомления: прочитано, не прочитано. Сразу после создания уведомление становится непрочитанным',
-        fotoArr TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Массив массивов (по структуре совпадающий с uploadedFoto - это нужно, чтобы на основе этих данных могла работать функция getHTMLfotosWrapper), который включает в себя информацию только об 1 фотографии - основной',
-        targetId INT(11) NOT NULL COMMENT 'Идентификатор пользователя (если речь идет об уведомлении о новом кандидате в арендаторы), идентификатор объекта (если речь идет о новом объекте недвижимости для арендатора), идентификатор заявки на просмотр (если речь идет о новой заявке)',
+/****************************************************************************
+ * СПИСОК РАЙОНОВ ВСЕХ ГОРОДОВ ПРИСУТСТВИЯ
+ *
+ * Таблица, содержащая константы
+ ***************************************************************************/
 
-    )");
-
-    echo "Статус создания таблицы с уведомлениями о назначении даты и времени просмотра недвижимости messagesRequestToViewConfirmed: ";
-    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
-
-    DBconnect::get()->query("CREATE TABLE messagesEditedTimeToView (
-        id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор уведомления',
-        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, к которому относится данное уведомление',
-        timeIndex INT(11) NOT NULL COMMENT 'Время формирования уведомления - используется для сортировки новостей по времени появления',
-        messageType VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'editedTimeToView' COMMENT 'Тип уведомления. В данной таблице хранятся новости типа editedTimeToView',
-        isReaded VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не прочитано' COMMENT 'Статус уведомления: прочитано, не прочитано. Сразу после создания уведомление становится непрочитанным',
-        fotoArr TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Массив массивов (по структуре совпадающий с uploadedFoto - это нужно, чтобы на основе этих данных могла работать функция getHTMLfotosWrapper), который включает в себя информацию только об 1 фотографии - основной',
-        targetId INT(11) NOT NULL COMMENT 'Идентификатор пользователя (если речь идет об уведомлении о новом кандидате в арендаторы), идентификатор объекта (если речь идет о новом объекте недвижимости для арендатора), идентификатор заявки на просмотр (если речь идет о новой заявке)',
-
-    )");
-
-    echo "Статус создания таблицы с уведомлениями о изменении времени просмотра недвижимости messagesEditedTimeToView: ";
-    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);  */
-
-
-    /****************************************************************************
-     * СПИСОК РАЙОНОВ ВСЕХ ГОРОДОВ ПРИСУТСТВИЯ
-	 *
-	 * Таблица, содержащая константы
-     ***************************************************************************/
-
-    DBconnect::get()->query("CREATE TABLE districts (
+DBconnect::get()->query("CREATE TABLE districts (
         name VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Название района, которое отображается пользователю',
         city VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Город, в котором расположен данный район'
 	)");
 
-    echo "districts: ";
-    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+echo "districts: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
-    // Записываем в таблицу с районами инфу о районах
-    DBconnect::get()->query("INSERT INTO districts (name, city) VALUES
+// Записываем в таблицу с районами инфу о районах
+DBconnect::get()->query("INSERT INTO districts (name, city) VALUES
     ('Автовокзал (южный)', 'Екатеринбург'),
     ('Академический', 'Екатеринбург'),
     ('Ботанический', 'Екатеринбург'),
@@ -473,44 +447,44 @@
     ('За городом', 'Екатеринбург')
 	");
 
-    echo "Запись инфы о районах в таблицу districts: ";
-    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+echo "Запись инфы о районах в таблицу districts: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
-    /****************************************************************************
-	 * ТЕКУЩИЕ КУРСЫ ВАЛЮТ
-	 *
-     * Создаем таблицу для хранения курсов валют: доллара США и евро к рублю
-     ***************************************************************************/
+/****************************************************************************
+ * ТЕКУЩИЕ КУРСЫ ВАЛЮТ
+ *
+ * Создаем таблицу для хранения курсов валют: доллара США и евро к рублю
+ ***************************************************************************/
 
-    DBconnect::get()->query("CREATE TABLE currencies (
+DBconnect::get()->query("CREATE TABLE currencies (
         name VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Название валюты',
         value DEC(7, 2) COMMENT 'Текущий курс обмена данной валюты на рубли'
 )");
 
-    echo "currencies: ";
-    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+echo "currencies: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
-    // Записываем в таблицу с валютами текущие курсы
-    DBconnect::get()->query("INSERT INTO currencies (name, value) VALUES
+// Записываем в таблицу с валютами текущие курсы
+DBconnect::get()->query("INSERT INTO currencies (name, value) VALUES
     ('дол. США', 31.22),
     ('евро', 40.17)
     ");
 
-    echo "Запись инфы о валютах: ";
-    if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+echo "Запись инфы о валютах: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
-    /**
-     * Проверяем настройки PHP сервера
-     * В файле php.ini нужно установить ограничения на максимальный размер загружаемых файлов:
-     * post_max_size = 100M 	// Максимальный размер в МБ для POST запроса пользователя
-     * upload_max_filesize = 25M // Максимальный размер файла, закачивать который разрешает php для пользователя
-     * memory_limit = 256M	// Максимальный размер оперативной памяти, которую сервер может выделить для выполнения 1 сценария PHP
-     * display_errors = Off		// Запрещает PHP отображать предупреждения и ошибки на экране
-     * все права для всех пользователей на каталог uploaded_files (чтобы можно было записывать новые фотографии и удалять старые)
-     * date.timezone = Asia/Yekaterinburg // Необходимо установить временную зону по умолчанию
-	 *
-     * ini_set ("session.use_trans_sid", true); вроде как PHP сам умеет устанавливать id сессии либо в куки, либо в строку запроса (http://www.phpfaq.ru/sessions)
-     */
+/**
+ * Проверяем настройки PHP сервера
+ * В файле php.ini нужно установить ограничения на максимальный размер загружаемых файлов:
+ * post_max_size = 100M     // Максимальный размер в МБ для POST запроса пользователя
+ * upload_max_filesize = 25M // Максимальный размер файла, закачивать который разрешает php для пользователя
+ * memory_limit = 256M    // Максимальный размер оперативной памяти, которую сервер может выделить для выполнения 1 сценария PHP
+ * display_errors = Off        // Запрещает PHP отображать предупреждения и ошибки на экране
+ * все права для всех пользователей на каталог uploaded_files (чтобы можно было записывать новые фотографии и удалять старые)
+ * date.timezone = Asia/Yekaterinburg // Необходимо установить временную зону по умолчанию
+ *
+ * ini_set ("session.use_trans_sid", true); вроде как PHP сам умеет устанавливать id сессии либо в куки, либо в строку запроса (http://www.phpfaq.ru/sessions)
+ */
 
-    // Закрываем соединение с БД
-    DBconnect::closeConnectToDB();
+// Закрываем соединение с БД
+DBconnect::closeConnectToDB();

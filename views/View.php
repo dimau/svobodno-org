@@ -426,17 +426,17 @@
            $arrShortListReplace['address'] = "";
            if (isset($oneProperty['address'])) $arrShortListReplace['address'] = $oneProperty['address'];
 
-           // Стоимость
-           $arrShortListReplace['costOfRenting'] = "";
+		   // Стоимость
+		   $arrShortListReplace['costOfRenting'] = "";
 		   $arrShortListReplace['currency'] = "";
 		   $arrShortListReplace['costOfRentingName'] = "";
-           if (isset($oneProperty['costOfRenting']) && $oneProperty['costOfRenting'] != "" && $oneProperty['costOfRenting'] != "0" && isset($oneProperty['currency']) && $oneProperty['currency'] != "" && $oneProperty['currency'] != "0") {
+		   $arrShortListReplace['utilities'] = "";
+		   if (isset($oneProperty['costOfRenting']) && $oneProperty['costOfRenting'] != "" && $oneProperty['costOfRenting'] != "0.00" && isset($oneProperty['currency']) && $oneProperty['currency'] != "" && $oneProperty['currency'] != "0") {
 			   $arrShortListReplace['costOfRenting'] = $oneProperty['costOfRenting'];
 			   $arrShortListReplace['currency'] = $oneProperty['currency']."/мес.";
+			   $arrShortListReplace['costOfRentingName'] = "Плата:";
+			   if (isset($oneProperty['utilities']) && $oneProperty['utilities'] == "да") $arrShortListReplace['utilities'] = " <span style='white-space: nowrap;'>+ ком.усл.</span>";
 		   }
-           $arrShortListReplace['utilities'] = "";
-           if (isset($oneProperty['utilities']) && $oneProperty['utilities'] == "да") $arrShortListReplace['utilities'] = " <span style='white-space: nowrap;'>+ ком.усл.</span>";
-			if ($arrShortListReplace['costOfRenting'] != "") $arrShortListReplace['costOfRentingName'] = "Плата:";
 
            // Комнаты
            if (isset($oneProperty['amountOfRooms']) && $oneProperty['amountOfRooms'] != "0") {
@@ -860,7 +860,11 @@
             $valuesArr['unread'] = "";
             if (isset($sourceArr['isReaded']) && $sourceArr['isReaded'] == "не прочитано") $valuesArr['unread'] = "unread";
 
-            // Фото
+			// Идентификатор уведомления
+			$valuesArr['messageId'] = "";
+			if (isset($sourceArr['id'])) $valuesArr['messageId'] = $sourceArr['id'];
+
+			// Фото
             $valuesArr['fotosWrapper'] = "";
             $valuesArr['fotosWrapper'] = View::getHTMLfotosWrapper("small", FALSE, FALSE, $sourceArr['fotoArr']);
 
@@ -876,13 +880,17 @@
             $valuesArr['address'] = "";
             if (isset($sourceArr['address']) && $sourceArr['address'] != "") $valuesArr['address'] = $sourceArr['address'];
 
-            // Стоимость
-            $valuesArr['costOfRenting'] = "";
-            if (isset($sourceArr['costOfRenting']) && $sourceArr['costOfRenting'] != "" && $sourceArr['costOfRenting'] != "0.00") $valuesArr['costOfRenting'] = $sourceArr['costOfRenting'];
-            $valuesArr['currency'] = "";
-            if (isset($sourceArr['currency']) && $sourceArr['currency'] != "0") $valuesArr['currency'] = $sourceArr['currency']."/мес.";
-            $valuesArr['utilities'] = "";
-            if (isset($sourceArr['utilities']) && $sourceArr['utilities'] == "да") $valuesArr['utilities'] = " <span style='white-space: nowrap;'>+ ком.усл.</span>";
+			// Стоимость
+			$valuesArr['costOfRenting'] = "";
+			$valuesArr['currency'] = "";
+			$valuesArr['costOfRentingName'] = "";
+			$valuesArr['utilities'] = "";
+			if (isset($sourceArr['costOfRenting']) && $sourceArr['costOfRenting'] != "" && $sourceArr['costOfRenting'] != "0.00" && isset($sourceArr['currency']) && $sourceArr['currency'] != "" && $sourceArr['currency'] != "0") {
+				$valuesArr['costOfRenting'] = $sourceArr['costOfRenting'];
+				$valuesArr['currency'] = $sourceArr['currency']."/мес.";
+				$valuesArr['costOfRentingName'] = "Плата:";
+				if (isset($sourceArr['utilities']) && $sourceArr['utilities'] == "да") $valuesArr['utilities'] = " <span style='white-space: nowrap;'>+ ком.усл.</span>";
+			}
 
             // Комнаты
             if (isset($sourceArr['amountOfRooms']) && $sourceArr['amountOfRooms'] != "0") {
@@ -936,7 +944,7 @@
             }
 
             // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне
-            $stringForReplaceArr = array('{unread}', '{fotosWrapper}', '{propertyId}', '{typeOfObject}', '{address}', '{costOfRenting}', '{currency}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{areaValuesName}', '{areaValuesMeasure}', '{floorName}', '{floor}');
+            $stringForReplaceArr = array('{unread}', '{messageId}', '{fotosWrapper}', '{propertyId}', '{typeOfObject}', '{address}', '{costOfRenting}', '{currency}', '{costOfRentingName}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{areaValuesName}', '{areaValuesMeasure}', '{floorName}', '{floor}');
             // Заполнение шаблона
             $resultHTML = str_replace($stringForReplaceArr, $valuesArr, $templ);
 

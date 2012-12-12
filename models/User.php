@@ -65,6 +65,7 @@ class User
 	public $howManyAnimals = "";
 	public $termOfLease = "0";
 	public $additionalDescriptionOfSearch = "";
+	public $regDate = "";
 
 	public $fileUploadId = "";
 	public $uploadedFoto = array(); // В переменной будет храниться информация о загруженных фотографиях. Представляет собой массив ассоциированных массивов
@@ -302,7 +303,7 @@ class User
 
 			if ($allFotos[$i]['fromTable'] == "tempFotos" && $allFotos[$i]['forRemove'] == FALSE) {
 				if ($strINSERT != "") $strINSERT .= ",";
-				$strINSERT .= "('" . $allFotos[$i]['id'] . "','" . $allFotos[$i]['folder'] . "','" . $allFotos[$i]['filename'] . "','" . $allFotos[$i]['extension'] . "','" . $allFotos[$i]['filesizeMb'] . "','" . $this->id . "','" . $allFotos[$i]['status'] . "')";
+				$strINSERT .= "('" . $allFotos[$i]['id'] . "','" . $allFotos[$i]['folder'] . "','" . $allFotos[$i]['filename'] . "','" . $allFotos[$i]['extension'] . "','" . $allFotos[$i]['filesizeMb'] . "','" . $this->id . "','" . $allFotos[$i]['status'] . "','" . $allFotos[$i]['regDate'] . "')";
 			}
 
 			if ($allFotos[$i]['forRemove'] == TRUE) {
@@ -315,13 +316,13 @@ class User
 		// Выполним сформированные запросы
 		// INSERT
 		if ($strINSERT != "") {
-			DBconnect::get()->query("INSERT INTO userFotos (id, folder, filename, extension, filesizeMb, userId, status) VALUES " . $strINSERT);
+			DBconnect::get()->query("INSERT INTO userFotos (id, folder, filename, extension, filesizeMb, userId, status, regDate) VALUES " . $strINSERT);
 			if ((DBconnect::get()->errno)
 				OR (($res = DBconnect::get()->affected_rows) === -1)
 				OR ($res === 0)
 			) {
 				// Логируем ошибку
-				Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO userFotos (id, folder, filename, extension, filesizeMb, userId, status) VALUES " . $strINSERT . "'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: " . $this->id);
+				Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO userFotos (id, folder, filename, extension, filesizeMb, userId, status, regDate) VALUES " . $strINSERT . "'. Местонахождение кода: User->saveFotoInformationToDB(). Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: " . $this->id);
 			}
 		}
 		// DELETE
@@ -356,13 +357,14 @@ class User
 		// Преобразование формата инфы об искомом кол-ве комнат и районах, так как MySQL не умеет хранить массивы
 		$amountOfRoomsSerialized = serialize($this->amountOfRooms);
 		$districtSerialized = serialize($this->district);
+		$regDate = time();
 
 		if ($this->typeTenant === TRUE && $typeOfUser == "edit") {
 
 			// Непосредственное сохранение данных о поисковом запросе
 			$stmt = DBconnect::get()->stmt_init();
-			if (($stmt->prepare("UPDATE searchRequests SET userId=?, typeOfObject=?, amountOfRooms=?, adjacentRooms=?, floor=?, minCost=?, maxCost=?, pledge=?, prepayment=?, district=?, withWho=?, linksToFriends=?, children=?, howManyChildren=?, animals=?, howManyAnimals=?, termOfLease=?, additionalDescriptionOfSearch=? WHERE userId=?") === FALSE)
-				OR ($stmt->bind_param("sssssiiisssssssssss", $this->id, $this->typeOfObject, $amountOfRoomsSerialized, $this->adjacentRooms, $this->floor, $this->minCost, $this->maxCost, $this->pledge, $this->prepayment, $districtSerialized, $this->withWho, $this->linksToFriends, $this->children, $this->howManyChildren, $this->animals, $this->howManyAnimals, $this->termOfLease, $this->additionalDescriptionOfSearch, $this->id) === FALSE)
+			if (($stmt->prepare("UPDATE searchRequests SET userId=?, typeOfObject=?, amountOfRooms=?, adjacentRooms=?, floor=?, minCost=?, maxCost=?, pledge=?, prepayment=?, district=?, withWho=?, linksToFriends=?, children=?, howManyChildren=?, animals=?, howManyAnimals=?, termOfLease=?, additionalDescriptionOfSearch=?, regDate=? WHERE userId=?") === FALSE)
+				OR ($stmt->bind_param("sssssiiissssssssssis", $this->id, $this->typeOfObject, $amountOfRoomsSerialized, $this->adjacentRooms, $this->floor, $this->minCost, $this->maxCost, $this->pledge, $this->prepayment, $districtSerialized, $this->withWho, $this->linksToFriends, $this->children, $this->howManyChildren, $this->animals, $this->howManyAnimals, $this->termOfLease, $this->additionalDescriptionOfSearch, $this->regDate, $this->id) === FALSE)
 				OR ($stmt->execute() === FALSE)
 				OR (($res = $stmt->affected_rows) === -1)
 				OR ($stmt->close() === FALSE)
@@ -375,8 +377,8 @@ class User
 
 			// Непосредственное сохранение данных о поисковом запросе
 			$stmt = DBconnect::get()->stmt_init();
-			if (($stmt->prepare("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
-				OR ($stmt->bind_param("sssssiiissssssssss", $this->id, $this->typeOfObject, $amountOfRoomsSerialized, $this->adjacentRooms, $this->floor, $this->minCost, $this->maxCost, $this->pledge, $this->prepayment, $districtSerialized, $this->withWho, $this->linksToFriends, $this->children, $this->howManyChildren, $this->animals, $this->howManyAnimals, $this->termOfLease, $this->additionalDescriptionOfSearch) === FALSE)
+			if (($stmt->prepare("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, regDate) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
+				OR ($stmt->bind_param("sssssiiissssssssssi", $this->id, $this->typeOfObject, $amountOfRoomsSerialized, $this->adjacentRooms, $this->floor, $this->minCost, $this->maxCost, $this->pledge, $this->prepayment, $districtSerialized, $this->withWho, $this->linksToFriends, $this->children, $this->howManyChildren, $this->animals, $this->howManyAnimals, $this->termOfLease, $this->additionalDescriptionOfSearch, $regDate) === FALSE)
 				OR ($stmt->execute() === FALSE)
 				OR (($res = $stmt->affected_rows) === -1)
 				OR ($res === 0)
@@ -390,6 +392,7 @@ class User
 			if (!DBconnect::updateUserCharacteristicTypeUser($this->id, "typeTenant", "TRUE")) return FALSE;
 
 			$this->typeTenant = TRUE;
+			$this->regDate = $regDate;
 		}
 
 		return TRUE;
@@ -564,6 +567,7 @@ class User
 		if (isset($oneUserDataArr['howManyAnimals'])) $this->howManyAnimals = $oneUserDataArr['howManyAnimals'];
 		if (isset($oneUserDataArr['termOfLease'])) $this->termOfLease = $oneUserDataArr['termOfLease'];
 		if (isset($oneUserDataArr['additionalDescriptionOfSearch'])) $this->additionalDescriptionOfSearch = $oneUserDataArr['additionalDescriptionOfSearch'];
+		if (isset($oneUserDataArr['regDate'])) $this->regDate = $oneUserDataArr['regDate'];
 
 		return TRUE;
 
@@ -634,6 +638,7 @@ class User
 		$this->howManyAnimals = "";
 		$this->termOfLease = "0";
 		$this->additionalDescriptionOfSearch = "";
+		$this->regDate = "";
 
 		return TRUE;
 	}
@@ -754,6 +759,7 @@ class User
 		$result['last_act'] = $this->last_act;
 		$result['reg_date'] = $this->reg_date;
 		$result['favoritesPropertysId'] = $this->favoritesPropertysId;
+		$result['regDate'] = $this->regDate;
 
 		return $result;
 	}

@@ -153,17 +153,17 @@
             <!-- /end.searchUserSection -->
 
             <div class="section admin right" id="requestFromOwnerSection">
-                <div class="headerSection">Запросы собственников</div>
+                <div class="headerSection">Заявки собственников</div>
                 <ul>
                     <li>
-                        <a href=""></a>
+                        <a href="adminAllRequestsFromOwners.php">Все имеющиеся запросы от собственников</a>
                     </li>
                 </ul>
                 <div class="clearBoth"></div>
             </div>
             <!-- /end.requestFromOwnerSection -->
 
-            <div class="section admin left" id="signUpToViewSection">
+            <div class="section admin right" id="signUpToViewSection">
                 <div class="headerSection">Заявки на просмотр</div>
                 <ul>
                     <li>
@@ -179,10 +179,10 @@
                         <a target="_blank" href="adminAllRequestsToView.php?action=Успешный просмотр">Успешные просмотры</a>
                     </li>
                     <li>
-                        <a target="_blank" href="adminAllProperties.php?action=allWithEarliestDate" style="font-weight: bold;">Ближайшие просмотры</a>
+                        <a target="_blank" href="adminAllProperties.php?action=allWithEarliestDate" title="Все объекты с назначенной датой просмотра" style="font-weight: bold;">Ближайшие просмотры</a>
                     </li>
                     <li>
-                        <a target="_blank" href="adminAllProperties.php?action=allRemovedWithRequestsToView" style="font-weight: bold;">Недозакрытые объявления</a>
+                        <a target="_blank" href="adminAllProperties.php?action=allRemovedWithRequestsToView" title="Снятые с публикации объекты, по которым остались активные заявки на просмотр" style="font-weight: bold;">Недозакрытые объявления</a>
                     </li>
                 </ul>
                 <div class="clearBoth"></div>
