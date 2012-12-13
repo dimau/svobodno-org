@@ -496,13 +496,13 @@ class Property
 		if (isset($onePropertyDataArr['typeOfBathrooms'])) $this->typeOfBathrooms = $onePropertyDataArr['typeOfBathrooms'];
 		if (isset($onePropertyDataArr['typeOfBalcony'])) $this->typeOfBalcony = $onePropertyDataArr['typeOfBalcony'];
 		if (isset($onePropertyDataArr['balconyGlazed'])) $this->balconyGlazed = $onePropertyDataArr['balconyGlazed'];
-		if (isset($onePropertyDataArr['roomSpace'])) $this->roomSpace = $onePropertyDataArr['roomSpace'];
-		if (isset($onePropertyDataArr['totalArea'])) $this->totalArea = $onePropertyDataArr['totalArea'];
-		if (isset($onePropertyDataArr['livingSpace'])) $this->livingSpace = $onePropertyDataArr['livingSpace'];
-		if (isset($onePropertyDataArr['kitchenSpace'])) $this->kitchenSpace = $onePropertyDataArr['kitchenSpace'];
-		if (isset($onePropertyDataArr['floor'])) $this->floor = $onePropertyDataArr['floor'];
-		if (isset($onePropertyDataArr['totalAmountFloor'])) $this->totalAmountFloor = $onePropertyDataArr['totalAmountFloor'];
-		if (isset($onePropertyDataArr['numberOfFloor'])) $this->numberOfFloor = $onePropertyDataArr['numberOfFloor'];
+		if (isset($onePropertyDataArr['roomSpace']) && $onePropertyDataArr['roomSpace'] != 0) $this->roomSpace = $onePropertyDataArr['roomSpace'];
+		if (isset($onePropertyDataArr['totalArea']) && $onePropertyDataArr['totalArea'] != 0) $this->totalArea = $onePropertyDataArr['totalArea'];
+		if (isset($onePropertyDataArr['livingSpace']) && $onePropertyDataArr['livingSpace'] != 0) $this->livingSpace = $onePropertyDataArr['livingSpace'];
+		if (isset($onePropertyDataArr['kitchenSpace']) && $onePropertyDataArr['kitchenSpace'] != 0) $this->kitchenSpace = $onePropertyDataArr['kitchenSpace'];
+		if (isset($onePropertyDataArr['floor']) && $onePropertyDataArr['floor'] != 0) $this->floor = $onePropertyDataArr['floor'];
+		if (isset($onePropertyDataArr['totalAmountFloor']) && $onePropertyDataArr['totalAmountFloor'] != 0) $this->totalAmountFloor = $onePropertyDataArr['totalAmountFloor'];
+		if (isset($onePropertyDataArr['numberOfFloor']) && $onePropertyDataArr['numberOfFloor'] != 0) $this->numberOfFloor = $onePropertyDataArr['numberOfFloor'];
 		if (isset($onePropertyDataArr['concierge'])) $this->concierge = $onePropertyDataArr['concierge'];
 		if (isset($onePropertyDataArr['intercom'])) $this->intercom = $onePropertyDataArr['intercom'];
 		if (isset($onePropertyDataArr['parking'])) $this->parking = $onePropertyDataArr['parking'];
@@ -1240,13 +1240,13 @@ class Property
 		// Ограничение на минимальную сумму арендной платы
 		$searchLimits['minCost'] = "";
 		if (isset($this->realCostOfRenting) && $this->realCostOfRenting != "" && $this->realCostOfRenting != 0) {
-			$searchLimits['minCost'] = " (minCost >= " . $this->realCostOfRenting . ")";
+			$searchLimits['minCost'] = " (minCost <= " . $this->realCostOfRenting . ")";
 		}
 
 		// Ограничение на максимальную сумму арендной платы
 		$searchLimits['maxCost'] = "";
 		if (isset($this->realCostOfRenting) && $this->realCostOfRenting != "" && $this->realCostOfRenting != 0) {
-			$searchLimits['maxCost'] = " (maxCost <= " . $this->realCostOfRenting . ")";
+			$searchLimits['maxCost'] = " (maxCost >= " . $this->realCostOfRenting . ")";
 		}
 
 		// Ограничение на максимальный залог
@@ -1309,49 +1309,28 @@ class Property
 			if ($strWHERE != "") $strWHERE .= " AND" . $value; else $strWHERE .= $value;
 		}
 
-		// Получаем идентификаторы всех пользователей-арендаторов, чьим поисковым запросам соответствует данный объект недвижимости
-		$targetUsers = array();
-		$res = DBconnect::get()->query("SELECT userId FROM searchRequests WHERE" . $strWHERE);
+		// Получаем идентификаторы и параметры рассылки всех пользователей-арендаторов, чьим поисковым запросам соответствует данный объект недвижимости
+		$listOfTargetUsers = DBconnect::get()->query("SELECT userId, needEmail, needSMS FROM searchRequests WHERE" . $strWHERE);
 		if ((DBconnect::get()->errno)
-			OR (($targetUsers = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+			OR (($listOfTargetUsers = $listOfTargetUsers->fetch_all(MYSQLI_ASSOC)) === FALSE)
 		) {
 			// Логируем ошибку
 			//TODO: сделать логирование ошибки
 			return FALSE;
-		}
-
-		// Сохраняем в БД информацию об уведомлении для кажжого такого пользователя-арендатора
-		$currentTargetUser = "0"; // Инициализируем переменную, в которую поочередно будем складывать id пользователей-арендаторов
-		$tm = time(); // Получаем текущее время
-		$messageType = "newProperty"; // Задаем тип уведомления
-		$isReaded = "не прочитано";
-		$fotoArrSerialized = serialize($this->uploadedFoto);
-
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("INSERT INTO messagesNewProperty (userId, timeIndex, messageType, isReaded, fotoArr, targetId, typeOfObject, address, currency, costOfRenting, utilities, electricPower, amountOfRooms, adjacentRooms, amountOfAdjacentRooms, roomSpace, totalArea, livingSpace, kitchenSpace, totalAmountFloor, numberOfFloor) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
-			OR ($stmt->bind_param("iisssisssssssssssssii", $currentTargetUser, $tm, $messageType, $isReaded, $fotoArrSerialized, $this->id, $this->typeOfObject, $this->address, $this->currency, $this->costOfRenting, $this->utilities, $this->electricPower, $this->amountOfRooms, $this->adjacentRooms, $this->amountOfAdjacentRooms, $this->roomSpace, $this->totalArea, $this->livingSpace, $this->kitchenSpace, $this->totalAmountFloor, $this->numberOfFloor) === FALSE)
-		) {
-			// TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-			return FALSE;
-		}
-
-		for ($i = 0, $s = count($targetUsers); $i < $s; $i++) {
-
-			// Подставляем новый идентификатор пользователя-арендатора
-			$currentTargetUser = $targetUsers[$i]['userId'];
-
-			// Записываем в БД для него уведомление про новый объект недвижимости
-			if (($stmt->execute() === FALSE)
-				OR (($res = $stmt->affected_rows) === -1)
-			) {
-				//TODO: Логируем ошибку
+		} else {
+			for ($i = 0, $s = count($listOfTargetUsers); $i < $s; $i++ ) {
+				$listOfTargetUsers[$i]['userId'] = intval($listOfTargetUsers[$i]['userId']);
+				$listOfTargetUsers[$i]['needEmail'] = intval($listOfTargetUsers[$i]['needEmail']);
+				$listOfTargetUsers[$i]['needSMS'] = intval($listOfTargetUsers[$i]['needSMS']);
 			}
-
 		}
 
-		$stmt->close();
+		// Подготовим параметры уведомления для сохранения в БД
+		$tm = time(); // Время регистрации уведомлений
+		$messageType = "newProperty"; // Задаем тип уведомления
+		$isReaded = "не прочитано"; // Первоначально все уведомления попадают в БД непрочитанными
 
-		return TRUE;
+		return DBconnect::insertMessageNewProperty(array("timeIndex" => $tm, "messageType" => $messageType, "isReaded" => $isReaded, "fotoArr" => $this->uploadedFoto, "targetId" => $this->id, "typeOfObject" => $this->typeOfObject, "address" => $this->address, "currency" => $this->currency, "costOfRenting" => $this->costOfRenting, "utilities" => $this->utilities, "electricPower" => $this->electricPower, "amountOfRooms" => $this->amountOfRooms, "adjacentRooms" => $this->adjacentRooms, "amountOfAdjacentRooms" => $this->amountOfAdjacentRooms, "roomSpace" => $this->roomSpace, "totalArea" => $this->totalArea, "livingSpace" => $this->livingSpace, "kitchenSpace" => $this->kitchenSpace, "totalAmountFloor" => $this->totalAmountFloor, "numberOfFloor" => $this->numberOfFloor), $listOfTargetUsers);
 	}
 
 	/**

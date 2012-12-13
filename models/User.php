@@ -66,6 +66,8 @@ class User
 	public $termOfLease = "0";
 	public $additionalDescriptionOfSearch = "";
 	public $regDate = "";
+	public $needEmail = 0;
+	public $needSMS = 0;
 
 	public $fileUploadId = "";
 	public $uploadedFoto = array(); // В переменной будет храниться информация о загруженных фотографиях. Представляет собой массив ассоциированных массивов
@@ -363,8 +365,8 @@ class User
 
 			// Непосредственное сохранение данных о поисковом запросе
 			$stmt = DBconnect::get()->stmt_init();
-			if (($stmt->prepare("UPDATE searchRequests SET userId=?, typeOfObject=?, amountOfRooms=?, adjacentRooms=?, floor=?, minCost=?, maxCost=?, pledge=?, prepayment=?, district=?, withWho=?, linksToFriends=?, children=?, howManyChildren=?, animals=?, howManyAnimals=?, termOfLease=?, additionalDescriptionOfSearch=?, regDate=? WHERE userId=?") === FALSE)
-				OR ($stmt->bind_param("sssssiiissssssssssis", $this->id, $this->typeOfObject, $amountOfRoomsSerialized, $this->adjacentRooms, $this->floor, $this->minCost, $this->maxCost, $this->pledge, $this->prepayment, $districtSerialized, $this->withWho, $this->linksToFriends, $this->children, $this->howManyChildren, $this->animals, $this->howManyAnimals, $this->termOfLease, $this->additionalDescriptionOfSearch, $this->regDate, $this->id) === FALSE)
+			if (($stmt->prepare("UPDATE searchRequests SET userId=?, typeOfObject=?, amountOfRooms=?, adjacentRooms=?, floor=?, minCost=?, maxCost=?, pledge=?, prepayment=?, district=?, withWho=?, linksToFriends=?, children=?, howManyChildren=?, animals=?, howManyAnimals=?, termOfLease=?, additionalDescriptionOfSearch=?, regDate=?, needEmail=?, needSMS=? WHERE userId=?") === FALSE)
+				OR ($stmt->bind_param("sssssiiissssssssssiiis", $this->id, $this->typeOfObject, $amountOfRoomsSerialized, $this->adjacentRooms, $this->floor, $this->minCost, $this->maxCost, $this->pledge, $this->prepayment, $districtSerialized, $this->withWho, $this->linksToFriends, $this->children, $this->howManyChildren, $this->animals, $this->howManyAnimals, $this->termOfLease, $this->additionalDescriptionOfSearch, $this->regDate, $this->needEmail, $this->needSMS, $this->id) === FALSE)
 				OR ($stmt->execute() === FALSE)
 				OR (($res = $stmt->affected_rows) === -1)
 				OR ($stmt->close() === FALSE)
@@ -377,8 +379,8 @@ class User
 
 			// Непосредственное сохранение данных о поисковом запросе
 			$stmt = DBconnect::get()->stmt_init();
-			if (($stmt->prepare("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, regDate) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
-				OR ($stmt->bind_param("sssssiiissssssssssi", $this->id, $this->typeOfObject, $amountOfRoomsSerialized, $this->adjacentRooms, $this->floor, $this->minCost, $this->maxCost, $this->pledge, $this->prepayment, $districtSerialized, $this->withWho, $this->linksToFriends, $this->children, $this->howManyChildren, $this->animals, $this->howManyAnimals, $this->termOfLease, $this->additionalDescriptionOfSearch, $regDate) === FALSE)
+			if (($stmt->prepare("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, regDate, needEmail, needSMS) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
+				OR ($stmt->bind_param("sssssiiissssssssssiii", $this->id, $this->typeOfObject, $amountOfRoomsSerialized, $this->adjacentRooms, $this->floor, $this->minCost, $this->maxCost, $this->pledge, $this->prepayment, $districtSerialized, $this->withWho, $this->linksToFriends, $this->children, $this->howManyChildren, $this->animals, $this->howManyAnimals, $this->termOfLease, $this->additionalDescriptionOfSearch, $regDate, $this->needEmail, $this->needSMS) === FALSE)
 				OR ($stmt->execute() === FALSE)
 				OR (($res = $stmt->affected_rows) === -1)
 				OR ($res === 0)
@@ -568,9 +570,10 @@ class User
 		if (isset($oneUserDataArr['termOfLease'])) $this->termOfLease = $oneUserDataArr['termOfLease'];
 		if (isset($oneUserDataArr['additionalDescriptionOfSearch'])) $this->additionalDescriptionOfSearch = $oneUserDataArr['additionalDescriptionOfSearch'];
 		if (isset($oneUserDataArr['regDate'])) $this->regDate = $oneUserDataArr['regDate'];
+		if (isset($oneUserDataArr['needEmail'])) $this->needEmail = $oneUserDataArr['needEmail'];
+		if (isset($oneUserDataArr['needSMS'])) $this->needSMS = $oneUserDataArr['needSMS'];
 
 		return TRUE;
-
 	}
 
 	/**
@@ -639,6 +642,8 @@ class User
 		$this->termOfLease = "0";
 		$this->additionalDescriptionOfSearch = "";
 		$this->regDate = "";
+		$this->regDate = 0;
+		$this->regDate = 0;
 
 		return TRUE;
 	}
@@ -798,6 +803,9 @@ class User
 		$result['howManyAnimals'] = $this->howManyAnimals;
 		$result['termOfLease'] = $this->termOfLease;
 		$result['additionalDescriptionOfSearch'] = $this->additionalDescriptionOfSearch;
+		$result['regDate'] = $this->regDate;
+		$result['needEmail'] = $this->needEmail;
+		$result['needSMS'] = $this->needSMS;
 
 		return $result;
 	}
@@ -1028,31 +1036,12 @@ class User
 	// Уведомления сортируются следующим образом: наверху все непрочитанные, внизу прочитанные, каждая из категорий сортируется по времени появления: появившиеся позже сверху
 	public function getAllMessagesSorted() {
 
-		// Инициализируем массив, который вернем по окончанию выполнения метода
-		$messagesNewProperty = array();
+		// Валидация исходных условий. Уведомления типа "Новый подходящий объект" получают только арендаторы
+		if ($this->id == "" || $this->typeTenant !== TRUE) return array();
 
-		// Получим уведомления по новым объектам недвижимости, соответствующим запросу, если наш пользователь - арендатор
-		if ($this->id != "" && $this->typeTenant === TRUE) {
-			$stmt = DBconnect::get()->stmt_init();
-			if (($stmt->prepare("SELECT * FROM messagesNewProperty WHERE userId = ? ORDER BY isReaded DESC, timeIndex DESC") === FALSE)
-				OR ($stmt->bind_param("s", $this->id) === FALSE)
-				OR ($stmt->execute() === FALSE)
-				OR (($messagesNewProperty = $stmt->get_result()) === FALSE)
-				OR (($messagesNewProperty = $messagesNewProperty->fetch_all(MYSQLI_ASSOC)) === FALSE)
-				OR ($stmt->close() === FALSE)
-			) {
-				$messagesNewProperty = array();
-				// TODO: Логируем ошибку
-			}
-		}
-
-		// Преобразования над данными - чтобы обеспечить удобство работы на клиенте с ними
-		for ($i = 0, $s = count($messagesNewProperty); $i < $s; $i++) {
-			$messagesNewProperty[$i]['fotoArr'] = unserialize($messagesNewProperty[$i]['fotoArr']);
-		}
+		$messagesNewProperty = DBconnect::selectMessagesNewPropertyForUser($this->id);
 
 		//TODO: реализовать получение новостей и из других таблиц
-
 		//TODO: когда будет несколько таблиц, Сортируем результат по статусу прочитанности и по времени появления
 
 		return $messagesNewProperty;

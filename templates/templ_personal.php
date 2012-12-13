@@ -87,12 +87,12 @@
 
     <?php
     // Сформируем и вставим заголовок страницы
-    include("templates/templ_header.php");
+		require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
     ?>
 
     <?php
     // Модальное окно для незарегистрированных пользователей, которые нажимают на кнопку добавления в Избранное
-    if ($isLoggedIn === FALSE) include "templates/templ_addToFavotitesDialog_ForLoggedOut.php";
+    if ($isLoggedIn === FALSE) require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_addToFavotitesDialog_ForLoggedOut.php";
     ?>
 
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -131,7 +131,7 @@
                 <li>
                     <a href="#tabs-2">Уведомления<?php
                         // Сколько уведомлений не прочитано?
-                        if ($amountUnreadMessages != 0) echo " (<span class='amountOfNewMessages'>".$amountUnreadMessages."</span>)"; ?>
+                        if ($amountUnreadMessages != 0) echo "<span class='amountOfNewMessagesBlock'> (<span class='amountOfNewMessages'>".$amountUnreadMessages."</span>)</span>"; ?>
                     </a>
                 </li>
                 <li>
@@ -158,7 +158,7 @@
                     echo View::getHTMLfotosWrapper("middle", TRUE, FALSE, $userFotoInformation['uploadedFoto']);
 
                     // Вставляем анкетные данные пользователя
-                    include ("templates/notEditableBlocks/templ_notEditedProfile.php");
+					require $_SERVER['DOCUMENT_ROOT'] . "/templates/notEditableBlocks/templ_notEditedProfile.php";
 
                     ?>
                 </div>
@@ -169,13 +169,13 @@
 
                     <?php
                     // Подключим форму для ввода и редактирования данных о ФИО, логине, контактах пользователя, а также о фотографиях
-                    include "templates/editableBlocks/templ_editablePersonalFIO.php";
+					require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editablePersonalFIO.php";
 
                     // Подключим форму для ввода и редактирования данных об образовании, работе и месте рождения
-                    include "templates/editableBlocks/templ_editablePersonalEducAndWork.php";
+					require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editablePersonalEducAndWork.php";
 
                     // Подключим форму для ввода и редактирования данных о социальных сетях пользователя
-                    include "templates/editableBlocks/templ_editablePersonalSocial.php";
+					require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editablePersonalSocial.php";
                     ?>
 
                     <div class="clearBoth"></div>
@@ -242,7 +242,7 @@
                     </ul>
                     <?php
                     // Шаблон для представления нередактируемых параметров поисковго запроса пользователя
-                    include ("templates/notEditableBlocks/templ_notEditedSearchRequest.php");
+					require $_SERVER['DOCUMENT_ROOT'] . "/templates/notEditableBlocks/templ_notEditedSearchRequest.php";
                     ?>
                 </div>
                 <?php endif;?>
@@ -253,7 +253,7 @@
 
                     <?php
                     // Подключим форму для ввода и редактирования данных о социальных сетях пользователя
-                    include "templates/editableBlocks/templ_editableSearchRequest.php";
+					require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editableSearchRequest.php";
                     ?>
 
                     <div class="clearBoth"></div>
@@ -275,7 +275,7 @@
             <div id="tabs-5">
                 <?php
                     // Размещаем на странице HTML для результатов поиска (списка избранных объектов недвижимости)
-                    include("templates/searchResultBlocks/templ_searchResult.php");
+					require $_SERVER['DOCUMENT_ROOT'] . "/templates/searchResultBlocks/templ_searchResult.php";
                 ?>
             </div>
 

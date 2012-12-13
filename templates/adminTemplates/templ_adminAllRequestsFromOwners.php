@@ -71,7 +71,7 @@
 
         <div class="simpleBlockForAnyContent">
 			<?php foreach ($allRequestsFromOwners as $requestFromOwner): ?>
-			<?php include "templates/adminTemplates/templ_adminRequestFromOwnerItem.php"; ?>
+			<?php require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminRequestFromOwnerItem.php"; ?>
             <hr>
 			<?php endforeach; ?>
         </div>

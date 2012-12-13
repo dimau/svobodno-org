@@ -85,7 +85,7 @@
 
 <?php
     // Сформируем и вставим заголовок страницы
-    include("templates/templ_header.php");
+	require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
 ?>
 
 <div class="page_main_content">
@@ -149,7 +149,7 @@
 
     <?php
         // Подключим форму для ввода и редактирования данных о ФИО, логине, контактах пользователя, а также о фотографиях
-        include "templates/editableBlocks/templ_editablePersonalFIO.php";
+	require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editablePersonalFIO.php";
     ?>
 
     <div class="bottomControls">
@@ -166,7 +166,7 @@
 
     <?php
         // Подключим форму для ввода и редактирования данных об образовании, работе и месте рождения
-        include "templates/editableBlocks/templ_editablePersonalEducAndWork.php";
+	require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editablePersonalEducAndWork.php";
     ?>
 
     <div class="bottomControls">
@@ -184,7 +184,7 @@
 
     <?php
         // Подключим форму для ввода и редактирования данных о социальных сетях пользователя
-        include "templates/editableBlocks/templ_editablePersonalSocial.php";
+	require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editablePersonalSocial.php";
     ?>
 
     <?php if ($userCharacteristic['typeTenant']): ?>
@@ -217,7 +217,7 @@
 
     <?php
         // Подключим форму для ввода и редактирования данных о поисковом запросе пользователя
-        include "templates/editableBlocks/templ_editableSearchRequest.php";
+	require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editableSearchRequest.php";
     ?>
 
     <div class="bottomControls">

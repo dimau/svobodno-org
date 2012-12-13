@@ -37,7 +37,7 @@
 
     <?php
         // Сформируем и вставим заголовок страницы
-        include("templates/templ_header.php");
+	require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
     ?>
 
     <div class="page_main_content">
@@ -60,7 +60,7 @@
                         echo View::getHTMLfotosWrapper("middle", TRUE, FALSE, $userFotoInformation['uploadedFoto']);
 
                         // Вставляем анкетные данные пользователя
-                        include ("templates/notEditableBlocks/templ_notEditedProfile.php");
+					require $_SERVER['DOCUMENT_ROOT'] . "/templates/notEditableBlocks/templ_notEditedProfile.php";
                     ?>
                 </div>
                 <div class="clearBoth"></div>
@@ -78,7 +78,7 @@
                 </div>
                 <?php
                     // Шаблон для представления нередактируемых параметров поисковго запроса пользователя
-                    include ("templates/notEditableBlocks/templ_notEditedSearchRequest.php");
+                    require $_SERVER['DOCUMENT_ROOT'] . "/templates/notEditableBlocks/templ_notEditedSearchRequest.php";
                 ?>
                 <?php endif;?>
             </div>

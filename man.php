@@ -3,12 +3,12 @@
 session_start();
 
 // Подключаем нужные модели и представления
-include 'models/DBconnect.php';
-include 'models/GlobFunc.php';
-include 'models/Logger.php';
-include 'models/IncomingUser.php';
-include 'views/View.php';
-include 'models/User.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/IncomingUser.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
@@ -100,7 +100,7 @@ $mode = "tenantForOwner"; // Режим в котором будет работ�
 $strHeaderOfPage = $user->surname . " " . $user->name . " " . $user->secondName; // Получаем заголовок страницы
 
 // Подсоединяем нужный основной шаблон
-include "templates/"."templ_man.php";
+require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_man.php";
 
 /********************************************************************************
  * Закрываем соединение с БД

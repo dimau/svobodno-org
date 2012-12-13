@@ -5,11 +5,11 @@
 session_start();
 
 // Подключаем нужные модели и представления
-include 'models/DBconnect.php';
-include 'models/GlobFunc.php';
-include 'models/Logger.php';
-include 'models/IncomingUser.php';
-include 'views/View.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/IncomingUser.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
@@ -90,7 +90,7 @@ for ($i = 0, $s = count($allRequestsToView); $i < $s; $i++) {
 //$action	статус заявок на просмотр, выборку которых производим
 
 // Подсоединяем нужный основной шаблон
-include "templates/" . "adminTemplates/templ_adminAllRequestsToView.php";
+require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminAllRequestsToView.php";
 
 /********************************************************************************
  * Закрываем соединение с БД

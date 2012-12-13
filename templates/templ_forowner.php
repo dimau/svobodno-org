@@ -54,7 +54,7 @@
 
     <?php
         // Сформируем и вставим заголовок страницы
-        include("templates/templ_header.php");
+	require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
     ?>
 
     <div class="page_main_content">

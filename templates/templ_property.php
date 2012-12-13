@@ -91,7 +91,7 @@
 
 <?php
 // Сформируем и вставим заголовок страницы
-include("templates/templ_header.php");
+	require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
 ?>
 
 <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -218,7 +218,7 @@ include("templates/templ_header.php");
     <ul class="setOfInstructions">
 		<?php
 		/* Оформляем пункт меню о Заявке на просмотр */
-		include ("templates/signUpToViewBlocks/templ_signUpToViewItem.php");
+		require $_SERVER['DOCUMENT_ROOT'] . "/templates/signUpToViewBlocks/templ_signUpToViewItem.php";
 		?>
         <li>
 			<?php
@@ -240,9 +240,9 @@ include("templates/templ_header.php");
 
 <?php
 // Подключаем нужное модальное окно для Запроса на просмотр
-if ($isLoggedIn === FALSE) include "templates/signUpToViewBlocks/templ_signUpToViewDialog_ForLoggedOut.php";
-if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] !== TRUE) include "templates/signUpToViewBlocks/templ_signUpToViewDialog_ForOwner.php";
-if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include "templates/signUpToViewBlocks/templ_signUpToViewDialog_ForTenant.php";
+if ($isLoggedIn === FALSE) require $_SERVER['DOCUMENT_ROOT'] . "/templates/signUpToViewBlocks/templ_signUpToViewDialog_ForLoggedOut.php";
+if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] !== TRUE) require $_SERVER['DOCUMENT_ROOT'] . "/templates/signUpToViewBlocks/templ_signUpToViewDialog_ForOwner.php";
+if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require $_SERVER['DOCUMENT_ROOT'] . "/templates/signUpToViewBlocks/templ_signUpToViewDialog_ForTenant.php";
 ?>
 
 <div class="objectDescription">
@@ -868,7 +868,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
     <ul class="setOfInstructions">
 		<?php
 		/* Оформляем пункт меню о Заявке на просмотр */
-		include ("templates/signUpToViewBlocks/templ_signUpToViewItem.php");
+		require $_SERVER['DOCUMENT_ROOT'] . "/templates/signUpToViewBlocks/templ_signUpToViewItem.php";
 		?>
         <li>
 			<?php
@@ -928,7 +928,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) include 
 
 <?php
 // Модальное окно для незарегистрированных пользователей, которые нажимают на кнопку добавления в Избранное
-if ($isLoggedIn === FALSE) include "templates/templ_addToFavotitesDialog_ForLoggedOut.php";
+if ($isLoggedIn === FALSE) require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_addToFavotitesDialog_ForLoggedOut.php";
 ?>
 
 </div>

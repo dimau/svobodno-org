@@ -71,7 +71,7 @@
 
         <div class="simpleBlockForAnyContent">
 			<?php foreach ($allRequestsToView as $requestToView): ?>
-			<?php include "templates/adminTemplates/templ_adminRequestToViewDetailedItem.php"; ?>
+			<?php require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminRequestToViewDetailedItem.php"; ?>
             <hr>
 			<?php endforeach; ?>
         </div>

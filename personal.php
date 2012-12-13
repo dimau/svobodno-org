@@ -3,14 +3,14 @@
 session_start();
 
 // Подключаем нужные модели и представления
-include 'models/DBconnect.php';
-include 'models/GlobFunc.php';
-include 'models/Logger.php';
-include 'models/IncomingUser.php';
-include 'views/View.php';
-include 'models/User.php';
-include 'models/Property.php';
-include 'models/CollectionProperty.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/IncomingUser.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Property.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/CollectionProperty.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
@@ -133,7 +133,7 @@ if ($action == "publishAdvert" && $propertyId != "" && $propertyId != 0) {
 
 		// Создаем специльный объект для работы с данным объявлением
 		$property = new Property($propertyId);
-		if ($property->writeCharacteristicFromDB()) {
+		if ($property->writeCharacteristicFromDB() && $property->writeFotoInformationFromDB()) {
 			$property->publishAdvert();
 		}
 
@@ -240,7 +240,7 @@ $propertyFullArr = $incomingUser->getPropertyFullArr();
 $favoritesPropertysId = $incomingUser->getFavoritesPropertysId();
 $mode = "personal"; // Режим в котором будут работать ряд шаблонов: анкеты пользователя на вкладке №1 (templ_notEditedProfile.php), шаблон для редактирования поискового запроса (templ_editableSearchRequest.php)
 $messagesArr = $user->getAllMessagesSorted(); // массив массивов, каждый из которых представляет инфу по 1-ому уведомлению пользователя
-$amountUnreadMessages = count($messagesArr); // В отличие от других страниц в Личном кабинете мы можем использовать для подсчета гарантированно точный способ - реально пересчитать количество уведомлений, которые будут выдаваться на странице. Количество непрочитанных уведомлений пользователя (при просмотре админом - показывает количество непросмотренных уведомлений админа)
+$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 $compId = GlobFunc::idToCompId($userId);
 //$errors
 //$correctNewSearchRequest
@@ -250,7 +250,7 @@ $compId = GlobFunc::idToCompId($userId);
 //$tabsId // Идентификатор вкладки, которая будет открыта по умолчанию после загрузки страницы
 
 // Подсоединяем нужный основной шаблон
-include "templates/"."templ_personal.php";
+require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_personal.php";
 
 /********************************************************************************
  * Закрываем соединение с БД

@@ -10,6 +10,8 @@ class MessageNewProperty
 	public $isReaded = "";
 	public $fotoArr = array();
 	public $targetId = "";
+	public $needEmail = 0;
+	public $needSMS = 0;
 	public $typeOfObject = "0";
 	public $address = "";
 	public $currency = "0";
@@ -86,8 +88,10 @@ class MessageNewProperty
 		if (isset($one['timeIndex'])) $this->timeIndex = $one['timeIndex'];
 		if (isset($one['messageType'])) $this->messageType = $one['messageType'];
 		if (isset($one['isReaded'])) $this->isReaded = $one['isReaded'];
-		if (isset($one['fotoArr'])) $this->fotoArr = unserialize($one['fotoArr']);
+		if (isset($one['fotoArr'])) $this->fotoArr = $one['fotoArr'];
 		if (isset($one['targetId'])) $this->targetId = $one['targetId'];
+		if (isset($one['needEmail'])) $this->needEmail = $one['needEmail'];
+		if (isset($one['needSMS'])) $this->needSMS = $one['needSMS'];
 		if (isset($one['typeOfObject'])) $this->typeOfObject = $one['typeOfObject'];
 		if (isset($one['address'])) $this->address = $one['address'];
 		if (isset($one['currency'])) $this->currency = $one['currency'];
@@ -122,11 +126,11 @@ class MessageNewProperty
 		return DBconnect::deleteMessageNewPropertyForId($this->id);
 	}
 
-	// Делает новость прочитанной. Меняет в БД статус isReaded на "TRUE"
-	// Возвращает TRUE в случае успеха и FALSE в противном случае
+	// Делает уведомление прочитанным
+	// Возвращает TRUE
 	public function changeIsReadedTrue() {
-		$this->isReaded = "TRUE";
-		return $this->saveParamsToDB();
+		$this->isReaded = "прочитано";
+		return TRUE;
 	}
 
 	public function getParams() {
@@ -139,6 +143,8 @@ class MessageNewProperty
 		$result['isReaded'] = $this->isReaded;
 		$result['fotoArr'] = $this->fotoArr;
 		$result['targetId'] = $this->targetId;
+		$result['needEmail'] = $this->needEmail;
+		$result['needSMS'] = $this->needSMS;
 		$result['typeOfObject'] = $this->typeOfObject;
 		$result['address'] = $this->address;
 		$result['currency'] = $this->currency;

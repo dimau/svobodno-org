@@ -234,7 +234,7 @@
         public static function getFullBalloonHTML($oneProperty, $favoritesPropertysId = array())
         {
             // Получим HTML шаблон блока из файла
-            $templ = file_get_contents('templates/searchResultBlocks/fullBalloonListItem.php');
+            $templ = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/templates/searchResultBlocks/fullBalloonListItem.php');
 
             // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне баллуна
             $arrBalloonReplace = array();
@@ -385,7 +385,7 @@
        public static function getShortListItemHTML($oneProperty, $favoritesPropertysId = array(), $number)
        {
            // Получим HTML шаблон блока из файла
-           $tmpl_shortAdvert = file_get_contents('templates/searchResultBlocks/shortListItem.php');
+           $tmpl_shortAdvert = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/templates/searchResultBlocks/shortListItem.php');
 
            // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне shortList строки таблицы
            $arrShortListReplace = array();
@@ -509,7 +509,7 @@
         public static function getFullParametersListItemHTML($oneProperty, $favoritesPropertysId = array(), $number)
         {
             // Получим HTML шаблон блока из файла
-            $tmpl_extendedAdvert = file_get_contents('templates/searchResultBlocks/fullListItem.php');
+            $tmpl_extendedAdvert = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/templates/searchResultBlocks/fullListItem.php');
 
             // Инициализируем массив, в который будут сохранены значения, используемые для замены констант в шаблоне
             $arrExtendedListReplace = array();
@@ -673,7 +673,7 @@
             if (!is_array($allPropertiesCharacteristic) || count($allPropertiesCharacteristic) == 0 || !is_array($allPropertiesFotoInformation) || !is_array($allPropertiesTenantPretenders)) return "";
 
 			// Получим из файла HTML шаблон блока для описания отдельного объекта недвижимости
-			$tmpl_MyAdvert = file_get_contents('templates/templ_descriptionPropertyForOwner.php');
+			$tmpl_MyAdvert = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/templates/templ_descriptionPropertyForOwner.php');
 
             // Создаем бриф для каждого объявления пользователя на основе шаблона (для вкладки МОИ ОБЪЯВЛЕНИЯ), и в цикле объединяем их в один HTML блок - $briefOfAdverts.
             // Если объявлений у пользователя несколько, то в переменную, содержащую весь HTML - $briefOfAdverts, записываем каждое из них последовательно
@@ -846,7 +846,7 @@
         public static function getHTMLforMessageNewProperty($sourceArr)
         {
 			// Получим HTML шаблон блока из файла
-			$templ = file_get_contents('templates/messagesBlocks/templ_messageNewProperty.php');
+			$templ = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/templates/messagesBlocks/templ_messageNewProperty.php');
 
             // Если массив с параметрами уведомления не передан, то возвращаем пустую строку вместо HTML блока
             if (!isset($sourceArr) || !is_array($sourceArr)) {
@@ -867,6 +867,10 @@
 			// Фото
             $valuesArr['fotosWrapper'] = "";
             $valuesArr['fotosWrapper'] = View::getHTMLfotosWrapper("small", FALSE, FALSE, $sourceArr['fotoArr']);
+
+			// Команда прочитанности уведомления
+			$valuesArr['isReadedTrue'] = "";
+			if (isset($sourceArr['isReaded']) && $sourceArr['isReaded'] == "не прочитано") $valuesArr['isReadedTrue'] = "прочитано";
 
             // Идентификатор объекта
             $valuesArr['propertyId'] = "";
@@ -944,7 +948,7 @@
             }
 
             // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне
-            $stringForReplaceArr = array('{unread}', '{messageId}', '{fotosWrapper}', '{propertyId}', '{typeOfObject}', '{address}', '{costOfRenting}', '{currency}', '{costOfRentingName}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{areaValuesName}', '{areaValuesMeasure}', '{floorName}', '{floor}');
+            $stringForReplaceArr = array('{unread}', '{messageId}', '{fotosWrapper}', '{isReadedTrue}', '{propertyId}', '{typeOfObject}', '{address}', '{costOfRenting}', '{currency}', '{costOfRentingName}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{areaValuesName}', '{areaValuesMeasure}', '{floorName}', '{floor}');
             // Заполнение шаблона
             $resultHTML = str_replace($stringForReplaceArr, $valuesArr, $templ);
 

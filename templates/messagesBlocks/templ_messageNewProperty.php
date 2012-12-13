@@ -5,7 +5,7 @@
     {fotosWrapper}
     <ul class='setOfInstructions'>
         <li>
-            <a class="isReadedTrueMessage">прочитал</a>
+            <a class="isReadedTrueMessage">{isReadedTrue}</a>
         </li>
         <li>
             <a class="removeMessage">удалить</a>

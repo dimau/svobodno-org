@@ -74,14 +74,14 @@
             <div style="float: left; width: 49%;">
 				<?php
 				// Шаблон для сведений о собственнике
-				include "templates/adminTemplates/templ_adminUserItem.php";
+				require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminUserItem.php";
 				?>
             </div>
 
             <div style="float: right; width: 49%;">
 				<?php
 				// Шаблон для сведений об объекте недвижимости
-				include "templates/adminTemplates/templ_adminPropertyItem.php";
+				require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminPropertyItem.php";
 				?>
             </div>
 
@@ -91,7 +91,7 @@
             <div style="margin-left: 40px;">
 				<?php foreach ($allRequestsToView as $requestToView): ?>
 					<div class="<?php if ($requestToView['id'] == $requestToViewId) echo "highlightedBlock";?>">
-						<?php include "templates/adminTemplates/templ_adminRequestToViewDetailedItem.php";?>
+						<?php require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminRequestToViewDetailedItem.php";?>
 					</div>
                 	<hr>
 				<?php endforeach; ?>

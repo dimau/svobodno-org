@@ -5,11 +5,11 @@
 session_start();
 
 // Подключаем нужные модели и представления
-include 'models/DBconnect.php';
-include 'models/GlobFunc.php';
-include 'models/Logger.php';
-include 'models/IncomingUser.php';
-include 'models/MessageNewProperty.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/IncomingUser.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/MessageNewProperty.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.'); // TODO: Вернуть ошибку
@@ -61,12 +61,11 @@ switch ($messageType) {
  *************************************************************************************/
 
 if ($action == "remove") {
-	// Эта новость принадлежит пользователю, который запросил ее удаление
-	if ($message->referToUser($incomingUser->getId())) {
-		if (!$message->remove()) GlobFunc::accessDenied();
-	} else {
-		GlobFunc::accessDenied();
-	}
+
+	// Убедимся, что это уведомление принадлежит пользователю, который запросил ее удаление
+	if (!$message->referToUser($incomingUser->getId())) GlobFunc::accessDenied();
+
+	if (!$message->remove()) GlobFunc::accessDenied();
 }
 
 /*************************************************************************************
@@ -74,12 +73,11 @@ if ($action == "remove") {
  *************************************************************************************/
 
 if ($action == "isReadedTrue") {
-	// Эта новость принадлежит пользователю, который запросил изменение ее статуса прочитанности
-	if ($message->referToUser($incomingUser->getId())) {
-		if (!$message->changeIsReadedTrue()) GlobFunc::accessDenied();
-	} else {
-		GlobFunc::accessDenied();
-	}
+
+	// Убедимся, что это уведомление принадлежит пользователю, который запросил изменение ее статуса прочитанности
+	if (!$message->referToUser($incomingUser->getId())) GlobFunc::accessDenied();
+
+	if (!$message->changeIsReadedTrue() || !$message->saveParamsToDB()) GlobFunc::accessDenied();
 }
 
 /*************************************************************************************

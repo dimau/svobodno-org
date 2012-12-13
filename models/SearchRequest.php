@@ -21,6 +21,8 @@
         public $termOfLease = "0";
         public $additionalDescriptionOfSearch = "";
 		public $regDate = "";
+		public $needEmail = 0;
+		public $needSMS = 0;
 
         private $propertyLightArr; // Массив массивов. После выполнения метода searchProperties содержит минимальные данные по ВСЕМ объектам, соответствующим условиям поиска
         private $propertyFullArr; // Массив массивов. После выполнения метода searchProperties содержит полные данные, включая фотографии, по нескольким первым в выборке объектам (количество указывается в качестве первого параметра к методу searchProperties)
@@ -79,6 +81,8 @@
             if (isset($oneSearchRequestDataArr['termOfLease'])) $this->termOfLease = $oneSearchRequestDataArr['termOfLease'];
             if (isset($oneSearchRequestDataArr['additionalDescriptionOfSearch'])) $this->additionalDescriptionOfSearch = $oneSearchRequestDataArr['additionalDescriptionOfSearch'];
 			if (isset($oneSearchRequestDataArr['regDate'])) $this->regDate = $oneSearchRequestDataArr['regDate'];
+			if (isset($oneSearchRequestDataArr['needEmail'])) $this->needEmail = $oneSearchRequestDataArr['needEmail'];
+			if (isset($oneSearchRequestDataArr['needSMS'])) $this->needSMS = $oneSearchRequestDataArr['needSMS'];
 
             return TRUE;
         }
@@ -323,6 +327,8 @@
             $result['termOfLease'] = $this->termOfLease;
             $result['additionalDescriptionOfSearch'] = $this->additionalDescriptionOfSearch;
 			$result['regDate'] = $this->regDate;
+			$result['needEmail'] = $this->needEmail;
+			$result['needSMS'] = $this->needSMS;
 
             return $result;
         }

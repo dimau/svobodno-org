@@ -294,29 +294,15 @@
             }
 
             // Если во время этой сессии уже подсчитали количество непрочитанных уведомлений - вернем его
-            if (isset($_SESSION['amountUnreadMessages'])) {
+			// Это решение приводило к тому, что пока не был перегружен браузер кол-во непрочитанных уведомлений не изменялось
+            /*if (isset($_SESSION['amountUnreadMessages'])) {
                 $this->amountUnreadMessages = $_SESSION['amountUnreadMessages'];
                 return $_SESSION['amountUnreadMessages'];
-            }
-
-            // Инициализируем переменную для возвращения
-            $result = 0;
+            }*/
 
             // Считаем количество непрочитанных уведомлений пользователя
-            $res = DBconnect::get()->query("SELECT COUNT(*) FROM messagesNewProperty WHERE userId = '".$this->id."' AND isReaded = 'не прочитано'");
-            if ((DBconnect::get()->errno)
-                OR (($res = $res->fetch_row()) === NULL)
-            ) {
-                //TODO: сделать логирование ошибки
-                $result = 0;
-            } else {
-                $result = $res[0];
-
-                // Сохраним результат в переменную сессии. Сохранение результата только в случае успеха позволит при загрузке следующей страницы переполучить значение для тех случаев, когда попытка подсчета закончилась неудачей
-                $_SESSION['amountUnreadMessages'] = $result;
-            }
-
-            //TODO: сделать подсчет количества уведомлений и по другим таблицам уведомлений
+			$result = DBconnect::countUnreadMessagesForUser($this->id);
+            //TODO: сделать подсчет количества уведомлений и по другим таблицам уведомлений (когда они появятся)
 
             // Сохраним также результат в переменную объекта пользователя
             $this->amountUnreadMessages = $result;

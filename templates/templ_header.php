@@ -48,10 +48,10 @@
                 if ($amountUnreadMessages == 0) {
                     $amountUnreadMessagesText = "";
                 } else {
-                    $amountUnreadMessagesText = " (<span class='amountOfNewMessages'>".$amountUnreadMessages."</span>)";
+                    $amountUnreadMessagesText = "<span class='amountOfNewMessagesBlock'> (<span class='amountOfNewMessages'>".$amountUnreadMessages."</span>)</span>";
                 }
 
-                if ($_SERVER['PHP_SELF'] == "/fortenant.php") { // TODO: поменять ссылку, на которую нужно переходить fortenant - cltkfnm c gjvjom. JS правильное выделение ссылки при нахождении на вкладке новости
+                if ($_SERVER['PHP_SELF'] == "/fortenant.php") { // TODO: поменять ссылку, на которую нужно переходить fortenant - cltkfnm c gjvjom. JS правильное выделение ссылки при нахождении на вкладке уведомлений
                     echo ("<li class='selected choice' style='width:" . $width[3] . "%'><span>Уведомления".$amountUnreadMessagesText."</span>");
                 } else {
                     echo ("<li class='choice' style='width:" . $width[3] . "%'><a href='personal.php?tabsId=2'>Уведомления".$amountUnreadMessagesText."</a>");

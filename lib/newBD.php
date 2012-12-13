@@ -5,7 +5,7 @@
  */
 
 // Подключаем нужные модели и представления
-include '../models/DBconnect.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
@@ -273,7 +273,9 @@ DBconnect::get()->query("CREATE TABLE searchRequests (
         howManyAnimals TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
         termOfLease VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
         additionalDescriptionOfSearch TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
-        regDate INT(11) COMMENT 'Дата и время создания поискового запроса'
+        regDate INT(11) COMMENT 'Дата и время создания поискового запроса',
+        needEmail INT(1) DEFAULT 0 COMMENT 'Требуется ли оповещать пользователя по email о появлении новых подходящих под его запрос объектов недвижимости: 0 = не требуется, 1 = требуется',
+        needSMS INT(1) DEFAULT 0 COMMENT 'Требуется ли оповещать пользователя по смс о появлении новых подходящих под его запрос объектов недвижимости: 0 = не требуется, 1 = требуется'
 )");
 
 echo "searchRequests: ";
@@ -333,6 +335,8 @@ DBconnect::get()->query("CREATE TABLE messagesNewProperty (
         isReaded VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'не прочитано' COMMENT 'Статус уведомления: прочитано, не прочитано. Сразу после создания уведомления становится непрочитанным',
         fotoArr TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Массив массивов (по структуре совпадающий с uploadedFoto - это нужно, чтобы на основе этих данных могла работать функция getHTMLfotosWrapper), который включает в себя информацию только об 1 фотографии - основной',
         targetId INT(11) NOT NULL COMMENT 'Идентификатор объекта недвижимости, которому посвящена новость',
+        needEmail INT(1) DEFAULT 0 COMMENT 'Требуется ли отправка уведомления пользователю по email: 0 = не требуется (или уже была осуществлена), 1 = требуется',
+        needSMS INT(1) DEFAULT 0 COMMENT 'Требуется ли отправка уведомления пользователю по смс: 0 = не требуется (или уже была осуществлена), 1 = требуется',
         typeOfObject VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип объекта: квартира, комната, дом, таунхаус, дача, гараж',
         address VARCHAR(60) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Человеческое название улицы и номера дома',
         currency VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Валюта для рассчетов',

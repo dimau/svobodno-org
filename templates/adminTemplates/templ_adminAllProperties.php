@@ -71,7 +71,7 @@
 
         <div class="simpleBlockForAnyContent">
 			<?php foreach ($allPropertiesCharacteristic as $propertyCharacteristic): ?>
-			<?php include "templates/adminTemplates/templ_adminPropertyItem.php"; ?>
+			<?php require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminPropertyItem.php"; ?>
             <hr>
 			<?php endforeach; ?>
         </div>

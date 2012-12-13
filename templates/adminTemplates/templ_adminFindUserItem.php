@@ -1,5 +1,5 @@
 <div class="simpleBlockForAnyContent">
-	<?php include "templates/adminTemplates/templ_adminUserItem.php";?>
+	<?php require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminUserItem.php";?>
 
 	<hr>
 
@@ -7,7 +7,7 @@
 		<?php
 		foreach ($allProperties as $propertyCharacteristic) {
 			if ($propertyCharacteristic['userId'] == $userCharacteristic['id']) {
-				include "templates/adminTemplates/templ_adminPropertyItem.php";
+				require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminPropertyItem.php";
 			}
 		}
 		?>
@@ -19,7 +19,7 @@
 		<?php
 		foreach ($allRequestsToView as $requestToView) {
 			if ($requestToView['tenantId'] == $userCharacteristic['id']) {
-				include "templates/adminTemplates/templ_adminRequestToViewItem.php";
+				require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminRequestToViewItem.php";
 			}
 		}
 		?>
