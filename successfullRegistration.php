@@ -6,14 +6,15 @@ session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/IncomingUser.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
 // Инициализируем модель для запросившего страницу пользователя
-$incomingUser = new IncomingUser();
+$userIncoming = new UserIncoming();
 
 /********************************************************************************
  * ОТКУДА К НАМ ПРИШЕЛ ПОЛЬЗОВАТЕЛЬ
@@ -31,8 +32,8 @@ if (isset($_SESSION['url_initial']) && preg_match('~^((http://svobodno.org)|(htt
  *******************************************************************************/
 
 // Инициализируем используемые в шаблоне(ах) переменные
-$isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
+$isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
+$amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 //$url_initial
 
 // Подсоединяем нужный основной шаблон

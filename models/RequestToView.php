@@ -4,11 +4,11 @@
     class RequestToView
     {
         private $id = "";
-        public $tenantId = "";
-        public $propertyId = "";
-        public $tenantTime = "";
-        public $tenantComment = "";
-        public $status = "";
+        private $tenantId = "";
+        private $propertyId = "";
+        private $tenantTime = "";
+        private $tenantComment = "";
+        private $status = "";
 
 		/**
 		 * КОНСТРУКТОР
@@ -38,8 +38,17 @@
             $this->writeParamsFromDB();
         }
 
-        // ДЕСТРУКТОР
-        public function __destruct() {}
+		public function setStatus($status) {
+			$this->status = $status;
+		}
+
+		public function setTenantComment($tenantComment) {
+			$this->tenantComment = $tenantComment;
+		}
+
+		public function setTenantTime($tenantTime) {
+			$this->tenantTime = $tenantTime;
+		}
 
         // Сохраняет параметры запроса на показ в БД
         // Возвращает TRUE, если данные успешно сохранены и FALSE в противном случае

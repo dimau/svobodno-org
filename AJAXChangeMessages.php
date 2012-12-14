@@ -8,21 +8,22 @@ session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/IncomingUser.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/MessageNewProperty.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.'); // TODO: Вернуть ошибку
 
 // Инициализируем модель для запросившего страницу пользователя
-$incomingUser = new IncomingUser();
+$userIncoming = new UserIncoming();
 
 /*************************************************************************************
  * ПРОВЕРКА ПРАВ ДОСТУПА К СКРИПТУ
  ************************************************************************************/
 
 // Проверяем, залогинен ли пользователь, если нет - то отказываем в доступе
-if (!$incomingUser->login()) {
+if (!$userIncoming->login()) {
 	GlobFunc::accessDenied();
 }
 
@@ -63,7 +64,7 @@ switch ($messageType) {
 if ($action == "remove") {
 
 	// Убедимся, что это уведомление принадлежит пользователю, который запросил ее удаление
-	if (!$message->referToUser($incomingUser->getId())) GlobFunc::accessDenied();
+	if (!$message->referToUser($userIncoming->getId())) GlobFunc::accessDenied();
 
 	if (!$message->remove()) GlobFunc::accessDenied();
 }
@@ -75,7 +76,7 @@ if ($action == "remove") {
 if ($action == "isReadedTrue") {
 
 	// Убедимся, что это уведомление принадлежит пользователю, который запросил изменение ее статуса прочитанности
-	if (!$message->referToUser($incomingUser->getId())) GlobFunc::accessDenied();
+	if (!$message->referToUser($userIncoming->getId())) GlobFunc::accessDenied();
 
 	if (!$message->changeIsReadedTrue() || !$message->saveParamsToDB()) GlobFunc::accessDenied();
 }

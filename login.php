@@ -6,17 +6,18 @@ session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/IncomingUser.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
 // Инициализируем модель для запросившего страницу пользователя
-$incomingUser = new IncomingUser();
+$userIncoming = new UserIncoming();
 
 // Если пользователь уже авторизирован, перенаправим его в личный кабинет
-if ($incomingUser->login()) {
+if ($userIncoming->login()) {
 	header('Location: personal.php');
 	exit();
 }
@@ -56,13 +57,13 @@ if (isset($_SESSION['url_initial']) && !preg_match('~((http://svobodno.org)|(htt
 
 if ($action == "signIn") {
 
-	$errors = $incomingUser->enter(); //функция входа на сайт
+	$errors = $userIncoming->enter(); //функция входа на сайт
 
 	if (is_array($errors) && count($errors) == 0) // Если нет ошибок - пользователь успешно авторизован, понимаем, куда теперь его нужно переслать
 	{
 		// Уточняем - имеет ли пользователь права админа
-		// Строка расположена не вверху страницы как обычно, а после выполнения метода $incomingUser->enter(), так как только после ее выполнения мы узнаем настоящие права на администрирование у пользователя
-		$isAdmin = $incomingUser->isAdmin();
+		// Строка расположена не вверху страницы как обычно, а после выполнения метода $userIncoming->enter(), так как только после ее выполнения мы узнаем настоящие права на администрирование у пользователя
+		$isAdmin = $userIncoming->isAdmin();
 
 		// Если мы знаем страницу, с которой пришел пользователь и это не главная, то перешлем его на исходную страницу, с которой он и попал на авторизацию
 		if (isset($_SESSION['url_initial']) && $_SESSION['url_initial'] != "http://svobodno.org/index.php" && $_SESSION['url_initial'] != "http://localhost/index.php" && $_SESSION['url_initial'] != "http://svobodno.org/" && $_SESSION['url_initial'] != "http://localhost/") {
@@ -86,8 +87,8 @@ if ($action == "signIn") {
  *******************************************************************************/
 
 // Инициализируем используемые в шаблоне(ах) переменные
-$isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
+$isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
+$amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 //$errors
 
 // Подсоединяем нужный основной шаблон

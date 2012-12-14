@@ -63,9 +63,9 @@
 
     <?php
         // Пока пользователь любуется заголовком страницы, а браузер загружает нужные библиотеки, вычислим представление для результатов поиска. Размещать же его на странице мы будем несколько позже
-        $matterOfBalloonList = View::getMatterOfBalloonList($propertyFullArr, $favoritesPropertysId, "search");
-        $matterOfShortList = View::getMatterOfShortList($propertyFullArr, $favoritesPropertysId, 1, "search");
-        $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullArr, $favoritesPropertysId, 1, "search");
+        $matterOfBalloonList = View::getMatterOfBalloonList($propertyFullArr, $favoritePropertiesId, "search");
+        $matterOfShortList = View::getMatterOfShortList($propertyFullArr, $favoritePropertiesId, 1, "search");
+        $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullArr, $favoritePropertiesId, 1, "search");
     ?>
 
     <div class="page_main_content">

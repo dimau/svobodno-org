@@ -21,21 +21,22 @@ session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/IncomingUser.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/SearchRequest.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
 // Инициализируем модель для запросившего страницу пользователя
-$incomingUser = new IncomingUser();
+$userIncoming = new UserIncoming();
 
 // Инициализируем поисковый запрос значениями по умолчанию
-$searchRequest = new SearchRequest();
+$searchRequest = new SearchRequest(NULL);
 
 // Готовим массив со списком районов в городе пользователя
-$allDistrictsInCity = GlobFunc::getAllDistrictsInCity("Екатеринбург");
+$allDistrictsInCity = DBconnect::selectDistrictsForCity("Екатеринбург");
 
 /***************************************************************************************************************
  * ОТПРАВЛЕНА ФОРМА ПОИСКА
@@ -53,8 +54,9 @@ if (isset($_GET['extendedSearchButton'])) {
  * Если пользователь залогинен и указал в личном кабинете параметры поиска, но еще не нажимал кнопки Поиск на этой странице
  **************************************************************************************************************/
 
-if (!isset($_GET['fastSearchButton']) && !isset($_GET['extendedSearchButton']) && $incomingUser->login()) {
-	$searchRequest->writeParamsFromDB();
+if (!isset($_GET['fastSearchButton']) && !isset($_GET['extendedSearchButton']) && $userIncoming->login()) {
+	$searchRequest->setUserId($userIncoming->getId());
+	$searchRequest->writeFromDB();
 }
 
 /***************************************************************************************************************
@@ -68,12 +70,12 @@ $searchRequest->searchProperties(20);
  *******************************************************************************/
 
 // Инициализируем используемые в шаблоне(ах) переменные
-$isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
+$isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
+$amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 $propertyLightArr = $searchRequest->getPropertyLightArr();
 $propertyFullArr = $searchRequest->getPropertyFullArr();
 $userSearchRequest = $searchRequest->getSearchRequestData();
-$favoritesPropertysId = $incomingUser->getFavoritesPropertysId();
+$favoritePropertiesId = $userIncoming->getFavoritePropertiesId();
 $mode = "search"; // Режим, согласно которому будут работать некоторые шаблоны
 //$allDistrictsInCity
 

@@ -91,7 +91,7 @@ DBconnect::get()->query("CREATE TABLE users (
         user_hash VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Поле хранит id последней сессии пользователя. Это нужно для безопасности: если значение идентификатора сессии, присланное браузером, не совпадает с этим значением, значит его сессия устарела и требует обновления ',
         last_act INT(11) COMMENT 'Время последней активности пользователя в секундах после 1970 года - формат timestamp',
         reg_date INT(11) COMMENT 'Время регистрации пользователя с точностью до секунд в формате timestamp',
-        favoritesPropertysId TEXT COMMENT 'Список id объектов недвижимости, которые данный пользователь добавил в избранные'
+        favoritePropertiesId TEXT COMMENT 'Список id объектов недвижимости, которые данный пользователь добавил в избранные'
 )");
 
 echo "users: ";
@@ -107,7 +107,7 @@ if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TR
  ***************************************************************************/
 
 DBconnect::get()->query("CREATE TABLE property (
-        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор объекта недвижимости или объявления - можно его называть и так, и так',
+        id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор объекта недвижимости или объявления - можно его называть и так, и так',
         userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя (собственника), который указал данное объявление в системе и который сдает данный объект',
         typeOfObject VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип объекта: квартира, комната, дом, таунхаус, дача, гараж',
         dateOfEntry DATE COMMENT 'С какого числа арендатор может въезжать в объект',
@@ -255,7 +255,8 @@ if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TR
  ***************************************************************************/
 
 DBconnect::get()->query("CREATE TABLE searchRequests (
-        userId INT(11) NOT NULL PRIMARY KEY COMMENT 'Идентификатор пользователя, которому принадлежит данный поисковый запрос. Так как я считаю, что каждый пользователь может иметь только 1 поисковый запрос, то данное поле является ключом таблицы',
+		id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор поискового запроса',
+        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, которому принадлежит данный поисковый запрос. Так как я считаю, что каждый пользователь может иметь только 1 поисковый запрос, то данное поле является ключом таблицы',
         typeOfObject VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип объекта, который ищет пользователь',
         amountOfRooms TEXT,
         adjacentRooms VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci,
@@ -289,7 +290,7 @@ if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TR
  ***************************************************************************/
 
 DBconnect::get()->query("CREATE TABLE requestToView (
-       id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор запроса на просмотр недвижимости',
+       id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор запроса на просмотр недвижимости',
        tenantId INT(11) NOT NULL COMMENT 'Идентификатор пользователя (арендатора), который отправил запрос на просмотр объекта недвижимости',
        propertyId INT(11) NOT NULL COMMENT 'Идентификатор объекта недвижимости, который желает посмотреть арендатор',
        tenantTime VARCHAR(200) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Дата и время, которые указал арендатор в качестве желаемых (удобных) по этому запросу',
@@ -307,7 +308,7 @@ if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TR
  ***************************************************************************/
 
 DBconnect::get()->query("CREATE TABLE requestFromOwners (
-       id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор запроса на сдачу в аренду недвижимости',
+       id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор запроса на сдачу в аренду недвижимости',
        name VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Имя собственника - как к нему обращаться',
        telephon VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci,
        address VARCHAR(60) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Человеческое назва',
@@ -386,6 +387,22 @@ DBconnect::get()->query("CREATE TABLE messagesNewTenant (
 
 echo "messagesNewTenant: ";
 if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
+/****************************************************************************
+ * СПИСОК ОСНОВАНИЙ ДЛЯ ОПОВЕЩЕНИЯ ПОЛЬЗОВАТЕЛЕЙ
+ *
+ * Таблица содержит сведения, являющиеся основанием для формирования массовых оповещений (уведомлени + рассылка e-mail и sms)
+ * На текущий момент времени мне требуется только 1 массовое оповещение - о появлении нового объекта недвижимости
+ * Все остальные поводы для формирования оповещений кажутся гораздо менее массовми (затрагивая интересы 1 человека или группы пользователей по 1 сделке). Такого рода оповещения можно формировать в момент появления основания - не откладывая.
+ ***************************************************************************/
+/*DBconnect::get()->query("CREATE TABLE requestsForNotification (
+        id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор основания',
+        type VARCHAR(30) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Название района, которое отображается пользователю',
+        propertyId VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Город, в котором расположен данный район'
+	)");
+
+echo "districts: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE); */
 
 /****************************************************************************
  * СПИСОК РАЙОНОВ ВСЕХ ГОРОДОВ ПРИСУТСТВИЯ
@@ -484,7 +501,7 @@ if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TR
  * upload_max_filesize = 25M // Максимальный размер файла, закачивать который разрешает php для пользователя
  * memory_limit = 256M    // Максимальный размер оперативной памяти, которую сервер может выделить для выполнения 1 сценария PHP
  * display_errors = Off        // Запрещает PHP отображать предупреждения и ошибки на экране
- * все права для всех пользователей на каталог uploaded_files (чтобы можно было записывать новые фотографии и удалять старые)
+ * все права для всех пользователей на каталог uploaded_files и logs(чтобы можно было записывать новые фотографии и удалять старые, а также писать логи)
  * date.timezone = Asia/Yekaterinburg // Необходимо установить временную зону по умолчанию
  *
  * ini_set ("session.use_trans_sid", true); вроде как PHP сам умеет устанавливать id сессии либо в куки, либо в строку запроса (http://www.phpfaq.ru/sessions)

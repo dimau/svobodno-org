@@ -6,20 +6,22 @@ session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/IncomingUser.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserFull.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Property.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/CollectionProperty.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/SearchRequest.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
 // Инициализируем модель для запросившего страницу пользователя
-$incomingUser = new IncomingUser();
+$userIncoming = new UserIncoming();
 
 // Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
-if (!$incomingUser->login()) {
+if (!$userIncoming->login()) {
 	header('Location: login.php');
 	exit();
 }
@@ -46,11 +48,11 @@ $compId = "";
 if (isset($_GET['compId'])) $compId = intval(htmlspecialchars($_GET['compId'], ENT_QUOTES));
 
 // Проверяем, что у администратора есть право на поиск пользователей и вход в их Личные кабинеты: $isAdmin['searchUser'] == TRUE
-$isAdmin = $incomingUser->isAdmin();
+$isAdmin = $userIncoming->isAdmin();
 if ($isAdmin['searchUser'] && $compId != "" && $compId != 0) {
 	$userId = GlobFunc::compIdToId($compId);
 } else {
-	$userId = $incomingUser->getId();
+	$userId = $userIncoming->getId();
 }
 
 /*************************************************************************************
@@ -58,13 +60,12 @@ if ($isAdmin['searchUser'] && $compId != "" && $compId != 0) {
  ************************************************************************************/
 
 // Инициализируем полную модель пользователя
-$user = new User($userId);
-
-// Анкетные (основные персональные) данные пользователя
-$user->writeCharacteristicFromDB();
+$user = new UserFull($userId);
+$user->readCharacteristicFromDB();
 
 // Данные поискового запроса
-$user->writeSearchRequestFromDB();
+$searchRequest = new SearchRequest($userId);
+$searchRequest->writeFromDB();
 
 // Информация о фотографиях пользователя. Метод вызывается во всех случаях, кроме того, когда пользователь отредактировал свои личные параметры и нажал на кнопку "Сохранить"
 if ($action != "saveProfileParameters") $user->writeFotoInformationFromDB();
@@ -74,7 +75,7 @@ $collectionProperty = new CollectionProperty();
 $collectionProperty->buildFromOwnerId($user->getId());
 
 // Готовим массив со списком районов в городе пользователя
-$allDistrictsInCity = GlobFunc::getAllDistrictsInCity("Екатеринбург");
+$allDistrictsInCity = DBconnect::selectDistrictsForCity("Екатеринбург");
 
 // Инициализируем переменные корректности - используется при формировании нового Запроса на поиск
 $errors = array();
@@ -92,8 +93,8 @@ if ($action == "saveProfileParameters") {
 	$user->writeCharacteristicFromPOST();
 	$user->writeFotoInformationFromPOST();
 
-	// Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
-	$errors = $user->userDataCorrect("validateProfileParameters");
+	// Проверяем корректность данных пользователя.
+	$errors = $user->validate("validateProfileParameters");
 
 	// Установим признак корректности введенных пользователем новых личных параметров
 	if (is_array($errors) && count($errors) == 0) {
@@ -133,7 +134,7 @@ if ($action == "publishAdvert" && $propertyId != "" && $propertyId != 0) {
 
 		// Создаем специльный объект для работы с данным объявлением
 		$property = new Property($propertyId);
-		if ($property->writeCharacteristicFromDB() && $property->writeFotoInformationFromDB()) {
+		if ($property->readCharacteristicFromDB() && $property->writeFotoInformationFromDB()) {
 			$property->publishAdvert();
 		}
 
@@ -156,7 +157,7 @@ if ($action == "unpublishAdvert" && $propertyId != "" && $propertyId != 0) {
 
 		// Создаем специльный объект для работы с данным объявлением
 		$property = new Property($propertyId);
-		if ($property->writeCharacteristicFromDB()) {
+		if ($property->readCharacteristicFromDB()) {
 			$property->unpublishAdvert();
 		}
 
@@ -175,16 +176,21 @@ if ($action == "unpublishAdvert" && $propertyId != "" && $propertyId != 0) {
 if ($action == "saveSearchParameters") {
 
 	// Записываем POST параметры в параметры объекта пользователя
-	$user->writeSearchRequestFromPOST();
+	$searchRequest->writeParamsFromPOST();
 
-	// Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
-	$errors = $user->userDataCorrect("validateSearchRequest"); // Параметр validateSearchRequest задает режим проверки "Проверка корректности уже существующих параметров поиска", который активирует только соответствующие ему проверки
+	// Проверяем корректность данных пользователя.
+	$errors = $searchRequest->validate("personalRequest");
 	if (count($errors) == 0) $correctEditSearchRequest = TRUE; else $correctEditSearchRequest = FALSE; // Считаем ошибки, если 0, то можно принять и сохранить новые параметры поиска
 
 	// Если данные верны, сохраним их в БД
 	// Кроме сохранение данных поискового запроса метод перезапишет статус пользователя (typeTenant), так как он теперь точно стал арендатором
 	if ($correctEditSearchRequest == TRUE) {
-		$user->saveSearchRequestToDB("edit");
+		if ($user->isTenant()) {
+			$searchRequest->saveToDB("edit");
+		} else {
+			$searchRequest->saveToDB("new");
+			$user->setTypeTenant(TRUE);
+		}
 	}
 
 	// При любом искходе валидации параметров поискового запроса открываем вкладку 4 (Поисковый запрос)
@@ -196,7 +202,9 @@ if ($action == "saveSearchParameters") {
  *******************************************************************************/
 
 if ($action == 'deleteSearchRequest') {
-	$user->removeSearchRequest();
+	if ($searchRequest->remove()) {
+		$user->setTypeTenant(FALSE);
+	}
 }
 
 /********************************************************************************
@@ -205,8 +213,8 @@ if ($action == 'deleteSearchRequest') {
 
 if ($action == "createSearchRequest") {
 
-	// Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
-	$errors = $user->userDataCorrect("createSearchRequest"); // Параметр createSearchRequest задает режим проверки "Создание запроса на поиск", который активирует только соответствующие ему проверки
+	// Проверяем корректность данных пользователя.
+	$errors = $user->validate("createSearchRequest");
 	if (count($errors) == 0) $correctNewSearchRequest = TRUE; else $correctNewSearchRequest = FALSE; // Считаем ошибки, если 0, то можно выдать пользователю форму для ввода параметров Запроса поиска
 
 	// Если создание поискового запроса одобрено (успешно прошли валидации параметров пользователя) открываем вкладку 4 (Поисковый запрос), в противном случае вкладку 1 (Личные параметры пользователя)
@@ -221,33 +229,33 @@ if ($action == "createSearchRequest") {
  * это позволяет арендатору, который вновь стал искать недвижимость сразу в избранном увидеть те объекты, которые ему когда-то нравились и в данный момент сдаются. Скорее всего, ему один из этих объектов и может подойти
  **************************************************************************************************************/
 
-$incomingUser->searchProperties(20);
+$userIncoming->searchProperties(20);
 
 /********************************************************************************
  * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
  *******************************************************************************/
 
 // Инициализируем используемые в шаблоне(ах) переменные
-$isLoggedIn = $incomingUser->login(); // Используется в templ_header.php (при просмотре страницы админом, показывает его статус, а не того пользователя, чьи данные он смотрит)
+$isLoggedIn = $userIncoming->login(); // Используется в templ_header.php (при просмотре страницы админом, показывает его статус, а не того пользователя, чьи данные он смотрит)
 $userCharacteristic = $user->getCharacteristicData();
 $userFotoInformation = $user->getFotoInformationData();
-$userSearchRequest = $user->getSearchRequestData();
+$userSearchRequest = $searchRequest->getSearchRequestData();
 $allPropertiesCharacteristic = $collectionProperty->getAllPropertiesCharacteristic();
 $allPropertiesFotoInformation = $collectionProperty->getAllPropertiesFotoInformation();
 $allPropertiesTenantPretenders = $collectionProperty->getAllPropertiesTenantPretenders();
-$propertyLightArr = $incomingUser->getPropertyLightArr();
-$propertyFullArr = $incomingUser->getPropertyFullArr();
-$favoritesPropertysId = $incomingUser->getFavoritesPropertysId();
+$propertyLightArr = $userIncoming->getPropertyLightArr();
+$propertyFullArr = $userIncoming->getPropertyFullArr();
+$favoritePropertiesId = $userIncoming->getFavoritePropertiesId();
 $mode = "personal"; // Режим в котором будут работать ряд шаблонов: анкеты пользователя на вкладке №1 (templ_notEditedProfile.php), шаблон для редактирования поискового запроса (templ_editableSearchRequest.php)
 $messagesArr = $user->getAllMessagesSorted(); // массив массивов, каждый из которых представляет инфу по 1-ому уведомлению пользователя
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
+$amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 $compId = GlobFunc::idToCompId($userId);
 //$errors
 //$correctNewSearchRequest
 //$correctEditSearchRequest
 //$correctEditProfileParameters
 //$allDistrictsInCity
-//$tabsId // Идентификатор вкладки, которая будет открыта по умолчанию после загрузки страницы
+//$tabsId Идентификатор вкладки, которая будет открыта по умолчанию после загрузки страницы
 
 // Подсоединяем нужный основной шаблон
 require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_personal.php";

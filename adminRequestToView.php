@@ -8,26 +8,27 @@ session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/IncomingUser.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Property.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserFull.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Property.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
 // Инициализируем модель для запросившего страницу пользователя
-$incomingUser = new IncomingUser();
+$userIncoming = new UserIncoming();
 
 // Уточняем - имеет ли пользователь права админа.
-$isAdmin = $incomingUser->isAdmin();
+$isAdmin = $userIncoming->isAdmin();
 
 /*************************************************************************************
  * Проверяем - может ли данный пользователь просматривать данную страницу
  ************************************************************************************/
 
 // Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
-if (!$incomingUser->login()) {
+if (!$userIncoming->login()) {
 	header('Location: login.php');
 	exit();
 }
@@ -94,14 +95,14 @@ for ($i = 0, $s = count($allRequestsToView); $i < $s; $i++) {
  *******************************************************************************/
 
 $property = new Property($propertyId);
-if (!$property->writeCharacteristicFromDB()) die("Ошибка получения данных об объекте недвижимости");
+if (!$property->readCharacteristicFromDB()) die("Ошибка получения данных об объекте недвижимости");
 
 /********************************************************************************
  * ПОЛУЧИМ СВЕДЕНИЯ О СОБСТВЕННИКЕ ОБЪЕКТА ($propertyId)
  *******************************************************************************/
 
-$user = new User($property->userId);
-if (!$user->writeCharacteristicFromDB()) die("Ошибка получения данных о собственнике недвижимости");
+$user = new UserFull($property->getUserId());
+if (!$user->readCharacteristicFromDB()) die("Ошибка получения данных о собственнике недвижимости");
 
 /********************************************************************************
  * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)

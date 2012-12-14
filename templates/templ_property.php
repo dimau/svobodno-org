@@ -222,7 +222,7 @@
 		?>
         <li>
 			<?php
-			echo View::getHTMLforFavorites($propertyCharacteristic["id"], $favoritesPropertysId, "stringWithIcon");
+			echo View::getHTMLforFavorites($propertyCharacteristic["id"], $favoritePropertiesId, "stringWithIcon");
 			?>
         </li>
         <!-- TODO: добавить функциональность!
@@ -872,7 +872,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
 		?>
         <li>
 			<?php
-			echo View::getHTMLforFavorites($propertyCharacteristic["id"], $favoritesPropertysId, "stringWithIcon");
+			echo View::getHTMLforFavorites($propertyCharacteristic["id"], $favoritePropertiesId, "stringWithIcon");
 			?>
         </li>
         <!-- TODO: добавить функциональность!

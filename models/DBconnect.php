@@ -9,8 +9,17 @@
 
 class DBconnect
 {
-	private static $connect; // Cодержит объект соединения с базой данных класса mysqli (единственный на весь скрипт)
+	/**
+	 * Cодержит объект соединения с базой данных класса mysqli (единственный на весь скрипт)
+	 * @var mysqli
+	 */
+	private static $connect;
 
+	/**
+	 * Возвращает объект mysqli для прямого обращения к БД
+	 *
+	 * @return mysqli|bool возвращает объект класса mysqli для прямой работы с БД в случае успеха (удалось получить соединение с БД) и FALSE в ином случае
+	 */
 	public static function get() {
 		if (self::$connect === NULL) { // Если соединение с БД еще не устанавливалось
 			self::$connect = self::connectToDB(); // Создаем объект соединения с БД
@@ -19,8 +28,12 @@ class DBconnect
 		return self::$connect; // Возвращаем объект соединения с БД. Либо FALSE, если установить соединение не удалось
 	}
 
-	// Метод отрабатывает один раз при вызове DBconnect::get();
-	// Метод возвращает объект соединения с БД (mysqli), лиюо FALSE
+	/**
+	 * Метод возвращает объект соединения с БД (mysqli), либо FALSE
+	 * Метод отрабатывает один раз при вызове DBconnect::get();
+	 *
+	 * @return mysqli|bool
+	 */
 	private static function connectToDB() {
 		// Устанавливаем соединение с базой данных
 		$mysqli = new mysqli("localhost", "dimau1_dimau", "udvudv", "dimau1_homes");
@@ -60,6 +73,33 @@ class DBconnect
 
 	}
 
+	/**
+	 * Функция возвращает массив массивов с названиями районов в городе $city
+	 *
+	 * @param string $city город, чей список районов мы хотим получить
+	 * @return array массив ассоциированных массивов, содержащих только один ключ-значение = названию района города
+	 */
+	public static function selectDistrictsForCity($city = "Екатеринбург")
+	{
+		// Проверка входных параметров
+		if ($city != "Екатеринбург") return array();
+
+		// Получим из БД данные ($res) по пользователю с логином = $login
+		$stmt = DBconnect::get()->stmt_init();
+		if (($stmt->prepare("SELECT name FROM districts WHERE city=? ORDER BY name ASC") === FALSE)
+			OR ($stmt->bind_param("s", $city) === FALSE)
+			OR ($stmt->execute() === FALSE)
+			OR (($res = $stmt->get_result()) === FALSE)
+			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+			OR ($stmt->close() === FALSE)
+		) {
+			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT name FROM districts WHERE city = ".$city." ORDER BY name ASC'. id логгера: DBconnect::selectDistrictsForCity():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+			return array();
+		}
+
+		return $res;
+	}
+
 	// Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одной из фотографий. Если ничего не найдено или произошла ошибка, вернет пустой массив
 	// На входе - временный идентификатор сессии загрузки фотографий ($fileUploadId)
 	public static function selectPhotosForFileUploadId($fileUploadId) {
@@ -97,7 +137,6 @@ class DBconnect
 			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
 			OR ($stmt->close() === FALSE)
 		) {
-			// Логируем ошибку
 			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM userFotos WHERE userId=" . $userId . "'. Местонахождение кода: DBconnect::selectPhotosForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
 			return array();
 		}
@@ -122,6 +161,38 @@ class DBconnect
 		) {
 			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM propertyFotos WHERE propertyId = " . $propertyId . "'. Местонахождение кода: DBconnect::selectPhotosForProperty():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
 			return array();
+		}
+
+		return $res;
+	}
+
+	/**
+	 * Возвращает поисковый запрос пользователя
+	 *
+	 * @param int $userId идентификатор пользователя, чей поисковый запрос мы хотим получить
+	 * @return array массив ассоциативных массивов, содержащих параметры поисковых запросов (теоретически всегда должен быть только 1 ассоциативный массив внутри этого возвращаемого). Если ничего не найдено, то вернет пустой массив
+	 */
+	public static function selectSearchRequestForUser($userId) {
+
+		// Проверка входящих параметров
+		if (!isset($userId) || !is_int($userId)) return array();
+
+		$stmt = DBconnect::get()->stmt_init();
+		if (($stmt->prepare("SELECT * FROM searchRequests WHERE userId = ?") === FALSE)
+			OR ($stmt->bind_param("i", $userId) === FALSE)
+			OR ($stmt->execute() === FALSE)
+			OR (($res = $stmt->get_result()) === FALSE)
+			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+			OR ($stmt->close() === FALSE)
+		) {
+			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM searchRequests WHERE userId = " . $userId . "'. Местонахождение кода: DBconnect::selectSearchRequestForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+			return array();
+		}
+
+		// Преобразование данных для удобной работы с ними
+		for ($i = 0, $s = count($res); $i < $s; $i++) {
+			$res[$i]['amountOfRooms'] = unserialize($res[$i]['amountOfRooms']);
+			$res[$i]['district'] = unserialize($res[$i]['district']);
 		}
 
 		return $res;
@@ -347,10 +418,40 @@ class DBconnect
 	}
 
 	/**
+	 * Сохраняет новый поисковый запрос
+	 *
+	 * @param array $paramsArr ассоциативный массив параметров поискового запроса
+	 * @return bool TRUE в случае успеха и FALSE в случае неудачи
+	 */
+	public static function insertSearchRequestForUser($paramsArr) {
+
+		// Проверка входящих параметров
+		if (!isset($paramsArr) || !is_array($paramsArr)) return FALSE;
+
+		// Подготовка данных к записи в БД
+		$paramsArr['amountOfRooms'] = serialize($paramsArr['amountOfRooms']);
+		$paramsArr['district'] = serialize($paramsArr['district']);
+
+		$stmt = DBconnect::get()->stmt_init();
+		if (($stmt->prepare("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, regDate, needEmail, needSMS) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
+			OR ($stmt->bind_param("issssiiissssssssssiii", $paramsArr['userId'], $paramsArr['typeOfObject'], $paramsArr['amountOfRooms'], $paramsArr['adjacentRooms'], $paramsArr['floor'], $paramsArr['minCost'], $paramsArr['maxCost'], $paramsArr['pledge'], $paramsArr['prepayment'], $paramsArr['district'], $paramsArr['withWho'], $paramsArr['linksToFriends'], $paramsArr['children'], $paramsArr['howManyChildren'], $paramsArr['animals'], $paramsArr['howManyAnimals'], $paramsArr['termOfLease'], $paramsArr['additionalDescriptionOfSearch'], $paramsArr['regDate'], $paramsArr['needEmail'], $paramsArr['needSMS']) === FALSE)
+			OR ($stmt->execute() === FALSE)
+			OR (($res = $stmt->affected_rows) === -1)
+			OR ($res === 0)
+			OR ($stmt->close() === FALSE)
+		) {
+			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, regDate, needEmail, needSMS) VALUES (".$paramsArr['userId'].",".$paramsArr['typeOfObject'].",".$paramsArr['amountOfRooms'].",".$paramsArr['adjacentRooms'].",".$paramsArr['floor'].",".$paramsArr['minCost'].",".$paramsArr['maxCost'].",".$paramsArr['pledge'].",".$paramsArr['prepayment'].",".$paramsArr['district'].",".$paramsArr['withWho'].",".$paramsArr['linksToFriends'].",".$paramsArr['children'].",".$paramsArr['howManyChildren'].",".$paramsArr['animals'].",".$paramsArr['howManyAnimals'].",".$paramsArr['termOfLease'].",".$paramsArr['additionalDescriptionOfSearch'].",".$paramsArr['regDate'].",".$paramsArr['needEmail'].",".$paramsArr['needSMS'].")'. id логгера: DBconnect::insertSearchRequestForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+			return FALSE;
+		}
+
+		return TRUE;
+	}
+
+	/**
 	 * Сохраняет данные о новом уведомлении в БД. Если передан второй аргумент - массив идентификаторов арендаторов, то уведомление будет сохранено для каждого из них
 	 *
-	 * @param $paramsArr параметры уведомления
-	 * @param $listOfTargetUsers массив, содержащий идентификаторы пользователей, для каждого из которых нужно сформировать данное уведомление
+	 * @param array $paramsArr параметры уведомления
+	 * @param array $listOfTargetUsers массив ассоциативных массивов, содержащих идентификаторы пользователей и их параметры рассылки (email и sms), для каждого из которых нужно сформировать данное уведомление
 	 * @return bool TRUE в случае успеха и FALSE в случае неудачи
 	 */
 	public static function insertMessageNewProperty($paramsArr, $listOfTargetUsers) {
@@ -455,6 +556,36 @@ class DBconnect
 			OR ($stmt->close() === FALSE)
 		) {
 			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE messagesNewProperty SET userId = " . $paramsArr['userId'] . ", timeIndex = " . $paramsArr['timeIndex'] . ", messageType = " . $paramsArr['messageType'] . ", isReaded = " . $paramsArr['isReaded'] . ", fotoArr = " . $paramsArr['fotoArr'] . ", targetId = " . $paramsArr['targetId'] . ", needEmail = ". $paramsArr['needEmail'].", needSMS = " . $paramsArr['needSMS'] . ", typeOfObject = " . $paramsArr['typeOfObject'] . ", address = " . $paramsArr['address'] . ", currency = " . $paramsArr['currency'] . ", costOfRenting = " . $paramsArr['costOfRenting'] . ", utilities = " . $paramsArr['utilities'] . ", electricPower = " . $paramsArr['electricPower'] . ", amountOfRooms = " . $paramsArr['amountOfRooms'] . ", adjacentRooms = " . $paramsArr['adjacentRooms'] . ", amountOfAdjacentRooms = " . $paramsArr['amountOfAdjacentRooms'] . ", roomSpace = " . $paramsArr['roomSpace'] . ", totalArea = " . $paramsArr['totalArea'] . ", livingSpace = " . $paramsArr['livingSpace'] . ", kitchenSpace = " . $paramsArr['kitchenSpace'] . ", totalAmountFloor = " . $paramsArr['totalAmountFloor'] . ", numberOfFloor = " . $paramsArr['numberOfFloor'] . "'. id логгера: DBconnect::updateMessageNewProperty():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+			return FALSE;
+		}
+
+		return TRUE;
+	}
+
+	/**
+	 * Обновляет параметры поискового запроса в БД
+	 *
+	 * @param array $paramsArr ассоциативный массив параметров поискового запроса
+	 * @return bool TRUE в случае успеха и FALSE в случае неудачи
+	 */
+	public static function updateSearchRequestForUser($paramsArr) {
+
+		// Проверка входящих параметров
+		if (!isset($paramsArr) || !is_array($paramsArr)) return FALSE;
+
+		// Подготовка данных к записи в БД
+		$paramsArr['amountOfRooms'] = serialize($paramsArr['amountOfRooms']);
+		$paramsArr['district'] = serialize($paramsArr['district']);
+
+		$stmt = DBconnect::get()->stmt_init();
+		if (($stmt->prepare("UPDATE searchRequests SET userId=?, typeOfObject=?, amountOfRooms=?, adjacentRooms=?, floor=?, minCost=?, maxCost=?, pledge=?, prepayment=?, district=?, withWho=?, linksToFriends=?, children=?, howManyChildren=?, animals=?, howManyAnimals=?, termOfLease=?, additionalDescriptionOfSearch=?, regDate=?, needEmail=?, needSMS=? WHERE userId=?") === FALSE)
+			OR ($stmt->bind_param("issssiiissssssssssiiii", $paramsArr['userId'], $paramsArr['typeOfObject'], $paramsArr['amountOfRooms'], $paramsArr['adjacentRooms'], $paramsArr['floor'], $paramsArr['minCost'], $paramsArr['maxCost'], $paramsArr['pledge'], $paramsArr['prepayment'], $paramsArr['district'], $paramsArr['withWho'], $paramsArr['linksToFriends'], $paramsArr['children'], $paramsArr['howManyChildren'], $paramsArr['animals'], $paramsArr['howManyAnimals'], $paramsArr['termOfLease'], $paramsArr['additionalDescriptionOfSearch'], $paramsArr['regDate'], $paramsArr['needEmail'], $paramsArr['needSMS'], $paramsArr['userId']) === FALSE)
+			OR ($stmt->execute() === FALSE)
+			OR (($res = $stmt->affected_rows) === -1)
+			OR ($res === 0)
+			OR ($stmt->close() === FALSE)
+		) {
+			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE searchRequests SET userId=".$paramsArr['userId'].", typeOfObject=".$paramsArr['typeOfObject'].", amountOfRooms=".$paramsArr['amountOfRooms'].", adjacentRooms=".$paramsArr['adjacentRooms'].", floor=".$paramsArr['floor'].", minCost=".$paramsArr['minCost'].", maxCost=".$paramsArr['maxCost'].", pledge=".$paramsArr['pledge'].", prepayment=".$paramsArr['prepayment'].", district=".$paramsArr['district'].", withWho=".$paramsArr['withWho'].", linksToFriends=".$paramsArr['linksToFriends'].", children=".$paramsArr['children'].", howManyChildren=".$paramsArr['howManyChildren'].", animals=".$paramsArr['animals'].", howManyAnimals=".$paramsArr['howManyAnimals'].", termOfLease=".$paramsArr['termOfLease'].", additionalDescriptionOfSearch=".$paramsArr['additionalDescriptionOfSearch'].", regDate=".$paramsArr['regDate'].", needEmail=".$paramsArr['needEmail'].", needSMS=".$paramsArr['needSMS']." WHERE userId=".$paramsArr['userId']."'. id логгера: DBconnect::updateSearchRequestForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
 			return FALSE;
 		}
 
@@ -612,12 +743,33 @@ class DBconnect
 		// Валидация входных параметров
 		if (!isset($userId) || !is_int($userId)) return 0;
 
-		$res = DBconnect::get()->query("SELECT COUNT(*) FROM messagesNewProperty WHERE userId = '" . $userId . "' AND isReaded = 'не прочитано'");
-		if ((DBconnect::get()->errno)
-			OR (($res = $res->fetch_row()) === NULL)
+		$stmt = DBconnect::get()->stmt_init();
+		if (($stmt->prepare("SELECT COUNT(*) FROM messagesNewProperty WHERE userId = ? AND isReaded = 'не прочитано'") === FALSE)
+			OR ($stmt->bind_param("i", $userId) === FALSE)
+			OR ($stmt->execute() === FALSE)
+			OR (($res = $stmt->get_result()) === FALSE)
+			OR (($res = $res->fetch_row()) === FALSE)
+			OR ($stmt->close() === FALSE)
 		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT COUNT(*) FROM messagesNewProperty WHERE userId = '" . $userId . "' AND isReaded = 'не прочитано''. id логгера: DBconnect::countUnreadMessagesForUser():1. Выдаваемая ошибка: " . DBconnect::get()->errno . " " . DBconnect::get()->error . ". ID пользователя: не определено");
+			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT COUNT(*) FROM messagesNewProperty WHERE userId = '" . $userId . "' AND isReaded = 'не прочитано''. id логгера: DBconnect::countUnreadMessagesForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
 			return 0;
+		}
+
+		return $res[0];
+	}
+
+	// Возвращает количество всех объявлений в БД со статусом "опубликовано"
+	public static function countAllPublishedProperties() {
+
+		$stmt = DBconnect::get()->stmt_init();
+		if (($stmt->prepare("SELECT COUNT(*) FROM property WHERE status = 'опубликовано'") === FALSE)
+			OR ($stmt->execute() === FALSE)
+			OR (($res = $stmt->get_result()) === FALSE)
+			OR (($res = $res->fetch_row()) === FALSE)
+			OR ($stmt->close() === FALSE)
+		) {
+			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT COUNT(*) FROM property WHERE status = 'опубликовано''. id логгера: DBconnect::countAllPublishedProperties():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+			return "";
 		}
 
 		return $res[0];
@@ -760,11 +912,6 @@ class DBconnect
 		// Вернем результат
 		return $res;
 	}
-
-	/*public function selectUsersCharacteristicFull() {
-	}
-	public function selectUsersFoto() {
-	} */
 
 	// Конструктор не используется (но чтобы его нельзя было вызвать снаружи защищен модификатором private), так как он возвращает объект класса DBconnect, а мне в переменной $connect нужен объект класса mysqli
 	private function __construct() {

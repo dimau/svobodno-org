@@ -18,6 +18,7 @@
         // КОНСТРУКТОР
         // Конструктор будет использоваться внутри класса, непосредственно при логировании мы будем пользоваться функцией getLogger
         public function __construct($name, $file = NULL){
+			Logger::$PATH = $_SERVER['DOCUMENT_ROOT'] . '/logs';
             $this->name = $name;
             $this->file = $file;
 

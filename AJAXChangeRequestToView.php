@@ -6,17 +6,18 @@ session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/IncomingUser.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/RequestToView.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.'); // TODO: Вернуть ошибку
 
 // Инициализируем модель для запросившего страницу пользователя
-$incomingUser = new IncomingUser();
+$userIncoming = new UserIncoming();
 
 // Уточняем - имеет ли пользователь права админа.
-$isAdmin = $incomingUser->isAdmin();
+$isAdmin = $userIncoming->isAdmin();
 
 // Инициализируем переменную для сохранения результата записи нового значения в БД
 $res = FALSE;
@@ -26,7 +27,7 @@ $res = FALSE;
  ************************************************************************************/
 
 // Проверяем, залогинен ли пользователь, если нет - то отказываем в доступе
-if (!$incomingUser->login()) {
+if (!$userIncoming->login()) {
 	GlobFunc::accessDenied();
 }
 
@@ -71,17 +72,17 @@ $requestToView = new RequestToView(NULL, NULL, $requestToViewId);
  *************************************************************************************/
 
 if ($action == "changeStatus") {
-	$requestToView->status = $newValue;
+	$requestToView->setStatus($newValue);
 	$res = $requestToView->saveParamsToDB();
 }
 
 if ($action == "changeTenantTime") {
-	$requestToView->tenantTime = $newValue;
+	$requestToView->setTenantTime($newValue);
 	$res = $requestToView->saveParamsToDB();
 }
 
 if ($action == "changeTenantComment") {
-	$requestToView->tenantComment = $newValue;
+	$requestToView->setTenantComment($newValue);
 	$res = $requestToView->saveParamsToDB();
 }
 

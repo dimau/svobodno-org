@@ -6,35 +6,40 @@ session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/IncomingUser.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserFull.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/SearchRequest.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
 // Инициализируем модель для запросившего страницу пользователя
-$incomingUser = new IncomingUser();
+$userIncoming = new UserIncoming();
 
 // Уточняем - имеет ли пользователь права админа.
-$isAdmin = $incomingUser->isAdmin();
+$isAdmin = $userIncoming->isAdmin();
 
 // Проверим, быть может пользователь уже авторизирован. Если это так и он не является администратором, перенаправим его на главную страницу сайта
-if ($incomingUser->login() && !$isAdmin['newOwner'] && !$isAdmin['newAdvertAlien']) {
+if ($userIncoming->login() && !$isAdmin['newOwner'] && !$isAdmin['newAdvertAlien']) {
 	header('Location: personal.php');
 	exit();
 }
 
 // Инициализируем полную модель неавторизованного пользователя
-$user = new User(FALSE);
+$user = new UserFull(NULL);
 // На странице регистрации важно получить роль, в которой регистрируется пользователь - арендатор или собственник (от этого зависит набор обязательных для заполнения параметров). Инициализируем параметры модели typeTenant и typeOwner в соответствии с ролью регистрируемого пользователя
 $user->setTypeTenantOwnerFromGET();
+
+// Инициализируем модель поискового запроса (в него будут писаться параметры поиска пользователя)
+$searchRequest = new SearchRequest(NULL);
 
 // Инициализируем переменную для сохранения ошибок, связанных с регистрационными данными пользователя, и других ошибок, которые не позволили успешно закончить его регистрацию
 $errors = array();
 
 // Готовим массив со списком районов в городе пользователя
-$allDistrictsInCity = GlobFunc::getAllDistrictsInCity("Екатеринбург");
+$allDistrictsInCity = DBconnect::selectDistrictsForCity("Екатеринбург");
 
 /*************************************************************************************
  * ПОЛУЧИМ GET ПАРАМЕТРЫ
@@ -72,17 +77,18 @@ if (isset($_SESSION['url_initial']) && !preg_match('~((http://svobodno.org)|(htt
 
 if ($action == "registration") {
 
-	// Записываем POST параметры в параметры объекта пользователя
+	// Запишем POST параметры в модели
 	$user->writeCharacteristicFromPOST();
 	$user->writeFotoInformationFromPOST();
-	$user->writeSearchRequestFromPOST();
+	$searchRequest->writeParamsFromPOST();
 
-	// Проверяем корректность данных пользователя. Функции userDataCorrect() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
+	// Проверяем корректность данных пользователя.
 	// Если мы имеем дело с созданием нового чужого объявления администратором, то проводим минимальную проверку данных
 	if ($isAdmin['newAdvertAlien'] && $alienOwner == "true") {
-		$errors = $user->userDataCorrect("newAlienOwner");
+		$errors = $user->validate("newAlienOwner");
 	} else {
-		$errors = $user->userDataCorrect("registration");
+		$errors = $user->validate("registration");
+		if ($user->isTenant()) $errors = array_merge($errors, $searchRequest->validate("personalRequest"));
 	}
 
 	// Если данные, указанные пользователем, корректны, запишем их в базу данных
@@ -91,16 +97,14 @@ if ($action == "registration") {
 		// Если сохранение Личных данных пользователя прошло успешно, то считаем, что пользователь уже зарегистрирован, выполняем сохранение в БД остальных данных (фотографии и поисковый запрос)
 		if ($user->saveCharacteristicToDB("new")) {
 
-			// Узнаем id пользователя - необходимо при сохранении информации о фотке в постоянную базу
-			$user->getIdUseLogin();
-
 			// Сохраним информацию о фотографиях пользователя
 			// Функция вызывать необходимо независимо от того, есть ли в uploadedFoto информация о фотографиях или нет, так как при регистрации пользователь мог сначала выбрать фотографии, а затем их удалить. В этом случае $this->saveFotoInformationToDB почистит БД и серве от удаленных пользователем файлов
 			$user->saveFotoInformationToDB();
 
 			// Сохраняем поисковый запрос, если пользователь регистрируется в качестве арендатора
-			if ($user->typeTenant) {
-				$user->saveSearchRequestToDB("new");
+			if ($user->isTenant()) {
+				$searchRequest->setUserId($user->getId());
+				$searchRequest->saveToDB("new");
 			}
 
 			/******* Авторизовываем пользователя *******/
@@ -108,16 +112,15 @@ if ($action == "registration") {
 			if ($isAdmin['newOwner'] || $isAdmin['newAdvertAlien'] || $isAdmin['searchUser']) {
 				$correctEnter = array();
 			} else {
-				$correctEnter = $incomingUser->enter();
+				$correctEnter = $userIncoming->enter();
 			}
 
 			if (count($correctEnter) == 0) //если нет ошибок, отправляем уже авторизованного пользователя на страницу успешной регистрации
 			{
 				header('Location: successfullRegistration.php');
 				exit();
-
 			} else {
-				// TODO:что-то нужно делать в случае, если возникли ошибки при авторизации во время регистрации - как минимум вывести их текст во всплывающем окошке
+				// Здесь можно закодить действия при возникновении ошибки авторизации
 			}
 
 		} else { // Если сохранить личные данные пользователя в БД не удалось
@@ -134,11 +137,11 @@ if ($action == "registration") {
  *******************************************************************************/
 
 // Инициализируем используемые в шаблоне(ах) переменные
-$isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
+$isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
+$amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 $userCharacteristic = $user->getCharacteristicData();
 $userFotoInformation = $user->getFotoInformationData();
-$userSearchRequest = $user->getSearchRequestData();
+$userSearchRequest = $searchRequest->getSearchRequestData();
 $mode = "registration";
 //$alienOwner
 //$isAdmin

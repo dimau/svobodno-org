@@ -29,23 +29,25 @@ session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/IncomingUser.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Property.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/RequestToView.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
+
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
 // Инициализируем модель для запросившего страницу пользователя
-$incomingUser = new IncomingUser();
+$userIncoming = new UserIncoming();
 
 // Уточняем - имеет ли пользователь права админа.
-$isAdmin = $incomingUser->isAdmin();
+$isAdmin = $userIncoming->isAdmin();
 
 // Инициализируем модель запроса на просмотр данного объекта данным пользователем.
 // Если он уже записался на просмотр, то в модели будут содержаться данные его запроса (время, комментарий...)
-$signUpToView = new RequestToView($incomingUser->getId(), $propertyId);
+$signUpToView = new RequestToView($userIncoming->getId(), $propertyId);
 
 // Инициализируем переменную для хранения информации об успешности/неуспешности отправки запроса на просмотр в БД
 $statusOfSaveParamsToDB = NULL;
@@ -62,7 +64,7 @@ $property = new Property($propertyId);
 
 // Анкетные данные объекта недвижимости
 // Если получить данные по объекту недвижимости из БД не удалось, то скорее всего не верно указан id объекта, перенаправляем пользователя на 404 страницу
-if (!$property->writeCharacteristicFromDB()) {
+if (!$property->readCharacteristicFromDB()) {
 	header('Location: 404.html');
 	exit();
 }
@@ -76,8 +78,8 @@ $property->writeFotoInformationFromDB();
 
 // Если объявление опубликовано, то его может просматривать каждый
 // Если объявление закрыто (снято с публикации), то его может просматривать только сам собственник и админы
-if ($property->status == "не опубликовано"
-	AND $property->userId != $incomingUser->getId()
+if ($property->getStatus() == "не опубликовано"
+	AND $property->getUserId() != $userIncoming->getId()
 	AND !$isAdmin['searchUser'])
 {
 	header('Location: 404.html');
@@ -104,17 +106,17 @@ if ($action == "signUpToView") {
  *******************************************************************************/
 
 // Инициализируем используемые в шаблоне(ах) переменные
-$isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
-$userCharacteristic = array('typeTenant' => $incomingUser->isTenant(), 'name' => $incomingUser->name, 'secondName' => $incomingUser->secondName, 'surname' => $incomingUser->surname, 'telephon' => $incomingUser->telephon); // Но для данной страницы данный массив содержит только имя, отчество, фамилию, телефон пользователя
+$isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
+$amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
+$userCharacteristic = array('typeTenant' => $userIncoming->isTenant(), 'name' => $userIncoming->getName(), 'secondName' => $userIncoming->getSecondName(), 'surname' => $userIncoming->getSurname(), 'telephon' => $userIncoming->getTelephon()); // Но для данной страницы данный массив содержит только имя, отчество, фамилию, телефон пользователя
 $propertyCharacteristic = $property->getCharacteristicData();
 $propertyFotoInformation = $property->getFotoInformationData();
-$favoritesPropertysId = $incomingUser->getFavoritesPropertysId();
+$favoritePropertiesId = $userIncoming->getFavoritePropertiesId();
 $signUpToViewData = $signUpToView->getParams(); // Используется в templ_signUpToViewItem.php
 $furnitureInLivingArea = $property->getFurnitureInLivingAreaAll();
 $furnitureInKitchen = $property->getFurnitureInKitchenAll();
 $appliances = $property->getAppliancesAll();
-$strHeaderOfPage = GlobFunc::getFirstCharUpper($property->typeOfObject) . " по адресу: " . $property->address; // Получаем заголовок страницы
+$strHeaderOfPage = GlobFunc::getFirstCharUpper($property->getTypeOfObject()) . " по адресу: " . $property->getAddress(); // Получаем заголовок страницы
 //$statusOfSaveParamsToDB // Используется в templ_signUpToViewItem.php
 //$errors
 

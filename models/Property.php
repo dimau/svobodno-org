@@ -11,85 +11,85 @@
 
 class Property
 {
-	public $typeOfObject = "0";
-	public $dateOfEntry = "";
-	public $termOfLease = "0";
-	public $dateOfCheckOut = "";
-	public $amountOfRooms = "0";
-	public $adjacentRooms = "0";
-	public $amountOfAdjacentRooms = "0";
-	public $typeOfBathrooms = "0";
-	public $typeOfBalcony = "0";
-	public $balconyGlazed = "0";
-	public $roomSpace = "";
-	public $totalArea = "";
-	public $livingSpace = "";
-	public $kitchenSpace = "";
-	public $floor = "";
-	public $totalAmountFloor = "";
-	public $numberOfFloor = "";
-	public $concierge = "0";
-	public $intercom = "0";
-	public $parking = "0";
-	public $city = "Екатеринбург";
-	public $district = "0";
-	public $coordX = "";
-	public $coordY = "";
-	public $address = "";
-	public $apartmentNumber = "";
-	public $subwayStation = "0";
-	public $distanceToMetroStation = "";
-	public $currency = "0";
-	public $costOfRenting = "";
-	public $utilities = "0";
-	public $costInSummer = "";
-	public $costInWinter = "";
-	public $electricPower = "0";
-	public $bail = "0";
-	public $bailCost = "";
-	public $prepayment = "0";
-	public $compensationMoney = "";
-	public $compensationPercent = "";
-	public $repair = "0";
-	public $furnish = "0";
-	public $windows = "0";
-	public $internet = "0";
-	public $telephoneLine = "0";
-	public $cableTV = "0";
-	public $furnitureInLivingArea = array();
-	public $furnitureInLivingAreaExtra = "";
-	public $furnitureInKitchen = array();
-	public $furnitureInKitchenExtra = "";
-	public $appliances = array();
-	public $appliancesExtra = "";
-	public $sexOfTenant = array();
-	public $relations = array();
-	public $children = "0";
-	public $animals = "0";
-	public $contactTelephonNumber = "";
-	public $timeForRingBegin = "0";
-	public $timeForRingEnd = "0";
-	public $checking = "0";
-	public $responsibility = "";
-	public $comment = "";
-	public $earliestDate = "";
-	public $earliestTimeHours = "";
-	public $earliestTimeMinutes = "";
-	public $adminComment = "";
-	public $completeness = "";
+	private $typeOfObject = "0";
+	private $dateOfEntry = "";
+	private $termOfLease = "0";
+	private $dateOfCheckOut = "";
+	private $amountOfRooms = "0";
+	private $adjacentRooms = "0";
+	private $amountOfAdjacentRooms = "0";
+	private $typeOfBathrooms = "0";
+	private $typeOfBalcony = "0";
+	private $balconyGlazed = "0";
+	private $roomSpace = "";
+	private $totalArea = "";
+	private $livingSpace = "";
+	private $kitchenSpace = "";
+	private $floor = "";
+	private $totalAmountFloor = "";
+	private $numberOfFloor = "";
+	private $concierge = "0";
+	private $intercom = "0";
+	private $parking = "0";
+	private $city = "Екатеринбург";
+	private $district = "0";
+	private $coordX = "";
+	private $coordY = "";
+	private $address = "";
+	private $apartmentNumber = "";
+	private $subwayStation = "0";
+	private $distanceToMetroStation = "";
+	private $currency = "0";
+	private $costOfRenting = "";
+	private $utilities = "0";
+	private $costInSummer = "";
+	private $costInWinter = "";
+	private $electricPower = "0";
+	private $bail = "0";
+	private $bailCost = "";
+	private $prepayment = "0";
+	private $compensationMoney = "";
+	private $compensationPercent = "";
+	private $repair = "0";
+	private $furnish = "0";
+	private $windows = "0";
+	private $internet = "0";
+	private $telephoneLine = "0";
+	private $cableTV = "0";
+	private $furnitureInLivingArea = array();
+	private $furnitureInLivingAreaExtra = "";
+	private $furnitureInKitchen = array();
+	private $furnitureInKitchenExtra = "";
+	private $appliances = array();
+	private $appliancesExtra = "";
+	private $sexOfTenant = array();
+	private $relations = array();
+	private $children = "0";
+	private $animals = "0";
+	private $contactTelephonNumber = "";
+	private $timeForRingBegin = "0";
+	private $timeForRingEnd = "0";
+	private $checking = "0";
+	private $responsibility = "";
+	private $comment = "";
+	private $earliestDate = "";
+	private $earliestTimeHours = "";
+	private $earliestTimeMinutes = "";
+	private $adminComment = "";
+	private $completeness = "";
 
-	public $realCostOfRenting = "";
-	public $last_act = "";
-	public $reg_date = "";
-	public $status = "";
-	public $id = "";
-	public $userId = "";
+	private $realCostOfRenting = "";
+	private $last_act = "";
+	private $reg_date = "";
+	private $status = "";
+	private $id = "";
+	private $userId = "";
 
-	public $fileUploadId = "";
-	public $uploadedFoto = array(); // В переменной будет храниться информация о загруженных фотографиях. Представляет собой массив ассоциированных массивов
-	public $primaryFotoId = "";
+	private $fileUploadId = "";
+	private $uploadedFoto = array(); // В переменной будет храниться информация о загруженных фотографиях. Представляет собой массив ассоциированных массивов
+	private $primaryFotoId = "";
 
-	public $ownerLogin = ""; // Параметр содержит логин пользователя-собственника (необходим для того, чтобя выездные агенты могли создавать новые объявления и присваивать их ране зарегистрированным собственникам)
+	private $ownerLogin = ""; // Параметр содержит логин пользователя-собственника (необходим для того, чтобя выездные агенты могли создавать новые объявления и присваивать их ране зарегистрированным собственникам)
 
 	/**
 	 * КОНСТРУКТОР
@@ -107,11 +107,29 @@ class Property
 		if ($propertyId != FALSE) $this->id = $propertyId;
 	}
 
-	// ДЕСТРУКТОР
-	public function __destruct() {
+	public function getId() {
+		return $this->id;
 	}
 
+	public function getUserId() {
+		return $this->userId;
+	}
 
+	public function getTypeOfObject() {
+		return $this->typeOfObject;
+	}
+
+	public function getAddress() {
+		return $this->address;
+	}
+
+	public function getStatus() {
+		return $this->status;
+	}
+
+	public function getCompleteness() {
+		return $this->completeness;
+	}
 
 	// Функция сохраняет текущие параметры объекта недвижимости в БД
 	// $typeOfProperty = "new" - режим сохранения для нового объекта недвижимости
@@ -209,6 +227,9 @@ class Property
 				// TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
 				return FALSE;
 			}
+
+			// Узнаем id объекта недвижимости - необходимо при сохранении информации о фотках в постоянную базу
+			$this->getIdUseAddress();
 		}
 
 		if ($typeOfProperty == "edit") {
@@ -456,10 +477,8 @@ class Property
 		return TRUE;
 	}
 
-
-
 	// Метод читает данные объекта недвижимости из БД и записывает их в параметры данного объекта
-	public function writeCharacteristicFromDB() {
+	public function readCharacteristicFromDB() {
 		// Если идентификатор объекта недвижимости неизвестен, то дальнейшие действия не имеют смысла
 		if ($this->id == "") return FALSE;
 
@@ -694,8 +713,6 @@ class Property
 		if (isset($_POST['primaryFotoRadioButton'])) $this->primaryFotoId = htmlspecialchars($_POST['primaryFotoRadioButton'], ENT_QUOTES);
 	}
 
-
-
 	// Получить ассоциированный массив с данными анкеты объекта недвижимости (для использования в представлении)
 	public function getCharacteristicData() {
 		$result = array();
@@ -833,8 +850,6 @@ class Property
 		return $appliances;
 	}
 
-
-
 	// Устанавливает признак полноты для объекта
 	// $levelCompleteness = "0" объявление из чужой базы - мнимум требований к полноте
 	// $levelCompleteness = "1" объявление от собственника, который является нашим клиентом - максимальные требования к полноте
@@ -851,7 +866,7 @@ class Property
 	// $typeOfValidation = editAdvert - режим вторичной (при редактировании уже существующего объявления) проверки указанных пользователем параметров объекта недвижимости
 	// $typeOfValidation = newAlienAdvert - режим проверки параметров нового объявления из чужой базы по минимуму - так как о чужих объектах обычно мало информации.
 	// $typeOfValidation = editAlienAdvert - режим проверки параметров ранее созданного и записанного в БД объявления из чужой базы. По минимуму - так как о чужих объектах обычно мало информации.
-	public function propertyDataValidate($typeOfValidation) {
+	public function validate($typeOfValidation) {
 		// Подготовим массив для сохранения сообщений об ошибках
 		$errors = array();
 
@@ -1175,7 +1190,7 @@ class Property
 
 	// Используется при регистрации нового объекта недвижимости - позволяет получить идентификатор, используя адрес (для дальнейшего сохранения фотографий объекта).
 	// Полученный идентификатор также указывается в параметрах данного объекта
-	public function getIdUseAddress() {
+	private function getIdUseAddress() {
 		$stmt = DBconnect::get()->stmt_init();
 		if (($stmt->prepare("SELECT id FROM property WHERE address=? AND coordX=? AND coordY=? AND apartmentNumber=?") === FALSE)
 			OR ($stmt->bind_param("ssss", $this->address, $this->coordX, $this->coordY, $this->apartmentNumber) === FALSE)
@@ -1193,20 +1208,37 @@ class Property
 		return $this->id;
 	}
 
-	// Метод, который позволяет оповестить пользователей-арендаторов о появлении нового объекта недвижимости, который соответствует их параметрам поиска.
-	// Создает и сохраняет в БД уведомления
-	// ВАЖНО: перед использованием метода убедиться, что параметры объекта Property инициализированы теми значениями, которые нужны, в противном случае, пользователи могут получить уведомления, не соответствующие действительности
-	public function sendMessagesAboutNewProperty() {
+	// Метод с минимальной задержкой Запускает механизм оповещения о Новом объекте недвижимости (уведомления + email + sms).
+	// Сам механизм оповещения выполняется в отдельном скрипте, что позволяет данному методу не дожидаться его окончания
+	public function notifyUsersAboutNewProperty() {
 
-		// Для выполнения функция у объекта недвижимости обязательно должен быть id (то есть данные о нем уже сохранены в БД)
-		if ($this->id == "") {
-			// TODO: Логируем ошибку использования метода
+		$parts = parse_url("http://svobodno.org/lib/emailSender.php");
+		$params = array("propertyId" => $this->id);
+
+		if (!$fp = fsockopen($parts['host'], isset($parts['port']) ? $parts['port'] : 80))
+		{
+			// TODO: записать в лог ошибку
 			return FALSE;
 		}
 
-		/******
-		 * Составляем поисковый запрос, который выявит список id пользователей-арендаторов, под чьи searchRequests подходит наше объявление (именно их и нужно оповестить)
-		 ******/
+		$data = http_build_query($params, '', '&');
+
+		fwrite($fp, "POST " . (!empty($parts['path']) ? $parts['path'] : '/') . " HTTP/1.1\r\n");
+		fwrite($fp, "Host: " . $parts['host'] . "\r\n");
+		fwrite($fp, "Content-Type: application/x-www-form-urlencoded\r\n");
+		fwrite($fp, "Content-Length: " . strlen($data) . "\r\n");
+		fwrite($fp, "Connection: Close\r\n\r\n");
+		fwrite($fp, $data);
+		fclose($fp);
+
+		return TRUE;
+	}
+
+	// Метод определяет каким пользователям подходит данный объект по их параметрам поиска
+	// Возвращает массив ассоциативных массивов c параметрами этих пользователей: (id, needEmail, needSMS)
+	public function whichTenantsAppropriate() {
+
+		//Составляем поисковый запрос, который выявит список id пользователей-арендаторов, под чьи searchRequests подходит наше объявление (именно их и нужно оповестить)
 
 		// Инициализируем массив, в который будем собирать условия поиска.
 		$searchLimits = array();
@@ -1325,12 +1357,56 @@ class Property
 			}
 		}
 
+		return $listOfTargetUsers;
+	}
+
+	// Метод, который позволяет оповестить пользователей-арендаторов о появлении нового объекта недвижимости, который соответствует их параметрам поиска.
+	// Создает и сохраняет в БД уведомления
+	// ВАЖНО: перед использованием метода убедиться, что параметры объекта Property инициализированы теми значениями, которые нужны, в противном случае, пользователи могут получить уведомления, не соответствующие действительности
+	public function sendMessagesAboutNewProperty($listOfTargetUsers) {
+
+		// Для выполнения функция у объекта недвижимости обязательно должен быть id (то есть данные о нем уже сохранены в БД)
+		if ($this->id == "") return FALSE;
+
 		// Подготовим параметры уведомления для сохранения в БД
 		$tm = time(); // Время регистрации уведомлений
 		$messageType = "newProperty"; // Задаем тип уведомления
 		$isReaded = "не прочитано"; // Первоначально все уведомления попадают в БД непрочитанными
 
 		return DBconnect::insertMessageNewProperty(array("timeIndex" => $tm, "messageType" => $messageType, "isReaded" => $isReaded, "fotoArr" => $this->uploadedFoto, "targetId" => $this->id, "typeOfObject" => $this->typeOfObject, "address" => $this->address, "currency" => $this->currency, "costOfRenting" => $this->costOfRenting, "utilities" => $this->utilities, "electricPower" => $this->electricPower, "amountOfRooms" => $this->amountOfRooms, "adjacentRooms" => $this->adjacentRooms, "amountOfAdjacentRooms" => $this->amountOfAdjacentRooms, "roomSpace" => $this->roomSpace, "totalArea" => $this->totalArea, "livingSpace" => $this->livingSpace, "kitchenSpace" => $this->kitchenSpace, "totalAmountFloor" => $this->totalAmountFloor, "numberOfFloor" => $this->numberOfFloor), $listOfTargetUsers);
+	}
+
+	public function sendEmailAboutNewProperty($listOfTargetUsersForEmail) {
+		// Инициализируем класс для отправки e-mail и указываем постоянные параметры (верные для любых уведомлений)
+		$mail = new PHPMailer(true); //defaults to using php "mail()"; the true param means it will throw exceptions on errors, which we need to catch
+
+		// Вычислим HTML для электронного письма
+		// TODO: Реализовать метод для вычисления HTML содержимого
+		$MsgHTML = View::getHTMLforMessageNewProperty($this->getCharacteristicData());
+
+		try {
+			$mail->SetFrom('support@svobodno.org', 'Svobodno.org');
+			$mail->AddReplyTo('', '');
+			$mail->Subject = 'Новое объявление: ';
+			$mail->MsgHTML($MsgHTML);
+			//$mail->AltBody = 'To view the message, please use an HTML compatible email viewer!'; // optional - MsgHTML will create an alternate automatically
+		} catch (phpmailerException $e) {
+			echo $e->errorMessage(); //Pretty error messages from PHPMailer
+		} catch (Exception $e) {
+			echo $e->getMessage(); //Boring error messages from anything else!
+		}
+
+		// Отправляем электронное письмо каждому пользователю индивидуально
+		foreach ($listOfTargetUsersForEmail as $tenant) {
+			try {
+				$mail->AddAddress($tenant['email'], $tenant['name']);
+				$mail->Send();
+			} catch (phpmailerException $e) {
+				echo $e->errorMessage(); //Pretty error messages from PHPMailer
+			} catch (Exception $e) {
+				echo $e->getMessage(); //Boring error messages from anything else!
+			}
+		}
 	}
 
 	/**
@@ -1425,12 +1501,12 @@ class Property
 		// Валидация начальных данных
 		if ($this->id == "" || $this->status == "" || $this->completeness == "") return FALSE;
 
-		// Проверяем корректность данных объявления. Функции propertyDataValidate() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
+		// Проверяем корректность данных объявления. Функции validate() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
 		// Если мы имеем дело с редактированием чужого объявления администратором, то проверки данных происходят по упрощенному способу
 		if ($this->completeness == "0") {
-			$errors = $this->propertyDataValidate("editAlienAdvert");
+			$errors = $this->validate("editAlienAdvert");
 		} else {
-			$errors = $this->propertyDataValidate("editAdvert");
+			$errors = $this->validate("editAdvert");
 		}
 		if (count($errors) != 0) return FALSE;
 
@@ -1440,8 +1516,8 @@ class Property
 		// Сохраняем изменения в БД. При этом пересчитывается реальная стоимость аренды (если она была указана валюте и даже в рублях)
 		if (!$this->saveCharacteristicToDB("edit")) return FALSE;
 
-		// Разослать по потенциальным арендаторам уведомление о том, что сдается интересный им объект
-		$this->sendMessagesAboutNewProperty();
+		// Оповестим арендаторов о появлении нового объекта недвижимости
+		$this->notifyUsersAboutNewProperty();
 
 		return TRUE;
 	}

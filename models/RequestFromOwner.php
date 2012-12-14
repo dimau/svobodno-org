@@ -2,22 +2,22 @@
 
     class RequestFromOwner
     {
-        public $id = "";
-        public $name = "";
-        public $telephon = "";
-        public $address = "";
-        public $commentOwner = "";
+        private $id = "";
+        private $name = "";
+        private $telephon = "";
+        private $address = "";
+        private $commentOwner = "";
         private $userId = ""; // Хранит идентификатор пользователя, если обратившийся пользователь был авторизован
-		public $regDate = "";
+		private $regDate = "";
 
         // КОНСТРУКТОР
-        public function __construct($incomingUser)
+        public function __construct($userIncoming)
         {
             // Если пользователь, перешедший на страницу формирования запроса авторизован - воспользуемся его данными (например, для автоматического заполнения части полей)
-            if (isset($incomingUser) && $incomingUser->login()) {
-                $this->name = $incomingUser->name." ".$incomingUser->secondName;
-                $this->telephon = $incomingUser->telephon;
-                $this->userId = $incomingUser->getId();
+            if (isset($userIncoming) && $userIncoming->login()) {
+                $this->name = $userIncoming->name." ".$userIncoming->secondName;
+                $this->telephon = $userIncoming->telephon;
+                $this->userId = $userIncoming->getId();
             }
         }
 

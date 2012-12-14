@@ -86,9 +86,9 @@
         }
 
         // Метод возвращает строку команды добавления в избранное или удаления из избранного в зависимости от ситуации
-        // На входе: $propertyId - id объекта недвижимости, для которого формируется строка, $favoritesPropertysId - массив идентификаторов всех избранных объявлений недвижимости данного пользователя,
+        // На входе: $propertyId - id объекта недвижимости, для которого формируется строка, $favoritePropertiesId - массив идентификаторов всех избранных объявлений недвижимости данного пользователя,
         // $typeOfHTML - задает используемый шаблон. Если = "onlyIcon" - выдается шаблон исключительно с иконкой избранного. Если = "stringWithIcon" - выдается строка и иконка избранного
-        public static function getHTMLforFavorites($propertyId = 0, $favoritesPropertysId = array(), $typeOfHTML = "stringWithIcon")
+        public static function getHTMLforFavorites($propertyId = 0, $favoritePropertiesId = array(), $typeOfHTML = "stringWithIcon")
         {
 
             // Шаблон для формируемого HTML блока с командой добавления в избранное / удаления из избранного
@@ -105,9 +105,9 @@
 
             if ($propertyId != 0) $arrForReplace['propertyId'] = $propertyId;
 
-            if ($propertyId != 0 && count($favoritesPropertysId) != 0) {
+            if ($propertyId != 0 && count($favoritePropertiesId) != 0) {
                 // Проверяем наличие данного объявления среди избранных у пользователя
-                if (in_array($propertyId, $favoritesPropertysId)) {
+                if (in_array($propertyId, $favoritePropertiesId)) {
                     $arrForReplace['actionFavorites'] = "removeFromFavorites";
                     $arrForReplace['imgFavorites'] = "img/gold_star.png";
                     $arrForReplace['textFavorites'] = "убрать из избранного";
@@ -136,17 +136,17 @@
          * Возвращает HTML для блока с баллунами Яндекс карты
          *
          * @param $propertyFullArr - массив массивов, содержащий подробные сведения по объектам недвижимости, для которых и нужно построить список баллунов
-         * @param $favoritesPropertysId - массив идентификаторов избранных объектов пользователя
+         * @param $favoritePropertiesId - массив идентификаторов избранных объектов пользователя
          * @param $typeOfRequest - тип запроса ("search" - для страницы поиска, "favorites" - для личного кабинета, вкладка Избранное)
          * @return string - возвращаем строку, содержащую HTML для списка баллунов
          */
-        public static function getMatterOfBalloonList($propertyFullArr, $favoritesPropertysId, $typeOfRequest) {
+        public static function getMatterOfBalloonList($propertyFullArr, $favoritePropertiesId, $typeOfRequest) {
 
             // Проверка входящих параметров
             if (!isset($propertyFullArr) || !is_array($propertyFullArr)) return "";
 
             // Инициализируем, если это нужно, список избранных объявлений так, чтобы функция не сломалась в непредвиденных ситуациях
-            if (!isset($favoritesPropertysId) || !is_array($favoritesPropertysId)) $favoritesPropertysId = array();
+            if (!isset($favoritePropertiesId) || !is_array($favoritePropertiesId)) $favoritePropertiesId = array();
 
             // Инициализируем переменную для хранения содержимого невидимого блока с HTML данными для всех баллунов
             $matterOfBalloonList = "";
@@ -154,7 +154,7 @@
             // Перебираем входящий массив ($propertyFullArr), создавая соответствующие баллуны для каждого объекта недвижимости
             for ($i = 0; $i < count($propertyFullArr); $i++ ) {
                 // Получаем HTML для баллуна и добавляем его в общую копилку
-                $matterOfBalloonList .= View::getFullBalloonHTML($propertyFullArr[$i], $favoritesPropertysId);
+                $matterOfBalloonList .= View::getFullBalloonHTML($propertyFullArr[$i], $favoritePropertiesId);
             }
 
             return $matterOfBalloonList;
@@ -164,18 +164,18 @@
          * Возвращает HTML для списка объектов недвижимости с кратким описанием
          *
          * @param $propertyFullArr - массив массивов, содержащий подробные сведения по объектам недвижимости, для которых и нужно построить список
-         * @param $favoritesPropertysId - массив идентификаторов избранных объектов пользователя
+         * @param $favoritePropertiesId - массив идентификаторов избранных объектов пользователя
          * @param $number - число, с которого нужно начать нумеровать по порядку объявления в формируемом списке
          * @param $typeOfRequest - тип запроса ("search" - для страницы поиска, "favorites" - для личного кабинета, вкладка Избранное)
          * @return string - возвращаем строку, содержащую HTML для списка
          */
-        public static function getMatterOfShortList($propertyFullArr, $favoritesPropertysId, $number, $typeOfRequest){
+        public static function getMatterOfShortList($propertyFullArr, $favoritePropertiesId, $number, $typeOfRequest){
 
             // Проверка входящих параметров
             if (!isset($propertyFullArr) || !is_array($propertyFullArr)) return "";
 
             // Инициализируем, если это нужно, список избранных объявлений так, чтобы функция не сломалась в непредвиденных ситуациях
-            if (!isset($favoritesPropertysId) || !is_array($favoritesPropertysId)) $favoritesPropertysId = array();
+            if (!isset($favoritePropertiesId) || !is_array($favoritePropertiesId)) $favoritePropertiesId = array();
 
             // Содержимое списка объявлений с краткими данными по каждому из них
             $matterOfShortList = "";
@@ -183,7 +183,7 @@
             // Перебираем входящий массив ($propertyFullArr), создавая соответствующие блоки для каждого объекта недвижимости
             for ($i = 0; $i < count($propertyFullArr); $i++ ) {
                 // Получаем HTML для блока и добавляем его в общую копилку
-                $matterOfShortList .= View::getShortListItemHTML($propertyFullArr[$i], $favoritesPropertysId, $number + $i);
+                $matterOfShortList .= View::getShortListItemHTML($propertyFullArr[$i], $favoritePropertiesId, $number + $i);
             }
 
             // Если не нашлось ни одного объекта - возвращаем специальное сообщение
@@ -196,18 +196,18 @@
          * Возвращает HTML для списка объектов недвижимости с подробным описанием
          *
          * @param $propertyFullArr - массив массивов, содержащий подробные сведения по объектам недвижимости, для которых и нужно построить список
-         * @param $favoritesPropertysId - массив идентификаторов избранных объектов пользователя
+         * @param $favoritePropertiesId - массив идентификаторов избранных объектов пользователя
          * @param $number - число, с которого нужно начать нумеровать по порядку объявления в формируемом списке
          * @param $typeOfRequest - тип запроса ("search" - для страницы поиска, "favorites" - для личного кабинета, вкладка Избранное)
          * @return string - возвращаем строку, содержащую HTML для списка
          */
-        public static function getMatterOfFullParametersList($propertyFullArr, $favoritesPropertysId, $number, $typeOfRequest){
+        public static function getMatterOfFullParametersList($propertyFullArr, $favoritePropertiesId, $number, $typeOfRequest){
 
             // Проверка входящих параметров
             if (!isset($propertyFullArr) || !is_array($propertyFullArr)) return "";
 
             // Инициализируем, если это нужно, список избранных объявлений так, чтобы функция не сломалась в непредвиденных ситуациях
-            if (!isset($favoritesPropertysId) || !is_array($favoritesPropertysId)) $favoritesPropertysId = array();
+            if (!isset($favoritePropertiesId) || !is_array($favoritePropertiesId)) $favoritePropertiesId = array();
 
             // Содержимое списка объявлений с подробными данными по каждому из них
             $matterOfFullParametersList = "";
@@ -215,7 +215,7 @@
             // Перебираем входящий массив ($propertyFullArr), создавая соответствующие блоки для каждого объекта недвижимости
             for ($i = 0; $i < count($propertyFullArr); $i++ ) {
                 // Получаем HTML для блока и добавляем его в общую копилку
-                $matterOfFullParametersList .= View::getFullParametersListItemHTML($propertyFullArr[$i], $favoritesPropertysId, $number + $i);
+                $matterOfFullParametersList .= View::getFullParametersListItemHTML($propertyFullArr[$i], $favoritePropertiesId, $number + $i);
             }
 
             // Если не нашлось ни одного объекта - возвращаем специальное сообщение
@@ -228,10 +228,10 @@
          * Возвращает HTML для всплывающего баллуна на Яндекс карте с описанием объекта недвижимости
          *
          * @param $oneProperty - ассоциированный массив данных по конкретному объявлению
-         * @param array $favoritesPropertysId - массив со списком идентификаторов избранных объектов текущего пользователя
+         * @param array $favoritePropertiesId - массив со списком идентификаторов избранных объектов текущего пользователя
          * @return mixed - строка HTML в соответствии с шаблоном баллуна
          */
-        public static function getFullBalloonHTML($oneProperty, $favoritesPropertysId = array())
+        public static function getFullBalloonHTML($oneProperty, $favoritePropertiesId = array())
         {
             // Получим HTML шаблон блока из файла
             $templ = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/templates/searchResultBlocks/fullBalloonListItem.php');
@@ -361,7 +361,7 @@
             }
 
             // Избранное
-            if (!($arrBalloonReplace['favorites'] = View::getHTMLforFavorites($oneProperty['id'], $favoritesPropertysId, "stringWithIcon"))) {
+            if (!($arrBalloonReplace['favorites'] = View::getHTMLforFavorites($oneProperty['id'], $favoritePropertiesId, "stringWithIcon"))) {
                 $arrBalloonReplace['favorites'] = "";
             }
 
@@ -378,11 +378,11 @@
          * Возвращает HTML для блока с картким описанием объекта недвижимости (используется при отображении результатов поиска Список + Карта)
          *
          * @param $oneProperty - ассоциированный массив данных по конкретному объявлению
-         * @param array $favoritesPropertysId - массив со списком идентификаторов избранных объектов текущего пользователя
+         * @param array $favoritePropertiesId - массив со списком идентификаторов избранных объектов текущего пользователя
          * @param $number - указывает какое число нужно присвоить блоку для его нумераци в выдаче
          * @return mixed - строка HTML в соответствии с шаблоном блока с кратким описанием объекта недвижимости
          */
-       public static function getShortListItemHTML($oneProperty, $favoritesPropertysId = array(), $number)
+       public static function getShortListItemHTML($oneProperty, $favoritePropertiesId = array(), $number)
        {
            // Получим HTML шаблон блока из файла
            $tmpl_shortAdvert = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/templates/searchResultBlocks/shortListItem.php');
@@ -400,9 +400,9 @@
            // Избранное
            $arrShortListReplace['actionFavorites'] = "";
            $arrShortListReplace['imgFavorites'] = "";
-           if (count($favoritesPropertysId) != 0) {
+           if (count($favoritePropertiesId) != 0) {
                // Проверяем наличие данного объявления среди избранных у пользователя
-               if (in_array($arrShortListReplace['propertyId'], $favoritesPropertysId)) {
+               if (in_array($arrShortListReplace['propertyId'], $favoritePropertiesId)) {
                    $arrShortListReplace['actionFavorites'] = "removeFromFavorites";
                    $arrShortListReplace['imgFavorites'] = "img/gold_star.png";
                } else {
@@ -502,11 +502,11 @@
          * Возвращает HTML для блока с подробным описанием объекта недвижимости (используется при отображении результатов поиска в режиме "Список")
          *
          * @param $oneProperty - ассоциированный массив данных по конкретному объявлению
-         * @param array $favoritesPropertysId - массив со списком идентификаторов избранных объектов текущего пользователя
+         * @param array $favoritePropertiesId - массив со списком идентификаторов избранных объектов текущего пользователя
          * @param $number - указывает какое число нужно присвоить блоку для его нумераци в выдаче
          * @return mixed - строка HTML в соответствии с шаблоном блока с подробным описанием объекта недвижимости
          */
-        public static function getFullParametersListItemHTML($oneProperty, $favoritesPropertysId = array(), $number)
+        public static function getFullParametersListItemHTML($oneProperty, $favoritePropertiesId = array(), $number)
         {
             // Получим HTML шаблон блока из файла
             $tmpl_extendedAdvert = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/templates/searchResultBlocks/fullListItem.php');
@@ -524,8 +524,8 @@
             // Избранное
             $arrExtendedListReplace['actionFavorites'] = "";
             $arrExtendedListReplace['imgFavorites'] = "";
-            if (count($favoritesPropertysId) != 0) {
-                if (in_array($arrExtendedListReplace['propertyId'], $favoritesPropertysId)) {
+            if (count($favoritePropertiesId) != 0) {
+                if (in_array($arrExtendedListReplace['propertyId'], $favoritePropertiesId)) {
                     $arrExtendedListReplace['actionFavorites'] = "removeFromFavorites";
                     $arrExtendedListReplace['imgFavorites'] = "img/gold_star.png";
                 } else {
@@ -637,16 +637,7 @@
             $searchResultHTML = "";
 
             // Вычисляем сколько всего опубликовано объявлений
-            $res = DBconnect::get()->query("SELECT COUNT(*) FROM property WHERE status = 'опубликовано'");
-            if ((DBconnect::get()->errno)
-                OR (($amountOfRows = $res->fetch_row()) === NULL)
-            ) {
-                // Логируем ошибку
-                //TODO: сделать логирование ошибки
-                $allAmountAdverts = "";
-            } else {
-                $allAmountAdverts = $amountOfRows[0];
-            }
+			$allAmountAdverts = DBconnect::countAllPublishedProperties();
 
             if ($typeOfRequest == "search") $searchResultHTML .= "
                     <tr><td><div style='margin-top: 2em; margin-left: 1em;'>

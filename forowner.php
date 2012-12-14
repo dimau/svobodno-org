@@ -6,7 +6,8 @@ session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/IncomingUser.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/RequestFromOwner.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 
@@ -14,10 +15,10 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
 // Инициализируем модель для запросившего страницу пользователя
-$incomingUser = new IncomingUser();
+$userIncoming = new UserIncoming();
 
 // Инициализируем модель для работ с запросом на новое объявление от собственника
-$requestFromOwner = new RequestFromOwner($incomingUser);
+$requestFromOwner = new RequestFromOwner($userIncoming);
 
 // Инициализируем переменную для сохранения ошибок, связанных с обработкой заявки собственника (которые не позволили ее принять)
 $errors = NULL;
@@ -57,8 +58,8 @@ if ($action == "takeRequest") {
  *******************************************************************************/
 
 // Инициализируем используемые в шаблоне(ах) переменные
-$isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
+$isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
+$amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 $requestFromOwnerData = $requestFromOwner->getRequestFromOwnerData();
 //$errors
 

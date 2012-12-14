@@ -3,30 +3,30 @@
 
 class MessageNewProperty
 {
-	public $id = "";
-	public $userId = "";
-	public $timeIndex = "";
-	public $messageType = "newProperty";
-	public $isReaded = "";
-	public $fotoArr = array();
-	public $targetId = "";
-	public $needEmail = 0;
-	public $needSMS = 0;
-	public $typeOfObject = "0";
-	public $address = "";
-	public $currency = "0";
-	public $costOfRenting = "";
-	public $utilities = "0";
-	public $electricPower = "0";
-	public $amountOfRooms = "0";
-	public $adjacentRooms = "0";
-	public $amountOfAdjacentRooms = "0";
-	public $roomSpace = "";
-	public $totalArea = "";
-	public $livingSpace = "";
-	public $kitchenSpace = "";
-	public $totalAmountFloor = "";
-	public $numberOfFloor = "";
+	private $id = "";
+	private $userId = "";
+	private $timeIndex = "";
+	private $messageType = "newProperty";
+	private $isReaded = "";
+	private $fotoArr = array();
+	private $targetId = "";
+	private $needEmail = 0;
+	private $needSMS = 0;
+	private $typeOfObject = "0";
+	private $address = "";
+	private $currency = "0";
+	private $costOfRenting = "";
+	private $utilities = "0";
+	private $electricPower = "0";
+	private $amountOfRooms = "0";
+	private $adjacentRooms = "0";
+	private $amountOfAdjacentRooms = "0";
+	private $roomSpace = "";
+	private $totalArea = "";
+	private $livingSpace = "";
+	private $kitchenSpace = "";
+	private $totalAmountFloor = "";
+	private $numberOfFloor = "";
 
 	/**
 	 * КОНСТРУКТОР

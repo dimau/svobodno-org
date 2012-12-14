@@ -39,26 +39,6 @@
             return $code;
         }
 
-        // Функция возвращает массив массивов с названиями районов в городе $city
-        public static function getAllDistrictsInCity($city)
-        {
-
-            // Получим из БД данные ($res) по пользователю с логином = $login
-            $stmt = DBconnect::get()->stmt_init();
-            if (($stmt->prepare("SELECT name FROM districts WHERE city=? ORDER BY name ASC") === FALSE)
-                OR ($stmt->bind_param("s", $city) === FALSE)
-                OR ($stmt->execute() === FALSE)
-                OR (($res = $stmt->get_result()) === FALSE)
-                OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-                OR ($stmt->close() === FALSE)
-            ) {
-                $res = array();
-                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-            }
-
-            return $res;
-        }
-
         // Преобразовывает дату из формата, пригодного для хранения в БД в формат, пригодный для отображения
         public static function dateFromDBToView($dateFromDB)
         {

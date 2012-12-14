@@ -6,15 +6,17 @@ session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/IncomingUser.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserFull.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/SearchRequest.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
 // Инициализируем модель для запросившего страницу пользователя
-$incomingUser = new IncomingUser();
+$userIncoming = new UserIncoming();
 
 /*************************************************************************************
  * ПОЛУЧИМ GET ПАРАМЕТРЫ
@@ -39,10 +41,13 @@ if ($compId != "" && $compId != 0) {
  ************************************************************************************/
 
 // Инициализируем полную модель для целевого пользователя по его идентификатору из GET строки
-$user = new User($targetUserId);
-$user->writeCharacteristicFromDB();
-$user->writeSearchRequestFromDB();
+$user = new UserFull($targetUserId);
+$user->readCharacteristicFromDB();
 $user->writeFotoInformationFromDB();
+
+// Инициализируем модель поискового запроса пользователя
+$searchRequest = new SearchRequest($targetUserId);
+$searchRequest->writeFromDB();
 
 /*************************************************************************************
  * ПРОВЕРКА ПРАВ ДОСТУПА К СТРАНИЦЕ
@@ -63,24 +68,24 @@ $user->writeFotoInformationFromDB();
  ************************************************************************************/
 
 // Если пользователь не авторизован, то он не сможет посмотреть ни одной анкеты
-if (!$incomingUser->login()) {
+if (!$userIncoming->login()) {
 	header('Location: 404.html'); //TODO: реализовать страницу Отказано в доступе
 	exit();
 }
 
-// Получаем список пользователей, которые интересовались недвижимостью нашего пользователя ($incomingUser->getId). Он выступает в качестве собственника
+// Получаем список пользователей, которые интересовались недвижимостью нашего пользователя ($userIncoming->getId). Он выступает в качестве собственника
 $tenantsWithRequestToView = array();
 // Формировать список имеет смысл только, если целевой пользователь на текущий момент времени является арендатором. В ином случае, доступ к анкете целевого пользователя для собственников - закрыт. Таким образом реализуется правило: собственник может видеть только анкеты тех пользователей, которые заинтересовались его недвижимостью и в текущий момент времени являются арендаторами (= имеют поисковый запрос)
-if ($user->typeTenant) {
-	$tenantsWithRequestToView = $incomingUser->getAllTenantsId();
+if ($user->isTenant()) {
+	$tenantsWithRequestToView = $userIncoming->getAllTenantsId();
 }
 
 // Проверяем, есть ли среди этого списка текущий целевой пользователь ($targetUserId)
 // Проверка вынесена в отдельный блок, так как это позволяет одновременно проверить несколько условий на доступ к данной странице
 // Админы имеют доступ к странице всегда
-$isAdmin = $incomingUser->isAdmin();
+$isAdmin = $userIncoming->isAdmin();
 if (!in_array($targetUserId, $tenantsWithRequestToView)
-	AND $incomingUser->getId() != $targetUserId
+	AND $userIncoming->getId() != $targetUserId
 	AND !$isAdmin['searchUser']) {
 	header('Location: 404.html'); //TODO: реализовать страницу Отказано в доступе
 	exit();
@@ -91,13 +96,13 @@ if (!in_array($targetUserId, $tenantsWithRequestToView)
  *******************************************************************************/
 
 // Инициализируем используемые в шаблоне(ах) переменные
-$isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
+$isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
+$amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 $userCharacteristic = $user->getCharacteristicData();
 $userFotoInformation = $user->getFotoInformationData();
-$userSearchRequest = $user->getSearchRequestData();
+$userSearchRequest = $searchRequest->getSearchRequestData();
 $mode = "tenantForOwner"; // Режим в котором будет работать шаблон анкеты пользователя (templ_notEditedProfile.php)
-$strHeaderOfPage = $user->surname . " " . $user->name . " " . $user->secondName; // Получаем заголовок страницы
+$strHeaderOfPage = $user->getSurname() . " " . $user->getName() . " " . $user->getSecondName(); // Получаем заголовок страницы
 
 // Подсоединяем нужный основной шаблон
 require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_man.php";

@@ -6,18 +6,19 @@ session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/IncomingUser.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Property.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
 // Инициализируем модель для запросившего страницу пользователя
-$incomingUser = new IncomingUser();
+$userIncoming = new UserIncoming();
 
 // Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
-if (!$incomingUser->login()) {
+if (!$userIncoming->login()) {
 	header('Location: login.php');
 	exit();
 }
@@ -46,12 +47,12 @@ if ($propertyId == "" || $propertyId == 0) {
  ************************************************************************************/
 
 $property = new Property($propertyId);
-if (!$property->writeCharacteristicFromDB() || !$property->writeFotoInformationFromDB()) {
+if (!$property->readCharacteristicFromDB() || !$property->writeFotoInformationFromDB()) {
 	die('Ошибка при работе с базой данных (. Попробуйте зайти к нам немного позже.'); // Если получить данные из БД не удалось, то просим пользователя зайти к нам немного позже
 }
 
 // Готовим массив со списком районов в городе пользователя
-$allDistrictsInCity = GlobFunc::getAllDistrictsInCity("Екатеринбург");
+$allDistrictsInCity = DBconnect::selectDistrictsForCity("Екатеринбург");
 
 // Инициализируем массив для хранения ошибок проверки данных объекта недвижимости
 $errors = array();
@@ -60,8 +61,8 @@ $errors = array();
  * Проверяем, что пользователь имеет право редактировать данное объявление - он является собственником данного объекта недвижимости или админом
  **************************************************************************************************************/
 
-$isAdmin = $incomingUser->isAdmin();
-if ($property->userId != $incomingUser->getId() AND !$isAdmin['searchUser']) {
+$isAdmin = $userIncoming->isAdmin();
+if ($property->getUserId() != $userIncoming->getId() AND !$isAdmin['searchUser']) {
 	header('Location: personal.php?tabsId=3');
 	exit();
 }
@@ -75,12 +76,12 @@ if ($action == "saveAdvert") {
 	$property->writeCharacteristicFromPOST("edit");
 	$property->writeFotoInformationFromPOST();
 
-	// Проверяем корректность данных объявления. Функции propertyDataValidate() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
+	// Проверяем корректность данных объявления. Функции validate() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
 	// Если мы имеем дело с редактированием чужого объявления администратором, то проверки данных происходят по упрощенному способу
-	if ($property->completeness == "0") {
-		$errors = $property->propertyDataValidate("editAlienAdvert");
+	if ($property->getCompleteness() == "0") {
+		$errors = $property->validate("editAlienAdvert");
 	} else {
-		$errors = $property->propertyDataValidate("editAdvert");
+		$errors = $property->validate("editAdvert");
 	}
 
 	// Если данные, указанные пользователем, корректны, сохраним данные объявления в базу данных
@@ -97,7 +98,7 @@ if ($action == "saveAdvert") {
 			if ($correctSaveFotoInformationToDB) {
 
 				// Пересылаем пользователя на страницу с подробным описанием его объявления - хороший способ убедиться в том, что все данные указаны верно
-				header('Location: property.php?propertyId=' . $property->id);
+				header('Location: property.php?propertyId=' . $property->getId());
 				exit();
 
 			} else {
@@ -121,8 +122,8 @@ if ($action == "saveAdvert") {
  *******************************************************************************/
 
 // Инициализируем используемые в шаблоне(ах) переменные
-$isLoggedIn = $incomingUser->login(); // Используется в templ_header.php
-$amountUnreadMessages = $incomingUser->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
+$isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
+$amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 $propertyCharacteristic = $property->getCharacteristicData();
 $propertyFotoInformation = $property->getFotoInformationData();
 $compId = $propertyCharacteristic['userId'];

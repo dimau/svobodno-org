@@ -6,24 +6,25 @@ session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/IncomingUser.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Property.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.'); // TODO: Вернуть ошибку
 
 // Инициализируем модель для запросившего страницу пользователя
-$incomingUser = new IncomingUser();
+$userIncoming = new UserIncoming();
 
 // Уточняем - имеет ли пользователь права админа.
-$isAdmin = $incomingUser->isAdmin();
+$isAdmin = $userIncoming->isAdmin();
 
 /*************************************************************************************
  * ПРОВЕРКА ПРАВ ДОСТУПА К СКРИПТУ
  ************************************************************************************/
 
 // Проверяем, залогинен ли пользователь, если нет - то отказываем в доступе
-if (!$incomingUser->login()) {
+if (!$userIncoming->login()) {
 	GlobFunc::accessDenied();
 }
 
@@ -64,7 +65,7 @@ if ($action == "changeEarliestDate" && (!is_array($newValueArr) || count($newVal
  *************************************************************************************/
 
 $property = new Property($propertyId);
-if (!$property->writeCharacteristicFromDB()) GlobFunc::accessDenied();
+if (!$property->readCharacteristicFromDB()) GlobFunc::accessDenied();
 
 /*************************************************************************************
  * НОВАЯ ДАТА ПРОСМОТРА ОБЪЕКТА
