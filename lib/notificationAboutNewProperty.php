@@ -1,5 +1,9 @@
 <?php
-/* Сценарий периодически пробегает уведомления и формирует+отправляет по тем из них, у которых проставлен признак необходимости отправки e-mail, соответствующие электронные письма */
+/**
+ * Сценарий запускается при сохранении нового объявления (newadvert.php) и при новой публикации имеющегося
+ * Задача - асинхронно (не задерживая окончание запустившего его сценария) выполнить формирование соответствующих уведомлений,
+ * рассылку e-mail и смс по претендентам, у которых поисковый запрос соответствует новому опубликованному объявлению
+ */
 
 // Подключаем необходимые модели, классы
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lib/class.phpmailer.php';
@@ -13,26 +17,29 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Property.php';
 if (isset($_POST['propertyId']) && intval($_POST['propertyId']) != 0) {
 	$propertyId = intval($_POST['propertyId']);
 } else {
-	// TODO: Запишем в лог сбой
+	Logger::getLogger(GlobFunc::$loggerName)->log("Обращение к notificationAboutNewProperty.php без указания propertyId");
 	exit();
 }
 
 // Инициализируем модель для этого объекта недвижимости
 $property = new Property($propertyId);
-if (!$property->readCharacteristicFromDB() || !$property->writeFotoInformationFromDB()) {
-	// TODO: Запишем в лог сбой
+if (!$property->readCharacteristicFromDB() || !$property->readFotoInformationFromDB()) {
+	Logger::getLogger(GlobFunc::$loggerName)->log("notificationAboutNewProperty.php: не удалось выполнить считывание данных из БД по объекту:".$propertyId);
 	exit();
 }
 
 // Получим список пользователей-арендаторов, под чьи поисковые запросы подходит этот объект
 $listOfTargetUsers = $property->whichTenantsAppropriate();
 if ($listOfTargetUsers == FALSE) {
-	// TODO: Запишем в лог сбой
+	Logger::getLogger(GlobFunc::$loggerName)->log("notificationAboutNewProperty.php: не удалось получить список id потенциальных арендаторов по объекту:".$propertyId);
 	exit();
 }
 
 // Формируем уведомления по данному объекту
-$property->sendMessagesAboutNewProperty($listOfTargetUsers);
+if (!$property->sendMessagesAboutNewProperty($listOfTargetUsers)) {
+	Logger::getLogger(GlobFunc::$loggerName)->log("notificationAboutNewProperty.php: не удалось сформировать уведомления для потенциальных арендаторов по объекту:".$propertyId);
+	exit();
+}
 
 // Формируем и рассылаем email по тем пользователям, которые подписаны на такую рассылку
 $listOfTargetUsersForEmail = array();

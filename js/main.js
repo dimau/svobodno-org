@@ -69,16 +69,19 @@ function addToFavorites() {
         return false;
     }
 
+    // Получим идентификатор объекта, который добавляем в избранное
     var self = this;
     var propertyId = 0;
     propertyId = $(self).attr('propertyId');
 
+    // Меняем внешний вид всех команд добавления в Избранное данного объекта на этой странице сразу - не дожидаясь ответа от сервера
+    $(".addToFavorites[propertyId='" + propertyId + "']").removeClass("addToFavorites").addClass("removeFromFavorites");
+    $(".removeFromFavorites[propertyId='" + propertyId + "'] img").attr('src', 'img/gold_star.png');
+    $(".removeFromFavorites[propertyId='" + propertyId + "'] a").html("убрать из избранного");
+
     jQuery.post("AJAXChangeFavorites.php", {"propertyId": propertyId, "action": "addToFavorites"}, function (data) {
         $(data).find("span[status='successful']").each(function () {
-            // Изменяем соответствующим образом вид команды
-            $("span.addToFavorites[propertyId='" + propertyId + "']").removeClass("addToFavorites").addClass("removeFromFavorites");
-            $("span.removeFromFavorites[propertyId='" + propertyId + "'] img").attr('src', 'img/gold_star.png');
-            $("span.removeFromFavorites[propertyId='" + propertyId + "'] a").html("убрать из избранного");
+            /* Действия при положительном ответе от сервера */
         });
         $(data).find("span[status='denied']").each(function () {
             /* Если вдруг нужно будет что-то выдавать при получении отказа в добавлении в избранное, то закодить здесь */
@@ -90,16 +93,20 @@ function addToFavorites() {
 
 // Обработчик события клика по удалению из избранного
 function removeFromFavorites() {
+
+    // Получим идентификатор объекта, который добавляем в избранное
     var self = this;
     var propertyId = 0;
     propertyId = $(self).attr('propertyId');
 
+    // Меняем внешний вид всех команд добавления в Избранное данного объекта на этой странице сразу - не дожидаясь ответа от сервера
+    $(".removeFromFavorites[propertyId='" + propertyId + "']").removeClass("removeFromFavorites").addClass("addToFavorites");
+    $(".addToFavorites[propertyId='" + propertyId + "'] img").attr('src', 'img/blue_star.png');
+    $(".addToFavorites[propertyId='" + propertyId + "'] a").html("добавить в избранное");
+
     jQuery.post("AJAXChangeFavorites.php", {"propertyId": propertyId, "action": "removeFromFavorites"}, function (data) {
         $(data).find("span[status='successful']").each(function () {
-            // Изменяем соответствующим образом вид команды
-            $("span.removeFromFavorites[propertyId='" + propertyId + "']").removeClass("removeFromFavorites").addClass("addToFavorites");
-            $("span.addToFavorites[propertyId='" + propertyId + "'] img").attr('src', 'img/blue_star.png');
-            $("span.addToFavorites[propertyId='" + propertyId + "'] a").html("добавить в избранное");
+            /* Действия при положительном ответе от сервера */
         });
         $(data).find("span[status='denied']").each(function () {
             /* Если вдруг нужно будет что-то выдавать при получении отказа в удалении из избранного, то закодить здесь */

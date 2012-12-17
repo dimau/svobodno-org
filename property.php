@@ -35,7 +35,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Property.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/RequestToView.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 
-
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
 
@@ -70,7 +69,7 @@ if (!$property->readCharacteristicFromDB()) {
 }
 
 // Если анкетные данные по объекту недвижимости получить удалось - получим инфу о его фотках
-$property->writeFotoInformationFromDB();
+$property->readFotoInformationFromDB();
 
 /*************************************************************************************
  * ПРОВЕРКА ПРАВ ДОСТУПА К СТРАНИЦЕ

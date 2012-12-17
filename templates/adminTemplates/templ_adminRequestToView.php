@@ -13,8 +13,6 @@
     <!-- Mobile viewport optimized: h5bp.com/viewport -->
     <meta name="viewport" content="initialscale=1.0, width=device-width">
 
-    <!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
-
     <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
@@ -48,7 +46,6 @@
 			padding: 5px;
 			border: 2px solid red;
 		}
-
     </style>
 
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->

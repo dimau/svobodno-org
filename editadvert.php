@@ -47,7 +47,7 @@ if ($propertyId == "" || $propertyId == 0) {
  ************************************************************************************/
 
 $property = new Property($propertyId);
-if (!$property->readCharacteristicFromDB() || !$property->writeFotoInformationFromDB()) {
+if (!$property->readCharacteristicFromDB() || !$property->readFotoInformationFromDB()) {
 	die('Ошибка при работе с базой данных (. Попробуйте зайти к нам немного позже.'); // Если получить данные из БД не удалось, то просим пользователя зайти к нам немного позже
 }
 

@@ -472,7 +472,7 @@ class Property
 		}
 
 		// Приведем в соответствие с данными из БД наш массив с фотографиями $this->uploadedFotos
-		$this->writeFotoInformationFromDB();
+		$this->readFotoInformationFromDB();
 
 		return TRUE;
 	}
@@ -584,7 +584,7 @@ class Property
 
 	// Метод читает данные о фотографиях из БД и записывает их в параметры объекта недвижимости
 	// Для корректной работы в параметрах объекта должен быть указан id объекта недвижимости ($this->id)
-	public function writeFotoInformationFromDB() {
+	public function readFotoInformationFromDB() {
 
 		// Если идентификатор объекта недвижимости неизвестен, то дальнейшие действия не имеют смысла
 		if ($this->id == "") return FALSE;
@@ -1212,12 +1212,14 @@ class Property
 	// Сам механизм оповещения выполняется в отдельном скрипте, что позволяет данному методу не дожидаться его окончания
 	public function notifyUsersAboutNewProperty() {
 
-		$parts = parse_url("http://svobodno.org/lib/emailSender.php");
+		$parts = parse_url("http://svobodno.org/lib/notificationAboutNewProperty.php");
+		//TODO: test
+		//$parts = parse_url("http://localhost/lib/notificationAboutNewProperty.php");
 		$params = array("propertyId" => $this->id);
 
 		if (!$fp = fsockopen($parts['host'], isset($parts['port']) ? $parts['port'] : 80))
 		{
-			// TODO: записать в лог ошибку
+			Logger::getLogger(GlobFunc::$loggerName)->log("Property->notifyUsersAboutNewProperty():1 не удалось запустить скрипт оповещения о новом объекте недвижимости для:".$this->id." ".$this->address);
 			return FALSE;
 		}
 
@@ -1246,58 +1248,58 @@ class Property
 		// Ограничение на тип объекта
 		$searchLimits['typeOfObject'] = "";
 		if (isset($this->typeOfObject) && $this->typeOfObject != "0") {
-			$searchLimits['typeOfObject'] = " (typeOfObject = '0' || typeOfObject = '" . $this->typeOfObject . "')";
+			$searchLimits['typeOfObject'] = " (searchRequests.typeOfObject = '0' || searchRequests.typeOfObject = '" . $this->typeOfObject . "')";
 		}
 
 		// Ограничение на количество комнат
 		$searchLimits['amountOfRooms'] = "";
 		if (isset($this->amountOfRooms) && $this->amountOfRooms != '0') {
-			$searchLimits['amountOfRooms'] = " (amountOfRooms = 'a:0:{}' OR amountOfRooms LIKE '%" . $this->amountOfRooms . "%')";
+			$searchLimits['amountOfRooms'] = " (searchRequests.amountOfRooms = 'a:0:{}' OR searchRequests.amountOfRooms LIKE '%" . $this->amountOfRooms . "%')";
 		}
 
 		// Ограничение на смежность комнат
 		$searchLimits['adjacentRooms'] = "";
 		if ($this->adjacentRooms == "0") $searchLimits['adjacentRooms'] = "";
-		if ($this->adjacentRooms == "да") $searchLimits['adjacentRooms'] = " (adjacentRooms = 'не имеет значения' || adjacentRooms = '0')";
+		if ($this->adjacentRooms == "да") $searchLimits['adjacentRooms'] = " (searchRequests.adjacentRooms = 'не имеет значения' || searchRequests.adjacentRooms = '0')";
 		if ($this->adjacentRooms == "нет") $searchLimits['adjacentRooms'] = "";
 
 		// Ограничение на этаж
 		$searchLimits['floor'] = "";
 		if (isset($this->floor) && isset($this->totalAmountFloor) && $this->floor != 0 && $this->totalAmountFloor != 0 && $this->floor != "" && $this->totalAmountFloor != "") {
-			if ($this->floor == 1) $searchLimits['floor'] = " (floor = '0' OR floor = 'любой')";
-			if ($this->floor != 1 && $this->floor == $this->totalAmountFloor) $searchLimits['floor'] = " (floor = '0' OR floor = 'любой' OR floor = 'не первый')";
+			if ($this->floor == 1) $searchLimits['floor'] = " (searchRequests.floor = '0' OR searchRequests.floor = 'любой')";
+			if ($this->floor != 1 && $this->floor == $this->totalAmountFloor) $searchLimits['floor'] = " (searchRequests.floor = '0' OR searchRequests.floor = 'любой' OR searchRequests.floor = 'не первый')";
 			if ($this->floor != 1 && $this->floor != $this->totalAmountFloor) $searchLimits['floor'] = "";
 		}
 
 		// Ограничение на минимальную сумму арендной платы
 		$searchLimits['minCost'] = "";
 		if (isset($this->realCostOfRenting) && $this->realCostOfRenting != "" && $this->realCostOfRenting != 0) {
-			$searchLimits['minCost'] = " (minCost <= " . $this->realCostOfRenting . ")";
+			$searchLimits['minCost'] = " (searchRequests.minCost <= " . $this->realCostOfRenting . ")";
 		}
 
 		// Ограничение на максимальную сумму арендной платы
 		$searchLimits['maxCost'] = "";
 		if (isset($this->realCostOfRenting) && $this->realCostOfRenting != "" && $this->realCostOfRenting != 0) {
-			$searchLimits['maxCost'] = " (maxCost >= " . $this->realCostOfRenting . ")";
+			$searchLimits['maxCost'] = " (searchRequests.maxCost >= " . $this->realCostOfRenting . ")";
 		}
 
 		// Ограничение на максимальный залог
 		// отношение realCostOfRenting / costOfRenting позволяет вычислить курс валюты, либо получить 1, если стоимость аренды указана собственником в рублях
 		$searchLimits['pledge'] = "";
 		if (isset($this->bailCost) && isset($this->realCostOfRenting) && isset($this->costOfRenting) && $this->bailCost != "" && $this->realCostOfRenting != "" && $this->costOfRenting != "" && $this->bailCost != 0 && $this->realCostOfRenting != 0 && $this->costOfRenting != 0) {
-			$searchLimits['pledge'] = " (pledge >= " . $this->bailCost * $this->realCostOfRenting / $this->costOfRenting . ")";
+			$searchLimits['pledge'] = " (searchRequests.pledge >= " . $this->bailCost * $this->realCostOfRenting / $this->costOfRenting . ")";
 		}
 
 		// Ограничение на максимальную предоплату
 		$searchLimits['prepayment'] = "";
 		if (isset($this->prepayment) && $this->prepayment != '0') {
-			$searchLimits['prepayment'] = " (prepayment + 0 >= '" . $this->prepayment . "')";
+			$searchLimits['prepayment'] = " (searchRequests.prepayment + 0 >= '" . $this->prepayment . "')";
 		}
 
 		// Ограничение на район
 		$searchLimits['district'] = "";
 		if (isset($this->district) && $this->district != '0') {
-			$searchLimits['district'] = " (district = 'a:0:{}' OR district LIKE '%" . $this->district . "%')";
+			$searchLimits['district'] = " (searchRequests.district = 'a:0:{}' OR searchRequests.district LIKE '%" . $this->district . "%')";
 		}
 
 		// Ограничение на формат проживания (с кем)
@@ -1305,7 +1307,7 @@ class Property
 		if (isset($this->relations) && is_array($this->relations) && count($this->relations) != 0) {
 			$searchLimits['withWho'] = " (";
 			for ($i = 0, $s = count($this->relations); $i < $s; $i++) {
-				$searchLimits['withWho'] .= " withWho LIKE '%" . $this->relations[$i] . "%'";
+				$searchLimits['withWho'] .= " searchRequests.withWho LIKE '%" . $this->relations[$i] . "%'";
 				if ($i < count($this->relations) - 1) $searchLimits['withWho'] .= " OR";
 			}
 			$searchLimits['withWho'] .= " )";
@@ -1316,22 +1318,22 @@ class Property
 		$searchLimits['children'] = "";
 		if (isset($this->children) && $this->children != "0") {
 			if ($this->children == "не имеет значения") $searchLimits['children'] = "";
-			if ($this->children == "с детьми старше 4-х лет") $searchLimits['children'] = " (children = '0' OR children = 'без детей' OR children = 'с детьми старше 4-х лет')";
-			if ($this->children == "только без детей") $searchLimits['children'] = " (children = '0' OR children = 'без детей')";
+			if ($this->children == "с детьми старше 4-х лет") $searchLimits['children'] = " (searchRequests.children = '0' OR searchRequests.children = 'без детей' OR searchRequests.children = 'с детьми старше 4-х лет')";
+			if ($this->children == "только без детей") $searchLimits['children'] = " (searchRequests.children = '0' OR searchRequests.children = 'без детей')";
 		}
 
 		// Ограничение на проживание с животными
 		$searchLimits['animals'] = "";
 		if (isset($this->animals) && $this->animals != "0") {
 			if ($this->animals == "не имеет значения") $searchLimits['animals'] = "";
-			if ($this->animals == "только без животных") $searchLimits['animals'] = " (animals = '0' OR animals = 'без животных')";
+			if ($this->animals == "только без животных") $searchLimits['animals'] = " (searchRequests.animals = '0' OR searchRequests.animals = 'без животных')";
 		}
 
 		// Ограничение на длительность аренды
 		$searchLimits['termOfLease'] = "";
 		if (isset($this->termOfLease) && $this->termOfLease != "0") {
-			if ($this->termOfLease == "длительный срок") $searchLimits['termOfLease'] = " (termOfLease = '0' OR termOfLease = 'длительный срок')";
-			if ($this->termOfLease == "несколько месяцев") $searchLimits['termOfLease'] = " (termOfLease = '0' OR termOfLease = 'несколько месяцев')";
+			if ($this->termOfLease == "длительный срок") $searchLimits['termOfLease'] = " (searchRequests.termOfLease = '0' OR searchRequests.termOfLease = 'длительный срок')";
+			if ($this->termOfLease == "несколько месяцев") $searchLimits['termOfLease'] = " (searchRequests.termOfLease = '0' OR searchRequests.termOfLease = 'несколько месяцев')";
 		}
 
 		// Собираем строку WHERE для поискового запроса к БД
@@ -1342,22 +1344,23 @@ class Property
 		}
 
 		// Получаем идентификаторы и параметры рассылки всех пользователей-арендаторов, чьим поисковым запросам соответствует данный объект недвижимости
-		$listOfTargetUsers = DBconnect::get()->query("SELECT userId, needEmail, needSMS FROM searchRequests WHERE" . $strWHERE);
+		$res = DBconnect::get()->query("SELECT searchRequests.userId AS userId, searchRequests.needEmail AS needEmail, searchRequests.needSMS AS needSMS, users.name AS name, users.email AS email, users.telephon AS telephon FROM searchRequests, users WHERE" . $strWHERE." AND searchRequests.userId = users.id");
+		//$res = DBconnect::get()->query("SELECT searchRequests.userId, searchRequests.needEmail, searchRequests.needSMS, users.name, users.email, users.telephon FROM searchRequests, users WHERE" . $strWHERE." AND searchRequests.userId = users.id");
 		if ((DBconnect::get()->errno)
-			OR (($listOfTargetUsers = $listOfTargetUsers->fetch_all(MYSQLI_ASSOC)) === FALSE)
+			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
 		) {
 			// Логируем ошибку
-			//TODO: сделать логирование ошибки
+			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT searchRequests.userId AS userId, searchRequests.needEmail AS needEmail, searchRequests.needSMS AS needSMS, user.name AS name, user.email AS email, user.telephon AS telephon FROM searchRequests, user WHERE" . $strWHERE." AND searchRequests.userId = user.id'. id логгера: DBconnect::whichTenantsAppropriate():1. Выдаваемая ошибка: " . DBconnect::get()->errno . " " . DBconnect::get()->error . ". ID пользователя: не определено");
 			return FALSE;
 		} else {
-			for ($i = 0, $s = count($listOfTargetUsers); $i < $s; $i++ ) {
-				$listOfTargetUsers[$i]['userId'] = intval($listOfTargetUsers[$i]['userId']);
-				$listOfTargetUsers[$i]['needEmail'] = intval($listOfTargetUsers[$i]['needEmail']);
-				$listOfTargetUsers[$i]['needSMS'] = intval($listOfTargetUsers[$i]['needSMS']);
+			for ($i = 0, $s = count($res); $i < $s; $i++ ) {
+				$res[$i]['userId'] = intval($res[$i]['userId']);
+				$res[$i]['needEmail'] = intval($res[$i]['needEmail']);
+				$res[$i]['needSMS'] = intval($res[$i]['needSMS']);
 			}
 		}
 
-		return $listOfTargetUsers;
+		return $res;
 	}
 
 	// Метод, который позволяет оповестить пользователей-арендаторов о появлении нового объекта недвижимости, который соответствует их параметрам поиска.
@@ -1377,36 +1380,47 @@ class Property
 	}
 
 	public function sendEmailAboutNewProperty($listOfTargetUsersForEmail) {
+
+		// Проверка входных данных
+		if (!isset($listOfTargetUsersForEmail) || !is_array($listOfTargetUsersForEmail) || count($listOfTargetUsersForEmail) == 0) return FALSE;
+
 		// Инициализируем класс для отправки e-mail и указываем постоянные параметры (верные для любых уведомлений)
 		$mail = new PHPMailer(true); //defaults to using php "mail()"; the true param means it will throw exceptions on errors, which we need to catch
 
 		// Вычислим HTML для электронного письма
-		// TODO: Реализовать метод для вычисления HTML содержимого
-		$MsgHTML = View::getHTMLforMessageNewProperty($this->getCharacteristicData());
+		$MsgHTML = View::getHTMLforEmailAboutNewProperty($this->getCharacteristicData());
 
+		// Инициализируем общие параметры всех email по данному оьъявлению
 		try {
+			$mail->CharSet = "utf-8";
 			$mail->SetFrom('support@svobodno.org', 'Svobodno.org');
-			$mail->AddReplyTo('', '');
-			$mail->Subject = 'Новое объявление: ';
-			$mail->MsgHTML($MsgHTML);
-			//$mail->AltBody = 'To view the message, please use an HTML compatible email viewer!'; // optional - MsgHTML will create an alternate automatically
+			$mail->AddReplyTo('support@svobodno.org', 'Svobodno.org');
+			$mail->Subject = 'Новое объявление: '.$this->address;
 		} catch (phpmailerException $e) {
-			echo $e->errorMessage(); //Pretty error messages from PHPMailer
+			Logger::getLogger(GlobFunc::$loggerName)->log("Property->sendEmailAboutNewProperty():1 Ошибка при формировании e-mail:".$e->errorMessage()."Текст сообщения:".$MsgHTML); //Pretty error messages from PHPMailer
+			return FALSE;
 		} catch (Exception $e) {
-			echo $e->getMessage(); //Boring error messages from anything else!
+			Logger::getLogger(GlobFunc::$loggerName)->log("Property->sendEmailAboutNewProperty():2 Ошибка при формировании e-mail:".$e->getMessage()."Текст сообщения:".$MsgHTML); //Boring error messages from anything else!
+			return FALSE;
 		}
 
 		// Отправляем электронное письмо каждому пользователю индивидуально
 		foreach ($listOfTargetUsersForEmail as $tenant) {
+			// Подставим имя клиента - получателя email
+			$MsgHTML = str_replace("{name}", $tenant['name'], $MsgHTML);
 			try {
+				$mail->MsgHTML($MsgHTML);
 				$mail->AddAddress($tenant['email'], $tenant['name']);
 				$mail->Send();
+				//$mail->AltBody = 'To view the message, please use an HTML compatible email viewer!'; // optional - MsgHTML will create an alternate automatically
 			} catch (phpmailerException $e) {
-				echo $e->errorMessage(); //Pretty error messages from PHPMailer
+				Logger::getLogger(GlobFunc::$loggerName)->log("Property->sendEmailAboutNewProperty():3 Ошибка при формировании e-mail:".$e->errorMessage()."Текст сообщения:".$MsgHTML); //Pretty error messages from PHPMailer
 			} catch (Exception $e) {
-				echo $e->getMessage(); //Boring error messages from anything else!
+				Logger::getLogger(GlobFunc::$loggerName)->log("Property->sendEmailAboutNewProperty():4 Ошибка при формировании e-mail:".$e->getMessage()."Текст сообщения:".$MsgHTML); //Boring error messages from anything else!
 			}
 		}
+
+		return TRUE;
 	}
 
 	/**

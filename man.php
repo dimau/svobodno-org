@@ -43,7 +43,7 @@ if ($compId != "" && $compId != 0) {
 // Инициализируем полную модель для целевого пользователя по его идентификатору из GET строки
 $user = new UserFull($targetUserId);
 $user->readCharacteristicFromDB();
-$user->writeFotoInformationFromDB();
+$user->readFotoInformationFromDB();
 
 // Инициализируем модель поискового запроса пользователя
 $searchRequest = new SearchRequest($targetUserId);

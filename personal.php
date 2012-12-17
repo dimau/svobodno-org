@@ -68,7 +68,7 @@ $searchRequest = new SearchRequest($userId);
 $searchRequest->writeFromDB();
 
 // Информация о фотографиях пользователя. Метод вызывается во всех случаях, кроме того, когда пользователь отредактировал свои личные параметры и нажал на кнопку "Сохранить"
-if ($action != "saveProfileParameters") $user->writeFotoInformationFromDB();
+if ($action != "saveProfileParameters") $user->readFotoInformationFromDB();
 
 // Данные по объектам недвижимости данного пользователя (для которых он является собственником)
 $collectionProperty = new CollectionProperty();
@@ -134,7 +134,7 @@ if ($action == "publishAdvert" && $propertyId != "" && $propertyId != 0) {
 
 		// Создаем специльный объект для работы с данным объявлением
 		$property = new Property($propertyId);
-		if ($property->readCharacteristicFromDB() && $property->writeFotoInformationFromDB()) {
+		if ($property->readCharacteristicFromDB() && $property->readFotoInformationFromDB()) {
 			$property->publishAdvert();
 		}
 

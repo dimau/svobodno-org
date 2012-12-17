@@ -307,7 +307,7 @@ class UserFull extends User
 		DBconnect::deletePhotosForFileUploadId($this->fileUploadId);
 
 		// Приведем в соответствие с данными из БД наш массив с фотографиями $this->uploadedFotos
-		if (!$this->writeFotoInformationFromDB()) return FALSE;
+		if (!$this->readFotoInformationFromDB()) return FALSE;
 
 		return TRUE;
 	}
@@ -391,7 +391,7 @@ class UserFull extends User
 	}
 
 	// Метод читает данные о фотографиях из БД и записывает их в параметры пользователя
-	public function writeFotoInformationFromDB() {
+	public function readFotoInformationFromDB() {
 
 		// Если идентификатор пользователя неизвестен, то дальнейшие действия не имеют смысла
 		if ($this->id == "") return FALSE;

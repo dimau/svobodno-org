@@ -1,7 +1,7 @@
 <div class='realtyObject' propertyId='{propertyId}'>
     <div class="serviceMarks">
         <div class='numberOfRealtyObject'>{number}</div>
-        <span class='{actionFavorites} aloneStar' propertyId='{propertyId}'><img src='{imgFavorites}'></span>
+        {favorites}
     </div>
     <div class="overFotosWrapper">
         {fotosWrapper}

@@ -15,7 +15,7 @@
             <span class='headOfString'>{amountOfRoomsName}</span> {amountOfRooms}{adjacentRooms}
         </li>
         <li>
-            <span class='headOfString'>{areaNames}</span> {areaValues} {areaValuesMeasure}
+            <span class='headOfString'>{areaValuesName}</span> {areaValues} {areaValuesMeasure}
         </li>
         <li>
             <span class='headOfString'>{floorName}</span> {floor}
