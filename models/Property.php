@@ -115,14 +115,6 @@ class Property
 		return $this->userId;
 	}
 
-	public function getTypeOfObject() {
-		return $this->typeOfObject;
-	}
-
-	public function getAddress() {
-		return $this->address;
-	}
-
 	public function getStatus() {
 		return $this->status;
 	}

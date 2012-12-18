@@ -115,7 +115,6 @@ $signUpToViewData = $signUpToView->getParams(); // Используется в t
 $furnitureInLivingArea = $property->getFurnitureInLivingAreaAll();
 $furnitureInKitchen = $property->getFurnitureInKitchenAll();
 $appliances = $property->getAppliancesAll();
-$strHeaderOfPage = GlobFunc::getFirstCharUpper($property->getTypeOfObject()) . " по адресу: " . $property->getAddress(); // Получаем заголовок страницы
 //$statusOfSaveParamsToDB // Используется в templ_signUpToViewItem.php
 //$errors
 

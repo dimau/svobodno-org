@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
 
-    <!-- Use the .htaccess and remove these lines to avoid edge case issues.
-         More info: h5bp.com/i/378 -->
+    <!-- meta -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-language" content="ru">
+    <meta name="description" content="<?php echo GlobFunc::getFirstCharUpper($propertyCharacteristic['typeOfObject']) . " по адресу: " . $propertyCharacteristic['address']; ?>">
+    <!-- Если у пользователя IE: использовать последний доступный стандартный режим отображения независимо от <!DOCTYPE> -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-
-    <title><?php echo $strHeaderOfPage; ?></title>
-    <meta name="description" content="<?php echo $strHeaderOfPage; ?>">
-
-    <!-- Mobile viewport optimized: h5bp.com/viewport -->
+    <!-- Оптимизация отображения на мобильных устройствах -->
     <meta name="viewport" content="initialscale=1.0, width=device-width">
+    <!-- end meta -->
 
+    <title><?php echo GlobFunc::getFirstCharUpper($propertyCharacteristic['typeOfObject']) . " по адресу: " . $propertyCharacteristic['address']; ?></title>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
     <link rel="stylesheet" href="css/colorbox.css">
     <link rel="stylesheet" href="css/main.css">
@@ -61,6 +63,7 @@
             list-style: square;
         }
     </style>
+    <!-- end CSS -->
 
 </head>
 
@@ -193,7 +196,7 @@
 <div class="page_main_content">
 
 <div class="headerOfPage">
-	<?php echo $strHeaderOfPage; ?>
+	<?php echo GlobFunc::getFirstCharUpper($propertyCharacteristic['typeOfObject']) . " по адресу: " . $propertyCharacteristic['address']; ?>
 </div>
 
 <div id="tabs">

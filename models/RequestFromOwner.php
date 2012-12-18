@@ -10,20 +10,20 @@
         private $userId = ""; // Хранит идентификатор пользователя, если обратившийся пользователь был авторизован
 		private $regDate = "";
 
-        // КОНСТРУКТОР
-        public function __construct($userIncoming)
+		/**
+		 * КОНСТРУКТОР
+		 *
+		 * @param userIncoming $userIncoming объект, созданный в качестве модели запросившего страницу пользователя
+		 */
+		public function __construct($userIncoming)
         {
             // Если пользователь, перешедший на страницу формирования запроса авторизован - воспользуемся его данными (например, для автоматического заполнения части полей)
             if (isset($userIncoming) && $userIncoming->login()) {
-                $this->name = $userIncoming->name." ".$userIncoming->secondName;
-                $this->telephon = $userIncoming->telephon;
+                $this->name = $userIncoming->getName()." ".$userIncoming->getSecondName();
+                $this->telephon = $userIncoming->getTelephon();
                 $this->userId = $userIncoming->getId();
             }
         }
-
-        // ДЕСТРУКТОР
-        public function __destruct()
-        {}
 
         // Сохраняет параметры запроса собственника в БД
         // Возвращает TRUE, если данные успешно сохранены и FALSE в противном случае
