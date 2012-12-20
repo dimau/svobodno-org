@@ -362,14 +362,17 @@ function init() {
  * Переход на страницу с подробным описанием недвижимости по клику в режиме "только список"
  **********************************************************************************/
 
-$(document).on('click', '#fullParametersListOfRealtyObjects .realtyObject', function (event) {
+$("#fullParametersListOfRealtyObjects").on('click', '.realtyObject', function (event) {
+
+    // Если клик был по ссылке "адрес объекта", то описание объекта откроется в новой вкладке и без этого обработчика
+    // Чтобы избежать открытия второй вкладки с описанием объекта, не будем выполнять аналогичное ссылке действие в обработчике
+    if ($(event.target).hasClass("linkToDescription")) return true;
 
     // Открываем подробное описание объекта в новом окне
-    var linkToDescription = $(this).attr('linkToDescription');
+    var linkToDescription = "property.php?propertyId=" + $(this).attr('propertyId');
     window.open(linkToDescription);
 
     return true;
-
 });
 
 /**********************************************************************************

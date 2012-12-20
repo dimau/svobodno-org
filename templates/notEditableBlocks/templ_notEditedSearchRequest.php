@@ -151,6 +151,12 @@
                         if (isset($userSearchRequest['additionalDescriptionOfSearch'])) echo $userSearchRequest['additionalDescriptionOfSearch'];
                         ?></span></td>
                 </tr>
+                <tr>
+                    <td class="objectDescriptionItemLabel">Оповещение по e-mail:</td>
+                    <td class="objectDescriptionBody"><span><?php
+						if (isset($userSearchRequest['needEmail']) && $userSearchRequest['needEmail'] == 1) echo "включено"; else echo "отключено";
+						?></span></td>
+                </tr>
             </tbody>
         </table>
     </div>

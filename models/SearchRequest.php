@@ -28,7 +28,7 @@ class SearchRequest
 	private $termOfLease = "0";
 	private $additionalDescriptionOfSearch = "";
 	private $regDate = "";
-	private $needEmail = 0;
+	private $needEmail = 1;
 	private $needSMS = 0;
 
 	private $propertyLightArr; // Массив массивов. После выполнения метода searchProperties содержит минимальные данные по ВСЕМ объектам, соответствующим условиям поиска
@@ -43,10 +43,6 @@ class SearchRequest
 		if (isset($userId)) {
 			$this->userId = $userId;
 		}
-	}
-
-	// ДЕСТРУКТОР
-	public function __destruct() {
 	}
 
 	// Используется для установки id пользователя, которому принадлежит данный поисковый запрос
@@ -185,6 +181,8 @@ class SearchRequest
 		if (isset($_POST['howManyAnimals'])) $this->howManyAnimals = htmlspecialchars($_POST['howManyAnimals'], ENT_QUOTES);
 		if (isset($_POST['termOfLease'])) $this->termOfLease = htmlspecialchars($_POST['termOfLease'], ENT_QUOTES);
 		if (isset($_POST['additionalDescriptionOfSearch'])) $this->additionalDescriptionOfSearch = htmlspecialchars($_POST['additionalDescriptionOfSearch'], ENT_QUOTES);
+		if (isset($_POST['needEmail'])) $this->needEmail = intval(htmlspecialchars($_POST['needEmail'], ENT_QUOTES)); else $this->needEmail = 0;
+		if (isset($_POST['needSMS'])) $this->needSMS = intval(htmlspecialchars($_POST['needSMS'], ENT_QUOTES)); else $this->needSMS = 0;
 	}
 
 	/**
@@ -238,24 +236,24 @@ class SearchRequest
 	 * 	6. Изменяем параметры текущего объекта
 	 * При этом нетронутым остается список избранных объектов пользователя - он ему пригодиться в следующий раз
 	 *
-	 * @return bool TRUE если все удачно и FALSE, если выполнить операцию не удалось
+	 * @return array массив строк, каждая из которых представляет сведения по 1 ошибке, не позволившей удалить поисковый запрос. В случае успеха - возвращаемый массив пуст
 	 */
 	public function remove() {
 
 		// Проверка на наличие id пользователя
-		if ($this->userId == "") return FALSE;
+		if ($this->userId == "") return array("Не удалось удалить поисковый запрос: недостаточно данных. Попробуйте повторить немного позже или свяжитесь с нами: 89221431615");
 
 		// Убеждаемся, что у арендатора нет заявок на просмотр со статусом "Назначен просмотр"
 		$allRequestsToView = DBconnect::selectRequestsToViewForTenants($this->userId);
 		foreach ($allRequestsToView as $value) {
-			if ($value['status'] == "Назначен просмотр") return FALSE;
+			if ($value['status'] == "Назначен просмотр") return array("Не удалось удалить поисковый запрос: для Вас назначен просмотр. Вы можете отменить просмотр, связавшись с нами по телефону 89221431615, после чего удалить поисковый запрос.");
 		}
 
 		// Удалим данные поискового запроса по данному пользователю из БД
-		if (!DBconnect::deleteSearchRequestsForUser($this->userId)) return FALSE;
+		if (!DBconnect::deleteSearchRequestsForUser($this->userId)) return array("Не удалось удалить поисковый запрос: ошибка обращения к базе. Попробуйте повторить немного позже или свяжитесь с нами: 89221431615");
 
 		// Обновляем статус данного пользователю (он больше не арендатор)
-		if (!DBconnect::updateUserCharacteristicTypeUser($this->userId, "typeTenant", "FALSE")) return FALSE;
+		if (!DBconnect::updateUserCharacteristicTypeUser($this->userId, "typeTenant", "FALSE")) return array("Не удалось удалить поисковый запрос: ошибка обращения к базе. Попробуйте повторить немного позже или свяжитесь с нами: 89221431615");
 
 		// Удалим все уведомления типа "Новый подходящий объект недвижимости" у данного арендатора
 		DBconnect::deleteMessagesNewPropertyForUser($this->userId);
@@ -286,7 +284,7 @@ class SearchRequest
 		$this->needEmail = 0;
 		$this->needSMS = 0;
 
-		return TRUE;
+		return array();
 	}
 
 	// Вычисляет массивы: 1. C краткими данными (id, coordX, coordY) о ВСЕХ объектах недвижимости, соответствующих параметрам поискового запроса

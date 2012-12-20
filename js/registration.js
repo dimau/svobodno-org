@@ -210,4 +210,5 @@ $(".submitButton").click(function() {
         return false;
     }
 
+    return true;
 });

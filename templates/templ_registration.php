@@ -9,7 +9,7 @@
     <!-- Если у пользователя IE: использовать последний доступный стандартный режим отображения независимо от <!DOCTYPE> -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <!-- Оптимизация отображения на мобильных устройствах -->
-    <meta name="viewport" content="initialscale=1.0, width=device-width">
+    <!--<meta name="viewport" content="initialscale=1.0, width=device-width">-->
     <!-- end meta -->
 
     <title>Регистрация</title>
@@ -198,8 +198,7 @@
     <div class="bottomControls">
         <div style="float: right; margin-bottom: 10px; text-align: left;">
             <label><input type="checkbox" name="lic" id="lic" value="yes" <?php if ($userCharacteristic['lic'] == "yes") echo "checked";?>> Я
-            принимаю условия <a
-            href="#">лицензионного соглашения</a></label>
+            принимаю условия <a href="useragreement.html" target="_blank">лицензионного соглашения</a></label>
         </div>
         <div class="clearBoth"></div>
         <button class="backButton">Назад</button>
@@ -223,8 +222,7 @@
     <div class="bottomControls">
         <div style="float: right; margin-bottom: 10px; text-align: left;">
             <label><input type="checkbox" name="lic" id="lic" value="yes" <?php if ($userCharacteristic['lic'] == "yes") echo "checked";?>> Я
-            принимаю условия <a
-            href="#">лицензионного соглашения</a></label>
+            принимаю условия <a href="useragreement.html" target="_blank">лицензионного соглашения</a></label>
         </div>
         <div class="clearBoth"></div>
         <button class="backButton">Назад</button>

@@ -9,7 +9,7 @@
     <!-- Если у пользователя IE: использовать последний доступный стандартный режим отображения независимо от <!DOCTYPE> -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <!-- Оптимизация отображения на мобильных устройствах -->
-    <meta name="viewport" content="initialscale=1.0, width=device-width">
+    <!--<meta name="viewport" content="initialscale=1.0, width=device-width">-->
     <!-- end meta -->
 
     <title><?php echo GlobFunc::getFirstCharUpper($propertyCharacteristic['typeOfObject']) . " по адресу: " . $propertyCharacteristic['address']; ?></title>
@@ -70,26 +70,6 @@
 <body>
 <div class="page_without_footer">
 
-<!-- Всплывающее поле для отображения списка ошибок, полученных при проверке данных на сервере (PHP)-->
-<div id="userMistakesBlock" class="ui-widget">
-    <div class="ui-state-highlight ui-corner-all">
-        <div>
-            <p>
-                <span class="icon-mistake ui-icon ui-icon-info"></span>
-                <span
-                        id="userMistakesText">Для продолжения, пожалуйста, дополните или исправьте следующие данные:</span>
-            </p>
-            <ol><?php
-				if (isset($errors) && count($errors) != 0) {
-					foreach ($errors as $value) {
-						echo "<li>$value</li>";
-					}
-				}
-				?></ol>
-        </div>
-    </div>
-</div>
-
 <?php
 // Сформируем и вставим заголовок страницы
 	require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
@@ -115,7 +95,8 @@
             autoOpen:false,
             modal:true,
             width:600,
-            dialogClass:"edited"
+            dialogClass:"edited",
+            draggable: true
         });
 
         $(".signUpToViewButton").click(function () {

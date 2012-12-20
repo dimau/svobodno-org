@@ -153,7 +153,8 @@ function initJQueryUI() {
         autoOpen:false,
         modal:true,
         width:600,
-        dialogClass:"edited"
+        dialogClass:"edited",
+        draggable: true
     });
 }
 

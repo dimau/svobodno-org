@@ -135,11 +135,16 @@ if ($action == "publishAdvert" && $propertyId != "" && $propertyId != 0) {
 		// Создаем специльный объект для работы с данным объявлением
 		$property = new Property($propertyId);
 		if ($property->readCharacteristicFromDB() && $property->readFotoInformationFromDB()) {
-			$property->publishAdvert();
+			$errors = array_merge($errors, $property->publishAdvert());
+		} else {
+			$errors[] = "Не удалось опубликовать объявление - не получены данные по этому объекту из базы. Повторите попытку немного позже или свяжитесь с нами: 89221431615";
 		}
 
 		// Переинициализируем коллекцию объектов недвижимости данного пользователя
 		$collectionProperty->buildFromOwnerId($user->getId());
+
+	} else {
+		$errors[] = "У Вас недостаточно прав для публикации этого объявления";
 	}
 
 	// По умолчанию откроем вкладку 3 (Мои объявления)
@@ -158,11 +163,16 @@ if ($action == "unpublishAdvert" && $propertyId != "" && $propertyId != 0) {
 		// Создаем специльный объект для работы с данным объявлением
 		$property = new Property($propertyId);
 		if ($property->readCharacteristicFromDB()) {
-			$property->unpublishAdvert();
+			$errors = array_merge($errors, $property->unpublishAdvert());
+		} else {
+			$errors[] = "Не удалось снять с публикации объявление - ошибка обращения к базе. Повторите попытку немного позже или свяжитесь с нами: 89221431615";
 		}
 
 		// Переинициализируем коллекцию объектов недвижимости данного пользователя
 		$collectionProperty->buildFromOwnerId($user->getId());
+
+	} else {
+		$errors[] = "У Вас недостаточно прав для снятия с публикации этого объявления";
 	}
 
 	// По умолчанию откроем вкладку 3 (Мои объявления)
@@ -202,9 +212,14 @@ if ($action == "saveSearchParameters") {
  *******************************************************************************/
 
 if ($action == 'deleteSearchRequest') {
-	if ($searchRequest->remove()) {
+
+	$err = $searchRequest->remove();
+
+	if (count($err) == 0) {
 		$user->setTypeTenant(FALSE);
 	}
+
+	$errors = array_merge($errors, $err);
 }
 
 /********************************************************************************

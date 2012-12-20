@@ -85,7 +85,7 @@ if ($action == "changeEarliestDate") {
  *************************************************************************************/
 
 if ($action == "unpublishAdvert") {
-	if (!$property->unpublishAdvert()) GlobFunc::accessDenied();
+	if (count($property->unpublishAdvert()) != 0) GlobFunc::accessDenied();
 }
 
 /*************************************************************************************

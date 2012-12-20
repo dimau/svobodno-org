@@ -13,7 +13,7 @@
     <meta name="keywords" content="Недвижимость, в Екатеринбурге, аренда, свободно">
     <meta name="robots" content="index,follow">
     <!-- Оптимизация отображения на мобильных устройствах -->
-    <meta name="viewport" content="initialscale=1.0, width=device-width">
+    <!--<meta name="viewport" content="initialscale=1.0, width=device-width">-->
     <!-- end meta -->
 
     <title>Поиск недвижимости в аренду</title>
