@@ -1,88 +1,79 @@
 <?php
 /**
- * Сценарий запускается автоматически каждый день
+ * Сценарий должен запускаться автоматически каждый день с помощью cron
  * Задача - выявить объявления из чужих баз, которые опубликованы на портале уже более 3-х дней и не имеют ни одной открытой заявки на просмотр (со статусом: Новая, Назначен просмотр, Отложена, Успешный просмотр)
- * Выявленные устаревшие объявления (скорее всего они уже сданы) необходимо также автоматически переносить в архив (типа удалять из рабочей базы объектов недвижимости)
+ * Выявленные устаревшие объявления (скорее всего они уже сданы) необходимо снимать с публикации и переносить в архив (типа удалять из рабочей базы объектов недвижимости)
  * При этом объявления, относящиеся к нашим собственникам, висят опубликованным на портале столько, сколько нужно для их сдачи в аренду
- *
- * Порядок действий:
- * 1. Получить из БД все данные по ЧУЖИМ объявлениям, ОПУБЛИКОВАННЫМ РАНЕЕ 3-Х ДНЕЙ
- *
  *
  */
 
 // Подключаем необходимые модели, классы
+if (!isset($_SERVER['DOCUMENT_ROOT']) || $_SERVER['DOCUMENT_ROOT'] == "") $_SERVER['DOCUMENT_ROOT'] = "/var/www/dimau/data/www/svobodno.org"; // так как cron не инициализирует переменную окружения $_SERVER['DOCUMENT_ROOT'] (а точнее инициализирует ее пустой строкой), приходиться использовать костыль
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lib/class.phpmailer.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Property.php';
 
-
-
-// Инициализируем модель для этого объекта недвижимости
-$property = new Property($propertyId);
-if (!$property->readCharacteristicFromDB() || !$property->readFotoInformationFromDB()) {
-	Logger::getLogger(GlobFunc::$loggerName)->log("notificationAboutNewProperty.php: не удалось выполнить считывание данных из БД по объекту:".$propertyId);
+// Удалось ли подключиться к БД?
+if (DBconnect::get() == FALSE) {
+	Logger::getLogger(GlobFunc::$loggerName)->log("removeOldAdverts.php:1 Ошибка инициализации соединения с БД:");
 	exit();
 }
 
-// Получим список пользователей-арендаторов, под чьи поисковые запросы подходит этот объект
-$listOfTargetUsers = $property->whichTenantsAppropriate();
-if ($listOfTargetUsers == FALSE) {
-	Logger::getLogger(GlobFunc::$loggerName)->log("notificationAboutNewProperty.php: не удалось получить список id потенциальных арендаторов по объекту:".$propertyId);
+// Если объявление было зарегистрировано ранее $oldestActualTimeStamp, то оно подпадает под угрозу переноса в архив
+$oldestActualTimeStamp = time() - (3 * 24 * 60 * 60);
+
+// Получаем полные данные по интересующим нас объявлениям из БД
+$stmt = DBconnect::get()->stmt_init();
+if (($stmt->prepare("SELECT * FROM property WHERE completeness = '0' AND reg_date < ? AND 0 = (SELECT COUNT(*) FROM requestToView WHERE property.id = requestToView.propertyId AND (status = 'Новая' OR status = 'Назначен просмотр' OR status = 'Отложена' OR status = 'Успешный просмотр') LIMIT 1)") === FALSE)
+	OR ($stmt->bind_param("i", $oldestActualTimeStamp) === FALSE)
+	OR ($stmt->execute() === FALSE)
+	OR (($res = $stmt->get_result()) === FALSE)
+	OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+	OR ($stmt->close() === FALSE)
+) {
+	//TODO: перенести в DBконнект и переделать строку логгирования
+	Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM property WHERE completeness = '0' AND reg_date < ". $oldestActualTimeStamp ." AND 0 < (SELECT COUNT(*) FROM requestToView WHERE property.id = requestToView.propertyId AND (status = 'Новая' OR status = 'Назначен просмотр' OR status = 'Отложена' OR status = 'Успешный просмотр') LIMIT 1)'. id логгера: :1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+	//return array();
 	exit();
 }
 
-// Формируем уведомления по данному объекту
-if (!$property->sendMessagesAboutNewProperty($listOfTargetUsers)) {
-	Logger::getLogger(GlobFunc::$loggerName)->log("notificationAboutNewProperty.php: не удалось сформировать уведомления для потенциальных арендаторов по объекту:".$propertyId);
-	exit();
+// Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
+for ($i = 0, $s = count($res); $i < $s; $i++) {
+	$res[$i] = DBconnect::conversionPropertyCharacteristicFromDBToView($res[$i]);
 }
 
-// Формируем и рассылаем email по тем пользователям, которые подписаны на такую рассылку
-$listOfTargetUsersForEmail = array();
-foreach ($listOfTargetUsers as $value) {
-	if ($value['needEmail'] = 1) $listOfTargetUsersForEmail[] = $value;
+// Для каждого полученного объявления создаем объект и переносим его в архивную таблицу ("удаляем") как положено
+foreach ($res as $propertyArr) {
+	$property = new Property($propertyArr);
+	$property->unpublishAdvert();
 }
-$property->sendEmailAboutNewProperty($listOfTargetUsersForEmail);
 
+/********************************************************************************
+ * Оповещаем руководство об успешном выполнении операции очистки
+ *******************************************************************************/
 
-// Получим максимум 100 уведомлений для обработки - обработка уведомлений порционно позволяет снизить негативный эффект в случае повторной обработки (если вдруг запустится второй экземпляр скрипта пока работает первый)
-/*$messages = DBconnect::selectMessagesForEmail(100);
-$amountMessages = count($messages);
-
-// Если отправлять нечего, то прекращает выполнение скрипта
-if ($amountMessages == 0) exit();
-
-// Инициализируем класс для отправки e-mail и указываем постоянные параметры (верные для любых уведомлений)
 $mail = new PHPMailer(true); //defaults to using php "mail()"; the true param means it will throw exceptions on errors, which we need to catch
+$MsgHTML = "Найдено и перенесено в архив ".count($res)." устаревших чужих объявлений";
 try {
+	$mail->CharSet = "utf-8";
 	$mail->SetFrom('support@svobodno.org', 'Svobodno.org');
-	$mail->AddReplyTo('support@svobodno.org', 'support');
-	//$mail->AltBody = 'To view the message, please use an HTML compatible email viewer!'; // optional - MsgHTML will create an alternate automatically
+	$mail->AddReplyTo('support@svobodno.org', 'Svobodno.org');
+	$mail->Subject = 'Удаление устаревших объявлений';
+	$mail->MsgHTML($MsgHTML);
+	$mail->AddAddress("dimau777@gmail.com");
+	$mail->Send();
 } catch (phpmailerException $e) {
-	echo $e->errorMessage(); //Pretty error messages from PHPMailer
+	Logger::getLogger(GlobFunc::$loggerName)->log("removeOldAdverts.php:1 Ошибка при формировании e-mail:".$e->errorMessage()."Текст сообщения:".$MsgHTML); //Pretty error messages from PHPMailer
+	return FALSE;
 } catch (Exception $e) {
-	echo $e->getMessage(); //Boring error messages from anything else!
+	Logger::getLogger(GlobFunc::$loggerName)->log("removeOldAdverts.php:2 Ошибка при формировании e-mail:".$e->getMessage()."Текст сообщения:".$MsgHTML); //Boring error messages from anything else!
+	return FALSE;
 }
 
-// Обрабатываем каждое уведомление индивидуально
-foreach ($messages as $message) {
+/********************************************************************************
+ * Закрываем соединение с БД
+ *******************************************************************************/
 
-	if ($message['messageType'] == "newProperty") {
-		$MsgHTML = View::getHTMLforMessageNewProperty($message);
-	}
-
-	// Отправка очередного e-mail
-	try {
-		$mail->AddAddress('dimau777@gmail.com', 'Ushakov');
-		$mail->Subject = 'Новое объявление: ';
-		$mail->MsgHTML($MsgHTML);
-		$mail->Send();
-	} catch (phpmailerException $e) {
-		echo $e->errorMessage(); //Pretty error messages from PHPMailer
-	} catch (Exception $e) {
-		echo $e->getMessage(); //Boring error messages from anything else!
-	}
-} */
-
+DBconnect::closeConnectToDB();

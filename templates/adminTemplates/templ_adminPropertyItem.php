@@ -23,9 +23,9 @@
             <li>
                 <a target="_blank" href='adminRequestToView.php?propertyId=<?php echo $propertyCharacteristic['id'];?>'>заявки на просмотр</a>
             </li>
-			<?php if (isset($propertyCharacteristic['completeness']) && $propertyCharacteristic['completeness'] == "0"): // Возможность удалить объявление есть только для объектов, полученных из чужих баз - а значит по определению некачественных объявлений ?>
-            <li>
-                <a class="removeAlienAdvert" propertyId='<?php echo $propertyCharacteristic['id'];?>'>удалить</a>
+			<?php if (isset($propertyCharacteristic['completeness']) && $propertyCharacteristic['completeness'] == "0"): // Возможность перенести в архив объявление есть только для объектов, полученных из чужих баз - а значит по определению некачественных объявлений ?>
+            <li class="unpublishAdvert">
+                <a>снять с публикации</a>
             </li>
 			<?php endif; ?>
         </ul>

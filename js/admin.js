@@ -32,7 +32,7 @@ $(document).ready(function () {
     $(".earliestDateCancelButton").on('click', cancelEditEarliestDate);
 
     /*** Снятие с просмотра объявления (перенос в архивную базу для чужих) ***/
-    //$(".unpublishAdvert").on('click', unpublishAdvert);
+    $(".unpublishAdvert").on('click', unpublishAdvert);
 
 
     // Показывает форму редактирования для статуса запроса на просмотр
@@ -251,7 +251,7 @@ $(document).ready(function () {
 
     // Отправляет и обрабатывает ответ AJAX запроса для снятия объекта с публикации (его переноса в архивную БД для чужих объявлений)
     // В качестве this - элемент управления по событию которого и выполняется действие
-    /*function unpublishAdvert() {
+    function unpublishAdvert() {
 
         // Получим головной элемент описания данного объекта недвижимости (класса propertyBlock)
         var propertyBlock = $(this).closest(".propertyBlock");
@@ -262,16 +262,11 @@ $(document).ready(function () {
         // Непосредственная работа с AJAX запросом
         jQuery.post("AJAXChangePropertyData.php", {"propertyId": propertyId, "action": "unpublishAdvert"}, function (data) {
             $(data).find("span[status='successful']").each(function () {
-                // Изменяем соответствующим образом текст даты ближайшего просмотра и его видимость
-                $(".unpublishAdvert", propertyBlock).html(earliestDate);
-                $(".earliestTimeHoursText", propertyBlock).html(earliestTimeHours);
-                $(".earliestTimeMinutesText", propertyBlock).html(earliestTimeMinutes);
-                $(".earliestDateFullText", propertyBlock).css('display', '');
-                $(".earliestDateEditBlock", propertyBlock).css('display', 'none');
+                $('.removeAlienAdvert', propertyBlock).html("перенесено в архив");
             });
             $(data).find("span[status='denied']").each(function () {
                 /* Если вдруг нужно будет что-то выдавать при получении отказа в добавлении в избранное, то закодить здесь */
-    /*        });
+            });
         }, "xml");
-    }*/
+    }
 });

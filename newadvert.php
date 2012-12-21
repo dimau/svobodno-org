@@ -55,7 +55,7 @@ if (isset($_GET['alienOwner'])) $alienOwner = htmlspecialchars($_GET['alienOwner
  * Инициализируем объект для работы с параметрами недвижимости
  ************************************************************************************/
 
-$property = new Property();
+$property = new Property(NULL);
 
 // Готовим массив со списком районов в городе пользователя
 $allDistrictsInCity = DBconnect::selectDistrictsForCity("Екатеринбург");

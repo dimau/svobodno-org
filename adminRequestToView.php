@@ -95,7 +95,9 @@ for ($i = 0, $s = count($allRequestsToView); $i < $s; $i++) {
  *******************************************************************************/
 
 $property = new Property($propertyId);
-if (!$property->readCharacteristicFromDB()) die("Ошибка получения данных об объекте недвижимости");
+if (!$property->readCharacteristicFromDB() && !$property->readCharacteristicFromArchive()) {
+	die("Ошибка получения данных об объекте недвижимости");
+}
 
 /********************************************************************************
  * ПОЛУЧИМ СВЕДЕНИЯ О СОБСТВЕННИКЕ ОБЪЕКТА ($propertyId)

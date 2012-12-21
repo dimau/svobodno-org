@@ -43,7 +43,8 @@ requestFromOwners,
 messagesNewProperty,
 messagesNewTenant,
 districts,
-currencies
+currencies,
+archiveAdverts
 ");
 
 echo "Удаление старых таблиц: ";
@@ -389,22 +390,6 @@ echo "messagesNewTenant: ";
 if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
 /****************************************************************************
- * СПИСОК ОСНОВАНИЙ ДЛЯ ОПОВЕЩЕНИЯ ПОЛЬЗОВАТЕЛЕЙ
- *
- * Таблица содержит сведения, являющиеся основанием для формирования массовых оповещений (уведомлени + рассылка e-mail и sms)
- * На текущий момент времени мне требуется только 1 массовое оповещение - о появлении нового объекта недвижимости
- * Все остальные поводы для формирования оповещений кажутся гораздо менее массовми (затрагивая интересы 1 человека или группы пользователей по 1 сделке). Такого рода оповещения можно формировать в момент появления основания - не откладывая.
- ***************************************************************************/
-/*DBconnect::get()->query("CREATE TABLE requestsForNotification (
-        id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор основания',
-        type VARCHAR(30) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Название района, которое отображается пользователю',
-        propertyId VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Город, в котором расположен данный район'
-	)");
-
-echo "districts: ";
-if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE); */
-
-/****************************************************************************
  * СПИСОК РАЙОНОВ ВСЕХ ГОРОДОВ ПРИСУТСТВИЯ
  *
  * Таблица, содержащая константы
@@ -494,8 +479,96 @@ DBconnect::get()->query("INSERT INTO currencies (name, value) VALUES
 echo "Запись инфы о валютах: ";
 if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
-/**
+/****************************************************************************
+ * ОБЪЕКТЫ НЕДВИЖИМОСТИ (ОБЪЯВЛЕНИЯ)
+ *
+ * Содержит информацию как по нашим объектам недвижимости (анкеты которых заполнил специалист компании),
+ * так и по чужим объявлениям (полученным из чужих баз собственников)
+ * Свои объявления с течением времени только накапливаются (не удаляются и не переносятся)
+ * TODO: Чужие объявления периодически переносятся в архивную таблицу с такой же структурой
+ ***************************************************************************/
+
+DBconnect::get()->query("CREATE TABLE archiveAdverts (
+        id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Идентификатор объекта недвижимости или объявления - можно его называть и так, и так',
+        userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя (собственника), который указал данное объявление в системе и который сдает данный объект',
+        typeOfObject VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип объекта: квартира, комната, дом, таунхаус, дача, гараж',
+        dateOfEntry DATE COMMENT 'С какого числа арендатор может въезжать в объект',
+        termOfLease VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Срок аренды: длительный срок (от года) или несколько месяцев (до года)',
+        dateOfCheckOut DATE COMMENT 'Крайний срок выезда арендатора',
+        amountOfRooms VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Количество комнат в квартире, доме:',
+        adjacentRooms VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Наличие смежных комнат: да или нет',
+        amountOfAdjacentRooms VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Количество смежных комнат',
+        typeOfBathrooms VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Санузел: совмещенный, раздельный или количество штук',
+        typeOfBalcony VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип балкона, лоджии, эркера и количество',
+        balconyGlazed VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Остекление балкона/лоджии',
+        roomSpace DEC(7, 2) COMMENT 'Площадь комнаты в м2',
+        totalArea DEC(7, 2) COMMENT 'Площадь общая в м2',
+        livingSpace DEC(7, 2) COMMENT 'Площадь жилая в м2',
+        kitchenSpace DEC(7, 2) COMMENT 'Площадь кухни в м2',
+        floor INT COMMENT 'Этаж, на котором расположена квартира, комната',
+        totalAmountFloor INT COMMENT 'Общее количество этажей в доме, в котором расположена квартира, комната',
+        numberOfFloor INT COMMENT 'Этажность дома, дачи, таунхауса',
+        concierge VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Наличие в подъезде консьержа',
+        intercom VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Наличие в подъезде домофона',
+        parking VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип парковки во дворе',
+        city VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Город местоположения объекта недвижимости',
+        district VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Район местоположения объекта недвижимости - название',
+        coordX VARCHAR(30) COMMENT 'Координата x на яндекс карте местоположения объекта недвижимости',
+        coordY VARCHAR(30) COMMENT 'Координата y на яндекс карте местоположения объекта недвижимости',
+        address VARCHAR(60) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Человеческое название улицы и номера дома',
+        apartmentNumber VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Номер квартиры, если комната в квартире, то с индексом для уникальности',
+        subwayStation VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Название станции метро рядом',
+        distanceToMetroStation INT COMMENT 'Расстояние в минутах ходьбы до ближайшего метро',
+        currency VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Валюта для рассчетов',
+        costOfRenting DEC(8) COMMENT 'Стоимость аренды в месяц в валюте, выбранной собственником',
+        realCostOfRenting DEC(10, 2) COMMENT 'Стоимость аренды в месяц в рублях (при сохранении в БД стоимость аренды конвертируется в рубли, если она была указана в другой валюте). Это позволяет делать правильные выборки и сортировки из БД.',
+        utilities VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Коммунальные услуги оплачиваются арендатором дополнительно: да или нет',
+        costInSummer DEC(8) COMMENT 'Стоимость комм. услуг летом',
+        costInWinter DEC(8) COMMENT 'Стоимость комм. услуг зимой',
+        electricPower VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Электроэнергия оплачивается дополнительно: да или нет',
+        bail VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Залог: есть или нет',
+        bailCost DEC(8) COMMENT 'Величина залога в валюте для расчетов',
+        prepayment VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Предоплата в количестве месяцев - указывается строкой (например, 1 месяц) для простоты отображения и возможности числового сравнения',
+        compensationMoney DEC(10, 2) COMMENT 'Единоразовая комиссия в валюте для расчетов',
+        compensationPercent DEC(6, 2) COMMENT 'Единоразовая комиссия в процентах от месячной стоимости аренды',
+        repair VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Текущее состояние ремонта',
+        furnish VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Текущее состояние отделки',
+        windows VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Материал окон',
+        internet VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Наличие интернета',
+        telephoneLine VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Наличие проводного телефона',
+        cableTV VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Наличие кабельного ТВ',
+        furnitureInLivingArea TEXT COMMENT 'Список мебели в жилой зоне - из предложенного в сервисе',
+        furnitureInLivingAreaExtra VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Дополнительный пользовательский список мебели (указывается через запятую с пробелом)',
+        furnitureInKitchen TEXT COMMENT 'Список мебели на кухне - из предложенного в сервисе',
+        furnitureInKitchenExtra VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Дополнительный пользовательский список мебели (указывается через запятую с пробелом)',
+        appliances TEXT COMMENT 'Список быт. техники - из предложенного в сервисе',
+        appliancesExtra VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Дополнительный пользовательский список быт. техники (указывается через запятую с пробелом)',
+        sexOfTenant TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Допустимый пол арендатора (если он будет жить один). Представляет собой строку - сериализованный массив. По такой строке работает SQL запрос с оператором LIKE',
+        relations TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Отношения между арендаторами (если можно проживать не только одному, но и с кем-то). Представляет собой строку - сериализованный массив. По такой строке работает SQL запрос с оператором LIKE',
+        children VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Возможность заселения арендаторов с детьми',
+        animals VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Возможность заселения арендаторов с животными',
+        contactTelephonNumber VARCHAR(20) COMMENT 'Контактный телефон собственника именно по аренде данного объявления, который будет болтаться на сайте',
+        timeForRingBegin VARCHAR(20) COMMENT 'С какого времени можно звонить собственнику',
+        timeForRingEnd VARCHAR(20) COMMENT 'До какого времени можно звонить собственнику',
+        checking VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Как часто собственник проверяет недвижимость',
+        responsibility TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Распределение ответственности между арендатором и собственником за ремонт и поддержание недвижимости',
+        comment TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Свободный комментарий собственника',
+        last_act INT(11) COMMENT 'Время последнего изменения объявления - будь-то время создания или время последнего редактирования. Используется для сортировки объявлений в разделе Мои объявления личного кабинета',
+        reg_date INT(11) COMMENT 'Время создания объявления',
+        status VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'опубликовано' COMMENT 'Статус объявления: опубликовано или не опубликовано. Сразу после создания объявление становится неопубликованным',
+        earliestDate DATE COMMENT 'Хранит дату ближайшего показа, согласованную с собственником',
+        earliestTimeHours VARCHAR(2) COMMENT 'Хранит время (часы) ближайшего показа, согласованные с собственником. Используется тип VARCHAR, чтобы незначащие нули оставались - для красоты',
+        earliestTimeMinutes VARCHAR(2) COMMENT 'Хранит время (минуты) ближайшего показа, согласованные с собственником. Используется тип VARCHAR, чтобы незначащие нули оставались - для красоты',
+        adminComment TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Комментарий сотрудников компании - админов',
+		completeness VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Признак полноты данных об объекте (значения: 1/0). Если объявление получено из чужой базы, то его полнота устанавливается в 0 (то есть никаких особых требований к полноте не предъявляется). Если с данным объектом проведена полная работа и получены полные и достоверные данные, то его полнота устанавливается в 1 (при редактировании данных мы требуем соблюдения их полноты)'
+)");
+
+echo "archiveAdverts: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
+/****************************************************************************
  * Проверяем настройки PHP сервера
+ *
  * В файле php.ini нужно установить ограничения на максимальный размер загружаемых файлов:
  * post_max_size = 100M     // Максимальный размер в МБ для POST запроса пользователя
  * upload_max_filesize = 25M // Максимальный размер файла, закачивать который разрешает php для пользователя
@@ -505,7 +578,8 @@ if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TR
  * date.timezone = Asia/Yekaterinburg // Необходимо установить временную зону по умолчанию
  *
  * ini_set ("session.use_trans_sid", true); вроде как PHP сам умеет устанавливать id сессии либо в куки, либо в строку запроса (http://www.phpfaq.ru/sessions)
- */
+ *
+ ***************************************************************************/
 
 // Закрываем соединение с БД
 DBconnect::closeConnectToDB();

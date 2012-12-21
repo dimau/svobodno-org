@@ -96,7 +96,7 @@ if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondNa
 	// Количество результатов ограничено первыми 20-тью, чтобы не перегружать БД
 	// В итоге получим массив ($allUsers), каждый элемент которого представляет собой еще один массив параметров конкретного пользователя
 	if ($strWHERE != "") {
-		$res = DBconnect::get()->query("SELECT id, typeTenant, typeOwner, name, secondName, surname, login, password, telephon, email FROM users WHERE".$strWHERE." LIMIT 20");
+		$res = DBconnect::get()->query("SELECT id, typeTenant, typeOwner, typeAdmin, name, secondName, surname, login, password, telephon, email FROM users WHERE".$strWHERE." LIMIT 20");
 		if ((DBconnect::get()->errno)
 			OR (($allUsers = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
 		) {
@@ -156,12 +156,18 @@ if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondNa
 
 	// Дополним данные о заявках на просмотр информацией об адресе соответствующего объекта (на который поступила заявка)
 	for ($i = 0, $s = count($allRequestsToView); $i < $s; $i++) {
+		$changed = FALSE;
 		foreach ($allProperties as $property) {
 			if ($allRequestsToView[$i]['propertyId'] == $property['id']) {
 				$allRequestsToView[$i]['address'] = $property['address'];
 				$allRequestsToView[$i]['apartmentNumber'] = $property['apartmentNumber'];
+				$changed = TRUE;
 				break;
 			}
+		}
+		if ($changed == FALSE) {
+			$allRequestsToView[$i]['address'] = "Объявление перенесено в архив";
+			$allRequestsToView[$i]['apartmentNumber'] = "";
 		}
 	}
 
@@ -213,7 +219,7 @@ if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondNa
 	// Получаем информацию о собственниках той недвижимости, что мы ранее отобрали по адресу ($allProperties)
 	// В итоге получим массив ($allUsers), каждый элемент которого представляет собой еще один массив параметров конкретного пользователя
 	if ($strWHERE != "") {
-		$res = DBconnect::get()->query("SELECT id, typeTenant, typeOwner, name, secondName, surname, login, password, telephon, email FROM users WHERE".$strWHERE);
+		$res = DBconnect::get()->query("SELECT id, typeTenant, typeOwner, typeAdmin, name, secondName, surname, login, password, telephon, email FROM users WHERE".$strWHERE);
 		if ((DBconnect::get()->errno)
 			OR (($allUsers = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
 		) {

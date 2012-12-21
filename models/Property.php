@@ -11,6 +11,8 @@
 
 class Property
 {
+	private $id = "";
+	private $userId = "";
 	private $typeOfObject = "0";
 	private $dateOfEntry = "";
 	private $termOfLease = "0";
@@ -41,6 +43,7 @@ class Property
 	private $distanceToMetroStation = "";
 	private $currency = "0";
 	private $costOfRenting = "";
+	private $realCostOfRenting = "";
 	private $utilities = "0";
 	private $costInSummer = "";
 	private $costInWinter = "";
@@ -72,18 +75,14 @@ class Property
 	private $checking = "0";
 	private $responsibility = "";
 	private $comment = "";
+	private $last_act = "";
+	private $reg_date = "";
+	private $status = "";
 	private $earliestDate = "";
 	private $earliestTimeHours = "";
 	private $earliestTimeMinutes = "";
 	private $adminComment = "";
 	private $completeness = "";
-
-	private $realCostOfRenting = "";
-	private $last_act = "";
-	private $reg_date = "";
-	private $status = "";
-	private $id = "";
-	private $userId = "";
 
 	private $fileUploadId = "";
 	private $uploadedFoto = array(); // В переменной будет храниться информация о загруженных фотографиях. Представляет собой массив ассоциированных массивов
@@ -95,16 +94,22 @@ class Property
 	 * КОНСТРУКТОР
 	 *
 	 * Конструктор всегда инициализирует параметры объекта пустыми значениями.
-	 * Если объект создается под существующее объявление, то нужно сразу указать id этого объекта недвижимости (в параметрах конструктора)
+	 * Если объект создается под существующее объявление, то нужно сразу указать id этого объекта недвижимости (в параметрах конструктора), либо передать ассоциированный массив, содержащий значения параметров создаваемого объекта
 	 * Инициализация объекта параметрами существующего объявления выделена в отдельные методы (writeCharacteristicFrom.., writeFotoInformationFrom..), что позволяет убедиться в их успешном выполнении (получении данных из БД или из POST), а также выполнить инициализацию только тех параметров, которые понадобятся в работе с этим объектом (характеристика и/или данные о фотографиях). Ну и кроме того, это позволяет инициализировать объект параметрами как из БД, так и из POST запроса по выбору.
-	 * @param bool $propertyId - идентификатор существующего (записанного ранее в БД) объекта недвижимости - используется при инициализации объекта под заранее известный, ранее заведенный в БД объект недвижимости
+	 *
+	 * @param int|array $params либо идентификтатор конкретного объекта недвижимости, либо ассоциативный массив параметров объекта недвижимости
 	 */
-	public function __construct($propertyId = FALSE) {
+	public function __construct($params) {
 		// Инициализируем переменную "сессии" для временного сохранения фотографий
 		$this->fileUploadId = GlobFunc::generateCode(7);
 
 		// Если конструктору передан идентификатор объекта недвижимости, запишем его в параметры объекта. Это позволит, например, инициализировать объект данными из БД
-		if ($propertyId != FALSE) $this->id = $propertyId;
+		if (isset($params) && is_int($params)) $this->id = $params;
+
+		// Если конструктору передан массив, то инициализируем параметры объекта значениями этого массива с соответствующими ассоциативными ключами
+		if (isset($params) && is_array($params)) {
+			$this->initialization($params);
+		}
 	}
 
 	public function getId() {
@@ -123,23 +128,30 @@ class Property
 		return $this->completeness;
 	}
 
+	/**
+	 * Метод для инициализации параметров объекта конкретными значениями
+	 *
+	 * @param array $params ассоциативный массив, содержащий значения параметров для инициализации
+	 */
+	private function initialization($params) {
+		foreach ($params as $key => $value) {
+			if (isset($this->$key)) $this->$key = $value;
+		}
+	}
+
 	// Функция сохраняет текущие параметры объекта недвижимости в БД
 	// $typeOfProperty = "new" - режим сохранения для нового объекта недвижимости
 	// $typeOfProperty = "edit" - режим сохранения для редактируемых параметров объекта недвижимости
 	// Кроме того, при успешной работе изменяет статус typeOwner пользователя (с id = userId) на TRUE
 	// Возвращает TRUE, если данные успешно сохранены и FALSE в противном случае
-	public function saveCharacteristicToDB($typeOfProperty = "edit") {
+	public function saveCharacteristicToDB($typeOfProperty) {
+
 		// Валидация необходимых исходных данных
 		if ($typeOfProperty != "new" && $typeOfProperty != "edit") return FALSE; // Если объявление не является ни новым, ни существующим - видимо какая-то ошибка была допущена при передаче параметров методу
 		if ($typeOfProperty == "new" && $this->ownerLogin == "") return FALSE;
 		if ($typeOfProperty == "edit" && $this->userId == "") return FALSE;
 
-		// Вычислим id пользователя-собственника данного объекта недвижимости (если создается не новое объявление, а идет редактирование ранее созданного)
-		if ($typeOfProperty == "edit") {
-			$userId = $this->userId;
-		}
-
-		// Вычислим id пользователя-собственника данного объекта недвижимости (если создается новое объявление выездным специалистом со своего аккаунта)
+		// Вычислим по логину id пользователя-собственника данного объекта недвижимости, если создается новое объявление выездным специалистом со своего аккаунта
 		if ($typeOfProperty == "new") {
 
 			$stmt = DBconnect::get()->stmt_init();
@@ -158,37 +170,17 @@ class Property
 				return FALSE;
 			}
 
-			$userId = $res[0]['id'];
+			$this->userId = $res[0]['id'];
 		}
 
 		// Если не указан id пользователя собственника, то дальнейшие действия не имеют смысла
-		if ($userId == "") return FALSE;
+		if ($this->userId == "") return FALSE;
 
-		// Корректируем даты для того, чтобы сделать их пригодными для сохранения в базу данных
-		$dateOfEntryForDB = GlobFunc::dateFromViewToDB($this->dateOfEntry);
-		$dateOfCheckOutForDB = GlobFunc::dateFromViewToDB($this->dateOfCheckOut);
-		$earliestDateForDB = GlobFunc::dateFromViewToDB($this->earliestDate);
-
-		// Для хранения массивов в БД, их необходимо сериализовать
-		$furnitureInLivingAreaSerialized = serialize($this->furnitureInLivingArea);
-		$furnitureInKitchenSerialized = serialize($this->furnitureInKitchen);
-		$appliancesSerialized = serialize($this->appliances);
-		$sexOfTenantSerialized = serialize($this->sexOfTenant);
-		$relationsSerialized = serialize($this->relations);
-
-		// Довычисляем значения переменных, которые понадобятся при сохранении новой записи в БД или при ее модификации
-		$tm = time();
-		$last_act = $tm; // время последнего редактирования объявления
-		$reg_date = $tm; // время регистрации ("рождения") объявления
-		if ($this->status != "опубликовано" && $this->status != "не опубликовано") { // На всякий случай (возможно, будет полезно для нового объявления) будем проверять заполненность поля со статусом
-			$this->status = "опубликовано";
-		}
-		if ($this->completeness != "0" && $this->completeness != "1") { // На всякий случай (возможно, будет полезно для нового объявления) будем проверять заполненность поля с признаком полноты данных об объекте
-			$this->completeness = "1";
-		}
+		// Меняем время последней операции над характеристикой объекта недвижимости
+		$this->last_act = time();
 
 		// Проверяем в какой валюте сохраняется стоимость аренды, формируем переменную realCostOfRenting
-		if ($this->currency == 'руб.') $realCostOfRenting = $this->costOfRenting;
+		if ($this->currency == 'руб.') $this->realCostOfRenting = $this->costOfRenting;
 		if ($this->currency != 'руб.') {
 			$stmt = DBconnect::get()->stmt_init();
 			if (($stmt->prepare("SELECT value FROM currencies WHERE name=?") === FALSE)
@@ -202,29 +194,31 @@ class Property
 				return FALSE;
 			}
 
-			$realCostOfRenting = $this->costOfRenting * $res[0]['value'];
+			$this->realCostOfRenting = $this->costOfRenting * $res[0]['value'];
 		}
 
 		// Пишем данные объекта недвижимости в БД.
 		// Код для сохранения данных разный: для нового объявления и при редактировании параметров существующего объявления
 		if ($typeOfProperty == "new") {
-			$stmt = DBconnect::get()->stmt_init();
-			if (($stmt->prepare("INSERT INTO property SET userId=?, typeOfObject=?, dateOfEntry=?, termOfLease=?, dateOfCheckOut=?, amountOfRooms=?, adjacentRooms=?, amountOfAdjacentRooms=?, typeOfBathrooms=?, typeOfBalcony=?, balconyGlazed=?, roomSpace=?, totalArea=?, livingSpace=?, kitchenSpace=?, floor=?, totalAmountFloor=?, numberOfFloor=?, concierge=?, intercom=?, parking=?, city=?, district=?, coordX=?, coordY=?, address=?, apartmentNumber=?, subwayStation=?, distanceToMetroStation=?, currency=?, costOfRenting=?, realCostOfRenting=?, utilities=?, costInSummer=?, costInWinter=?, electricPower=?, bail=?, bailCost=?, prepayment=?, compensationMoney=?, compensationPercent=?, repair=?, furnish=?, windows=?, internet=?, telephoneLine=?, cableTV=?, furnitureInLivingArea=?, furnitureInLivingAreaExtra=?, furnitureInKitchen=?, furnitureInKitchenExtra=?, appliances=?, appliancesExtra=?, sexOfTenant=?, relations=?, children=?, animals=?, contactTelephonNumber=?, timeForRingBegin=?, timeForRingEnd=?, checking=?, responsibility=?, comment=?, last_act=?, reg_date=?, status=?, earliestDate=?, earliestTimeHours=?, earliestTimeMinutes=?, adminComment=?, completeness=?") === FALSE)
-				OR ($stmt->bind_param("sssssssssssddddiiissssssssssisddsddssdsddssssssssssssssssssssssiissssss", $userId, $this->typeOfObject, $dateOfEntryForDB, $this->termOfLease, $dateOfCheckOutForDB, $this->amountOfRooms, $this->adjacentRooms, $this->amountOfAdjacentRooms, $this->typeOfBathrooms, $this->typeOfBalcony, $this->balconyGlazed, $this->roomSpace, $this->totalArea, $this->livingSpace, $this->kitchenSpace, $this->floor, $this->totalAmountFloor, $this->numberOfFloor, $this->concierge, $this->intercom, $this->parking, $this->city, $this->district, $this->coordX, $this->coordY, $this->address, $this->apartmentNumber, $this->subwayStation, $this->distanceToMetroStation, $this->currency, $this->costOfRenting, $realCostOfRenting, $this->utilities, $this->costInSummer, $this->costInWinter, $this->electricPower, $this->bail, $this->bailCost, $this->prepayment, $this->compensationMoney, $this->compensationPercent, $this->repair, $this->furnish, $this->windows, $this->internet, $this->telephoneLine, $this->cableTV, $furnitureInLivingAreaSerialized, $this->furnitureInLivingAreaExtra, $furnitureInKitchenSerialized, $this->furnitureInKitchenExtra, $appliancesSerialized, $this->appliancesExtra, $sexOfTenantSerialized, $relationsSerialized, $this->children, $this->animals, $this->contactTelephonNumber, $this->timeForRingBegin, $this->timeForRingEnd, $this->checking, $this->responsibility, $this->comment, $last_act, $reg_date, $this->status, $earliestDateForDB, $this->earliestTimeHours, $this->earliestTimeMinutes, $this->adminComment, $this->completeness) === FALSE)
-				OR ($stmt->execute() === FALSE)
-				OR (($res = $stmt->affected_rows) === -1)
-				OR ($res === 0)
-				OR ($stmt->close() === FALSE)
-			) {
-				// TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-				return FALSE;
+
+			// Довычисляем недостающие для нового объекта параметры
+			$this->reg_date = time(); // Время регистрации ("рождения") объявления
+			if ($this->status != "опубликовано" && $this->status != "не опубликовано") { // На всякий случай: если выездной специалист не указал статус при формировании характеристики объекта
+				$this->status = "опубликовано";
+			}
+			if ($this->completeness != "0" && $this->completeness != "1") { // На всякий случай: возможно, будет полезно для нового объявления
+				$this->completeness = "1";
 			}
 
+			// Непосредственное сохранение характеристики объекта в БД
+			if (!DBconnect::insertPropertyCharacteristic($this->getCharacteristicData())) return FALSE;
 			// Узнаем id объекта недвижимости - необходимо при сохранении информации о фотках в постоянную базу
 			$this->getIdUseAddress();
-		}
+			// Изменим статус пользователя (typeOwner), так как он теперь точно стал собственником
+			DBconnect::updateUserCharacteristicTypeUser($userId, "typeOwner", "TRUE");
 
-		if ($typeOfProperty == "edit") {
+		} elseif ($typeOfProperty == "edit") {
+
 			$stmt = DBconnect::get()->stmt_init();
 			if (($stmt->prepare("UPDATE property SET userId=?, typeOfObject=?, dateOfEntry=?, termOfLease=?, dateOfCheckOut=?, amountOfRooms=?, adjacentRooms=?, amountOfAdjacentRooms=?, typeOfBathrooms=?, typeOfBalcony=?, balconyGlazed=?, roomSpace=?, totalArea=?, livingSpace=?, kitchenSpace=?, floor=?, totalAmountFloor=?, numberOfFloor=?, concierge=?, intercom=?, parking=?, city=?, district=?, coordX=?, coordY=?, address=?, apartmentNumber=?, subwayStation=?, distanceToMetroStation=?, currency=?, costOfRenting=?, realCostOfRenting=?, utilities=?, costInSummer=?, costInWinter=?, electricPower=?, bail=?, bailCost=?, prepayment=?, compensationMoney=?, compensationPercent=?, repair=?, furnish=?, windows=?, internet=?, telephoneLine=?, cableTV=?, furnitureInLivingArea=?, furnitureInLivingAreaExtra=?, furnitureInKitchen=?, furnitureInKitchenExtra=?, appliances=?, appliancesExtra=?, sexOfTenant=?, relations=?, children=?, animals=?, contactTelephonNumber=?, timeForRingBegin=?, timeForRingEnd=?, checking=?, responsibility=?, comment=?, last_act=?, reg_date=?, status=?, earliestDate=?, earliestTimeHours=?, earliestTimeMinutes=?, adminComment=?, completeness=? WHERE id=?") === FALSE)
 				OR ($stmt->bind_param("sssssssssssddddiiissssssssssisddsddssdsddssssssssssssssssssssssiisssssss", $userId, $this->typeOfObject, $dateOfEntryForDB, $this->termOfLease, $dateOfCheckOutForDB, $this->amountOfRooms, $this->adjacentRooms, $this->amountOfAdjacentRooms, $this->typeOfBathrooms, $this->typeOfBalcony, $this->balconyGlazed, $this->roomSpace, $this->totalArea, $this->livingSpace, $this->kitchenSpace, $this->floor, $this->totalAmountFloor, $this->numberOfFloor, $this->concierge, $this->intercom, $this->parking, $this->city, $this->district, $this->coordX, $this->coordY, $this->address, $this->apartmentNumber, $this->subwayStation, $this->distanceToMetroStation, $this->currency, $this->costOfRenting, $realCostOfRenting, $this->utilities, $this->costInSummer, $this->costInWinter, $this->electricPower, $this->bail, $this->bailCost, $this->prepayment, $this->compensationMoney, $this->compensationPercent, $this->repair, $this->furnish, $this->windows, $this->internet, $this->telephoneLine, $this->cableTV, $furnitureInLivingAreaSerialized, $this->furnitureInLivingAreaExtra, $furnitureInKitchenSerialized, $this->furnitureInKitchenExtra, $appliancesSerialized, $this->appliancesExtra, $sexOfTenantSerialized, $relationsSerialized, $this->children, $this->animals, $this->contactTelephonNumber, $this->timeForRingBegin, $this->timeForRingEnd, $this->checking, $this->responsibility, $this->comment, $last_act, $this->reg_date, $this->status, $earliestDateForDB, $this->earliestTimeHours, $this->earliestTimeMinutes, $this->adminComment, $this->completeness, $this->id) === FALSE)
@@ -234,19 +228,6 @@ class Property
 			) {
 				// TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
 				return FALSE;
-			}
-		}
-
-		// Если объявление новое - изменим статус пользователя (typeOwner), так как он теперь точно стал собственником
-		if ($typeOfProperty == "new") {
-			$stmt = DBconnect::get()->stmt_init();
-			if (($stmt->prepare("UPDATE users SET typeOwner='TRUE' WHERE id=?") === FALSE)
-				OR ($stmt->bind_param("s", $userId) === FALSE)
-				OR ($stmt->execute() === FALSE)
-				OR (($res = $stmt->affected_rows) === -1)
-				OR ($stmt->close() === FALSE)
-			) {
-				// TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
 			}
 		}
 
@@ -471,105 +452,42 @@ class Property
 
 	// Метод читает данные объекта недвижимости из БД и записывает их в параметры данного объекта
 	public function readCharacteristicFromDB() {
+
 		// Если идентификатор объекта недвижимости неизвестен, то дальнейшие действия не имеют смысла
 		if ($this->id == "") return FALSE;
 
 		// Получим из БД данные ($res) по объекту недвижимости с идентификатором = $this->id
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("SELECT * FROM property WHERE id=?") === FALSE)
-			OR ($stmt->bind_param("s", $this->id) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->get_result()) === FALSE)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-			OR ($stmt->close() === FALSE)
-		) {
-			// TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-			return FALSE;
-		}
+		$res = DBconnect::selectPropertyCharacteristicForPropertiesId($this->id);
 
 		// Если получено меньше или больше одной строки (одного объекта недвижимости) из БД, то сообщаем об ошибке
 		if (!is_array($res) || count($res) != 1) {
-			// TODO: Сохранить в лог ошибку получения данных пользователя из БД
+			Logger::getLogger(GlobFunc::$loggerName)->log("Property->readCharacteristicFromDB():1 Ошибка: по id объекта недвижимости == ".$this->id." получено ".count($res)." результатов выборки данных из таблицы property БД. Должна быть только 1 строка. ID пользователя: не определено");
 			return FALSE;
 		}
 
-		// Для красоты (чтобы избавить от индекса ноль при обращении к переменным) переприсвоим значение $res[0] специальной переменной
-		$onePropertyDataArr = $res[0];
+		// Передаем данные для инициализации параметров объекта
+		$this->initialization($res[0]);
 
-		// Если данные по пользователю есть в БД, присваиваем их соответствующим переменным, иначе - у них останутся значения по умолчанию.
-		if (isset($onePropertyDataArr['typeOfObject'])) $this->typeOfObject = $onePropertyDataArr['typeOfObject'];
-		if (isset($onePropertyDataArr['dateOfEntry']) && $onePropertyDataArr['dateOfEntry'] != "0000-00-00") $this->dateOfEntry = GlobFunc::dateFromDBToView($onePropertyDataArr['dateOfEntry']);
-		if (isset($onePropertyDataArr['termOfLease'])) $this->termOfLease = $onePropertyDataArr['termOfLease'];
-		if (isset($onePropertyDataArr['dateOfCheckOut']) && $onePropertyDataArr['dateOfCheckOut'] != "0000-00-00") $this->dateOfCheckOut = GlobFunc::dateFromDBToView($onePropertyDataArr['dateOfCheckOut']);
-		if (isset($onePropertyDataArr['amountOfRooms'])) $this->amountOfRooms = $onePropertyDataArr['amountOfRooms'];
-		if (isset($onePropertyDataArr['adjacentRooms'])) $this->adjacentRooms = $onePropertyDataArr['adjacentRooms'];
-		if (isset($onePropertyDataArr['amountOfAdjacentRooms'])) $this->amountOfAdjacentRooms = $onePropertyDataArr['amountOfAdjacentRooms'];
-		if (isset($onePropertyDataArr['typeOfBathrooms'])) $this->typeOfBathrooms = $onePropertyDataArr['typeOfBathrooms'];
-		if (isset($onePropertyDataArr['typeOfBalcony'])) $this->typeOfBalcony = $onePropertyDataArr['typeOfBalcony'];
-		if (isset($onePropertyDataArr['balconyGlazed'])) $this->balconyGlazed = $onePropertyDataArr['balconyGlazed'];
-		if (isset($onePropertyDataArr['roomSpace']) && $onePropertyDataArr['roomSpace'] != 0) $this->roomSpace = $onePropertyDataArr['roomSpace'];
-		if (isset($onePropertyDataArr['totalArea']) && $onePropertyDataArr['totalArea'] != 0) $this->totalArea = $onePropertyDataArr['totalArea'];
-		if (isset($onePropertyDataArr['livingSpace']) && $onePropertyDataArr['livingSpace'] != 0) $this->livingSpace = $onePropertyDataArr['livingSpace'];
-		if (isset($onePropertyDataArr['kitchenSpace']) && $onePropertyDataArr['kitchenSpace'] != 0) $this->kitchenSpace = $onePropertyDataArr['kitchenSpace'];
-		if (isset($onePropertyDataArr['floor']) && $onePropertyDataArr['floor'] != 0) $this->floor = $onePropertyDataArr['floor'];
-		if (isset($onePropertyDataArr['totalAmountFloor']) && $onePropertyDataArr['totalAmountFloor'] != 0) $this->totalAmountFloor = $onePropertyDataArr['totalAmountFloor'];
-		if (isset($onePropertyDataArr['numberOfFloor']) && $onePropertyDataArr['numberOfFloor'] != 0) $this->numberOfFloor = $onePropertyDataArr['numberOfFloor'];
-		if (isset($onePropertyDataArr['concierge'])) $this->concierge = $onePropertyDataArr['concierge'];
-		if (isset($onePropertyDataArr['intercom'])) $this->intercom = $onePropertyDataArr['intercom'];
-		if (isset($onePropertyDataArr['parking'])) $this->parking = $onePropertyDataArr['parking'];
-		if (isset($onePropertyDataArr['city'])) $this->city = $onePropertyDataArr['city'];
-		if (isset($onePropertyDataArr['district'])) $this->district = $onePropertyDataArr['district'];
-		if (isset($onePropertyDataArr['coordX'])) $this->coordX = $onePropertyDataArr['coordX'];
-		if (isset($onePropertyDataArr['coordY'])) $this->coordY = $onePropertyDataArr['coordY'];
-		if (isset($onePropertyDataArr['address'])) $this->address = $onePropertyDataArr['address'];
-		if (isset($onePropertyDataArr['apartmentNumber'])) $this->apartmentNumber = $onePropertyDataArr['apartmentNumber'];
-		if (isset($onePropertyDataArr['subwayStation'])) $this->subwayStation = $onePropertyDataArr['subwayStation'];
-		if (isset($onePropertyDataArr['distanceToMetroStation'])) $this->distanceToMetroStation = $onePropertyDataArr['distanceToMetroStation'];
-		if (isset($onePropertyDataArr['currency'])) $this->currency = $onePropertyDataArr['currency'];
-		if (isset($onePropertyDataArr['costOfRenting'])) $this->costOfRenting = $onePropertyDataArr['costOfRenting'];
-		if (isset($onePropertyDataArr['utilities'])) $this->utilities = $onePropertyDataArr['utilities'];
-		if (isset($onePropertyDataArr['costInSummer'])) $this->costInSummer = $onePropertyDataArr['costInSummer'];
-		if (isset($onePropertyDataArr['costInWinter'])) $this->costInWinter = $onePropertyDataArr['costInWinter'];
-		if (isset($onePropertyDataArr['electricPower'])) $this->electricPower = $onePropertyDataArr['electricPower'];
-		if (isset($onePropertyDataArr['bail'])) $this->bail = $onePropertyDataArr['bail'];
-		if (isset($onePropertyDataArr['bailCost'])) $this->bailCost = $onePropertyDataArr['bailCost'];
-		if (isset($onePropertyDataArr['prepayment'])) $this->prepayment = $onePropertyDataArr['prepayment'];
-		if (isset($onePropertyDataArr['compensationMoney'])) $this->compensationMoney = $onePropertyDataArr['compensationMoney'];
-		if (isset($onePropertyDataArr['compensationPercent'])) $this->compensationPercent = $onePropertyDataArr['compensationPercent'];
-		if (isset($onePropertyDataArr['repair'])) $this->repair = $onePropertyDataArr['repair'];
-		if (isset($onePropertyDataArr['furnish'])) $this->furnish = $onePropertyDataArr['furnish'];
-		if (isset($onePropertyDataArr['windows'])) $this->windows = $onePropertyDataArr['windows'];
-		if (isset($onePropertyDataArr['internet'])) $this->internet = $onePropertyDataArr['internet'];
-		if (isset($onePropertyDataArr['telephoneLine'])) $this->telephoneLine = $onePropertyDataArr['telephoneLine'];
-		if (isset($onePropertyDataArr['cableTV'])) $this->cableTV = $onePropertyDataArr['cableTV'];
-		if (isset($onePropertyDataArr['furnitureInLivingArea'])) $this->furnitureInLivingArea = unserialize($onePropertyDataArr['furnitureInLivingArea']);
-		if (isset($onePropertyDataArr['furnitureInLivingAreaExtra'])) $this->furnitureInLivingAreaExtra = $onePropertyDataArr['furnitureInLivingAreaExtra'];
-		if (isset($onePropertyDataArr['furnitureInKitchen'])) $this->furnitureInKitchen = unserialize($onePropertyDataArr['furnitureInKitchen']);
-		if (isset($onePropertyDataArr['furnitureInKitchenExtra'])) $this->furnitureInKitchenExtra = $onePropertyDataArr['furnitureInKitchenExtra'];
-		if (isset($onePropertyDataArr['appliances'])) $this->appliances = unserialize($onePropertyDataArr['appliances']);
-		if (isset($onePropertyDataArr['appliancesExtra'])) $this->appliancesExtra = $onePropertyDataArr['appliancesExtra'];
-		if (isset($onePropertyDataArr['sexOfTenant'])) $this->sexOfTenant = unserialize($onePropertyDataArr['sexOfTenant']);
-		if (isset($onePropertyDataArr['relations'])) $this->relations = unserialize($onePropertyDataArr['relations']);
-		if (isset($onePropertyDataArr['children'])) $this->children = $onePropertyDataArr['children'];
-		if (isset($onePropertyDataArr['animals'])) $this->animals = $onePropertyDataArr['animals'];
-		if (isset($onePropertyDataArr['contactTelephonNumber'])) $this->contactTelephonNumber = $onePropertyDataArr['contactTelephonNumber'];
-		if (isset($onePropertyDataArr['timeForRingBegin'])) $this->timeForRingBegin = $onePropertyDataArr['timeForRingBegin'];
-		if (isset($onePropertyDataArr['timeForRingEnd'])) $this->timeForRingEnd = $onePropertyDataArr['timeForRingEnd'];
-		if (isset($onePropertyDataArr['checking'])) $this->checking = $onePropertyDataArr['checking'];
-		if (isset($onePropertyDataArr['responsibility'])) $this->responsibility = $onePropertyDataArr['responsibility'];
-		if (isset($onePropertyDataArr['comment'])) $this->comment = $onePropertyDataArr['comment'];
-		if (isset($onePropertyDataArr['earliestDate']) && $onePropertyDataArr['earliestDate'] != "0000-00-00") $this->earliestDate = GlobFunc::dateFromDBToView($onePropertyDataArr['earliestDate']);
-		if (isset($onePropertyDataArr['earliestTimeHours'])) $this->earliestTimeHours = $onePropertyDataArr['earliestTimeHours'];
-		if (isset($onePropertyDataArr['earliestTimeMinutes'])) $this->earliestTimeMinutes = $onePropertyDataArr['earliestTimeMinutes'];
-		if (isset($onePropertyDataArr['adminComment'])) $this->adminComment = $onePropertyDataArr['adminComment'];
-		if (isset($onePropertyDataArr['completeness'])) $this->completeness = $onePropertyDataArr['completeness'];
+		return TRUE;
+	}
 
-		if (isset($onePropertyDataArr['realCostOfRenting'])) $this->realCostOfRenting = $onePropertyDataArr['realCostOfRenting'];
-		if (isset($onePropertyDataArr['last_act'])) $this->last_act = $onePropertyDataArr['last_act'];
-		if (isset($onePropertyDataArr['reg_date'])) $this->reg_date = $onePropertyDataArr['reg_date'];
-		if (isset($onePropertyDataArr['status'])) $this->status = $onePropertyDataArr['status'];
-		if (isset($onePropertyDataArr['id'])) $this->id = $onePropertyDataArr['id'];
-		if (isset($onePropertyDataArr['userId'])) $this->userId = $onePropertyDataArr['userId'];
+	// Метод читает данные объекта недвижимости из архивной таблицы БД и записывает их в параметры данного объекта
+	public function readCharacteristicFromArchive() {
+
+		// Если идентификатор объекта недвижимости неизвестен, то дальнейшие действия не имеют смысла
+		if ($this->id == "") return FALSE;
+
+		// Получим из БД данные ($res) по объекту недвижимости с идентификатором = $this->id
+		$res = DBconnect::selectPropertyCharacteristicFromArchive($this->id);
+
+		// Если получено меньше или больше одной строки (одного объекта недвижимости) из БД, то сообщаем об ошибке
+		if (!is_array($res) || count($res) != 1) {
+			Logger::getLogger(GlobFunc::$loggerName)->log("Property->readCharacteristicFromArchive():1 Ошибка: по id объекта недвижимости == ".$this->id." получено ".count($res)." результатов выборки данных из таблицы archiveAdverts БД. Должна быть только 1 строка. ID пользователя: не определено");
+			return FALSE;
+		}
+
+		// Передаем данные для инициализации параметров объекта
+		$this->initialization($res[0]);
 
 		return TRUE;
 	}
@@ -709,7 +627,8 @@ class Property
 	public function getCharacteristicData() {
 		$result = array();
 
-		$result['ownerLogin'] = $this->ownerLogin;
+		$result['id'] = $this->id;
+		$result['userId'] = $this->userId;
 		$result['typeOfObject'] = $this->typeOfObject;
 		$result['dateOfEntry'] = $this->dateOfEntry;
 		$result['termOfLease'] = $this->termOfLease;
@@ -740,6 +659,7 @@ class Property
 		$result['distanceToMetroStation'] = $this->distanceToMetroStation;
 		$result['currency'] = $this->currency;
 		$result['costOfRenting'] = $this->costOfRenting;
+		$result['realCostOfRenting'] = $this->realCostOfRenting;
 		$result['utilities'] = $this->utilities;
 		$result['costInSummer'] = $this->costInSummer;
 		$result['costInWinter'] = $this->costInWinter;
@@ -771,18 +691,15 @@ class Property
 		$result['checking'] = $this->checking;
 		$result['responsibility'] = $this->responsibility;
 		$result['comment'] = $this->comment;
+		$result['last_act'] = $this->last_act;
+		$result['reg_date'] = $this->reg_date;
+		$result['status'] = $this->status;
 		$result['earliestDate'] = $this->earliestDate;
 		$result['earliestTimeHours'] = $this->earliestTimeHours;
 		$result['earliestTimeMinutes'] = $this->earliestTimeMinutes;
 		$result['adminComment'] = $this->adminComment;
 		$result['completeness'] = $this->completeness;
-
-		$result['realCostOfRenting'] = $this->realCostOfRenting;
-		$result['last_act'] = $this->last_act;
-		$result['reg_date'] = $this->reg_date;
-		$result['status'] = $this->status;
-		$result['id'] = $this->id;
-		$result['userId'] = $this->userId;
+		$result['ownerLogin'] = $this->ownerLogin;
 
 		return $result;
 	}
@@ -1473,8 +1390,8 @@ class Property
 		// Валидация начальных данных
 		if ($this->id == "" || $this->status == "" || $this->completeness == "") return array("Не удалось снять с публикации объявление: недостаточно данных. Попробуйте повторить немного позже или свяжитесь с нами: 89221431615");
 
-		// Если по объекту назначен ближайший просмотр, то его нельзя снять с публикации
-		if ($this->earliestDate != "" && $this->earliestDate != "0000-00-00") return array("Не удалось снять с публикации объявление: по нему назначен просмотр. Вы можете отменить просмотр, связавшись с нами по телефону 89221431615");
+		// Если по объекту назначен ближайший просмотр, то его нельзя снять с публикации. Если просмотр прошел, то объявление должно быть прежде обработано оператором, а затем снято с публикации, если же просмотр еще не прошел, то прежде чем снимать объявление с публикации необходимо предупредить об отмене всех участников просмотра
+		if ($this->earliestDate != "") return array("Не удалось снять с публикации объявление: по нему назначен просмотр. Вы можете отменить просмотр, связавшись с нами по телефону 89221431615");
 
 		// Меняем параметры объекта
 		$this->status = "не опубликовано";
@@ -1489,6 +1406,13 @@ class Property
 
 		// Удалим уведомления типа "Новый подходящий объект", касающиеся этого объекта
 		DBconnect::deleteMessagesNewPropertyForProperty($this->id);
+
+		// Если это объявление из чужой базы, то его необходимо перенести в архивную таблицу
+		if ($this->completeness == "0") {
+			if (!DBconnect::insertPropertyCharacteristicToArchive($this->getCharacteristicData()) || !DBconnect::deletePropertyCharacteristicForId($this->id)) {
+				return array("Не удалось снять с публикации объявление: ошибка доступа к базе. Попробуйте повторить немного позже или свяжитесь с нами по телефону 89221431615");
+			}
+		}
 
 		return array();
 	}

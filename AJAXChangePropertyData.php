@@ -74,7 +74,7 @@ if (!$property->readCharacteristicFromDB()) GlobFunc::accessDenied();
 if ($action == "changeEarliestDate") {
 	if ($property->changeEarliestDate($newValueArr['earliestDate'], $newValueArr['earliestTimeHours'], $newValueArr['earliestTimeMinutes'])) {
 		// Параметры объекта сохраняются в БД только в том случае, если удалось успешно изменить дату и время ближайшего просмотра
-		if (!$property->saveCharacteristicToDB()) GlobFunc::accessDenied();
+		if (!$property->saveCharacteristicToDB("edit")) GlobFunc::accessDenied();
 	} else {
 		GlobFunc::accessDenied();
 	}

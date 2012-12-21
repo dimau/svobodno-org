@@ -56,21 +56,123 @@ class DBconnect
 
 	// Функция закрывает соединение с БД
 	public static function closeConnectToDB() {
-
 		// Если соединения не было, то и закрывать нечего
 		if (self::$connect === FALSE || self::$connect === NULL) return TRUE;
 
 		if (self::$connect->close()) {
-
 			return TRUE;
-
 		} else {
-
 			// TODO: сохранить в лог ошибку закрытия соединения с БД
 			return FALSE;
+		}
+	}
 
+	// Функция возвращает подробные сведения по объектам недвижимости из БД
+	// В случае ошибки возвращает FALSE, елси данные получить не удалось, то пустой массив
+	// На входе - отсортированный массив id объектов недвижимости
+	// $mode - режим работы. "all" - выдать данные по всем объектам (вне зависимости опубликованы они или нет), "published" - выдать данные только по опубликованным объектам
+	// На выходе - отсортированный в том же порядке массив ассоциативных массивов, каждый из которых содержит все параметры одного объекта, в том числе его фотографии
+	// TODO: переделать функцию или избавиться от нее или переназвать
+	public static function getFullDataAboutProperties($propertiesId, $mode) {
+		// Проверка входного массива
+		if (!isset($propertiesId) || !is_array($propertiesId)) return FALSE;
+
+		// Сколько всего объектов интересует
+		$limit = count($propertiesId);
+		// Если 0, возвращаем пустой массив
+		if ($limit == 0) return array();
+
+		// Собираем строку WHERE для поискового запроса к БД по полным данным для не более чем 20-ти первых объектов
+		$strWHERE = " (";
+		for ($i = 0; $i < $limit; $i++) {
+			$strWHERE .= " id = '" . $propertiesId[$i] . "'";
+			if ($i < $limit - 1) $strWHERE .= " OR";
+		}
+		$strWHERE .= ")";
+
+		// Если требуется режим получения данных только по опубликованным объектам, то реализуем его
+		if ($mode == "published") $strWHERE .= " AND (status = 'опубликовано')";
+
+		// Узнаем анкетные данные о наших объектах
+		$res = DBconnect::get()->query("SELECT * FROM property WHERE" . $strWHERE);
+		if ((DBconnect::get()->errno)
+			OR (($propertyFullArr = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+		) {
+			// Логируем ошибку
+			//TODO: сделать логирование ошибки
+			$propertyFullArr = array();
 		}
 
+		// Упорядочим полученные результаты из БД в том порядке, в котором во входящем массиве $propertiesId были указаны соответствующие id объектов недвижимости
+		$tempArr = array();
+		for ($i = 0; $i < $limit; $i++) {
+			foreach ($propertyFullArr as $value) {
+				if ($propertiesId[$i] == $value['id']) {
+					$tempArr[] = $value;
+					break;
+				}
+			}
+		}
+		$propertyFullArr = $tempArr;
+
+		// Получим данные о фотографиях для каждого объекта из $propertyFullArr
+		for ($i = 0, $s = count($propertyFullArr); $i < $s; $i++) {
+			// Получим данные о фотографиях по id объекта недвижимости
+			$propertyFotos = DBconnect::selectPhotosForProperty($propertyFullArr[$i]['id']);
+			// Записываем полученный массив массивов с данными о фотографиях в специальный новый параметр массива $propertyFullArr
+			$propertyFullArr[$i]['propertyFotos'] = $propertyFotos;
+		}
+
+		return $propertyFullArr;
+	}
+
+	/**
+	 * Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одному из объектов недвижимости. Если ничего не найдено или произошла ошибка, вернет пустой массив
+	 * ВНИМАНИЕ: массивы могут быть расположены не в том же порядке, в каком идентификаторы располагались во входном массиве
+	 *
+	 * @param int|array $propertiesId - идентификатор объекта недвижимости, либо массив идентификаторов объектов недвижимости, по которым нужно получить данные
+	 * @return array
+	 */
+	public static function selectPropertyCharacteristicForPropertiesId($propertiesId) {
+
+		// Проверка входящих параметров
+		if (!isset($propertiesId)) return array();
+		if (is_array($propertiesId) && count($propertiesId) == 0) return array();
+
+		// Если нам на вход дали единичный идентификатор, то приведем его к виду массива
+		if (!is_array($propertiesId)) $propertiesId = array($propertiesId);
+
+		// Для надежности преобразование к целому типу членов массива и их проверка
+		for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
+			$propertiesId[$i] = intval($propertiesId[$i]);
+			if ($propertiesId[$i] == 0) return array(); // Если преобразование дало 0, значит один из членов массива не является идентификатором объекта недвижимости - входные данные некорректны
+		}
+
+		// Соберем условие для получения данных из БД
+		$strWHERE = " (";
+		for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
+			$strWHERE .= " id = '" . $propertiesId[$i] . "'";
+			if ($i < $s - 1) $strWHERE .= " OR";
+		}
+		$strWHERE .= " )";
+
+		// Получаем данные из БД
+		$res = DBconnect::get()->query("SELECT * FROM property WHERE" . $strWHERE);
+		if ((DBconnect::get()->errno)
+			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+		) {
+			// Логируем ошибку
+			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM property WHERE".$strWHERE."'. id логгера: DBconnect::selectPropertyCharacteristicForPropertiesId():1. Выдаваемая ошибка: " . DBconnect::get()->errno . " " . DBconnect::get()->error . ". ID пользователя: не определено");
+			return array();
+		}
+
+		// Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
+		for ($i = 0, $s = count($res); $i < $s; $i++) {
+			$res[$i] = DBconnect::conversionPropertyCharacteristicFromDBToView($res[$i]);
+		}
+
+		// Вернем результат
+		return $res;
 	}
 
 	/**
@@ -189,7 +291,7 @@ class DBconnect
 			return array();
 		}
 
-		// Преобразование данных для удобной работы с ними
+		// Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
 		for ($i = 0, $s = count($res); $i < $s; $i++) {
 			$res[$i]['amountOfRooms'] = unserialize($res[$i]['amountOfRooms']);
 			$res[$i]['district'] = unserialize($res[$i]['district']);
@@ -337,7 +439,7 @@ class DBconnect
 			return array();
 		}
 
-		// Преобразование данных для удобной работы с ними
+		// Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
 		for ($i = 0, $s = count($res); $i < $s; $i++) {
 			$res[$i]['fotoArr'] = unserialize($res[$i]['fotoArr']);
 		}
@@ -364,7 +466,7 @@ class DBconnect
 			return array();
 		}
 
-		// Преобразование данных для удобной работы с ними
+		// Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
 		for ($i = 0, $s = count($res); $i < $s; $i++) {
 			$res[$i]['fotoArr'] = unserialize($res[$i]['fotoArr']);
 		}
@@ -392,6 +494,105 @@ class DBconnect
 		}
 
 		return $res;
+	}
+
+	/**
+	 * Возвращает массив ассоциированных массивов из таблицы архивных объявлений, каждый из которых содержит данные по одному из объектов недвижимости. Если ничего не найдено или произошла ошибка, вернет пустой массив
+	 * ВНИМАНИЕ: массивы могут быть расположены не в том же порядке, в каком идентификаторы располагались во входном массиве
+	 *
+	 * @param int|array $propertiesId - идентификатор объекта недвижимости, либо массив идентификаторов объектов недвижимости, по которым нужно получить данные
+	 * @return array
+	 */
+	public static function selectPropertyCharacteristicFromArchive($propertiesId) {
+
+		// Проверка входящих параметров
+		if (!isset($propertiesId)) return array();
+		if (is_array($propertiesId) && count($propertiesId) == 0) return array();
+
+		// Если нам на вход дали единичный идентификатор, то приведем его к виду массива
+		if (!is_array($propertiesId)) $propertiesId = array($propertiesId);
+
+		// Для надежности преобразование к целому типу членов массива и их проверка
+		for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
+			$propertiesId[$i] = intval($propertiesId[$i]);
+			if ($propertiesId[$i] == 0) return array(); // Если преобразование дало 0, значит один из членов массива не является идентификатором объекта недвижимости - входные данные некорректны
+		}
+
+		// Соберем условие для получения данных из БД
+		$strWHERE = " (";
+		for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
+			$strWHERE .= " id = '" . $propertiesId[$i] . "'";
+			if ($i < $s - 1) $strWHERE .= " OR";
+		}
+		$strWHERE .= " )";
+
+		// Получаем данные из БД
+		$res = DBconnect::get()->query("SELECT * FROM archiveAdverts WHERE" . $strWHERE);
+		if ((DBconnect::get()->errno)
+			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+		) {
+			// Логируем ошибку
+			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM archiveAdverts WHERE".$strWHERE."'. id логгера: DBconnect::selectPropertyCharacteristicFromArchive():1. Выдаваемая ошибка: " . DBconnect::get()->errno . " " . DBconnect::get()->error . ". ID пользователя: не определено");
+			return array();
+		}
+
+		// Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
+		for ($i = 0, $s = count($res); $i < $s; $i++) {
+			$res[$i] = DBconnect::conversionPropertyCharacteristicFromDBToView($res[$i]);
+		}
+
+		// Вернем результат
+		return $res;
+	}
+
+	// Сохраняет данные об объекте недвижимости в БД
+	// Возвращает TRUE в случае успеха и FALSE в случае неудачи
+	public static function insertPropertyCharacteristic($paramsArr) {
+
+		// Проверка входящих параметров
+		if (!isset($paramsArr) || !is_array($paramsArr)) return FALSE;
+
+		// Подготовка данных к записи в БД
+		$paramsArr = DBconnect::conversionPropertyCharacteristicFromViewToDB($paramsArr);
+
+		$stmt = DBconnect::get()->stmt_init();
+		if (($stmt->prepare("INSERT INTO property SET userId=?, typeOfObject=?, dateOfEntry=?, termOfLease=?, dateOfCheckOut=?, amountOfRooms=?, adjacentRooms=?, amountOfAdjacentRooms=?, typeOfBathrooms=?, typeOfBalcony=?, balconyGlazed=?, roomSpace=?, totalArea=?, livingSpace=?, kitchenSpace=?, floor=?, totalAmountFloor=?, numberOfFloor=?, concierge=?, intercom=?, parking=?, city=?, district=?, coordX=?, coordY=?, address=?, apartmentNumber=?, subwayStation=?, distanceToMetroStation=?, currency=?, costOfRenting=?, realCostOfRenting=?, utilities=?, costInSummer=?, costInWinter=?, electricPower=?, bail=?, bailCost=?, prepayment=?, compensationMoney=?, compensationPercent=?, repair=?, furnish=?, windows=?, internet=?, telephoneLine=?, cableTV=?, furnitureInLivingArea=?, furnitureInLivingAreaExtra=?, furnitureInKitchen=?, furnitureInKitchenExtra=?, appliances=?, appliancesExtra=?, sexOfTenant=?, relations=?, children=?, animals=?, contactTelephonNumber=?, timeForRingBegin=?, timeForRingEnd=?, checking=?, responsibility=?, comment=?, last_act=?, reg_date=?, status=?, earliestDate=?, earliestTimeHours=?, earliestTimeMinutes=?, adminComment=?, completeness=?") === FALSE)
+			OR ($stmt->bind_param("sssssssssssddddiiissssssssssisddsddssdsddssssssssssssssssssssssiissssss", $paramsArr['userId'], $paramsArr['typeOfObject'], $paramsArr['dateOfEntry'], $paramsArr['termOfLease'], $paramsArr['dateOfCheckOut'], $paramsArr['amountOfRooms'], $paramsArr['adjacentRooms'], $paramsArr['amountOfAdjacentRooms'], $paramsArr['typeOfBathrooms'], $paramsArr['typeOfBalcony'], $paramsArr['balconyGlazed'], $paramsArr['roomSpace'], $paramsArr['totalArea'], $paramsArr['livingSpace'], $paramsArr['kitchenSpace'], $paramsArr['floor'], $paramsArr['totalAmountFloor'], $paramsArr['numberOfFloor'], $paramsArr['concierge'], $paramsArr['intercom'], $paramsArr['parking'], $paramsArr['city'], $paramsArr['district'], $paramsArr['coordX'], $paramsArr['coordY'], $paramsArr['address'], $paramsArr['apartmentNumber'], $paramsArr['subwayStation'], $paramsArr['distanceToMetroStation'], $paramsArr['currency'], $paramsArr['costOfRenting'], $paramsArr['realCostOfRenting'], $paramsArr['utilities'], $paramsArr['costInSummer'], $paramsArr['costInWinter'], $paramsArr['electricPower'], $paramsArr['bail'], $paramsArr['bailCost'], $paramsArr['prepayment'], $paramsArr['compensationMoney'], $paramsArr['compensationPercent'], $paramsArr['repair'], $paramsArr['furnish'], $paramsArr['windows'], $paramsArr['internet'], $paramsArr['telephoneLine'], $paramsArr['cableTV'], $paramsArr['furnitureInLivingArea'], $paramsArr['furnitureInLivingAreaExtra'], $paramsArr['furnitureInKitchen'], $paramsArr['furnitureInKitchenExtra'], $paramsArr['appliances'], $paramsArr['appliancesExtra'], $paramsArr['sexOfTenant'], $paramsArr['relations'], $paramsArr['children'], $paramsArr['animals'], $paramsArr['contactTelephonNumber'], $paramsArr['timeForRingBegin'], $paramsArr['timeForRingEnd'], $paramsArr['checking'], $paramsArr['responsibility'], $paramsArr['comment'], $paramsArr['last_act'], $paramsArr['reg_date'], $paramsArr['status'], $paramsArr['earliestDate'], $paramsArr['earliestTimeHours'], $paramsArr['earliestTimeMinutes'], $paramsArr['adminComment'], $paramsArr['completeness']) === FALSE)
+			OR ($stmt->execute() === FALSE)
+			OR (($res = $stmt->affected_rows) === -1)
+			OR ($res === 0)
+			OR ($stmt->close() === FALSE)
+		) {
+			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO archiveAdverts SET userId=".$paramsArr['userId'].", typeOfObject=".$paramsArr['typeOfObject'].", dateOfEntry=".$paramsArr['dateOfEntry'].", termOfLease=".$paramsArr['termOfLease'].", dateOfCheckOut=".$paramsArr['dateOfCheckOut'].", amountOfRooms=".$paramsArr['amountOfRooms'].", adjacentRooms=".$paramsArr['adjacentRooms'].", amountOfAdjacentRooms=".$paramsArr['amountOfAdjacentRooms'].", typeOfBathrooms=".$paramsArr['typeOfBathrooms'].", typeOfBalcony=".$paramsArr['typeOfBalcony'].", balconyGlazed=".$paramsArr['balconyGlazed'].", roomSpace=".$paramsArr['roomSpace'].", totalArea=".$paramsArr['totalArea'].", livingSpace=".$paramsArr['livingSpace'].", kitchenSpace=".$paramsArr['kitchenSpace'].", floor=".$paramsArr['floor'].", totalAmountFloor=".$paramsArr['totalAmountFloor'].", numberOfFloor=".$paramsArr['numberOfFloor'].", concierge=".$paramsArr['concierge'].", intercom=".$paramsArr['intercom'].", parking=".$paramsArr['parking'].", city=".$paramsArr['city'].", district=".$paramsArr['district'].", coordX=".$paramsArr['coordX'].", coordY=".$paramsArr['coordY'].", address=".$paramsArr['address'].", apartmentNumber=".$paramsArr['apartmentNumber'].", subwayStation=".$paramsArr['subwayStation'].", distanceToMetroStation=".$paramsArr['distanceToMetroStation'].", currency=".$paramsArr['currency'].", costOfRenting=".$paramsArr['costOfRenting'].", realCostOfRenting=".$paramsArr['realCostOfRenting'].", utilities=".$paramsArr['utilities'].", costInSummer=".$paramsArr['costInSummer'].", costInWinter=".$paramsArr['costInWinter'].", electricPower=".$paramsArr['electricPower'].", bail=".$paramsArr['bail'].", bailCost=".$paramsArr['bailCost'].", prepayment=".$paramsArr['prepayment'].", compensationMoney=".$paramsArr['compensationMoney'].", compensationPercent=".$paramsArr['compensationPercent'].", repair=".$paramsArr['repair'].", furnish=".$paramsArr['furnish'].", windows=".$paramsArr['windows'].", internet=".$paramsArr['internet'].", telephoneLine=".$paramsArr['telephoneLine'].", cableTV=".$paramsArr['cableTV'].", furnitureInLivingArea=".$paramsArr['furnitureInLivingArea'].", furnitureInLivingAreaExtra=".$paramsArr['furnitureInLivingAreaExtra'].", furnitureInKitchen=".$paramsArr['furnitureInKitchen'].", furnitureInKitchenExtra=".$paramsArr['furnitureInKitchenExtra'].", appliances=".$paramsArr['appliances'].", appliancesExtra=".$paramsArr['appliancesExtra'].", sexOfTenant=".$paramsArr['sexOfTenant'].", relations=".$paramsArr['relations'].", children=".$paramsArr['children'].", animals=".$paramsArr['animals'].", contactTelephonNumber=".$paramsArr['contactTelephonNumber'].", timeForRingBegin=".$paramsArr['timeForRingBegin'].", timeForRingEnd=".$paramsArr['timeForRingEnd'].", checking=".$paramsArr['checking'].", responsibility=".$paramsArr['responsibility'].", comment=".$paramsArr['comment'].", last_act=".$paramsArr['last_act'].", reg_date=".$paramsArr['reg_date'].", status=".$paramsArr['status'].", earliestDate=".$paramsArr['earliestDate'].", earliestTimeHours=".$paramsArr['earliestTimeHours'].", earliestTimeMinutes=".$paramsArr['earliestTimeMinutes'].", adminComment=".$paramsArr['adminComment'].", completeness=".$paramsArr['completeness']."'. id логгера: DBconnect::insertPropertyCharacteristicToArchive():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+			return FALSE;
+		}
+
+		return TRUE;
+	}
+
+	// Сохраняет данные о чужом объявлении в архивную таблицу
+	// Возвращает TRUE в случае успеха и FALSE в случае неудачи
+	public static function insertPropertyCharacteristicToArchive($paramsArr) {
+
+		// Проверка входящих параметров
+		if (!isset($paramsArr) || !is_array($paramsArr)) return FALSE;
+
+		// Подготовка данных к записи в БД
+		$paramsArr = DBconnect::conversionPropertyCharacteristicFromViewToDB($paramsArr);
+
+		$stmt = DBconnect::get()->stmt_init();
+		if (($stmt->prepare("INSERT INTO archiveAdverts SET id = ?, userId=?, typeOfObject=?, dateOfEntry=?, termOfLease=?, dateOfCheckOut=?, amountOfRooms=?, adjacentRooms=?, amountOfAdjacentRooms=?, typeOfBathrooms=?, typeOfBalcony=?, balconyGlazed=?, roomSpace=?, totalArea=?, livingSpace=?, kitchenSpace=?, floor=?, totalAmountFloor=?, numberOfFloor=?, concierge=?, intercom=?, parking=?, city=?, district=?, coordX=?, coordY=?, address=?, apartmentNumber=?, subwayStation=?, distanceToMetroStation=?, currency=?, costOfRenting=?, realCostOfRenting=?, utilities=?, costInSummer=?, costInWinter=?, electricPower=?, bail=?, bailCost=?, prepayment=?, compensationMoney=?, compensationPercent=?, repair=?, furnish=?, windows=?, internet=?, telephoneLine=?, cableTV=?, furnitureInLivingArea=?, furnitureInLivingAreaExtra=?, furnitureInKitchen=?, furnitureInKitchenExtra=?, appliances=?, appliancesExtra=?, sexOfTenant=?, relations=?, children=?, animals=?, contactTelephonNumber=?, timeForRingBegin=?, timeForRingEnd=?, checking=?, responsibility=?, comment=?, last_act=?, reg_date=?, status=?, earliestDate=?, earliestTimeHours=?, earliestTimeMinutes=?, adminComment=?, completeness=?") === FALSE)
+			OR ($stmt->bind_param("isssssssssssddddiiissssssssssisddsddssdsddssssssssssssssssssssssiissssss", $paramsArr['id'], $paramsArr['userId'], $paramsArr['typeOfObject'], $paramsArr['dateOfEntry'], $paramsArr['termOfLease'], $paramsArr['dateOfCheckOut'], $paramsArr['amountOfRooms'], $paramsArr['adjacentRooms'], $paramsArr['amountOfAdjacentRooms'], $paramsArr['typeOfBathrooms'], $paramsArr['typeOfBalcony'], $paramsArr['balconyGlazed'], $paramsArr['roomSpace'], $paramsArr['totalArea'], $paramsArr['livingSpace'], $paramsArr['kitchenSpace'], $paramsArr['floor'], $paramsArr['totalAmountFloor'], $paramsArr['numberOfFloor'], $paramsArr['concierge'], $paramsArr['intercom'], $paramsArr['parking'], $paramsArr['city'], $paramsArr['district'], $paramsArr['coordX'], $paramsArr['coordY'], $paramsArr['address'], $paramsArr['apartmentNumber'], $paramsArr['subwayStation'], $paramsArr['distanceToMetroStation'], $paramsArr['currency'], $paramsArr['costOfRenting'], $paramsArr['realCostOfRenting'], $paramsArr['utilities'], $paramsArr['costInSummer'], $paramsArr['costInWinter'], $paramsArr['electricPower'], $paramsArr['bail'], $paramsArr['bailCost'], $paramsArr['prepayment'], $paramsArr['compensationMoney'], $paramsArr['compensationPercent'], $paramsArr['repair'], $paramsArr['furnish'], $paramsArr['windows'], $paramsArr['internet'], $paramsArr['telephoneLine'], $paramsArr['cableTV'], $paramsArr['furnitureInLivingArea'], $paramsArr['furnitureInLivingAreaExtra'], $paramsArr['furnitureInKitchen'], $paramsArr['furnitureInKitchenExtra'], $paramsArr['appliances'], $paramsArr['appliancesExtra'], $paramsArr['sexOfTenant'], $paramsArr['relations'], $paramsArr['children'], $paramsArr['animals'], $paramsArr['contactTelephonNumber'], $paramsArr['timeForRingBegin'], $paramsArr['timeForRingEnd'], $paramsArr['checking'], $paramsArr['responsibility'], $paramsArr['comment'], $paramsArr['last_act'], $paramsArr['reg_date'], $paramsArr['status'], $paramsArr['earliestDate'], $paramsArr['earliestTimeHours'], $paramsArr['earliestTimeMinutes'], $paramsArr['adminComment'], $paramsArr['completeness']) === FALSE)
+			OR ($stmt->execute() === FALSE)
+			OR (($res = $stmt->affected_rows) === -1)
+			OR ($res === 0)
+			OR ($stmt->close() === FALSE)
+		) {
+			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO archiveAdverts SET id = ".$paramsArr['id'].", userId=".$paramsArr['userId'].", typeOfObject=".$paramsArr['typeOfObject'].", dateOfEntry=".$paramsArr['dateOfEntry'].", termOfLease=".$paramsArr['termOfLease'].", dateOfCheckOut=".$paramsArr['dateOfCheckOut'].", amountOfRooms=".$paramsArr['amountOfRooms'].", adjacentRooms=".$paramsArr['adjacentRooms'].", amountOfAdjacentRooms=".$paramsArr['amountOfAdjacentRooms'].", typeOfBathrooms=".$paramsArr['typeOfBathrooms'].", typeOfBalcony=".$paramsArr['typeOfBalcony'].", balconyGlazed=".$paramsArr['balconyGlazed'].", roomSpace=".$paramsArr['roomSpace'].", totalArea=".$paramsArr['totalArea'].", livingSpace=".$paramsArr['livingSpace'].", kitchenSpace=".$paramsArr['kitchenSpace'].", floor=".$paramsArr['floor'].", totalAmountFloor=".$paramsArr['totalAmountFloor'].", numberOfFloor=".$paramsArr['numberOfFloor'].", concierge=".$paramsArr['concierge'].", intercom=".$paramsArr['intercom'].", parking=".$paramsArr['parking'].", city=".$paramsArr['city'].", district=".$paramsArr['district'].", coordX=".$paramsArr['coordX'].", coordY=".$paramsArr['coordY'].", address=".$paramsArr['address'].", apartmentNumber=".$paramsArr['apartmentNumber'].", subwayStation=".$paramsArr['subwayStation'].", distanceToMetroStation=".$paramsArr['distanceToMetroStation'].", currency=".$paramsArr['currency'].", costOfRenting=".$paramsArr['costOfRenting'].", realCostOfRenting=".$paramsArr['realCostOfRenting'].", utilities=".$paramsArr['utilities'].", costInSummer=".$paramsArr['costInSummer'].", costInWinter=".$paramsArr['costInWinter'].", electricPower=".$paramsArr['electricPower'].", bail=".$paramsArr['bail'].", bailCost=".$paramsArr['bailCost'].", prepayment=".$paramsArr['prepayment'].", compensationMoney=".$paramsArr['compensationMoney'].", compensationPercent=".$paramsArr['compensationPercent'].", repair=".$paramsArr['repair'].", furnish=".$paramsArr['furnish'].", windows=".$paramsArr['windows'].", internet=".$paramsArr['internet'].", telephoneLine=".$paramsArr['telephoneLine'].", cableTV=".$paramsArr['cableTV'].", furnitureInLivingArea=".$paramsArr['furnitureInLivingArea'].", furnitureInLivingAreaExtra=".$paramsArr['furnitureInLivingAreaExtra'].", furnitureInKitchen=".$paramsArr['furnitureInKitchen'].", furnitureInKitchenExtra=".$paramsArr['furnitureInKitchenExtra'].", appliances=".$paramsArr['appliances'].", appliancesExtra=".$paramsArr['appliancesExtra'].", sexOfTenant=".$paramsArr['sexOfTenant'].", relations=".$paramsArr['relations'].", children=".$paramsArr['children'].", animals=".$paramsArr['animals'].", contactTelephonNumber=".$paramsArr['contactTelephonNumber'].", timeForRingBegin=".$paramsArr['timeForRingBegin'].", timeForRingEnd=".$paramsArr['timeForRingEnd'].", checking=".$paramsArr['checking'].", responsibility=".$paramsArr['responsibility'].", comment=".$paramsArr['comment'].", last_act=".$paramsArr['last_act'].", reg_date=".$paramsArr['reg_date'].", status=".$paramsArr['status'].", earliestDate=".$paramsArr['earliestDate'].", earliestTimeHours=".$paramsArr['earliestTimeHours'].", earliestTimeMinutes=".$paramsArr['earliestTimeMinutes'].", adminComment=".$paramsArr['adminComment'].", completeness=".$paramsArr['completeness']."'. id логгера: DBconnect::insertPropertyCharacteristicToArchive():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+			return FALSE;
+		}
+
+		return TRUE;
 	}
 
 	// Сохраняет данные о фотографии в таблицу временного хранения tempFotos
@@ -592,6 +793,27 @@ class DBconnect
 		return TRUE;
 	}
 
+	// Удаляет описание (характеристику) объекта недвижимости
+	// Возвращает TRUE в случае успеха и FALSE в случае неудачи
+	public static function deletePropertyCharacteristicForId($propertyId) {
+
+		// Валидация входный данных
+		if (!isset($propertyId) || !is_int($propertyId)) return FALSE;
+
+		$stmt = DBconnect::get()->stmt_init();
+		if (($stmt->prepare("DELETE FROM property WHERE id = ?") === FALSE)
+			OR ($stmt->bind_param("i", $propertyId) === FALSE)
+			OR ($stmt->execute() === FALSE)
+			OR (($res = $stmt->affected_rows) === -1)
+			OR ($stmt->close() === FALSE)
+		) {
+			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM property WHERE id = " . $propertyId . "'. id логгера: DBconnect::deletePropertyCharacteristicForId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+			return FALSE;
+		}
+
+		return TRUE;
+	}
+
 	// Удаляет все фотографии, загруженные по временному идентификатору сессии загрузки фотографий ($fileUploadId)
 	// Возвращает TRUE в случае успеха и FALSE в случае неудачи
 	public static function deletePhotosForFileUploadId($fileUploadId) {
@@ -775,67 +997,10 @@ class DBconnect
 		return $res[0];
 	}
 
-	// Функция возвращает подробные сведения по объектам недвижимости из БД
-	// В случае ошибки возвращает FALSE, елси данные получить не удалось, то пустой массив
-	// На входе - отсортированный массив id объектов недвижимости
-	// $mode - режим работы. "all" - выдать данные по всем объектам (вне зависимости опубликованы они или нет), "published" - выдать данные только по опубликованным объектам
-	// На выходе - отсортированный в том же порядке массив ассоциативных массивов, каждый из которых содержит все параметры одного объекта, в том числе его фотографии
-	public static function getFullDataAboutProperties($propertiesId, $mode) {
-		// Проверка входного массива
-		if (!isset($propertiesId) || !is_array($propertiesId)) return FALSE;
-
-		// Сколько всего объектов интересует
-		$limit = count($propertiesId);
-		// Если 0, возвращаем пустой массив
-		if ($limit == 0) return array();
-
-		// Собираем строку WHERE для поискового запроса к БД по полным данным для не более чем 20-ти первых объектов
-		$strWHERE = " (";
-		for ($i = 0; $i < $limit; $i++) {
-			$strWHERE .= " id = '" . $propertiesId[$i] . "'";
-			if ($i < $limit - 1) $strWHERE .= " OR";
-		}
-		$strWHERE .= ")";
-
-		// Если требуется режим получения данных только по опубликованным объектам, то реализуем его
-		if ($mode == "published") $strWHERE .= " AND (status = 'опубликовано')";
-
-		// Узнаем анкетные данные о наших объектах
-		$res = DBconnect::get()->query("SELECT * FROM property WHERE" . $strWHERE);
-		if ((DBconnect::get()->errno)
-			OR (($propertyFullArr = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-		) {
-			// Логируем ошибку
-			//TODO: сделать логирование ошибки
-			$propertyFullArr = array();
-		}
-
-		// Упорядочим полученные результаты из БД в том порядке, в котором во входящем массиве $propertiesId были указаны соответствующие id объектов недвижимости
-		$tempArr = array();
-		for ($i = 0; $i < $limit; $i++) {
-			foreach ($propertyFullArr as $value) {
-				if ($propertiesId[$i] == $value['id']) {
-					$tempArr[] = $value;
-					break;
-				}
-			}
-		}
-		$propertyFullArr = $tempArr;
-
-		// Получим данные о фотографиях для каждого объекта из $propertyFullArr
-		for ($i = 0, $s = count($propertyFullArr); $i < $s; $i++) {
-			// Получим данные о фотографиях по id объекта недвижимости
-			$propertyFotos = DBconnect::selectPhotosForProperty($propertyFullArr[$i]['id']);
-			// Записываем полученный массив массивов с данными о фотографиях в специальный новый параметр массива $propertyFullArr
-			$propertyFullArr[$i]['propertyFotos'] = $propertyFotos;
-		}
-
-		return $propertyFullArr;
-	}
-
 	// Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одному из пользователей. Если ничего не найдено или произошла ошибка, вернет пустой массив
 	// На входе - идентификатор пользователя, либо массив идентификаторов пользователей, по которым нужно получить данные
 	// ВНИМАНИЕ: массивы могут быть расположены не в том же порядке, в каком идентификаторы располагались во входном массиве
+	// TODO: переделать, переназвать
 	public static function getAllDataAboutCharacteristicUsers($usersId) {
 
 		// Проверка входящих параметров
@@ -873,44 +1038,76 @@ class DBconnect
 		return $res;
 	}
 
-	// Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одному из объектов недвижимости. Если ничего не найдено или произошла ошибка, вернет пустой массив
-	// На входе - идентификатор объекта недвижимости, либо массив идентификаторов объектов недвижимости, по которым нужно получить данные
-	// ВНИМАНИЕ: массивы могут быть расположены не в том же порядке, в каком идентификаторы располагались во входном массиве
-	public static function getAllDataAboutCharacteristicProperties($propertiesId) {
+	/**
+	 * Преобразование данных об объекте недвижимости из формата хранения в БД в формат, с которым работают php скрипты
+	 *
+	 * @param array $property ассоциативный массив с параметрами объекта недвижимости
+	 * @return array исходный массив с преобразованными параметрами
+	 */
+	public static function conversionPropertyCharacteristicFromDBToView($property) {
 
-		// Проверка входящих параметров
-		if (!isset($propertiesId)) return array();
-		if (is_array($propertiesId) && count($propertiesId) == 0) return array();
+		if (!isset($property) || !is_array($property)) return $property;
 
-		// Если нам на вход дали единичный идентификатор, то приведем его к виду массива
-		if (!is_array($propertiesId)) $propertiesId = array($propertiesId);
+		$property['dateOfEntry'] = GlobFunc::dateFromDBToView($property['dateOfEntry']);
+		$property['dateOfCheckOut'] = GlobFunc::dateFromDBToView($property['dateOfCheckOut']);
+		if ($property['roomSpace'] == 0) $property['roomSpace'] = "";
+		if ($property['totalArea'] == 0) $property['totalArea'] = "";
+		if ($property['livingSpace'] == 0) $property['livingSpace'] = "";
+		if ($property['kitchenSpace'] == 0) $property['kitchenSpace'] = "";
+		if ($property['floor'] == 0) $property['floor'] = "";
+		if ($property['totalAmountFloor'] == 0) $property['totalAmountFloor'] = "";
+		if ($property['numberOfFloor'] == 0) $property['numberOfFloor'] = "";
+		if ($property['distanceToMetroStation'] == 0) $property['distanceToMetroStation'] = "";
+		if ($property['costOfRenting'] == 0) $property['costOfRenting'] = "";
+		if ($property['costInSummer'] == 0) $property['costInSummer'] = "";
+		if ($property['costInWinter'] == 0) $property['costInWinter'] = "";
+		if ($property['bailCost'] == 0) $property['bailCost'] = "";
+		if ($property['compensationMoney'] == 0) $property['compensationMoney'] = "";
+		if ($property['compensationPercent'] == 0) $property['compensationPercent'] = "";
+		$property['furnitureInLivingArea'] = unserialize($property['furnitureInLivingArea']);
+		$property['furnitureInKitchen'] = unserialize($property['furnitureInKitchen']);
+		$property['appliances'] = unserialize($property['appliances']);
+		$property['sexOfTenant'] = unserialize($property['sexOfTenant']);
+		$property['relations'] = unserialize($property['relations']);
+		$property['earliestDate'] = GlobFunc::dateFromDBToView($property['earliestDate']);
 
-		// Для надежности преобразование к целому типу членов массива и их проверка
-		for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
-			$propertiesId[$i] = intval($propertiesId[$i]);
-			if ($propertiesId[$i] == 0) return array(); // Если преобразование дало 0, значит один из членов массива не является идентификатором объекта недвижимости - входные данные некорректны
-		}
+		return $property;
+	}
 
-		// Соберем условие для получения данных из БД
-		$strWHERE = " (";
-		for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
-			$strWHERE .= " id = '" . $propertiesId[$i] . "'";
-			if ($i < $s - 1) $strWHERE .= " OR";
-		}
-		$strWHERE .= " )";
+	/**
+	 * Преобразование данных об объекте недвижимости из формата, с которым работают php скрипты в формат хранения в БД
+	 *
+	 * @param array $property ассоциативный массив с параметрами объекта недвижимости
+	 * @return array исходный массив с преобразованными параметрами
+	 */
+	public static function conversionPropertyCharacteristicFromViewToDB($property) {
 
-		// Получаем данные из БД
-		$res = DBconnect::get()->query("SELECT * FROM property WHERE" . $strWHERE);
-		if ((DBconnect::get()->errno)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-		) {
-			// Логируем ошибку
-			//TODO: сделать логирование ошибки
-			return array();
-		}
+		if (!isset($property) || !is_array($property)) return $property;
 
-		// Вернем результат
-		return $res;
+		$property['dateOfEntry'] = GlobFunc::dateFromViewToDB($property['dateOfEntry']);
+		$property['dateOfCheckOut'] = GlobFunc::dateFromViewToDB($property['dateOfCheckOut']);
+		if ($property['roomSpace'] == "") $property['roomSpace'] = 0.00;
+		if ($property['totalArea'] == "") $property['totalArea'] = 0.00;
+		if ($property['livingSpace'] == "") $property['livingSpace'] = 0.00;
+		if ($property['kitchenSpace'] == "") $property['kitchenSpace'] = 0.00;
+		if ($property['floor'] == "") $property['floor'] = 0;
+		if ($property['totalAmountFloor'] == "") $property['totalAmountFloor'] = 0;
+		if ($property['numberOfFloor'] == "") $property['numberOfFloor'] = 0;
+		if ($property['distanceToMetroStation'] == "") $property['distanceToMetroStation'] = 0;
+		if ($property['costOfRenting'] == "") $property['costOfRenting'] = 0;
+		if ($property['costInSummer'] == "") $property['costInSummer'] = 0;
+		if ($property['costInWinter'] == "") $property['costInWinter'] = 0;
+		if ($property['bailCost'] == "") $property['bailCost'] = 0;
+		if ($property['compensationMoney'] == "") $property['compensationMoney'] = 0.00;
+		if ($property['compensationPercent'] == "") $property['compensationPercent'] = 0.00;
+		$property['furnitureInLivingArea'] = serialize($property['furnitureInLivingArea']);
+		$property['furnitureInKitchen'] = serialize($property['furnitureInKitchen']);
+		$property['appliances'] = serialize($property['appliances']);
+		$property['sexOfTenant'] = serialize($property['sexOfTenant']);
+		$property['relations'] = serialize($property['relations']);
+		$property['earliestDate'] = GlobFunc::dateFromViewToDB($property['earliestDate']);
+
+		return $property;
 	}
 
 	// Конструктор не используется (но чтобы его нельзя было вызвать снаружи защищен модификатором private), так как он возвращает объект класса DBconnect, а мне в переменной $connect нужен объект класса mysqli
