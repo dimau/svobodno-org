@@ -25,6 +25,14 @@
             }
         }
 
+        public function getName() {
+            return $this->name;
+        }
+
+        public function getAddress() {
+            return $this->address;
+        }
+
         // Сохраняет параметры запроса собственника в БД
         // Возвращает TRUE, если данные успешно сохранены и FALSE в противном случае
         public function saveParamsToDB()

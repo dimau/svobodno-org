@@ -96,7 +96,20 @@ if ($action == "signUpToView") {
 	$errors = $signUpToView->isParamsCorrect();
 	$statusOfSaveParamsToDB = $signUpToView->saveParamsToDB(); // вне зависимости от полноты заполнения формы (корректности) она будет отправлена на сервер и обработана. Это решение связано с тем, что сложно отобразить на клиенте пользователю - что он не заполнил поле в модальном окне, лень это реализовывать
 
-	//TODO: оповестить оператора о новом запросе на просмотр
+    // Оповестим операторов о появлении новой заявки на просмотр
+    if ($statusOfSaveParamsToDB) {
+
+        $subject = 'Заявка на просмотр: '.$property->getAddress();
+
+        $msgHTML = "Поступила новая заявка на просмотр:<br>
+        Дата: ".date('d.m.Y H:i')."<br>
+        Кто: ".$userIncoming->getSurname()." ".$userIncoming->getName()." ".$userIncoming->getSecondName()."<br>
+        Объект: ".$property->getAddress()."<br>
+        <a href='http://svobodno.org/adminAllRequestsToView.php?action=Новая'>Все новые заявки на просмотр</a>";
+
+        GlobFunc::sendEmailToOperator($subject, $msgHTML);
+    }
+
 	//TODO: новость для собственника о новом претенденте
 }
 

@@ -106,6 +106,38 @@
             return $age;
         }
 
+        // Отправляет e-mail на захардкоденные служебные адреса
+        public static function sendEmailToOperator($subject, $msgHTML) {
+
+            // Список служебных адресов для рассылки
+            $emails = array("dimau777@gmail.com");
+
+            // Подключаем класс для отправки e-mail, если он ранее еще не был подключен
+            require_once $_SERVER['DOCUMENT_ROOT'] . '/lib/class.phpmailer.php';
+
+            // Готовим и отправляем e-mail
+            $mail = new PHPMailer(true); //defaults to using php "mail()"; the true param means it will throw exceptions on errors, which we need to catch
+            try {
+                $mail->CharSet = "utf-8";
+                $mail->SetFrom('support@svobodno.org', 'Svobodno.org Служебная');
+                $mail->AddReplyTo('support@svobodno.org', 'Svobodno.org');
+                $mail->Subject = $subject;
+                $mail->MsgHTML($msgHTML);
+                foreach ($emails as $email) {
+                    $mail->AddAddress($email);
+                }
+                $mail->Send();
+            } catch (phpmailerException $e) {
+                Logger::getLogger(GlobFunc::$loggerName)->log("GlobFunc::sendEmailToOperator:1 Ошибка при формировании e-mail: ".$e->errorMessage()." Текст сообщения: ".$msgHTML); //Pretty error messages from PHPMailer
+                return FALSE;
+            } catch (Exception $e) {
+                Logger::getLogger(GlobFunc::$loggerName)->log("GlobFunc::sendEmailToOperator:2 Ошибка при формировании e-mail: ".$e->getMessage()." Текст сообщения: ".$msgHTML); //Boring error messages from anything else!
+                return FALSE;
+            }
+
+            return TRUE;
+        }
+
 		// Вспомогательная функция для AJAX запросов - отказ в доступе
 		public static function accessDenied() {
 			header('Content-Type: text/xml; charset=UTF-8');

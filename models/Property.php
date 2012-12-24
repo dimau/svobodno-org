@@ -120,6 +120,10 @@ class Property
 		return $this->userId;
 	}
 
+    public function getAddress() {
+        return $this->address;
+    }
+
 	public function getStatus() {
 		return $this->status;
 	}
@@ -128,15 +132,39 @@ class Property
 		return $this->completeness;
 	}
 
+    /**
+     * Устанавливает признак полноты для объекта
+     * ВАЖНО: сохранения в БД функция не выполняет, устанавливает признак лишь для текущего объекта
+     *
+     * @param $levelCompleteness
+     * $levelCompleteness = "0" объявление из чужой базы - мнимум требований к полноте
+     * $levelCompleteness = "1" объявление от собственника, который является нашим клиентом - максимальные требования к полноте
+     * @return bool возвращает TRUE в случае успешной установки признака у нашего объекта, FALSE в противном случае
+     */
+    public function setCompleteness($levelCompleteness) {
+        // Проверка входных данных на адекватность
+        if ($levelCompleteness != "1" && $levelCompleteness != "0") return FALSE;
+        $this->completeness = $levelCompleteness;
+        return TRUE;
+    }
+
 	/**
 	 * Метод для инициализации параметров объекта конкретными значениями
 	 *
 	 * @param array $params ассоциативный массив, содержащий значения параметров для инициализации
+     * @return bool TRUE в случае успешного перебора и FALSE в противном случае.
 	 */
 	private function initialization($params) {
+
+        // Валидация исходных данных
+        if (!isset($params) || !is_array($params)) return FALSE;
+
+        // Перебираем полученный ассоциативный массив и присваиваем значения его параметров параметрам объекта
 		foreach ($params as $key => $value) {
 			if (isset($this->$key)) $this->$key = $value;
 		}
+
+        return TRUE;
 	}
 
 	// Функция сохраняет текущие параметры объекта недвижимости в БД
@@ -180,22 +208,23 @@ class Property
 		$this->last_act = time();
 
 		// Проверяем в какой валюте сохраняется стоимость аренды, формируем переменную realCostOfRenting
-		if ($this->currency == 'руб.') $this->realCostOfRenting = $this->costOfRenting;
-		if ($this->currency != 'руб.') {
-			$stmt = DBconnect::get()->stmt_init();
-			if (($stmt->prepare("SELECT value FROM currencies WHERE name=?") === FALSE)
-				OR ($stmt->bind_param("s", $this->currency) === FALSE)
-				OR ($stmt->execute() === FALSE)
-				OR (($res = $stmt->get_result()) === FALSE)
-				OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-				OR ($stmt->close() === FALSE)
-			) {
-				// TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-				return FALSE;
-			}
+		if ($this->currency == 'руб.') {
+            $this->realCostOfRenting = $this->costOfRenting;
+        } else {
+            $stmt = DBconnect::get()->stmt_init();
+            if (($stmt->prepare("SELECT value FROM currencies WHERE name=?") === FALSE)
+                OR ($stmt->bind_param("s", $this->currency) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($res = $stmt->get_result()) === FALSE)
+                OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+                OR ($stmt->close() === FALSE)
+            ) {
+                // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
+                return FALSE;
+            }
 
-			$this->realCostOfRenting = $this->costOfRenting * $res[0]['value'];
-		}
+            $this->realCostOfRenting = $this->costOfRenting * $res[0]['value'];
+        }
 
 		// Пишем данные объекта недвижимости в БД.
 		// Код для сохранения данных разный: для нового объявления и при редактировании параметров существующего объявления
@@ -203,32 +232,20 @@ class Property
 
 			// Довычисляем недостающие для нового объекта параметры
 			$this->reg_date = time(); // Время регистрации ("рождения") объявления
-			if ($this->status != "опубликовано" && $this->status != "не опубликовано") { // На всякий случай: если выездной специалист не указал статус при формировании характеристики объекта
-				$this->status = "опубликовано";
-			}
-			if ($this->completeness != "0" && $this->completeness != "1") { // На всякий случай: возможно, будет полезно для нового объявления
-				$this->completeness = "1";
-			}
+			if ($this->status != "опубликовано" && $this->status != "не опубликовано") $this->status = "опубликовано"; // На всякий случай: если выездной специалист не указал статус при формировании характеристики объекта
+			if ($this->completeness != "0" && $this->completeness != "1") $this->completeness = "1"; // На всякий случай: возможно, будет полезно для нового объявления
 
 			// Непосредственное сохранение характеристики объекта в БД
 			if (!DBconnect::insertPropertyCharacteristic($this->getCharacteristicData())) return FALSE;
 			// Узнаем id объекта недвижимости - необходимо при сохранении информации о фотках в постоянную базу
 			$this->getIdUseAddress();
 			// Изменим статус пользователя (typeOwner), так как он теперь точно стал собственником
-			DBconnect::updateUserCharacteristicTypeUser($userId, "typeOwner", "TRUE");
+			DBconnect::updateUserCharacteristicTypeUser($this->userId, "typeOwner", "TRUE");
 
 		} elseif ($typeOfProperty == "edit") {
 
-			$stmt = DBconnect::get()->stmt_init();
-			if (($stmt->prepare("UPDATE property SET userId=?, typeOfObject=?, dateOfEntry=?, termOfLease=?, dateOfCheckOut=?, amountOfRooms=?, adjacentRooms=?, amountOfAdjacentRooms=?, typeOfBathrooms=?, typeOfBalcony=?, balconyGlazed=?, roomSpace=?, totalArea=?, livingSpace=?, kitchenSpace=?, floor=?, totalAmountFloor=?, numberOfFloor=?, concierge=?, intercom=?, parking=?, city=?, district=?, coordX=?, coordY=?, address=?, apartmentNumber=?, subwayStation=?, distanceToMetroStation=?, currency=?, costOfRenting=?, realCostOfRenting=?, utilities=?, costInSummer=?, costInWinter=?, electricPower=?, bail=?, bailCost=?, prepayment=?, compensationMoney=?, compensationPercent=?, repair=?, furnish=?, windows=?, internet=?, telephoneLine=?, cableTV=?, furnitureInLivingArea=?, furnitureInLivingAreaExtra=?, furnitureInKitchen=?, furnitureInKitchenExtra=?, appliances=?, appliancesExtra=?, sexOfTenant=?, relations=?, children=?, animals=?, contactTelephonNumber=?, timeForRingBegin=?, timeForRingEnd=?, checking=?, responsibility=?, comment=?, last_act=?, reg_date=?, status=?, earliestDate=?, earliestTimeHours=?, earliestTimeMinutes=?, adminComment=?, completeness=? WHERE id=?") === FALSE)
-				OR ($stmt->bind_param("sssssssssssddddiiissssssssssisddsddssdsddssssssssssssssssssssssiisssssss", $userId, $this->typeOfObject, $dateOfEntryForDB, $this->termOfLease, $dateOfCheckOutForDB, $this->amountOfRooms, $this->adjacentRooms, $this->amountOfAdjacentRooms, $this->typeOfBathrooms, $this->typeOfBalcony, $this->balconyGlazed, $this->roomSpace, $this->totalArea, $this->livingSpace, $this->kitchenSpace, $this->floor, $this->totalAmountFloor, $this->numberOfFloor, $this->concierge, $this->intercom, $this->parking, $this->city, $this->district, $this->coordX, $this->coordY, $this->address, $this->apartmentNumber, $this->subwayStation, $this->distanceToMetroStation, $this->currency, $this->costOfRenting, $realCostOfRenting, $this->utilities, $this->costInSummer, $this->costInWinter, $this->electricPower, $this->bail, $this->bailCost, $this->prepayment, $this->compensationMoney, $this->compensationPercent, $this->repair, $this->furnish, $this->windows, $this->internet, $this->telephoneLine, $this->cableTV, $furnitureInLivingAreaSerialized, $this->furnitureInLivingAreaExtra, $furnitureInKitchenSerialized, $this->furnitureInKitchenExtra, $appliancesSerialized, $this->appliancesExtra, $sexOfTenantSerialized, $relationsSerialized, $this->children, $this->animals, $this->contactTelephonNumber, $this->timeForRingBegin, $this->timeForRingEnd, $this->checking, $this->responsibility, $this->comment, $last_act, $this->reg_date, $this->status, $earliestDateForDB, $this->earliestTimeHours, $this->earliestTimeMinutes, $this->adminComment, $this->completeness, $this->id) === FALSE)
-				OR ($stmt->execute() === FALSE)
-				OR (($res = $stmt->affected_rows) === -1)
-				OR ($stmt->close() === FALSE)
-			) {
-				// TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-				return FALSE;
-			}
+            // Непосредственное сохранение характеристики объекта в БД
+            if (!DBconnect::updatePropertyCharacteristic($this->getCharacteristicData())) return FALSE;
 		}
 
 		return TRUE;
@@ -457,16 +474,13 @@ class Property
 		if ($this->id == "") return FALSE;
 
 		// Получим из БД данные ($res) по объекту недвижимости с идентификатором = $this->id
-		$res = DBconnect::selectPropertyCharacteristicForPropertiesId($this->id);
+		$res = DBconnect::selectPropertyCharacteristic($this->id);
 
-		// Если получено меньше или больше одной строки (одного объекта недвижимости) из БД, то сообщаем об ошибке
-		if (!is_array($res) || count($res) != 1) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Property->readCharacteristicFromDB():1 Ошибка: по id объекта недвижимости == ".$this->id." получено ".count($res)." результатов выборки данных из таблицы property БД. Должна быть только 1 строка. ID пользователя: не определено");
-			return FALSE;
-		}
+		// Если мы получили пустой массив, значит данные в БД по этому объекту не найдены
+		if (!is_array($res) || count($res) == 0) return FALSE;
 
 		// Передаем данные для инициализации параметров объекта
-		$this->initialization($res[0]);
+		if (!$this->initialization($res)) return FALSE;
 
 		return TRUE;
 	}
@@ -758,18 +772,6 @@ class Property
 
 		return $appliances;
 	}
-
-	// Устанавливает признак полноты для объекта
-	// $levelCompleteness = "0" объявление из чужой базы - мнимум требований к полноте
-	// $levelCompleteness = "1" объявление от собственника, который является нашим клиентом - максимальные требования к полноте
-	public function setCompleteness($levelCompleteness) {
-		// Проверка входных данных на адекватность
-		if ($levelCompleteness != "1" && $levelCompleteness != "0") return FALSE;
-		$this->completeness = $levelCompleteness;
-		return TRUE;
-	}
-
-
 
 	// $typeOfValidation = newAdvert - режим первичной (для нового объявления) проверки указанных пользователем параметров объекта недвижимости
 	// $typeOfValidation = editAdvert - режим вторичной (при редактировании уже существующего объявления) проверки указанных пользователем параметров объекта недвижимости

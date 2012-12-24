@@ -262,7 +262,7 @@ $(document).ready(function () {
         // Непосредственная работа с AJAX запросом
         jQuery.post("AJAXChangePropertyData.php", {"propertyId": propertyId, "action": "unpublishAdvert"}, function (data) {
             $(data).find("span[status='successful']").each(function () {
-                $('.removeAlienAdvert', propertyBlock).html("перенесено в архив");
+                $('.unpublishAdvert', propertyBlock).html("<span style='color: silver;'>снято с публикации</span>");
             });
             $(data).find("span[status='denied']").each(function () {
                 /* Если вдруг нужно будет что-то выдавать при получении отказа в добавлении в избранное, то закодить здесь */

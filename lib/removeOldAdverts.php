@@ -34,7 +34,7 @@ if (($stmt->prepare("SELECT * FROM property WHERE completeness = '0' AND reg_dat
 	OR ($stmt->close() === FALSE)
 ) {
 	//TODO: перенести в DBконнект и переделать строку логгирования
-	Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM property WHERE completeness = '0' AND reg_date < ". $oldestActualTimeStamp ." AND 0 < (SELECT COUNT(*) FROM requestToView WHERE property.id = requestToView.propertyId AND (status = 'Новая' OR status = 'Назначен просмотр' OR status = 'Отложена' OR status = 'Успешный просмотр') LIMIT 1)'. id логгера: :1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+	Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM property WHERE completeness = '0' AND reg_date < ". $oldestActualTimeStamp ." AND 0 < (SELECT COUNT(*) FROM requestToView WHERE property.id = requestToView.propertyId AND (status = 'Новая' OR status = 'Назначен просмотр' OR status = 'Отложена' OR status = 'Успешный просмотр') LIMIT 1)'. id логгера: removeOldAdverts.php:2. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
 	//return array();
 	exit();
 }
@@ -54,23 +54,10 @@ foreach ($res as $propertyArr) {
  * Оповещаем руководство об успешном выполнении операции очистки
  *******************************************************************************/
 
-$mail = new PHPMailer(true); //defaults to using php "mail()"; the true param means it will throw exceptions on errors, which we need to catch
-$MsgHTML = "Найдено и перенесено в архив ".count($res)." устаревших чужих объявлений";
-try {
-	$mail->CharSet = "utf-8";
-	$mail->SetFrom('support@svobodno.org', 'Svobodno.org');
-	$mail->AddReplyTo('support@svobodno.org', 'Svobodno.org');
-	$mail->Subject = 'Удаление устаревших объявлений';
-	$mail->MsgHTML($MsgHTML);
-	$mail->AddAddress("dimau777@gmail.com");
-	$mail->Send();
-} catch (phpmailerException $e) {
-	Logger::getLogger(GlobFunc::$loggerName)->log("removeOldAdverts.php:1 Ошибка при формировании e-mail:".$e->errorMessage()."Текст сообщения:".$MsgHTML); //Pretty error messages from PHPMailer
-	return FALSE;
-} catch (Exception $e) {
-	Logger::getLogger(GlobFunc::$loggerName)->log("removeOldAdverts.php:2 Ошибка при формировании e-mail:".$e->getMessage()."Текст сообщения:".$MsgHTML); //Boring error messages from anything else!
-	return FALSE;
-}
+$subject = 'Удаление устаревших объявлений';
+$msgHTML = "Найдено и перенесено в архив ".count($res)." устаревших чужих объявлений";
+
+GlobFunc::sendEmailToOperator($subject, $msgHTML);
 
 /********************************************************************************
  * Закрываем соединение с БД

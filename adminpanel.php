@@ -8,6 +8,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Property.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 
 // Удалось ли подключиться к БД?
@@ -66,9 +67,70 @@ if ($action == "registrationNewOwner") {
 	exit();
 }
 
+/*************************************************************************************
+ * СЛИЯНИЕ ОБЪЯВЛЕНИЙ: когда чужое объявление (из чужой базы собственников, неполное) заменяется сформированным моим специалистом (нашим объявлением)
+ *
+ * Порядок действий:
+ * 1. Снять чужое объявление с публикации
+ * 2. Удалить чужое объявление из архивной таблицы
+ * 3. Удалить фотографии чужого объявления, если они есть
+ * 4. Все запросы на просмотр чужого объявления изменить на запросы на просмотр нашего объявления
+ ************************************************************************************/
+
+if ($action == "mergeAdverts") {
+
+    // Получим id старого (чужого) объявления и id нового (нашего)
+    $alienAdvertId = "";
+    if (isset($_POST['alienAdvertId'])) $alienAdvertId = intval(htmlspecialchars($_POST['alienAdvertId'], ENT_QUOTES));
+    $ourAdvertId = "";
+    if (isset($_POST['ourAdvertId'])) $ourAdvertId = intval(htmlspecialchars($_POST['ourAdvertId'], ENT_QUOTES));
+    if ($alienAdvertId == "" || $alienAdvertId == 0 || $ourAdvertId == "" || $ourAdvertId == 0) exit("Ошибка в исходных данных: для слияния объявлений укажите их идентификаторы");
+
+    // Инициализируем объекты для чужого и нашего объявления
+    $alienProperty = new Property($alienAdvertId);
+    $ourProperty = new Property($ourAdvertId);
+
+    // Убедимся в том, что объявление с которым сливаем чужое, действительно существует в БД
+    if (!$ourProperty->readCharacteristicFromDB()) exit("Объявление, с которым Вы просите слить чужое объявление, не найдено в БД");
+
+    // Если чужое объявление еще не сняли с публикации, то сделаем это
+    if ($alienProperty->readCharacteristicFromDB()) {
+
+        // Проверим - чужое ли мы получили объявление
+        if ($alienProperty->getCompleteness() != "0") exit("Вы хотите слить НЕ чужое объявление, а полученное усилиями наших собственных специалистов, с другим объявлением. Это запрещено");
+
+        // Снимаем с публикации чужое объявление
+        $unpublishErrors = $alienProperty->unpublishAdvert();
+
+        // Если при снятии объявления с публикации возникли ошибки, то прекращаем выполнение скрипта и выдаем их
+        if (count($unpublishErrors) != 0) {
+            exit("При снятии с публикации чужого объявления возникли ошибки:<br>" . json_decode($unpublishErrors));
+        }
+
+    } elseif ($alienProperty->readCharacteristicFromArchive()) {
+        // Если чужое объявление уже сняли с публикации ничего дополнительно не делаем
+    } else {
+        exit("Чужое объявление для объединения не найдено в БД по указанному идентификатору");
+    }
+
+    // Удаляем чужое объявление из архива
+    if (!DBconnect::deletePropertyFromArchive($alienAdvertId)) exit ("Не получилось удалить чужое объявление из архива");
+
+    // Удаляем фотографии чужого объявления, если таковые имеются
+    if(!DBconnect::deletePhotosForProperty($alienAdvertId)) exit ("Не получилось удалить фотографии объекта из БД");
+
+    // Перенацелим все запросы на просмотр чужого объекта недвижимости на наш объект
+    if(!DBconnect::updateRequestToViewForPropertyId($alienAdvertId, $ourAdvertId)) exit("Не удалось изменить целевой объект недвижимости у запросов на просмотр, направленных на чужое объявление");
+
+    exit("Слияние объявлений успешно произведено!");
+}
+
 /********************************************************************************
  * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
  *******************************************************************************/
+
+// Инициализируем используемые в шаблоне(ах) переменные
+//$isAdmin
 
 // Подсоединяем нужный основной шаблон
 require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminpanel.php";

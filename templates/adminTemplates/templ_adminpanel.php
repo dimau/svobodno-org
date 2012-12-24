@@ -92,6 +92,7 @@
         </div>
         <div id="allSections">
 
+            <?php if ($isAdmin['newOwner']): ?>
             <div class="section admin left" id="newOwnerSection">
                 <div class="headerSection">Новый собственник</div>
                 <ul>
@@ -104,8 +105,10 @@
                 </ul>
                 <div class="clearBoth"></div>
             </div>
+            <?php endif; ?>
             <!-- /end.newOwnerSection -->
 
+            <?php if ($isAdmin['newAdvertAlien']): ?>
             <div class="section admin right" id="newAdvertAlienSection">
                 <div class="headerSection">Новое объявление (чужое)</div>
                 <ul>
@@ -115,11 +118,21 @@
                     <li>
                         <a href="newadvert.php?alienOwner=true" target="_blank">Новое чужое объявление</a>
                     </li>
+                    <li>
+                        <form name="advertMerging" method="post" action="adminpanel.php?action=mergeAdverts">
+                            Слить чужое объявление
+                            <input name="alienAdvertId" type="text" value="" size="7"> с
+                            <input name="ourAdvertId" type="text" value="" size="7">
+                            <button type="submit">ок</button>
+                        </form>
+                    </li>
                 </ul>
                 <div class="clearBoth"></div>
             </div>
+            <?php endif; ?>
             <!-- /end.newAdvertAlienSection -->
 
+            <?php if ($isAdmin['searchUser']): ?>
             <div class="section admin left" id="searchUserSection">
                 <div class="headerSection">Поиск пользователя</div>
 				<form name="findUserForm" method="post" action="adminFindUser.php" target = "_blank">
@@ -153,8 +166,10 @@
 				</form>
                 <div class="clearBoth"></div>
             </div>
+            <?php endif; ?>
             <!-- /end.searchUserSection -->
 
+            <?php if ($isAdmin['searchUser']): ?>
             <div class="section admin right" id="requestFromOwnerSection">
                 <div class="headerSection">Заявки собственников</div>
                 <ul>
@@ -164,8 +179,10 @@
                 </ul>
                 <div class="clearBoth"></div>
             </div>
+            <?php endif; ?>
             <!-- /end.requestFromOwnerSection -->
 
+            <?php if ($isAdmin['searchUser']): ?>
             <div class="section admin right" id="signUpToViewSection">
                 <div class="headerSection">Заявки на просмотр</div>
                 <ul>
@@ -190,8 +207,10 @@
                 </ul>
                 <div class="clearBoth"></div>
             </div>
+            <?php endif; ?>
             <!-- /end.signUpToViewSection -->
 
+            <?php if ($isAdmin['searchUser']): ?>
             <div class="section admin right" id="logsFromServerSection">
                 <div class="headerSection">Логи сервера</div>
                 <ul>
@@ -201,6 +220,7 @@
                 </ul>
                 <div class="clearBoth"></div>
             </div>
+            <?php endif; ?>
             <!-- /end.logsFromServerSection -->
 
         </div>

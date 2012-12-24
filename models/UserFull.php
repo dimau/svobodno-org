@@ -67,31 +67,38 @@ class UserFull extends User
 		return TRUE;
 	}
 
+    /**
+     * Метод для инициализации параметров объекта конкретными значениями
+     *
+     * @param array $params ассоциативный массив, содержащий значения параметров для инициализации
+     * @return bool TRUE в случае успешного перебора и FALSE в противном случае.
+     */
+    private function initialization($params) {
+
+        // Валидация исходных данных
+        if (!isset($params) || !is_array($params)) return FALSE;
+
+        // Перебираем полученный ассоциативный массив и присваиваем значения его параметров параметрам объекта
+        foreach ($params as $key => $value) {
+            if (isset($this->$key)) $this->$key = $value;
+        }
+
+        return TRUE;
+    }
+
 	// Функция сохраняет личные параметры пользователя (текущие значения параметров данного объекта) в БД. Все параметры, кроме поискового запроса (у него отдельная функция)
 	// $typeOfUser = "new" - режим сохранения для нового (регистрируемого пользователя)
 	// $typeOfUser = "edit" - режим сохранения для редактируемых параметров (для существующего пользователя)
 	// Возвращает TRUE, если данные успешно сохранены и FALSE в противном случае
-	public function saveCharacteristicToDB($typeOfUser = "edit") {
+	public function saveCharacteristicToDB($typeOfUser) {
+
 		// Валидация необходимых исходных данных
 		if ($typeOfUser != "new" && $typeOfUser != "edit") return FALSE;
 		if ($typeOfUser == "edit" && $this->id == "") return FALSE; // Если запись данные в БД требуется не для нового пользователя (не на странице регистрации) и мы не знаем id пользователя, то функция не выполняется
 		if ($this->login == "" || $this->password == "") return FALSE; // Логин и пароль - это самые обязательные из всех реквизитов пользователя, без них сохраненные данные о пользователе потеряются в БД
 
-		// Корректируем дату дня рождения для того, чтобы сделать ее пригодной для сохранения в базу данных
-		$birthdayDB = GlobFunc::dateFromViewToDB($this->birthday);
-		// Получаем текущее время для сохранения в качестве даты регистрации и даты последнего действия
-		$tm = time();
-		$last_act = $tm;
-		$reg_date = $tm; // Сохранится в БД только для нового пользователя $typeOfUser = "new"
-		// Сериализуем массив с избранными объявлениями
-		$favoritePropertiesId = serialize($this->favoritePropertiesId);
-		// Преобразуем из логических в строковые (MySQL почему-то не поддерживает сохранение логических параметров)
-		if ($this->typeTenant === TRUE) $typeTenant = "TRUE";
-		if ($this->typeTenant === FALSE) $typeTenant = "FALSE";
-		if ($this->typeTenant === NULL) $typeTenant = "FALSE";
-		if ($this->typeOwner === TRUE) $typeOwner = "TRUE";
-		if ($this->typeOwner === FALSE) $typeOwner = "FALSE";
-		if ($this->typeOwner === NULL) $typeOwner = "FALSE";
+		// Дата и время последнего изменения характеристики пользователя
+		$this->last_act = time();
 
 		// Для простоты технической поддержки пользователей пойдем на небольшой риск с точки зрения безопасности и будем хранить пароли пользователей на сервере в БД без соли и шифрования
 		/*$salt = mt_rand(100, 999);
@@ -101,21 +108,14 @@ class UserFull extends User
 		// Код для сохранения данных разный: для нового пользователя и при редактировании параметров существующего пользователя
 		if ($typeOfUser == "new") {
 
+            // Вычисляем дату и время регистрации пользователя
+            $this->reg_date = time();
+
 			// Для нового пользователя всегда тип собственника сбрасываем в FALSE (пока под этим пользователем не появится хотя бы 1 объявление)
-			$typeOwner = "FALSE";
+			$this->typeOwner = "FALSE";
 
-			$stmt = DBconnect::get()->stmt_init();
-			if (($stmt->prepare("INSERT INTO users (typeTenant,typeOwner,name,secondName,surname,sex,nationality,birthday,login,password,telephon,emailReg,email,currentStatusEducation,almamater,speciality,kurs,ochnoZaochno,yearOfEnd,statusWork,placeOfWork,workPosition,regionOfBorn,cityOfBorn,shortlyAboutMe,vkontakte,odnoklassniki,facebook,twitter,lic,last_act,reg_date,favoritePropertiesId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
-				OR ($stmt->bind_param("ssssssssssssssssssssssssssssssiis", $typeTenant, $typeOwner, $this->name, $this->secondName, $this->surname, $this->sex, $this->nationality, $birthdayDB, $this->login, $this->password, $this->telephon, $this->email, $this->email, $this->currentStatusEducation, $this->almamater, $this->speciality, $this->kurs, $this->ochnoZaochno, $this->yearOfEnd, $this->statusWork, $this->placeOfWork, $this->workPosition, $this->regionOfBorn, $this->cityOfBorn, $this->shortlyAboutMe, $this->vkontakte, $this->odnoklassniki, $this->facebook, $this->twitter, $this->lic, $last_act, $reg_date, $favoritePropertiesId) === FALSE)
-				OR ($stmt->execute() === FALSE)
-				OR (($res = $stmt->affected_rows) === -1)
-				OR ($res === 0)
-				OR ($stmt->close() === FALSE)
-			) {
-				// TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-
-				return FALSE;
-			}
+            // Непосредственное сохранение характеристики пользователя в БД
+			if (!DBconnect::insertUserCharacteristic($this->getCharacteristicData())) return FALSE;
 
 			// Получим и сохраним в качестве параметра модели id пользователя (он становится известен только после записи данных в БД)
 			// id в текущей модели пользователя понадобиться как минимум для сохранения его фотографий
@@ -124,16 +124,8 @@ class UserFull extends User
 
 		if ($typeOfUser == "edit") {
 
-			$stmt = DBconnect::get()->stmt_init();
-			if (($stmt->prepare("UPDATE users SET name=?, secondName=?, surname=?, sex=?, nationality=?, birthday=?, password=?, telephon=?, email=?, currentStatusEducation=?, almamater=?, speciality=?, kurs=?, ochnoZaochno=?, yearOfEnd=?, statusWork=?, placeOfWork=?, workPosition=?, regionOfBorn=?, cityOfBorn=?, shortlyAboutMe=?, vkontakte=?, odnoklassniki=?, facebook=?, twitter=?, last_act=? WHERE id=?") === FALSE)
-				OR ($stmt->bind_param("sssssssssssssssssssssssssis", $this->name, $this->secondName, $this->surname, $this->sex, $this->nationality, $birthdayDB, $this->password, $this->telephon, $this->email, $this->currentStatusEducation, $this->almamater, $this->speciality, $this->kurs, $this->ochnoZaochno, $this->yearOfEnd, $this->statusWork, $this->placeOfWork, $this->workPosition, $this->regionOfBorn, $this->cityOfBorn, $this->shortlyAboutMe, $this->vkontakte, $this->odnoklassniki, $this->facebook, $this->twitter, $last_act, $this->id) === FALSE)
-				OR ($stmt->execute() === FALSE)
-				OR (($res = $stmt->affected_rows) === -1)
-				OR ($stmt->close() === FALSE)
-			) {
-				// TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-				return FALSE;
-			}
+            // Непосредственное сохранение характеристики пользователя в БД
+			if (!DBconnect::updateUserCharacteristic($this->getCharacteristicData())) return FALSE;
 		}
 
 		return TRUE;
@@ -319,75 +311,15 @@ class UserFull extends User
 		if ($this->id == "") return FALSE;
 
 		// Получим из БД данные ($res) по пользователю с идентификатором = $this->id
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("SELECT * FROM users WHERE id=?") === FALSE)
-			OR ($stmt->bind_param("s", $this->id) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->get_result()) === FALSE)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-			OR ($stmt->close() === FALSE)
-		) {
-			// TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-			return FALSE;
-		}
+        $res = DBconnect::selectUserCharacteristic($this->id);
 
-		// Если получено меньше или больше одной строки (одного пользователя) из БД, то сообщаем об ошибке
-		if (!is_array($res) || count($res) != 1) {
-			// TODO: Сохранить в лог ошибку получения данных пользователя из БД
-			return FALSE;
-		}
+        // Если мы получили пустой массив, значит данные в БД по этому пользователю не найдены
+        if (!is_array($res) || count($res) == 0) return FALSE;
 
-		// Для красоты (чтобы избавить от индекса ноль при обращении к переменным) переприсвоим значение $res[0] специальной переменной
-		$oneUserDataArr = $res[0];
+        // Передаем данные для инициализации параметров объекта
+        if (!$this->initialization($res)) return FALSE;
 
-		// Если данные по пользователю есть в БД, присваиваем их соответствующим переменным, иначе - у них останутся значения по умолчанию.
-		if (isset($oneUserDataArr['id'])) $this->id = $oneUserDataArr['id'];
-
-		if (isset($oneUserDataArr['typeTenant'])) {
-			if ($oneUserDataArr['typeTenant'] == "TRUE") $this->typeTenant = TRUE;
-			if ($oneUserDataArr['typeTenant'] == "FALSE") $this->typeTenant = FALSE;
-		}
-		if (isset($oneUserDataArr['typeOwner'])) {
-			if ($oneUserDataArr['typeOwner'] == "TRUE") $this->typeOwner = TRUE;
-			if ($oneUserDataArr['typeOwner'] == "FALSE") $this->typeOwner = FALSE;
-		}
-		if (isset($oneUserDataArr['typeAdmin'])) $this->typeAdmin = $oneUserDataArr['typeAdmin'];
-		if (isset($oneUserDataArr['name'])) $this->name = $oneUserDataArr['name'];
-		if (isset($oneUserDataArr['secondName'])) $this->secondName = $oneUserDataArr['secondName'];
-		if (isset($oneUserDataArr['surname'])) $this->surname = $oneUserDataArr['surname'];
-		if (isset($oneUserDataArr['sex'])) $this->sex = $oneUserDataArr['sex'];
-		if (isset($oneUserDataArr['nationality'])) $this->nationality = $oneUserDataArr['nationality'];
-		if (isset($oneUserDataArr['birthday'])) $this->birthday = GlobFunc::dateFromDBToView($oneUserDataArr['birthday']);
-		if (isset($oneUserDataArr['login'])) $this->login = $oneUserDataArr['login'];
-		if (isset($oneUserDataArr['password'])) $this->password = $oneUserDataArr['password'];
-		if (isset($oneUserDataArr['telephon'])) $this->telephon = $oneUserDataArr['telephon'];
-		if (isset($oneUserDataArr['emailReg'])) $this->emailReg = $oneUserDataArr['emailReg'];
-		if (isset($oneUserDataArr['email'])) $this->email = $oneUserDataArr['email'];
-
-		if (isset($oneUserDataArr['currentStatusEducation'])) $this->currentStatusEducation = $oneUserDataArr['currentStatusEducation'];
-		if (isset($oneUserDataArr['almamater'])) $this->almamater = $oneUserDataArr['almamater'];
-		if (isset($oneUserDataArr['speciality'])) $this->speciality = $oneUserDataArr['speciality'];
-		if (isset($oneUserDataArr['kurs'])) $this->kurs = $oneUserDataArr['kurs'];
-		if (isset($oneUserDataArr['ochnoZaochno'])) $this->ochnoZaochno = $oneUserDataArr['ochnoZaochno'];
-		if (isset($oneUserDataArr['yearOfEnd'])) $this->yearOfEnd = $oneUserDataArr['yearOfEnd'];
-		if (isset($oneUserDataArr['statusWork'])) $this->statusWork = $oneUserDataArr['statusWork'];
-		if (isset($oneUserDataArr['placeOfWork'])) $this->placeOfWork = $oneUserDataArr['placeOfWork'];
-		if (isset($oneUserDataArr['workPosition'])) $this->workPosition = $oneUserDataArr['workPosition'];
-		if (isset($oneUserDataArr['regionOfBorn'])) $this->regionOfBorn = $oneUserDataArr['regionOfBorn'];
-		if (isset($oneUserDataArr['cityOfBorn'])) $this->cityOfBorn = $oneUserDataArr['cityOfBorn'];
-		if (isset($oneUserDataArr['shortlyAboutMe'])) $this->shortlyAboutMe = $oneUserDataArr['shortlyAboutMe'];
-		if (isset($oneUserDataArr['vkontakte'])) $this->vkontakte = $oneUserDataArr['vkontakte'];
-		if (isset($oneUserDataArr['odnoklassniki'])) $this->odnoklassniki = $oneUserDataArr['odnoklassniki'];
-		if (isset($oneUserDataArr['facebook'])) $this->facebook = $oneUserDataArr['facebook'];
-		if (isset($oneUserDataArr['twitter'])) $this->twitter = $oneUserDataArr['twitter'];
-
-		if (isset($oneUserDataArr['lic'])) $this->lic = $oneUserDataArr['lic'];
-		if (isset($oneUserDataArr['user_hash'])) $this->user_hash = $oneUserDataArr['user_hash'];
-		if (isset($oneUserDataArr['last_act'])) $this->last_act = $oneUserDataArr['last_act'];
-		if (isset($oneUserDataArr['reg_date'])) $this->reg_date = $oneUserDataArr['reg_date'];
-		if (isset($oneUserDataArr['favoritePropertiesId'])) $this->favoritePropertiesId = unserialize($oneUserDataArr['favoritePropertiesId']);
-
-		return TRUE;
+        return TRUE;
 	}
 
 	// Метод читает данные о фотографиях из БД и записывает их в параметры пользователя
@@ -476,6 +408,10 @@ class UserFull extends User
 
 		$result = array();
 
+        $result['id'] = $this->id;
+        $result['typeTenant'] = $this->typeTenant;
+        $result['typeOwner'] = $this->typeOwner;
+        $result['typeAdmin'] = $this->typeAdmin;
 		$result['name'] = $this->name;
 		$result['secondName'] = $this->secondName;
 		$result['surname'] = $this->surname;
@@ -485,6 +421,7 @@ class UserFull extends User
 		$result['login'] = $this->login;
 		$result['password'] = $this->password;
 		$result['telephon'] = $this->telephon;
+        $result['emailReg'] = $this->emailReg;
 		$result['email'] = $this->email;
 		$result['currentStatusEducation'] = $this->currentStatusEducation;
 		$result['almamater'] = $this->almamater;
@@ -503,11 +440,6 @@ class UserFull extends User
 		$result['facebook'] = $this->facebook;
 		$result['twitter'] = $this->twitter;
 		$result['lic'] = $this->lic;
-		$result['id'] = $this->id;
-		$result['typeTenant'] = $this->typeTenant;
-		$result['typeOwner'] = $this->typeOwner;
-		$result['typeAdmin'] = $this->typeAdmin;
-		$result['emailReg'] = $this->emailReg;
 		$result['user_hash'] = $this->user_hash;
 		$result['last_act'] = $this->last_act;
 		$result['reg_date'] = $this->reg_date;

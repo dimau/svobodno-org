@@ -43,14 +43,25 @@ if ($action == "takeRequest") {
 	$errors = $requestFromOwner->requestFromOwnerDataValidate();
 
 	if (is_array($errors) && count($errors) == 0) {
-		// Сохраняем запрос собственника в БД
-		if (!$requestFromOwner->saveParamsToDB()) {
-			// Сохранении данных в БД не прошло - заявка не принята
-			$errors[] = 'К сожалению, при сохранении данных произошла ошибка: попробуйте еще раз или сообщите нам о Вашей недвижимости по телефону: 8-922-143-16-15';
-		}
-	}
 
-	//TODO: оповестить опрератора о новом запросе собственника
+		// Сохраняем запрос собственника в БД
+		if ($requestFromOwner->saveParamsToDB()) {
+
+            $subject = 'Заявка от собственника: '.$requestFromOwner->getName();
+
+            $msgHTML = "Поступила новая заявка от собственника:<br>
+            Дата: ".date('d.m.Y H:i')."<br>
+            Кто: ".$requestFromOwner->getName()."<br>
+            Адрес: ".$requestFromOwner->getAddress()."<br>
+            <a href='http://svobodno.org/adminAllRequestsFromOwners.php'>Все заявки от собственников</a>";
+
+            GlobFunc::sendEmailToOperator($subject, $msgHTML);
+
+		} else {
+            // Сохранении данных в БД не прошло - заявка не принята
+            $errors[] = 'К сожалению, при сохранении данных произошла ошибка: попробуйте еще раз или сообщите нам о Вашей недвижимости по телефону: 8-922-143-16-15';
+        }
+	}
 }
 
 /********************************************************************************

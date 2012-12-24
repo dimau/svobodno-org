@@ -23,7 +23,7 @@
             <li>
                 <a target="_blank" href='adminRequestToView.php?propertyId=<?php echo $propertyCharacteristic['id'];?>'>заявки на просмотр</a>
             </li>
-			<?php if (isset($propertyCharacteristic['completeness']) && $propertyCharacteristic['completeness'] == "0"): // Возможность перенести в архив объявление есть только для объектов, полученных из чужих баз - а значит по определению некачественных объявлений ?>
+			<?php if (isset($propertyCharacteristic['status']) && $propertyCharacteristic['status'] == "опубликовано"): ?>
             <li class="unpublishAdvert">
                 <a>снять с публикации</a>
             </li>

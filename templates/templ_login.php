@@ -86,7 +86,7 @@
                             </tr>
                             <tr>
                                 <td></td>
-                                <td><a href="#">Забыли пароль?</a></td>
+                                <td><a href="passwordRecovery.php">Забыли пароль?</a></td>
                             </tr>
                         </tbody>
                     </table>
