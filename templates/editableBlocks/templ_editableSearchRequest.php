@@ -416,16 +416,18 @@
                           rows="4"><?php echo $userSearchRequest['additionalDescriptionOfSearch'];?></textarea>
             </td>
         </tr>
-			<?php endif; ?>
+		<?php endif; ?>
 
         </tbody>
     </table>
 
 </fieldset>
 
+<?php if ($mode == "registration" || $mode == "personal"): ?>
 <div class="edited right" style="margin: 0; padding: 0; border: none; text-align: right;">
 	<label><input type="checkbox" value="1" name="needEmail" <?php if ($userSearchRequest['needEmail'] == 1) echo "checked";?>> Оповещать меня по e-mail о подходящих объявлениях</label>
 </div>
+<?php endif; ?>
 
 <div class="clearBoth"></div>
 

@@ -577,8 +577,6 @@ if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TR
  * все права для всех пользователей на каталог uploaded_files и logs(чтобы можно было записывать новые фотографии и удалять старые, а также писать логи)
  * date.timezone = Asia/Yekaterinburg // Необходимо установить временную зону по умолчанию
  *
- * ini_set ("session.use_trans_sid", true); вроде как PHP сам умеет устанавливать id сессии либо в куки, либо в строку запроса (http://www.phpfaq.ru/sessions)
- *
  ***************************************************************************/
 
 // Закрываем соединение с БД

@@ -229,7 +229,7 @@ class DBconnect
         // Получим данные о фотографиях для каждого объекта из $propertyFullArr
         for ($i = 0, $s = count($propertyFullArr); $i < $s; $i++) {
             // Получим данные о фотографиях по id объекта недвижимости
-            $propertyFotos = DBconnect::selectPhotosForProperty($propertyFullArr[$i]['id']);
+            $propertyFotos = DBconnect::selectPhotosForProperty(intval($propertyFullArr[$i]['id']));
             // Записываем полученный массив массивов с данными о фотографиях в специальный новый параметр массива $propertyFullArr
             $propertyFullArr[$i]['propertyFotos'] = $propertyFotos;
         }

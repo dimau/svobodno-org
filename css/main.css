@@ -643,11 +643,12 @@ td, th {
 }
 
 .slogan {
-    font-size: 1.5em; /* 24px / 16 px */
+    font-size: 1.4em;
 }
 
 .underslogan {
-    font-size: 1em; /* 16px / 16 px */
+    font-size: 1em;
+    color: grey;
 }
 
 /* Стили для минималистской формы входа */

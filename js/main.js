@@ -369,8 +369,7 @@ function getCoords(elem) {
 function notavailability() {
 
     // Понимаем роль пользователя, так как некоторые поля обязательны для арендатора, но необязательны для собственника
-    var userTypeTenant = "";
-    if ($(".userType").length) userTypeTenant = $(".userType").attr('typeTenant') == "TRUE";
+    if (typeTenant === undefined) typeTenant = false;
 
     // Перебираем все элементы, доступность которых зависит от каких-либо условий
     $("[notavailability]").each(function () {
@@ -385,7 +384,7 @@ function notavailability() {
         $("select, input", currentElem).removeAttr("disabled");
         $(currentElem).css('color', '');
         $("select, input", currentElem).css("background-color", '');
-        if (userTypeTenant) $(".itemRequired.typeTenantRequired", currentElem).text("*");
+        if (typeTenant) $(".itemRequired.typeTenantRequired", currentElem).text("*");
 
         // Проверяем верность каждого условия недоступности
         for (var i = 0; i < arrNotSelectorsOfElem.length; i++) {
@@ -496,6 +495,9 @@ function personalFIO_validation() {
 
     var err = 0;
 
+    // Понимаем роль пользователя, так как некоторые поля обязательны для арендатора, но необязательны для собственника
+    if (typeTenant === undefined) typeTenant = false;
+
     // ФИО
     if ($('#surname').val() == '') {
         buildErrorMessageBlock ("surname", "Укажите фамилию");
@@ -592,6 +594,9 @@ function personalFIO_validation() {
 // Функция валидации для данных об образовании и работе
 function personalEducAndWork_validation() {
     var err = 0;
+
+    // Понимаем роль пользователя, так как некоторые поля обязательны для арендатора, но необязательны для собственника
+    if (typeTenant === undefined) typeTenant = false;
 
     if ($('#currentStatusEducation').val() == '0' && typeTenant) {
         buildErrorMessageBlock ("currentStatusEducation", "Укажите Ваше образование (текущий статус)");

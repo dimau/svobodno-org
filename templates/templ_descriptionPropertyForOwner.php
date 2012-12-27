@@ -20,7 +20,7 @@
             <span class='headOfString'>{earliestDateName}</span> {earliestDate}
         </li>
         <li>
-            <span class='headOfString' style='vertical-align: top;' title='Пользователи, запросившие контакты собственника по этому объявлению'>Возможные арендаторы:</span> {probableTenants}
+            <span class='headOfString' style='vertical-align: top;' title="Пользователи, отправившие заявку на просмотр этого объявления">Возможные арендаторы:</span> {probableTenants}
         </li>
         <li>
             <br>

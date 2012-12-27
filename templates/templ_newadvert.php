@@ -1378,7 +1378,7 @@
     <div class="advertDescriptionChapterHeader">
         Особые условия
     </div>
-    <div class="objectDescriptionItem" title="Этот номер будет доступен для заинтересовавшихся арендаторов">
+    <div class="objectDescriptionItem" title="Этот номер будет использоваться только сотрудниками нашей компании">
         <div class="objectDescriptionItemLabel">
             Контактный номер телефона:
         </div>

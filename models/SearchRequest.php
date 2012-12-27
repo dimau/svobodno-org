@@ -45,6 +45,10 @@ class SearchRequest
 		}
 	}
 
+    public function getNeedEmail() {
+        return $this->needEmail;
+    }
+
 	// Используется для установки id пользователя, которому принадлежит данный поисковый запрос
 	public function setUserId($userId) {
 		if (!isset($userId) || !is_int($userId)) return FALSE;

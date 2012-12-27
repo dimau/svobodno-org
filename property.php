@@ -14,8 +14,12 @@ if (isset($_GET['propertyId'])) $propertyId = intval(htmlspecialchars($_GET['pro
 
 // Если в запросе не указан идентификатор объявления для редактирования, то пересылаем пользователя на спец страницу
 if ($propertyId == "" || $propertyId == 0) {
-	header('Location: 404.html');
-	exit();
+    // Инициализируем используемые в шаблоне(ах) переменные
+    $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
+    $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
+    $mode = "notfound";
+    require $_SERVER['DOCUMENT_ROOT'] . '/templates/templ_error.php';
+    exit();
 }
 
 /*************************************************************************************
@@ -64,8 +68,12 @@ $property = new Property($propertyId);
 // Анкетные данные объекта недвижимости
 // Если получить данные по объекту недвижимости из БД не удалось, то скорее всего не верно указан id объекта, перенаправляем пользователя на 404 страницу
 if (!$property->readCharacteristicFromDB()) {
-	header('Location: 404.html');
-	exit();
+    // Инициализируем используемые в шаблоне(ах) переменные
+    $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
+    $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
+    $mode = "notfound";
+    require $_SERVER['DOCUMENT_ROOT'] . '/templates/templ_error.php';
+    exit();
 }
 
 // Если анкетные данные по объекту недвижимости получить удалось - получим инфу о его фотках
@@ -81,10 +89,13 @@ if ($property->getStatus() == "не опубликовано"
 	AND $property->getUserId() != $userIncoming->getId()
 	AND !$isAdmin['searchUser'])
 {
-	header('Location: 404.html');
-	exit();
+    // Инициализируем используемые в шаблоне(ах) переменные
+    $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
+    $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
+    $mode = "accessdenied";
+    require $_SERVER['DOCUMENT_ROOT'] . '/templates/templ_error.php';
+    exit();
 }
-//TODO: реализовать соответствующую 404 страницу
 
 /************************************************************************************
  * НОВЫЙ ЗАПРОС НА ПРОСМОТР. Если пользователь отправил форму запроса на просмотр объекта

@@ -74,18 +74,6 @@
     </div>
 </div>
 
-<!-- Добавялем невидимый input для того, чтобы передать тип пользователя (собственник/арендатор) - это используется в JS для простановки обязательности полей для заполнения -->
-<input type='hidden' class='userType'
-       typeTenant='<?php if ($userCharacteristic['typeTenant']) echo "TRUE"; else echo "FALSE";?>'
-       typeOwner='<?php if ($userCharacteristic['typeOwner']) echo "TRUE"; else echo "FALSE";?>'
-       correctEditSearchRequest='<?php
-	   if ($correctEditSearchRequest) echo "TRUE"; else if ($correctEditSearchRequest === FALSE) echo "FALSE"; else echo "NULL"; ?>'>
-
-<?php
-// Добавяем невидимый input для того, чтобы передать идентификатор вкладки, которую нужно открыть через JS
-echo "<input type='hidden' class='tabsId' tabsId='" . $tabsId . "'>";
-?>
-
 <?php
 // Сформируем и вставим заголовок страницы
 require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
@@ -301,12 +289,12 @@ $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullA
 
 <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
 <script>
-    // Сервер сохранит в эту переменную данные о загруженных фотографиях в формате JSON
-    // Переменная uploadedFoto содержит массив объектов, каждый из которых представляет информацию по 1 фотографии
-    var uploadedFoto = JSON.parse('<?php echo json_encode($userFotoInformation['uploadedFoto']);?>');
-    // Сервер сохранит в эту переменную данные об объектах недвижимости в формате JSON
-    // Переменная allProperties содержит массив объектов, каждый из которых представляет информацию по 1 объявлению
-    var allProperties = JSON.parse('<?php echo json_encode($propertyLightArr);?>');
+    var typeTenant = <?php if ($userCharacteristic['typeTenant']) echo "true"; else echo "false"; // Является ли регистрируемый пользователь арендатором ?>;
+    var typeOwner = <?php if ($userCharacteristic['typeOwner']) echo "true"; else echo "false"; // Является ли регистрируемый пользователь собственником ?>;
+    var correctEditSearchRequest = '<?php if ($correctEditSearchRequest) echo "TRUE"; else if ($correctEditSearchRequest === FALSE) echo "FALSE"; else echo "NULL"; // ?>';
+    var uploadedFoto = JSON.parse('<?php echo json_encode($userFotoInformation['uploadedFoto']); // Сервер сохранит в эту переменную данные о загруженных фотографиях в формате JSON. Переменная uploadedFoto содержит массив объектов, каждый из которых представляет информацию по 1 фотографии ?>');
+    var allProperties = JSON.parse('<?php echo json_encode($propertyLightArr); // Сервер сохранит в эту переменную данные об объектах недвижимости в формате JSON. Переменная allProperties содержит массив объектов, каждый из которых представляет информацию по 1 объявлению ?>');
+    var tabsId = '<?php echo $tabsId; // Передаем идентификатор вкладки, которую нужно открыть через JS ?>';
 </script>
 <script src="js/main.js"></script>
 <script src="js/personal.js"></script>

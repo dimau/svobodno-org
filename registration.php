@@ -107,6 +107,17 @@ if ($action == "registration") {
 				$searchRequest->saveToDB("new");
 			}
 
+            // Сообщаем операторам о появлении нового зарегистрированного пользователя
+            $compId = GlobFunc::idToCompId($user->getId());
+            $subject = 'Новый зарегистрированный пользователь: '.$user->getSurname()." ".$user->getName()." ".$user->getSecondName();
+            $msgHTML = "Новый пользователь зарегистрировался на сайте:<br>
+                Дата: ".date('d.m.Y H:i')."<br>
+                Кто: ".$user->getSurname()." ".$user->getName()." ".$user->getSecondName()."<br>
+                Арендатор: ".$user->isTenant()." Собственник: ".$user->isOwner()."<br>
+                Подписан на e-mail рассылку: ".$searchRequest->getNeedEmail()."<br>
+                <a href='http://svobodno.org/personal.php?compId=".$compId."'>Детально о пользователе</a>";
+            GlobFunc::sendEmailToOperator($subject, $msgHTML);
+
 			/******* Авторизовываем пользователя *******/
 			// Если админ заводил нового пользователя, то авторизация под новым пользователем нам не нужна
 			if ($isAdmin['newOwner'] || $isAdmin['newAdvertAlien'] || $isAdmin['searchUser']) {

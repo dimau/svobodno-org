@@ -32,8 +32,12 @@ $targetUserId = "0";
 if ($compId != "" && $compId != 0) {
 	$targetUserId = GlobFunc::compIdToId($compId); // Получаем идентификатор пользователя для показа его страницы
 } else { // Если в строке GET запроса не указан идентификатор интересующего (целевого) пользователя, то пересылаем нашего пользователя на спец. страницу
-	header('Location: 404.html');
-	exit();
+    // Инициализируем используемые в шаблоне(ах) переменные
+    $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
+    $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
+    $mode = "notfound";
+    require $_SERVER['DOCUMENT_ROOT'] . '/templates/templ_error.php';
+    exit();
 }
 
 /*************************************************************************************
@@ -69,8 +73,12 @@ $searchRequest->writeFromDB();
 
 // Если пользователь не авторизован, то он не сможет посмотреть ни одной анкеты
 if (!$userIncoming->login()) {
-	header('Location: 404.html'); //TODO: реализовать страницу Отказано в доступе
-	exit();
+    // Инициализируем используемые в шаблоне(ах) переменные
+    $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
+    $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
+    $mode = "accessdenied";
+    require $_SERVER['DOCUMENT_ROOT'] . '/templates/templ_error.php';
+    exit();
 }
 
 // Получаем список пользователей, которые интересовались недвижимостью нашего пользователя ($userIncoming->getId). Он выступает в качестве собственника
@@ -87,8 +95,13 @@ $isAdmin = $userIncoming->isAdmin();
 if (!in_array($targetUserId, $tenantsWithRequestToView)
 	AND $userIncoming->getId() != $targetUserId
 	AND !$isAdmin['searchUser']) {
-	header('Location: 404.html'); //TODO: реализовать страницу Отказано в доступе
-	exit();
+
+    // Инициализируем используемые в шаблоне(ах) переменные
+    $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
+    $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
+    $mode = "accessdenied";
+    require $_SERVER['DOCUMENT_ROOT'] . '/templates/templ_error.php';
+    exit();
 }
 
 /********************************************************************************

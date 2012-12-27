@@ -35,7 +35,7 @@ if (!$userIncoming->login()) {
 $action = "";
 if (isset($_GET['action'])) $action = htmlspecialchars($_GET['action'], ENT_QUOTES);
 
-// Идентификатор объекта для просмотра
+// Идентификатор объекта, с которым нужно выполнить действия, указанные в action
 $propertyId = "";
 if (isset($_GET['propertyId'])) $propertyId = intval(htmlspecialchars($_GET['propertyId'], ENT_QUOTES));
 

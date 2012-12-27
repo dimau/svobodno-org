@@ -53,9 +53,13 @@ if (isset($_GET['propertyId'])) $propertyId = intval(htmlspecialchars($_GET['pro
 $requestToViewId = "";
 if (isset($_GET['requestToViewId'])) $requestToViewId = intval(htmlspecialchars($_GET['requestToViewId'], ENT_QUOTES));
 
-// Если в запросе не указан идентификатор объекта, то пересылаем пользователя на спец страницу
+// Если в запросе не указан идентификатор объекта, то выдаем пользователю спец страницу с описанием ошибки
 if ($propertyId == "" || $propertyId == 0) {
-	header('Location: 404.html');
+    // Инициализируем используемые в шаблоне(ах) переменные
+    $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
+    $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
+    $mode = "notfound";
+    require $_SERVER['DOCUMENT_ROOT'] . '/templates/templ_error.php';
 	exit();
 }
 

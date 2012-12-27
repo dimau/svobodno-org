@@ -7,10 +7,9 @@ if ($('#userMistakesBlock ol').html() != "") {
 }
 
 // Выбор вкладки для отображения в качестве текущей после загрузки страницы
-var index = "tabs-1"; // По умолчанию открываем первую вкладку - Профайл
-if ($(".tabsId").attr('tabsId')) index = $(".tabsId").attr('tabsId');
+if (tabsId === undefined || tabsId == '') tabsId = "tabs-1"; // По умолчанию открываем первую вкладку - Профайл
 $(function () {
-    $("#tabs").tabs("select", index);
+    $("#tabs").tabs("select", tabsId);
 });
 
 /***********************************************************
@@ -162,7 +161,7 @@ $(function () {
 
 // Блок редактируемых параметров поиска невидим в случае если пользователь уже является арендатором (у него есть поисковый запрос, данные которого и отображаются в нередактируемом виде (блок id="notEditingSearchParametersBlock"))
 if ($('#extendedSearchParametersBlock').length) {
-    if ($(".userType").attr('typeTenant') == "TRUE" && $(".userType").attr('correctEditSearchRequest') != "FALSE") $('#extendedSearchParametersBlock').css('display', 'none');
+    if (typeTenant == true && correctEditSearchRequest != "FALSE") $('#extendedSearchParametersBlock').css('display', 'none');
 }
 
 // Активируем кнопку Нового поискового запроса, если она есть на странице
