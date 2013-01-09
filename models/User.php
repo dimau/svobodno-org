@@ -4,9 +4,9 @@
 class User
 {
 	protected $id = "";
-	protected $typeTenant = NULL;
-	protected $typeOwner = NULL;
-	protected $typeAdmin = NULL;
+	protected $typeTenant = FALSE;
+	protected $typeOwner = FALSE;
+	protected $typeAdmin = FALSE;
 	protected $name = "";
 	protected $secondName = "";
 	protected $surname = "";
@@ -41,26 +41,18 @@ class User
 
 	// Является ли пользователь арендатором (то есть имеет действующий поисковый запрос или регистрируется в качестве арендатора)
 	public function isTenant() {
-		if ($this->typeTenant !== NULL) {
-			return $this->typeTenant;
-		}
-
-		return FALSE;
+        return $this->typeTenant;
 	}
 
 	// Является ли пользователь собственником (то есть имеет хотя бы 1 объявление или регистрируется в качестве собственника)
 	public function isOwner() {
-		if ($this->typeOwner !== NULL) {
-			return $this->typeOwner;
-		}
-
-		return FALSE;
+        return $this->typeOwner;
 	}
 
 	// Является ли пользователь администратором. Возвращает ассоциированный массив с правами доступа
 	// Если пользователь не является администратором, то все права у него будут с флагами FALSE
 	public function isAdmin() {
-		if ($this->typeAdmin === NULL || $this->typeAdmin == FALSE) return array('newOwner' => FALSE, 'newAdvertAlien' => FALSE, 'searchUser' => FALSE);
+		if ($this->typeAdmin == FALSE) return array('newOwner' => FALSE, 'newAdvertAlien' => FALSE, 'searchUser' => FALSE);
 
 		if (substr($this->typeAdmin, 0, 1) == "1") $result['newOwner'] = TRUE; else $result['newOwner'] = FALSE;
 		if (substr($this->typeAdmin, 1, 1) == "1") $result['newAdvertAlien'] = TRUE; else $result['newAdvertAlien'] = FALSE;

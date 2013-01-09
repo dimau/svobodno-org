@@ -131,7 +131,7 @@ if ($action == "signUpToView") {
 // Инициализируем используемые в шаблоне(ах) переменные
 $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
 $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
-$userCharacteristic = array('typeTenant' => $userIncoming->isTenant(), 'name' => $userIncoming->getName(), 'secondName' => $userIncoming->getSecondName(), 'surname' => $userIncoming->getSurname(), 'telephon' => $userIncoming->getTelephon()); // Но для данной страницы данный массив содержит только имя, отчество, фамилию, телефон пользователя
+$userCharacteristic = array('typeTenant' => $userIncoming->isTenant(), 'typeOwner' => $userIncoming->isOwner(), 'name' => $userIncoming->getName(), 'secondName' => $userIncoming->getSecondName(), 'surname' => $userIncoming->getSurname(), 'telephon' => $userIncoming->getTelephon()); // Но для данной страницы данный массив содержит только имя, отчество, фамилию, телефон пользователя
 $propertyCharacteristic = $property->getCharacteristicData();
 $propertyFotoInformation = $property->getFotoInformationData();
 $favoritePropertiesId = $userIncoming->getFavoritePropertiesId();

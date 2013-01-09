@@ -135,6 +135,7 @@ $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullA
         </ul>
 
         <div id="tabs-1">
+
 			<?php if ($correctEditProfileParameters !== FALSE): ?>
             <!-- Блок с нередактируемыми параметрами Профайла не выдается только в 1 случае: если пользователь корректировал свои параметры, и они не прошли проверку -->
             <div id="notEditingProfileParametersBlock">
@@ -152,6 +153,7 @@ $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullA
 				?>
             </div>
 			<?php endif; ?>
+
             <form method="post" action="personal.php?compId=<?php echo $compId;?>&action=saveProfileParameters"
                   name="profileParameters" id="editingProfileParametersBlock"
                   class="descriptionFieldsetsWrapper formWithFotos" enctype="multipart/form-data"
@@ -182,6 +184,7 @@ $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullA
             </form>
             <!-- /end.descriptionFieldsetsWrapper -->
             <div class="clearBoth"></div>
+
         </div>
         <!-- /end.tabs-1 -->
 
@@ -282,7 +285,7 @@ $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullA
 </div>
 <!-- /end.page_without_footer -->
 <div class="footer">
-    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-143-16-15, e-mail:
+    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
     support@svobodno.org
 </div>
 <!-- /end.footer -->

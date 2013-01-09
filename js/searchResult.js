@@ -343,11 +343,9 @@ function init() {
         var realtyObjCoordY = $("#allBalloons .balloonBlock[propertyId='" + propertyId + "']").attr('coordY');
 
         map.balloon.open(
-            // Позиция балуна
-            [realtyObjCoordX, realtyObjCoordY], {
-                // Свойства балуна
-                contentBody:balloonContentBodyVar
-            });
+            [realtyObjCoordX, realtyObjCoordY], // Позиция балуна
+            { contentBody:balloonContentBodyVar } // Свойства балуна
+        );
 
         // Берем только что сформированный HTML баллуна и навешиваем на фотографии галерею colorBox
         $("#map .fotosWrapper .gallery").removeClass('cboxElement').colorbox({ opacity: 0.7 , rel: currentFotoGalleryIndex, current: '№ {current} из {total}' });

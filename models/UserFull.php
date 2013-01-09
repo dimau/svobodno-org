@@ -636,7 +636,7 @@ class UserFull extends User
 	public function getAllMessagesSorted() {
 
 		// Валидация исходных условий. Уведомления типа "Новый подходящий объект" получают только арендаторы
-		if ($this->id == "" || $this->typeTenant !== TRUE) return array();
+		if ($this->id == "" || $this->typeTenant != TRUE) return array();
 
 		$messagesNewProperty = DBconnect::selectMessagesNewPropertyForUser($this->id);
 

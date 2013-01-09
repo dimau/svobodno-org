@@ -86,7 +86,7 @@
         // Функция вычисляет возраст по дате рождения. Пример: echo calculate_age('27.01.2012');
         public static function calculate_age($birthday)
         {
-			if (!isset($birthday) || $birthday == "" || $birthday = "00.00.0000") return "";
+			if (!isset($birthday) || $birthday == "" || $birthday == "00.00.0000") return "";
 
             // Дата рождения
             $dateOfBorn = substr($birthday, 0, 2);

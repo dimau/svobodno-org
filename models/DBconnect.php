@@ -78,7 +78,7 @@ class DBconnect
         // Проверка входящих параметров
         if (!isset($userId) || !is_int($userId)) return array();
 
-        // Получим из БД данные ($res) по искомому объекту недвижимости
+        // Получим из БД данные ($res) по искомому пользователю
         $stmt = DBconnect::get()->stmt_init();
         if (($stmt->prepare("SELECT * FROM users WHERE id = ? LIMIT 1") === FALSE)
             OR ($stmt->bind_param("i", $userId) === FALSE)
@@ -88,6 +88,68 @@ class DBconnect
             OR ($stmt->close() === FALSE)
         ) {
             Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM users WHERE id = ".$userId." LIMIT 1'. id логгера: DBconnect::selectUserCharacteristic():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return array();
+        }
+
+        // Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
+        $res = DBconnect::conversionUserCharacteristicFromDBToView($res);
+
+        // Вернем результат
+        return $res;
+    }
+
+    /**
+     * Возвращает ассоциированный массив, который содержит полные данные (характеристику) по пользователю системы с известным логином. Если ничего не найдено или произошла ошибка, вернет пустой массив
+     *
+     * @param string $login - логин пользователя, по которому нужно получить данные
+     * @return array - ассоциированный массив, содержащий все параметры характеристики пользователя
+     */
+    public static function selectUserCharacteristicForLogin($login) {
+
+        // Проверка входящих параметров
+        if (!isset($login) || !is_string($login)) return array();
+
+        // Получим из БД данные ($res) по искомому пользователю
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("SELECT * FROM users WHERE login = ? LIMIT 1") === FALSE)
+            OR ($stmt->bind_param("s", $login) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->get_result()) === FALSE)
+            OR (($res = $res->fetch_assoc()) === NULL)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM users WHERE login = ".$login." LIMIT 1'. id логгера: DBconnect::selectUserCharacteristicForLogin():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return array();
+        }
+
+        // Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
+        $res = DBconnect::conversionUserCharacteristicFromDBToView($res);
+
+        // Вернем результат
+        return $res;
+    }
+
+    /**
+     * Возвращает ассоциированный массив, который содержит полные данные (характеристику) по пользователю системы с известным хэшем. Если ничего не найдено или произошла ошибка, вернет пустой массив
+     *
+     * @param string $user_hash - хэш пользователя, по которому нужно получить данные
+     * @return array - ассоциированный массив, содержащий все параметры характеристики пользователя
+     */
+    public static function selectUserCharacteristicForHash($user_hash) {
+
+        // Проверка входящих параметров
+        if (!isset($user_hash) || !is_string($user_hash)) return array();
+
+        // Получим из БД данные ($res) по искомому пользователю
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("SELECT * FROM users WHERE user_hash = ? LIMIT 1") === FALSE)
+            OR ($stmt->bind_param("s", $user_hash) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->get_result()) === FALSE)
+            OR (($res = $res->fetch_assoc()) === NULL)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM users WHERE user_hash = ".$user_hash." LIMIT 1'. id логгера: DBconnect::selectUserCharacteristicForHash():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return array();
         }
 
@@ -226,6 +288,11 @@ class DBconnect
         }
         $propertyFullArr = $tempArr;
 
+        // Подготовим данные объектов недвижимости к обработке в php
+        for ($i = 0, $s = count($propertyFullArr); $i < $s; $i++) {
+            $propertyFullArr[$i] = DBconnect::conversionPropertyCharacteristicFromDBToView($propertyFullArr[$i]);
+        }
+
         // Получим данные о фотографиях для каждого объекта из $propertyFullArr
         for ($i = 0, $s = count($propertyFullArr); $i < $s; $i++) {
             // Получим данные о фотографиях по id объекта недвижимости
@@ -355,8 +422,7 @@ class DBconnect
 
 		// Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
 		for ($i = 0, $s = count($res); $i < $s; $i++) {
-			$res[$i]['amountOfRooms'] = unserialize($res[$i]['amountOfRooms']);
-			$res[$i]['district'] = unserialize($res[$i]['district']);
+            $res[$i] = DBconnect::conversionSearchRequestFromDBToView($res[$i]);
 		}
 
 		return $res;
@@ -1272,24 +1338,28 @@ class DBconnect
 
         if (!isset($user) || !is_array($user)) return array();
 
-        if ($user['typeTenant'] == "TRUE") {
-            $user['typeTenant'] = TRUE;
-        } elseif ($user['typeTenant'] == "FALSE") {
-            $user['typeTenant'] = FALSE;
-        } else {
-            $user['typeTenant'] = FALSE;
+        if (isset($user['typeTenant'])) {
+            if ($user['typeTenant'] == "TRUE") {
+                $user['typeTenant'] = TRUE;
+            } elseif ($user['typeTenant'] == "FALSE") {
+                $user['typeTenant'] = FALSE;
+            } else {
+                $user['typeTenant'] = FALSE;
+            }
         }
 
-        if ($user['typeOwner'] == "TRUE") {
-            $user['typeOwner'] = TRUE;
-        } elseif ($user['typeOwner'] == "FALSE") {
-            $user['typeOwner'] = FALSE;
-        } else {
-            $user['typeOwner'] = FALSE;
+        if (isset($user['typeOwner'])) {
+            if ($user['typeOwner'] == "TRUE") {
+                $user['typeOwner'] = TRUE;
+            } elseif ($user['typeOwner'] == "FALSE") {
+                $user['typeOwner'] = FALSE;
+            } else {
+                $user['typeOwner'] = FALSE;
+            }
         }
 
-        $user['birthday'] = GlobFunc::dateFromDBToView($user['birthday']);
-        $user['favoritePropertiesId'] = unserialize($user['favoritePropertiesId']);
+        if (isset($user['birthday'])) $user['birthday'] = GlobFunc::dateFromDBToView($user['birthday']);
+        if (isset($user['favoritePropertiesId'])) $user['favoritePropertiesId'] = unserialize($user['favoritePropertiesId']);
 
         return $user;
     }
@@ -1329,6 +1399,25 @@ class DBconnect
 
 		return $property;
 	}
+
+    /**
+     * Преобразование данных о поисковом запросе пользователя из формата хранения в БД в формат, с которым работают php скрипты
+     *
+     * @param array $searchRequest ассоциативный массив с параметрами поискового запроса
+     * @return array исходный массив с преобразованными параметрами. Если на входе мусор, возвращает пустой массив
+     */
+    public static function conversionSearchRequestFromDBToView($searchRequest) {
+
+        if (!isset($searchRequest) || !is_array($searchRequest)) return array();
+
+        $searchRequest['amountOfRooms'] = unserialize($searchRequest['amountOfRooms']);
+        $searchRequest['district'] = unserialize($searchRequest['district']);
+        if ($searchRequest['minCost'] == 0) $searchRequest['minCost'] = "";
+        if ($searchRequest['maxCost'] == 0) $searchRequest['maxCost'] = "";
+        if ($searchRequest['pledge'] == 0) $searchRequest['pledge'] = "";
+
+        return $searchRequest;
+    }
 
     /**
      * Преобразование данных о пользователе из формата, с которым работают php скрипты в формат хранения в БД

@@ -381,9 +381,8 @@ function notavailability() {
         var arrNotSelectorsOfElem = notSelectorsOfElem.split('&');
 
         // Презумпция доступности элемента, если одно из его условий недоступности выполнится ниже, то он станет недоступным
-        $("select, input", currentElem).removeAttr("disabled");
+        $("select, input, textarea", currentElem).removeAttr("disabled");
         $(currentElem).css('color', '');
-        $("select, input", currentElem).css("background-color", '');
         if (typeTenant) $(".itemRequired.typeTenantRequired", currentElem).text("*");
 
         // Проверяем верность каждого условия недоступности
@@ -397,9 +396,8 @@ function notavailability() {
             var currentSelectValue = $("#" + currentSelectId).val();
             var isCurrentSelectDisabled = $("#" + currentSelectId).attr("disabled");
             if (currentSelectValue == currentNotSelectValue || isCurrentSelectDisabled) { // Если текущее значение селекта совпало с тем значением, при котором данный элемент должен быть недоступен, либо селект, от значения которого зависит судьба данного недоступен, то выполняем скрытие элемента и его селектов
-                $("select, input", currentElem).attr("disabled", "disabled");
+                $("select, input, textarea", currentElem).attr("disabled", "disabled");
                 $(currentElem).css('color', '#e6e6e6');
-                $("select, input", currentElem).css("background-color", '#e6e6e6');
                 $(".itemRequired", currentElem).text("");
                 break; // Прерываем цикл, так как проверка остальных условий по данному элементу уже не нужна
             }

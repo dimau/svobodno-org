@@ -381,6 +381,18 @@ textarea {
 }
 
 /*
+ * Стили для заблокированных элементов ввода
+ */
+
+button[disabled],
+input[disabled],
+select[disabled],
+textarea[disabled] {
+    color: silver;
+    background-color: #ffffff;
+}
+
+/*
  * 1. Define line-height as normal to match FF3/4 (set using !important in the UA stylesheet)
  */
 

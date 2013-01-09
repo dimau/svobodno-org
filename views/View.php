@@ -370,9 +370,9 @@ class View
 		// Мебель
 		$arrBalloonReplace['furnitureName'] = "";
 		$arrBalloonReplace['furniture'] = "";
-		$furnitureInLivingArea = unserialize($oneProperty['furnitureInLivingArea']);
-		$furnitureInKitchen = unserialize($oneProperty['furnitureInKitchen']);
-		$appliances = unserialize($oneProperty['appliances']);
+		$furnitureInLivingArea = $oneProperty['furnitureInLivingArea'];
+		$furnitureInKitchen = $oneProperty['furnitureInKitchen'];
+		$appliances = $oneProperty['appliances'];
 		if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "0" && $oneProperty['typeOfObject'] != "гараж" && !($oneProperty['completeness'] == "0" && count($furnitureInLivingArea) == 0 && count($furnitureInKitchen) == 0 && count($appliances) == 0 && $oneProperty['furnitureInLivingAreaExtra'] == "" && $oneProperty['furnitureInKitchenExtra'] == "" && $oneProperty['appliancesExtra'] == "")) {
 			$arrBalloonReplace['furnitureName'] = "Мебель:";
 			if ((isset($oneProperty['furnitureInLivingArea']) && count($furnitureInLivingArea) != 0) || (isset($oneProperty['furnitureInLivingAreaExtra']) && $oneProperty['furnitureInLivingAreaExtra'] != "")) $arrBalloonReplace['furniture'] = "есть в жилой зоне";
@@ -590,9 +590,9 @@ class View
 
 		// Мебель
 		$arrExtendedListReplace['furniture'] = "";
-		$furnitureInLivingArea = unserialize($oneProperty['furnitureInLivingArea']);
-		$furnitureInKitchen = unserialize($oneProperty['furnitureInKitchen']);
-		$appliances = unserialize($oneProperty['appliances']);
+		$furnitureInLivingArea = $oneProperty['furnitureInLivingArea'];
+		$furnitureInKitchen = $oneProperty['furnitureInKitchen'];
+		$appliances = $oneProperty['appliances'];
 		if ($oneProperty['typeOfObject'] == "0" || $oneProperty['typeOfObject'] == "гараж" || ($oneProperty['completeness'] == "0" && count($furnitureInLivingArea) == 0 && count($furnitureInKitchen) == 0 && count($appliances) == 0 && $oneProperty['furnitureInLivingAreaExtra'] == "" && $oneProperty['furnitureInKitchenExtra'] == "" && $oneProperty['appliancesExtra'] == "")) {
 			$arrExtendedListReplace['furniture'] = "<span title='нет данных о мебели и бытовой технике'>-</span>";
 		} else {

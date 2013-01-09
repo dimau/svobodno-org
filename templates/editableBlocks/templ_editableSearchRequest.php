@@ -297,12 +297,12 @@
                 </select>
             </td>
         </tr>
-        <tr class="withWhoDescription" style="display: none;">
+        <tr notavailability="typeOfObject_гараж" class="withWhoDescription" style="display: none;">
             <td class="itemLabel" colspan="3">
                 Что Вы можете сказать о сожителях:
             </td>
         </tr>
-        <tr class="withWhoDescription" style="display: none;">
+        <tr notavailability="typeOfObject_гараж" class="withWhoDescription" style="display: none;">
             <td colspan="3">
                 <textarea name="linksToFriends" id="linksToFriends"
                           rows="3"><?php echo $userSearchRequest['linksToFriends'];?></textarea>
@@ -336,12 +336,12 @@
                 </select>
             </td>
         </tr>
-        <tr class="childrenDescription" style="display: none;">
+        <tr notavailability="typeOfObject_гараж" class="childrenDescription" style="display: none;">
             <td class="itemLabel" colspan="3">
                 Сколько у Вас детей и какого возраста:
             </td>
         </tr>
-        <tr class="childrenDescription" style="display: none;">
+        <tr notavailability="typeOfObject_гараж" class="childrenDescription" style="display: none;">
             <td colspan="3">
                 <textarea name="howManyChildren" id="howManyChildren"
                           rows="3"><?php echo $userSearchRequest['howManyChildren'];?></textarea>
@@ -370,12 +370,12 @@
                 </select>
             </td>
         </tr>
-        <tr class="animalsDescription" style="display: none;">
+        <tr notavailability="typeOfObject_гараж" class="animalsDescription" style="display: none;">
             <td class="itemLabel" colspan="3">
                 Сколько у Вас животных и какого вида:
             </td>
         </tr>
-        <tr class="animalsDescription" style="display: none;">
+        <tr notavailability="typeOfObject_гараж" class="animalsDescription" style="display: none;">
             <td colspan="3">
                 <textarea name="howManyAnimals" id="howManyAnimals"
                           rows="3"><?php echo $userSearchRequest['howManyAnimals'];?></textarea>

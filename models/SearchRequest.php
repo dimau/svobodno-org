@@ -245,19 +245,19 @@ class SearchRequest
 	public function remove() {
 
 		// Проверка на наличие id пользователя
-		if ($this->userId == "") return array("Не удалось удалить поисковый запрос: недостаточно данных. Попробуйте повторить немного позже или свяжитесь с нами: 89221431615");
+		if ($this->userId == "") return array("Не удалось удалить поисковый запрос: недостаточно данных. Попробуйте повторить немного позже или свяжитесь с нами: 8-922-160-95-14");
 
 		// Убеждаемся, что у арендатора нет заявок на просмотр со статусом "Назначен просмотр"
 		$allRequestsToView = DBconnect::selectRequestsToViewForTenants($this->userId);
 		foreach ($allRequestsToView as $value) {
-			if ($value['status'] == "Назначен просмотр") return array("Не удалось удалить поисковый запрос: для Вас назначен просмотр. Вы можете отменить просмотр, связавшись с нами по телефону 89221431615, после чего удалить поисковый запрос.");
+			if ($value['status'] == "Назначен просмотр") return array("Не удалось удалить поисковый запрос: для Вас назначен просмотр. Вы можете отменить просмотр, связавшись с нами по телефону 8-922-160-95-14, после чего удалить поисковый запрос.");
 		}
 
 		// Удалим данные поискового запроса по данному пользователю из БД
-		if (!DBconnect::deleteSearchRequestsForUser($this->userId)) return array("Не удалось удалить поисковый запрос: ошибка обращения к базе. Попробуйте повторить немного позже или свяжитесь с нами: 89221431615");
+		if (!DBconnect::deleteSearchRequestsForUser($this->userId)) return array("Не удалось удалить поисковый запрос: ошибка обращения к базе. Попробуйте повторить немного позже или свяжитесь с нами: 8-922-160-95-14");
 
 		// Обновляем статус данного пользователю (он больше не арендатор)
-		if (!DBconnect::updateUserCharacteristicTypeUser($this->userId, "typeTenant", "FALSE")) return array("Не удалось удалить поисковый запрос: ошибка обращения к базе. Попробуйте повторить немного позже или свяжитесь с нами: 89221431615");
+		if (!DBconnect::updateUserCharacteristicTypeUser($this->userId, "typeTenant", "FALSE")) return array("Не удалось удалить поисковый запрос: ошибка обращения к базе. Попробуйте повторить немного позже или свяжитесь с нами: 8-922-160-95-14");
 
 		// Удалим все уведомления типа "Новый подходящий объект недвижимости" у данного арендатора
 		DBconnect::deleteMessagesNewPropertyForUser($this->userId);
@@ -334,18 +334,18 @@ class SearchRequest
 		$searchLimits['typeOfObject'] = "";
 		if ($this->typeOfObject == "0") $searchLimits['typeOfObject'] = "";
 		if ($this->typeOfObject == "квартира" || $this->typeOfObject == "комната" || $this->typeOfObject == "дом" || $this->typeOfObject == "таунхаус" || $this->typeOfObject == "дача" || $this->typeOfObject == "гараж") {
-			$searchLimits['typeOfObject'] = " (typeOfObject = '" . $this->typeOfObject . "')"; // Думаю, что с точки зрения безопасности (чтобы нельзя было подсунуть в запрос левые SQL подобные строки), нужно перечислять все доступные варианты
+			$searchLimits['typeOfObject'] = " (typeOfObject = '" . $this->typeOfObject . "' OR typeOfObject = '0')"; // Думаю, что с точки зрения безопасности (чтобы нельзя было подсунуть в запрос левые SQL подобные строки), нужно перечислять все доступные варианты
 		}
 
 		// Ограничение на количество комнат
 		$searchLimits['amountOfRooms'] = "";
-		if (count($this->amountOfRooms) != "0") {
+		if (count($this->amountOfRooms) != 0) {
 			$searchLimits['amountOfRooms'] = " (";
 			for ($i = 0, $s = count($this->amountOfRooms); $i < $s; $i++) {
 				$searchLimits['amountOfRooms'] .= " amountOfRooms = '" . $this->amountOfRooms[$i] . "'";
-				if ($i < count($this->amountOfRooms) - 1) $searchLimits['amountOfRooms'] .= " OR";
+				if ($i < $s - 1) $searchLimits['amountOfRooms'] .= " OR";
 			}
-			$searchLimits['amountOfRooms'] .= " )";
+			$searchLimits['amountOfRooms'] .= " OR amountOfRooms = '0')";
 		}
 
 		// Ограничение на смежность комнат
@@ -357,9 +357,9 @@ class SearchRequest
 		// Ограничение на этаж
 		$searchLimits['floor'] = "";
 		if ($this->floor == "0") $searchLimits['floor'] = "";
-		if ($this->floor == "любой") $searchLimits['floor'] = " (floor != 0)";
-		if ($this->floor == "не первый") $searchLimits['floor'] = " (floor != 0 AND floor != 1)";
-		if ($this->floor == "не первый и не последний") $searchLimits['floor'] = " (floor != 0 AND floor != 1 AND floor != totalAmountFloor)";
+		if ($this->floor == "любой") $searchLimits['floor'] = "";
+		if ($this->floor == "не первый") $searchLimits['floor'] = " (floor != 1)";
+		if ($this->floor == "не первый и не последний") $searchLimits['floor'] = " (floor != 1 AND floor != totalAmountFloor)";
 
 		// Ограничение на минимальную сумму арендной платы
 		$searchLimits['minCost'] = "";
@@ -390,18 +390,18 @@ class SearchRequest
 				$searchLimits['district'] .= " district = '" . $this->district[$i] . "'";
 				if ($i < count($this->district) - 1) $searchLimits['district'] .= " OR";
 			}
-			$searchLimits['district'] .= " )";
+			$searchLimits['district'] .= " OR district = '0')";
 		}
 
 		// Ограничение на формат проживания (с кем собираетесь проживать)
 		$searchLimits['withWho'] = "";
 		if ($this->withWho == "0") $searchLimits['withWho'] = "";
-		if ($this->withWho == "самостоятельно") $searchLimits['withWho'] = " (relations LIKE '%один человек%' OR relations = '')";
-		if ($this->withWho == "семья") $searchLimits['withWho'] = " (relations LIKE '%семья%' OR relations = '')";
-		if ($this->withWho == "пара") $searchLimits['withWho'] = " (relations LIKE '%пара%' OR relations = '')";
-		if ($this->withWho == "2 мальчика") $searchLimits['withWho'] = " (relations LIKE '%2 мальчика%' OR relations = '')";
-		if ($this->withWho == "2 девочки") $searchLimits['withWho'] = " (relations LIKE '%2 девочки%' OR relations = '')";
-		if ($this->withWho == "со знакомыми") $searchLimits['withWho'] = " (relations LIKE '%группа людей%' OR relations = '')";
+		if ($this->withWho == "самостоятельно") $searchLimits['withWho'] = " (relations LIKE '%один человек%' OR relations = 'a:0:{}')";
+		if ($this->withWho == "семья") $searchLimits['withWho'] = " (relations LIKE '%семья%' OR relations = 'a:0:{}')";
+		if ($this->withWho == "пара") $searchLimits['withWho'] = " (relations LIKE '%пара%' OR relations = 'a:0:{}')";
+		if ($this->withWho == "2 мальчика") $searchLimits['withWho'] = " (relations LIKE '%2 мальчика%' OR relations = 'a:0:{}')";
+		if ($this->withWho == "2 девочки") $searchLimits['withWho'] = " (relations LIKE '%2 девочки%' OR relations = 'a:0:{}')";
+		if ($this->withWho == "со знакомыми") $searchLimits['withWho'] = " (relations LIKE '%группа людей%' OR relations = 'a:0:{}')";
 
 		// Ограничение на проживание с детьми
 		$searchLimits['children'] = "";
@@ -417,8 +417,8 @@ class SearchRequest
 		// Ограничение на длительность аренды
 		$searchLimits['termOfLease'] = "";
 		if ($this->termOfLease == "0") $searchLimits['termOfLease'] = "";
-		if ($this->termOfLease == "длительный срок") $searchLimits['termOfLease'] = " (termOfLease = 'длительный срок')";
-		if ($this->termOfLease == "несколько месяцев") $searchLimits['termOfLease'] = " (termOfLease = 'несколько месяцев')";
+		if ($this->termOfLease == "длительный срок") $searchLimits['termOfLease'] = " (termOfLease = 'длительный срок' OR termOfLease = '0')";
+		if ($this->termOfLease == "несколько месяцев") $searchLimits['termOfLease'] = " (termOfLease = 'несколько месяцев' OR termOfLease = '0')";
 
 		// Показываем только опубликованные объявления
 		$searchLimits['status'] = " (status = 'опубликовано')";
