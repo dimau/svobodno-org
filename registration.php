@@ -154,6 +154,8 @@ $userCharacteristic = $user->getCharacteristicData();
 $userFotoInformation = $user->getFotoInformationData();
 $userSearchRequest = $searchRequest->getSearchRequestData();
 $mode = "registration";
+$isTenant = $user->isTenant(); // Пригодится для составления правильного GET запроса, по которому будет отправляться форма регистрации
+$isOwner = $user->isOwner(); // Пригодится для составления правильного GET запроса, по которому будет отправляться форма регистрации
 //$alienOwner
 //$isAdmin
 //$errors

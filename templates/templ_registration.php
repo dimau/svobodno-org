@@ -120,7 +120,7 @@
     <div class="clearBoth"></div>
 </div>
 
-<form name="personalInformation" id="personalInformationForm" class="formWithFotos" method="post" enctype="multipart/form-data" action="registration.php?action=registration<?php if ($isAdmin['newAdvertAlien'] && $alienOwner == "true") echo "&alienOwner=true";?>">
+<form name="personalInformation" id="personalInformationForm" class="formWithFotos" method="post" enctype="multipart/form-data" action="registration.php?action=registration<?php if ($isAdmin['newAdvertAlien'] && $alienOwner == "true") echo "&alienOwner=true";?><?php if ($isOwner) echo "&typeOwner=true";?><?php if ($isTenant) echo "&typeTenant=true";?>">
 <div id="tabs">
 <ul>
     <li>
@@ -198,7 +198,7 @@
     <div class="bottomControls">
         <div style="float: right; margin-bottom: 10px; text-align: left;">
             <label><input type="checkbox" name="lic" id="lic" value="yes" <?php if ($userCharacteristic['lic'] == "yes") echo "checked";?>> Я
-            принимаю условия <a href="useragreement.html" target="_blank">лицензионного соглашения</a></label>
+            принимаю условия <a href="useragreement.php" target="_blank">лицензионного соглашения</a></label>
         </div>
         <div class="clearBoth"></div>
         <button class="backButton">Назад</button>
@@ -222,7 +222,7 @@
     <div class="bottomControls">
         <div style="float: right; margin-bottom: 10px; text-align: left;">
             <label><input type="checkbox" name="lic" id="lic" value="yes" <?php if ($userCharacteristic['lic'] == "yes") echo "checked";?>> Я
-            принимаю условия <a href="useragreement.html" target="_blank">лицензионного соглашения</a></label>
+            принимаю условия <a href="useragreement.php" target="_blank">лицензионного соглашения</a></label>
         </div>
         <div class="clearBoth"></div>
         <button class="backButton">Назад</button>
@@ -263,13 +263,5 @@
 <script src="js/registration.js"></script>
 <!-- end scripts -->
 
-<!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.
-        mathiasbynens.be/notes/async-analytics-snippet -->
-<!-- <script>
-        var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
-        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-        g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
-        s.parentNode.insertBefore(g,s)}(document,'script'));
-        </script> -->
 </body>
 </html>
