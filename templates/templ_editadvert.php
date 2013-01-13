@@ -1280,18 +1280,9 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
-    <div class="objectDescriptionItem"
-         title="Какую ответственность за состояние и ремонт объекта берет на себя собственник">
-        <div class="objectDescriptionItemLabel">
-            Ответственность за состояние и ремонт недвижимости:
-        </div>
-        <div class="objectDescriptionBody" style="min-width: 330px">
-            <textarea name="responsibility" maxlength="2000" rows="7" cols="43"><?php echo $propertyCharacteristic['responsibility'];?></textarea>
-        </div>
-    </div>
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
-            Дополнительный комментарий:
+            Комментарий:
         </div>
         <div class="objectDescriptionBody" style="min-width: 330px">
             <textarea name="comment" maxlength="2000" rows="7" cols="43"><?php echo $propertyCharacteristic['comment'];?></textarea>

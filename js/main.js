@@ -1,4 +1,3 @@
-
 /**********************************************************************
  * ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ: инициализация
  **********************************************************************/
@@ -79,7 +78,7 @@ function addToFavorites() {
     $(".removeFromFavorites[propertyId='" + propertyId + "'] img").attr('src', 'img/gold_star.png');
     $(".removeFromFavorites[propertyId='" + propertyId + "'] a").html("убрать из избранного");
 
-    jQuery.post("AJAXChangeFavorites.php", {"propertyId": propertyId, "action": "addToFavorites"}, function (data) {
+    jQuery.post("AJAXChangeFavorites.php", {"propertyId":propertyId, "action":"addToFavorites"}, function (data) {
         $(data).find("span[status='successful']").each(function () {
             /* Действия при положительном ответе от сервера */
         });
@@ -104,7 +103,7 @@ function removeFromFavorites() {
     $(".addToFavorites[propertyId='" + propertyId + "'] img").attr('src', 'img/blue_star.png');
     $(".addToFavorites[propertyId='" + propertyId + "'] a").html("добавить в избранное");
 
-    jQuery.post("AJAXChangeFavorites.php", {"propertyId": propertyId, "action": "removeFromFavorites"}, function (data) {
+    jQuery.post("AJAXChangeFavorites.php", {"propertyId":propertyId, "action":"removeFromFavorites"}, function (data) {
         $(data).find("span[status='successful']").each(function () {
             /* Действия при положительном ответе от сервера */
         });
@@ -154,7 +153,7 @@ function initJQueryUI() {
         modal:true,
         width:600,
         dialogClass:"edited",
-        draggable: true
+        draggable:true
     });
 }
 
@@ -187,16 +186,16 @@ if ($('#userMistakesBlock ol').html() != "") {
 // Функция активирует блок загрузки и редактирования фотографий на странице
 function createUploader() {
     var uploader = new qq.FileUploader({
-        element: document.getElementById('file-uploader'),
-        action: '../AJAXUploader.php',
-        allowedExtensions: ["jpeg", "JPEG", "jpg", "JPG", "png", "PNG", "gif", "GIF"], // Также расширения нужно менять в файле AJAXUploader.php
-        sizeLimit: 25 * 1024 * 1024,
-        debug: false,
+        element:document.getElementById('file-uploader'),
+        action:'../AJAXUploader.php',
+        allowedExtensions:["jpeg", "JPEG", "jpg", "JPG", "png", "PNG", "gif", "GIF"], // Также расширения нужно менять в файле AJAXUploader.php
+        sizeLimit:25 * 1024 * 1024,
+        debug:false,
         // О каждом загруженном файле информацию передаем на сервер через переменные - для сохранения в БД
         onSubmit:function (id, fileName) {
             uploader.setParams({
-                fileuploadid: $("#fileUploadId").val(),
-                sourcefilename: fileName
+                fileuploadid:$("#fileUploadId").val(),
+                sourcefilename:fileName
             });
         }
         //extraDropzones: [qq.getByClass(document, 'qq-upload-extra-drop-area')[0]]
@@ -252,13 +251,10 @@ function attrInputHiddenToValue() {
     return true;
 
     // Вспомогательная функция для определения значения (value) выбранной радиокнопки в группе с именем radioboxGroupName
-    function getRadioValue(radioboxGroupName)
-    {
+    function getRadioValue(radioboxGroupName) {
         group = document.getElementsByName(radioboxGroupName);
-        for (var i = 0; i < group.length; i++)
-        {
-            if (group[i].checked)
-            {
+        for (var i = 0; i < group.length; i++) {
+            if (group[i].checked) {
                 return (group[i].value);
             }
         }
@@ -280,12 +276,12 @@ function createUploadedFilesBlocks(uploader) {
 
         // Собираем объект с параметрами вызова функции _onComplete
         var result = {
-            success: true,
-            folder: folder,
-            name: fotoid,
-            ext: extension,
-            status: status,
-            uploadedFotoObjExists: 'true' // Этот признак скажет функции uploader._onComplete, что не нужно записывать в массив uploadedFoto новый объект с информацией по этой фотографии, так как он уже там есть
+            success:true,
+            folder:folder,
+            name:fotoid,
+            ext:extension,
+            status:status,
+            uploadedFotoObjExists:'true' // Этот признак скажет функции uploader._onComplete, что не нужно записывать в массив uploadedFoto новый объект с информацией по этой фотографии, так как он уже там есть
         };
 
         // Формируем зеленый блок в списке загруженных файлов в разделе Фотографии. Шаблон для блока хранится в fileTemplate в fileuploader.js (примерно 571 строка)
@@ -362,9 +358,9 @@ function getCoords(elem) {
  * Функция для БЛОКИРОВКИ / РАЗБЛОКИРОВКИ ЭЛЕМЕНТОВ ВВОДА при изменении уже введенных значений.
  *********************************************************************************/
 
- // Пробегает все элементы и изменяет в соответствии с текущей ситуацией их доступность/недоступность для пользователя
- // Для использования необходимо подключить запуск функции к соответствующему селекту:
- // $("#typeOfObject").change(notavailability);
+    // Пробегает все элементы и изменяет в соответствии с текущей ситуацией их доступность/недоступность для пользователя
+    // Для использования необходимо подключить запуск функции к соответствующему селекту:
+    // $("#typeOfObject").change(notavailability);
 
 function notavailability() {
 
@@ -411,7 +407,7 @@ function notavailability() {
 
 // inputId - идентификатор элемента управления (select, input..)
 // errorText - сообщение об ошибке, которое нужно отобразить
-function buildErrorMessageBlock (inputId, errorText) {
+function buildErrorMessageBlock(inputId, errorText) {
     var divErrorBlock = document.createElement('div');
     var divErrorContent = document.createElement('div');
     var errorArrow = document.createElement('div');
@@ -437,17 +433,17 @@ function buildErrorMessageBlock (inputId, errorText) {
     inputTopPosition = inputTopPosition - divErrorBlockHeight - 10;
 
     $(divErrorBlock).css({
-        top: inputTopPosition,
-        left: inputleftPosition,
-        opacity: 0
+        top:inputTopPosition,
+        left:inputleftPosition,
+        opacity:0
     });
     $(divErrorBlock).fadeTo("fast", 0.8);
 }
 
 // При фокусировке на некотором элементе управления нам нужно удалить сообщение об ошибке, чтобы оно не мешало вводу данных
-$("input[type=text], input[type=password], select, textarea").on('focus', function() {
+$("input[type=text], input[type=password], select, textarea").on('focus', function () {
     // Ищем блок с отображением ошибки, который помечен классом, совпадающим с именем элемента управления - то есть относящимся к этому элементу управления и удаляем его.
-    $(".errorBlock." + $(this).attr("name")).each(function() {
+    $(".errorBlock." + $(this).attr("name")).each(function () {
         $(this).remove();
     });
 });
@@ -497,58 +493,47 @@ function personalFIO_validation() {
     if (typeTenant === undefined) typeTenant = false;
 
     // ФИО
-    if ($('#surname').val() == '') {
-        buildErrorMessageBlock ("surname", "Укажите фамилию");
-        err++;
-    }
     if ($('#surname').val().length > 50) {
-        buildErrorMessageBlock ("surname", "Слишком длинная фамилия. Можно указать не более 50-ти символов");
+        buildErrorMessageBlock("surname", "Не более 50-ти символов");
         err++;
     }
     if ($('#name').val() == '') {
-        buildErrorMessageBlock ("name", "Укажите имя");
+        buildErrorMessageBlock("name", "Укажите имя");
         err++;
     }
     if ($('#name').val().length > 50) {
-        buildErrorMessageBlock ("name", "Слишком длинное имя. Можно указать не более 50-ти символов");
-        err++;
-    }
-    if ($('#secondName').val() == '') {
-        buildErrorMessageBlock ("secondName", "Укажите отчество");
+        buildErrorMessageBlock("name", "Не более 50-ти символов");
         err++;
     }
     if ($('#secondName').val().length > 50) {
-        buildErrorMessageBlock ("secondName", "Слишком длинное отчество. Можно указать не более 50-ти символов");
+        buildErrorMessageBlock("secondName", "Не более 50-ти символов");
         err++;
     }
 
     // Пол, внешность, ДР
-    if ($('#sex').val() == '0') {
-        buildErrorMessageBlock ("sex", "Укажите пол");
+    if ($('#sex').val() == '0' && typeTenant) {
+        buildErrorMessageBlock("sex", "Укажите пол");
         err++;
     }
-    if ($('#nationality').val() == '0') {
-        buildErrorMessageBlock ("nationality", "Укажите внешность");
+    if ($('#birthday').val() == '' && typeTenant) {
+        buildErrorMessageBlock("birthday", "Укажите дату рождения");
         err++;
     }
-    if ($('#birthday').val() == '') {
-        buildErrorMessageBlock ("birthday", "Укажите дату рождения");
-        err++;
-    } else {
+    if ($('#birthday').val() != '') {
         if (!/^\d\d.\d\d.\d\d\d\d$/.test($('#birthday').val())) {
-            buildErrorMessageBlock ("birthday", "Неправильный формат даты рождения, должен быть: дд.мм.гггг, например: 01.01.1980");
+            buildErrorMessageBlock("birthday", "Неправильный формат даты рождения, должен быть: дд.мм.гггг, например: 01.01.1980");
             err++;
         } else {
             if ($('#birthday').val().slice(0, 2) < "01" || $('#birthday').val().slice(0, 2) > "31") {
-                buildErrorMessageBlock ("birthday", "Проверьте дату Дня рождения (допустимо от 01 до 31)");
+                buildErrorMessageBlock("birthday", "Проверьте дату Дня рождения (допустимо от 01 до 31)");
                 err++;
             }
             if ($('#birthday').val().slice(3, 5) < "01" || $('#birthday').val().slice(3, 5) > "12") {
-                buildErrorMessageBlock ("birthday", "Проверьте месяц Дня рождения (допустимо от 01 до 12)");
+                buildErrorMessageBlock("birthday", "Проверьте месяц Дня рождения (допустимо от 01 до 12)");
                 err++;
             }
-            if ($('#birthday').val().slice(6) < "1800" || $('#birthday').val().slice(6) > "2100") {
-                buildErrorMessageBlock ("birthday", "Проверьте год Дня рождения (допустимо от 1800 до 2100)");
+            if ($('#birthday').val().slice(6) < "1900" || $('#birthday').val().slice(6) > "2003") {
+                buildErrorMessageBlock("birthday", "Проверьте год Дня рождения (допустимо от 1900 до 2003)");
                 err++;
             }
         }
@@ -556,34 +541,30 @@ function personalFIO_validation() {
 
     // Логин и пароль
     if ($('#login').val() == '') {
-        buildErrorMessageBlock ("login", "Укажите логин");
+        buildErrorMessageBlock("login", "Укажите логин");
         err++;
     }
     if ($('#login').val().length > 50) {
-        buildErrorMessageBlock ("login", "Слишком длинный логин. Можно указать не более 50-ти символов");
+        buildErrorMessageBlock("login", "Не более 50-ти символов");
         err++;
     }
     if ($('#password').val() == '') {
-        buildErrorMessageBlock ("password", "Укажите пароль");
+        buildErrorMessageBlock("password", "Укажите пароль");
         err++;
     }
 
     // Телефон и e-mail
     if ($('#telephon').val() == '') {
-        buildErrorMessageBlock ("telephon", "Укажите контактный (мобильный) телефон");
+        buildErrorMessageBlock("telephon", "Укажите контактный (мобильный) телефон");
         err++;
     } else {
         if (!/^[0-9]{10}$/.test($('#telephon').val())) {
-            buildErrorMessageBlock ("telephon", "Укажите, пожалуйста, Ваш мобильный номер без 8-ки, например: 9226470019");
+            buildErrorMessageBlock("telephon", "Укажите, пожалуйста, Ваш мобильный номер без 8-ки, например: 9226470019");
             err++;
         }
     }
-    if ($('#email').val() == '' && typeTenant) {
-        buildErrorMessageBlock ("email", "Укажите e-mail");
-        err++;
-    }
     if ($('#email').val() != '' && !/^(([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+\.)*([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]{2,5}$/.test($('#email').val())) {
-        buildErrorMessageBlock ("email", "Попробуйте ввести e-mail еще раз или указать другой электронный адрес (e-mail не прошел проверку формата)");
+        buildErrorMessageBlock("email", "E-mail не соответствует формату: попробуйте ввести e-mail еще раз или указать другой электронный адрес");
         err++;
     }
 
@@ -597,201 +578,176 @@ function personalEducAndWork_validation() {
     if (typeTenant === undefined) typeTenant = false;
 
     if ($('#currentStatusEducation').val() == '0' && typeTenant) {
-        buildErrorMessageBlock ("currentStatusEducation", "Укажите Ваше образование (текущий статус)");
+        buildErrorMessageBlock("currentStatusEducation", "Укажите, учитесь ли Вы");
         err++;
     } else {
         // Образование
-        if ($('#almamater').val() == '' && typeTenant && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  )) {
-            buildErrorMessageBlock ("almamater", "Укажите учебное заведение");
-            err++;
-        }
         if ($('#almamater').val().length > 100) {
-            buildErrorMessageBlock ("almamater", "Слишком длинное название учебного заведения (используйте не более 100 символов)");
-            err++;
-        }
-        if ($('#speciality').val() == '' && typeTenant && ( $('#currentStatusEducation').val() == 'сейчас учусь' || $('#currentStatusEducation').val() == "закончил"  )) {
-            buildErrorMessageBlock ("speciality", "Укажите специальность");
+            buildErrorMessageBlock("almamater", "Не более 100 символов");
             err++;
         }
         if ($('#speciality').val().length > 100) {
-            buildErrorMessageBlock ("speciality", "Слишком длинное название специальности (используйте не более 100 символов)");
-            err++;
-        }
-        if ($('#kurs').val() == '' && typeTenant && $('#currentStatusEducation').val() == 'сейчас учусь') {
-            buildErrorMessageBlock ("kurs", "Укажите курс обучения");
+            buildErrorMessageBlock("speciality", "Не более 100 символов");
             err++;
         }
         if ($('#kurs').val().length > 30) {
-            buildErrorMessageBlock ("kurs", "Указана слишком длинная строка (используйте не более 30 символов)");
-            err++;
-        }
-        if ($('#ochnoZaochno').val() == '0' && typeTenant && $('#currentStatusEducation').val() == 'сейчас учусь') {
-            buildErrorMessageBlock ("ochnoZaochno", "Укажите форму обучения (очная, заочная)");
-            err++;
-        }
-        if ($('#yearOfEnd').val() == '' && typeTenant && $('#currentStatusEducation').val() == 'закончил') {
-            buildErrorMessageBlock ("yearOfEnd", "Укажите год окончания учебного заведения");
+            buildErrorMessageBlock("kurs", "Не более 30-ти символов");
             err++;
         }
         if ($('#yearOfEnd').val() != '' && !/^[12]{1}[0-9]{3}$/.test($('#yearOfEnd').val())) {
-            buildErrorMessageBlock ("yearOfEnd", "Укажите год окончания учебного заведения в формате: \"гггг\". Например: 2007");
+            buildErrorMessageBlock("yearOfEnd", "Укажите год окончания учебного заведения в формате: \"гггг\". Например: 2007");
             err++;
         }
     }
 
     // Работа
     if ($('#statusWork').val() == '0' && typeTenant) {
-        buildErrorMessageBlock ("statusWork", "Укажите статус занятости");
+        buildErrorMessageBlock("statusWork", "Укажите, работаете ли Вы");
         err++;
     } else {
-        if ($('#placeOfWork').val() == '' && $("#statusWork").val() == 'работаю' && typeTenant) {
-            buildErrorMessageBlock ("placeOfWork", "Укажите Ваше место работы (название организации)");
-            err++;
-        }
         if ($('#placeOfWork').val().length > 100) {
-            buildErrorMessageBlock ("placeOfWork", "Слишком длинное наименование места работы (используйте не более 100 символов)");
-            err++;
-        }
-        if ($('#workPosition').val() == '' && $("#statusWork").val() == 'работаю' && typeTenant) {
-            buildErrorMessageBlock ("workPosition", "Укажите Вашу должность");
+            buildErrorMessageBlock("placeOfWork", "Не более 100 символов");
             err++;
         }
         if ($('#workPosition').val().length > 100) {
-            buildErrorMessageBlock ("workPosition", "Слишком длинное название должности (используйте не более 100 символов)");
+            buildErrorMessageBlock("workPosition", "Не более 100 символов");
             err++;
         }
     }
 
     // Коротко о себе
     if ($('#regionOfBorn').val().length > 50) {
-        buildErrorMessageBlock ("regionOfBorn", "Слишком длинное наименование региона, в котором Вы родились (используйте не более 50 символов)");
+        buildErrorMessageBlock("regionOfBorn", "Не более 50-ти символов");
         err++;
     }
     if ($('#cityOfBorn').val().length > 50) {
-        buildErrorMessageBlock ("cityOfBorn", "Слишком длинное наименование города, в котором Вы родились (используйте не более 50 символов)");
+        buildErrorMessageBlock("cityOfBorn", "Не более 50-ти символов");
         err++;
     }
 
     return err;
 }
+
 // Функция валидации для данных о социальных сетях пользователя
 function personalSocial_validation() {
     var err = 0;
 
     if ($('#vkontakte').val().length > 100) {
-        buildErrorMessageBlock ("vkontakte", "Указана слишком длинная ссылка на личную страницу Вконтакте (используйте не более 100 символов)");
+        buildErrorMessageBlock("vkontakte", "Не более 100 символов");
         err++;
     }
     if ($('#vkontakte').val() != '' && !/vk\.com/.test($('#vkontakte').val())) {
-        buildErrorMessageBlock ("vkontakte", "Укажите, пожалуйста, Вашу настоящую личную страницу Вконтакте, либо оставьте поле пустым (ссылка должна содержать строчку \"vk.com\")");
+        buildErrorMessageBlock("vkontakte", "Ошибка формата, строка должна содержать \"vk.com\")");
         err++;
     }
     if ($('#odnoklassniki').val().length > 100) {
-        buildErrorMessageBlock ("odnoklassniki", "Указана слишком длинная ссылка на личную страницу в Одноклассниках (используйте не более 100 символов)");
+        buildErrorMessageBlock("odnoklassniki", "Не более 100 символов");
         err++;
     }
     if ($('#odnoklassniki').val() != '' && !/www\.odnoklassniki\.ru\/profile\//.test($('#odnoklassniki').val())) {
-        buildErrorMessageBlock ("odnoklassniki", "Укажите, пожалуйста, Вашу настоящую личную страницу в Одноклассниках, либо оставьте поле пустым (ссылка должна содержать строчку \"www.odnoklassniki.ru/profile/\")");
+        buildErrorMessageBlock("odnoklassniki", "Ошибка формата, строка должна содержать \"www.odnoklassniki.ru/profile/\")");
         err++;
     }
     if ($('#facebook').val().length > 100) {
-        buildErrorMessageBlock ("facebook", "Указана слишком длинная ссылка на личную страницу на Facebook (используйте не более 100 символов)");
+        buildErrorMessageBlock("facebook", "Не более 100 символов");
         err++;
     }
     if ($('#facebook').val() != '' && !/www\.facebook\.com\/profile\.php/.test($('#facebook').val())) {
-        buildErrorMessageBlock ("facebook", "Укажите, пожалуйста, Вашу настоящую личную страницу на Facebook, либо оставьте поле пустым (ссылка должна содержать строчку с \"www.facebook.com/profile.php\")");
+        buildErrorMessageBlock("facebook", "Ошибка формата, строка должна содержать \"www.facebook.com/profile.php\")");
         err++;
     }
     if ($('#twitter').val().length > 100) {
-        buildErrorMessageBlock ("twitter", "Указана слишком длинная ссылка на личную страницу в Twitter (используйте не более 100 символов)");
+        buildErrorMessageBlock("twitter", "Не более 100 символов");
         err++;
     }
     if ($('#twitter').val() != '' && !/twitter\.com/.test($('#twitter').val())) {
-        buildErrorMessageBlock ("twitter", "Укажите, пожалуйста, Вашу настоящую личную страницу в Twitter, либо оставьте поле пустым (ссылка должна содержать строчку \"twitter.com\")");
+        buildErrorMessageBlock("twitter", "Ошибка формата, строка должна содержать \"twitter.com\")");
         err++;
     }
 
     if ($('#tabs-3 #lic').length && $('#tabs-3 #lic').attr('checked') != "checked") {
-        buildErrorMessageBlock ("lic", "Регистрация возможна только при согласии с условиями лицензионного соглашения");
+        buildErrorMessageBlock("lic", "Регистрация возможна только при согласии с условиями лицензионного соглашения");
         err++;
     }
 
     return err;
 }
+
 // Функция валидации для параметров поискового запроса пользователя
 function searchRequest_validation() {
     var err = 0;
 
     if (!/^\d{0,8}$/.test($('#minCost').val())) {
-        buildErrorMessageBlock ("minCost", "Неправильный формат числа в поле минимальной величины арендной платы (проверьте: только числа, не более 8 символов)");
+        buildErrorMessageBlock("minCost", "Неправильный формат числа (проверьте: только числа, не более 8 символов)");
         err++;
     }
     if (!/^\d{0,8}$/.test($('#maxCost').val())) {
-        buildErrorMessageBlock ("maxCost", "Неправильный формат числа в поле максимальной величины арендной платы (проверьте: только числа, не более 8 символов)");
+        buildErrorMessageBlock("maxCost", "Неправильный формат числа (проверьте: только числа, не более 8 символов)");
         err++;
     }
     if (!/^\d{0,8}$/.test($('#pledge').val())) {
-        buildErrorMessageBlock ("pledge", "Неправильный формат числа в поле максимальной величины залога (проверьте: только числа, не более 8 символов)");
+        buildErrorMessageBlock("pledge", "Неправильный формат числа (проверьте: только числа, не более 8 символов)");
         err++;
     }
 
     if ($('#minCost').val() > $('#maxCost').val()) {
-        buildErrorMessageBlock ("#minCost", "Минимальная стоимость аренды не может быть больше, чем максимальная. Исправьте поля, в которых указаны Ваши требования к диапазону стоимости аренды");
+        buildErrorMessageBlock("#minCost", "Минимальная стоимость аренды не может быть больше, чем максимальная");
         err++;
     }
 
     if ($('#withWho').val() == "0" && $('#typeOfObject').val() != "гараж") {
-        buildErrorMessageBlock ("withWho", "Укажите, как Вы собираетесь проживать в арендуемой недвижимости (с кем)");
+        buildErrorMessageBlock("withWho", "Обязательное поле");
         err++;
     }
     if ($('#children').val() == "0" && $('#typeOfObject').val() != "гараж") {
-        buildErrorMessageBlock ("children", "Укажите, собираетесь ли Вы проживать вместе с детьми или без них");
+        buildErrorMessageBlock("children", "Обязательное поле");
         err++;
     }
     if ($('#animals').val() == "0" && $('#typeOfObject').val() != "гараж") {
-        buildErrorMessageBlock ("animals", "Укажите, собираетесь ли Вы проживать вместе с животными или без них");
+        buildErrorMessageBlock("animals", "Обязательное поле");
         err++;
     }
     if ($('#termOfLease').val() == "0") {
-        buildErrorMessageBlock ("termOfLease", "Укажите предполагаемый срок аренды");
+        buildErrorMessageBlock("termOfLease", "Обязательное поле");
         err++;
     }
 
     if ($('#tabs-4 #lic').length && $('#tabs-4 #lic').attr('checked') != "checked") {
-        buildErrorMessageBlock ("lic", "Регистрация возможна только при согласии с условиями лицензионного соглашения");
+        buildErrorMessageBlock("lic", "Регистрация возможна только при согласии с условиями лицензионного соглашения");
         err++;
     }
 
     return err;
 }
+
 // Функция валидации для параметров заявки собственника
 function requestFromOwner_validation() {
     var err = 0;
 
     if ($('#name').val() == '') {
-        buildErrorMessageBlock ("name", "Укажите Ваше имя");
+        buildErrorMessageBlock("name", "Укажите Ваше имя");
         err++;
     }
     if ($('#name').val().length > 100) {
-        buildErrorMessageBlock ("name", "Используйте не более 100 символов");
+        buildErrorMessageBlock("name", "Используйте не более 100 символов");
         err++;
     }
 
     if ($('#telephon').val() == '') {
-        buildErrorMessageBlock ("telephon", "Укажите Ваш контактный номер телефона");
+        buildErrorMessageBlock("telephon", "Укажите Ваш контактный номер телефона");
         err++;
     }
     if ($('#telephon').val().length > 20) {
-        buildErrorMessageBlock ("telephon", "Используйте не более 20 цифр, например: 9225468392");
+        buildErrorMessageBlock("telephon", "Используйте не более 20 цифр, например: 9225468392");
         err++;
     }
 
     if ($('#address').val() == '') {
-        buildErrorMessageBlock ("address", "Укажите адрес недвижимости");
+        buildErrorMessageBlock("address", "Укажите адрес недвижимости");
         err++;
     }
     if ($('#address').val().length > 60) {
-        buildErrorMessageBlock ("address", "Используйте не более 60-ти символов");
+        buildErrorMessageBlock("address", "Используйте не более 60-ти символов");
         err++;
     }
 

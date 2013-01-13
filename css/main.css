@@ -334,6 +334,13 @@ div.notEdited.right {
     margin-left: 1.5%;
 }
 
+div.notEdited.both {
+    float: left;
+    clear: both;
+    width: 100%;
+    margin-left: 0;
+}
+
 div.notEdited .legend {
     width: 100%;
     text-align: left;
@@ -345,11 +352,11 @@ div.notEdited .legend {
 }
 
 div.notEdited .objectDescriptionItemLabel {
-    width: 65%
+    width: 60%;
 }
 
 div.notEdited .objectDescriptionBody {
-    width: 35%
+    width: 40%
 }
 
 div.notEdited table {

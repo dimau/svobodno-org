@@ -466,6 +466,7 @@ class UserFull extends User
 	// $typeOfValidation = validateProfileParameters - режим проверки отредактированных пользователем данных Профиля (учитывается, является ли пользователь арендатором, или собственником)
 	// $typeOfValidation = newAlienOwner - режим проверки параметров нового пользователя по минимуму - так как о чужих собственниках обычно мало информации: только проверки на логин и пароль + проверки на формат (чтобы в БД удалось сохранить без ошибок)
 	public function validate($typeOfValidation) {
+
 		// Подготовим массив для сохранения сообщений об ошибках
 		$errors = array();
 
@@ -473,30 +474,16 @@ class UserFull extends User
 		$typeTenant = $this->typeTenant;
 
 		// Проверки для блока "Личные данные"
-		if ($typeOfValidation == "registration" || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateProfileParameters") {
-			if ($this->name == "") $errors[] = 'Укажите имя';
-		}
+		if ($this->name == "") $errors[] = 'Укажите имя';
 		if (strlen($this->name) > 50) $errors[] = 'Слишком длинное имя. Можно указать не более 50-ти символов';
-
-		if ($typeOfValidation == "registration" || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateProfileParameters") {
-			if ($this->secondName == "") $errors[] = 'Укажите отчество';
-		}
 		if (strlen($this->secondName) > 50) $errors[] = 'Слишком длинное отчество. Можно указать не более 50-ти символов';
-
-		if ($typeOfValidation == "registration" || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateProfileParameters") {
-			if ($this->surname == "") $errors[] = 'Укажите фамилию';
-		}
 		if (strlen($this->surname) > 50) $errors[] = 'Слишком длинная фамилия. Можно указать не более 50-ти символов';
 
-		if ($typeOfValidation == "registration" || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateProfileParameters") {
+		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "createSearchRequest") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE)) {
 			if ($this->sex == "0") $errors[] = 'Укажите пол';
 		}
 
-		if ($typeOfValidation == "registration" || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateProfileParameters") {
-			if ($this->nationality == "0") $errors[] = 'Укажите внешность';
-		}
-
-		if ($typeOfValidation == "registration" || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateProfileParameters") {
+		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "createSearchRequest") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE)) {
 			if ($this->birthday == "") $errors[] = 'Укажите дату рождения';
 		}
 		if ($this->birthday != "") {
@@ -530,59 +517,27 @@ class UserFull extends User
 
 		if ($this->password == "") $errors[] = 'Укажите пароль';
 
-		if ($typeOfValidation == "registration" || $typeOfValidation == "createSearchRequest" || $typeOfValidation == "validateProfileParameters") {
-			if ($this->telephon == "") $errors[] = 'Укажите контактный (мобильный) телефон';
-		}
-
+		if ($this->telephon == "") $errors[] = 'Укажите контактный (мобильный) телефон';
 		if ($this->telephon != "") {
 			if (!preg_match('/^[0-9]{10}$/', $this->telephon)) $errors[] = 'Укажите, пожалуйста, Ваш мобильный номер без 8-ки, например: 9226470019';
 		}
 
-		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "createSearchRequest") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE)) {
-			if ($this->email == "") $errors[] = 'Укажите e-mail';
-		}
 		if ($this->email != "" && !preg_match("/^(([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+\.)*([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]{2,5}$/", $this->email)) $errors[] = 'Укажите, пожалуйста, Ваш настоящий e-mail (указанный Вами e-mail не прошел проверку формата)';
 
 		// Проверки для блока "Образование"
 		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest") {
-			if ($this->currentStatusEducation == "0") $errors[] = 'Укажите Ваше образование (текущий статус)';
-		}
-		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest") {
-			if ($this->almamater == "" && ($this->currentStatusEducation == "сейчас учусь" || $this->currentStatusEducation == "закончил")) $errors[] = 'Укажите учебное заведение';
+			if ($this->currentStatusEducation == "0") $errors[] = 'Укажите Ваше образование';
 		}
 		if (isset($this->almamater) && strlen($this->almamater) > 100) $errors[] = 'Слишком длинное название учебного заведения (используйте не более 100 символов)';
-
-		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest") {
-			if ($this->speciality == "" && ($this->currentStatusEducation == "сейчас учусь" || $this->currentStatusEducation == "закончил")) $errors[] = 'Укажите специальность';
-		}
 		if (isset($this->speciality) && strlen($this->speciality) > 100) $errors[] = 'Слишком длинное название специальности (используйте не более 100 символов)';
-
-		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest") {
-			if ($this->kurs == "" && $this->currentStatusEducation == "сейчас учусь") $errors[] = 'Укажите курс обучения';
-		}
 		if (isset($this->kurs) && strlen($this->kurs) > 30) $errors[] = 'Курс. Указана слишком длинная строка (используйте не более 30 символов)';
-
-		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest") {
-			if ($this->ochnoZaochno == "0" && $this->currentStatusEducation == "сейчас учусь") $errors[] = 'Укажите форму обучения (очная, заочная)';
-		}
-		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest") {
-			if ($this->yearOfEnd == "" && $this->currentStatusEducation == "закончил") $errors[] = 'Укажите год окончания учебного заведения';
-		}
 		if ($this->yearOfEnd != "" && !preg_match("/^[12]{1}[0-9]{3}$/", $this->yearOfEnd)) $errors[] = 'Укажите год окончания учебного заведения в формате: "гггг". Например: 2007';
 
 		// Проверки для блока "Работа"
 		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest") {
-			if ($this->statusWork == "0") $errors[] = 'Укажите статус занятости';
-		}
-
-		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest") {
-			if ($this->placeOfWork == "" && $this->statusWork == "работаю") $errors[] = 'Укажите Ваше место работы (название организации)';
+			if ($this->statusWork == "0") $errors[] = 'Укажите, работаете ли Вы';
 		}
 		if (isset($this->placeOfWork) && strlen($this->placeOfWork) > 100) $errors[] = 'Слишком длинное наименование места работы (используйте не более 100 символов)';
-
-		if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest") {
-			if ($this->workPosition == "" && $this->statusWork == "работаю") $errors[] = 'Укажите Вашу должность';
-		}
 		if (isset($this->workPosition) && strlen($this->workPosition) > 100) $errors[] = 'Слишком длинное название должности (используйте не более 100 символов)';
 
 		// Проверки для блока "Коротко о себе"

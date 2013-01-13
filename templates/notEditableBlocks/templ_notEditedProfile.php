@@ -15,41 +15,54 @@
                 echo "нет";
             }
             if ($userCharacteristic['currentStatusEducation'] == "сейчас учусь") {
-                if (isset($userCharacteristic['almamater'])) echo $userCharacteristic['almamater'] . ", ";
-                if (isset($userCharacteristic['speciality'])) echo $userCharacteristic['speciality'] . ", ";
-                if (isset($userCharacteristic['ochnoZaochno'])) echo $userCharacteristic['ochnoZaochno'] . ", ";
-                if (isset($userCharacteristic['kurs'])) echo "курс: " . $userCharacteristic['kurs'];
+                if ($userCharacteristic['almamater'] != "") echo $userCharacteristic['almamater'] . ", ";
+                if ($userCharacteristic['speciality'] != "") echo $userCharacteristic['speciality'] . ", ";
+                if ($userCharacteristic['ochnoZaochno'] != "0") echo $userCharacteristic['ochnoZaochno'] . ", ";
+                if ($userCharacteristic['kurs'] != "") echo "курс: " . $userCharacteristic['kurs'];
+                if ($userCharacteristic['almamater'] == "" && $userCharacteristic['speciality'] == "" && $userCharacteristic['ochnoZaochno'] == "0" && $userCharacteristic['kurs'] == "") {
+                    echo "студент";
+                }
             }
             if ($userCharacteristic['currentStatusEducation'] == "закончил") {
-                if (isset($userCharacteristic['almamater'])) echo $userCharacteristic['almamater'] . ", ";
-                if (isset($userCharacteristic['speciality'])) echo $userCharacteristic['speciality'] . ", ";
-                if (isset($userCharacteristic['ochnoZaochno'])) echo $userCharacteristic['ochnoZaochno'] . ", ";
-                if (isset($userCharacteristic['yearOfEnd'])) echo "<span style='white-space: nowrap;'>закончил в " . $userCharacteristic['yearOfEnd'] . " году</span>";
+                if ($userCharacteristic['almamater'] != "") echo $userCharacteristic['almamater'] . ", ";
+                if ($userCharacteristic['speciality'] != "") echo $userCharacteristic['speciality'] . ", ";
+                if ($userCharacteristic['ochnoZaochno'] != "0") echo $userCharacteristic['ochnoZaochno'] . ", ";
+                if ($userCharacteristic['yearOfEnd'] != "") echo "<span style='white-space: nowrap;'>закончил в " . $userCharacteristic['yearOfEnd'] . " году</span>";
+                if ($userCharacteristic['almamater'] == "" && $userCharacteristic['speciality'] == "" && $userCharacteristic['ochnoZaochno'] == "0" && $userCharacteristic['yearOfEnd'] == "") {
+                    echo "закончил";
+                }
             }
             ?>
         </li>
         <li>
             <span class="headOfString">Работа:</span> <?php
+            if ($userCharacteristic['statusWork'] == "0") {
+                echo "";
+            }
             if ($userCharacteristic['statusWork'] == "не работаю") {
-                echo "не работаю";
-            } else {
-                if (isset($userCharacteristic['placeOfWork']) && $userCharacteristic['placeOfWork'] != "") {
+                echo "нет";
+            }
+            if ($userCharacteristic['statusWork'] == "работаю") {
+                if ($userCharacteristic['placeOfWork'] != "") {
                     echo $userCharacteristic['placeOfWork'] . ", ";
                 }
-                if (isset($userCharacteristic['workPosition'])) {
+                if ($userCharacteristic['workPosition'] != "") {
                     echo $userCharacteristic['workPosition'];
+                }
+                if ($userCharacteristic['placeOfWork'] == "" && $userCharacteristic['workPosition'] == "") {
+                    echo "есть";
                 }
             }
             ?>
         </li>
         <li>
             <span class="headOfString">Внешность:</span> <?php
-            if (isset($userCharacteristic['nationality']) && $userCharacteristic['nationality'] != "0") echo "<span style='white-space: nowrap;'>" . $userCharacteristic['nationality'] . "</span>";
+            if ($userCharacteristic['nationality'] != "0") echo "<span style='white-space: nowrap;'>" . $userCharacteristic['nationality'] . "</span>";
             ?>
         </li>
         <li>
             <span class="headOfString">Пол:</span> <?php
-            if (isset($userCharacteristic['sex'])) echo $userCharacteristic['sex'];
+            if ($userCharacteristic['sex'] != "0") echo $userCharacteristic['sex'];
             ?>
         </li>
         <li>

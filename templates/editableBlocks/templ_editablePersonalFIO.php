@@ -10,7 +10,6 @@
                             Фамилия
                         </td>
                         <td class="itemRequired">
-                            *
                         </td>
                         <td class="itemBody">
                             <input name="surname" id="surname" type="text" autofocus value='<?php echo $userCharacteristic['surname'];?>'>
@@ -32,18 +31,19 @@
                             Отчество
                         </td>
                         <td class="itemRequired">
-                            *
                         </td>
                         <td class="itemBody">
                             <input name="secondName" id="secondName" type="text" value='<?php echo $userCharacteristic['secondName'];?>'>
                         </td>
                     </tr>
-                    <tr>
+                    <tr <?php if ($userCharacteristic['typeTenant']) echo 'title="Мы используем указанный Вами пол при поиске недвижимости: некоторые объекты сдаются только девушкам, другие только молодым людям"'; ?>>
                         <td class="itemLabel">
                             Пол
                         </td>
                         <td class="itemRequired">
-                            *
+                            <?php if ($userCharacteristic['typeTenant']) {
+                            echo "*";
+                        } ?>
                         </td>
                         <td class="itemBody">
                             <select name="sex" id="sex">
@@ -58,7 +58,6 @@
                             Внешность
                         </td>
                         <td class="itemRequired">
-                            *
                         </td>
                         <td class="itemBody">
                             <select name="nationality" id="nationality">
@@ -86,12 +85,14 @@
                             </select>
                         </td>
                     </tr>
-                    <tr>
+                    <tr <?php if ($userCharacteristic['typeTenant']) echo 'title="На основе даты рождения мы автоматически вычисляем Ваш возраст, а им, в свою очередь, интересуются собственники"'; ?>>
                         <td class="itemLabel">
                             День рождения
                         </td>
                         <td class="itemRequired">
-                            *
+                            <?php if ($userCharacteristic['typeTenant']) {
+                            echo "*";
+                        } ?>
                         </td>
                         <td class="itemBody">
                             <input name="birthday" id="birthday" type="text"
@@ -163,9 +164,6 @@
                                 E-mail
                             </td>
                             <td class="itemRequired">
-                                <?php if ($userCharacteristic['typeTenant']) {
-                                echo "*";
-                            } ?>
                             </td>
                             <td class="itemBody">
                                 <input type="text" name="email" id="email" value='<?php echo $userCharacteristic['email'];?>'>

@@ -73,7 +73,6 @@ class Property
 	private $timeForRingBegin = "0";
 	private $timeForRingEnd = "0";
 	private $checking = "0";
-	private $responsibility = "";
 	private $comment = "";
 	private $last_act = "";
 	private $reg_date = "";
@@ -620,7 +619,6 @@ class Property
 		if (isset($_POST['timeForRingBegin'])) $this->timeForRingBegin = htmlspecialchars($_POST['timeForRingBegin'], ENT_QUOTES);
 		if (isset($_POST['timeForRingEnd'])) $this->timeForRingEnd = htmlspecialchars($_POST['timeForRingEnd'], ENT_QUOTES);
 		if (isset($_POST['checking'])) $this->checking = htmlspecialchars($_POST['checking'], ENT_QUOTES);
-		if (isset($_POST['responsibility'])) $this->responsibility = htmlspecialchars($_POST['responsibility'], ENT_QUOTES);
 		if (isset($_POST['comment'])) $this->comment = htmlspecialchars($_POST['comment'], ENT_QUOTES);
 		if (isset($_POST['earliestDate'])) $this->earliestDate = htmlspecialchars($_POST['earliestDate'], ENT_QUOTES);
 		if (isset($_POST['earliestTimeHours'])) $this->earliestTimeHours = htmlspecialchars($_POST['earliestTimeHours'], ENT_QUOTES);
@@ -703,7 +701,6 @@ class Property
 		$result['timeForRingBegin'] = $this->timeForRingBegin;
 		$result['timeForRingEnd'] = $this->timeForRingEnd;
 		$result['checking'] = $this->checking;
-		$result['responsibility'] = $this->responsibility;
 		$result['comment'] = $this->comment;
 		$result['last_act'] = $this->last_act;
 		$result['reg_date'] = $this->reg_date;
@@ -1090,10 +1087,6 @@ class Property
 
 		if ($typeOfValidation == "newAdvert" || $typeOfValidation == "editAdvert") {
 			if ($this->checking == "0") $errors[] = 'Укажите: где собирается проживать собственник';
-		}
-
-		if ($typeOfValidation == "newAdvert" || $typeOfValidation == "editAdvert") {
-			if ($this->responsibility == "") $errors[] = 'Укажите: какую ответственность за состояние и ремонт объекта Вы берете на себя, а какую арендатор';
 		}
 
 		return $errors; // Возвращаем список ошибок, если все в порядке, то он будет пуст

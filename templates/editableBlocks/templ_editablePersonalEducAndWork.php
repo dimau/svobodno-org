@@ -6,7 +6,7 @@
         <tbody>
             <tr>
                 <td class="itemLabel">
-                    Статус занятости
+                    Вы работаете?
                 </td>
                 <td class="itemRequired">
                     <?php if ($userCharacteristic['typeTenant']) {
@@ -28,22 +28,20 @@
                 <td class="itemLabel">
                     Место работы
                 </td>
-                <td class="itemRequired typeTenantRequired">
+                <td class="itemRequired">
                 </td>
                 <td class="itemBody">
-                    <input type="text" name="placeOfWork" id="placeOfWork"
-                           class="ifWorked" <?php echo "value='".$userCharacteristic['placeOfWork']."'";?>>
+                    <input type="text" name="placeOfWork" id="placeOfWork" <?php echo "value='".$userCharacteristic['placeOfWork']."'";?>>
                 </td>
             </tr>
             <tr notavailability="statusWork_0&statusWork_не работаю">
                 <td class="itemLabel">
                     Должность
                 </td>
-                <td class="itemRequired typeTenantRequired">
+                <td class="itemRequired">
                 </td>
                 <td class="itemBody">
-                    <input type="text" name="workPosition" id="workPosition"
-                           class="ifWorked" <?php echo "value='".$userCharacteristic['workPosition']."'";?>>
+                    <input type="text" name="workPosition" id="workPosition" <?php echo "value='".$userCharacteristic['workPosition']."'";?>>
                 </td>
             </tr>
         </tbody>
@@ -58,7 +56,7 @@
         <tbody>
             <tr>
                 <td class="itemLabel">
-                    Текущий статус
+                    Вы учитесь?
                 </td>
                 <td class="itemRequired">
                     <?php if ($userCharacteristic['typeTenant']) {
@@ -88,7 +86,7 @@
                 <td class="itemLabel">
                     Учебное заведение
                 </td>
-                <td class="itemRequired typeTenantRequired">
+                <td class="itemRequired">
                 </td>
                 <td class="itemBody">
                     <input type="text" name="almamater" id="almamater"
@@ -99,7 +97,7 @@
                 <td class="itemLabel">
                     Специальность
                 </td>
-                <td class="itemRequired typeTenantRequired">
+                <td class="itemRequired">
                 </td>
                 <td class="itemBody">
                     <input type="text" name="speciality" id="speciality"
@@ -112,7 +110,7 @@
                 <td class="itemLabel">
                     Курс
                 </td>
-                <td class="itemRequired typeTenantRequired">
+                <td class="itemRequired">
                 </td>
                 <td class="itemBody">
                     <input type="text" name="kurs" id="kurs" class="ifLearned" value='<?php echo $userCharacteristic['kurs'];?>'>
@@ -124,7 +122,7 @@
                 <td class="itemLabel">
                     Очно / Заочно
                 </td>
-                <td class="itemRequired typeTenantRequired">
+                <td class="itemRequired">
                 </td>
                 <td class="itemBody">
                     <select name="ochnoZaochno" id="ochnoZaochno" class="ifLearned">
@@ -141,7 +139,7 @@
                 <td class="itemLabel">
                     Год окончания
                 </td>
-                <td class="itemRequired typeTenantRequired">
+                <td class="itemRequired">
                 </td>
                 <td class="itemBody">
                     <input type="text" name="yearOfEnd" id="yearOfEnd"
