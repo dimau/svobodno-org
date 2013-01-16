@@ -12,7 +12,18 @@
     <!--<meta name="viewport" content="initialscale=1.0, width=device-width">-->
     <!-- end meta -->
 
-    <title>Редактирование объявления</title>
+    <title>
+        <?php switch ($mode) {
+            case "new":
+                echo "Новое объявление";
+                break;
+            case "editFull":
+            case "editLimited":
+            default:
+                echo "Редактирование объявления";
+                break;
+        }?>
+    </title>
 
     <!-- CSS -->
     <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
@@ -110,37 +121,110 @@
 </div>
 
 <?php
-    // Сформируем и вставим заголовок страницы
+// Сформируем и вставим заголовок страницы
 require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
 ?>
 
 <div class="page_main_content">
 
 <div class="headerOfPage">
-    Редактирование объявления.
+
+    <?php switch ($mode) {
+    case "new":
+        echo "Новое объявление";
+        break;
+    case "editFull":
+    case "editLimited":
+    default:
+        echo "Редактирование объявления";
+        break;
+    }?>
+
     <?php
-    if ($propertyCharacteristic['apartmentNumber'] != "") $apartmentNumberInHeader = ", № " . $propertyCharacteristic['apartmentNumber']; else $apartmentNumberInHeader = "";
-    echo GlobFunc::getFirstCharUpper($propertyCharacteristic['typeOfObject']) . " по адресу: " . $propertyCharacteristic['address'] . $apartmentNumberInHeader;
+        if ($propertyCharacteristic['address'] != "") echo GlobFunc::getFirstCharUpper($propertyCharacteristic['address']);
+        if ($propertyCharacteristic['apartmentNumber'] != "") echo ", № " . $propertyCharacteristic['apartmentNumber'];
     ?>
 </div>
 
-<form action="editadvert.php?action=saveAdvert&propertyId=<?php echo $propertyCharacteristic['id'];?>" name="newAdvert" class="advertDescriptionEdit formWithFotos" method="post" enctype="multipart/form-data">
+<form action="<?php if ($mode == "new") echo "newadvert.php"; else echo "editadvert.php";?>?action=saveAdvert<?php if ($propertyCharacteristic['id'] != "") echo "&propertyId=".$propertyCharacteristic['id'];?><?php if (isset($completeness)) echo "&completeness=$completeness";?>" name="changeAdvert" class="advertDescriptionEdit formWithFotos" method="post" enctype="multipart/form-data">
+
 <div class="advertDescriptionChapter" id="typeAndPeriodChapter">
+
     <div class="advertDescriptionChapterHeader">
         Тип и сроки
     </div>
+
+    <?php if ($mode == "new"): ?>
+    <div class="objectDescriptionItem">
+        <div class="objectDescriptionItemLabel">
+            Логин собственника:
+        </div>
+        <div class="objectDescriptionBody">
+            <input name="ownerLogin" type="text" id="ownerLogin" size="15"
+                   value='<?php echo $propertyCharacteristic['ownerLogin'];?>'>
+        </div>
+    </div>
+    <?php endif;?>
+
+    <?php if ($mode == "new" || $mode == "editFull"): ?>
+    <div class="objectDescriptionItem">
+        <div class="objectDescriptionItemLabel">
+            Статус опубликованности:
+        </div>
+        <div class="objectDescriptionBody">
+            <select name="status" id="status">
+                <option value="опубликовано" <?php if ($propertyCharacteristic['status'] == "опубликовано") echo "selected";?>>
+                    опубликовать
+                </option>
+                <option value="не опубликовано" <?php if ($propertyCharacteristic['status'] == "не опубликовано") echo "selected";?>>
+                    не публиковать
+                </option>
+            </select>
+        </div>
+    </div>
+    <?php endif;?>
+
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
             Тип объекта:
         </div>
         <div class="objectDescriptionBody">
+
+            <?php if ($mode == "editLimited"): ?>
             <input type="hidden" name="typeOfObject" id="typeOfObject" value='<?php echo $propertyCharacteristic['typeOfObject']; ?>'>
             <?php
             // Значение поля необходимо сохранить еще и в скрытом input, так как JS в зависимости от него будет делать некоторые элементы недоступными для редактирования
             echo $propertyCharacteristic['typeOfObject'];
             ?>
+            <?php endif;?>
+
+            <?php if ($mode == "new" || $mode == "editFull"): ?>
+            <select name="typeOfObject" id="typeOfObject">
+                <option value="0" <?php if ($propertyCharacteristic['typeOfObject'] == "0") echo "selected";?>></option>
+                <option value="квартира" <?php if ($propertyCharacteristic['typeOfObject'] == "квартира") echo "selected";?>>
+                    квартира
+                </option>
+                <option value="комната" <?php if ($propertyCharacteristic['typeOfObject'] == "комната") echo "selected";?>>
+                    комната
+                </option>
+                <option value="дом" <?php if ($propertyCharacteristic['typeOfObject'] == "дом") echo "selected";?>>дом,
+                    коттедж
+                </option>
+                <option value="таунхаус" <?php if ($propertyCharacteristic['typeOfObject'] == "таунхаус") echo "selected";?>>
+                    таунхаус
+                </option>
+                <option value="дача" <?php if ($propertyCharacteristic['typeOfObject'] == "дача") echo "selected";?>>
+                    дача
+                </option>
+                <option value="гараж" <?php if ($propertyCharacteristic['typeOfObject'] == "гараж") echo "selected";?>>
+                    гараж
+                </option>
+            </select>
+            <?php endif;?>
+
         </div>
     </div>
+
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
             С какого числа можно въезжать:
@@ -150,6 +234,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
                    placeholder="дд.мм.гггг" value='<?php echo $propertyCharacteristic['dateOfEntry'];?>'>
         </div>
     </div>
+
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
             На какой срок сдается:
@@ -166,6 +251,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="termOfLease_0&termOfLease_длительный срок">
         <div class="objectDescriptionItemLabel">
             Крайний срок выезда арендатора(ов):
@@ -175,6 +261,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
                    placeholder="дд.мм.гггг" value='<?php echo $propertyCharacteristic['dateOfCheckOut'];?>'>
         </div>
     </div>
+
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
             Фотографии:
@@ -192,12 +279,15 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </fieldset>
         </div>
     </div>
+
 </div>
 
 <div class="advertDescriptionChapter" id="roomsAndFacilitiesChapter">
+
     <div class="advertDescriptionChapterHeader">
         Комнаты и помещения
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Количество комнат в квартире, доме:
@@ -214,6 +304,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="amountOfRooms_0&amountOfRooms_1">
         <div class="objectDescriptionItemLabel">
             Комнаты смежные:
@@ -226,6 +317,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
     <div class="objectDescriptionItem"
          notavailability="typeOfObject_0&typeOfObject_комната&typeOfObject_гараж&adjacentRooms_0&adjacentRooms_нет&amountOfRooms_0&amountOfRooms_1&amountOfRooms_2">
         <div class="objectDescriptionItemLabel">
@@ -242,6 +334,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Санузел:
@@ -259,6 +352,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Балкон/лоджия:
@@ -288,6 +382,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
     <div class="objectDescriptionItem"
          notavailability="typeOfBalcony_0&typeOfBalcony_нет&typeOfBalcony_эркер&typeOfBalcony_2 эркера и более">
         <div class="objectDescriptionItemLabel">
@@ -301,6 +396,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
     <div class="objectDescriptionItem"
          notavailability="typeOfObject_0&typeOfObject_квартира&typeOfObject_дом&typeOfObject_таунхаус&typeOfObject_дача&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
@@ -311,6 +407,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             м²
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_комната">
         <div class="objectDescriptionItemLabel">
             Площадь общая:
@@ -320,6 +417,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             м²
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_комната&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Площадь жилая:
@@ -329,6 +427,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             м²
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_дача&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Площадь кухни:
@@ -338,35 +437,59 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             м²
         </div>
     </div>
+
 </div>
 
 <div class="advertDescriptionChapter" id="floorAndPorchChapter">
+
     <div class="advertDescriptionChapterHeader">
         Этаж и подъезд
     </div>
+
     <div class="objectDescriptionItem"
          notavailability="typeOfObject_0&typeOfObject_дом&typeOfObject_таунхаус&typeOfObject_дача&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Этаж:
         </div>
         <div class="objectDescriptionBody">
+
+        <?php if ($mode == "editLimited"):?>
             <input type="hidden" name="floor" value='<?php echo $propertyCharacteristic['floor'];?>'>
             <?php echo $propertyCharacteristic['floor'];?>
             из
             <input type="hidden" name="totalAmountFloor" value='<?php echo $propertyCharacteristic['totalAmountFloor'];?>'>
             <?php echo $propertyCharacteristic['totalAmountFloor'];?>
+        <?php endif;?>
+
+        <?php if ($mode == "new"|| $mode == "editFull"):?>
+        <input type="text" size="3" name="floor" value='<?php echo $propertyCharacteristic['floor'];?>'>
+        из
+        <input type="text" size="3" name="totalAmountFloor"
+               value='<?php echo $propertyCharacteristic['totalAmountFloor'];?>'>
+        <?php endif;?>
+
         </div>
     </div>
+
     <div class="objectDescriptionItem"
          notavailability="typeOfObject_0&typeOfObject_квартира&typeOfObject_комната&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Этажность дома:
         </div>
         <div class="objectDescriptionBody">
+
+        <?php if ($mode == "editLimited"):?>
             <input type="hidden" name="numberOfFloor" value='<?php echo $propertyCharacteristic['numberOfFloor'];?>'>
             <?php echo $propertyCharacteristic['numberOfFloor'];?>
+        <?php endif;?>
+
+        <?php if ($mode == "new"|| $mode == "editFull"):?>
+            <input type="text" size="3" name="numberOfFloor" value='<?php echo $propertyCharacteristic['numberOfFloor'];?>'>
+        <?php endif;?>
+
         </div>
     </div>
+
     <div class="objectDescriptionItem"
          notavailability="typeOfObject_0&typeOfObject_дом&typeOfObject_таунхаус&typeOfObject_дача&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
@@ -380,6 +503,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_дача&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Домофон:
@@ -392,6 +516,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_дача&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Парковка во дворе:
@@ -407,12 +532,15 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
 </div>
 
 <div class="advertDescriptionChapter" id="addressChapter">
+
     <div class="advertDescriptionChapterHeader">
         Местоположение
     </div>
+
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
             Город:
@@ -421,17 +549,38 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             <span>Екатеринбург</span>
         </div>
     </div>
+
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
             Район:
         </div>
         <div class="objectDescriptionBody">
+
+            <?php if ($mode == "editLimited"): ?>
             <input type="hidden" name="district" value='<?php echo $propertyCharacteristic['district'];?>'>
             <?php
             if (isset($propertyCharacteristic['district'])) echo $propertyCharacteristic['district'];
             ?>
+            <?php endif;?>
+
+            <?php if ($mode == "new" || $mode == "editFull"): ?>
+            <select name="district">
+                <option value="0"></option>
+                <?php
+                if (isset($allDistrictsInCity)) {
+                    foreach ($allDistrictsInCity as $value) { // Для каждого названия района формируем option в селекте
+                        echo "<option value='" . $value['name'] . "'";
+                        if ($value['name'] == $propertyCharacteristic['district']) echo "selected";
+                        echo ">" . $value['name'] . "</option>";
+                    }
+                }
+                ?>
+            </select>
+            <?php endif;?>
+
         </div>
     </div>
+
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel" style="line-height: 2.3em;">
             Улица и номер дома:
@@ -443,8 +592,16 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
                 <tbody>
                     <tr>
                         <td>
+
+                            <?php if ($mode == "editLimited"):?>
                             <input type="hidden" name="address" id="addressTextBox" value='<?php echo $propertyCharacteristic['address'];?>'>
                             <?php echo $propertyCharacteristic['address']; ?>
+                            <?php endif;?>
+
+                            <?php if ($mode == "new" || $mode == "editFull"): ?>
+                            <input type="text" name="address" id="addressTextBox" size="30" value='<?php echo $propertyCharacteristic['address'];?>'>
+                            <?php endif;?>
+
                         </td>
                         <td>
                             <button id="checkAddressButton" style='margin-left: 0.7em;'>Подтвердить адрес</button>
@@ -459,17 +616,27 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </table>
         </div>
     </div>
+
     <div class="objectDescriptionItem"
          notavailability="typeOfObject_0&typeOfObject_дом&typeOfObject_дача&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Номер квартиры:
         </div>
         <div class="objectDescriptionBody">
+
+            <?php if ($mode == "editLimited"):?>
             <input type="hidden" name="apartmentNumber" value='<?php echo $propertyCharacteristic['apartmentNumber'];?>'>
             <!-- Значение поля необходимо сохранить, так как JS в зависимости от него будет делать некоторые элементы недоступными для редактирования -->
             <?php if ($propertyCharacteristic['apartmentNumber'] != "") echo $propertyCharacteristic['apartmentNumber']; ?>
+            <?php endif;?>
+
+            <?php if ($mode == "new" || $mode == "editFull"): ?>
+            <input type="text" name="apartmentNumber" size="7" maxlength="20" value='<?php echo $propertyCharacteristic['apartmentNumber'];?>'>
+            <?php endif;?>
+
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_дача&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Станция метро рядом:
@@ -506,12 +673,15 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </span>
         </div>
     </div>
+
 </div>
 
 <div class="advertDescriptionChapter" id="costChapter">
+
     <div class="advertDescriptionChapterHeader">
         Стоимость, условия оплаты
     </div>
+
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
             Валюта для расчетов:
@@ -525,6 +695,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
             Плата за аренду:
@@ -534,6 +705,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             <span class="currency"></span> в месяц
         </div>
     </div>
+
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
             Коммунальные услуги оплачиваются арендатором дополнительно:
@@ -553,6 +725,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </span>
         </div>
     </div>
+
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
             Электроэнергия оплачивается дополнительно:
@@ -565,6 +738,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
             Залог:
@@ -581,6 +755,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </span>
         </div>
     </div>
+
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
             Предоплата:
@@ -598,14 +773,35 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
-    <input type="hidden" name="compensationMoney" id="compensationMoney" value='<?php echo $propertyCharacteristic['compensationMoney'];?>'>
-    <input type="hidden" name="compensationPercent" id="compensationPercent" value='<?php echo $propertyCharacteristic['compensationPercent'];?>'>
+
+    <div class="objectDescriptionItem">
+        <div class="objectDescriptionItemLabel">
+            Единоразовая комиссия:
+        </div>
+        <div class="objectDescriptionBody">
+
+    <?php if ($mode == "new" || $mode == "editFull"): ?>
+        <input type="text" size="7" name="compensationMoney" id="compensationMoney" value='<?php echo $propertyCharacteristic['compensationMoney'];?>'>
+        <span class="currency"></span> или <input type="text" size="7" name="compensationPercent" id="compensationPercent" value='<?php echo $propertyCharacteristic['compensationPercent'];?>'>
+        % от стоимости аренды
+    <?php endif;?>
+
+    <?php if ($mode == "editLimited"): ?>
+            <input type="hidden" name="compensationMoney" id="compensationMoney" value='<?php echo $propertyCharacteristic['compensationMoney'];?>'>
+            <input type="hidden" name="compensationPercent" id="compensationPercent" value='<?php echo $propertyCharacteristic['compensationPercent'];?>'>
+    <?php endif;?>
+
+        </div>
+    </div>
+
 </div>
 
 <div class="advertDescriptionChapter" id="currentStatus">
+
     <div class="advertDescriptionChapterHeader">
         Текущее состояние
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Ремонт:
@@ -632,6 +828,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Отделка:
@@ -654,6 +851,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Окна:
@@ -667,12 +865,15 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
 </div>
 
 <div class="advertDescriptionChapter" id="communication">
+
     <div class="advertDescriptionChapterHeader">
         Связь
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Интернет:
@@ -686,6 +887,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Телефон:
@@ -699,6 +901,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Кабельное ТВ:
@@ -712,12 +915,15 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
 </div>
 
 <div class="advertDescriptionChapter" id="furniture">
+
     <div class="advertDescriptionChapterHeader">
         Мебель и бытовая техника
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Мебель в жилой зоне:
@@ -891,6 +1097,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </ul>
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Мебель на кухне:
@@ -964,6 +1171,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </ul>
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Бытовая техника:
@@ -1065,12 +1273,15 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </ul>
         </div>
     </div>
+
 </div>
 
 <div class="advertDescriptionChapter" id="requirementsForTenant">
+
     <div class="advertDescriptionChapterHeader">
         Требования к арендатору
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Пол:
@@ -1095,6 +1306,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             женщина</label>
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Отношения между арендаторами:
@@ -1155,6 +1367,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             группа людей</label>
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Дети:
@@ -1175,6 +1388,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
     <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
         <div class="objectDescriptionItemLabel">
             Животные:
@@ -1191,12 +1405,15 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
 </div>
 
 <div class="advertDescriptionChapter" id="specialConditions">
+
     <div class="advertDescriptionChapterHeader">
         Особые условия
     </div>
+
     <div class="objectDescriptionItem" title="Этот номер будет использоваться только сотрудниками нашей компании">
         <div class="objectDescriptionItemLabel">
             Контактный номер телефона:
@@ -1205,6 +1422,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             <input type="text" name="contactTelephonNumber" size="15" value='<?php echo $propertyCharacteristic['contactTelephonNumber'];?>'>
         </div>
     </div>
+
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel" style="line-height: 1.8em;">
             Время для звонков:
@@ -1258,6 +1476,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
             Где проживает собственник:
@@ -1280,6 +1499,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             </select>
         </div>
     </div>
+
     <div class="objectDescriptionItem">
         <div class="objectDescriptionItemLabel">
             Комментарий:
@@ -1288,6 +1508,17 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             <textarea name="comment" maxlength="2000" rows="7" cols="43"><?php echo $propertyCharacteristic['comment'];?></textarea>
         </div>
     </div>
+
+    <?php if ($isAdmin['newOwner'] || $isAdmin['newAdvertAlien'] || $isAdmin['searchUser']): ?>
+    <div class="objectDescriptionItem">
+        <div class="objectDescriptionItemLabel">
+            Источник:
+        </div>
+        <div class="objectDescriptionBody" style="min-width: 330px">
+            <textarea name="sourceOfAdvert" maxlength="2000" rows="7" cols="43"><?php echo $propertyCharacteristic['sourceOfAdvert'];?></textarea>
+        </div>
+    </div>
+    <?php endif; ?>
 
 	<?php if ($isAdmin['newOwner'] || $isAdmin['newAdvertAlien'] || $isAdmin['searchUser']): ?>
     <div class="objectDescriptionItem">
@@ -1299,13 +1530,19 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         </div>
     </div>
 	<?php endif; ?>
+
 </div>
 
 <div class="bottomButton">
+
+    <?php if ($mode == "editLimited"):?>
     <a href="personal.php?compId=<?php echo $compId;?>&tabsId=3" style="margin-right: 10px;">Отмена</a>
+    <?php endif;?>
+
     <button type="submit" name="saveAdvertButton" id="saveAdvertButton" class="button mainButton">
         Сохранить
     </button>
+
 </div>
 <div class="clearBoth"></div>
 
@@ -1327,6 +1564,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
     // Сервер сохранит в эту переменную данные о загруженных фотографиях в формате JSON
     // Переменная uploadedFoto содержит массив объектов, каждый из которых представляет информацию по 1 фотографии
     var uploadedFoto = JSON.parse('<?php echo json_encode($propertyFotoInformation['uploadedFoto']);?>');
+    var availability = "<?php if ($isAdmin['newOwner'] || $isAdmin['searchUser'] || $isAdmin['newAdvertAlien']) echo "full"; else echo "limited";?>";
 </script>
 <script src="js/main.js"></script>
 <script src="js/newOrEditAdvert.js"></script>

@@ -82,6 +82,7 @@ class Property
 	private $earliestTimeMinutes = "";
 	private $adminComment = "";
 	private $completeness = "";
+    private $sourceOfAdvert = "";
 
 	private $fileUploadId = "";
 	private $uploadedFoto = array(); // В переменной будет храниться информация о загруженных фотографиях. Представляет собой массив ассоциированных массивов
@@ -131,17 +132,30 @@ class Property
 		return $this->completeness;
 	}
 
+    // Устанавливает id собственника для данного объявления
+    // Используется при полуавтоматическом парсинге объявлений из чужих баз
+    public function setOwnerLogin($ownerLogin) {
+        if (!is_string($ownerLogin)) return FALSE;
+        $this->ownerLogin = $ownerLogin;
+        return TRUE;
+    }
+
+    // Устанавливает статус - объявление опубликовано или нет
+    public function setStatus($status) {
+        if ($status != "опубликовано" && $status != "не опубликовано") return FALSE;
+        $this->status = $status;
+        return TRUE;
+    }
+
     /**
      * Устанавливает признак полноты для объекта
      * ВАЖНО: сохранения в БД функция не выполняет, устанавливает признак лишь для текущего объекта
-     *
      * @param $levelCompleteness
      * $levelCompleteness = "0" объявление из чужой базы - мнимум требований к полноте
      * $levelCompleteness = "1" объявление от собственника, который является нашим клиентом - максимальные требования к полноте
      * @return bool возвращает TRUE в случае успешной установки признака у нашего объекта, FALSE в противном случае
      */
     public function setCompleteness($levelCompleteness) {
-        // Проверка входных данных на адекватность
         if ($levelCompleteness != "1" && $levelCompleteness != "0") return FALSE;
         $this->completeness = $levelCompleteness;
         return TRUE;
@@ -541,12 +555,12 @@ class Property
 	}
 
 	// Записать в качестве параметров объекта недвижимости значения, полученные через POST запрос
-	// $mode = "new" режим выбора POST параметров для создания пользователем-собственником (или моим обычным сотрудником) нового объявления
-	// $mode = "edit" режим выбора POST параметров для редактирования пользователем-собственником ранее созданного объявления (отличается от режима "new" тем, что не принимает (игнорирует) через POST ряд параметров объекта, запрещенных для редактирования пользователем)
-	public function writeCharacteristicFromPOST($mode = "edit") {
-		if (isset($_POST['ownerLogin']) && $mode == "new") $this->ownerLogin = htmlspecialchars($_POST['ownerLogin'], ENT_QUOTES);
-		if (isset($_POST['status']) && $mode == "new") $this->status = htmlspecialchars($_POST['status'], ENT_QUOTES);
-		if (isset($_POST['typeOfObject']) && $mode == "new") $this->typeOfObject = htmlspecialchars($_POST['typeOfObject'], ENT_QUOTES);
+	// $mode = "full" режим выбора всех POST параметров, задествованных в описании объявления. Используется, например, при создании нового объявления
+	// $mode = "limited" режим выбора ограниченного количества POST параметров. Используется, например, для редактирования пользователем-собственником ранее созданного объявления (отличается от режима "full" тем, что не принимает (игнорирует) через POST ряд параметров объекта, запрещенных для редактирования пользователем)
+	public function writeCharacteristicFromPOST($mode = "limited") {
+		if (isset($_POST['ownerLogin']) && $mode == "full") $this->ownerLogin = htmlspecialchars($_POST['ownerLogin'], ENT_QUOTES);
+		if (isset($_POST['status']) && $mode == "full") $this->status = htmlspecialchars($_POST['status'], ENT_QUOTES);
+		if (isset($_POST['typeOfObject']) && $mode == "full") $this->typeOfObject = htmlspecialchars($_POST['typeOfObject'], ENT_QUOTES);
 		if (isset($_POST['dateOfEntry'])) $this->dateOfEntry = htmlspecialchars($_POST['dateOfEntry'], ENT_QUOTES);
 		if (isset($_POST['termOfLease'])) $this->termOfLease = htmlspecialchars($_POST['termOfLease'], ENT_QUOTES);
 		if (isset($_POST['dateOfCheckOut'])) $this->dateOfCheckOut = htmlspecialchars($_POST['dateOfCheckOut'], ENT_QUOTES);
@@ -560,17 +574,17 @@ class Property
 		if (isset($_POST['totalArea'])) $this->totalArea = htmlspecialchars($_POST['totalArea'], ENT_QUOTES);
 		if (isset($_POST['livingSpace'])) $this->livingSpace = htmlspecialchars($_POST['livingSpace'], ENT_QUOTES);
 		if (isset($_POST['kitchenSpace'])) $this->kitchenSpace = htmlspecialchars($_POST['kitchenSpace'], ENT_QUOTES);
-		if (isset($_POST['floor']) && $mode == "new") $this->floor = htmlspecialchars($_POST['floor'], ENT_QUOTES);
-		if (isset($_POST['totalAmountFloor']) && $mode == "new") $this->totalAmountFloor = htmlspecialchars($_POST['totalAmountFloor'], ENT_QUOTES);
-		if (isset($_POST['numberOfFloor']) && $mode == "new") $this->numberOfFloor = htmlspecialchars($_POST['numberOfFloor'], ENT_QUOTES);
+		if (isset($_POST['floor']) && $mode == "full") $this->floor = htmlspecialchars($_POST['floor'], ENT_QUOTES);
+		if (isset($_POST['totalAmountFloor']) && $mode == "full") $this->totalAmountFloor = htmlspecialchars($_POST['totalAmountFloor'], ENT_QUOTES);
+		if (isset($_POST['numberOfFloor']) && $mode == "full") $this->numberOfFloor = htmlspecialchars($_POST['numberOfFloor'], ENT_QUOTES);
 		if (isset($_POST['concierge'])) $this->concierge = htmlspecialchars($_POST['concierge'], ENT_QUOTES);
 		if (isset($_POST['intercom'])) $this->intercom = htmlspecialchars($_POST['intercom'], ENT_QUOTES);
 		if (isset($_POST['parking'])) $this->parking = htmlspecialchars($_POST['parking'], ENT_QUOTES);
-		if (isset($_POST['district']) && $mode == "new") $this->district = htmlspecialchars($_POST['district'], ENT_QUOTES);
-		if (isset($_POST['coordX']) && $mode == "new") $this->coordX = htmlspecialchars($_POST['coordX'], ENT_QUOTES);
-		if (isset($_POST['coordY']) && $mode == "new") $this->coordY = htmlspecialchars($_POST['coordY'], ENT_QUOTES);
-		if (isset($_POST['address']) && $mode == "new") $this->address = htmlspecialchars($_POST['address'], ENT_QUOTES);
-		if (isset($_POST['apartmentNumber']) && $mode == "new") $this->apartmentNumber = htmlspecialchars($_POST['apartmentNumber'], ENT_QUOTES);
+		if (isset($_POST['district']) && $mode == "full") $this->district = htmlspecialchars($_POST['district'], ENT_QUOTES);
+		if (isset($_POST['coordX']) && $mode == "full") $this->coordX = htmlspecialchars($_POST['coordX'], ENT_QUOTES);
+		if (isset($_POST['coordY']) && $mode == "full") $this->coordY = htmlspecialchars($_POST['coordY'], ENT_QUOTES);
+		if (isset($_POST['address']) && $mode == "full") $this->address = htmlspecialchars($_POST['address'], ENT_QUOTES);
+		if (isset($_POST['apartmentNumber']) && $mode == "full") $this->apartmentNumber = htmlspecialchars($_POST['apartmentNumber'], ENT_QUOTES);
 		if (isset($_POST['subwayStation'])) $this->subwayStation = htmlspecialchars($_POST['subwayStation'], ENT_QUOTES);
 		if (isset($_POST['distanceToMetroStation'])) $this->distanceToMetroStation = htmlspecialchars($_POST['distanceToMetroStation'], ENT_QUOTES);
 		if (isset($_POST['currency'])) $this->currency = htmlspecialchars($_POST['currency'], ENT_QUOTES);
@@ -582,8 +596,8 @@ class Property
 		if (isset($_POST['bail'])) $this->bail = htmlspecialchars($_POST['bail'], ENT_QUOTES);
 		if (isset($_POST['bailCost'])) $this->bailCost = htmlspecialchars($_POST['bailCost'], ENT_QUOTES);
 		if (isset($_POST['prepayment'])) $this->prepayment = htmlspecialchars($_POST['prepayment'], ENT_QUOTES);
-		if (isset($_POST['compensationMoney']) && $mode == "new") $this->compensationMoney = htmlspecialchars($_POST['compensationMoney'], ENT_QUOTES);
-		if (isset($_POST['compensationPercent']) && $mode == "new") $this->compensationPercent = htmlspecialchars($_POST['compensationPercent'], ENT_QUOTES);
+		if (isset($_POST['compensationMoney']) && $mode == "full") $this->compensationMoney = htmlspecialchars($_POST['compensationMoney'], ENT_QUOTES);
+		if (isset($_POST['compensationPercent']) && $mode == "full") $this->compensationPercent = htmlspecialchars($_POST['compensationPercent'], ENT_QUOTES);
 		if (isset($_POST['repair'])) $this->repair = htmlspecialchars($_POST['repair'], ENT_QUOTES);
 		if (isset($_POST['furnish'])) $this->furnish = htmlspecialchars($_POST['furnish'], ENT_QUOTES);
 		if (isset($_POST['windows'])) $this->windows = htmlspecialchars($_POST['windows'], ENT_QUOTES);
@@ -620,10 +634,11 @@ class Property
 		if (isset($_POST['timeForRingEnd'])) $this->timeForRingEnd = htmlspecialchars($_POST['timeForRingEnd'], ENT_QUOTES);
 		if (isset($_POST['checking'])) $this->checking = htmlspecialchars($_POST['checking'], ENT_QUOTES);
 		if (isset($_POST['comment'])) $this->comment = htmlspecialchars($_POST['comment'], ENT_QUOTES);
-		if (isset($_POST['earliestDate'])) $this->earliestDate = htmlspecialchars($_POST['earliestDate'], ENT_QUOTES);
-		if (isset($_POST['earliestTimeHours'])) $this->earliestTimeHours = htmlspecialchars($_POST['earliestTimeHours'], ENT_QUOTES);
-		if (isset($_POST['earliestTimeMinutes'])) $this->earliestTimeMinutes = htmlspecialchars($_POST['earliestTimeMinutes'], ENT_QUOTES);
-		if (isset($_POST['adminComment'])) $this->adminComment = htmlspecialchars($_POST['adminComment'], ENT_QUOTES);
+		if (isset($_POST['earliestDate']) && $mode == "full") $this->earliestDate = htmlspecialchars($_POST['earliestDate'], ENT_QUOTES);
+		if (isset($_POST['earliestTimeHours']) && $mode == "full") $this->earliestTimeHours = htmlspecialchars($_POST['earliestTimeHours'], ENT_QUOTES);
+		if (isset($_POST['earliestTimeMinutes']) && $mode == "full") $this->earliestTimeMinutes = htmlspecialchars($_POST['earliestTimeMinutes'], ENT_QUOTES);
+		if (isset($_POST['adminComment']) && $mode == "full") $this->adminComment = htmlspecialchars($_POST['adminComment'], ENT_QUOTES);
+        if (isset($_POST['sourceOfAdvert']) && $mode == "full") $this->sourceOfAdvert = htmlspecialchars($_POST['sourceOfAdvert'], ENT_QUOTES);
 	}
 
 	// Записать в качестве данных о фотографиях соответствующую информацию из POST запроса
@@ -711,6 +726,7 @@ class Property
 		$result['adminComment'] = $this->adminComment;
 		$result['completeness'] = $this->completeness;
 		$result['ownerLogin'] = $this->ownerLogin;
+        $result['sourceOfAdvert'] = $this->sourceOfAdvert;
 
 		return $result;
 	}

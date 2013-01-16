@@ -116,7 +116,7 @@
                         <a href="registration.php?typeOwner=true&alienOwner=true" target="_blank">Новый чужой собственник</a>
                     </li>
                     <li>
-                        <a href="newadvert.php?alienOwner=true" target="_blank">Новое чужое объявление</a>
+                        <a href="newadvert.php?completeness=0" target="_blank">Новое чужое объявление</a>
                     </li>
                     <li>
                         <form name="advertMerging" method="post" action="adminpanel.php?action=mergeAdverts">

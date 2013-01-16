@@ -12,7 +12,7 @@
     <!--<meta name="viewport" content="initialscale=1.0, width=device-width">-->
     <!-- end meta -->
 
-    <title><?php echo GlobFunc::getFirstCharUpper($propertyCharacteristic['typeOfObject']) . " по адресу: " . $propertyCharacteristic['address']; ?></title>
+    <title><?php echo $propertyCharacteristic['address']; ?></title>
 
     <!-- CSS -->
     <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
@@ -804,7 +804,18 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['checking']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+	    <?php endif; ?>
+
+        <?php if ($isAdmin['searchUser']): ?>
+        <tr>
+            <td class="objectDescriptionItemLabel">
+                Источник:
+            </td>
+            <td class="objectDescriptionBody">
+                <span><?php echo $propertyCharacteristic['sourceOfAdvert']; ?></span>
+            </td>
+        </tr>
+        <?php endif; ?>
 
         </tbody>
     </table>

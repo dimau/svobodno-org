@@ -26,7 +26,6 @@ if (!$userIncoming->login()) {
 /*************************************************************************************
  * ПОЛУЧИМ GET ПАРАМЕТРЫ
  ************************************************************************************/
-// Для защиты от XSS атаки и для использования в коде более простого имени для переменной
 
 // Получаем команду из строки запроса
 $action = "";
@@ -62,7 +61,7 @@ $errors = array();
  **************************************************************************************************************/
 
 $isAdmin = $userIncoming->isAdmin();
-if ($property->getUserId() != $userIncoming->getId() AND !$isAdmin['searchUser']) {
+if ($property->getUserId() != $userIncoming->getId() AND !$isAdmin['searchUser'] AND !$isAdmin['newAdvertAlien']) {
 	header('Location: personal.php?tabsId=3');
 	exit();
 }
@@ -73,7 +72,12 @@ if ($property->getUserId() != $userIncoming->getId() AND !$isAdmin['searchUser']
 
 if ($action == "saveAdvert") {
 
-	$property->writeCharacteristicFromPOST("edit");
+    // Если редактирует объявление админ, то его поля для редактирования не ограничены. Для собственника есть ограничения на редактируемые поля
+	if ($isAdmin['searchUser'] || $isAdmin['newAdvertAlien']) {
+        $property->writeCharacteristicFromPOST("full");
+    } else {
+        $property->writeCharacteristicFromPOST("limited");
+    }
 	$property->writeFotoInformationFromPOST();
 
 	// Проверяем корректность данных объявления. Функции validate() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
@@ -126,18 +130,21 @@ $isLoggedIn = $userIncoming->login(); // Используется в templ_heade
 $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 $propertyCharacteristic = $property->getCharacteristicData();
 $propertyFotoInformation = $property->getFotoInformationData();
-$compId = $propertyCharacteristic['userId'];
+$compId = GlobFunc::idToCompId($propertyCharacteristic['userId']);
+if ($isAdmin['searchUser'] || $isAdmin['newAdvertAlien']) { // Определяет доступность полей для редактирования. Все поля доступны для админов, ограниченное количество полей доступны для редактирования собственникам
+    $mode = "editFull";
+} else {
+    $mode = "editLimited";
+}
 //$allDistrictsInCity
 //$errors
 //$isAdmin
 
 // Подсоединяем нужный основной шаблон
-require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_editadvert.php";
+require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_changeadvert.php";
 
 /********************************************************************************
  * Закрываем соединение с БД
  *******************************************************************************/
 
 DBconnect::closeConnectToDB();
-
-//TODO: В будущем необходимо будет проверять личные данные пользователя на полноту для его работы в качестве собственника, если у него typeOwner != "true"

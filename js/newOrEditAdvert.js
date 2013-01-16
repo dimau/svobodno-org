@@ -5,6 +5,7 @@ $(document).ready(notavailability);
 $("#typeOfObject, #termOfLease, #amountOfRooms, #adjacentRooms, #typeOfBalcony, #subwayStation, #utilities, #bail").change(notavailability);
 
 // Пробегает все элементы и изменяет в соответствии с текущей ситуацией их доступность/недоступность для пользователя
+// ВНИМАНИЕ: данная функция отличается от той, что указана в main.js - она полностью прячет недоступные поля, а не просто делает их серыми
 function notavailability() {
     // Перебираем все элементы, доступность которых зависит от каких-либо условий
     $("[notavailability]").each(function () {
@@ -38,14 +39,6 @@ function notavailability() {
     });
 }
 
-// Отображение результатов обработки формы на PHP - найденных ошибок при заполнении форм на этой странице
-if ($('#userMistakesBlock ol').html() != "") {
-    $('#userMistakesBlock').on('click', function () {
-        $(this).slideUp(800);
-    });
-    $('#userMistakesBlock').css('display', 'block');
-}
-
 // Вставляем календарь для выбора даты для начала аренды объекта
 $(function () {
     var now = new Date();
@@ -64,8 +57,8 @@ $(function () {
 // Подготовим возможность загрузки фотографий
 $(document).ready(createUploader);
 
-// Деактивируем кнопку проверки адреса, если это форма для РЕДАКТИРОВАНИЯ
-if ((window.location + '').indexOf("editadvert.php") != -1) {
+// Деактивируем кнопку проверки адреса, если доступность полей для редактирования ограничена
+if (availability == "limited") {
     $(function () {
         $("#checkAddressButton").button({
             disabled:true
@@ -171,8 +164,8 @@ function init() {
     });
 
     // Если пользователь кликнит левой кнопкой по дому - то адресная строка заполнится автоматически
-    // Работает только, если пользователь работает с новым объявлением. При редактировании - не выполняется
-    if ((window.location + '').indexOf("editadvert.php") == -1) {
+    // Работает только, если не производится ограниченное редактирование параметров объявления самим собственником
+    if (availability != "limited") {
         map.events.add('click', function (e) {
             var coords = e.get('coordPosition');
 

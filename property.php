@@ -141,6 +141,7 @@ $furnitureInKitchen = $property->getFurnitureInKitchenAll();
 $appliances = $property->getAppliancesAll();
 //$statusOfSaveParamsToDB // Используется в templ_signUpToViewItem.php
 //$errors
+//$isAdmin
 
 // Подсоединяем нужный основной шаблон
 require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_property.php";

@@ -13,7 +13,7 @@
             if ($isLoggedIn) {
                 $width = array(13.08, 32.71, 30.84, 23.37); // ширины для каждого пункта меню определены в соответствии с количеством букв в каждом из них
             } else {
-                $width = array(18.07, 42.69, 39.24, 0); //
+                $width = array(12.07, 31.03, 29.31, 27.58); //
             }
 
             // Элемент для выравнивания. С помощью JS при загрузке страницы и при изменении ее размеров всем сепараторам присвоим одинаковую ширину, которая заполнит расстояния между пунктами меню
@@ -41,7 +41,16 @@
                 echo ("<li class='choice' style='width:" . $width[2] . "%'><a href='forowner.php'>Подать объявление</a>");
             }
 
-            if ($isLoggedIn) echo "<li class='separator'></li>"; else echo "<li class='right separator'></li>";
+            echo "<li class='separator'></li>";
+
+            if (!$isLoggedIn) { // Пункт меню "Заявка на аренду" выдается только авторизованным пользователям
+
+                if ($_SERVER['PHP_SELF'] == "/registration.php") {
+                    echo ("<li class='selected choice' style='width:" . $width[3] . "%'><span>Заявка на аренду</span>");
+                } else {
+                    echo ("<li class='choice' style='width:" . $width[3] . "%'><a href='registration.php?typeTenant=true'>Заявка на аренду</a>");
+                }
+            }
 
             if ($isLoggedIn) { // Пункт меню "Уведомления" выдается только авторизованным пользователям
                 // Сколько уведомлений не прочитано?
@@ -56,9 +65,10 @@
                 } else {
                     echo ("<li class='choice' style='width:" . $width[3] . "%'><a href='personal.php?tabsId=2'>Уведомления".$amountUnreadMessagesText."</a>");
                 }
-
-                echo "<li class='right separator'></li>";
             }
+
+            echo "<li class='right separator'></li>";
+
             ?>
         </ul>
         <div class="clearBoth"></div>

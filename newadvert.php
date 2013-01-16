@@ -47,9 +47,9 @@ if (!$isAdmin['newOwner'] && !$isAdmin['newAdvertAlien']) {
 $action = "";
 if (isset($_GET['action'])) $action = htmlspecialchars($_GET['action'], ENT_QUOTES);
 
-// Режим регистрации собственника из чужой базы
-$alienOwner = "";
-if (isset($_GET['alienOwner'])) $alienOwner = htmlspecialchars($_GET['alienOwner'], ENT_QUOTES);
+// Режим регистрации объявления из чужой базы
+$completeness = "";
+if (isset($_GET['completeness'])) $completeness = htmlspecialchars($_GET['completeness'], ENT_QUOTES);
 
 /*************************************************************************************
  * Инициализируем объект для работы с параметрами недвижимости
@@ -66,12 +66,12 @@ $allDistrictsInCity = DBconnect::selectDistrictsForCity("Екатеринбур�
 
 if ($action == "saveAdvert") {
 
-	$property->writeCharacteristicFromPOST("new");
+	$property->writeCharacteristicFromPOST("full");
 	$property->writeFotoInformationFromPOST();
 
 	// Проверяем корректность данных нового объявления. Функции validate() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
 	// Если мы имеем дело с созданием нового чужого объявления администратором, то проверки данных происходят по упрощенному способу
-	if ($isAdmin['newAdvertAlien'] && $alienOwner == "true") {
+	if ($isAdmin['newAdvertAlien'] && $completeness == "0") {
 		$property->setCompleteness("0");
 		$errors = $property->validate("newAlienAdvert");
 	} else {
@@ -116,17 +116,18 @@ $isLoggedIn = $userIncoming->login(); // Используется в templ_heade
 $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 $propertyCharacteristic = $property->getCharacteristicData();
 $propertyFotoInformation = $property->getFotoInformationData();
-//$errors
+$compId = GlobFunc::idToCompId($propertyCharacteristic['userId']);
+$mode = "new";
 //$allDistrictsInCity
+//$errors
 //$isAdmin
+//$completeness
 
 // Подсоединяем нужный основной шаблон
-require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_newadvert.php";
+require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_changeadvert.php";
 
 /********************************************************************************
  * Закрываем соединение с БД
  *******************************************************************************/
 
 DBconnect::closeConnectToDB();
-
-//TODO: В будущем необходимо будет проверять личные данные пользователя на полноту для его работы в качестве собственника, если у него typeOwner != "true"
