@@ -31,6 +31,9 @@ $parser = new ParserBazaB2B();
  * Парсим сайт bazab2b.ru
  *******************************************************************************/
 
+// Для начала необходимо отправить параметры пользователя для авторизации
+$parser->authorization();
+
 // В цикле закачиваем страницы со списками объявлений и обрабатываем каждую из них (начиная с самой актуальной - первой).
 // Вплоть до момента, пока не доберемся до объявления со временем публикации позже, чем наша граница актуальности (задается в классе ParserBazaB2B в переменной actualDayAmountForAdvert)
 while ($parser->loadNextAdvertsList()) {
@@ -42,23 +45,24 @@ while ($parser->loadNextAdvertsList()) {
         // Если мы достигли конца временного диапазона актуальности объявлений, то необходимо остановить обработку страницы на этом объявлении
         if ($parser->isStopHandling()) {
             DBconnect::closeConnectToDB();
-            exit("Слишком старое объявление!"); //TODO: test
+            exit();
         }
 
         // Проверить, работали ли мы с этим объявлением уже. Если да, то сразу переходим к следующему
         if ($parser->isAdvertAlreadyHandled()) {
-            echo("Объявление уже обработано ранее"); //TODO: test
             continue;
         }
 
-        // Получим подробные сведения по этому объявлению в виде ассоциативного массива
+        // Загрузим подробные сведения по этому объявлению
         if (!$parser->loadFullAdvertDescription()) {
-            //TODO: test
-            DBconnect::closeConnectToDB();
-            exit("Не удалось загрузить полное объявление");
             continue;
         }
-        $paramsArr = $parser->parseFullAdvert();
+
+        // Преобразуем подробные сведения по объявлению к виду ассоциативного массива
+        if (!($paramsArr = $parser->parseFullAdvert())) {
+            $parser->authorization();
+            continue;
+        }
 
         // Инициализируем модель и сохраняем данные в БД
         $property = new Property($paramsArr);
@@ -68,22 +72,19 @@ while ($parser->loadNextAdvertsList()) {
         $correctSaveCharacteristicToDB = $property->saveCharacteristicToDB("new");
 
         // Добавим объявление в список успешно обработанных, чтобы избежать в будущем его повторной обработки
-        $parser->setAdvertIsHandled();
+        if (!$parser->setAdvertIsHandled()) {
+            DBconnect::closeConnectToDB();
+            exit();
+        }
 
         // Оповещаем операторов о новом объявлении на сайте bazab2b.ru
         $subject = 'Объявление на bazab2b.ru';
         $msgHTML = "Новое объявление на bazab2b.ru: <a href='http://svobodno.org/editadvert.php?propertyId=" . $property->getId() . "'>Перейти к редактированию</a>";
         GlobFunc::sendEmailToOperator($subject, $msgHTML);
-
-        //TODO: test
-        DBconnect::closeConnectToDB();
-        exit("Объявление успешно обработано");
     }
 
     // Когда мы переберем все объявления на текущей странице списка объявлений, то следующим шагом автоматически загрузится следующая страница - и все по новой
 }
-
-// TODO: записать в лог ошибку получения данных списка объявлений
 
 /********************************************************************************
  * Закрываем соединение с БД

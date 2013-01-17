@@ -8,12 +8,14 @@ class ParserBazaB2B {
     private $login = "testagent"; // Логин для доступа к сайту
     private $password = "tsettest"; // Пароль для доступа к сайту
     private $actualDayAmountForAdvert = 1; // Количество дней, за которые парсер проверяет объявления из списка. Если ему попадается объявление, опубликованное ранее данного количества дней назад, то он прекращает свою работу. 1 - только сегодняшние объявления, 2 - сегодняшние и вчерашние и так далее.
-    public $handledAdverts = NULL; // Содержит ассоциативный массив с идентификаторами обработанных объявлений за срок = $actualDayAmountForAdvert от текущего момента
-    public $advertsListDOM; // DOM-объект страницы со списком объявлений, обрабатываемой в данный момент
+    private $handledAdverts = NULL; // Содержит ассоциативный массив с идентификаторами обработанных объявлений за срок = $actualDayAmountForAdvert от текущего момента
+    private $advertsListDOM; // DOM-объект страницы со списком объявлений, обрабатываемой в данный момент
     private $advertsListNumber = 0; // Номер страницы со списком объявлений, обрабатываемой в данный момент (находится в $advertsListDOM). Первоначальное значение = 0 означает, что в переменной $advertsListDOM еще нет DOM объекта (мы еще не получали страницу со списком объявлений)
-    public $advertShortDescriptionDOM; // DOM-объект строки таблицы (единичного элемента списка объявлений). Содержит краткое описание объявления, обрабатываемого в данный момент
+    private $advertShortDescriptionDOM; // DOM-объект строки таблицы (единичного элемента списка объявлений). Содержит краткое описание объявления, обрабатываемого в данный момент
     private $advertShortDescriptionNumber = 0; // Номер строки таблицы (единичного элемента списка объявлений), обрабатываемого в данный момент (находится в $advertShortDescriptionDOM)
-    public $advertFullDescriptionDOM; // DOM-объект страницы с подробным описанием объявления
+    private $c_id; // Один из 2-х идентификаторов объявления на сайте bazab2b
+    private $id; // Один из 2-х идентификаторов объявления на сайте bazab2b
+    private $advertFullDescriptionDOM; // DOM-объект страницы с подробным описанием объявления
 
     /**
      * КОНСТРУКТОР
@@ -21,15 +23,16 @@ class ParserBazaB2B {
     public function __construct() {
 
         // Получить идентификаторы всех обработанных объявлений за срок = actualDayAmountForAdvert от текущего дня
-        $finalDate = new DateTime();
+        $finalDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
         $finalDate = $finalDate->format('d.m.Y');
-        $initialDate = new DateTime();
+        $initialDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
         $initialDate->modify('-'.$this->actualDayAmountForAdvert.' day');
         $initialDate = $initialDate->format('d.m.Y');
         $this->handledAdverts = DBconnect::selectHandledAdvertsFromBazab2b($initialDate, $finalDate);
 
         // Если получить список уже обработанных объявлений с сайта bazab2b получить не удалось, то прекращаем выполнение скрипта от греха подальше
         if ($this->handledAdverts === NULL || !is_array($this->handledAdverts)) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->__construct():1 Парсинг сайта bazaB2B остановлен, так как не удалось получить сведения о ранее загруженных объявлениях");
             DBconnect::closeConnectToDB();
             exit();
         }
@@ -46,19 +49,33 @@ class ParserBazaB2B {
         // Говорят, что в библиотеке SimpleHTMLDOM могут наблюдаться утечки памяти, на всякий случай чистим после каждого цикла работы
         if (isset($this->advertsListDOM)) $this->advertsListDOM->clear();
 
-        // Получаем следующую страницу со списком объявлений
+        // Увеличиваем счетчик текущей страницы списка объявлений
         $this->advertsListNumber++;
-        $pageHTML = $this->getAdvertsListHTML($this->advertsListNumber);
+
+        // Вычисляем URL запрашиваемой страницы
+        $url = 'http://bazab2b.ru/?pagx=baza&p='.$this->advertsListNumber;
+
+        // Вычисляем POST параметры, которые могут понадобиться для авторизации на сайте
+        $post = "user_name=".$this->login."&user_password=".$this->password;
+
+        // Неспосредственно выполняем запрос к серверу
+        $pageHTML = $this->curlRequest($url, $post, 'cookieBazaB2B.txt');
 
         // Если получить HTML страницы не удалось
-        if (!$pageHTML) return FALSE;
+        if (!$pageHTML) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->loadNextAdvertsList():1 Не удалось получить страницу со списком объявлений с сайта bazaB2B по адресу:".$url);
+            return FALSE;
+        }
 
         // Получаем DOM-объект и сохраняем его в параметры
         $this->advertsListDOM = str_get_html($pageHTML);
 
-        // Сбрасываем счетчик текущего обрабатываемого краткого описания объявления
+        // Сбрасываем параметры текущего обрабатываемого краткого описания объявления на значения по умолчанию
         $this->advertShortDescriptionNumber = 0;
         $this->advertShortDescriptionDOM = NULL;
+        $this->c_id = NULL;
+        $this->id = NULL;
+        $this->advertFullDescriptionDOM = NULL;
 
         return TRUE;
     }
@@ -70,6 +87,7 @@ class ParserBazaB2B {
      * @return bool TRUE в случае успешной загрузки и FALSE в противном случае
      */
     public function getNextAdvertShortDescription() {
+
         $this->advertShortDescriptionNumber++;
         $currentShortAdvert = $this->advertsListDOM->find('.poisk .chr-wite', $this->advertShortDescriptionNumber - 1);
 
@@ -78,6 +96,13 @@ class ParserBazaB2B {
 
         // Сохраняем результат в параметры
         $this->advertShortDescriptionDOM = $currentShortAdvert;
+
+        // Сохраняем идентификаторы соответствующего объявления на сайте bazab2b в параметры объекта
+        $href = $this->advertShortDescriptionDOM->find('.modal', 0)->href;
+        preg_match('/^\?c_id=([0-9]*)&.*$/', $href, $val);
+        $this->c_id = intval($val[1]);
+        preg_match('/&id=([0-9]*)$/', $href, $val);
+        $this->id = intval($val[1]);
 
         return TRUE;
     }
@@ -91,15 +116,27 @@ class ParserBazaB2B {
         // Говорят, что в библиотеке SimpleHTMLDOM могут наблюдаться утечки памяти, на всякий случай чистим после каждого цикла работы
         if (isset($this->advertFullDescriptionDOM)) $this->advertFullDescriptionDOM->clear();
 
-        // Получаем ссылку из краткого описания объявления для загрузки его подробного описания
-        $href = $this->advertShortDescriptionDOM->find('.modal', 0)->href;
+        // Вычисляем URL запрашиваемой страницы
+        $url = "http://bazab2b.ru/?c_id=".$this->c_id."&&id=".$this->id."&modal=1";
 
-        // Загрузим страницу с подробным описанием
-        $pageHTML = $this->getFullAdvertDescriptionHTML($href);
+        // Вычисляем POST параметры, которые могут понадобиться для авторизации на сайте
+        //$post = "user_name=".$this->login."&user_password=".$this->password;
+        // Не передаем POST параметры, так как авторизация производится только при первоначальной загрузке списка объявлений, затем достаточно передавать только куки
+        $post = 0;
+
+        // Неспосредственно выполняем запрос к серверу
+        $pageHTML = $this->curlRequest($url, $post, 'cookieBazaB2B.txt');
 
         // Если загрузить страницу не удалось - сообщим об этом
-        if (!$pageHTML) return FALSE;
+        if (!$pageHTML) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->loadFullAdvertDescription():1 Не удалось получить страницу с подробным описанием объекта с сайта bazaB2B по адресу:".$url);
+            return FALSE;
+        }
 
+        // Меняем кодировку с windows-1251 на utf-8
+        $pageHTML = iconv("windows-1251", "UTF-8", $pageHTML);
+
+        // Сохраним в параметры объекта DOM-объект страницы со списком объявлений
         $this->advertFullDescriptionDOM = str_get_html($pageHTML);
 
         return TRUE;
@@ -107,7 +144,7 @@ class ParserBazaB2B {
 
     /**
      * Функция для парсинга данных по конкретному объявлению с сайта bazab2b.ru
-     * @return array ассоциативный массив параметров объекта недвижимости
+     * @return array|bool ассоциативный массив параметров объекта недвижимости, если отсутствют ключевые параметры (сейчас только источник объявления), то возвращает FALSE
      */
     public function parseFullAdvert() {
 
@@ -120,8 +157,12 @@ class ParserBazaB2B {
         // Тип объекта
         $params['typeOfObject'] = $this->getTypeOfObject();
 
+        // Номер квартиры - его необходимо обязательно указывать и указывать уникальное значение, иначе объявление невозможно будет уникально идентифицировать
+        $params['apartmentNumber'] = mt_rand(1000, 100000);
+
         // Перебираем все имеющиеся параметры объявления и заполняет соответствующие параметры ассоциативного массива
         foreach ($tableRows as $oneParam) {
+
             // Получим название параметра
             $paramName = $oneParam->find("td b", 0)->plaintext;
 
@@ -158,14 +199,15 @@ class ParserBazaB2B {
 
             // Площадь
             if ($paramName == "Площадь:") {
-                $value = explode("/", $oneParam->find("td", 1)->plaintext);
+                $value = $oneParam->find("td", 1)->plaintext;
+                if ($value != "") $value = explode("/", $value); else continue;
                 if ($params['typeOfObject'] == "комната") {
-                    if (isset($value[0])) $param['roomSpace'] = $value[0];
+                    if (isset($value[0])) $params['roomSpace'] = floatval($value[0]);
                 }
                 if ($params['typeOfObject'] == "квартира" || $params['typeOfObject'] == "0") {
-                    if (isset($value[0])) $param['totalArea'] = floatval($value[0]);
-                    if (isset($value[1])) $param['livingSpace'] = floatval($value[1]);
-                    if (isset($value[2])) $param['kitchenSpace'] = floatval($value[2]);
+                    if (isset($value[0])) $params['totalArea'] = floatval($value[0]);
+                    if (isset($value[1])) $params['livingSpace'] = floatval($value[1]);
+                    if (isset($value[2])) $params['kitchenSpace'] = floatval($value[2]);
                 }
                 continue;
             }
@@ -181,15 +223,19 @@ class ParserBazaB2B {
 
             // Район
             if ($paramName == "Район:") {
-                $value = $oneParam->find("td", 1)->plaintext;
-                if ($value != "") $params['district'] = $value; else $params['district'] = "0";
+                $value = $oneParam->find("td", 1);
+                if (isset($value)) $value = $value->plaintext; else $value = "0";
+                if ($value == "Новая Сортировка") $value = "Сортировка новая";
+                if ($value == "Виз") $value = "ВИЗ";
+                if ($value == "Юго-Западный") $value = "Юго-запад";
+                $params['district'] = $value;
                 continue;
             }
 
             // Адрес
-            if ($paramName == "Адрес:") {
-                $value = $oneParam->find("td", 1)->plaintext;
-                if ($value != "") $params['address'] = $value; else $params['district'] = "0";
+            if ($paramName == "Адрес:" || $paramName == "Адрес: ") {
+                $value = $oneParam->find("td", 1)->find("a", 0);
+                if (isset($value)) $params['address'] = $value->plaintext;
                 continue;
             }
 
@@ -234,11 +280,14 @@ class ParserBazaB2B {
             $paramName = $oneParam->find("td", 0)->plaintext;
             if ($paramName == "Источник") {
                 $value = $oneParam->find("td a font b", 0)->plaintext;
-                if ($value == "" && $oneParam->find("td", 1)->plaintext == "Добавлено на наш сайт") $value = "Сайт bazaB2B"; // Для объявлений добавленных напрямую в базуБ2Б
+                if ($value == "" && $oneParam->find("td", 1)->plaintext == "Добавлено на наш сайт") $value = "http://bazab2b.ru/?c_id=".$this->c_id."&&id=".$this->id."&modal=1"; // Для объявлений добавленных напрямую в базуБ2Б
                 $params['sourceOfAdvert'] = $value;
-                if (!isset($params['comment']) || $params['comment'] == "") $params['comment'] = $value; else $params['comment'] .= $value;
-                continue;
             }
+        }
+
+        // Проверяем, удалось ли получить ссылку на источник объявления, если нет - значит пользователь, под которым мы запросили данные не авторизован, нужно повторить процедуру
+        if (!isset($params['sourceOfAdvert']) || $params['sourceOfAdvert'] == "") {
+            return FALSE;
         }
 
         return $params;
@@ -250,25 +299,31 @@ class ParserBazaB2B {
      */
     public function isStopHandling() {
 
-        // Получим текущую дату и месяц
-        $currentDate = date('j');
-        $currentMonth = date('n');
+        // Получим текущую дату
+        $currentDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
 
         // Получим значения времени и даты публикации для данного объявления
-        $publicationTime = $this->advertShortDescriptionDOM->find('td', 0)->find('font', 0)->plaintext;
-        $value = $this->advertShortDescriptionDOM->find('td', 0)->find('center', 0)->plaintext;
-        if (isset($value) && $value = explode(".", $value)) {
-            $publicationDate = intval($value['0']);
-            $publicationMonth = intval($value['1']);
+        $publicationTime = $this->advertShortDescriptionDOM->find('td', 0)->find('font', 0);
+        if (isset($publicationTime) && $publicationTime->plaintext != "") {
+            $date = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg')); // Получаем текущую дату
         } else {
-            $publicationDate = 0;
-            $publicationMonth = 0;
+            // Если объявление не сегодняшнее, то вычисляем дату его публикации
+            $value = $this->advertShortDescriptionDOM->find('td', 0)->find('center', 0);
+            if (isset($value) && $value = explode(".", $value->plaintext)) {
+                $publicationDate = intval($value['0']);
+                $publicationMonth = intval($value['1']);
+                $date = new DateTime(date("Y")."-".$publicationMonth."-".$publicationDate, new DateTimeZone('Asia/Yekaterinburg'));
+            } else {
+                // Если не удалось получить ни время, ни дату публикации
+                Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->isStopHandling():1 Не удалось получить ни время, ни дату публикации объекта с сайта bazaB2B по адресу: "."http://bazab2b.ru/?c_id=".$this->c_id."&&id=".$this->id."&modal=1");
+                return TRUE;
+            }
         }
 
-        // Если объявление было опубликовано ранее, чем 3 дня назад, то нужно остановить парсинг
-        if (isset($publicationTime)) return FALSE;
-        if ($publicationDate == 0 || $publicationMonth == 0) return TRUE;
-        if ($publicationMonth < $currentMonth || $publicationDate < $currentDate - $this->actualDayAmountForAdvert) {
+        // Если объявление было опубликовано ранее, чем $this->actualDayAmountForAdvert дня назад, то нужно остановить парсинг
+        $interval = $currentDate->diff($date);
+        $interval = intval($interval->format("%d"));
+        if ($interval >= $this->actualDayAmountForAdvert) {
             return TRUE;
         } else {
             return FALSE;
@@ -285,16 +340,9 @@ class ParserBazaB2B {
         /* Опознавательные идентификаторы всех обработанных за последнее время объявлений сохраняются в БД по мере обработки каждого объявления
            Сравнение идентификаторов текущего объявления с сохраненными позволяет гарантированно убедиться в том, что данное объявление еще не сохранялось в мою БД */
 
-        // Получим идентификаторы текущего объявления
-        $href = $this->advertShortDescriptionDOM->find('.modal', 0)->href;
-        preg_match('/^\?c_id=([0-9]*)&.*$/', $href, $val);
-        $c_id = $val[1];
-        preg_match('/&id=([0-9]*)$/', $href, $val);
-        $id = $val[1];
-
         // Проверяем по массиву $this->handledAdverts - было ли данное объявление уже обработано или нет
         foreach ($this->handledAdverts as $key => $value) {
-            if ($key == $id && $value == $c_id) {
+            if ($key == $this->id && $value == $this->c_id) {
                 return TRUE;
             }
         }
@@ -308,108 +356,74 @@ class ParserBazaB2B {
      */
     public function setAdvertIsHandled() {
 
-        // Получим идентификаторы текущего объявления
-        $href = $this->advertShortDescriptionDOM->find('.modal', 0)->href;
-        preg_match('/^\?c_id=([0-9]*)&.*$/', $href, $val);
-        $c_id = $val[1];
-        preg_match('/&id=([0-9]*)$/', $href, $val);
-        $id = $val[1];
-
-        // Получим дату публикации для данного объявления
-        $publicationTime = $this->advertShortDescriptionDOM->find('td', 0)->find('font', 0)->plaintext;
-        $value = $this->advertShortDescriptionDOM->find('td', 0)->find('center', 0)->plaintext;
-        if (isset($value) && $value = explode(".", $value)) {
-            $publicationDate = intval($value['0']);
-            $publicationMonth = intval($value['1']);
+        // Проверяем - объявление сегодняшнее? Если да, то дату устанавливаем также сегодняшнюю
+        $publicationTime = $this->advertShortDescriptionDOM->find('td', 0)->find('font', 0);
+        if (isset($publicationTime) && $publicationTime->plaintext != "") {
+            $date = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg')); // Получаеми текущую дату
+            $date = $date->format("d.m.Y");
         } else {
-            $publicationDate = 0;
-            $publicationMonth = 0;
+            // Если объявление не сегодняшнее, то вычисляем дату его публикации
+            $value = $this->advertShortDescriptionDOM->find('td', 0)->find('center', 0);
+            if (isset($value) && $value = explode(".", $value->plaintext)) {
+                $publicationDate = intval($value['0']);
+                $publicationMonth = intval($value['1']);
+                $date = new DateTime(date("Y")."-".$publicationMonth."-".$publicationDate, new DateTimeZone('Asia/Yekaterinburg'));
+                $date = $date->format("d.m.Y");
+            } else {
+                // Если не удалось получить ни время, ни дату публикации, то дальнейшие действия бесполезны
+                Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->setAdvertIsHandled():1 Не удалось получить ни время, ни дату публикации объекта с сайта bazaB2B по адресу: "."http://bazab2b.ru/?c_id=".$this->c_id."&&id=".$this->id."&modal=1");
+                return FALSE;
+            }
         }
-
-        // Преобразуем дату публикации к виду: 27.01.1987
-        if (isset($publicationTime)) {
-            $date = new DateTime();
-        } else {
-            $date = new DateTime(date("Y")."-".$publicationMonth."-".$publicationDate);
-        }
-        $date = $date->format("d.m.Y");
 
         // Сохраняем идентификаторы объявления в БД и сразу выдаем результат
-        return DBconnect::insertHandledAdvertFromBazab2b($c_id, $id, $date);
+        return DBconnect::insertHandledAdvertFromBazab2b($this->c_id, $this->id, $date);
     }
 
     /**
-     * Функция возвращает HTML страницы с таблицей всех объявлений сайта bazaB2B
-     * @param int $pageNumber номер страницы со списком объявлений, которую необходимо загрузить
-     * @return bool|string HTML страницы с таблицей всех объявлений сайта bazaB2B, в случае ошибки FALSE
+     * Метод запускается в начале выполнения скрипта для авторизации и получения доступа к полным данным
+     * @return bool возвращает TRUE в случае успеха и FALSE в противном случае
      */
-    private function getAdvertsListHTML($pageNumber) {
+    public function authorization() {
 
-        // Валидация входных параметров
-        if (!isset($pageNumber) || !is_int($pageNumber)) return FALSE;
+        // Вычисляем URL запрашиваемой страницы, на которой производится авторизация
+        $url = 'http://bazab2b.ru/?pagx=baza&p=1';
 
-        // Иницализация библиотеки curl.
-        if (!($ch = curl_init())) return FALSE;
+        // Вычисляем POST параметры, которые могут понадобиться для авторизации на сайте
+        $post = "user_name=".$this->login."&user_password=".$this->password;
 
-        //Устанавливаем URL запроса
-        curl_setopt($ch, CURLOPT_URL, 'http://bazab2b.ru/?pagx=baza&p='.$pageNumber);
-        // Включаем работу с сессиями от этого сайта
-        curl_setopt($ch, CURLOPT_COOKIESESSION, TRUE);
-        curl_setopt($ch, CURLOPT_COOKIE, "PHPSESSID=4dd4d06ee0acb2d4ac0bd24f808c97a1");
-        //При значении true CURL включает в вывод заголовки.
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        //Куда помещать результат выполнения запроса:
-        //  false – в стандартный поток вывода,
-        //  true – в виде возвращаемого значения функции curl_exec.
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        //Максимальное время ожидания в секундах
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
-        //Установим значение поля User-agent
-        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 6.0; ru; rv:1.9.1.3) Gecko/20090824 Firefox/3.5.3');
-        //Выполнение запроса
+        // Неспосредственно выполняем запрос к серверу
+        $pageHTML = $this->curlRequest($url, $post, 'cookieBazaB2B.txt');
+
+        // Возвращаем результат
+        if ($pageHTML) return TRUE; else return FALSE;
+    }
+
+    private function curlRequest($url, $post = 0, $cookieFileName) {
+
+        // Инициализация библиотеки curl.
+        if (!($ch = curl_init())) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->curlRequest():1 Не удалось получить страницу с сайта bazaB2B по адресу: ".$url);
+            return FALSE;
+        }
+        curl_setopt($ch, CURLOPT_URL, $url); // Устанавливаем URL запроса
+        curl_setopt($ch, CURLOPT_COOKIEJAR, $_SERVER['DOCUMENT_ROOT'].'/logs/'.$cookieFileName); // Сохранять куки в указанный файл
+        curl_setopt($ch, CURLOPT_COOKIEFILE, $_SERVER['DOCUMENT_ROOT'].'/logs/'.$cookieFileName); // При запросе передавать значения кук из указанного файла
+        curl_setopt($ch, CURLOPT_HEADER, false); // При значении true CURL включает в вывод результата заголовки, которые нам не нужны (мы их на сервере не обрабатываем).
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // При значении = true полученный код страницы возвращается как результат выполнения curl_exec.
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); // Следовать за редиректами
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30); // Максимальное время ожидания ответа от сервера в секундах
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17'); // Установим значение поля User-agent для маскировки под обычного пользователя
+        curl_setopt($ch, CURLOPT_POST, $post !== 0); // Если указаны POST параметры, то включаем их использование
+        if ($post) curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+
+        // Выполнение запроса
         $data = curl_exec($ch);
-        //Особождение ресурса
+        // Особождение ресурса
         curl_close($ch);
 
         // Меняем кодировку с windows-1251 на utf-8
         //$data = iconv("windows-1251", "UTF-8", $data);
-
-        // Выдаем результат работы, в случае ошибки FALSE
-        return $data;
-    }
-
-    /**
-     * Функция возвращает HTML страницы с подробным описание опеределенного объявления сайта bazaB2B
-     * @param string $href ссылка на подробное описание объявления
-     * @return string|bool HTML страницы с подробным описание определенного объявления сайта bazaB2B, в случае ошибки FALSE
-     */
-    private function getFullAdvertDescriptionHTML($href) {
-
-        // Иницализация библиотеки curl.
-        if (!($ch = curl_init())) return FALSE;
-
-        //Устанавливаем URL запроса
-        curl_setopt($ch, CURLOPT_URL, 'http://bazab2b.ru/'.$href."&modal=1");
-        // Включаем работу с сессиями от этого сайта
-        curl_setopt($ch, CURLOPT_COOKIESESSION, TRUE);
-        curl_setopt($ch, CURLOPT_COOKIE, "PHPSESSID=4dd4d06ee0acb2d4ac0bd24f808c97a1");
-        //При значении true CURL включает в вывод заголовки.
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        //Куда помещать результат выполнения запроса:
-        //  false – в стандартный поток вывода,
-        //  true – в виде возвращаемого значения функции curl_exec.
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        //Максимальное время ожидания в секундах
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
-        //Установим значение поля User-agent
-        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 6.0; ru; rv:1.9.1.3) Gecko/20090824 Firefox/3.5.3');
-        //Выполнение запроса
-        $data = curl_exec($ch);
-        //Особождение ресурса
-        curl_close($ch);
-
-        // Меняем кодировку с windows-1251 на utf-8
-        $data = iconv("windows-1251", "UTF-8", $data);
 
         // Выдаем результат работы, в случае ошибки FALSE
         return $data;

@@ -1088,7 +1088,7 @@ class Property
 			if ($this->animals == "0" && $this->typeOfObject != "0" && $this->typeOfObject != "гараж") $errors[] = 'Укажите: готовы ли Вы поселить арендаторов с животными';
 		}
 
-		if ($typeOfValidation == "newAdvert" || $typeOfValidation == "editAdvert" || $typeOfValidation == "newAlienAdvert" || $typeOfValidation == "editAlienAdvert") {
+		if ($typeOfValidation == "newAdvert" || $typeOfValidation == "editAdvert") {
 			if ($this->contactTelephonNumber != "") {
 				if (!preg_match('/^[0-9]{10}$/', $this->contactTelephonNumber)) $errors[] = 'Укажите, пожалуйста, Ваш мобильный номер без 8-ки, например: 9226540018';
 			} else {
@@ -1168,7 +1168,7 @@ class Property
 		// Ограничение на тип объекта
 		$searchLimits['typeOfObject'] = "";
 		if (isset($this->typeOfObject) && $this->typeOfObject != "0") {
-			$searchLimits['typeOfObject'] = " (searchRequests.typeOfObject = '0' || searchRequests.typeOfObject = '" . $this->typeOfObject . "')";
+			$searchLimits['typeOfObject'] = " (searchRequests.typeOfObject = '0' OR searchRequests.typeOfObject = '" . $this->typeOfObject . "')";
 		}
 
 		// Ограничение на количество комнат
@@ -1179,52 +1179,47 @@ class Property
 
 		// Ограничение на смежность комнат
 		$searchLimits['adjacentRooms'] = "";
-		if ($this->adjacentRooms == "0") $searchLimits['adjacentRooms'] = "";
-		if ($this->adjacentRooms == "да") $searchLimits['adjacentRooms'] = " (searchRequests.adjacentRooms = 'не имеет значения' || searchRequests.adjacentRooms = '0')";
+		if ($this->adjacentRooms == "да") $searchLimits['adjacentRooms'] = " (searchRequests.adjacentRooms = 'не имеет значения' OR searchRequests.adjacentRooms = '0')";
 		if ($this->adjacentRooms == "нет") $searchLimits['adjacentRooms'] = "";
 
 		// Ограничение на этаж
 		$searchLimits['floor'] = "";
-		if (isset($this->floor) && isset($this->totalAmountFloor) && $this->floor != 0 && $this->totalAmountFloor != 0 && $this->floor != "" && $this->totalAmountFloor != "") {
+		if ($this->floor != 0 && $this->totalAmountFloor != 0 && $this->floor != "" && $this->totalAmountFloor != "") {
 			if ($this->floor == 1) $searchLimits['floor'] = " (searchRequests.floor = '0' OR searchRequests.floor = 'любой')";
 			if ($this->floor != 1 && $this->floor == $this->totalAmountFloor) $searchLimits['floor'] = " (searchRequests.floor = '0' OR searchRequests.floor = 'любой' OR searchRequests.floor = 'не первый')";
 			if ($this->floor != 1 && $this->floor != $this->totalAmountFloor) $searchLimits['floor'] = "";
 		}
 
-		// Ограничение на минимальную сумму арендной платы
+		// Ограничение на минимальную и максимальную сумму арендной платы
 		$searchLimits['minCost'] = "";
-		if (isset($this->realCostOfRenting) && $this->realCostOfRenting != "" && $this->realCostOfRenting != 0) {
+        $searchLimits['maxCost'] = "";
+		if ($this->realCostOfRenting != "" && $this->realCostOfRenting != 0) {
 			$searchLimits['minCost'] = " (searchRequests.minCost <= " . $this->realCostOfRenting . ")";
-		}
-
-		// Ограничение на максимальную сумму арендной платы
-		$searchLimits['maxCost'] = "";
-		if (isset($this->realCostOfRenting) && $this->realCostOfRenting != "" && $this->realCostOfRenting != 0) {
-			$searchLimits['maxCost'] = " (searchRequests.maxCost >= " . $this->realCostOfRenting . ")";
+            $searchLimits['maxCost'] = " (searchRequests.maxCost >= " . $this->realCostOfRenting . ")";
 		}
 
 		// Ограничение на максимальный залог
 		// отношение realCostOfRenting / costOfRenting позволяет вычислить курс валюты, либо получить 1, если стоимость аренды указана собственником в рублях
 		$searchLimits['pledge'] = "";
-		if (isset($this->bailCost) && isset($this->realCostOfRenting) && isset($this->costOfRenting) && $this->bailCost != "" && $this->realCostOfRenting != "" && $this->costOfRenting != "" && $this->bailCost != 0 && $this->realCostOfRenting != 0 && $this->costOfRenting != 0) {
+		if ($this->bailCost != "" && $this->realCostOfRenting != "" && $this->costOfRenting != "" && $this->bailCost != 0 && $this->realCostOfRenting != 0 && $this->costOfRenting != 0) {
 			$searchLimits['pledge'] = " (searchRequests.pledge >= " . $this->bailCost * $this->realCostOfRenting / $this->costOfRenting . ")";
 		}
 
 		// Ограничение на максимальную предоплату
 		$searchLimits['prepayment'] = "";
-		if (isset($this->prepayment) && $this->prepayment != '0') {
-			$searchLimits['prepayment'] = " (searchRequests.prepayment + 0 >= '" . $this->prepayment . "')";
+		if ($this->prepayment != '0') {
+			$searchLimits['prepayment'] = " (searchRequests.prepayment = '0' OR searchRequests.prepayment + 0 >= '" . $this->prepayment . "')";
 		}
 
 		// Ограничение на район
 		$searchLimits['district'] = "";
-		if (isset($this->district) && $this->district != '0') {
+		if ($this->district != '0') {
 			$searchLimits['district'] = " (searchRequests.district = 'a:0:{}' OR searchRequests.district LIKE '%" . $this->district . "%')";
 		}
 
 		// Ограничение на формат проживания (с кем)
 		$searchLimits['withWho'] = "";
-		if (isset($this->relations) && is_array($this->relations) && count($this->relations) != 0) {
+		if (is_array($this->relations) && count($this->relations) != 0) {
 			$searchLimits['withWho'] = " (";
 			for ($i = 0, $s = count($this->relations); $i < $s; $i++) {
 				$searchLimits['withWho'] .= " searchRequests.withWho LIKE '%" . $this->relations[$i] . "%'";
@@ -1236,7 +1231,7 @@ class Property
 
 		// Ограничение на проживание с детьми
 		$searchLimits['children'] = "";
-		if (isset($this->children) && $this->children != "0") {
+		if ($this->children != "0") {
 			if ($this->children == "не имеет значения") $searchLimits['children'] = "";
 			if ($this->children == "с детьми старше 4-х лет") $searchLimits['children'] = " (searchRequests.children = '0' OR searchRequests.children = 'без детей' OR searchRequests.children = 'с детьми старше 4-х лет')";
 			if ($this->children == "только без детей") $searchLimits['children'] = " (searchRequests.children = '0' OR searchRequests.children = 'без детей')";
@@ -1244,14 +1239,14 @@ class Property
 
 		// Ограничение на проживание с животными
 		$searchLimits['animals'] = "";
-		if (isset($this->animals) && $this->animals != "0") {
+		if ($this->animals != "0") {
 			if ($this->animals == "не имеет значения") $searchLimits['animals'] = "";
 			if ($this->animals == "только без животных") $searchLimits['animals'] = " (searchRequests.animals = '0' OR searchRequests.animals = 'без животных')";
 		}
 
 		// Ограничение на длительность аренды
 		$searchLimits['termOfLease'] = "";
-		if (isset($this->termOfLease) && $this->termOfLease != "0") {
+		if ($this->termOfLease != "0") {
 			if ($this->termOfLease == "длительный срок") $searchLimits['termOfLease'] = " (searchRequests.termOfLease = '0' OR searchRequests.termOfLease = 'длительный срок')";
 			if ($this->termOfLease == "несколько месяцев") $searchLimits['termOfLease'] = " (searchRequests.termOfLease = '0' OR searchRequests.termOfLease = 'несколько месяцев')";
 		}
@@ -1267,7 +1262,7 @@ class Property
 		$res = DBconnect::get()->query("SELECT searchRequests.userId AS userId, searchRequests.needEmail AS needEmail, searchRequests.needSMS AS needSMS, users.name AS name, users.email AS email, users.telephon AS telephon FROM searchRequests, users WHERE" . $strWHERE." AND searchRequests.userId = users.id");
 		//$res = DBconnect::get()->query("SELECT searchRequests.userId, searchRequests.needEmail, searchRequests.needSMS, users.name, users.email, users.telephon FROM searchRequests, users WHERE" . $strWHERE." AND searchRequests.userId = users.id");
 		if ((DBconnect::get()->errno)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) == FALSE)
 		) {
 			// Логируем ошибку
 			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT searchRequests.userId AS userId, searchRequests.needEmail AS needEmail, searchRequests.needSMS AS needSMS, user.name AS name, user.email AS email, user.telephon AS telephon FROM searchRequests, user WHERE" . $strWHERE." AND searchRequests.userId = user.id'. id логгера: DBconnect::whichTenantsAppropriate():1. Выдаваемая ошибка: " . DBconnect::get()->errno . " " . DBconnect::get()->error . ". ID пользователя: не определено");

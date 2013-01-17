@@ -1539,6 +1539,10 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
     <a href="personal.php?compId=<?php echo $compId;?>&tabsId=3" style="margin-right: 10px;">Отмена</a>
     <?php endif;?>
 
+    <?php if (($isAdmin['newAdvertAlien'] || $isAdmin['searchUser']) && $propertyCharacteristic['completeness'] == "0" && $mode == "editFull"):?>
+    <a href="editadvert.php?action=removeAdvert<?php if ($propertyCharacteristic['id'] != "") echo "&propertyId=".$propertyCharacteristic['id'];?>" style="margin-right: 10px;">В архив</a>
+    <?php endif;?>
+
     <button type="submit" name="saveAdvertButton" id="saveAdvertButton" class="button mainButton">
         Сохранить
     </button>

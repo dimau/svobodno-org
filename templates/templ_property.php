@@ -789,7 +789,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
 
         <?php if ($propertyCharacteristic['comment'] != ""): ?>
         <tr>
-            <td>
+            <td colspan="2">
                 <span><?php echo $propertyCharacteristic['comment']; ?></span>
             </td>
         </tr>
@@ -812,7 +812,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 Источник:
             </td>
             <td class="objectDescriptionBody">
-                <span><?php echo $propertyCharacteristic['sourceOfAdvert']; ?></span>
+                <a href="<?php echo $propertyCharacteristic['sourceOfAdvert']; ?>">
+                    <?php echo $propertyCharacteristic['sourceOfAdvert']; ?>
+                </a>
             </td>
         </tr>
         <?php endif; ?>

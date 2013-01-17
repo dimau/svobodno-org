@@ -933,7 +933,7 @@ class DBconnect
         // Сохраняем информацию в БД
         $stmt = DBconnect::get()->stmt_init();
         if (($stmt->prepare("INSERT INTO bazab2b (id, c_id, date) VALUES (?,?,?)") === FALSE)
-            OR ($stmt->bind_param("iis", $c_id, $id, $date) === FALSE)
+            OR ($stmt->bind_param("iis", $id, $c_id, $date) === FALSE)
             OR ($stmt->execute() === FALSE)
             OR (($res = $stmt->affected_rows) === -1)
             OR ($res === 0)

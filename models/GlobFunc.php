@@ -110,7 +110,7 @@
         public static function sendEmailToOperator($subject, $msgHTML) {
 
             // Список служебных адресов для рассылки
-            $emails = array("dimau777@gmail.com");
+            $emails = array("support@svobodno.org");
 
             // Подключаем класс для отправки e-mail, если он ранее еще не был подключен
             require_once $_SERVER['DOCUMENT_ROOT'] . '/lib/class.phpmailer.php';
