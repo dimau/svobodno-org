@@ -429,6 +429,12 @@
 </div>
 <?php endif; ?>
 
+<?php if (($mode == "registration" || $mode == "personal") && $isAdmin['searchUser']): ?>
+<div class="edited right" style="margin: 0; padding: 0; border: none; text-align: right;">
+    <label><input type="checkbox" value="0" name="needSMS" <?php if ($userSearchRequest['needSMS'] == 1) echo "checked";?>> Оповещать меня по sms о подходящих объявлениях</label>
+</div>
+    <?php endif; ?>
+
 <div class="clearBoth"></div>
 
 </div>

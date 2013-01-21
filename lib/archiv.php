@@ -81,6 +81,28 @@
 $messages = DBconnect::selectMessagesForEmail(100);
 $amountMessages = count($messages);
 
+// Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одному из уведомлений. Если ничего не найдено или произошла ошибка, вернет пустой массив
+// Необязательный параметр на входе - максимальное кол-во уведомлений, которые мы хотим получить за одно обращение
+public static function selectMessagesForEmail($limit = 100) {
+
+    // Проверка входящих параметров
+    if (isset($limit) && !is_int($limit)) return array();
+
+    $stmt = DBconnect::get()->stmt_init();
+    if (($stmt->prepare("SELECT * FROM messagesNewProperty WHERE needEmail = 1 LIMIT ?") === FALSE)
+        OR ($stmt->bind_param("i", $limit) === FALSE)
+        OR ($stmt->execute() === FALSE)
+        OR (($res = $stmt->get_result()) === FALSE)
+        OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+        OR ($stmt->close() === FALSE)
+    ) {
+        Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM messagesNewProperty WHERE needEmail = 1 LIMIT ".$limit."'. Местонахождение кода: DBconnect::selectMessagesNewPropertyForEmail():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+        return array();
+    }
+
+    return $res;
+}
+
 // Если отправлять нечего, то прекращает выполнение скрипта
 if ($amountMessages == 0) exit();
 

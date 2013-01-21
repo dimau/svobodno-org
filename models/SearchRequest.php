@@ -95,34 +95,31 @@ class SearchRequest
 		// Получим из БД данные ($res) по поисковому запросу пользователя с идентификатором = $this->id
 		$res = DBconnect::selectSearchRequestForUser($this->userId);
 
-		// Если получено меньше или больше одной строки (одного поискового запроса) из БД, то сообщаем о невозможности записи параметров поискового запроса из БД
-		if (count($res) != 1) return FALSE;
-
-		// Для красоты (чтобы избавить от индекса ноль при обращении к переменным) переприсвоим значение $res[0] специальной переменной
-		$one = $res[0];
+		// Если получен пустой массив, то сообщаем о невозможности записи параметров поискового запроса из БД - у данного пользователя нет поискового запроса
+		if (count($res) == 0) return FALSE;
 
 		// Если данные по поисковому запросу есть в БД, присваиваем их соответствующим переменным, иначе - у них останутся значения по умолчанию.
-		if (isset($one['userId'])) $this->userId = $one['userId'];
-		if (isset($one['typeOfObject'])) $this->typeOfObject = $one['typeOfObject'];
-		if (isset($one['amountOfRooms'])) $this->amountOfRooms = $one['amountOfRooms'];
-		if (isset($one['adjacentRooms'])) $this->adjacentRooms = $one['adjacentRooms'];
-		if (isset($one['floor'])) $this->floor = $one['floor'];
-		if (isset($one['minCost'])) $this->minCost = $one['minCost'];
-		if (isset($one['maxCost'])) $this->maxCost = $one['maxCost'];
-		if (isset($one['pledge'])) $this->pledge = $one['pledge'];
-		if (isset($one['prepayment'])) $this->prepayment = $one['prepayment'];
-		if (isset($one['district'])) $this->district = $one['district'];
-		if (isset($one['withWho'])) $this->withWho = $one['withWho'];
-		if (isset($one['linksToFriends'])) $this->linksToFriends = $one['linksToFriends'];
-		if (isset($one['children'])) $this->children = $one['children'];
-		if (isset($one['howManyChildren'])) $this->howManyChildren = $one['howManyChildren'];
-		if (isset($one['animals'])) $this->animals = $one['animals'];
-		if (isset($one['howManyAnimals'])) $this->howManyAnimals = $one['howManyAnimals'];
-		if (isset($one['termOfLease'])) $this->termOfLease = $one['termOfLease'];
-		if (isset($one['additionalDescriptionOfSearch'])) $this->additionalDescriptionOfSearch = $one['additionalDescriptionOfSearch'];
-		if (isset($one['regDate'])) $this->regDate = $one['regDate'];
-		if (isset($one['needEmail'])) $this->needEmail = $one['needEmail'];
-		if (isset($one['needSMS'])) $this->needSMS = $one['needSMS'];
+		if (isset($res['userId'])) $this->userId = $res['userId'];
+		if (isset($res['typeOfObject'])) $this->typeOfObject = $res['typeOfObject'];
+		if (isset($res['amountOfRooms'])) $this->amountOfRooms = $res['amountOfRooms'];
+		if (isset($res['adjacentRooms'])) $this->adjacentRooms = $res['adjacentRooms'];
+		if (isset($res['floor'])) $this->floor = $res['floor'];
+		if (isset($res['minCost'])) $this->minCost = $res['minCost'];
+		if (isset($res['maxCost'])) $this->maxCost = $res['maxCost'];
+		if (isset($res['pledge'])) $this->pledge = $res['pledge'];
+		if (isset($res['prepayment'])) $this->prepayment = $res['prepayment'];
+		if (isset($res['district'])) $this->district = $res['district'];
+		if (isset($res['withWho'])) $this->withWho = $res['withWho'];
+		if (isset($res['linksToFriends'])) $this->linksToFriends = $res['linksToFriends'];
+		if (isset($res['children'])) $this->children = $res['children'];
+		if (isset($res['howManyChildren'])) $this->howManyChildren = $res['howManyChildren'];
+		if (isset($res['animals'])) $this->animals = $res['animals'];
+		if (isset($res['howManyAnimals'])) $this->howManyAnimals = $res['howManyAnimals'];
+		if (isset($res['termOfLease'])) $this->termOfLease = $res['termOfLease'];
+		if (isset($res['additionalDescriptionOfSearch'])) $this->additionalDescriptionOfSearch = $res['additionalDescriptionOfSearch'];
+		if (isset($res['regDate'])) $this->regDate = $res['regDate'];
+		if (isset($res['needEmail'])) $this->needEmail = $res['needEmail'];
+		if (isset($res['needSMS'])) $this->needSMS = $res['needSMS'];
 
 		return TRUE;
 	}
@@ -285,7 +282,7 @@ class SearchRequest
 		$this->termOfLease = "0";
 		$this->additionalDescriptionOfSearch = "";
 		$this->regDate = "";
-		$this->needEmail = 0;
+		$this->needEmail = 1;
 		$this->needSMS = 0;
 
 		return array();

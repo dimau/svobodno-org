@@ -159,8 +159,12 @@ $(window).scroll(function () {
     // Если мы дожидаемся окончания прошлого запроса к серверу, то новые не отправляются
     if (blockOfScrollHandler) return true;
 
+    // Получаем списки с краткими и с полными сведениями об объектах недвижимости для дальнейшей работы
+    var shortList = $("#shortListOfRealtyObjects");
+    var fullParametersList = $("#fullParametersListOfRealtyObjects");
+
     // Если ни один из списков объектов недвижимости не является видимым (например, при просмотре пользователем результатов поиска в режиме карты), то и обрабатывать прокрутку экрана не нужно
-    if ($("#shortListOfRealtyObjects").is(":hidden") && $("#fullParametersListOfRealtyObjects").is(":hidden")) return true;
+    if (shortList.is(":hidden") && fullParametersList.is(":hidden")) return true;
 
     var screenHeight = $(window).height(); // Высота экрана пользователя
     var currentTopScroll = $(this).scrollTop(); // Текущая промотка экрана (количество пикселей, скрытое вверху страницы)
@@ -168,15 +172,15 @@ $(window).scroll(function () {
     var currentScreenBottom = screenHeight + currentTopScroll;
 
     // Вычисляем координату низа списка с объявлениями относительно всего документа. Либо подробного, либо с минимумом сведений - в зависимости от того, какой режим отображения результатов поиска выбран
-    if ($("#shortListOfRealtyObjects").is(":visible")) {
-        var listOfRealtyObjectsBottom = $("#shortListOfRealtyObjects").height() + $("#shortListOfRealtyObjects").offset().top;
-        var lastRealtyObjectsId = $("#shortListOfRealtyObjects .realtyObject:last").attr('propertyId');
-        var lastNumber = $("#shortListOfRealtyObjects .realtyObject:last .numberOfRealtyObject").html();
+    if (shortList.is(":visible")) {
+        var listOfRealtyObjectsBottom = shortList.height() + shortList.offset().top;
+        var lastRealtyObjectsId = $(".realtyObject:last", shortList).attr('propertyId');
+        var lastNumber = $(".realtyObject:last .numberOfRealtyObject", shortList).html();
     }
-    if ($("#fullParametersListOfRealtyObjects").is(":visible")) {
-        listOfRealtyObjectsBottom = $("#fullParametersListOfRealtyObjects").height() + $("#fullParametersListOfRealtyObjects").offset().top;
-        lastRealtyObjectsId = $("#fullParametersListOfRealtyObjects .realtyObject:last").attr('propertyId');
-        lastNumber = $("#fullParametersListOfRealtyObjects .realtyObject:last .numberOfRealtyObject").html();
+    if (fullParametersList.is(":visible")) {
+        listOfRealtyObjectsBottom = fullParametersList.height() + fullParametersList.offset().top;
+        lastRealtyObjectsId = $(".realtyObject:last", fullParametersList).attr('propertyId');
+        lastNumber = $(".realtyObject:last .numberOfRealtyObject", fullParametersList).html();
     }
 
     // Сколько пикселей осталось промотать пользователю, чтобы достигнуть низа списка объектов
@@ -197,25 +201,16 @@ $(window).scroll(function () {
  * Инициализация карты при загрузке страницы
  **********************************************************************************/
 
-ymaps.ready(init);
+/**** Класс для работы с Яндекс картой на странице ****/
+function MapYandex(options) {
 
-function init() {
-    // Создание экземпляра карты и его привязка к контейнеру с заданным id ("map")
-    var map = new ymaps.Map('map', {
-        center:[56.829748, 60.617435], // В центре карты - Екатеринбург
-        zoom:11, // Коэффициент первоначального масштабирования
-        behaviors:['default', 'scrollZoom', 'ruler'] // Включим поведения по умолчанию (default), а также масштабирование колесом мыши (scrollZoom) и измеритель расстояний по клику левой кнопки мыши (ruler)
-    });
+    // Хранит данный объект - для обращения к нему из методов обработчиков событий (у них this получает другое значение)
+    var self = this;
 
-    /***** Добавляем элементы управления на карту *****/
-    map.controls.add('typeSelector'); // Выбор типа карты
-    map.controls.add('smallZoomControl', { // Кнопка изменения масштаба - компактный вариант. Расположим её ниже и левее левого верхнего угла
-        left:5,
-        top:55
-    });
-    map.controls.add('mapTools'); // Стандартный набор кнопок
+    // Хранит объект - карту Яндекса
+    var map;
 
-    // Создаем макет для правой части баллуна кластера
+    // Макет для баллуна кластера
     var MyMainContentLayout = ymaps.templateLayoutFactory.createClass('', {
 
         build:function () {
@@ -245,54 +240,102 @@ function init() {
         },
 
         applyContent:function () {
-            balloonHTML = getContentForBalloonFromPage(this.activeObject.properties.get('propertyid')); //TODO: пока не получаем данные с сервера
-            this.activeObject.properties.set('balloonContentBody', balloonHTML);
-            // Для того, чтобы макет автоматически изменялся при обновлении данных
-            // в геообъекте, создадим дочерний макет через фабрику
-            var subLayout = new MyMainContentSubLayout({
-                options:this.options,
-                properties:this.activeObject.properties
-            });
+            // Получим HTML содержимое для баллуна
+            var balloonHTML = self.getContentForBalloonFromPage(this.activeObject.properties.get('propertyid')); //TODO: пока не получаем данные с сервера
+            if (balloonHTML != null) {
+                this.activeObject.properties.set('balloonContentBody', balloonHTML);
+                // Для того, чтобы макет автоматически изменялся при обновлении данных
+                // в геообъекте, создадим дочерний макет через фабрику
+                var subLayout = new MyMainContentSubLayout({
+                    options:this.options,
+                    properties:this.activeObject.properties
+                });
+                // прицепим новый макет к родителю
+                subLayout.setParentElement(this.getParentElement());
+            } else {
+                var applyContentThis = this;
+                var propertyid = this.activeObject.properties.get('propertyid');
+                // Обращаемся к серверу за HTML баллуна, передаем серверу propertyid - идентификатор объекта недвижимости
+                jQuery.post(
+                    "../AJAXGetSearchResult.php",
+                    {"propertyId":new Array(propertyid), "typeOperation":"FullBalloons"},
+                    function (data) {
+                        //TODO: мы можем получить пустой массив data.arrayOfBalloonList, нужно проверять, что возможно обращение к данному элементу, иначе выдавать ошибку запроса в баллуне, чтобы пользователь понял, что ждать нечего
+                        var balloonHTML = data.arrayOfBalloonList[propertyid];
 
-            // прицепим новый макет к родителю
-            subLayout.setParentElement(this.getParentElement());
+                        // Проверка на адекватность полученного HTML для баллуна
+                        if (balloonHTML != null) {
+
+                            applyContentThis.activeObject.properties.set('balloonContentBody', balloonHTML);
+                            // Для того, чтобы макет автоматически изменялся при обновлении данных
+                            // в геообъекте, создадим дочерний макет через фабрику
+                            var subLayout = new MyMainContentSubLayout({
+                                options:applyContentThis.options,
+                                properties:applyContentThis.activeObject.properties
+                            });
+
+                            // прицепим новый макет к родителю
+                            subLayout.setParentElement(applyContentThis.getParentElement());
+
+                            // Цепляем colorBox для отображения галереи фотографий
+                            self.setColorBoxForOpenBalloon();
+
+                            // Также в случае успеха, сохраняем данные по баллуну для данного объекта на странице с целью уменьшения количества запросов к серверу
+                            $("#allBalloons").append(balloonHTML);
+                        }
+                    },
+                    'json'
+                );
+            }
         }
     });
 
-    // А вот и сам дочерний макет - он принимает на вход данные текущего выбранного геообъекта и показывает их.
+    // Дочерний макет баллуна кластера - принимает на вход данные текущего выбранного геообъекта и показывает их.
     var MyMainContentSubLayout = ymaps.templateLayoutFactory.createClass(
         '<div width="100">' +
             '$[properties.balloonContentBody]' +
         '</div>'
     );
 
-    // Рисуем на карте маркеры объектов недвижимости, соответствующих запросу
-    placeMarkers();
-
-    // Перестроение карты при различных событиях
-    $('#expandMap').bind('click', reDrawMap);
-    $('#listPlusMap').bind('click', reDrawMap);
-    // Чтобы карта отображалась при открытии вкладки (Избранное в Личном кабинете), ее нужно перестраивать по событию - открытие вкладки
-    if ($("#tabs #map").length) {
-        $('#tabs').bind('tabsshow', function (event, ui) {
-            map.setCenter([56.829748, 60.617435]);
-            map.container.fitToViewport();
+    // Создание экземпляра карты и его привязка к контейнеру с заданным id ("map")
+    // TODO: Сделать инициализацию по любому идентификатору переданному через оптионс
+    self.initialization = function() {
+        map = new ymaps.Map('map', {
+            center:[56.829748, 60.617435], // В центре карты - Екатеринбург
+            zoom:11, // Коэффициент первоначального масштабирования
+            behaviors:['default', 'scrollZoom', 'ruler'] // Включим поведения по умолчанию (default), а также масштабирование колесом мыши (scrollZoom) и измеритель расстояний по клику левой кнопки мыши (ruler)
         });
-    }
+    };
 
-    /***** Функция перестроения карты - используется при изменении размеров блока *****/
-    function reDrawMap() {
+    // Добавляет элементы управления на карту. Используется при инициализации
+    self.addControls = function() {
+        map.controls.add('typeSelector'); // Выбор типа карты
+        map.controls.add('smallZoomControl', { // Кнопка изменения масштаба - компактный вариант. Расположим её ниже и левее левого верхнего угла
+            left:5,
+            top:55
+        });
+        map.controls.add('mapTools'); // Стандартный набор кнопок
+    };
+
+    // Функция перестроения карты - используется при изменении размеров блока
+    self.reDrawMap = function() {
         //map.setCenter([56.829748, 60.617435]);
         map.container.fitToViewport();
-    }
+    };
 
-    function placeMarkers() {
+    // TODO: Можно избавиться от этой функции?
+    self.reDrawMapFull = function() {
+        map.setCenter([56.829748, 60.617435]);
+        map.container.fitToViewport();
+    };
+
+    // Размещает метки на карте в соответствии со сдаваемыми объектами недвижимости
+    self.placeMarkers = function() {
 
         // Создаем кластеризатор. Который будет объединять в 1 метку близко расположенные метки и будет масштабироваться по клику
         cluster = new ymaps.Clusterer();
         // Задаем размер ячейки кластера в пикселях. Чем больше, тем при большем расстояние между друг другом метки будут объединяться в одну
         cluster.options.set({
-            // TODO: test
             clusterBalloonMainContentLayout:MyMainContentLayout, // зададим макет для правой части балуна
             //clusterBalloonSidebarWidth: 75, // Настроим ширину левой части балуна кластера
             //clusterBalloonWidth: 450, // И ширину балуна неделимого кластера целиком
@@ -313,7 +356,7 @@ function init() {
             });
 
             // Навешиваем обработчик клика по метке
-            myPlacemark.events.add('click', onPlacemarkClick);
+            myPlacemark.events.add('click', self.onPlacemarkClick);
 
             // Добавляем полученную метку в коллекцию. Перед этим можно добавить проверку на удачность создания метки, чтобы всю страницу не запароть из-за одной косячной метки
             placemarks[i] = myPlacemark;
@@ -322,104 +365,120 @@ function init() {
         // Добавляем собранную коллекцию меток в кластер и на карту
         cluster.add(placemarks);
         map.geoObjects.add(cluster);
-    }
+    };
 
     // Обработчик клика по метке на Яндекс карте
-    function onPlacemarkClick(event) {
+    self.onPlacemarkClick = function(event) {
 
         // Получаем параметры метки, в том числе id объекта недвижимости.
-        var placemark = event.get('target'),
-            map = placemark.getMap(), // Ссылка на карту.
-            //bounds = map.getBounds(), // Область показа карты.
-            propertyid = placemark.properties.get('propertyid'); // Получаем данные для запроса из свойств метки.
+        var placemark = event.get('target');
+        //var map = placemark.getMap(); // Ссылка на карту.
+        var propertyid = placemark.properties.get('propertyid'); // Получаем данные для запроса из свойств метки.
 
         // Пытаемся найти контент для баллуна на нашей текущей странице в разделе AllBalloons
-        balloonHTML = getContentForBalloonFromPage(propertyid);
+        var balloonHTML = self.getContentForBalloonFromPage(propertyid);
 
         // Проверяем - есть ли на странице данные для формирования баллуна для этого объекта, если есть, формируем на основе их баллун
         if (balloonHTML) {
 
             // Обновляем поле "body" у properties метки
             placemark.properties.set('balloonContentBody', balloonHTML);
-            setColorBoxForOpenBalloon();
+            self.setColorBoxForOpenBalloon();
 
         } else { // Если данные по этому объекту еще не были подгружены на страницу, то обращаемся к серверу
 
             // Обращаемся к серверу за HTML баллуна, передаем серверу propertyid - идентификатор объекта недвижимости
-            jQuery.post("../AJAXGetSearchResult.php", {"propertyId":new Array(propertyid), "typeOperation":"FullBalloons"}, function (data) {
+            jQuery.post(
+                "../AJAXGetSearchResult.php",
+                {"propertyId":new Array(propertyid), "typeOperation":"FullBalloons"},
+                function (data) {
+                    //TODO: мы можем получить пустой массив data.arrayOfBalloonList, нужно проверять, что возможно обращение к данному элементу, иначе выдавать ошибку запроса в баллуне, чтобы пользователь понял, что ждать нечего
+                    var balloonHTML = data.arrayOfBalloonList[propertyid];
 
-                //TODO: мы можем получить пустой массив data.arrayOfBalloonList, нужно проверять, что возможно обращение к данному элементу, иначе выдавать ошибку запроса в баллуне, чтобы пользователь понял, что ждать нечего
-                balloonHTML = data.arrayOfBalloonList[propertyid];
+                    // Проверка на адекватность полученного HTML для баллуна
+                    if (balloonHTML != "") {
 
-                // Проверка на адекватность полученного HTML для баллуна
-                if (balloonHTML != "") {
+                        // Обновляем поле "body" у properties метки
+                        // TODO: научиться яво передавать переменную placemark в эту функцию из self.onPlacemarkClick м вынести эту функцию в отдельную в данном классе
+                        placemark.properties.set('balloonContentBody', balloonHTML);
+                        self.setColorBoxForOpenBalloon();
 
-                    // Обновляем поле "body" у properties метки
-                    placemark.properties.set('balloonContentBody', balloonHTML);
-                    setColorBoxForOpenBalloon();
+                        // Также в случае успеха, сохраняем данные по баллуну для данного объекта на странице с целью уменьшения количества запросов к серверу
+                        $("#allBalloons").append(balloonHTML);
 
-                    // Также в случае успеха, сохраняем данные по баллуну для данного объекта на странице с целью уменьшения количества запросов к серверу
-                    $("#allBalloons").append(balloonHTML);
-
-                } else {
-                    // Сообщаем об ошибке получения данных объявления с сервера
-                    placemark.properties.set('balloonContentBody', "Не удалось найти данные по этому объявлению");
-                }
-
-            }, 'json');
-
+                    } else {
+                        // Сообщаем об ошибке получения данных объявления с сервера
+                        placemark.properties.set('balloonContentBody', "Не удалось найти данные по этому объявлению");
+                    }
+                },
+                'json'
+            );
         }
-
-    }
+    };
 
     // Пытается найти HTML содержимое для баллуна на странице
-    function getContentForBalloonFromPage(propertyid) {
-        balloonHTML = $("#allBalloons .balloonBlock[propertyId='" + propertyid + "']").html();
+    // TODO: выяснить, что возвращает функция при невозможности получения html
+    self.getContentForBalloonFromPage = function(propertyid) {
+        var balloonHTML = $("#allBalloons .balloonBlock[propertyId='" + propertyid + "']").html();
         return balloonHTML;
-    }
+    };
 
     // Объединяет в галерею ColorBox фотографии открытого баллуна (нужно запускать каждый раз при открытии нового баллуна)
-    function setColorBoxForOpenBalloon() {
+    self.setColorBoxForOpenBalloon = function() {
         $("#map .fotosWrapper .gallery").removeClass('cboxElement').colorbox({ opacity:0.7, rel:currentFotoGalleryIndex, current:'№ {current} из {total}' });
         currentFotoGalleryIndex++;
-    }
+    };
 
-    // TODO: test
-    /*map.geoObjects.events.add('click', onClickHandler);
-     function onClickHandler(event) {
-     alert("Получилось");
-     /*currentGeoObject = event.get('target');
-     if (currentGeoObject.options.getName() == "cluster") {
-     // Проверить масштаб, если минимальный
-     // Перебираем объявления в кластере и получаем их данные
-     arr = currentGeoObject.properties.get('geoObjects');
-     for (i = 0; i < arr.length; i++) {
-     arr[i].properties.set('balloonContentBody', "Тестовое значение!");
-     }
-     }
-     }*/
+    // Обработчик клика по строчке с кратким описанием объявления - отображает инфу в виде баллуна на карте
+    // this = элементу с классом realtyObject, на котором был произведен клик
+    self.onShortListClick = function(event) {
 
-    /* Вешаем обработчик на клик по строчке краткого списка - чтобы отобразить инфу в виде баллуна на карте */
-    $('#shortListOfRealtyObjects').on('click', ".realtyObject", function (event) {
         var target = event.target;
 
         var propertyId = $(this).attr('propertyId');
-        var balloonContentBodyVar = getContentForBalloonFromPage(propertyId);
-        var realtyObjCoordX = $("#allBalloons .balloonBlock[propertyId='" + propertyId + "']").attr('coordX');
-        var realtyObjCoordY = $("#allBalloons .balloonBlock[propertyId='" + propertyId + "']").attr('coordY');
+        var balloonContentBodyVar = self.getContentForBalloonFromPage(propertyId);
 
+        // Получаем координаты объекта недвижимости на Яндекс карте
+        var balloonContent = $("#allBalloons .balloonBlock[propertyId='" + propertyId + "']");
+        var coordX = balloonContent.attr('coordX');
+        var coordY = balloonContent.attr('coordY');
+
+        // Рисуем баллун на карте
         map.balloon.open(
-            [realtyObjCoordX, realtyObjCoordY], // Позиция балуна
+            [coordX, coordY], // Позиция балуна
             { contentBody:balloonContentBodyVar } // Свойства балуна
         );
 
         // Навешиваем на фотографии только что сформированного HTML баллуна галерею colorBox
-        setColorBoxForOpenBalloon();
+        self.setColorBoxForOpenBalloon();
 
         return true; // чтобы дать возможность отработать и другим обработчикам клика (например, для добавления/удаления в избранное, просмотра объявления подробнее)
-    });
-
+    };
 }
+
+// Как только библиотека с Яндекс картами готова - инициализируем соответствующий объект как надо
+ymaps.ready(function() {
+
+    // Создаем объект класса MapYandex
+    var mapYandex = new MapYandex({});
+
+    // Инициализация объекта
+    mapYandex.initialization();
+    mapYandex.addControls();
+
+    // Рисуем на карте маркеры объектов недвижимости, соответствующих запросу
+    mapYandex.placeMarkers();
+
+    // Перестроение карты при различных событиях
+    $('#expandMap').bind('click', mapYandex.reDrawMap);
+    $('#listPlusMap').bind('click', mapYandex.reDrawMap);
+
+    // Чтобы карта отображалась при открытии вкладки (Избранное в Личном кабинете), ее нужно перестраивать по событию - открытие вкладки
+    if ($("#tabs #map").length) $('#tabs').bind('tabsshow', mapYandex.reDrawMapFull);
+
+    // Вешаем обработчик на клик по строчке краткого списка - чтобы отобразить инфу в виде баллуна на карте
+    $('#shortListOfRealtyObjects').on('click', ".realtyObject", mapYandex.onShortListClick);
+});
 
 /**********************************************************************************
  * Переход на страницу с подробным описанием недвижимости по клику в режиме "только список"

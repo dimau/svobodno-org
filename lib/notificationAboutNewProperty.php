@@ -47,3 +47,19 @@ foreach ($listOfTargetUsers as $value) {
 	if ($value['needEmail'] = 1) $listOfTargetUsersForEmail[] = $value;
 }
 $property->sendEmailAboutNewProperty($listOfTargetUsersForEmail);
+
+// Формируем и рассылаем sms по тем пользователям, которые подписаны на такую рассылку
+$listOfTargetUsersForSMS = array();
+foreach ($listOfTargetUsers as $value) {
+    if ($value['needSMS'] = 1) $listOfTargetUsersForSMS[] = $value;
+}
+$property->sendSMSAboutNewProperty($listOfTargetUsersForSMS);
+
+// Оповестить оператора о подходящем варианте для клиента
+foreach ($listOfTargetUsers as $value) {
+    $subject = 'Подходящий вариант';
+    $msgHTML = "Новый подходящий вариант:<br>
+                Для пользователя: <a href='http://svobodno.org/man.php?compId=" . GlobFunc::idToCompId($value['userId']) . "'>" . $value['name'] . " " . $value['telephon'] . "</a><br>
+                Подробное объявление: <a href='http://svobodno.org/property.php?propertyId=" . $property->getId() . "'>" . $property->getAddress() . "</a>";
+    GlobFunc::sendEmailToOperator($subject, $msgHTML);
+}

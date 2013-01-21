@@ -79,7 +79,7 @@ while ($parser->loadNextAdvertsList()) {
 
         // Оповещаем операторов о новом объявлении на сайте bazab2b.ru
         $subject = 'Объявление на bazab2b.ru';
-        $msgHTML = "Новое объявление на bazab2b.ru: <a href='http://svobodno.org/editadvert.php?propertyId=" . $property->getId() . "'>Перейти к редактированию</a>";
+        $msgHTML = "Новое объявление на bazab2b.ru: <a href='http://svobodno.org/editadvert.php?propertyId=" . $property->getId() . "'>" . $property->getAddress() . "</a>";
         GlobFunc::sendEmailToOperator($subject, $msgHTML);
     }
 

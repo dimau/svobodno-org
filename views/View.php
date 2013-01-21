@@ -293,11 +293,11 @@ class View
 		}
 		$arrBalloonReplace['utilities'] = "";
 		$arrBalloonReplace['utilitiesName'] = "";
-		if ($oneProperty['utilities'] == "да" && $arrBalloonReplace['currency'] != "0" && ($oneProperty['costInSummer'] != "0" && $oneProperty['costInWinter'] != "0")) {
+		if ($oneProperty['utilities'] == "да" && $arrBalloonReplace['currency'] != "0" && ($oneProperty['costInSummer'] != "" && $oneProperty['costInWinter'] != "")) {
 			$arrBalloonReplace['utilities'] = "от " . $oneProperty['costInSummer'] . " до " . $oneProperty['costInWinter'] . " " . $oneProperty['currency'] . " в месяц";
 			$arrBalloonReplace['utilitiesName'] = "Ком. услуги:";
 		}
-		if ($oneProperty['utilities'] == "да" && $arrBalloonReplace['currency'] != "0" && ($oneProperty['costInSummer'] == "0" || $oneProperty['costInWinter'] == "0")) {
+		if ($oneProperty['utilities'] == "да" && $arrBalloonReplace['currency'] != "0" && ($oneProperty['costInSummer'] == "" || $oneProperty['costInWinter'] == "")) {
 			$arrBalloonReplace['utilities'] = "оплачиваются дополнительно";
 			$arrBalloonReplace['utilitiesName'] = "Ком. услуги:";
 		}

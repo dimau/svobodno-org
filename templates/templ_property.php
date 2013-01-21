@@ -790,28 +790,28 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
         <?php if ($propertyCharacteristic['comment'] != ""): ?>
         <tr>
             <td colspan="2">
-                <span><?php echo $propertyCharacteristic['comment']; ?></span>
+                <span>
+                    <?php echo $propertyCharacteristic['comment']; ?>
+                </span>
             </td>
         </tr>
         <?php endif; ?>
 
 		<?php if ($propertyCharacteristic['checking'] != "" && $propertyCharacteristic['checking'] != "0"): ?>
         <tr>
-            <td class="objectDescriptionItemLabel">
+            <td colspan="2">
                 Где проживает собственник:
-            </td>
-            <td class="objectDescriptionBody">
-                <span><?php echo $propertyCharacteristic['checking']; ?></span>
+                <span>
+                    <?php echo $propertyCharacteristic['checking']; ?>
+                </span>
             </td>
         </tr>
 	    <?php endif; ?>
 
         <?php if ($isAdmin['searchUser']): ?>
         <tr>
-            <td class="objectDescriptionItemLabel">
+            <td colspan="2">
                 Источник:
-            </td>
-            <td class="objectDescriptionBody">
                 <a href="<?php echo $propertyCharacteristic['sourceOfAdvert']; ?>">
                     <?php echo $propertyCharacteristic['sourceOfAdvert']; ?>
                 </a>

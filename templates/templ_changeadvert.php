@@ -1518,6 +1518,13 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             <textarea name="sourceOfAdvert" maxlength="2000" rows="7" cols="43"><?php echo $propertyCharacteristic['sourceOfAdvert'];?></textarea>
         </div>
     </div>
+    <div class="objectDescriptionItem">
+        <div class="objectDescriptionItemLabel">
+        </div>
+        <div class="objectDescriptionBody">
+            <a target="_blank" href="<?php echo $propertyCharacteristic['sourceOfAdvert'];?>">Быстрый доступ к Источнику</a>
+        </div>
+    </div>
     <?php endif; ?>
 
 	<?php if ($isAdmin['newOwner'] || $isAdmin['newAdvertAlien'] || $isAdmin['searchUser']): ?>

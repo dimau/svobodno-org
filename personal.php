@@ -272,6 +272,7 @@ $compId = GlobFunc::idToCompId($userId);
 //$correctEditProfileParameters
 //$allDistrictsInCity
 //$tabsId Идентификатор вкладки, которая будет открыта по умолчанию после загрузки страницы
+//$isAdmin
 
 // Подсоединяем нужный основной шаблон
 require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_personal.php";

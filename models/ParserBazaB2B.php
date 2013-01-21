@@ -226,6 +226,7 @@ class ParserBazaB2B {
                 $value = $oneParam->find("td", 1);
                 if (isset($value)) $value = $value->plaintext; else $value = "0";
                 if ($value == "Новая Сортировка") $value = "Сортировка новая";
+                if ($value == "Старая Сортировка") $value = "Сортировка старая";
                 if ($value == "Виз") $value = "ВИЗ";
                 if ($value == "Юго-Западный") $value = "Юго-запад";
                 $params['district'] = $value;

@@ -133,8 +133,8 @@ function init() {
         var geoObjectsOfsearch_query = ymaps.geocode(search_query, {
             results:1,
             boundedBy:[
-                [55, 59],
-                [58, 62]
+                [56.727374, 60.465207],
+                [56.921091, 60.838283]
             ],
             strictBounds:true
         });
@@ -169,7 +169,7 @@ function init() {
         map.events.add('click', function (e) {
             var coords = e.get('coordPosition');
 
-            // Отправим запрос на геокодирование, берем только 1 результат - это будетт название улицы и номер дома (так у них в Яндексе настроено).
+            // Отправим запрос на геокодирование, берем только 1 результат - это будет название улицы и номер дома (так у них в Яндексе настроено).
             ymaps.geocode(coords, {
                 results:1
             }).then(function (res) {

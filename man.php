@@ -115,6 +115,7 @@ $userCharacteristic = $user->getCharacteristicData();
 $userFotoInformation = $user->getFotoInformationData();
 $userSearchRequest = $searchRequest->getSearchRequestData();
 $mode = "tenantForOwner"; // Режим в котором будет работать шаблон анкеты пользователя (templ_notEditedProfile.php)
+//$isAdmin
 
 // Подсоединяем нужный основной шаблон
 require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_man.php";

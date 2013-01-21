@@ -1133,7 +1133,7 @@ class Property
 	public function notifyUsersAboutNewProperty() {
 
 		$parts = parse_url("http://svobodno.org/lib/notificationAboutNewProperty.php");
-		//TODO: test
+		// Строчка используется для тестирования на локальной машине работы рассылки уведомлений о новом объекте
 		//$parts = parse_url("http://localhost/lib/notificationAboutNewProperty.php");
 		$params = array("propertyId" => $this->id);
 
@@ -1174,7 +1174,7 @@ class Property
 		// Ограничение на количество комнат
 		$searchLimits['amountOfRooms'] = "";
 		if (isset($this->amountOfRooms) && $this->amountOfRooms != '0') {
-			$searchLimits['amountOfRooms'] = " (searchRequests.amountOfRooms = 'a:0:{}' OR searchRequests.amountOfRooms LIKE '%" . $this->amountOfRooms . "%')";
+			$searchLimits['amountOfRooms'] = " (searchRequests.amountOfRooms = 'a:0:{}' OR searchRequests.amountOfRooms LIKE '%\"" . $this->amountOfRooms . "\"%')";
 		}
 
 		// Ограничение на смежность комнат
@@ -1217,17 +1217,30 @@ class Property
 			$searchLimits['district'] = " (searchRequests.district = 'a:0:{}' OR searchRequests.district LIKE '%" . $this->district . "%')";
 		}
 
-		// Ограничение на формат проживания (с кем)
+		// Ограничение на формат проживания (с кем) и пол арендатора (если собственник разрешает проживание одного человека и указаны требования к его полу)
 		$searchLimits['withWho'] = "";
 		if (is_array($this->relations) && count($this->relations) != 0) {
-			$searchLimits['withWho'] = " (";
+			$searchLimits['withWho'] = " ( searchRequests.withWho = '0'";
 			for ($i = 0, $s = count($this->relations); $i < $s; $i++) {
-				$searchLimits['withWho'] .= " searchRequests.withWho LIKE '%" . $this->relations[$i] . "%'";
-				if ($i < count($this->relations) - 1) $searchLimits['withWho'] .= " OR";
+                if ($this->relations[$i] == "один человек") {
+                    // Проверяем - предъявляет ли собственник требования к полу арендатора, если может проживать только девочка или только мальчик, учитываем это при отборе кандидатов
+                    if (is_array($this->sexOfTenant) && count($this->sexOfTenant) == 1) {
+                        $searchLimits['withWho'] .= " OR (searchRequests.withWho = 'самостоятельно' AND ( users.sex = '0'";
+                        if ($this->sexOfTenant[0] == "мужчина") $searchLimits['withWho'] .= " OR users.sex = 'мужской'";
+                        if ($this->sexOfTenant[0] == "женщина") $searchLimits['withWho'] .= " OR users.sex = 'женский'";
+                        $searchLimits['withWho'] .= " ))";
+                    } else {
+                        $searchLimits['withWho'] .= " OR searchRequests.withWho = 'самостоятельно'";
+                    }
+                }
+                if ($this->relations[$i] == "семья") $searchLimits['withWho'] .= " OR searchRequests.withWho = 'семья'";
+                if ($this->relations[$i] == "пара") $searchLimits['withWho'] .= " OR searchRequests.withWho = 'пара'";
+                if ($this->relations[$i] == "2 мальчика") $searchLimits['withWho'] .= " OR searchRequests.withWho = '2 мальчика'";
+                if ($this->relations[$i] == "2 девочки") $searchLimits['withWho'] .= " OR searchRequests.withWho = '2 девочки'";
+                if ($this->relations[$i] == "группа людей") $searchLimits['withWho'] .= " OR searchRequests.withWho = 'со знакомыми'";
 			}
 			$searchLimits['withWho'] .= " )";
 		}
-		//TODO: если есть ограничение на пол и возможно проживание 1 человека, то сделать еще проверку на пол этого арендатора
 
 		// Ограничение на проживание с детьми
 		$searchLimits['children'] = "";
@@ -1294,7 +1307,12 @@ class Property
 		return DBconnect::insertMessageNewProperty(array("timeIndex" => $tm, "messageType" => $messageType, "isReaded" => $isReaded, "fotoArr" => $this->uploadedFoto, "targetId" => $this->id, "typeOfObject" => $this->typeOfObject, "address" => $this->address, "currency" => $this->currency, "costOfRenting" => $this->costOfRenting, "utilities" => $this->utilities, "electricPower" => $this->electricPower, "amountOfRooms" => $this->amountOfRooms, "adjacentRooms" => $this->adjacentRooms, "amountOfAdjacentRooms" => $this->amountOfAdjacentRooms, "roomSpace" => $this->roomSpace, "totalArea" => $this->totalArea, "livingSpace" => $this->livingSpace, "kitchenSpace" => $this->kitchenSpace, "totalAmountFloor" => $this->totalAmountFloor, "numberOfFloor" => $this->numberOfFloor), $listOfTargetUsers);
 	}
 
-	public function sendEmailAboutNewProperty($listOfTargetUsersForEmail) {
+    /**
+     * Метод, который позволяет оповестить по e-mail пользователей-арендаторов о появлении нового объекта недвижимости, который соответствует их параметрам поиска.
+     * @param $listOfTargetUsersForEmail массив ассоциативных массивов, каждый член которого содержит сведения об имени пользователя ('name') и его e-mail ('email')
+     * @return bool Возвращает TRUE в случае успеха и FALSE в противном случае
+     */
+    public function sendEmailAboutNewProperty($listOfTargetUsersForEmail) {
 
 		// Проверка входных данных
 		if (!isset($listOfTargetUsersForEmail) || !is_array($listOfTargetUsersForEmail) || count($listOfTargetUsersForEmail) == 0) return FALSE;
@@ -1338,10 +1356,24 @@ class Property
 		return TRUE;
 	}
 
+    /**
+     * Метод, позволяющий оповестить по смс пользователей-арендаторов о появлении нового объекта недвижимости, который соответствует их параметрам поиска.
+     * @param $listOfTargetUsers массив ассоциативных массивов, каждый член которого содержит сведения об имени пользователя ('name') и его номере телефона ('telephon')
+     * @return bool Возвращает TRUE в случае успеха и FALSE в противном случае
+     */
+    public function sendSMSAboutNewProperty($listOfTargetUsers) {
+
+        // Проверка входных данных
+        if (!isset($listOfTargetUsers) || !is_array($listOfTargetUsers) || count($listOfTargetUsers) == 0) return FALSE;
+
+        
+
+        return TRUE;
+    }
+
 	/**
 	 * Устанавливает или меняет ближайшую дату просмотра у данного объекта.
 	 * Но метод не сохраняет данные в БД - для этого нужно вызвать $this->saveCharacteristicToDB
-	 *
 	 * @param $earliestDate - новая дата просмотра в формате: 27.01.1987
 	 * @param $earliestTimeHours - новый час просмотра в 24-х часовом формате
 	 * @param $earliestTimeMinutes - новые минуты просмотра (от 0 до 59)

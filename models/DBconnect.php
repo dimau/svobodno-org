@@ -409,21 +409,19 @@ class DBconnect
 		if (!isset($userId) || !is_int($userId)) return array();
 
 		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("SELECT * FROM searchRequests WHERE userId = ?") === FALSE)
+		if (($stmt->prepare("SELECT * FROM searchRequests WHERE userId = ? LIMIT 1") === FALSE)
 			OR ($stmt->bind_param("i", $userId) === FALSE)
 			OR ($stmt->execute() === FALSE)
 			OR (($res = $stmt->get_result()) === FALSE)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+			OR (($res = $res->fetch_assoc()) === NULL)
 			OR ($stmt->close() === FALSE)
 		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM searchRequests WHERE userId = " . $userId . "'. Местонахождение кода: DBconnect::selectSearchRequestForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM searchRequests WHERE userId = " . $userId . " LIMIT 1'. Местонахождение кода: DBconnect::selectSearchRequestForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
 			return array();
 		}
 
 		// Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
-		for ($i = 0, $s = count($res); $i < $s; $i++) {
-            $res[$i] = DBconnect::conversionSearchRequestFromDBToView($res[$i]);
-		}
+        $res = DBconnect::conversionSearchRequestFromDBToView($res);
 
 		return $res;
 	}
@@ -597,28 +595,6 @@ class DBconnect
 		// Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
 		for ($i = 0, $s = count($res); $i < $s; $i++) {
 			$res[$i]['fotoArr'] = unserialize($res[$i]['fotoArr']);
-		}
-
-		return $res;
-	}
-
-	// Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одному из уведомлений. Если ничего не найдено или произошла ошибка, вернет пустой массив
-	// Необязательный параметр на входе - максимальное кол-во уведомлений, которые мы хотим получить за одно обращение
-	public static function selectMessagesForEmail($limit = 100) {
-
-		// Проверка входящих параметров
-		if (isset($limit) && !is_int($limit)) return array();
-
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("SELECT * FROM messagesNewProperty WHERE needEmail = 1 LIMIT ?") === FALSE)
-			OR ($stmt->bind_param("i", $limit) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->get_result()) === FALSE)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM messagesNewProperty WHERE needEmail = 1 LIMIT ".$limit."'. Местонахождение кода: DBconnect::selectMessagesNewPropertyForEmail():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return array();
 		}
 
 		return $res;
