@@ -1315,7 +1315,10 @@ class Property
     public function sendEmailAboutNewProperty($listOfTargetUsersForEmail) {
 
 		// Проверка входных данных
-		if (!isset($listOfTargetUsersForEmail) || !is_array($listOfTargetUsersForEmail) || count($listOfTargetUsersForEmail) == 0) return FALSE;
+		if (!isset($listOfTargetUsersForEmail) || !is_array($listOfTargetUsersForEmail) || count($listOfTargetUsersForEmail) == 0) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Property.php->sendEmailAboutNewProperty():1 Входные данные не прошли проверку!");
+            return FALSE;
+        }
 
 		// Инициализируем класс для отправки e-mail и указываем постоянные параметры (верные для любых уведомлений)
 		$mail = new PHPMailer(true); //defaults to using php "mail()"; the true param means it will throw exceptions on errors, which we need to catch
@@ -1330,15 +1333,17 @@ class Property
 			$mail->AddReplyTo('support@svobodno.org', 'Svobodno.org');
 			$mail->Subject = 'Новое объявление: '.$this->address;
 		} catch (phpmailerException $e) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Property->sendEmailAboutNewProperty():1 Ошибка при формировании e-mail:".$e->errorMessage()."Текст сообщения:".$MsgHTML); //Pretty error messages from PHPMailer
+			Logger::getLogger(GlobFunc::$loggerName)->log("Property->sendEmailAboutNewProperty():2 Ошибка при формировании e-mail:".$e->errorMessage()."Текст сообщения:".$MsgHTML); //Pretty error messages from PHPMailer
 			return FALSE;
 		} catch (Exception $e) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Property->sendEmailAboutNewProperty():2 Ошибка при формировании e-mail:".$e->getMessage()."Текст сообщения:".$MsgHTML); //Boring error messages from anything else!
+			Logger::getLogger(GlobFunc::$loggerName)->log("Property->sendEmailAboutNewProperty():3 Ошибка при формировании e-mail:".$e->getMessage()."Текст сообщения:".$MsgHTML); //Boring error messages from anything else!
 			return FALSE;
 		}
 
 		// Отправляем электронное письмо каждому пользователю индивидуально
 		foreach ($listOfTargetUsersForEmail as $tenant) {
+            // Проверим наличие необходимых данных о данном пользователе. Если данных недостаточно, то сразу переходим к обработке следующего пользователя
+            if (!isset($tenant['name']) || !isset($tenant['email']) || $tenant['email'] = "") continue;
 			// Подставим имя клиента - получателя email
 			$MsgHTML = str_replace("{name}", $tenant['name'], $MsgHTML);
 			try {
@@ -1347,9 +1352,9 @@ class Property
 				$mail->Send();
 				//$mail->AltBody = 'To view the message, please use an HTML compatible email viewer!'; // optional - MsgHTML will create an alternate automatically
 			} catch (phpmailerException $e) {
-				Logger::getLogger(GlobFunc::$loggerName)->log("Property->sendEmailAboutNewProperty():3 Ошибка при формировании e-mail:".$e->errorMessage()."Текст сообщения:".$MsgHTML); //Pretty error messages from PHPMailer
+				Logger::getLogger(GlobFunc::$loggerName)->log("Property->sendEmailAboutNewProperty():4 Ошибка при формировании e-mail:".$e->errorMessage()."Текст сообщения:".$MsgHTML); //Pretty error messages from PHPMailer
 			} catch (Exception $e) {
-				Logger::getLogger(GlobFunc::$loggerName)->log("Property->sendEmailAboutNewProperty():4 Ошибка при формировании e-mail:".$e->getMessage()."Текст сообщения:".$MsgHTML); //Boring error messages from anything else!
+				Logger::getLogger(GlobFunc::$loggerName)->log("Property->sendEmailAboutNewProperty():5 Ошибка при формировании e-mail:".$e->getMessage()."Текст сообщения:".$MsgHTML); //Boring error messages from anything else!
 			}
 		}
 
@@ -1364,10 +1369,52 @@ class Property
     public function sendSMSAboutNewProperty($listOfTargetUsers) {
 
         // Проверка входных данных
-        if (!isset($listOfTargetUsers) || !is_array($listOfTargetUsers) || count($listOfTargetUsers) == 0) return FALSE;
+        if (!isset($listOfTargetUsers) || !is_array($listOfTargetUsers) || count($listOfTargetUsers) == 0) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Property.php->sendSMSAboutNewProperty():1 Входные данные не прошли проверку!");
+            return FALSE;
+        }
 
-        
+        // Инициализация библиотеки curl.
+        if (!($ch = curl_init())) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Property.php->sendSMSAboutNewProperty():2 Не удалось инициализировать библиотеку curl");
+            return FALSE;
+        }
+        curl_setopt($ch, CURLOPT_HEADER, false); // При значении true CURL включает в вывод результата заголовки, которые нам не нужны (мы их на сервере не обрабатываем).
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // При значении = true полученный код страницы возвращается как результат выполнения curl_exec.
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30); // Максимальное время ожидания ответа от сервера в секундах
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17'); // Установим значение поля User-agent для маскировки под обычного пользователя
 
+        // Вычислим текст для смс. "%2B" - кодирует знак "+" для передачи его в GET запросе на сервер смсАэро
+        if ($this->utilities == "да") $utilities = " %2B ком"; else $utilities = "";
+        if ($this->contactTelephonNumber != "") $contactTelephonNumber = "8" . $this->contactTelephonNumber; else $contactTelephonNumber = "";
+        $text = $this->address . ", " . $this->realCostOfRenting . " руб" . $utilities . ", " . $contactTelephonNumber;
+        // Заменим пробелы на плюсы для передачи текста в GET запросе на сервис рассылки смс (смсАэро)
+        $text = str_replace(" ", "+", $text);
+
+        $user = "dimau777@gmail.com";
+        $password = md5("udvudvudv5H");
+        $from = "Svobodno";
+
+        // Оповещаем пользователей по списку
+        foreach ($listOfTargetUsers as $value) {
+
+            $to = "7" . $value['telephon'];
+            $url = "http://gate.smsaero.ru/send/?user=".$user."&password=".$password."&to=".$to."&from=".$from."&text=".$text;
+            curl_setopt($ch, CURLOPT_URL, $url); // Устанавливаем URL запроса
+
+            // Выполнение запроса
+            $data = curl_exec($ch);
+
+            // Проверка на успех отправки смс. Смс считается успешно отправленной, если получен ответ вида: "123456=accepted"
+            if ($data == FALSE || strpos($data, "accepted") === FALSE) {
+                Logger::getLogger(GlobFunc::$loggerName)->log("Property.php->sendSMSAboutNewProperty():3 Не удалось отправить смс, используя адрес: ".$url." Ответ сервера: ".$data);
+            }
+        }
+
+        // Особождение ресурса
+        curl_close($ch);
+
+        // Задача успешно выполнена
         return TRUE;
     }
 
