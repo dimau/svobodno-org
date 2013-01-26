@@ -24,7 +24,7 @@ $userIncoming = new UserIncoming();
 
 // Проверяем, залогинен ли пользователь, если нет - то отказываем в доступе
 if (!$userIncoming->login()) {
-	GlobFunc::accessDenied();
+    GlobFunc::accessDenied();
 }
 
 /*************************************************************************************
@@ -52,9 +52,9 @@ if ($messageId == "" || $messageId == 0 || $messageType != "newProperty" || $act
  *************************************************************************************/
 
 switch ($messageType) {
-	case "newProperty":
-		$message = new MessageNewProperty($messageId);
-		break;
+    case "newProperty":
+        $message = new MessageNewProperty($messageId);
+        break;
 }
 
 /*************************************************************************************
@@ -63,10 +63,10 @@ switch ($messageType) {
 
 if ($action == "remove") {
 
-	// Убедимся, что это уведомление принадлежит пользователю, который запросил ее удаление
-	if (!$message->referToUser($userIncoming->getId())) GlobFunc::accessDenied();
+    // Убедимся, что это уведомление принадлежит пользователю, который запросил ее удаление
+    if (!$message->referToUser($userIncoming->getId())) GlobFunc::accessDenied();
 
-	if (!$message->remove()) GlobFunc::accessDenied();
+    if (!$message->remove()) GlobFunc::accessDenied();
 }
 
 /*************************************************************************************
@@ -75,10 +75,10 @@ if ($action == "remove") {
 
 if ($action == "isReadedTrue") {
 
-	// Убедимся, что это уведомление принадлежит пользователю, который запросил изменение ее статуса прочитанности
-	if (!$message->referToUser($userIncoming->getId())) GlobFunc::accessDenied();
+    // Убедимся, что это уведомление принадлежит пользователю, который запросил изменение ее статуса прочитанности
+    if (!$message->referToUser($userIncoming->getId())) GlobFunc::accessDenied();
 
-	if (!$message->changeIsReadedTrue() || !$message->saveParamsToDB()) GlobFunc::accessDenied();
+    if (!$message->changeIsReadedTrue() || !$message->saveParamsToDB()) GlobFunc::accessDenied();
 }
 
 /*************************************************************************************

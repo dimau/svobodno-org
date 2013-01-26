@@ -55,7 +55,7 @@ $("#typeOfObject").change(notavailability);
  * Вкладка Уведомления
  *****************************************************************/
 
-$(document).ready(function() {
+$(document).ready(function () {
     // Вешаем обработчик на клик по ссылке "прочитано" на уведомлении
     $(".isReadedTrueMessage").click(isReadedTrueMessage);
 
@@ -80,7 +80,7 @@ function isReadedTrueMessage() {
     // Получим тип уведомления
     var messageType = messageBlock.attr('messageType');
 
-    jQuery.post("AJAXChangeMessages.php", {"messageId": messageId, "messageType": messageType, "action": "isReadedTrue"}, function (data) {
+    jQuery.post("AJAXChangeMessages.php", {"messageId":messageId, "messageType":messageType, "action":"isReadedTrue"}, function (data) {
         $(data).find("span[status='successful']").each(function () {
             /* Если вдруг нужно будет что-то выдавать при получении положительного ответа, то закодить здесь */
         });
@@ -106,7 +106,7 @@ function removeMessage() {
     // Проведем изменения в интерфейсе - удалим блок данного уведомления
     $(messageBlock).remove();
 
-    jQuery.post("AJAXChangeMessages.php", {"messageId": messageId, "messageType": messageType, "action": "remove"}, function (data) {
+    jQuery.post("AJAXChangeMessages.php", {"messageId":messageId, "messageType":messageType, "action":"remove"}, function (data) {
         $(data).find("span[status='successful']").each(function () {
             /* Если вдруг нужно будет что-то выдавать при получении положительного ответа, то закодить здесь */
         });

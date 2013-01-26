@@ -2,13 +2,13 @@
 $(document).ready(function () {
 
     /*** Работа с статусом заявки на просмотр ***/
-    // Обработчик клика по статусу запроса на просмотр
+        // Обработчик клика по статусу запроса на просмотр
     $(".statusAnchor").on('click', startEditStatusOfRequestToView);
     // Обработчик выбора нового статуса в селекте
     $(".statusSelect").on('change', changeStatusOfRequestToView);
 
     /*** Работа с удобным временем просмотра для арендатора ***/
-    // Обработчик клика по ссылке для изменения удобного времени просмотра арендатора
+        // Обработчик клика по ссылке для изменения удобного времени просмотра арендатора
     $(".tenantTimeAnchor").on('click', startEditTenantTimeOfRequestToView);
     // Обработчик клика по кнопка сохранения удобного времени просмотра арендатора
     $(".tenantTimeSaveButton").on('click', changeTenantTimeOfRequestToView);
@@ -16,7 +16,7 @@ $(document).ready(function () {
     $(".tenantTimeCancelButton").on('click', cancelEditTenantTimeOfRequestToView);
 
     /*** Работа с комментарием к заявке на просмотр от арендатора ***/
-    // Обработчик клика по ссылке для изменения комментария арендатора
+        // Обработчик клика по ссылке для изменения комментария арендатора
     $(".tenantCommentAnchor").on('click', startEditTenantCommentOfRequestToView);
     // Обработчик клика по кнопка сохранения комментария арендатора
     $(".tenantCommentSaveButton").on('click', changeTenantCommentOfRequestToView);
@@ -24,7 +24,7 @@ $(document).ready(function () {
     $(".tenantCommentCancelButton").on('click', cancelEditTenantCommentOfRequestToView);
 
     /*** Работа с ближайшей датой просмотра объекта ***/
-    // Обработчик клика по ссылке для изменения ближайшей даты и времени просмотра
+        // Обработчик клика по ссылке для изменения ближайшей даты и времени просмотра
     $(".earliestDateAnchor").on('click', startEditEarliestDate);
     // Обработчик клика по кнопка сохранения измененной даты и времени ближайшего просмотра
     $(".earliestDateSaveButton").on('click', changeEarliestDate);
@@ -81,7 +81,7 @@ $(document).ready(function () {
         // Получим новое значение статуса для запроса на просмотр
         var newValue = $('.statusSelect option:selected', requestToViewBlock).val();
 
-        jQuery.post("AJAXChangeRequestToView.php", {"requestToViewId": requestToViewId, "action": "changeStatus", "newValue": newValue}, function (data) {
+        jQuery.post("AJAXChangeRequestToView.php", {"requestToViewId":requestToViewId, "action":"changeStatus", "newValue":newValue}, function (data) {
             $(data).find("span[status='successful']").each(function () {
                 // Изменяем соответствующим образом текст статуса и его видимость
                 $(".statusAnchor", requestToViewBlock).html(newValue).css('display', '');
@@ -107,7 +107,7 @@ $(document).ready(function () {
         // Получим новое значение удобного времени просмотра арендатора
         var newValue = $('.tenantTimeTextArea', requestToViewBlock).val();
 
-        jQuery.post("AJAXChangeRequestToView.php", {"requestToViewId": requestToViewId, "action": "changeTenantTime", "newValue": newValue}, function (data) {
+        jQuery.post("AJAXChangeRequestToView.php", {"requestToViewId":requestToViewId, "action":"changeTenantTime", "newValue":newValue}, function (data) {
             $(data).find("span[status='successful']").each(function () {
                 // Изменяем соответствующим образом текст статуса и его видимость
                 $(".tenantTimeText", requestToViewBlock).html(newValue).css('display', '');
@@ -133,7 +133,7 @@ $(document).ready(function () {
         // Получим новое значение комментария арендатора
         var newValue = $('.tenantCommentTextArea', requestToViewBlock).val();
 
-        jQuery.post("AJAXChangeRequestToView.php", {"requestToViewId": requestToViewId, "action": "changeTenantComment", "newValue": newValue}, function (data) {
+        jQuery.post("AJAXChangeRequestToView.php", {"requestToViewId":requestToViewId, "action":"changeTenantComment", "newValue":newValue}, function (data) {
             $(data).find("span[status='successful']").each(function () {
                 // Изменяем соответствующим образом текст статуса и его видимость
                 $(".tenantCommentText", requestToViewBlock).html(newValue).css('display', '');
@@ -207,12 +207,12 @@ $(document).ready(function () {
         var earliestTimeHours = $('.earliestTimeHoursInput', propertyBlock).val();
         var earliestTimeMinutes = $('.earliestTimeMinutes', propertyBlock).val();
         var newValue = {
-            "earliestDate": earliestDate,
-            "earliestTimeHours": earliestTimeHours,
-            "earliestTimeMinutes": earliestTimeMinutes
+            "earliestDate":earliestDate,
+            "earliestTimeHours":earliestTimeHours,
+            "earliestTimeMinutes":earliestTimeMinutes
         };
 
-        jQuery.post("AJAXChangePropertyData.php", {"propertyId": propertyId, "action": "changeEarliestDate", "newValueArr": JSON.stringify(newValue)}, function (data) {
+        jQuery.post("AJAXChangePropertyData.php", {"propertyId":propertyId, "action":"changeEarliestDate", "newValueArr":JSON.stringify(newValue)}, function (data) {
             $(data).find("span[status='successful']").each(function () {
                 // Изменяем соответствующим образом текст даты ближайшего просмотра и его видимость
                 $(".earliestDateText", propertyBlock).html(earliestDate);
@@ -260,7 +260,7 @@ $(document).ready(function () {
         var propertyId = propertyBlock.attr('propertyId');
 
         // Непосредственная работа с AJAX запросом
-        jQuery.post("AJAXChangePropertyData.php", {"propertyId": propertyId, "action": "unpublishAdvert"}, function (data) {
+        jQuery.post("AJAXChangePropertyData.php", {"propertyId":propertyId, "action":"unpublishAdvert"}, function (data) {
             $(data).find("span[status='successful']").each(function () {
                 $('.unpublishAdvert', propertyBlock).html("<span style='color: silver;'>снято с публикации</span>");
             });

@@ -86,9 +86,9 @@ $property->readFotoInformationFromDB();
 // Если объявление опубликовано, то его может просматривать каждый
 // Если объявление закрыто (снято с публикации), то его может просматривать только сам собственник и админы
 if ($property->getStatus() == "не опубликовано"
-	AND $property->getUserId() != $userIncoming->getId()
-	AND !$isAdmin['searchUser'])
-{
+    AND $property->getUserId() != $userIncoming->getId()
+        AND !$isAdmin['searchUser']
+) {
     // Инициализируем используемые в шаблоне(ах) переменные
     $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
     $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
@@ -103,25 +103,25 @@ if ($property->getStatus() == "не опубликовано"
 
 if ($action == "signUpToView") {
 
-	$signUpToView->writeParamsFromPOST();
-	$errors = $signUpToView->isParamsCorrect();
-	$statusOfSaveParamsToDB = $signUpToView->saveParamsToDB(); // вне зависимости от полноты заполнения формы (корректности) она будет отправлена на сервер и обработана. Это решение связано с тем, что сложно отобразить на клиенте пользователю - что он не заполнил поле в модальном окне, лень это реализовывать
+    $signUpToView->writeParamsFromPOST();
+    $errors = $signUpToView->isParamsCorrect();
+    $statusOfSaveParamsToDB = $signUpToView->saveParamsToDB(); // вне зависимости от полноты заполнения формы (корректности) она будет отправлена на сервер и обработана. Это решение связано с тем, что сложно отобразить на клиенте пользователю - что он не заполнил поле в модальном окне, лень это реализовывать
 
     // Оповестим операторов о появлении новой заявки на просмотр
     if ($statusOfSaveParamsToDB) {
 
-        $subject = 'Заявка на просмотр: '.$property->getAddress();
+        $subject = 'Заявка на просмотр: ' . $property->getAddress();
 
         $msgHTML = "Поступила новая заявка на просмотр:<br>
-        Дата: ".date('d.m.Y H:i')."<br>
-        Кто: ".$userIncoming->getSurname()." ".$userIncoming->getName()." ".$userIncoming->getSecondName()."<br>
-        Объект: ".$property->getAddress()."<br>
+        Дата: " . date('d.m.Y H:i') . "<br>
+        Кто: " . $userIncoming->getSurname() . " " . $userIncoming->getName() . " " . $userIncoming->getSecondName() . "<br>
+        Объект: " . $property->getAddress() . "<br>
         <a href='http://svobodno.org/adminAllRequestsToView.php?action=Новая'>Все новые заявки на просмотр</a>";
 
         GlobFunc::sendEmailToOperator($subject, $msgHTML);
     }
 
-	//TODO: новость для собственника о новом претенденте
+    //TODO: новость для собственника о новом претенденте
 }
 
 /********************************************************************************

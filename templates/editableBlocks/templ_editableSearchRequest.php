@@ -42,64 +42,64 @@
             </td>
             <td class="itemBody">
                 <label><input type="checkbox" value="1" name="amountOfRooms[]"
-					<?php
-					foreach ($userSearchRequest['amountOfRooms'] as $value) {
-						if ($value == "1") {
-							echo "checked";
-							break;
-						}
-					}
-					?>>
+                    <?php
+                    foreach ($userSearchRequest['amountOfRooms'] as $value) {
+                        if ($value == "1") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                    ?>>
                     1</label>
                 <label><input type="checkbox" value="2"
                               name="amountOfRooms[]" <?php
-					foreach ($userSearchRequest['amountOfRooms'] as $value) {
-						if ($value == "2") {
-							echo "checked";
-							break;
-						}
-					}
-					?>>
+                    foreach ($userSearchRequest['amountOfRooms'] as $value) {
+                        if ($value == "2") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                    ?>>
                     2</label>
                 <label><input type="checkbox" value="3"
                               name="amountOfRooms[]" <?php
-					foreach ($userSearchRequest['amountOfRooms'] as $value) {
-						if ($value == "3") {
-							echo "checked";
-							break;
-						}
-					}
-					?>>
+                    foreach ($userSearchRequest['amountOfRooms'] as $value) {
+                        if ($value == "3") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                    ?>>
                     3</label>
                 <label><input type="checkbox" value="4"
                               name="amountOfRooms[]" <?php
-					foreach ($userSearchRequest['amountOfRooms'] as $value) {
-						if ($value == "4") {
-							echo "checked";
-							break;
-						}
-					}
-					?>>
+                    foreach ($userSearchRequest['amountOfRooms'] as $value) {
+                        if ($value == "4") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                    ?>>
                     4</label>
                 <label><input type="checkbox" value="5"
                               name="amountOfRooms[]" <?php
-					foreach ($userSearchRequest['amountOfRooms'] as $value) {
-						if ($value == "5") {
-							echo "checked";
-							break;
-						}
-					}
-					?>>
+                    foreach ($userSearchRequest['amountOfRooms'] as $value) {
+                        if ($value == "5") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                    ?>>
                     5</label>
                 <label><input type="checkbox" value="6"
                               name="amountOfRooms[]" <?php
-					foreach ($userSearchRequest['amountOfRooms'] as $value) {
-						if ($value == "6") {
-							echo "checked";
-							break;
-						}
-					}
-					?>>
+                    foreach ($userSearchRequest['amountOfRooms'] as $value) {
+                        if ($value == "6") {
+                            echo "checked";
+                            break;
+                        }
+                    }
+                    ?>>
                     6...</label>
             </td>
         </tr>
@@ -240,20 +240,20 @@
         Район
     </legend>
     <ul>
-		<?php
-		if (isset($allDistrictsInCity)) {
-			foreach ($allDistrictsInCity as $value) { // Для каждого идентификатора района и названия формируем чекбокс
-				echo "<li><label><input type='checkbox' name='district[]' value='" . $value['name'] . "'";
-				foreach ($userSearchRequest['district'] as $valueDistrict) {
-					if ($valueDistrict == $value['name']) {
-						echo "checked";
-						break;
-					}
-				}
-				echo "> " . $value['name'] . "</label></li>";
-			}
-		}
-		?>
+        <?php
+        if (isset($allDistrictsInCity)) {
+            foreach ($allDistrictsInCity as $value) { // Для каждого идентификатора района и названия формируем чекбокс
+                echo "<li><label><input type='checkbox' name='district[]' value='" . $value['name'] . "'";
+                foreach ($userSearchRequest['district'] as $valueDistrict) {
+                    if ($valueDistrict == $value['name']) {
+                        echo "checked";
+                        break;
+                    }
+                }
+                echo "> " . $value['name'] . "</label></li>";
+            }
+        }
+        ?>
     </ul>
     <div class="clearBoth"></div>
 </fieldset>
@@ -268,9 +268,9 @@
             <td class="itemLabel">
                 Как собираетесь проживать
             </td>
-			<?php
-			if ($mode == "search") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
-			?>
+            <?php
+            if ($mode == "search") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
+            ?>
             <td class="itemBody">
                 <select name="withWho" id="withWho">
                     <option value="0" <?php if ($userSearchRequest['withWho'] == "0") echo "selected";?>></option>
@@ -313,9 +313,9 @@
             <td class="itemLabel">
                 Дети
             </td>
-			<?php
-			if ($mode == "search") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
-			?>
+            <?php
+            if ($mode == "search") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
+            ?>
             <td class="itemBody">
                 <select name="children" id="children">
                     <option value="0" <?php if ($userSearchRequest['children'] == "0") echo "selected";?>></option>
@@ -352,9 +352,9 @@
             <td class="itemLabel">
                 Домашние животные
             </td>
-			<?php
-			if ($mode == "search") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
-			?>
+            <?php
+            if ($mode == "search") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
+            ?>
             <td class="itemBody">
                 <select name="animals" id="animals">
                     <option value="0" <?php if ($userSearchRequest['animals'] == "0") echo "selected";?>></option>
@@ -386,9 +386,9 @@
             <td class="itemLabel">
                 Срок аренды
             </td>
-			<?php
-			if ($mode == "search") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
-			?>
+            <?php
+            if ($mode == "search") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
+            ?>
             <td class="itemBody">
                 <select name="termOfLease" id="termOfLease">
                     <option value="0" <?php if ($userSearchRequest['termOfLease'] == "0") echo "selected";?>></option>
@@ -404,7 +404,7 @@
             </td>
         </tr>
 
-		<?php if ($mode == "registration" || $mode == "personal"): ?>
+        <?php if ($mode == "registration" || $mode == "personal"): ?>
         <tr class="additionalSearchConditions">
             <td class="itemLabel" colspan="3">
                 Дополнительные условия поиска:
@@ -416,7 +416,7 @@
                           rows="4"><?php echo $userSearchRequest['additionalDescriptionOfSearch'];?></textarea>
             </td>
         </tr>
-		<?php endif; ?>
+            <?php endif; ?>
 
         </tbody>
     </table>
@@ -425,13 +425,17 @@
 
 <?php if ($mode == "registration" || $mode == "personal"): ?>
 <div class="edited right" style="margin: 0; padding: 0; border: none; text-align: right;">
-	<label><input type="checkbox" value="1" name="needEmail" <?php if ($userSearchRequest['needEmail'] == 1) echo "checked";?>> Оповещать меня по e-mail о подходящих объявлениях</label>
+    <label><input type="checkbox" value="1"
+                  name="needEmail" <?php if ($userSearchRequest['needEmail'] == 1) echo "checked";?>> Оповещать меня по
+        e-mail о подходящих объявлениях</label>
 </div>
-<?php endif; ?>
+    <?php endif; ?>
 
 <?php if (($mode == "registration" || $mode == "personal") && $isAdmin['searchUser']): ?>
 <div class="edited right" style="margin: 0; padding: 0; border: none; text-align: right;">
-    <label><input type="checkbox" value="0" name="needSMS" <?php if ($userSearchRequest['needSMS'] == 1) echo "checked";?>> Оповещать меня по sms о подходящих объявлениях</label>
+    <label><input type="checkbox" value="0"
+                  name="needSMS" <?php if ($userSearchRequest['needSMS'] == 1) echo "checked";?>> Оповещать меня по sms
+        о подходящих объявлениях</label>
 </div>
     <?php endif; ?>
 

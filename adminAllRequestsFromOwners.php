@@ -27,15 +27,15 @@ $isAdmin = $userIncoming->isAdmin();
 
 // Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
 if (!$userIncoming->login()) {
-	header('Location: login.php');
-	exit();
+    header('Location: login.php');
+    exit();
 }
 
 // Если пользователь не является администратором, то доступ к странице ему запрещен - разавторизуем его и перекинем на главную (в идеале нужно перекидывать на login.php)
 // Кроме того, проверяем, что у данного администратора есть право на поиск пользователей и вход в их Личные кабинеты
 if (!$isAdmin['searchUser']) {
-	header('Location: out.php');
-	exit();
+    header('Location: out.php');
+    exit();
 }
 
 /*************************************************************************************
@@ -56,7 +56,7 @@ if (isset($_GET['requestFromOwnerId'])) $requestFromOwnerId = intval(htmlspecial
  *******************************************************************************/
 
 if ($action == "remove" && $requestFromOwnerId != "" && $requestFromOwnerId != 0) {
-	DBconnect::deleteRequestFromOwnerForId($requestFromOwnerId);
+    DBconnect::deleteRequestFromOwnerForId($requestFromOwnerId);
 }
 
 /********************************************************************************

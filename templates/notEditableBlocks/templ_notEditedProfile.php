@@ -73,14 +73,14 @@
         <li>
             <span class="headOfString">Возраст:</span>
             <?php
-                echo GlobFunc::calculate_age($userCharacteristic['birthday']);
+            echo GlobFunc::calculate_age($userCharacteristic['birthday']);
             ?>
         </li>
         <li>
             <br>
         </li>
 
-    <?php if ($mode == "personal" || $isAdmin['searchUser']): // Контакты показываются в личном кабинете, а также при просмотре анкеты админом, но не при просмотре анкеты арендатора собственником ?>
+        <?php if ($mode == "personal" || $isAdmin['searchUser']): // Контакты показываются в личном кабинете, а также при просмотре анкеты админом, но не при просмотре анкеты арендатора собственником ?>
         <li>
             <span style="font-weight: bold;">Контакты:</span>
         </li>
@@ -97,7 +97,7 @@
         <li>
             <br>
         </li>
-    <?php endif; ?>
+        <?php endif; ?>
 
         <li>
             <span style="font-weight: bold;">Малая Родина:</span>

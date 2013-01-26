@@ -33,7 +33,7 @@
 </head>
 
 <body>
-<div class="page_without_footer">
+<div class="pageWithoutFooter">
 
     <!-- Всплывающее поле для отображения списка ошибок, полученных при проверке данных на сервере (PHP)-->
     <div id="userMistakesBlock" class="ui-widget">
@@ -42,7 +42,7 @@
                 <p>
                     <span class="icon-mistake ui-icon ui-icon-info"></span>
                     <span
-                        id="userMistakesText">Для продолжения, пожалуйста, дополните или исправьте следующие данные:</span>
+                            id="userMistakesText">Для продолжения, пожалуйста, дополните или исправьте следующие данные:</span>
                 </p>
                 <ol><?php
                     if (isset($errors) && count($errors) != 0) {
@@ -56,60 +56,56 @@
     </div>
 
     <?php
-        // Сформируем и вставим заголовок страницы
-	require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+    // Сформируем и вставим заголовок страницы
+    require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
     ?>
 
-    <div class="page_main_content">
-
-
-        <div class="miniBlock">
-            <div class="miniBlockHeader">
-                Введите логин и пароль
-            </div>
-            <div class="miniBlockContent">
-                <form name="loginParol" method="post" action="login.php?action=signIn">
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td><label>Логин: </label></td>
-                                <td>
-                                    <input type="text" name="login" size="23" tabindex="0"
-                                           placeholder=" e-mail или телефон" autofocus>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><label>Пароль: </label></td>
-                                <td>
-                                    <input type="password" name="password" size="23" maxlength="50">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td><a href="passwordRecovery.php">Забыли пароль?</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div>
-                        <button type="submit" id="buttonSubmit" name="buttonSubmit">Войти</button>
-                        <a class="buttonRegistration" href="registration.php">Зарегистрироваться</a>
-                        <div class="clearBoth"></div>
-                    </div>
-                </form>
-            </div>
-            <!-- /end.miniBlockContent -->
-            <div class="clearBoth"></div>
+    <div class="miniBlock">
+        <div class="miniBlockHeader">
+            Введите логин и пароль
         </div>
+        <div class="miniBlockContent">
+            <form name="loginParol" method="post" action="login.php?action=signIn">
+                <table>
+                    <tbody>
+                    <tr>
+                        <td><label>Логин: </label></td>
+                        <td>
+                            <input type="text" name="login" size="23" tabindex="0"
+                                   placeholder=" e-mail или телефон" autofocus>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label>Пароль: </label></td>
+                        <td>
+                            <input type="password" name="password" size="23" maxlength="50">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><a href="passwordRecovery.php">Забыли пароль?</a></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div>
+                    <button type="submit" id="buttonSubmit" name="buttonSubmit">Войти</button>
+                    <a class="buttonRegistration" href="registration.php">Зарегистрироваться</a>
 
+                    <div class="clearBoth"></div>
+                </div>
+            </form>
+        </div>
+        <!-- /end.miniBlockContent -->
+        <div class="clearBoth"></div>
     </div>
-    <!-- /end.page_main_content -->
 
     <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
     <div class="page-buffer"></div>
 </div>
-<!-- /end.page_without_footer -->
+<!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail: support@svobodno.org
+    2013 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
+    support@svobodno.org
 </div>
 <!-- /end.footer -->
 

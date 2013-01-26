@@ -65,27 +65,25 @@
 </head>
 
 <body>
-<div class="page_without_footer">
-    <div class="page_main_content">
-        <div class="headerOfPage">
-            Панель администратора -> Все заявки на просмотр со статусом "<?php echo $action;?>"
-        </div>
+<div class="pageWithoutFooter">
 
-        <div class="simpleBlockForAnyContent">
-			<?php foreach ($allRequestsToView as $requestToView): ?>
-			<?php require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminRequestToViewDetailedItem.php"; ?>
-            <hr>
-			<?php endforeach; ?>
-        </div>
-
+    <div class="headerOfPage">
+        Панель администратора -> Все заявки на просмотр со статусом "<?php echo $action;?>"
     </div>
-    <!-- /end.page_main_content -->
+
+    <div class="simpleBlockForAnyContent">
+        <?php foreach ($allRequestsToView as $requestToView): ?>
+        <?php require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminRequestToViewDetailedItem.php"; ?>
+        <hr>
+        <?php endforeach; ?>
+    </div>
+
     <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
     <div class="page-buffer"></div>
 </div>
-<!-- /end.page_without_footer -->
+<!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
+    2013 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
     support@svobodno.org
 </div>
 <!-- /end.footer -->

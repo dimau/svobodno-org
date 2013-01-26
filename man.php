@@ -30,7 +30,7 @@ if (isset($_GET['compId'])) $compId = intval(htmlspecialchars($_GET['compId'], E
 // Вычисляем истинный идентификатор целевого пользователя из $compId
 $targetUserId = "0";
 if ($compId != "" && $compId != 0) {
-	$targetUserId = GlobFunc::compIdToId($compId); // Получаем идентификатор пользователя для показа его страницы
+    $targetUserId = GlobFunc::compIdToId($compId); // Получаем идентификатор пользователя для показа его страницы
 } else { // Если в строке GET запроса не указан идентификатор интересующего (целевого) пользователя, то пересылаем нашего пользователя на спец. страницу
     // Инициализируем используемые в шаблоне(ах) переменные
     $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
@@ -85,7 +85,7 @@ if (!$userIncoming->login()) {
 $tenantsWithRequestToView = array();
 // Формировать список имеет смысл только, если целевой пользователь на текущий момент времени является арендатором. В ином случае, доступ к анкете целевого пользователя для собственников - закрыт. Таким образом реализуется правило: собственник может видеть только анкеты тех пользователей, которые заинтересовались его недвижимостью и в текущий момент времени являются арендаторами (= имеют поисковый запрос)
 if ($user->isTenant()) {
-	$tenantsWithRequestToView = $userIncoming->getAllTenantsId();
+    $tenantsWithRequestToView = $userIncoming->getAllTenantsId();
 }
 
 // Проверяем, есть ли среди этого списка текущий целевой пользователь ($targetUserId)
@@ -93,8 +93,9 @@ if ($user->isTenant()) {
 // Админы имеют доступ к странице всегда
 $isAdmin = $userIncoming->isAdmin();
 if (!in_array($targetUserId, $tenantsWithRequestToView)
-	AND $userIncoming->getId() != $targetUserId
-	AND !$isAdmin['searchUser']) {
+    AND $userIncoming->getId() != $targetUserId
+        AND !$isAdmin['searchUser']
+) {
 
     // Инициализируем используемые в шаблоне(ах) переменные
     $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php

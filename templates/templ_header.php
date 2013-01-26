@@ -1,11 +1,38 @@
 <div class="header">
-    <div class="nameOfServiceBox">
-        <div>
-            <span class='slogan'>Лучший способ аренды недвижимости!</span>
-            <br>
-            <span class="underslogan">Мы помогаем людям сдать в аренду и снять жилье в Екатеринбурге</span>
+
+    <div class="logoStripe">
+
+        <a href="index.php">
+            <div class="iconBox"></div>
+        </a>
+
+        <div class="enter">
+            <?php
+            if ($isLoggedIn == FALSE) {
+                if ($_SERVER['PHP_SELF'] == "/registration.php") {
+                    echo ("<span>Регистрация</span><br>");
+                } else {
+                    echo ("<a href='registration.php'>Регистрация</a><br>");
+                }
+
+                if ($_SERVER['PHP_SELF'] == "/login.php") {
+                    echo ("<span>Вход</span><br>");
+                } else {
+                    echo ("<a href='login.php'>Вход</a><br>");
+                }
+            } else {
+                if ($_SERVER['PHP_SELF'] == "/personal.php") {
+                    echo ("<span>Личный кабинет</span><br>");
+                } else {
+                    echo ("<a href='personal.php'>Личный кабинет</a><br>");
+                }
+                ?>
+                <a href="out.php">Выйти</a>
+                <br>
+                <?php } ?>
         </div>
     </div>
+
     <div class="menu">
         <ul>
             <?php
@@ -22,7 +49,7 @@
             if ($_SERVER['PHP_SELF'] == "/index.php") {
                 echo ("<li class='selected choice' style='width:" . $width[0] . "%'><span>Главная</span>");
             } else {
-                echo ("<li class='choice' style='width:" . $width[0] . "%'><a href='index.php'>Главная</a>");
+                echo ("<li class='choice ' style='width:" . $width[0] . "%'><a href='index.php'>Главная</a>");
             }
 
             echo "<li class='separator'></li>";
@@ -57,13 +84,13 @@
                 if ($amountUnreadMessages == 0) {
                     $amountUnreadMessagesText = "";
                 } else {
-                    $amountUnreadMessagesText = "<span class='amountOfNewMessagesBlock'> (<span class='amountOfNewMessages'>".$amountUnreadMessages."</span>)</span>";
+                    $amountUnreadMessagesText = "<span class='amountOfNewMessagesBlock'> (<span class='amountOfNewMessages'>" . $amountUnreadMessages . "</span>)</span>";
                 }
 
                 if ($_SERVER['PHP_SELF'] == "/fortenant.php") { // TODO: поменять ссылку, на которую нужно переходить fortenant - cltkfnm c gjvjom. JS правильное выделение ссылки при нахождении на вкладке уведомлений
-                    echo ("<li class='selected choice' style='width:" . $width[3] . "%'><span>Уведомления".$amountUnreadMessagesText."</span>");
+                    echo ("<li class='selected choice' style='width:" . $width[3] . "%'><span>Уведомления" . $amountUnreadMessagesText . "</span>");
                 } else {
-                    echo ("<li class='choice' style='width:" . $width[3] . "%'><a href='personal.php?tabsId=2'>Уведомления".$amountUnreadMessagesText."</a>");
+                    echo ("<li class='choice' style='width:" . $width[3] . "%'><a href='personal.php?tabsId=2'>Уведомления" . $amountUnreadMessagesText . "</a>");
                 }
             }
 
@@ -73,36 +100,10 @@
         </ul>
         <div class="clearBoth"></div>
     </div>
-    <a href="index.php"><div class="iconBox"></div></a>
-    <div class="enter">
-        <?php
-        if ($isLoggedIn == FALSE) {
-            if ($_SERVER['PHP_SELF'] == "/registration.php") {
-                echo ("<span>Регистрация</span><br>");
-            } else {
-                echo ("<a href='registration.php'>Регистрация</a><br>");
-            }
-
-            if ($_SERVER['PHP_SELF'] == "/login.php") {
-                echo ("<span>Вход</span><br>");
-            } else {
-                echo ("<a href='login.php'>Вход</a><br>");
-            }
-        } else {
-            if ($_SERVER['PHP_SELF'] == "/personal.php") {
-                echo ("<span>Личный кабинет</span><br>");
-            } else {
-                echo ("<a href='personal.php'>Личный кабинет</a><br>");
-            }
-        ?>
-        <a href="out.php">Выйти</a>
-        <br>
-        <?php } ?>
-    </div>
 
     <?php
-        // Подключаем шаблон для аналитики посещаемости страниц от гугла
-        require $_SERVER['DOCUMENT_ROOT'] . "/templates/"."templ-googleAnalytics.php";
+    // Подключаем шаблон для аналитики посещаемости страниц от гугла
+    require $_SERVER['DOCUMENT_ROOT'] . "/templates/" . "templ-googleAnalytics.php";
     ?>
 
 </div><!-- /end.header -->

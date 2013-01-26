@@ -5,7 +5,8 @@
     <!-- meta -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="Content-language" content="ru">
-    <meta name="description" content="<?php echo GlobFunc::getFirstCharUpper($propertyCharacteristic['typeOfObject']) . " по адресу: " . $propertyCharacteristic['address']; ?>">
+    <meta name="description"
+          content="<?php echo GlobFunc::getFirstCharUpper($propertyCharacteristic['typeOfObject']) . " по адресу: " . $propertyCharacteristic['address']; ?>">
     <!-- Если у пользователя IE: использовать последний доступный стандартный режим отображения независимо от <!DOCTYPE> -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <!-- Оптимизация отображения на мобильных устройствах -->
@@ -68,11 +69,11 @@
 </head>
 
 <body>
-<div class="page_without_footer">
+<div class="pageWithoutFooter">
 
 <?php
 // Сформируем и вставим заголовок страницы
-	require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
 ?>
 
 <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -96,7 +97,7 @@
             modal:true,
             width:600,
             dialogClass:"edited",
-            draggable: true
+            draggable:true
         });
 
         $(".signUpToViewButton").click(function () {
@@ -174,10 +175,8 @@
     }
 </script>
 
-<div class="page_main_content">
-
 <div class="headerOfPage">
-	<?php echo GlobFunc::getFirstCharUpper($propertyCharacteristic['typeOfObject']) . " по адресу: " . $propertyCharacteristic['address']; ?>
+    <?php echo GlobFunc::getFirstCharUpper($propertyCharacteristic['typeOfObject']) . " по адресу: " . $propertyCharacteristic['address']; ?>
 </div>
 
 <div id="tabs">
@@ -192,20 +191,20 @@
 <div id="tabs-1">
 
 <div>
-	<?php
-	// Формируем и размещаем на странице блок для фотографий объекта недвижимости
-	echo View::getHTMLfotosWrapper("middle", TRUE, FALSE, $propertyFotoInformation['uploadedFoto']);
-	?>
+    <?php
+    // Формируем и размещаем на странице блок для фотографий объекта недвижимости
+    echo View::getHTMLfotosWrapper("middle", TRUE, FALSE, $propertyFotoInformation['uploadedFoto']);
+    ?>
 
     <ul class="setOfInstructions">
-		<?php
-		/* Оформляем пункт меню о Заявке на просмотр */
-		require $_SERVER['DOCUMENT_ROOT'] . "/templates/signUpToViewBlocks/templ_signUpToViewItem.php";
-		?>
+        <?php
+        /* Оформляем пункт меню о Заявке на просмотр */
+        require $_SERVER['DOCUMENT_ROOT'] . "/templates/signUpToViewBlocks/templ_signUpToViewItem.php";
+        ?>
         <li>
-			<?php
-			echo View::getHTMLforFavorites($propertyCharacteristic["id"], $favoritePropertiesId, "stringWithIcon");
-			?>
+            <?php
+            echo View::getHTMLforFavorites($propertyCharacteristic["id"], $favoritePropertiesId, "stringWithIcon");
+            ?>
         </li>
         <!-- TODO: добавить функциональность!
 		<li>
@@ -236,7 +235,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
     <table>
         <tbody>
 
-		<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['amountOfRooms'] != "0"): ?>
+        <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['amountOfRooms'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Кол-во комнат:
@@ -245,9 +244,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['amountOfRooms'];?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-		<?php if ($propertyCharacteristic['amountOfRooms'] != "0" && $propertyCharacteristic['amountOfRooms'] != "1" && $propertyCharacteristic['adjacentRooms'] != "0"): ?>
+        <?php if ($propertyCharacteristic['amountOfRooms'] != "0" && $propertyCharacteristic['amountOfRooms'] != "1" && $propertyCharacteristic['adjacentRooms'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Комнаты смежные:
@@ -256,9 +255,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['adjacentRooms'];?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-		<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "комната" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['adjacentRooms'] != "0" && $propertyCharacteristic['adjacentRooms'] != "нет" && $propertyCharacteristic['amountOfRooms'] != "0" && $propertyCharacteristic['amountOfRooms'] != "1" && $propertyCharacteristic['amountOfRooms'] != "2" && $propertyCharacteristic['amountOfAdjacentRooms'] != "0"): ?>
+        <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "комната" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['adjacentRooms'] != "0" && $propertyCharacteristic['adjacentRooms'] != "нет" && $propertyCharacteristic['amountOfRooms'] != "0" && $propertyCharacteristic['amountOfRooms'] != "1" && $propertyCharacteristic['amountOfRooms'] != "2" && $propertyCharacteristic['amountOfAdjacentRooms'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Кол-во смежных комнат:
@@ -267,9 +266,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['amountOfAdjacentRooms'];?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-		<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['typeOfBathrooms'] != "0"): ?>
+        <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['typeOfBathrooms'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Санузел:
@@ -278,9 +277,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['typeOfBathrooms'];?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-		<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['typeOfBalcony'] != "0"): ?>
+        <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['typeOfBalcony'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Балкон/лоджия:
@@ -289,9 +288,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['typeOfBalcony'];?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-		<?php if ($propertyCharacteristic['typeOfBalcony'] != "0" && $propertyCharacteristic['typeOfBalcony'] != "нет" && $propertyCharacteristic['typeOfBalcony'] != "эркер" && $propertyCharacteristic['typeOfBalcony'] != "2 эркера и более" && $propertyCharacteristic['balconyGlazed'] != "0"): ?>
+        <?php if ($propertyCharacteristic['typeOfBalcony'] != "0" && $propertyCharacteristic['typeOfBalcony'] != "нет" && $propertyCharacteristic['typeOfBalcony'] != "эркер" && $propertyCharacteristic['typeOfBalcony'] != "2 эркера и более" && $propertyCharacteristic['balconyGlazed'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Остекление:
@@ -300,9 +299,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['balconyGlazed'];?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-		<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "квартира" && $propertyCharacteristic['typeOfObject'] != "дом" && $propertyCharacteristic['typeOfObject'] != "таунхаус" && $propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['roomSpace'] != ""): ?>
+        <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "квартира" && $propertyCharacteristic['typeOfObject'] != "дом" && $propertyCharacteristic['typeOfObject'] != "таунхаус" && $propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['roomSpace'] != ""): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Площадь комнаты:
@@ -311,9 +310,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['roomSpace'];?> м²</span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-		<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "комната" && $propertyCharacteristic['totalArea'] != ""): ?>
+        <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "комната" && $propertyCharacteristic['totalArea'] != ""): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Площадь общая:
@@ -322,9 +321,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['totalArea'];?> м²</span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-		<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "комната" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['livingSpace'] != ""): ?>
+        <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "комната" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['livingSpace'] != ""): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Площадь жилая:
@@ -333,9 +332,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['livingSpace'];?> м²</span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-		<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['kitchenSpace'] != ""): ?>
+        <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['kitchenSpace'] != ""): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Площадь кухни:
@@ -344,7 +343,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['kitchenSpace'];?> м²</span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
         </tbody>
     </table>
@@ -357,14 +356,14 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
     <table>
         <tbody>
 
-		<?php if ($propertyCharacteristic['costOfRenting'] != "" && $propertyCharacteristic['costOfRenting'] != "0"): ?>
+        <?php if ($propertyCharacteristic['costOfRenting'] != "" && $propertyCharacteristic['costOfRenting'] != "0"): ?>
         <tr>
             <td class="objectDescriptionItemLabel">Стоимость:</td>
             <td class="objectDescriptionBody"><?php echo "<span>" . $propertyCharacteristic['costOfRenting'] . "</span>" . " " . $propertyCharacteristic['currency'] . " в месяц" ?></td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-		<?php if ($propertyCharacteristic['compensationMoney'] != "" && $propertyCharacteristic['currency'] != "" && $propertyCharacteristic['compensationPercent'] != "" && $propertyCharacteristic['compensationMoney'] != "0" && $propertyCharacteristic['currency'] != "0" && $propertyCharacteristic['compensationPercent'] != "0.00"): ?>
+        <?php if ($propertyCharacteristic['compensationMoney'] != "" && $propertyCharacteristic['currency'] != "" && $propertyCharacteristic['compensationPercent'] != "" && $propertyCharacteristic['compensationMoney'] != "0" && $propertyCharacteristic['currency'] != "0" && $propertyCharacteristic['compensationPercent'] != "0.00"): ?>
         <tr>
             <td class="objectDescriptionItemLabel">
                 Комиссия:
@@ -373,25 +372,25 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['compensationMoney'] . " " . $propertyCharacteristic['currency'] . " (" . $propertyCharacteristic['compensationPercent'] . "%)" ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-		<?php if ($propertyCharacteristic['utilities'] != "" && $propertyCharacteristic['utilities'] != "0"): ?>
+        <?php if ($propertyCharacteristic['utilities'] != "" && $propertyCharacteristic['utilities'] != "0"): ?>
         <tr>
             <td class="objectDescriptionItemLabel">
                 Ком. услуги:
             </td>
             <td class="objectDescriptionBody">
-				<?php if ($propertyCharacteristic['utilities'] == "да"): ?>
+                <?php if ($propertyCharacteristic['utilities'] == "да"): ?>
                 <span>оплачиваются дополнительно<?php if ($propertyCharacteristic['costInSummer'] != "" && $propertyCharacteristic['costInWinter'] != "" && $propertyCharacteristic['currency'] != "" && $propertyCharacteristic['costInSummer'] != "0" && $propertyCharacteristic['costInWinter'] != "0" && $propertyCharacteristic['currency'] != "0") echo ",<br>от " . $propertyCharacteristic['costInSummer'] . " до " . $propertyCharacteristic['costInWinter'] . " " . $propertyCharacteristic['currency'];?></span>
-				<?php endif; ?>
-				<?php if ($propertyCharacteristic['utilities'] == "нет"): ?>
+                <?php endif; ?>
+                <?php if ($propertyCharacteristic['utilities'] == "нет"): ?>
                 <span>включены в стоимость</span>
-				<?php endif; ?>
+                <?php endif; ?>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-		<?php if ($propertyCharacteristic['electricPower'] == "да"): ?>
+        <?php if ($propertyCharacteristic['electricPower'] == "да"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Электроэнергия:
@@ -400,9 +399,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span>оплачивается дополнительно</span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-		<?php if ($propertyCharacteristic['bail'] != "" && $propertyCharacteristic['bail'] != "0"): ?>
+        <?php if ($propertyCharacteristic['bail'] != "" && $propertyCharacteristic['bail'] != "0"): ?>
         <tr>
             <td class="objectDescriptionItemLabel">Залог:</td>
             <td class="objectDescriptionBody">
@@ -414,9 +413,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                </span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-		<?php if ($propertyCharacteristic['prepayment'] != "" && $propertyCharacteristic['prepayment'] != "0"): ?>
+        <?php if ($propertyCharacteristic['prepayment'] != "" && $propertyCharacteristic['prepayment'] != "0"): ?>
         <tr>
             <td class="objectDescriptionItemLabel">
                 Предоплата:
@@ -425,7 +424,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['prepayment']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
         </tbody>
     </table>
@@ -439,7 +438,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
     <table>
         <tbody>
 
-			<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "дом" && $propertyCharacteristic['typeOfObject'] != "таунхаус" && $propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['floor'] != "" && $propertyCharacteristic['totalAmountFloor'] != "" && $propertyCharacteristic['floor'] != "0" && $propertyCharacteristic['totalAmountFloor'] != "0"): ?>
+            <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "дом" && $propertyCharacteristic['typeOfObject'] != "таунхаус" && $propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['floor'] != "" && $propertyCharacteristic['totalAmountFloor'] != "" && $propertyCharacteristic['floor'] != "0" && $propertyCharacteristic['totalAmountFloor'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Этаж:
@@ -448,9 +447,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['floor'] . " из " . $propertyCharacteristic['totalAmountFloor']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-			<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "квартира" && $propertyCharacteristic['typeOfObject'] != "комната" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['numberOfFloor'] != "" && $propertyCharacteristic['numberOfFloor'] != "0"): ?>
+            <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "квартира" && $propertyCharacteristic['typeOfObject'] != "комната" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['numberOfFloor'] != "" && $propertyCharacteristic['numberOfFloor'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Этажность дома:
@@ -459,9 +458,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['numberOfFloor']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-			<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "дом" && $propertyCharacteristic['typeOfObject'] != "таунхаус" && $propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['concierge'] != "" && $propertyCharacteristic['concierge'] != "0"): ?>
+            <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "дом" && $propertyCharacteristic['typeOfObject'] != "таунхаус" && $propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['concierge'] != "" && $propertyCharacteristic['concierge'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Консьерж:
@@ -470,9 +469,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['concierge']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-			<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['intercom'] != "" && $propertyCharacteristic['intercom'] != "0"): ?>
+            <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['intercom'] != "" && $propertyCharacteristic['intercom'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Домофон:
@@ -481,9 +480,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['intercom']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-			<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['parking'] != "" && $propertyCharacteristic['parking'] != "0"): ?>
+            <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['parking'] != "" && $propertyCharacteristic['parking'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Парковка во дворе:
@@ -492,12 +491,12 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['parking']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
         </tbody>
     </table>
 </div>
-	<?php endif; ?>
+    <?php endif; ?>
 
 <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж"): ?>
 <div class="notEdited right">
@@ -507,7 +506,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
     <table>
         <tbody>
 
-			<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['repair'] != "" && $propertyCharacteristic['repair'] != "0"): ?>
+            <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['repair'] != "" && $propertyCharacteristic['repair'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Ремонт:
@@ -516,9 +515,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['repair']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-			<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['furnish'] != "" && $propertyCharacteristic['furnish'] != "0"): ?>
+            <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['furnish'] != "" && $propertyCharacteristic['furnish'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Отделка:
@@ -527,9 +526,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['furnish']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-			<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['windows'] != "" && $propertyCharacteristic['windows'] != "0"): ?>
+            <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['windows'] != "" && $propertyCharacteristic['windows'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Окна:
@@ -538,12 +537,12 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['windows']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
         </tbody>
     </table>
 </div>
-	<?php endif; ?>
+    <?php endif; ?>
 
 <div class="notEdited left">
     <div class='legend'>
@@ -552,7 +551,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
     <table>
         <tbody>
 
-		<?php if ($propertyCharacteristic['typeOfObject'] != "" && $propertyCharacteristic['typeOfObject'] != "0"): ?>
+        <?php if ($propertyCharacteristic['typeOfObject'] != "" && $propertyCharacteristic['typeOfObject'] != "0"): ?>
         <tr>
             <td class="objectDescriptionItemLabel">
                 Тип объекта:
@@ -561,9 +560,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['typeOfObject']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-		<?php if ($propertyCharacteristic['dateOfEntry'] != "" && $propertyCharacteristic['dateOfEntry'] != "0000-00-00"): ?>
+        <?php if ($propertyCharacteristic['dateOfEntry'] != "" && $propertyCharacteristic['dateOfEntry'] != "0000-00-00"): ?>
         <tr>
             <td class="objectDescriptionItemLabel">
                 Дата въезда:
@@ -572,9 +571,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['dateOfEntry']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-		<?php if ($propertyCharacteristic['termOfLease'] != "" && $propertyCharacteristic['termOfLease'] != "0"): ?>
+        <?php if ($propertyCharacteristic['termOfLease'] != "" && $propertyCharacteristic['termOfLease'] != "0"): ?>
         <tr>
             <td class="objectDescriptionItemLabel">
                 Срок аренды:
@@ -583,9 +582,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['termOfLease']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-		<?php if ($propertyCharacteristic['termOfLease'] != "0" && $propertyCharacteristic['termOfLease'] != "длительный срок" && $propertyCharacteristic['dateOfCheckOut'] != "" && $propertyCharacteristic['dateOfCheckOut'] != "0000-00-00"): ?>
+        <?php if ($propertyCharacteristic['termOfLease'] != "0" && $propertyCharacteristic['termOfLease'] != "длительный срок" && $propertyCharacteristic['dateOfCheckOut'] != "" && $propertyCharacteristic['dateOfCheckOut'] != "0000-00-00"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Сдается до:
@@ -594,7 +593,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['dateOfCheckOut']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
         </tbody>
     </table>
@@ -608,7 +607,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
     <table>
         <tbody>
 
-			<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['internet'] != "" && $propertyCharacteristic['internet'] != "0"): ?>
+            <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['internet'] != "" && $propertyCharacteristic['internet'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Интернет:
@@ -617,9 +616,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['internet']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-			<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['telephoneLine'] != "" && $propertyCharacteristic['telephoneLine'] != "0"): ?>
+            <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['telephoneLine'] != "" && $propertyCharacteristic['telephoneLine'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Телефон:
@@ -628,9 +627,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['telephoneLine']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-			<?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['cableTV'] != "" && $propertyCharacteristic['cableTV'] != "0"): ?>
+            <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['cableTV'] != "" && $propertyCharacteristic['cableTV'] != "0"): ?>
         <tr>
             <td class='objectDescriptionItemLabel'>
                 Кабельное ТВ:
@@ -639,12 +638,12 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['cableTV']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
         </tbody>
     </table>
 </div>
-	<?php endif; ?>
+    <?php endif; ?>
 
 <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж"): ?>
 <div class="notEdited left">
@@ -654,76 +653,76 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
     <table>
         <tbody>
 
-			<?php if (is_array($furnitureInLivingArea) && (count($furnitureInLivingArea) != 0 || $propertyCharacteristic['completeness'] == "1")): ?>
+            <?php if (is_array($furnitureInLivingArea) && (count($furnitureInLivingArea) != 0 || $propertyCharacteristic['completeness'] == "1")): ?>
         <tr>
             <td class="objectDescriptionItemLabel">
                 В жилой зоне:
             </td>
             <td class="objectDescriptionBody">
                 <ul class="furnitureList">
-					<?php foreach ($furnitureInLivingArea as $value): ?>
+                    <?php foreach ($furnitureInLivingArea as $value): ?>
                     <li>
-						<?php echo $value; ?>
+                        <?php echo $value; ?>
                     </li>
-					<?php endforeach; ?>
-					<?php if ($propertyCharacteristic['completeness'] == "1" && count($furnitureInLivingArea) == 0): ?>
+                    <?php endforeach; ?>
+                    <?php if ($propertyCharacteristic['completeness'] == "1" && count($furnitureInLivingArea) == 0): ?>
                     <li>
                         <span>нет</span>
                     </li>
-					<?php endif; ?>
+                    <?php endif; ?>
                 </ul>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-			<?php if (is_array($furnitureInKitchen) && (count($furnitureInKitchen) != 0 || $propertyCharacteristic['completeness'] == "1")): ?>
+            <?php if (is_array($furnitureInKitchen) && (count($furnitureInKitchen) != 0 || $propertyCharacteristic['completeness'] == "1")): ?>
         <tr>
             <td class="objectDescriptionItemLabel">
                 На кухне:
             </td>
             <td class="objectDescriptionBody">
                 <ul class="furnitureList">
-					<?php foreach ($furnitureInKitchen as $value): ?>
+                    <?php foreach ($furnitureInKitchen as $value): ?>
                     <li>
-						<?php echo $value; ?>
+                        <?php echo $value; ?>
                     </li>
-					<?php endforeach; ?>
-					<?php if ($propertyCharacteristic['completeness'] == "1" && count($furnitureInKitchen) == 0): ?>
+                    <?php endforeach; ?>
+                    <?php if ($propertyCharacteristic['completeness'] == "1" && count($furnitureInKitchen) == 0): ?>
                     <li>
                         <span>нет</span>
                     </li>
-					<?php endif; ?>
+                    <?php endif; ?>
                 </ul>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-			<?php if (is_array($appliances) && (count($appliances) != 0 || $propertyCharacteristic['completeness'] == "1")): ?>
+            <?php if (is_array($appliances) && (count($appliances) != 0 || $propertyCharacteristic['completeness'] == "1")): ?>
         <tr>
             <td class="objectDescriptionItemLabel">
                 Быт. техника:
             </td>
             <td class="objectDescriptionBody">
                 <ul class="furnitureList">
-					<?php foreach ($appliances as $value): ?>
+                    <?php foreach ($appliances as $value): ?>
                     <li>
-						<?php echo $value; ?>
+                        <?php echo $value; ?>
                     </li>
-					<?php endforeach; ?>
-					<?php if ($propertyCharacteristic['completeness'] == "1" && count($appliances) == 0): ?>
+                    <?php endforeach; ?>
+                    <?php if ($propertyCharacteristic['completeness'] == "1" && count($appliances) == 0): ?>
                     <li>
                         <span>нет</span>
                     </li>
-					<?php endif; ?>
+                    <?php endif; ?>
                 </ul>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
         </tbody>
     </table>
 </div>
-	<?php endif; ?>
+    <?php endif; ?>
 
 <?php if ($propertyCharacteristic['typeOfObject'] != "0" && $propertyCharacteristic['typeOfObject'] != "гараж"): ?>
 <div class="notEdited right">
@@ -733,27 +732,27 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
     <table>
         <tbody>
 
-			<?php if (is_array($propertyCharacteristic['relations']) && (count($propertyCharacteristic['relations']) != 0 || $propertyCharacteristic['completeness'] == "1")): ?>
+            <?php if (is_array($propertyCharacteristic['relations']) && (count($propertyCharacteristic['relations']) != 0 || $propertyCharacteristic['completeness'] == "1")): ?>
         <tr>
             <td class="objectDescriptionItemLabel">
                 Кто может проживать:
             </td>
             <td class="objectDescriptionBody">
                 <ul class="furnitureList">
-					<?php foreach ($propertyCharacteristic['relations'] as $value): ?>
+                    <?php foreach ($propertyCharacteristic['relations'] as $value): ?>
                     <li>
-						<?php
-                            echo $value;
-                            if ($value == "один человек" && count($propertyCharacteristic['sexOfTenant']) == 1) echo " (".$propertyCharacteristic['sexOfTenant'][0].")";
+                        <?php
+                        echo $value;
+                        if ($value == "один человек" && count($propertyCharacteristic['sexOfTenant']) == 1) echo " (" . $propertyCharacteristic['sexOfTenant'][0] . ")";
                         ?>
                     </li>
-					<?php endforeach; ?>
+                    <?php endforeach; ?>
                 </ul>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-			<?php if ($propertyCharacteristic['children'] != "" && $propertyCharacteristic['children'] != "0"): ?>
+            <?php if ($propertyCharacteristic['children'] != "" && $propertyCharacteristic['children'] != "0"): ?>
         <tr>
             <td class="objectDescriptionItemLabel">
                 Дети:
@@ -762,9 +761,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['children']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
-			<?php if ($propertyCharacteristic['animals'] != "" && $propertyCharacteristic['animals'] != "0"): ?>
+            <?php if ($propertyCharacteristic['animals'] != "" && $propertyCharacteristic['animals'] != "0"): ?>
         <tr>
             <td class="objectDescriptionItemLabel">
                 Животные:
@@ -773,12 +772,12 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 <span><?php echo $propertyCharacteristic['animals']; ?></span>
             </td>
         </tr>
-			<?php endif; ?>
+            <?php endif; ?>
 
         </tbody>
     </table>
 </div>
-	<?php endif; ?>
+    <?php endif; ?>
 
 <div class="notEdited both">
     <div class='legend'>
@@ -795,9 +794,9 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 </span>
             </td>
         </tr>
-        <?php endif; ?>
+            <?php endif; ?>
 
-		<?php if ($propertyCharacteristic['checking'] != "" && $propertyCharacteristic['checking'] != "0"): ?>
+        <?php if ($propertyCharacteristic['checking'] != "" && $propertyCharacteristic['checking'] != "0"): ?>
         <tr>
             <td colspan="2">
                 Где проживает собственник:
@@ -806,7 +805,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 </span>
             </td>
         </tr>
-	    <?php endif; ?>
+            <?php endif; ?>
 
         <?php if ($isAdmin['searchUser']): ?>
         <tr>
@@ -817,7 +816,7 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
                 </a>
             </td>
         </tr>
-        <?php endif; ?>
+            <?php endif; ?>
 
         </tbody>
     </table>
@@ -831,14 +830,14 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
     <div id="mapForAdvertView" style="width: 50%; min-width: 300px; height: 400px; float: left;"></div>
 
     <ul class="setOfInstructions">
-		<?php
-		/* Оформляем пункт меню о Заявке на просмотр */
-		require $_SERVER['DOCUMENT_ROOT'] . "/templates/signUpToViewBlocks/templ_signUpToViewItem.php";
-		?>
+        <?php
+        /* Оформляем пункт меню о Заявке на просмотр */
+        require $_SERVER['DOCUMENT_ROOT'] . "/templates/signUpToViewBlocks/templ_signUpToViewItem.php";
+        ?>
         <li>
-			<?php
-			echo View::getHTMLforFavorites($propertyCharacteristic["id"], $favoritePropertiesId, "stringWithIcon");
-			?>
+            <?php
+            echo View::getHTMLforFavorites($propertyCharacteristic["id"], $favoritePropertiesId, "stringWithIcon");
+            ?>
         </li>
         <!-- TODO: добавить функциональность!
 		<li>
@@ -858,31 +857,31 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
             <tbody>
             <tr>
                 <td class="objectDescriptionItemLabel">
-					Город:
-				</td>
+                    Город:
+                </td>
                 <td class="objectDescriptionBody">
                     <span><?php echo $propertyCharacteristic['city'];?></span>
                 </td>
             </tr>
             <tr>
                 <td class="objectDescriptionItemLabel">
-					Район:
-				</td>
+                    Район:
+                </td>
                 <td class="objectDescriptionBody">
-					<span><?php if ($propertyCharacteristic['district'] != "" && $propertyCharacteristic['district'] != "0") echo $propertyCharacteristic['district'];?></span>
-				</td>
+                    <span><?php if ($propertyCharacteristic['district'] != "" && $propertyCharacteristic['district'] != "0") echo $propertyCharacteristic['district'];?></span>
+                </td>
             </tr>
             <tr>
                 <td class="objectDescriptionItemLabel">
-					Адрес:
-				</td>
+                    Адрес:
+                </td>
                 <td class="objectDescriptionBody">
                     <span><?php echo $propertyCharacteristic['address'];?></span>
                 </td>
             </tr>
-			<?php
-			if ($propertyCharacteristic['subwayStation'] != "0" && $propertyCharacteristic['subwayStation'] != "нет") echo "<tr><td class='objectDescriptionItemLabel'>Станция метро рядом:</td><td class='objectDescriptionBody'><span>" . $propertyCharacteristic['subwayStation'] . ",<br>" . $propertyCharacteristic['distanceToMetroStation'] . " мин. ходьбы" . "</span></td></tr>";
-			?>
+            <?php
+            if ($propertyCharacteristic['subwayStation'] != "0" && $propertyCharacteristic['subwayStation'] != "нет") echo "<tr><td class='objectDescriptionItemLabel'>Станция метро рядом:</td><td class='objectDescriptionBody'><span>" . $propertyCharacteristic['subwayStation'] . ",<br>" . $propertyCharacteristic['distanceToMetroStation'] . " мин. ходьбы" . "</span></td></tr>";
+            ?>
             </tbody>
         </table>
     </div>
@@ -896,14 +895,12 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
 if ($isLoggedIn === FALSE) require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_addToFavotitesDialog_ForLoggedOut.php";
 ?>
 
-</div>
-<!-- /end.page_main_content -->
 <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
 <div class="page-buffer"></div>
 </div>
-<!-- /end.page_without_footer -->
+<!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
+    2013 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
     support@svobodno.org
 </div>
 <!-- /end.footer -->

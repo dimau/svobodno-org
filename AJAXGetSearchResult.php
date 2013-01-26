@@ -21,8 +21,8 @@ if (!isset($propertiesId) || !is_array($propertiesId) || count($propertiesId) ==
 // Выдаем значения максимум по 20-ти объектам за раз
 if (count($propertiesId) > 20) $propertiesId = array_slice($propertiesId, 0, 20);
 for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
-	$propertiesId[$i] = intval($propertiesId[$i]);
-	if ($propertiesId[$i] == 0) die("Входные данные не корректны"); // TODO: вывести сообщение об ошибке или пустые данные
+    $propertiesId[$i] = intval($propertiesId[$i]);
+    if ($propertiesId[$i] == 0) die("Входные данные не корректны"); // TODO: вывести сообщение об ошибке или пустые данные
 }
 if (!isset($typeOperation) || ($typeOperation != "FullBalloons" && $typeOperation != "FullData")) die("Входные данные не корректны"); // TODO: вывести сообщение об ошибке или пустые данные
 if ($typeOperation == "FullData" && !isset($number)) die("Входные данные не корректны"); // TODO: вывести сообщение об ошибке или пустые данные
@@ -65,17 +65,17 @@ $favoritePropertiesId = $userIncoming->getFavoritePropertiesId();
 // Из полученного массива с подробными данными по объектам нужно сформировать ассоциированный массив, в качестве ключей в котором будут выступать id объектов недвижимости, а в качестве значений - HTML для баллунов
 $arrayOfBalloonList = array();
 if (is_array($propertyFullArr) && count($propertyFullArr) != 0) {
-	foreach ($propertyFullArr as $value) {
-		$arrayOfBalloonList[$value['id']] = View::getFullBalloonHTML($value, $favoritePropertiesId);
-	}
+    foreach ($propertyFullArr as $value) {
+        $arrayOfBalloonList[$value['id']] = View::getFullBalloonHTML($value, $favoritePropertiesId);
+    }
 }
 
 if ($typeOperation == "FullData" && is_array($propertyFullArr) && count($propertyFullArr) != 0) {
-	$matterOfShortList = View::getMatterOfShortList($propertyFullArr, $favoritePropertiesId, $number + 1, "search");
-	$matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullArr, $favoritePropertiesId, $number + 1, "search");
+    $matterOfShortList = View::getMatterOfShortList($propertyFullArr, $favoritePropertiesId, $number + 1, "search");
+    $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullArr, $favoritePropertiesId, $number + 1, "search");
 } else {
-	$matterOfShortList = "";
-	$matterOfFullParametersList = "";
+    $matterOfShortList = "";
+    $matterOfFullParametersList = "";
 }
 
 /*************************************************************************************

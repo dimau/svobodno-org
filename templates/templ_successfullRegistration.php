@@ -2,7 +2,7 @@
 <html>
 <head>
 
-	<!-- meta -->
+    <!-- meta -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="Content-language" content="ru">
     <meta name="description" content="Успешное окончание регистрации">
@@ -10,7 +10,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <!-- Оптимизация отображения на мобильных устройствах -->
     <!--<meta name="viewport" content="initialscale=1.0, width=device-width">-->
- 	<!-- end meta -->
+    <!-- end meta -->
 
     <title>Успешная регистрация</title>
 
@@ -44,47 +44,44 @@
 </head>
 
 <body>
-<div class="page_without_footer">
+<div class="pageWithoutFooter">
 
     <?php
-        // Сформируем и вставим заголовок страницы
-		require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+    // Сформируем и вставим заголовок страницы
+    require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
     ?>
 
-    <div class="page_main_content">
-        <div class="miniBlock">
-            <div class="miniBlockHeader">
-                Вы успешно зарегистрировались на портале Svobodno.org!
-            </div>
-            <div class="miniBlockContent">
-                <div class="text">
-                    <p style="text-align: left;">
-                        <?php
-                            if ($url_initial != "" && $url_initial != "http://svobodno.org/index.php" && $url_initial != "http://localhost/index.php" && $url_initial != "http://svobodno.org/" && $url_initial != "http://localhost/") {
-                                echo "<a href='".$url_initial."'>Вернуться на страницу</a>, с которой Вы перешли к регистрации";
-                            } else {
-                                echo "Воспользоваться <a href='search.php'>Поиском недвижимости</a>";
-                            }
-                        ?>
-                    </p>
-
-                    <p style="text-align: left;">
-                        Либо посетить <a href="personal.php">Личный кабинет</a>
-                    </p>
-                </div>
-            </div>
-            <div style="clear:both;"></div>
+    <div class="miniBlock">
+        <div class="miniBlockHeader">
+            Вы успешно зарегистрировались на портале Svobodno.org!
         </div>
+        <div class="miniBlockContent">
+            <div class="text">
+                <p style="text-align: left;">
+                    <?php
+                    if ($url_initial != "" && $url_initial != "http://svobodno.org/index.php" && $url_initial != "http://localhost/index.php" && $url_initial != "http://svobodno.org/" && $url_initial != "http://localhost/") {
+                        echo "<a href='" . $url_initial . "'>Вернуться на страницу</a>, с которой Вы перешли к регистрации";
+                    } else {
+                        echo "Воспользоваться <a href='search.php'>Поиском недвижимости</a>";
+                    }
+                    ?>
+                </p>
 
+                <p style="text-align: left;">
+                    Либо посетить <a href="personal.php">Личный кабинет</a>
+                </p>
+            </div>
+        </div>
+        <div style="clear:both;"></div>
     </div>
-    <!-- /end.page_main_content -->
 
     <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
     <div class="page-buffer"></div>
 </div>
-<!-- /end.page_without_footer -->
+<!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail: support@svobodno.org
+    2013 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
+    support@svobodno.org
 </div>
 <!-- /end.footer -->
 

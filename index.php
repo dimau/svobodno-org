@@ -25,7 +25,7 @@ $isLoggedIn = $userIncoming->login(); // Используется в templ_heade
 $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 
 // Подсоединяем нужный основной шаблон
-require $_SERVER['DOCUMENT_ROOT'] . "/templates/"."templ_index.php";
+require $_SERVER['DOCUMENT_ROOT'] . "/templates/" . "templ_index.php";
 
 /********************************************************************************
  * Закрываем соединение с БД

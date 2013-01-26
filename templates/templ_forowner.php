@@ -21,7 +21,7 @@
     <!-- CSS -->
     <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
     <link rel="stylesheet" href="css/main.css">
-	<!-- end CSS -->
+    <!-- end CSS -->
 
     <!-- JS -->
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -37,7 +37,7 @@
 </head>
 
 <body>
-<div class="page_without_footer">
+<div class="pageWithoutFooter">
 
     <!-- Всплывающее поле для отображения списка ошибок, полученных при проверке данных на сервере (PHP)-->
     <div id="userMistakesBlock" class="ui-widget">
@@ -49,138 +49,139 @@
                         id="userMistakesText">Для продолжения, пожалуйста, дополните или исправьте следующие данные:</span>
                 </p>
                 <ol><?php
-					if (is_array($errors) && count($errors) != 0) {
-						foreach ($errors as $key => $value) {
-							echo "<li>$value</li>";
-						}
-					}
-					?></ol>
+                    if (is_array($errors) && count($errors) != 0) {
+                        foreach ($errors as $key => $value) {
+                            echo "<li>$value</li>";
+                        }
+                    }
+                    ?></ol>
             </div>
         </div>
     </div>
 
     <?php
-        // Сформируем и вставим заголовок страницы
-	require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+    // Сформируем и вставим заголовок страницы
+    require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
     ?>
 
-    <div class="page_main_content">
+    <div class="headerOfPage">
+        Поможем сдать Вашу недвижимость!
+    </div>
 
-        <div class="headerOfPage">
-            Поможем сдать Вашу недвижимость!
-        </div>
+    <div class="edited left simpleBlockForAnyContent" style="min-width: 430px;">
 
-        <div class="edited left simpleBlockForAnyContent" style="min-width: 430px;">
+        <?php if (!isset($errors) || (is_array($errors) && count($errors) != 0)): ?>
+        <form name="requestFromOwnerForm" id="requestFromOwnerForm" method="post"
+              action="forowner.php?action=takeRequest">
+            <table>
+                <tbody>
+                <tr>
+                    <td class="itemLabel">
+                        Как к Вам обращаться
+                    </td>
+                    <td class="itemRequired">
+                        *
+                    </td>
+                    <td class="itemBody">
+                        <input type="text" name="name" id="name" maxlength="100"
+                               value="<?php echo $requestFromOwnerData['name']; ?>">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="itemLabel">
+                        Ваш контактный номер
+                    </td>
+                    <td class="itemRequired">
+                        *
+                    </td>
+                    <td class="itemBody">
+                        <input type="text" name="telephon" id="telephon" maxlength="20"
+                               value="<?php echo $requestFromOwnerData['telephon']; ?>">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="itemLabel">
+                        Адрес недвижимости
+                    </td>
+                    <td class="itemRequired">
+                        *
+                    </td>
+                    <td class="itemBody">
+                        <input type="text" name="address" id="address" maxlength="60"
+                               value="<?php echo $requestFromOwnerData['address']; ?>">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="itemLabel">
+                        Комментарий:
+                    </td>
+                    <td class="itemRequired">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <textarea name="commentOwner" rows="4"
+                                  title="Например, в какое время Вам будет удобно принять наш звонок"><?php echo $requestFromOwnerData['commentOwner']; ?></textarea>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
 
-            <?php if (!isset($errors) || (is_array($errors) && count($errors) != 0)): ?>
-            <form name="requestFromOwnerForm" id="requestFromOwnerForm" method="post" action="forowner.php?action=takeRequest">
-                <table>
-                    <tbody>
-                        <tr>
-                            <td class="itemLabel">
-                                Как к Вам обращаться
-                            </td>
-                            <td class="itemRequired">
-                                *
-                            </td>
-                            <td class="itemBody">
-                                <input type="text" name="name" id="name" maxlength="100" value="<?php echo $requestFromOwnerData['name']; ?>">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="itemLabel">
-                                Ваш контактный номер
-                            </td>
-                            <td class="itemRequired">
-                                *
-                            </td>
-                            <td class="itemBody">
-                                <input type="text" name="telephon" id="telephon" maxlength="20" value="<?php echo $requestFromOwnerData['telephon']; ?>">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="itemLabel">
-                                Адрес недвижимости
-                            </td>
-                            <td class="itemRequired">
-                                *
-                            </td>
-                            <td class="itemBody">
-                                <input type="text" name="address" id="address" maxlength="60" value="<?php echo $requestFromOwnerData['address']; ?>">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="itemLabel">
-                                Комментарий:
-                            </td>
-                            <td class="itemRequired">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">
-                                <textarea name="commentOwner" rows="4"
-                                          title="Например, в какое время Вам будет удобно принять наш звонок"><?php echo $requestFromOwnerData['commentOwner']; ?></textarea>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div class="bottomButton">
-                    <button type="submit" name="submitButton" id="submitButton" class="button mainButton">
-                        Отправить заявку
-                    </button>
-                </div>
-
-                <div class="clearBoth"></div>
-            </form>
-            <?php endif; ?>
-
-            <?php if (is_array($errors) && count($errors) == 0): ?>
-            <div>
-                <span style="font-size: 0.9em;">Запрос успешно передан</span><br><br>
-                <span>Спасибо за Ваше доверие, мы приложим все усилия, чтобы его оправдать!</span>
+            <div class="bottomButton">
+                <button type="submit" name="submitButton" id="submitButton" class="button mainButton">
+                    Отправить заявку
+                </button>
             </div>
-            <?php endif; ?>
 
-        </div>
-
-        <div class="simpleBlockForAnyContent" style="float: left; width: 48.5%; min-width: 430px; margin-top: 10px; margin-bottom: 10px; margin-left: 1.4%; text-align: left;">
-            <div class="localHeader">
-                Что будет дальше?
-            </div>
-            <ul class="simpleTextList">
-                <li>
-                    В течение дня Вам перезвонит оператор и уточнит удобное время для выезда специалиста
-                </li>
-                <li>
-                    Наш специалист приедет и сформирует подробное объявление по Вашему объекту
-                </li>
-                <li>
-                    Объявление попадет на все основные интернет-ресурсы города для привлечения арендаторов
-                </li>
-                <li>
-                    Заинтересовавшиеся арендаторы заполнят подробные анкеты, которые будут доступны для просмотра в
-                    Вашем личном кабинете
-                </li>
-                <li>
-                    Понравившийся Вам арендатор приедет вместе с нашим специалистом на просмотр и заключение
-                    договора
-                </li>
-                <li>
-                    В итоге: недвижимость сдана порядочным людям, которых Вы выберете сами с минимальными усилиями!
-                </li>
-            </ul>
             <div class="clearBoth"></div>
+        </form>
+        <?php endif; ?>
+
+        <?php if (is_array($errors) && count($errors) == 0): ?>
+        <div>
+            <span style="font-size: 0.9em;">Запрос успешно передан</span><br><br>
+            <span>Спасибо за Ваше доверие, мы приложим все усилия, чтобы его оправдать!</span>
         </div>
+        <?php endif; ?>
 
     </div>
-    <!-- /end.page_main_content -->
+
+    <div class="simpleBlockForAnyContent"
+         style="float: left; width: 48.5%; min-width: 430px; margin-top: 10px; margin-bottom: 10px; margin-left: 1.4%; text-align: left;">
+        <div class="localHeader">
+            Что будет дальше?
+        </div>
+        <ul class="simpleTextList">
+            <li>
+                В течение дня Вам перезвонит оператор и уточнит удобное время для выезда специалиста
+            </li>
+            <li>
+                Наш специалист приедет и сформирует подробное объявление по Вашему объекту
+            </li>
+            <li>
+                Объявление попадет на все основные интернет-ресурсы города для привлечения арендаторов
+            </li>
+            <li>
+                Заинтересовавшиеся арендаторы заполнят подробные анкеты, которые будут доступны для просмотра в
+                Вашем личном кабинете
+            </li>
+            <li>
+                Понравившийся Вам арендатор приедет вместе с нашим специалистом на просмотр и заключение
+                договора
+            </li>
+            <li>
+                В итоге: недвижимость сдана порядочным людям, которых Вы выберете сами с минимальными усилиями!
+            </li>
+        </ul>
+        <div class="clearBoth"></div>
+    </div>
+
     <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
     <div class="page-buffer"></div>
 </div>
-<!-- /end.page_without_footer -->
+<!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
+    2013 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
     support@svobodno.org
 </div>
 <!-- /end.footer -->
@@ -188,12 +189,12 @@
 <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
 <script src="js/main.js"></script>
 <script>
-	// JS проверка формы перед отправкой на сервер
-    $("#requestFromOwnerForm").on('submit', function() {
+    // JS проверка формы перед отправкой на сервер
+    $("#requestFromOwnerForm").on('submit', function () {
         if (executeValidation("forowner") != 0) {
-			return false;
+            return false;
         } else {
-			return true;
+            return true;
         }
     });
 </script>

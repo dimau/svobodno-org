@@ -25,12 +25,12 @@ $isAdmin = $userIncoming->isAdmin();
 
 // Проверяем, залогинен ли пользователь, если нет - то отказываем в доступе
 if (!$userIncoming->login()) {
-	GlobFunc::accessDenied();
+    GlobFunc::accessDenied();
 }
 
 // Если пользователь не является администратором, то доступ к скрипту ему запрещен
 if (!$isAdmin['searchUser']) {
-	GlobFunc::accessDenied();
+    GlobFunc::accessDenied();
 }
 
 /*************************************************************************************
@@ -49,10 +49,10 @@ if (isset($_POST['action'])) $action = htmlspecialchars($_POST['action'], ENT_QU
 // Новые значения, которые нужно присвоить параметрам объекта недвижимости
 $newValueArr = array();
 if (isset($_POST['newValueArr'])) {
-	$newValueArr = json_decode($_POST['newValueArr'], TRUE);
-	foreach ($newValueArr as $value) {
-		$value = htmlspecialchars($value, ENT_QUOTES);
-	}
+    $newValueArr = json_decode($_POST['newValueArr'], TRUE);
+    foreach ($newValueArr as $value) {
+        $value = htmlspecialchars($value, ENT_QUOTES);
+    }
 }
 
 // Если в запросе не указан идентификатор объекта недвижимости или команда, которую нужно выполнить, то отказываем в доступе
@@ -72,12 +72,12 @@ if (!$property->readCharacteristicFromDB()) GlobFunc::accessDenied();
  *************************************************************************************/
 
 if ($action == "changeEarliestDate") {
-	if ($property->changeEarliestDate($newValueArr['earliestDate'], $newValueArr['earliestTimeHours'], $newValueArr['earliestTimeMinutes'])) {
-		// Параметры объекта сохраняются в БД только в том случае, если удалось успешно изменить дату и время ближайшего просмотра
-		if (!$property->saveCharacteristicToDB("edit")) GlobFunc::accessDenied();
-	} else {
-		GlobFunc::accessDenied();
-	}
+    if ($property->changeEarliestDate($newValueArr['earliestDate'], $newValueArr['earliestTimeHours'], $newValueArr['earliestTimeMinutes'])) {
+        // Параметры объекта сохраняются в БД только в том случае, если удалось успешно изменить дату и время ближайшего просмотра
+        if (!$property->saveCharacteristicToDB("edit")) GlobFunc::accessDenied();
+    } else {
+        GlobFunc::accessDenied();
+    }
 }
 
 /*************************************************************************************
@@ -85,7 +85,7 @@ if ($action == "changeEarliestDate") {
  *************************************************************************************/
 
 if ($action == "unpublishAdvert") {
-	if (count($property->unpublishAdvert()) != 0) GlobFunc::accessDenied();
+    if (count($property->unpublishAdvert()) != 0) GlobFunc::accessDenied();
 }
 
 /*************************************************************************************

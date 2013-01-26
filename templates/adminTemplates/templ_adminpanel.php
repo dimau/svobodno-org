@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
-        /* =============================================================================
+            /* =============================================================================
             АДМИНКА
            ========================================================================== */
 
@@ -84,58 +84,59 @@
 </head>
 
 <body>
-<div class="page_without_footer">
+<div class="pageWithoutFooter">
 
-    <div class="page_main_content">
-        <div class="headerOfPage">
-            Панель администратора
+    <div class="headerOfPage">
+        Панель администратора
+    </div>
+    <div id="allSections">
+
+        <?php if ($isAdmin['newOwner']): ?>
+        <div class="section admin left" id="newOwnerSection">
+            <div class="headerSection">Новый собственник</div>
+            <ul>
+                <li>
+                    <a href="adminpanel.php?action=registrationNewOwner" target="_blank">Зарегистрировать нового
+                        собственника</a>
+                </li>
+                <li>
+                    <a href="newadvert.php" target="_blank">Создать новое объявление</a>
+                </li>
+            </ul>
+            <div class="clearBoth"></div>
         </div>
-        <div id="allSections">
+        <?php endif; ?>
+        <!-- /end.newOwnerSection -->
 
-            <?php if ($isAdmin['newOwner']): ?>
-            <div class="section admin left" id="newOwnerSection">
-                <div class="headerSection">Новый собственник</div>
-                <ul>
-                    <li>
-                        <a href="adminpanel.php?action=registrationNewOwner" target="_blank">Зарегистрировать нового собственника</a>
-                    </li>
-                    <li>
-                        <a href="newadvert.php" target="_blank">Создать новое объявление</a>
-                    </li>
-                </ul>
-                <div class="clearBoth"></div>
-            </div>
-            <?php endif; ?>
-            <!-- /end.newOwnerSection -->
+        <?php if ($isAdmin['newAdvertAlien']): ?>
+        <div class="section admin right" id="newAdvertAlienSection">
+            <div class="headerSection">Новое объявление (чужое)</div>
+            <ul>
+                <li>
+                    <a href="registration.php?typeOwner=true&alienOwner=true" target="_blank">Новый чужой
+                        собственник</a>
+                </li>
+                <li>
+                    <a href="newadvert.php?completeness=0" target="_blank">Новое чужое объявление</a>
+                </li>
+                <li>
+                    <form name="advertMerging" method="post" action="adminpanel.php?action=mergeAdverts">
+                        Слить чужое объявление
+                        <input name="alienAdvertId" type="text" value="" size="7"> с
+                        <input name="ourAdvertId" type="text" value="" size="7">
+                        <button type="submit">ок</button>
+                    </form>
+                </li>
+            </ul>
+            <div class="clearBoth"></div>
+        </div>
+        <?php endif; ?>
+        <!-- /end.newAdvertAlienSection -->
 
-            <?php if ($isAdmin['newAdvertAlien']): ?>
-            <div class="section admin right" id="newAdvertAlienSection">
-                <div class="headerSection">Новое объявление (чужое)</div>
-                <ul>
-                    <li>
-                        <a href="registration.php?typeOwner=true&alienOwner=true" target="_blank">Новый чужой собственник</a>
-                    </li>
-                    <li>
-                        <a href="newadvert.php?completeness=0" target="_blank">Новое чужое объявление</a>
-                    </li>
-                    <li>
-                        <form name="advertMerging" method="post" action="adminpanel.php?action=mergeAdverts">
-                            Слить чужое объявление
-                            <input name="alienAdvertId" type="text" value="" size="7"> с
-                            <input name="ourAdvertId" type="text" value="" size="7">
-                            <button type="submit">ок</button>
-                        </form>
-                    </li>
-                </ul>
-                <div class="clearBoth"></div>
-            </div>
-            <?php endif; ?>
-            <!-- /end.newAdvertAlienSection -->
-
-            <?php if ($isAdmin['searchUser']): ?>
-            <div class="section admin left" id="searchUserSection">
-                <div class="headerSection">Поиск пользователя</div>
-				<form name="findUserForm" method="post" action="adminFindUser.php" target = "_blank">
+        <?php if ($isAdmin['searchUser']): ?>
+        <div class="section admin left" id="searchUserSection">
+            <div class="headerSection">Поиск пользователя</div>
+            <form name="findUserForm" method="post" action="adminFindUser.php" target="_blank">
                 <ul style="line-height: 2.5em; text-align: right;">
                     <li>
                         <label>Фамилия</label> <input name="surname" id="surname" type="text" size="20">
@@ -150,12 +151,13 @@
                         <label>Логин</label> <input name='login' id='login' type="text" size="20">
                     </li>
                     <li>
-                        <label>Номер телефона (без 8-ки)</label> <input name="telephon" id="telephon" type="text" size="20">
+                        <label>Номер телефона (без 8-ки)</label> <input name="telephon" id="telephon" type="text"
+                                                                        size="20">
                     </li>
                     <li>
                         <label>E-mail</label> <input name="email" id="email" type="text" size="20">
                     </li>
-					<div style="line-height: 0.7em;">-------------------------------------------------------</div>
+                    <div style="line-height: 0.7em;">-------------------------------------------------------</div>
                     <li>
                         <label>Адрес недвижимости</label> <input name="address" id="address" type="text" size="20">
                     </li>
@@ -163,75 +165,79 @@
                         <button type="submit" name="findUserButton" id="findUserButton">Найти</button>
                     </li>
                 </ul>
-				</form>
-                <div class="clearBoth"></div>
-            </div>
-            <?php endif; ?>
-            <!-- /end.searchUserSection -->
-
-            <?php if ($isAdmin['searchUser']): ?>
-            <div class="section admin right" id="requestFromOwnerSection">
-                <div class="headerSection">Заявки собственников</div>
-                <ul>
-                    <li>
-                        <a href="adminAllRequestsFromOwners.php">Все имеющиеся запросы от собственников</a>
-                    </li>
-                </ul>
-                <div class="clearBoth"></div>
-            </div>
-            <?php endif; ?>
-            <!-- /end.requestFromOwnerSection -->
-
-            <?php if ($isAdmin['searchUser']): ?>
-            <div class="section admin right" id="signUpToViewSection">
-                <div class="headerSection">Заявки на просмотр</div>
-                <ul>
-                    <li>
-                        <a target="_blank" href="adminAllRequestsToView.php?action=Новая">Новые заявки</a>
-                    </li>
-                    <li>
-                        <a target="_blank" href="adminAllRequestsToView.php?action=Назначен просмотр">Назначен просмотр</a>
-                    </li>
-                    <li>
-                        <a target="_blank" href="adminAllRequestsToView.php?action=Отложена">Отложенные заявки</a>
-                    </li>
-                    <li>
-                        <a target="_blank" href="adminAllRequestsToView.php?action=Успешный просмотр">Успешные просмотры</a>
-                    </li>
-                    <li>
-                        <a target="_blank" href="adminAllProperties.php?action=allWithEarliestDate" title="Все объекты с назначенной датой просмотра" style="font-weight: bold;">Ближайшие просмотры</a>
-                    </li>
-                    <li>
-                        <a target="_blank" href="adminAllProperties.php?action=allRemovedWithRequestsToView" title="Снятые с публикации объекты, по которым остались активные заявки на просмотр" style="font-weight: bold;">Недозакрытые объявления</a>
-                    </li>
-                </ul>
-                <div class="clearBoth"></div>
-            </div>
-            <?php endif; ?>
-            <!-- /end.signUpToViewSection -->
-
-            <?php if ($isAdmin['searchUser']): ?>
-            <div class="section admin right" id="logsFromServerSection">
-                <div class="headerSection">Логи сервера</div>
-                <ul>
-                    <li>
-                        <a href=""></a>
-                    </li>
-                </ul>
-                <div class="clearBoth"></div>
-            </div>
-            <?php endif; ?>
-            <!-- /end.logsFromServerSection -->
-
+            </form>
+            <div class="clearBoth"></div>
         </div>
+        <?php endif; ?>
+        <!-- /end.searchUserSection -->
+
+        <?php if ($isAdmin['searchUser']): ?>
+        <div class="section admin right" id="requestFromOwnerSection">
+            <div class="headerSection">Заявки собственников</div>
+            <ul>
+                <li>
+                    <a href="adminAllRequestsFromOwners.php">Все имеющиеся запросы от собственников</a>
+                </li>
+            </ul>
+            <div class="clearBoth"></div>
+        </div>
+        <?php endif; ?>
+        <!-- /end.requestFromOwnerSection -->
+
+        <?php if ($isAdmin['searchUser']): ?>
+        <div class="section admin right" id="signUpToViewSection">
+            <div class="headerSection">Заявки на просмотр</div>
+            <ul>
+                <li>
+                    <a target="_blank" href="adminAllRequestsToView.php?action=Новая">Новые заявки</a>
+                </li>
+                <li>
+                    <a target="_blank" href="adminAllRequestsToView.php?action=Назначен просмотр">Назначен просмотр</a>
+                </li>
+                <li>
+                    <a target="_blank" href="adminAllRequestsToView.php?action=Отложена">Отложенные заявки</a>
+                </li>
+                <li>
+                    <a target="_blank" href="adminAllRequestsToView.php?action=Успешный просмотр">Успешные просмотры</a>
+                </li>
+                <li>
+                    <a target="_blank" href="adminAllProperties.php?action=allWithEarliestDate"
+                       title="Все объекты с назначенной датой просмотра" style="font-weight: bold;">Ближайшие
+                        просмотры</a>
+                </li>
+                <li>
+                    <a target="_blank" href="adminAllProperties.php?action=allRemovedWithRequestsToView"
+                       title="Снятые с публикации объекты, по которым остались активные заявки на просмотр"
+                       style="font-weight: bold;">Недозакрытые объявления</a>
+                </li>
+            </ul>
+            <div class="clearBoth"></div>
+        </div>
+        <?php endif; ?>
+        <!-- /end.signUpToViewSection -->
+
+        <?php if ($isAdmin['searchUser']): ?>
+        <div class="section admin right" id="logsFromServerSection">
+            <div class="headerSection">Логи сервера</div>
+            <ul>
+                <li>
+                    <a href=""></a>
+                </li>
+            </ul>
+            <div class="clearBoth"></div>
+        </div>
+        <?php endif; ?>
+        <!-- /end.logsFromServerSection -->
+
     </div>
-    <!-- /end.page_main_content -->
+
     <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
     <div class="page-buffer"></div>
 </div>
-<!-- /end.page_without_footer -->
+<!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail: support@svobodno.org
+    2013 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
+    support@svobodno.org
 </div>
 <!-- /end.footer -->
 

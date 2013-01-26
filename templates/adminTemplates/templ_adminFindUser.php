@@ -25,28 +25,28 @@
         }
 
         .simpleBlockForAnyContent {
-			margin: 10px 0 10px 0;
-			font-size: 0.9em;
+            margin: 10px 0 10px 0;
+            font-size: 0.9em;
             line-height: 2em;
         }
 
         .simpleBlockForAnyContent .content {
-			font-size: 1.1em;
-			color: #6A9D02;
+            font-size: 1.1em;
+            color: #6A9D02;
             font-weight: bold;
         }
 
-		.simpleBlockForAnyContent .setOfInstructions {
-			float: left;
-			margin-left: 15px;
-			list-style: none;
-		}
+        .simpleBlockForAnyContent .setOfInstructions {
+            float: left;
+            margin-left: 15px;
+            list-style: none;
+        }
 
         .simpleBlockForAnyContent .setOfInstructions li {
             display: inline-block;
-			margin-left: 10px;
+            margin-left: 10px;
             margin-right: 10px;
-			font-size: 1em;
+            font-size: 1em;
         }
     </style>
     <!-- end CSS -->
@@ -65,36 +65,37 @@
 </head>
 
 <body>
-<div class="page_without_footer">
-    <div class="page_main_content">
-        <div class="headerOfPage">
-            Панель администратора -> Найденные пользователи
-        </div>
+<div class="pageWithoutFooter">
 
-        <ul id="allUsers">
-			<?php foreach ($allUsers as $userCharacteristic): ?>
-            <li>
-				<?php
-				// Возвращает HTML для блока с описанием 1 пользователя
-				require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminFindUserItem.php";
-				?>
-            </li>
-			<?php endforeach; ?>
-        </ul>
-
-		<div class="shadowText">
-			При поиске по параметрам пользователя выдается максимум 20 человек - с полными списками их недвижимости и заявок на просмотр, которые они отправляли<br>
-			При поиске по адресу недвижимости выдается максимум 40 объектов с указанием собственников - в списке объектов собственника представлены лишь соответствующие запросу объявления. Заявки на просмотр данных пользователей не выдаются
-		</div>
-
+    <div class="headerOfPage">
+        Панель администратора -> Найденные пользователи
     </div>
-    <!-- /end.page_main_content -->
+
+    <ul id="allUsers">
+        <?php foreach ($allUsers as $userCharacteristic): ?>
+        <li>
+            <?php
+            // Возвращает HTML для блока с описанием 1 пользователя
+            require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminFindUserItem.php";
+            ?>
+        </li>
+        <?php endforeach; ?>
+    </ul>
+
+    <div class="shadowText">
+        При поиске по параметрам пользователя выдается максимум 20 человек - с полными списками их недвижимости и заявок
+        на просмотр, которые они отправляли<br>
+        При поиске по адресу недвижимости выдается максимум 40 объектов с указанием собственников - в списке объектов
+        собственника представлены лишь соответствующие запросу объявления. Заявки на просмотр данных пользователей не
+        выдаются
+    </div>
+
     <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
     <div class="page-buffer"></div>
 </div>
-<!-- /end.page_without_footer -->
+<!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
+    2013 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
     support@svobodno.org
 </div>
 <!-- /end.footer -->

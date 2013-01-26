@@ -27,15 +27,15 @@ $isAdmin = $userIncoming->isAdmin();
 
 // Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
 if (!$userIncoming->login()) {
-	header('Location: login.php');
-	exit();
+    header('Location: login.php');
+    exit();
 }
 
 // Если пользователь не является администратором, то доступ к странице ему запрещен - разавторизуем его и перекинем на главную (в идеале нужно перекидывать на login.php)
 // Кроме того, проверяем, что у данного администратора есть право на поиск пользователей и вход в их Личные кабинеты
 if (!$isAdmin['searchUser']) {
-	header('Location: out.php');
-	exit();
+    header('Location: out.php');
+    exit();
 }
 
 /*************************************************************************************
@@ -60,7 +60,7 @@ $allRequestsToView = DBconnect::selectRequestsToViewForStatus($action);
 // Выделим идентификаторы всех арендаторов, отправивших заявки на просмотр
 $allTenants = array();
 foreach ($allRequestsToView as $value) {
-	$allTenants[] = $value['tenantId'];
+    $allTenants[] = $value['tenantId'];
 }
 
 // Получим полные данные по всем этим арендаторам
@@ -68,14 +68,14 @@ $allTenants = DBconnect::getAllDataAboutCharacteristicUsers($allTenants);
 
 // Дополним сведения о заявках на просмотр недостающими данными об их отправителях
 for ($i = 0, $s = count($allRequestsToView); $i < $s; $i++) {
-	foreach ($allTenants as $value) {
-		if ($allRequestsToView[$i]['tenantId'] == $value['id']) {
-			$allRequestsToView[$i]['name'] = $value['name'];
-			$allRequestsToView[$i]['secondName'] = $value['secondName'];
-			$allRequestsToView[$i]['surname'] = $value['surname'];
-			break;
-		}
-	}
+    foreach ($allTenants as $value) {
+        if ($allRequestsToView[$i]['tenantId'] == $value['id']) {
+            $allRequestsToView[$i]['name'] = $value['name'];
+            $allRequestsToView[$i]['secondName'] = $value['secondName'];
+            $allRequestsToView[$i]['surname'] = $value['surname'];
+            break;
+        }
+    }
 }
 
 /********************************************************************************

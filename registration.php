@@ -23,8 +23,8 @@ $isAdmin = $userIncoming->isAdmin();
 
 // Проверим, быть может пользователь уже авторизирован. Если это так и он не является администратором, перенаправим его на главную страницу сайта
 if ($userIncoming->login() && !$isAdmin['newOwner'] && !$isAdmin['newAdvertAlien']) {
-	header('Location: personal.php');
-	exit();
+    header('Location: personal.php');
+    exit();
 }
 
 // Инициализируем полную модель неавторизованного пользователя
@@ -60,15 +60,15 @@ if (isset($_GET['alienOwner'])) $alienOwner = htmlspecialchars($_GET['alienOwner
 
 // Запоминаем в параметры сессии адрес URL, с которого на регистрацию пришел пользователь (это позволит вернуть его после регистрации на ту же страницу)
 if (isset($_SERVER['HTTP_REFERER'])) {
-	$hostName = explode("?", $_SERVER['HTTP_REFERER']);
-	// Важно модифицировать адрес, с которого пользователь попал на страницу регистрации только, если он не перегружал саму страницу регистрации (например, в случае отправки ошибочной формы)
-	if ($hostName[0] != "http://svobodno.org/registration.php" && $hostName[0] != "http://localhost/registration.php") {
-		$_SESSION['url_initial'] = $_SERVER['HTTP_REFERER'];
-	}
+    $hostName = explode("?", $_SERVER['HTTP_REFERER']);
+    // Важно модифицировать адрес, с которого пользователь попал на страницу регистрации только, если он не перегружал саму страницу регистрации (например, в случае отправки ошибочной формы)
+    if ($hostName[0] != "http://svobodno.org/registration.php" && $hostName[0] != "http://localhost/registration.php") {
+        $_SESSION['url_initial'] = $_SERVER['HTTP_REFERER'];
+    }
 }
 // Если вдруг в переменную сессии попал адрес, который не относится к нашему домену, то удалим его от греха подальше
 if (isset($_SESSION['url_initial']) && !preg_match('~((http://svobodno.org)|(http://localhost))~', $_SESSION['url_initial'])) {
-	unlink($_SESSION['url_initial']);
+    unlink($_SESSION['url_initial']);
 }
 
 /********************************************************************************
@@ -77,70 +77,70 @@ if (isset($_SESSION['url_initial']) && !preg_match('~((http://svobodno.org)|(htt
 
 if ($action == "registration") {
 
-	// Запишем POST параметры в модели
-	$user->writeCharacteristicFromPOST();
-	$user->writeFotoInformationFromPOST();
-	$searchRequest->writeParamsFromPOST();
+    // Запишем POST параметры в модели
+    $user->writeCharacteristicFromPOST();
+    $user->writeFotoInformationFromPOST();
+    $searchRequest->writeParamsFromPOST();
 
-	// Проверяем корректность данных пользователя.
-	// Если мы имеем дело с созданием нового чужого объявления администратором, то проводим минимальную проверку данных
-	if ($isAdmin['newAdvertAlien'] && $alienOwner == "true") {
-		$errors = $user->validate("newAlienOwner");
-	} else {
-		$errors = $user->validate("registration");
-		if ($user->isTenant()) $errors = array_merge($errors, $searchRequest->validate("personalRequest"));
-	}
+    // Проверяем корректность данных пользователя.
+    // Если мы имеем дело с созданием нового чужого объявления администратором, то проводим минимальную проверку данных
+    if ($isAdmin['newAdvertAlien'] && $alienOwner == "true") {
+        $errors = $user->validate("newAlienOwner");
+    } else {
+        $errors = $user->validate("registration");
+        if ($user->isTenant()) $errors = array_merge($errors, $searchRequest->validate("personalRequest"));
+    }
 
-	// Если данные, указанные пользователем, корректны, запишем их в базу данных
-	if (is_array($errors) && count($errors) == 0) {
+    // Если данные, указанные пользователем, корректны, запишем их в базу данных
+    if (is_array($errors) && count($errors) == 0) {
 
-		// Если сохранение Личных данных пользователя прошло успешно, то считаем, что пользователь уже зарегистрирован, выполняем сохранение в БД остальных данных (фотографии и поисковый запрос)
-		if ($user->saveCharacteristicToDB("new")) {
+        // Если сохранение Личных данных пользователя прошло успешно, то считаем, что пользователь уже зарегистрирован, выполняем сохранение в БД остальных данных (фотографии и поисковый запрос)
+        if ($user->saveCharacteristicToDB("new")) {
 
-			// Сохраним информацию о фотографиях пользователя
-			// Функция вызывать необходимо независимо от того, есть ли в uploadedFoto информация о фотографиях или нет, так как при регистрации пользователь мог сначала выбрать фотографии, а затем их удалить. В этом случае $this->saveFotoInformationToDB почистит БД и серве от удаленных пользователем файлов
-			$user->saveFotoInformationToDB();
+            // Сохраним информацию о фотографиях пользователя
+            // Функция вызывать необходимо независимо от того, есть ли в uploadedFoto информация о фотографиях или нет, так как при регистрации пользователь мог сначала выбрать фотографии, а затем их удалить. В этом случае $this->saveFotoInformationToDB почистит БД и серве от удаленных пользователем файлов
+            $user->saveFotoInformationToDB();
 
-			// Сохраняем поисковый запрос, если пользователь регистрируется в качестве арендатора
-			if ($user->isTenant()) {
-				$searchRequest->setUserId($user->getId());
-				$searchRequest->saveToDB("new");
-			}
+            // Сохраняем поисковый запрос, если пользователь регистрируется в качестве арендатора
+            if ($user->isTenant()) {
+                $searchRequest->setUserId($user->getId());
+                $searchRequest->saveToDB("new");
+            }
 
             // Сообщаем операторам о появлении нового зарегистрированного пользователя
             $compId = GlobFunc::idToCompId($user->getId());
-            $subject = 'Новый зарегистрированный пользователь: '.$user->getSurname()." ".$user->getName()." ".$user->getSecondName();
+            $subject = 'Новый зарегистрированный пользователь: ' . $user->getSurname() . " " . $user->getName() . " " . $user->getSecondName();
             $msgHTML = "Новый пользователь зарегистрировался на сайте:<br>
-                Дата: ".date('d.m.Y H:i')."<br>
-                Кто: ".$user->getSurname()." ".$user->getName()." ".$user->getSecondName()."<br>
-                Арендатор: ".$user->isTenant()." Собственник: ".$user->isOwner()."<br>
-                Подписан на e-mail рассылку: ".$searchRequest->getNeedEmail()."<br>
-                <a href='http://svobodno.org/personal.php?compId=".$compId."'>Детально о пользователе</a>";
+                Дата: " . date('d.m.Y H:i') . "<br>
+                Кто: " . $user->getSurname() . " " . $user->getName() . " " . $user->getSecondName() . "<br>
+                Арендатор: " . $user->isTenant() . " Собственник: " . $user->isOwner() . "<br>
+                Подписан на e-mail рассылку: " . $searchRequest->getNeedEmail() . "<br>
+                <a href='http://svobodno.org/personal.php?compId=" . $compId . "'>Детально о пользователе</a>";
             GlobFunc::sendEmailToOperator($subject, $msgHTML);
 
-			/******* Авторизовываем пользователя *******/
-			// Если админ заводил нового пользователя, то авторизация под новым пользователем нам не нужна
-			if ($isAdmin['newOwner'] || $isAdmin['newAdvertAlien'] || $isAdmin['searchUser']) {
-				$correctEnter = array();
-			} else {
-				$correctEnter = $userIncoming->enter();
-			}
+            /******* Авторизовываем пользователя *******/
+            // Если админ заводил нового пользователя, то авторизация под новым пользователем нам не нужна
+            if ($isAdmin['newOwner'] || $isAdmin['newAdvertAlien'] || $isAdmin['searchUser']) {
+                $correctEnter = array();
+            } else {
+                $correctEnter = $userIncoming->enter();
+            }
 
-			if (count($correctEnter) == 0) //если нет ошибок, отправляем уже авторизованного пользователя на страницу успешной регистрации
-			{
-				header('Location: successfullRegistration.php');
-				exit();
-			} else {
-				// Здесь можно закодить действия при возникновении ошибки авторизации
-			}
+            if (count($correctEnter) == 0) //если нет ошибок, отправляем уже авторизованного пользователя на страницу успешной регистрации
+            {
+                header('Location: successfullRegistration.php');
+                exit();
+            } else {
+                // Здесь можно закодить действия при возникновении ошибки авторизации
+            }
 
-		} else { // Если сохранить личные данные пользователя в БД не удалось
+        } else { // Если сохранить личные данные пользователя в БД не удалось
 
-			$errors[] = 'К сожалению, при сохранении данных произошла ошибка: проверьте, пожалуйста, еще раз корректность Вашей информации и повторите попытку регистрации';
-			// Сохранении данных в БД не прошло - пользователь не зарегистрирован
-		}
+            $errors[] = 'К сожалению, при сохранении данных произошла ошибка: проверьте, пожалуйста, еще раз корректность Вашей информации и повторите попытку регистрации';
+            // Сохранении данных в БД не прошло - пользователь не зарегистрирован
+        }
 
-	}
+    }
 }
 
 /********************************************************************************

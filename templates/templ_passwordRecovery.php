@@ -33,58 +33,55 @@
 </head>
 
 <body>
-<div class="page_without_footer">
+<div class="pageWithoutFooter">
 
     <?php
     // Сформируем и вставим заголовок страницы
     require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
     ?>
 
-    <div class="page_main_content">
+    <div class="miniBlock">
 
-        <div class="miniBlock">
-
-            <div class="miniBlockHeader">
-                Восстановление пароля
-            </div>
-
-            <div class="miniBlockContent">
-
-                <table>
-                    <tbody>
-                    <tr>
-                        <td>
-                            Пожалуйста, свяжитесь с нашей службой тех. поддержки:
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Телефон: 8-922-160-95-14
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                <div>
-                    <a href="login.php" style="float: right;">Я вспомнил пароль!</a>
-                    <div class="clearBoth"></div>
-                </div>
-
-            </div>
-            <!-- /end.miniBlockContent -->
-
-            <div class="clearBoth"></div>
+        <div class="miniBlockHeader">
+            Восстановление пароля
         </div>
 
+        <div class="miniBlockContent">
+
+            <table>
+                <tbody>
+                <tr>
+                    <td>
+                        Пожалуйста, свяжитесь с нашей службой тех. поддержки:
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Телефон: 8-922-160-95-14
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div>
+                <a href="login.php" style="float: right;">Я вспомнил пароль!</a>
+
+                <div class="clearBoth"></div>
+            </div>
+
+        </div>
+        <!-- /end.miniBlockContent -->
+
+        <div class="clearBoth"></div>
     </div>
-    <!-- /end.page_main_content -->
 
     <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
     <div class="page-buffer"></div>
 </div>
-<!-- /end.page_without_footer -->
+<!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail: support@svobodno.org
+    2013 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
+    support@svobodno.org
 </div>
 <!-- /end.footer -->
 

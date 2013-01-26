@@ -119,7 +119,7 @@ $('#tabs').bind('tabsshow', function () {
 });
 
 // Обработка клика по кнопке Назад
-$(".backButton").click(function() {
+$(".backButton").click(function () {
 
     // Получаем номер текущей вкладки
     currentTabId = $("#tabs").tabs().tabs('option', 'selected');
@@ -139,7 +139,7 @@ $(".backButton").click(function() {
 });
 
 // Обработка клика по кнопке Далее
-$(".forwardButton").click(function() {
+$(".forwardButton").click(function () {
 
     // Получаем номер текущей вкладки
     currentTabId = $("#tabs").tabs().tabs('option', 'selected');
@@ -162,7 +162,7 @@ $(".forwardButton").click(function() {
 });
 
 // Обработка клика по кнопке Отправить (submitButton)
-$(".submitButton").click(function() {
+$(".submitButton").click(function () {
 
     // Получаем номер текущей вкладки
     currentTabId = $("#tabs").tabs().tabs('option', 'selected');
@@ -171,37 +171,37 @@ $(".submitButton").click(function() {
     // Если мы имеем дело с админом, который регистрирует чужого собственника, то не проводим проверок
     var errOnTab = 0;
     if (!isAlienOwnerRegistration) {
-    switch (currentTabId) {
-        case 2:
-            $("#tabs").tabs().tabs('select', 0);
-            errOnTab = executeValidation("registration", 0);
-            if (errOnTab != 0)  break;
+        switch (currentTabId) {
+            case 2:
+                $("#tabs").tabs().tabs('select', 0);
+                errOnTab = executeValidation("registration", 0);
+                if (errOnTab != 0)  break;
 
-            $("#tabs").tabs().tabs('select', 1);
-            errOnTab = executeValidation("registration", 1);
-            if (errOnTab != 0)  break;
+                $("#tabs").tabs().tabs('select', 1);
+                errOnTab = executeValidation("registration", 1);
+                if (errOnTab != 0)  break;
 
-            $("#tabs").tabs().tabs('select', 2);
-            errOnTab = executeValidation("registration", 2);
-            break;
+                $("#tabs").tabs().tabs('select', 2);
+                errOnTab = executeValidation("registration", 2);
+                break;
 
-        case 3:
-            $("#tabs").tabs().tabs('select', 0);
-            errOnTab = executeValidation("registration", 0);
-            if (errOnTab != 0)  break;
+            case 3:
+                $("#tabs").tabs().tabs('select', 0);
+                errOnTab = executeValidation("registration", 0);
+                if (errOnTab != 0)  break;
 
-            $("#tabs").tabs().tabs('select', 1);
-            errOnTab = executeValidation("registration", 1);
-            if (errOnTab != 0)  break;
+                $("#tabs").tabs().tabs('select', 1);
+                errOnTab = executeValidation("registration", 1);
+                if (errOnTab != 0)  break;
 
-            $("#tabs").tabs().tabs('select', 2);
-            errOnTab = executeValidation("registration", 2);
-            if (errOnTab != 0)  break;
+                $("#tabs").tabs().tabs('select', 2);
+                errOnTab = executeValidation("registration", 2);
+                if (errOnTab != 0)  break;
 
-            $("#tabs").tabs().tabs('select', 3);
-            errOnTab = executeValidation("registration", 3);
-            break;
-    }
+                $("#tabs").tabs().tabs('select', 3);
+                errOnTab = executeValidation("registration", 3);
+                break;
+        }
     }
 
     // Проверяем, есть ли ошибки на какой-либо вкладке

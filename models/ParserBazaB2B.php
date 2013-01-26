@@ -26,7 +26,7 @@ class ParserBazaB2B {
         $finalDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
         $finalDate = $finalDate->format('d.m.Y');
         $initialDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
-        $initialDate->modify('-'.$this->actualDayAmountForAdvert.' day');
+        $initialDate->modify('-' . $this->actualDayAmountForAdvert . ' day');
         $initialDate = $initialDate->format('d.m.Y');
         $this->handledAdverts = DBconnect::selectHandledAdvertsFromBazab2b($initialDate, $finalDate);
 
@@ -53,22 +53,31 @@ class ParserBazaB2B {
         $this->advertsListNumber++;
 
         // Вычисляем URL запрашиваемой страницы
-        $url = 'http://bazab2b.ru/?pagx=baza&p='.$this->advertsListNumber;
+        $url = 'http://bazab2b.ru/?pagx=baza&p=' . $this->advertsListNumber;
+
+        // Фиксируем в логах факт загрузки новой страницы со списком объявлений
+        Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->loadNextAdvertsList():1 Загружаем новую страницу со списком объявлений с bazaB2B, url: '" . $url . "'");
 
         // Вычисляем POST параметры, которые могут понадобиться для авторизации на сайте
-        $post = "user_name=".$this->login."&user_password=".$this->password;
+        $post = "user_name=" . $this->login . "&user_password=" . $this->password;
 
         // Неспосредственно выполняем запрос к серверу
-        $pageHTML = $this->curlRequest($url, $post, 'cookieBazaB2B.txt');
+        $pageHTML = $this->curlRequest($url, $post, 'cookieBazaB2B.txt', TRUE);
 
         // Если получить HTML страницы не удалось
         if (!$pageHTML) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->loadNextAdvertsList():1 Не удалось получить страницу со списком объявлений с сайта bazaB2B по адресу:".$url);
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->loadNextAdvertsList():2 Не удалось получить страницу со списком объявлений с сайта bazaB2B по адресу: '" . $url . "', получена страница: '" . $pageHTML . "'");
             return FALSE;
         }
 
         // Получаем DOM-объект и сохраняем его в параметры
         $this->advertsListDOM = str_get_html($pageHTML);
+
+        // Убедимся, что на странице есть список объявлений. Иначе мы можем бесконечно загружать 404 страницу или подобные ей.
+        if ($this->advertsListDOM->find('.poisk .chr-wite', 0) === NULL) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->loadNextAdvertsList():3 Полученная страница со списком объявлений с сайта bazaB2B не содержит список объявлений, по адресу: '" . $url . "'");
+            return FALSE;
+        }
 
         // Сбрасываем параметры текущего обрабатываемого краткого описания объявления на значения по умолчанию
         $this->advertShortDescriptionNumber = 0;
@@ -117,7 +126,7 @@ class ParserBazaB2B {
         if (isset($this->advertFullDescriptionDOM)) $this->advertFullDescriptionDOM->clear();
 
         // Вычисляем URL запрашиваемой страницы
-        $url = "http://bazab2b.ru/?c_id=".$this->c_id."&&id=".$this->id."&modal=1";
+        $url = "http://bazab2b.ru/?c_id=" . $this->c_id . "&&id=" . $this->id . "&modal=1";
 
         // Вычисляем POST параметры, которые могут понадобиться для авторизации на сайте
         //$post = "user_name=".$this->login."&user_password=".$this->password;
@@ -125,11 +134,11 @@ class ParserBazaB2B {
         $post = 0;
 
         // Неспосредственно выполняем запрос к серверу
-        $pageHTML = $this->curlRequest($url, $post, 'cookieBazaB2B.txt');
+        $pageHTML = $this->curlRequest($url, $post, 'cookieBazaB2B.txt', TRUE);
 
         // Если загрузить страницу не удалось - сообщим об этом
         if (!$pageHTML) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->loadFullAdvertDescription():1 Не удалось получить страницу с подробным описанием объекта с сайта bazaB2B по адресу:".$url);
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->loadFullAdvertDescription():1 Не удалось получить страницу с подробным описанием объекта с сайта bazaB2B по адресу:" . $url);
             return FALSE;
         }
 
@@ -172,7 +181,7 @@ class ParserBazaB2B {
                 if ($value != "") {
                     $params['costOfRenting'] = intval($value);
                     $params['currency'] = "руб.";
-                    $params['compensationMoney'] = intval($params['costOfRenting']*0.3);
+                    $params['compensationMoney'] = intval($params['costOfRenting'] * 0.3);
                     $params['compensationPercent'] = 30;
                 }
                 continue;
@@ -281,7 +290,7 @@ class ParserBazaB2B {
             $paramName = $oneParam->find("td", 0)->plaintext;
             if ($paramName == "Источник") {
                 $value = $oneParam->find("td a font b", 0)->plaintext;
-                if ($value == "" && $oneParam->find("td", 1)->plaintext == "Добавлено на наш сайт") $value = "http://bazab2b.ru/?c_id=".$this->c_id."&&id=".$this->id."&modal=1"; // Для объявлений добавленных напрямую в базуБ2Б
+                if ($value == "" && $oneParam->find("td", 1)->plaintext == "Добавлено на наш сайт") $value = "http://bazab2b.ru/?c_id=" . $this->c_id . "&&id=" . $this->id . "&modal=1"; // Для объявлений добавленных напрямую в базуБ2Б
                 $params['sourceOfAdvert'] = $value;
             }
         }
@@ -313,10 +322,10 @@ class ParserBazaB2B {
             if (isset($value) && $value = explode(".", $value->plaintext)) {
                 $publicationDate = intval($value['0']);
                 $publicationMonth = intval($value['1']);
-                $date = new DateTime(date("Y")."-".$publicationMonth."-".$publicationDate, new DateTimeZone('Asia/Yekaterinburg'));
+                $date = new DateTime(date("Y") . "-" . $publicationMonth . "-" . $publicationDate, new DateTimeZone('Asia/Yekaterinburg'));
             } else {
                 // Если не удалось получить ни время, ни дату публикации
-                Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->isStopHandling():1 Не удалось получить ни время, ни дату публикации объекта с сайта bazaB2B по адресу: "."http://bazab2b.ru/?c_id=".$this->c_id."&&id=".$this->id."&modal=1");
+                Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->isStopHandling():1 Не удалось получить ни время, ни дату публикации объекта с сайта bazaB2B по адресу: " . "http://bazab2b.ru/?c_id=" . $this->c_id . "&&id=" . $this->id . "&modal=1");
                 return TRUE;
             }
         }
@@ -368,11 +377,11 @@ class ParserBazaB2B {
             if (isset($value) && $value = explode(".", $value->plaintext)) {
                 $publicationDate = intval($value['0']);
                 $publicationMonth = intval($value['1']);
-                $date = new DateTime(date("Y")."-".$publicationMonth."-".$publicationDate, new DateTimeZone('Asia/Yekaterinburg'));
+                $date = new DateTime(date("Y") . "-" . $publicationMonth . "-" . $publicationDate, new DateTimeZone('Asia/Yekaterinburg'));
                 $date = $date->format("d.m.Y");
             } else {
                 // Если не удалось получить ни время, ни дату публикации, то дальнейшие действия бесполезны
-                Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->setAdvertIsHandled():1 Не удалось получить ни время, ни дату публикации объекта с сайта bazaB2B по адресу: "."http://bazab2b.ru/?c_id=".$this->c_id."&&id=".$this->id."&modal=1");
+                Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->setAdvertIsHandled():1 Не удалось получить ни время, ни дату публикации объекта с сайта bazaB2B по адресу: " . "http://bazab2b.ru/?c_id=" . $this->c_id . "&&id=" . $this->id . "&modal=1");
                 return FALSE;
             }
         }
@@ -389,34 +398,53 @@ class ParserBazaB2B {
 
         // Вычисляем URL запрашиваемой страницы, на которой производится авторизация
         $url = 'http://bazab2b.ru/?pagx=baza&p=1';
+        //TODO: test
+        //$url = 'http://seasonvar.ru';
 
         // Вычисляем POST параметры, которые могут понадобиться для авторизации на сайте
-        $post = "user_name=".$this->login."&user_password=".$this->password;
+        $post = "user_name=" . $this->login . "&user_password=" . $this->password;
 
-        // Неспосредственно выполняем запрос к серверу
-        $pageHTML = $this->curlRequest($url, $post, 'cookieBazaB2B.txt');
+        // Непосредственно выполняем запрос к серверу
+        $pageHTML = $this->curlRequest($url, $post, 'cookieBazaB2B.txt', TRUE);
+        //$pageHTML = $this->curlRequest($url, "", "", TRUE);
+
+        // TODO: test
+        //exit($pageHTML);
 
         // Возвращаем результат
-        if ($pageHTML) return TRUE; else return FALSE;
+        if ($pageHTML) {
+            return TRUE;
+        } else {
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->authorization():1 Не удалось получить страницу в процессе авторизации на сайте bazaB2B");
+            return FALSE;
+        }
     }
 
-    private function curlRequest($url, $post = 0, $cookieFileName) {
+    private function curlRequest($url, $post = "", $cookieFileName = "", $proxy = FALSE) {
 
         // Инициализация библиотеки curl.
         if (!($ch = curl_init())) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->curlRequest():1 Не удалось получить страницу с сайта bazaB2B по адресу: ".$url);
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->curlRequest():1 Ошибка при инициализации curl. Не удалось получить страницу с сайта bazaB2B по адресу: " . $url);
             return FALSE;
         }
         curl_setopt($ch, CURLOPT_URL, $url); // Устанавливаем URL запроса
-        curl_setopt($ch, CURLOPT_COOKIEJAR, $_SERVER['DOCUMENT_ROOT'].'/logs/'.$cookieFileName); // Сохранять куки в указанный файл
-        curl_setopt($ch, CURLOPT_COOKIEFILE, $_SERVER['DOCUMENT_ROOT'].'/logs/'.$cookieFileName); // При запросе передавать значения кук из указанного файла
         curl_setopt($ch, CURLOPT_HEADER, false); // При значении true CURL включает в вывод результата заголовки, которые нам не нужны (мы их на сервере не обрабатываем).
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // При значении = true полученный код страницы возвращается как результат выполнения curl_exec.
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); // Следовать за редиректами
+        //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); // Следовать за редиректами
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30); // Максимальное время ожидания ответа от сервера в секундах
         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17'); // Установим значение поля User-agent для маскировки под обычного пользователя
-        curl_setopt($ch, CURLOPT_POST, $post !== 0); // Если указаны POST параметры, то включаем их использование
-        if ($post) curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        if ($proxy) {
+            curl_setopt($ch, CURLOPT_PROXY, '92.255.185.161:3128'); // адрес прокси-сервера для анонимности
+            //curl_setopt($ch, CURLOPT_PROXYUSERPWD,'user:pass'); // если необходимо предоставить имя пользователя и пароль для прокси
+        }
+        if ($cookieFileName != "") {
+            curl_setopt($ch, CURLOPT_COOKIEJAR, $_SERVER['DOCUMENT_ROOT'] . '/logs/' . $cookieFileName); // Сохранять куки в указанный файл
+            curl_setopt($ch, CURLOPT_COOKIEFILE, $_SERVER['DOCUMENT_ROOT'] . '/logs/' . $cookieFileName); // При запросе передавать значения кук из указанного файла
+        }
+        if ($post != "") {
+            curl_setopt($ch, CURLOPT_POST, TRUE); // Если указаны POST параметры, то включаем их использование
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        }
 
         // Выполнение запроса
         $data = curl_exec($ch);

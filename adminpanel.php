@@ -35,14 +35,14 @@ if (isset($_GET['action'])) $action = htmlspecialchars($_GET['action'], ENT_QUOT
 
 // Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
 if (!$userIncoming->login()) {
-	header('Location: login.php');
-	exit();
+    header('Location: login.php');
+    exit();
 }
 
 // Если пользователь не является администратором, то доступ к странице ему запрещен - разавторизуем его и перекинем на главную (в идеале нужно перекидывать на login.php)
 if (!$isAdmin['newOwner'] && !$isAdmin['newAdvertAlien'] && !$isAdmin['searchUser']) {
-	header('Location: out.php');
-	exit();
+    header('Location: out.php');
+    exit();
 }
 
 /*************************************************************************************
@@ -51,20 +51,20 @@ if (!$isAdmin['newOwner'] && !$isAdmin['newAdvertAlien'] && !$isAdmin['searchUse
 
 if ($action == "registrationNewOwner") {
 
-	// Сначала "разавторизовываем" пользователя
-	if (!isset($_SESSION)) {
-		session_start();
-	}
-	unset($_SESSION['id']); //удаляем переменную сессии
-	$_SESSION = array();
-	session_unset();
-	session_destroy();
-	SetCookie("login", "", time() - 3600, '/'); //удаляем cookie с логином
-	SetCookie("password", "", time() - 3600, '/'); //удаляем cookie с паролем
+    // Сначала "разавторизовываем" пользователя
+    if (!isset($_SESSION)) {
+        session_start();
+    }
+    unset($_SESSION['id']); //удаляем переменную сессии
+    $_SESSION = array();
+    session_unset();
+    session_destroy();
+    SetCookie("login", "", time() - 3600, '/'); //удаляем cookie с логином
+    SetCookie("password", "", time() - 3600, '/'); //удаляем cookie с паролем
 
-	// Затем перекидываем его на страницу регистрации собственника
-	header("Location: registration.php?typeOwner=true");
-	exit();
+    // Затем перекидываем его на страницу регистрации собственника
+    header("Location: registration.php?typeOwner=true");
+    exit();
 }
 
 /*************************************************************************************
@@ -117,10 +117,10 @@ if ($action == "mergeAdverts") {
     if (!DBconnect::deletePropertyFromArchive($alienAdvertId)) exit ("Не получилось удалить чужое объявление из архива");
 
     // Удаляем фотографии чужого объявления, если таковые имеются
-    if(!DBconnect::deletePhotosForProperty($alienAdvertId)) exit ("Не получилось удалить фотографии объекта из БД");
+    if (!DBconnect::deletePhotosForProperty($alienAdvertId)) exit ("Не получилось удалить фотографии объекта из БД");
 
     // Перенацелим все запросы на просмотр чужого объекта недвижимости на наш объект
-    if(!DBconnect::updateRequestToViewForPropertyId($alienAdvertId, $ourAdvertId)) exit("Не удалось изменить целевой объект недвижимости у запросов на просмотр, направленных на чужое объявление");
+    if (!DBconnect::updateRequestToViewForPropertyId($alienAdvertId, $ourAdvertId)) exit("Не удалось изменить целевой объект недвижимости у запросов на просмотр, направленных на чужое объявление");
 
     exit("Слияние объявлений успешно произведено!");
 }

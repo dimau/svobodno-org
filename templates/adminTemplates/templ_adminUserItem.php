@@ -1,27 +1,28 @@
 <div>
-	<div>
+    <div>
 		<span class='content'>
-			<a target="_self" href="personal.php?compId=<?php if ($userCharacteristic['typeAdmin'] == NULL) echo GlobFunc::idToCompId($userCharacteristic['id']);?>">
-				<?php echo $userCharacteristic['surname']." ".$userCharacteristic['name']." ".$userCharacteristic['secondName']; ?>
-			</a>
+			<a target="_self"
+               href="personal.php?compId=<?php if ($userCharacteristic['typeAdmin'] == NULL) echo GlobFunc::idToCompId($userCharacteristic['id']);?>">
+                <?php echo $userCharacteristic['surname'] . " " . $userCharacteristic['name'] . " " . $userCharacteristic['secondName']; ?>
+            </a>
 		</span>
-		<?php if ($userCharacteristic['typeTenant'] === "TRUE") echo "[арендатор]"; ?>
-		<?php if ($userCharacteristic['typeOwner'] === "TRUE") echo "[собственник]";?>
-	</div>
-	<div>
+        <?php if ($userCharacteristic['typeTenant'] === "TRUE") echo "[арендатор]"; ?>
+        <?php if ($userCharacteristic['typeOwner'] === "TRUE") echo "[собственник]";?>
+    </div>
+    <div>
         Телефон: <span class='content'><?php echo $userCharacteristic['telephon']; ?></span>
-		E-mail: <span class='content'><?php echo $userCharacteristic['email']; ?></span>
-	</div>
+        E-mail: <span class='content'><?php echo $userCharacteristic['email']; ?></span>
+    </div>
     <div>
         Логин:
 		<span class='content'>
 			<?php if ($userCharacteristic['typeAdmin'] == NULL) echo $userCharacteristic['login']; ?>
-			<?php if ($userCharacteristic['typeAdmin'] != NULL) echo "скрыто"; ?>
+            <?php if ($userCharacteristic['typeAdmin'] != NULL) echo "скрыто"; ?>
 		</span>
-		Пароль:
+        Пароль:
 		<span class='content'>
 			<?php if ($userCharacteristic['typeAdmin'] == NULL) echo $userCharacteristic['password']; ?>
-			<?php if ($userCharacteristic['typeAdmin'] != NULL) echo "скрыто"; ?>
+            <?php if ($userCharacteristic['typeAdmin'] != NULL) echo "скрыто"; ?>
 		</span>
     </div>
 </div>

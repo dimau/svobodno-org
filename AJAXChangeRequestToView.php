@@ -28,12 +28,12 @@ $res = FALSE;
 
 // Проверяем, залогинен ли пользователь, если нет - то отказываем в доступе
 if (!$userIncoming->login()) {
-	GlobFunc::accessDenied();
+    GlobFunc::accessDenied();
 }
 
 // Если пользователь не является администратором, то доступ к скрипту ему запрещен
 if (!$isAdmin['searchUser']) {
-	GlobFunc::accessDenied();
+    GlobFunc::accessDenied();
 }
 
 /*************************************************************************************
@@ -55,7 +55,7 @@ if (isset($_POST['newValue'])) $newValue = htmlspecialchars($_POST['newValue'], 
 
 // Если в запросе не указан идентификатор заявки на показ, то отказываем в доступе
 if ($requestToViewId == "" || $requestToViewId == 0) {
-	GlobFunc::accessDenied();
+    GlobFunc::accessDenied();
 }
 
 // TODO: проверка нового значения при режиме сохранения статуса на Белый список
@@ -72,18 +72,18 @@ $requestToView = new RequestToView(NULL, NULL, $requestToViewId);
  *************************************************************************************/
 
 if ($action == "changeStatus") {
-	$requestToView->setStatus($newValue);
-	$res = $requestToView->saveParamsToDB();
+    $requestToView->setStatus($newValue);
+    $res = $requestToView->saveParamsToDB();
 }
 
 if ($action == "changeTenantTime") {
-	$requestToView->setTenantTime($newValue);
-	$res = $requestToView->saveParamsToDB();
+    $requestToView->setTenantTime($newValue);
+    $res = $requestToView->saveParamsToDB();
 }
 
 if ($action == "changeTenantComment") {
-	$requestToView->setTenantComment($newValue);
-	$res = $requestToView->saveParamsToDB();
+    $requestToView->setTenantComment($newValue);
+    $res = $requestToView->saveParamsToDB();
 }
 
 /*************************************************************************************
@@ -91,10 +91,10 @@ if ($action == "changeTenantComment") {
  *************************************************************************************/
 
 if ($res) {
-	header('Content-Type: text/xml; charset=UTF-8');
-	echo "<xml><span status='successful'></span></xml>";
+    header('Content-Type: text/xml; charset=UTF-8');
+    echo "<xml><span status='successful'></span></xml>";
 } else {
-	GlobFunc::accessDenied();
+    GlobFunc::accessDenied();
 }
 
 

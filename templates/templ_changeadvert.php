@@ -14,15 +14,15 @@
 
     <title>
         <?php switch ($mode) {
-            case "new":
-                echo "Новое объявление";
-                break;
-            case "editFull":
-            case "editLimited":
-            default:
-                echo "Редактирование объявления";
-                break;
-        }?>
+        case "new":
+            echo "Новое объявление";
+            break;
+        case "editFull":
+        case "editLimited":
+        default:
+            echo "Редактирование объявления";
+            break;
+    }?>
     </title>
 
     <!-- CSS -->
@@ -30,7 +30,7 @@
     <link rel="stylesheet" href="css/fileuploader.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
-        /* Стили для создания нового Объявления*/
+            /* Стили для создания нового Объявления*/
         .objectDescriptionItem .objectDescriptionItemLabel {
             min-width: 150px;
             width: 49%;
@@ -98,7 +98,7 @@
 </head>
 
 <body>
-<div class="page_without_footer">
+<div class="pageWithoutFooter">
 
 <!-- Всплывающее поле для отображения списка ошибок, полученных при проверке данных на сервере (PHP)-->
 <div id="userMistakesBlock" class="ui-widget">
@@ -107,7 +107,7 @@
             <p>
                 <span class="icon-mistake ui-icon ui-icon-info"></span>
                 <span
-                    id="userMistakesText">Для продолжения, пожалуйста, дополните или исправьте следующие данные:</span>
+                        id="userMistakesText">Для продолжения, пожалуйста, дополните или исправьте следующие данные:</span>
             </p>
             <ol><?php
                 if (isset($errors) && count($errors) != 0) {
@@ -125,8 +125,6 @@
 require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
 ?>
 
-<div class="page_main_content">
-
 <div class="headerOfPage">
 
     <?php switch ($mode) {
@@ -138,15 +136,16 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
     default:
         echo "Редактирование объявления";
         break;
-    }?>
+}?>
 
     <?php
-        if ($propertyCharacteristic['address'] != "") echo GlobFunc::getFirstCharUpper($propertyCharacteristic['address']);
-        if ($propertyCharacteristic['apartmentNumber'] != "") echo ", № " . $propertyCharacteristic['apartmentNumber'];
+    if ($propertyCharacteristic['address'] != "") echo GlobFunc::getFirstCharUpper($propertyCharacteristic['address']);
+    if ($propertyCharacteristic['apartmentNumber'] != "") echo ", № " . $propertyCharacteristic['apartmentNumber'];
     ?>
 </div>
 
-<form action="<?php if ($mode == "new") echo "newadvert.php"; else echo "editadvert.php";?>?action=saveAdvert<?php if ($propertyCharacteristic['id'] != "") echo "&propertyId=".$propertyCharacteristic['id'];?><?php if (isset($completeness)) echo "&completeness=$completeness";?>" name="changeAdvert" class="advertDescriptionEdit formWithFotos" method="post" enctype="multipart/form-data">
+<form action="<?php if ($mode == "new") echo "newadvert.php"; else echo "editadvert.php";?>?action=saveAdvert<?php if ($propertyCharacteristic['id'] != "") echo "&propertyId=" . $propertyCharacteristic['id'];?><?php if (isset($completeness)) echo "&completeness=$completeness";?>"
+      name="changeAdvert" class="advertDescriptionEdit formWithFotos" method="post" enctype="multipart/form-data">
 
 <div class="advertDescriptionChapter" id="typeAndPeriodChapter">
 
@@ -191,7 +190,8 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
 
             <?php if ($mode == "editLimited"): ?>
-            <input type="hidden" name="typeOfObject" id="typeOfObject" value='<?php echo $propertyCharacteristic['typeOfObject']; ?>'>
+            <input type="hidden" name="typeOfObject" id="typeOfObject"
+                   value='<?php echo $propertyCharacteristic['typeOfObject']; ?>'>
             <?php
             // Значение поля необходимо сохранить еще и в скрытом input, так как JS в зависимости от него будет делать некоторые элементы недоступными для редактирования
             echo $propertyCharacteristic['typeOfObject'];
@@ -268,8 +268,10 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         </div>
         <div class="objectDescriptionBody">
             <fieldset id='fotoWrapperBlock' class="edited fullWidth" style="min-width: 300px;">
-                <input type='hidden' name='fileUploadId' id='fileUploadId' value='<?php echo $propertyFotoInformation['fileUploadId'];?>'>
+                <input type='hidden' name='fileUploadId' id='fileUploadId'
+                       value='<?php echo $propertyFotoInformation['fileUploadId'];?>'>
                 <input type='hidden' name='uploadedFoto' id='uploadedFoto' value=''>
+
                 <div id="file-uploader">
                     <noscript>
                         <p>Пожалуйста, активируйте JavaScript для загрузки файлов</p>
@@ -295,12 +297,19 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="amountOfRooms" id="amountOfRooms">
                 <option value="0" <?php if ($propertyCharacteristic['amountOfRooms'] == "0") echo "selected";?>></option>
-                <option value="1" <?php if ($propertyCharacteristic['amountOfRooms'] == "1") echo "selected";?>>1</option>
-                <option value="2" <?php if ($propertyCharacteristic['amountOfRooms'] == "2") echo "selected";?>>2</option>
-                <option value="3" <?php if ($propertyCharacteristic['amountOfRooms'] == "3") echo "selected";?>>3</option>
-                <option value="4" <?php if ($propertyCharacteristic['amountOfRooms'] == "4") echo "selected";?>>4</option>
-                <option value="5" <?php if ($propertyCharacteristic['amountOfRooms'] == "5") echo "selected";?>>5</option>
-                <option value="6" <?php if ($propertyCharacteristic['amountOfRooms'] == "6") echo "selected";?>>6 или более</option>
+                <option value="1" <?php if ($propertyCharacteristic['amountOfRooms'] == "1") echo "selected";?>>1
+                </option>
+                <option value="2" <?php if ($propertyCharacteristic['amountOfRooms'] == "2") echo "selected";?>>2
+                </option>
+                <option value="3" <?php if ($propertyCharacteristic['amountOfRooms'] == "3") echo "selected";?>>3
+                </option>
+                <option value="4" <?php if ($propertyCharacteristic['amountOfRooms'] == "4") echo "selected";?>>4
+                </option>
+                <option value="5" <?php if ($propertyCharacteristic['amountOfRooms'] == "5") echo "selected";?>>5
+                </option>
+                <option value="6" <?php if ($propertyCharacteristic['amountOfRooms'] == "6") echo "selected";?>>6 или
+                    более
+                </option>
             </select>
         </div>
     </div>
@@ -312,8 +321,11 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="adjacentRooms" id="adjacentRooms">
                 <option value="0" <?php if ($propertyCharacteristic['adjacentRooms'] == "0") echo "selected";?>></option>
-                <option value="да" <?php if ($propertyCharacteristic['adjacentRooms'] == "да") echo "selected";?>>да</option>
-                <option value="нет" <?php if ($propertyCharacteristic['adjacentRooms'] == "нет") echo "selected";?>>нет</option>
+                <option value="да" <?php if ($propertyCharacteristic['adjacentRooms'] == "да") echo "selected";?>>да
+                </option>
+                <option value="нет" <?php if ($propertyCharacteristic['adjacentRooms'] == "нет") echo "selected";?>>
+                    нет
+                </option>
             </select>
         </div>
     </div>
@@ -326,11 +338,21 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="amountOfAdjacentRooms">
                 <option value="0" <?php if ($propertyCharacteristic['amountOfAdjacentRooms'] == "0") echo "selected";?>></option>
-                <option value="2" <?php if ($propertyCharacteristic['amountOfAdjacentRooms'] == "2") echo "selected";?>>2</option>
-                <option value="3" <?php if ($propertyCharacteristic['amountOfAdjacentRooms'] == "3") echo "selected";?>>3</option>
-                <option value="4" <?php if ($propertyCharacteristic['amountOfAdjacentRooms'] == "4") echo "selected";?>>4</option>
-                <option value="5" <?php if ($propertyCharacteristic['amountOfAdjacentRooms'] == "5") echo "selected";?>>5</option>
-                <option value="6" <?php if ($propertyCharacteristic['amountOfAdjacentRooms'] == "6") echo "selected";?>>6 или более</option>
+                <option value="2" <?php if ($propertyCharacteristic['amountOfAdjacentRooms'] == "2") echo "selected";?>>
+                    2
+                </option>
+                <option value="3" <?php if ($propertyCharacteristic['amountOfAdjacentRooms'] == "3") echo "selected";?>>
+                    3
+                </option>
+                <option value="4" <?php if ($propertyCharacteristic['amountOfAdjacentRooms'] == "4") echo "selected";?>>
+                    4
+                </option>
+                <option value="5" <?php if ($propertyCharacteristic['amountOfAdjacentRooms'] == "5") echo "selected";?>>
+                    5
+                </option>
+                <option value="6" <?php if ($propertyCharacteristic['amountOfAdjacentRooms'] == "6") echo "selected";?>>
+                    6 или более
+                </option>
             </select>
         </div>
     </div>
@@ -342,13 +364,18 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="typeOfBathrooms">
                 <option value="0" <?php if ($propertyCharacteristic['typeOfBathrooms'] == "0") echo "selected";?>></option>
-                <option value="раздельный" <?php if ($propertyCharacteristic['typeOfBathrooms'] == "раздельный") echo "selected";?>>раздельный
+                <option value="раздельный" <?php if ($propertyCharacteristic['typeOfBathrooms'] == "раздельный") echo "selected";?>>
+                    раздельный
                 </option>
                 <option value="совмещенный" <?php if ($propertyCharacteristic['typeOfBathrooms'] == "совмещенный") echo "selected";?>>
                     совмещенный
                 </option>
-                <option value="2 шт." <?php if ($propertyCharacteristic['typeOfBathrooms'] == "2 шт.") echo "selected";?>>2</option>
-                <option value="3 шт." <?php if ($propertyCharacteristic['typeOfBathrooms'] == "3 шт.") echo "selected";?>>3</option>
+                <option value="2 шт." <?php if ($propertyCharacteristic['typeOfBathrooms'] == "2 шт.") echo "selected";?>>
+                    2
+                </option>
+                <option value="3 шт." <?php if ($propertyCharacteristic['typeOfBathrooms'] == "3 шт.") echo "selected";?>>
+                    3
+                </option>
             </select>
         </div>
     </div>
@@ -360,23 +387,36 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="typeOfBalcony" id="typeOfBalcony">
                 <option value="0" <?php if ($propertyCharacteristic['typeOfBalcony'] == "0") echo "selected";?>></option>
-                <option value="нет" <?php if ($propertyCharacteristic['typeOfBalcony'] == "нет") echo "selected";?>>нет</option>
-                <option value="балкон" <?php if ($propertyCharacteristic['typeOfBalcony'] == "балкон") echo "selected";?>>балкон</option>
-                <option value="лоджия" <?php if ($propertyCharacteristic['typeOfBalcony'] == "лоджия") echo "selected";?>>лоджия</option>
-                <option value="эркер" <?php if ($propertyCharacteristic['typeOfBalcony'] == "эркер") echo "selected";?>>эркер</option>
-                <option value="балкон и лоджия" <?php if ($propertyCharacteristic['typeOfBalcony'] == "балкон и лоджия") echo "selected";?>>балкон
-                    и лоджия
+                <option value="нет" <?php if ($propertyCharacteristic['typeOfBalcony'] == "нет") echo "selected";?>>
+                    нет
                 </option>
-                <option value="балкон и эркер" <?php if ($propertyCharacteristic['typeOfBalcony'] == "балкон и эркер") echo "selected";?>>балкон и
+                <option value="балкон" <?php if ($propertyCharacteristic['typeOfBalcony'] == "балкон") echo "selected";?>>
+                    балкон
+                </option>
+                <option value="лоджия" <?php if ($propertyCharacteristic['typeOfBalcony'] == "лоджия") echo "selected";?>>
+                    лоджия
+                </option>
+                <option value="эркер" <?php if ($propertyCharacteristic['typeOfBalcony'] == "эркер") echo "selected";?>>
                     эркер
                 </option>
-                <option value="2 балкона и более" <?php if ($propertyCharacteristic['typeOfBalcony'] == "2 балкона и более") echo "selected";?>>2
+                <option value="балкон и лоджия" <?php if ($propertyCharacteristic['typeOfBalcony'] == "балкон и лоджия") echo "selected";?>>
+                    балкон
+                    и лоджия
+                </option>
+                <option value="балкон и эркер" <?php if ($propertyCharacteristic['typeOfBalcony'] == "балкон и эркер") echo "selected";?>>
+                    балкон и
+                    эркер
+                </option>
+                <option value="2 балкона и более" <?php if ($propertyCharacteristic['typeOfBalcony'] == "2 балкона и более") echo "selected";?>>
+                    2
                     балкона и более
                 </option>
-                <option value="2 лоджии и более" <?php if ($propertyCharacteristic['typeOfBalcony'] == "2 лоджии и более") echo "selected";?>>2
+                <option value="2 лоджии и более" <?php if ($propertyCharacteristic['typeOfBalcony'] == "2 лоджии и более") echo "selected";?>>
+                    2
                     лоджии и более
                 </option>
-                <option value="2 эркера и более" <?php if ($propertyCharacteristic['typeOfBalcony'] == "2 эркера и более") echo "selected";?>>2
+                <option value="2 эркера и более" <?php if ($propertyCharacteristic['typeOfBalcony'] == "2 эркера и более") echo "selected";?>>
+                    2
                     эркера и более
                 </option>
             </select>
@@ -391,8 +431,11 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="balconyGlazed">
                 <option value="0" <?php if ($propertyCharacteristic['balconyGlazed'] == "0") echo "selected";?>></option>
-                <option value="да" <?php if ($propertyCharacteristic['balconyGlazed'] == "да") echo "selected";?>>да</option>
-                <option value="нет" <?php if ($propertyCharacteristic['balconyGlazed'] == "нет") echo "selected";?>>нет</option>
+                <option value="да" <?php if ($propertyCharacteristic['balconyGlazed'] == "да") echo "selected";?>>да
+                </option>
+                <option value="нет" <?php if ($propertyCharacteristic['balconyGlazed'] == "нет") echo "selected";?>>
+                    нет
+                </option>
             </select>
         </div>
     </div>
@@ -433,7 +476,8 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             Площадь кухни:
         </div>
         <div class="objectDescriptionBody">
-            <input type="text" size="7" name="kitchenSpace" value='<?php echo $propertyCharacteristic['kitchenSpace'];?>'>
+            <input type="text" size="7" name="kitchenSpace"
+                   value='<?php echo $propertyCharacteristic['kitchenSpace'];?>'>
             м²
         </div>
     </div>
@@ -453,20 +497,21 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         </div>
         <div class="objectDescriptionBody">
 
-        <?php if ($mode == "editLimited"):?>
+            <?php if ($mode == "editLimited"): ?>
             <input type="hidden" name="floor" value='<?php echo $propertyCharacteristic['floor'];?>'>
-            <?php echo $propertyCharacteristic['floor'];?>
+            <?php echo $propertyCharacteristic['floor']; ?>
             из
-            <input type="hidden" name="totalAmountFloor" value='<?php echo $propertyCharacteristic['totalAmountFloor'];?>'>
-            <?php echo $propertyCharacteristic['totalAmountFloor'];?>
-        <?php endif;?>
+            <input type="hidden" name="totalAmountFloor"
+                   value='<?php echo $propertyCharacteristic['totalAmountFloor'];?>'>
+            <?php echo $propertyCharacteristic['totalAmountFloor']; ?>
+            <?php endif;?>
 
-        <?php if ($mode == "new"|| $mode == "editFull"):?>
-        <input type="text" size="3" name="floor" value='<?php echo $propertyCharacteristic['floor'];?>'>
-        из
-        <input type="text" size="3" name="totalAmountFloor"
-               value='<?php echo $propertyCharacteristic['totalAmountFloor'];?>'>
-        <?php endif;?>
+            <?php if ($mode == "new" || $mode == "editFull"): ?>
+            <input type="text" size="3" name="floor" value='<?php echo $propertyCharacteristic['floor'];?>'>
+            из
+            <input type="text" size="3" name="totalAmountFloor"
+                   value='<?php echo $propertyCharacteristic['totalAmountFloor'];?>'>
+            <?php endif;?>
 
         </div>
     </div>
@@ -478,14 +523,15 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         </div>
         <div class="objectDescriptionBody">
 
-        <?php if ($mode == "editLimited"):?>
+            <?php if ($mode == "editLimited"): ?>
             <input type="hidden" name="numberOfFloor" value='<?php echo $propertyCharacteristic['numberOfFloor'];?>'>
-            <?php echo $propertyCharacteristic['numberOfFloor'];?>
-        <?php endif;?>
+            <?php echo $propertyCharacteristic['numberOfFloor']; ?>
+            <?php endif;?>
 
-        <?php if ($mode == "new"|| $mode == "editFull"):?>
-            <input type="text" size="3" name="numberOfFloor" value='<?php echo $propertyCharacteristic['numberOfFloor'];?>'>
-        <?php endif;?>
+            <?php if ($mode == "new" || $mode == "editFull"): ?>
+            <input type="text" size="3" name="numberOfFloor"
+                   value='<?php echo $propertyCharacteristic['numberOfFloor'];?>'>
+            <?php endif;?>
 
         </div>
     </div>
@@ -498,8 +544,10 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="concierge">
                 <option value="0" <?php if ($propertyCharacteristic['concierge'] == "0") echo "selected";?>></option>
-                <option value="есть" <?php if ($propertyCharacteristic['concierge'] == "есть") echo "selected";?>>есть</option>
-                <option value="нет" <?php if ($propertyCharacteristic['concierge'] == "нет") echo "selected";?>>нет</option>
+                <option value="есть" <?php if ($propertyCharacteristic['concierge'] == "есть") echo "selected";?>>есть
+                </option>
+                <option value="нет" <?php if ($propertyCharacteristic['concierge'] == "нет") echo "selected";?>>нет
+                </option>
             </select>
         </div>
     </div>
@@ -511,8 +559,10 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="intercom">
                 <option value="0" <?php if ($propertyCharacteristic['intercom'] == "0") echo "selected";?>></option>
-                <option value="есть" <?php if ($propertyCharacteristic['intercom'] == "есть") echo "selected";?>>есть</option>
-                <option value="нет" <?php if ($propertyCharacteristic['intercom'] == "нет") echo "selected";?>>нет</option>
+                <option value="есть" <?php if ($propertyCharacteristic['intercom'] == "есть") echo "selected";?>>есть
+                </option>
+                <option value="нет" <?php if ($propertyCharacteristic['intercom'] == "нет") echo "selected";?>>нет
+                </option>
             </select>
         </div>
     </div>
@@ -524,11 +574,18 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="parking">
                 <option value="0" <?php if ($propertyCharacteristic['parking'] == "0") echo "selected";?>></option>
-                <option value="охраняемая" <?php if ($propertyCharacteristic['parking'] == "охраняемая") echo "selected";?>>охраняемая</option>
-                <option value="неохраняемая" <?php if ($propertyCharacteristic['parking'] == "неохраняемая") echo "selected";?>>неохраняемая
+                <option value="охраняемая" <?php if ($propertyCharacteristic['parking'] == "охраняемая") echo "selected";?>>
+                    охраняемая
                 </option>
-                <option value="подземная" <?php if ($propertyCharacteristic['parking'] == "подземная") echo "selected";?>>подземная</option>
-                <option value="отсутствует" <?php if ($propertyCharacteristic['parking'] == "отсутствует") echo "selected";?>>отсутствует</option>
+                <option value="неохраняемая" <?php if ($propertyCharacteristic['parking'] == "неохраняемая") echo "selected";?>>
+                    неохраняемая
+                </option>
+                <option value="подземная" <?php if ($propertyCharacteristic['parking'] == "подземная") echo "selected";?>>
+                    подземная
+                </option>
+                <option value="отсутствует" <?php if ($propertyCharacteristic['parking'] == "отсутствует") echo "selected";?>>
+                    отсутствует
+                </option>
             </select>
         </div>
     </div>
@@ -590,28 +647,30 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             <input type="hidden" name="coordY" id="coordY" value='<?php echo $propertyCharacteristic['coordY'];?>'>
             <table class="tableForMap">
                 <tbody>
-                    <tr>
-                        <td>
+                <tr>
+                    <td>
 
-                            <?php if ($mode == "editLimited"):?>
-                            <input type="hidden" name="address" id="addressTextBox" value='<?php echo $propertyCharacteristic['address'];?>'>
-                            <?php echo $propertyCharacteristic['address']; ?>
-                            <?php endif;?>
+                        <?php if ($mode == "editLimited"): ?>
+                        <input type="hidden" name="address" id="addressTextBox"
+                               value='<?php echo $propertyCharacteristic['address'];?>'>
+                        <?php echo $propertyCharacteristic['address']; ?>
+                        <?php endif;?>
 
-                            <?php if ($mode == "new" || $mode == "editFull"): ?>
-                            <input type="text" name="address" id="addressTextBox" size="30" value='<?php echo $propertyCharacteristic['address'];?>'>
-                            <?php endif;?>
+                        <?php if ($mode == "new" || $mode == "editFull"): ?>
+                        <input type="text" name="address" id="addressTextBox" size="30"
+                               value='<?php echo $propertyCharacteristic['address'];?>'>
+                        <?php endif;?>
 
-                        </td>
-                        <td>
-                            <button id="checkAddressButton" style='margin-left: 0.7em;'>Подтвердить адрес</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan='2'><!-- Карта Яндекса -->
-                            <div id="mapForNewAdvert" style="width: 100%; height: 400px; margin-top: 15px;"></div>
-                        </td>
-                    </tr>
+                    </td>
+                    <td>
+                        <button id="checkAddressButton" style='margin-left: 0.7em;'>Подтвердить адрес</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan='2'><!-- Карта Яндекса -->
+                        <div id="mapForNewAdvert" style="width: 100%; height: 400px; margin-top: 15px;"></div>
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>
@@ -624,14 +683,16 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         </div>
         <div class="objectDescriptionBody">
 
-            <?php if ($mode == "editLimited"):?>
-            <input type="hidden" name="apartmentNumber" value='<?php echo $propertyCharacteristic['apartmentNumber'];?>'>
+            <?php if ($mode == "editLimited"): ?>
+            <input type="hidden" name="apartmentNumber"
+                   value='<?php echo $propertyCharacteristic['apartmentNumber'];?>'>
             <!-- Значение поля необходимо сохранить, так как JS в зависимости от него будет делать некоторые элементы недоступными для редактирования -->
             <?php if ($propertyCharacteristic['apartmentNumber'] != "") echo $propertyCharacteristic['apartmentNumber']; ?>
             <?php endif;?>
 
             <?php if ($mode == "new" || $mode == "editFull"): ?>
-            <input type="text" name="apartmentNumber" size="7" maxlength="20" value='<?php echo $propertyCharacteristic['apartmentNumber'];?>'>
+            <input type="text" name="apartmentNumber" size="7" maxlength="20"
+                   value='<?php echo $propertyCharacteristic['apartmentNumber'];?>'>
             <?php endif;?>
 
         </div>
@@ -644,31 +705,41 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="subwayStation" id="subwayStation">
                 <option value="0" <?php if ($propertyCharacteristic['subwayStation'] == "0") echo "selected";?>></option>
-                <option value="нет" <?php if ($propertyCharacteristic['subwayStation'] == "нет") echo "selected";?>>Нет</option>
+                <option value="нет" <?php if ($propertyCharacteristic['subwayStation'] == "нет") echo "selected";?>>
+                    Нет
+                </option>
                 <option
-                    value="Проспект Космонавтов" <?php if ($propertyCharacteristic['subwayStation'] == "Проспект Космонавтов") echo "selected";?>>
+                        value="Проспект Космонавтов" <?php if ($propertyCharacteristic['subwayStation'] == "Проспект Космонавтов") echo "selected";?>>
                     Проспект Космонавтов
                 </option>
-                <option value="Уралмаш" <?php if ($propertyCharacteristic['subwayStation'] == "Уралмаш") echo "selected";?>>Уралмаш</option>
+                <option value="Уралмаш" <?php if ($propertyCharacteristic['subwayStation'] == "Уралмаш") echo "selected";?>>
+                    Уралмаш
+                </option>
                 <option value="Машиностроителей" <?php if ($propertyCharacteristic['subwayStation'] == "Машиностроителей") echo "selected";?>>
                     Машиностроителей
                 </option>
-                <option value="Уральская" <?php if ($propertyCharacteristic['subwayStation'] == "Уральская") echo "selected";?>>Уральская</option>
-                <option value="Динамо" <?php if ($propertyCharacteristic['subwayStation'] == "Динамо") echo "selected";?>>Динамо</option>
+                <option value="Уральская" <?php if ($propertyCharacteristic['subwayStation'] == "Уральская") echo "selected";?>>
+                    Уральская
+                </option>
+                <option value="Динамо" <?php if ($propertyCharacteristic['subwayStation'] == "Динамо") echo "selected";?>>
+                    Динамо
+                </option>
                 <option value="Площадь 1905 г." <?php if ($propertyCharacteristic['subwayStation'] == "Площадь 1905 г.") echo "selected";?>>
                     Площадь 1905 г.
                 </option>
                 <option value="Геологическая" <?php if ($propertyCharacteristic['subwayStation'] == "Геологическая") echo "selected";?>>
                     Геологическая
                 </option>
-                <option value="Чкаловская" <?php if ($propertyCharacteristic['subwayStation'] == "Чкаловская") echo "selected";?>>Чкаловская
+                <option value="Чкаловская" <?php if ($propertyCharacteristic['subwayStation'] == "Чкаловская") echo "selected";?>>
+                    Чкаловская
                 </option>
                 <option value="Ботаническая" <?php if ($propertyCharacteristic['subwayStation'] == "Ботаническая") echo "selected";?>>
                     Ботаническая
                 </option>
             </select>
             <span notavailability="subwayStation_0&subwayStation_нет">
-            <input type="text" name="distanceToMetroStation" size="7" value='<?php echo $propertyCharacteristic['distanceToMetroStation'];?>'>
+            <input type="text" name="distanceToMetroStation" size="7"
+                   value='<?php echo $propertyCharacteristic['distanceToMetroStation'];?>'>
             мин. ходьбы
             </span>
         </div>
@@ -689,9 +760,13 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="currency" id="currency">
                 <option value="0" <?php if ($propertyCharacteristic['currency'] == "0") echo "selected";?>></option>
-                <option value="руб." <?php if ($propertyCharacteristic['currency'] == "руб.") echo "selected";?>>рубль</option>
-                <option value="дол. США" <?php if ($propertyCharacteristic['currency'] == "дол. США") echo "selected";?>>доллар США</option>
-                <option value="евро" <?php if ($propertyCharacteristic['currency'] == "евро") echo "selected";?>>евро</option>
+                <option value="руб." <?php if ($propertyCharacteristic['currency'] == "руб.") echo "selected";?>>рубль
+                </option>
+                <option value="дол. США" <?php if ($propertyCharacteristic['currency'] == "дол. США") echo "selected";?>>
+                    доллар США
+                </option>
+                <option value="евро" <?php if ($propertyCharacteristic['currency'] == "евро") echo "selected";?>>евро
+                </option>
             </select>
         </div>
     </div>
@@ -701,7 +776,8 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             Плата за аренду:
         </div>
         <div class="objectDescriptionBody">
-            <input type="text" name="costOfRenting" id="costOfRenting" size="7" value='<?php echo $propertyCharacteristic['costOfRenting'];?>'>
+            <input type="text" name="costOfRenting" id="costOfRenting" size="7"
+                   value='<?php echo $propertyCharacteristic['costOfRenting'];?>'>
             <span class="currency"></span> в месяц
         </div>
     </div>
@@ -713,14 +789,18 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="utilities" id="utilities">
                 <option value="0" <?php if ($propertyCharacteristic['utilities'] == "0") echo "selected";?>></option>
-                <option value="да" <?php if ($propertyCharacteristic['utilities'] == "да") echo "selected";?>>да</option>
-                <option value="нет" <?php if ($propertyCharacteristic['utilities'] == "нет") echo "selected";?>>нет</option>
+                <option value="да" <?php if ($propertyCharacteristic['utilities'] == "да") echo "selected";?>>да
+                </option>
+                <option value="нет" <?php if ($propertyCharacteristic['utilities'] == "нет") echo "selected";?>>нет
+                </option>
             </select>
             <span notavailability="utilities_0&utilities_нет">
             Летом
-            <input type="text" name="costInSummer" size="7" value='<?php echo $propertyCharacteristic['costInSummer'];?>'>
+            <input type="text" name="costInSummer" size="7"
+                   value='<?php echo $propertyCharacteristic['costInSummer'];?>'>
             <span class="currency"></span> Зимой
-            <input type="text" name="costInWinter" size="7" value='<?php echo $propertyCharacteristic['costInWinter'];?>'>
+            <input type="text" name="costInWinter" size="7"
+                   value='<?php echo $propertyCharacteristic['costInWinter'];?>'>
             <span class="currency"></span>
             </span>
         </div>
@@ -733,8 +813,11 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="electricPower">
                 <option value="0" <?php if ($propertyCharacteristic['electricPower'] == "0") echo "selected";?>></option>
-                <option value="да" <?php if ($propertyCharacteristic['electricPower'] == "да") echo "selected";?>>да</option>
-                <option value="нет" <?php if ($propertyCharacteristic['electricPower'] == "нет") echo "selected";?>>нет</option>
+                <option value="да" <?php if ($propertyCharacteristic['electricPower'] == "да") echo "selected";?>>да
+                </option>
+                <option value="нет" <?php if ($propertyCharacteristic['electricPower'] == "нет") echo "selected";?>>
+                    нет
+                </option>
             </select>
         </div>
     </div>
@@ -746,7 +829,8 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="bail" id="bail">
                 <option value="0" <?php if ($propertyCharacteristic['bail'] == "0") echo "selected";?>></option>
-                <option value="есть" <?php if ($propertyCharacteristic['bail'] == "есть") echo "selected";?>>есть</option>
+                <option value="есть" <?php if ($propertyCharacteristic['bail'] == "есть") echo "selected";?>>есть
+                </option>
                 <option value="нет" <?php if ($propertyCharacteristic['bail'] == "нет") echo "selected";?>>нет</option>
             </select>
             <span notavailability="bail_0&bail_нет">
@@ -763,13 +847,26 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="prepayment">
                 <option value="0" <?php if ($propertyCharacteristic['prepayment'] == "0") echo "selected";?>></option>
-                <option value="нет" <?php if ($propertyCharacteristic['prepayment'] == "нет") echo "selected";?>>нет</option>
-                <option value="1 месяц" <?php if ($propertyCharacteristic['prepayment'] == "1 месяц") echo "selected";?>>1 месяц</option>
-                <option value="2 месяца" <?php if ($propertyCharacteristic['prepayment'] == "2 месяца") echo "selected";?>>2 месяца</option>
-                <option value="3 месяца" <?php if ($propertyCharacteristic['prepayment'] == "3 месяца") echo "selected";?>>3 месяца</option>
-                <option value="4 месяца" <?php if ($propertyCharacteristic['prepayment'] == "4 месяца") echo "selected";?>>4 месяца</option>
-                <option value="5 месяцев" <?php if ($propertyCharacteristic['prepayment'] == "5 месяцев") echo "selected";?>>5 месяцев</option>
-                <option value="6 месяцев" <?php if ($propertyCharacteristic['prepayment'] == "6 месяцев") echo "selected";?>>6 месяцев</option>
+                <option value="нет" <?php if ($propertyCharacteristic['prepayment'] == "нет") echo "selected";?>>нет
+                </option>
+                <option value="1 месяц" <?php if ($propertyCharacteristic['prepayment'] == "1 месяц") echo "selected";?>>
+                    1 месяц
+                </option>
+                <option value="2 месяца" <?php if ($propertyCharacteristic['prepayment'] == "2 месяца") echo "selected";?>>
+                    2 месяца
+                </option>
+                <option value="3 месяца" <?php if ($propertyCharacteristic['prepayment'] == "3 месяца") echo "selected";?>>
+                    3 месяца
+                </option>
+                <option value="4 месяца" <?php if ($propertyCharacteristic['prepayment'] == "4 месяца") echo "selected";?>>
+                    4 месяца
+                </option>
+                <option value="5 месяцев" <?php if ($propertyCharacteristic['prepayment'] == "5 месяцев") echo "selected";?>>
+                    5 месяцев
+                </option>
+                <option value="6 месяцев" <?php if ($propertyCharacteristic['prepayment'] == "6 месяцев") echo "selected";?>>
+                    6 месяцев
+                </option>
             </select>
         </div>
     </div>
@@ -780,16 +877,21 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         </div>
         <div class="objectDescriptionBody">
 
-    <?php if ($mode == "new" || $mode == "editFull"): ?>
-        <input type="text" size="7" name="compensationMoney" id="compensationMoney" value='<?php echo $propertyCharacteristic['compensationMoney'];?>'>
-        <span class="currency"></span> или <input type="text" size="7" name="compensationPercent" id="compensationPercent" value='<?php echo $propertyCharacteristic['compensationPercent'];?>'>
-        % от стоимости аренды
-    <?php endif;?>
+            <?php if ($mode == "new" || $mode == "editFull"): ?>
+            <input type="text" size="7" name="compensationMoney" id="compensationMoney"
+                   value='<?php echo $propertyCharacteristic['compensationMoney'];?>'>
+            <span class="currency"></span> или <input type="text" size="7" name="compensationPercent"
+                                                      id="compensationPercent"
+                                                      value='<?php echo $propertyCharacteristic['compensationPercent'];?>'>
+            % от стоимости аренды
+            <?php endif;?>
 
-    <?php if ($mode == "editLimited"): ?>
-            <input type="hidden" name="compensationMoney" id="compensationMoney" value='<?php echo $propertyCharacteristic['compensationMoney'];?>'>
-            <input type="hidden" name="compensationPercent" id="compensationPercent" value='<?php echo $propertyCharacteristic['compensationPercent'];?>'>
-    <?php endif;?>
+            <?php if ($mode == "editLimited"): ?>
+            <input type="hidden" name="compensationMoney" id="compensationMoney"
+                   value='<?php echo $propertyCharacteristic['compensationMoney'];?>'>
+            <input type="hidden" name="compensationPercent" id="compensationPercent"
+                   value='<?php echo $propertyCharacteristic['compensationPercent'];?>'>
+            <?php endif;?>
 
         </div>
     </div>
@@ -810,19 +912,22 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             <select name="repair">
                 <option value="0" <?php if ($propertyCharacteristic['repair'] == "0") echo "selected";?>></option>
                 <option
-                    value="не выполнялся (новый дом)" <?php if ($propertyCharacteristic['repair'] == "не выполнялся (новый дом)") echo "selected";?>>
+                        value="не выполнялся (новый дом)" <?php if ($propertyCharacteristic['repair'] == "не выполнялся (новый дом)") echo "selected";?>>
                     не выполнялся (новый дом)
                 </option>
-                <option value="сделан только что" <?php if ($propertyCharacteristic['repair'] == "сделан только что") echo "selected";?>>сделан
+                <option value="сделан только что" <?php if ($propertyCharacteristic['repair'] == "сделан только что") echo "selected";?>>
+                    сделан
                     только что
                 </option>
                 <option value="меньше 1 года назад" <?php if ($propertyCharacteristic['repair'] == "меньше 1 года назад") echo "selected";?>>
                     меньше 1 года назад
                 </option>
-                <option value="больше года назад" <?php if ($propertyCharacteristic['repair'] == "больше года назад") echo "selected";?>>больше
+                <option value="больше года назад" <?php if ($propertyCharacteristic['repair'] == "больше года назад") echo "selected";?>>
+                    больше
                     года назад
                 </option>
-                <option value="выполнялся давно" <?php if ($propertyCharacteristic['repair'] == "выполнялся давно") echo "selected";?>>выполнялся
+                <option value="выполнялся давно" <?php if ($propertyCharacteristic['repair'] == "выполнялся давно") echo "selected";?>>
+                    выполнялся
                     давно
                 </option>
             </select>
@@ -836,13 +941,15 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody" style="min-width: 400px">
             <select name="furnish">
                 <option value="0" <?php if ($propertyCharacteristic['furnish'] == "0") echo "selected";?>></option>
-                <option value="евростандарт" <?php if ($propertyCharacteristic['furnish'] == "евростандарт") echo "selected";?>>евростандарт
+                <option value="евростандарт" <?php if ($propertyCharacteristic['furnish'] == "евростандарт") echo "selected";?>>
+                    евростандарт
                 </option>
                 <option
-                    value="свежая (новые обои, побелка потолков)" <?php if ($propertyCharacteristic['furnish'] == "свежая (новые обои, побелка потолков)") echo "selected";?>>
+                        value="свежая (новые обои, побелка потолков)" <?php if ($propertyCharacteristic['furnish'] == "свежая (новые обои, побелка потолков)") echo "selected";?>>
                     свежая (новые обои, побелка потолков)
                 </option>
-                <option value="бабушкин вариант" <?php if ($propertyCharacteristic['furnish'] == "бабушкин вариант") echo "selected";?>>бабушкин
+                <option value="бабушкин вариант" <?php if ($propertyCharacteristic['furnish'] == "бабушкин вариант") echo "selected";?>>
+                    бабушкин
                     вариант
                 </option>
                 <option value="требует обновления" <?php if ($propertyCharacteristic['furnish'] == "требует обновления") echo "selected";?>>
@@ -859,9 +966,14 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="windows">
                 <option value="0" <?php if ($propertyCharacteristic['windows'] == "0") echo "selected";?>></option>
-                <option value="деревянные" <?php if ($propertyCharacteristic['windows'] == "деревянные") echo "selected";?>>деревянные</option>
-                <option value="пластиковые" <?php if ($propertyCharacteristic['windows'] == "пластиковые") echo "selected";?>>пластиковые</option>
-                <option value="иное" <?php if ($propertyCharacteristic['windows'] == "иное") echo "selected";?>>иное</option>
+                <option value="деревянные" <?php if ($propertyCharacteristic['windows'] == "деревянные") echo "selected";?>>
+                    деревянные
+                </option>
+                <option value="пластиковые" <?php if ($propertyCharacteristic['windows'] == "пластиковые") echo "selected";?>>
+                    пластиковые
+                </option>
+                <option value="иное" <?php if ($propertyCharacteristic['windows'] == "иное") echo "selected";?>>иное
+                </option>
             </select>
         </div>
     </div>
@@ -881,8 +993,11 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="internet">
                 <option value="0" <?php if ($propertyCharacteristic['internet'] == "0") echo "selected";?>></option>
-                <option value="проведен" <?php if ($propertyCharacteristic['internet'] == "проведен") echo "selected";?>>проведен</option>
-                <option value="не проведен" <?php if ($propertyCharacteristic['internet'] == "не проведен") echo "selected";?>>не проведен
+                <option value="проведен" <?php if ($propertyCharacteristic['internet'] == "проведен") echo "selected";?>>
+                    проведен
+                </option>
+                <option value="не проведен" <?php if ($propertyCharacteristic['internet'] == "не проведен") echo "selected";?>>
+                    не проведен
                 </option>
             </select>
         </div>
@@ -895,8 +1010,11 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="telephoneLine">
                 <option value="0" <?php if ($propertyCharacteristic['telephoneLine'] == "0") echo "selected";?>></option>
-                <option value="проведен" <?php if ($propertyCharacteristic['telephoneLine'] == "проведен") echo "selected";?>>проведен</option>
-                <option value="не проведен" <?php if ($propertyCharacteristic['telephoneLine'] == "не проведен") echo "selected";?>>не проведен
+                <option value="проведен" <?php if ($propertyCharacteristic['telephoneLine'] == "проведен") echo "selected";?>>
+                    проведен
+                </option>
+                <option value="не проведен" <?php if ($propertyCharacteristic['telephoneLine'] == "не проведен") echo "selected";?>>
+                    не проведен
                 </option>
             </select>
         </div>
@@ -909,8 +1027,11 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="cableTV">
                 <option value="0" <?php if ($propertyCharacteristic['cableTV'] == "0") echo "selected";?>></option>
-                <option value="проведено" <?php if ($propertyCharacteristic['cableTV'] == "проведено") echo "selected";?>>проведено</option>
-                <option value="не проведено" <?php if ($propertyCharacteristic['cableTV'] == "не проведено") echo "selected";?>>не проведено
+                <option value="проведено" <?php if ($propertyCharacteristic['cableTV'] == "проведено") echo "selected";?>>
+                    проведено
+                </option>
+                <option value="не проведено" <?php if ($propertyCharacteristic['cableTV'] == "не проведено") echo "selected";?>>
+                    не проведено
                 </option>
             </select>
         </div>
@@ -920,359 +1041,364 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
 
 <div class="advertDescriptionChapter" id="furniture">
 
-    <div class="advertDescriptionChapterHeader">
-        Мебель и бытовая техника
-    </div>
+<div class="advertDescriptionChapterHeader">
+    Мебель и бытовая техника
+</div>
 
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
-        <div class="objectDescriptionItemLabel">
-            Мебель в жилой зоне:
-        </div>
-        <div class="objectDescriptionBody">
-            <ul>
-                <li>
-                    <label><input type="checkbox" name="furnitureInLivingArea[]" value="диван раскладной"
-                        <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
-                        if ($value == "диван раскладной") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> диван раскладной</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInLivingArea[]"
-                           value="диван нераскладной" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
-                        if ($value == "диван нераскладной") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> диван нераскладной</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInLivingArea[]"
-                           value="кровать одноместная" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
-                        if ($value == "кровать одноместная") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> кровать одноместная</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInLivingArea[]"
-                           value="кровать двухместная" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
-                        if ($value == "кровать двухместная") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> кровать двухместная</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInLivingArea[]"
-                           value="кровать детская" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
-                        if ($value == "кровать детская") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> кровать детская</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInLivingArea[]"
-                           value="стол письменный" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
-                        if ($value == "стол письменный") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> стол письменный</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInLivingArea[]"
-                           value="стол компьютерный" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
-                        if ($value == "стол компьютерный") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> стол компьютерный</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInLivingArea[]"
-                           value="стол журнальный" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
-                        if ($value == "стол журнальный") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> стол журнальный</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInLivingArea[]"
-                           value="стол раскладной" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
-                        if ($value == "стол раскладной") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> стол раскладной</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInLivingArea[]"
-                           value="кресло раскладное" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
-                        if ($value == "кресло раскладное") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> кресло раскладное</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInLivingArea[]"
-                           value="кресло нераскладное" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
-                        if ($value == "кресло нераскладное") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> кресло нераскладное</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInLivingArea[]"
-                           value="стулья и табуретки" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
-                        if ($value == "стулья и табуретки") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> стулья и табуретки</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInLivingArea[]"
-                           value="стенка" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
-                        if ($value == "стенка") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> стенка</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInLivingArea[]"
-                           value="шкаф для одежды" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
-                        if ($value == "шкаф для одежды") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> шкаф для одежды</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInLivingArea[]"
-                           value="шкаф-купе" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
-                        if ($value == "шкаф-купе") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> шкаф-купе</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInLivingArea[]"
-                           value="комод" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
-                        if ($value == "комод") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> комод</label>
-                </li>
-                <li>
-                    <input type="text" name="furnitureInLivingAreaExtra" maxlength="254"
-                           title='Перечислите через запятую те предметы мебели в жилой зоне, что предоставляются вместе с арендуемой недвижимостью и не были указаны в списке выше. Например: "трюмо, тумбочка под телевизор"' value='<?php echo $propertyCharacteristic['furnitureInLivingAreaExtra'];?>'>
-                </li>
-            </ul>
-        </div>
+<div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
+    <div class="objectDescriptionItemLabel">
+        Мебель в жилой зоне:
     </div>
+    <div class="objectDescriptionBody">
+        <ul>
+            <li>
+                <label><input type="checkbox" name="furnitureInLivingArea[]" value="диван раскладной"
+                    <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
+                    if ($value == "диван раскладной") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> диван раскладной</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInLivingArea[]"
+                              value="диван нераскладной" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
+                    if ($value == "диван нераскладной") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> диван нераскладной</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInLivingArea[]"
+                              value="кровать одноместная" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
+                    if ($value == "кровать одноместная") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> кровать одноместная</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInLivingArea[]"
+                              value="кровать двухместная" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
+                    if ($value == "кровать двухместная") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> кровать двухместная</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInLivingArea[]"
+                              value="кровать детская" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
+                    if ($value == "кровать детская") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> кровать детская</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInLivingArea[]"
+                              value="стол письменный" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
+                    if ($value == "стол письменный") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> стол письменный</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInLivingArea[]"
+                              value="стол компьютерный" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
+                    if ($value == "стол компьютерный") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> стол компьютерный</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInLivingArea[]"
+                              value="стол журнальный" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
+                    if ($value == "стол журнальный") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> стол журнальный</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInLivingArea[]"
+                              value="стол раскладной" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
+                    if ($value == "стол раскладной") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> стол раскладной</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInLivingArea[]"
+                              value="кресло раскладное" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
+                    if ($value == "кресло раскладное") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> кресло раскладное</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInLivingArea[]"
+                              value="кресло нераскладное" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
+                    if ($value == "кресло нераскладное") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> кресло нераскладное</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInLivingArea[]"
+                              value="стулья и табуретки" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
+                    if ($value == "стулья и табуретки") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> стулья и табуретки</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInLivingArea[]"
+                              value="стенка" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
+                    if ($value == "стенка") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> стенка</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInLivingArea[]"
+                              value="шкаф для одежды" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
+                    if ($value == "шкаф для одежды") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> шкаф для одежды</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInLivingArea[]"
+                              value="шкаф-купе" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
+                    if ($value == "шкаф-купе") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> шкаф-купе</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInLivingArea[]"
+                              value="комод" <?php foreach ($propertyCharacteristic['furnitureInLivingArea'] as $value) {
+                    if ($value == "комод") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> комод</label>
+            </li>
+            <li>
+                <input type="text" name="furnitureInLivingAreaExtra" maxlength="254"
+                       title='Перечислите через запятую те предметы мебели в жилой зоне, что предоставляются вместе с арендуемой недвижимостью и не были указаны в списке выше. Например: "трюмо, тумбочка под телевизор"'
+                       value='<?php echo $propertyCharacteristic['furnitureInLivingAreaExtra'];?>'>
+            </li>
+        </ul>
+    </div>
+</div>
 
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
-        <div class="objectDescriptionItemLabel">
-            Мебель на кухне:
-        </div>
-        <div class="objectDescriptionBody">
-            <ul>
-                <li>
-                    <label><input type="checkbox" name="furnitureInKitchen[]"
-                           value="стол обеденный" <?php foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
-                        if ($value == "стол обеденный") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> стол обеденный</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInKitchen[]"
-                           value="стулья, табуретки" <?php foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
-                        if ($value == "стулья, табуретки") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> стулья, табуретки</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInKitchen[]"
-                           value="диван" <?php foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
-                        if ($value == "диван") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> диван</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInKitchen[]"
-                           value="кухонный гарнитур" <?php foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
-                        if ($value == "кухонный гарнитур") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> кухонный гарнитур</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInKitchen[]"
-                           value="шкафчики навесные" <?php foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
-                        if ($value == "шкафчики навесные") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> шкафчики навесные</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="furnitureInKitchen[]"
-                           value="шкафчики напольные" <?php foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
-                        if ($value == "шкафчики напольные") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> шкафчики напольные</label>
-                </li>
-                <li>
-                    <input type="text" name="furnitureInKitchenExtra" maxlength="254"
-                           title='Перечислите через запятую те предметы мебели на кухне, что предоставляются вместе с арендуемой недвижимостью и не были указаны в списке выше. Например: "трюмо, тумбочка под телевизор"' value='<?php echo $propertyCharacteristic['furnitureInKitchenExtra'];?>'>
-                </li>
-            </ul>
-        </div>
+<div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
+    <div class="objectDescriptionItemLabel">
+        Мебель на кухне:
     </div>
+    <div class="objectDescriptionBody">
+        <ul>
+            <li>
+                <label><input type="checkbox" name="furnitureInKitchen[]"
+                              value="стол обеденный" <?php foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
+                    if ($value == "стол обеденный") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> стол обеденный</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInKitchen[]"
+                              value="стулья, табуретки" <?php foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
+                    if ($value == "стулья, табуретки") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> стулья, табуретки</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInKitchen[]"
+                              value="диван" <?php foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
+                    if ($value == "диван") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> диван</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInKitchen[]"
+                              value="кухонный гарнитур" <?php foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
+                    if ($value == "кухонный гарнитур") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> кухонный гарнитур</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInKitchen[]"
+                              value="шкафчики навесные" <?php foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
+                    if ($value == "шкафчики навесные") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> шкафчики навесные</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="furnitureInKitchen[]"
+                              value="шкафчики напольные" <?php foreach ($propertyCharacteristic['furnitureInKitchen'] as $value) {
+                    if ($value == "шкафчики напольные") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> шкафчики напольные</label>
+            </li>
+            <li>
+                <input type="text" name="furnitureInKitchenExtra" maxlength="254"
+                       title='Перечислите через запятую те предметы мебели на кухне, что предоставляются вместе с арендуемой недвижимостью и не были указаны в списке выше. Например: "трюмо, тумбочка под телевизор"'
+                       value='<?php echo $propertyCharacteristic['furnitureInKitchenExtra'];?>'>
+            </li>
+        </ul>
+    </div>
+</div>
 
-    <div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
-        <div class="objectDescriptionItemLabel">
-            Бытовая техника:
-        </div>
-        <div class="objectDescriptionBody">
-            <ul>
-                <li>
-                    <label><input type="checkbox" name="appliances[]"
-                           value="холодильник" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
-                        if ($value == "холодильник") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> холодильник</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="appliances[]"
-                           value="микроволновая печь" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
-                        if ($value == "микроволновая печь") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> микроволновая печь</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="appliances[]" value="телевизор" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
-                        if ($value == "телевизор") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> телевизор</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="appliances[]"
-                           value="стиральная машина (автомат)" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
-                        if ($value == "стиральная машина (автомат)") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> стиральная машина (автомат)</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="appliances[]"
-                           value="стиральная машина (не автомат)" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
-                        if ($value == "стиральная машина (не автомат)") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> стиральная машина (не автомат)</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="appliances[]"
-                           value="нагреватель воды" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
-                        if ($value == "нагреватель воды") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> нагреватель воды</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="appliances[]" value="пылесос" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
-                        if ($value == "пылесос") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> пылесос</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="appliances[]"
-                           value="кондиционер" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
-                        if ($value == "кондиционер") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> кондиционер</label>
-                </li>
-                <li>
-                    <label><input type="checkbox" name="appliances[]"
-                           value="охранная сигнализация" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
-                        if ($value == "охранная сигнализация") {
-                            echo "checked";
-                            break;
-                        }
-                    }
-                        ?>> охранная сигнализация</label>
-                </li>
-                <li>
-                    <input type="text" name="appliancesExtra" maxlength="254"
-                           title='Перечислите через запятую ту бытовую технику, что предоставляется вместе с арендуемой недвижимостью и не была указана в списке выше. Например: "кухонный комбайн, компьютер"' value='<?php echo $propertyCharacteristic['appliancesExtra'];?>'>
-                </li>
-            </ul>
-        </div>
+<div class="objectDescriptionItem" notavailability="typeOfObject_0&typeOfObject_гараж">
+    <div class="objectDescriptionItemLabel">
+        Бытовая техника:
     </div>
+    <div class="objectDescriptionBody">
+        <ul>
+            <li>
+                <label><input type="checkbox" name="appliances[]"
+                              value="холодильник" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
+                    if ($value == "холодильник") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> холодильник</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="appliances[]"
+                              value="микроволновая печь" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
+                    if ($value == "микроволновая печь") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> микроволновая печь</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="appliances[]"
+                              value="телевизор" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
+                    if ($value == "телевизор") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> телевизор</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="appliances[]"
+                              value="стиральная машина (автомат)" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
+                    if ($value == "стиральная машина (автомат)") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> стиральная машина (автомат)</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="appliances[]"
+                              value="стиральная машина (не автомат)" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
+                    if ($value == "стиральная машина (не автомат)") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> стиральная машина (не автомат)</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="appliances[]"
+                              value="нагреватель воды" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
+                    if ($value == "нагреватель воды") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> нагреватель воды</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="appliances[]"
+                              value="пылесос" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
+                    if ($value == "пылесос") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> пылесос</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="appliances[]"
+                              value="кондиционер" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
+                    if ($value == "кондиционер") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> кондиционер</label>
+            </li>
+            <li>
+                <label><input type="checkbox" name="appliances[]"
+                              value="охранная сигнализация" <?php foreach ($propertyCharacteristic['appliances'] as $value) {
+                    if ($value == "охранная сигнализация") {
+                        echo "checked";
+                        break;
+                    }
+                }
+                    ?>> охранная сигнализация</label>
+            </li>
+            <li>
+                <input type="text" name="appliancesExtra" maxlength="254"
+                       title='Перечислите через запятую ту бытовую технику, что предоставляется вместе с арендуемой недвижимостью и не была указана в списке выше. Например: "кухонный комбайн, компьютер"'
+                       value='<?php echo $propertyCharacteristic['appliancesExtra'];?>'>
+            </li>
+        </ul>
+    </div>
+</div>
 
 </div>
 
@@ -1287,23 +1413,25 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             Пол:
         </div>
         <div class="objectDescriptionBody">
-            <label><input type="checkbox" name="sexOfTenant[]" value="мужчина" <?php foreach ($propertyCharacteristic['sexOfTenant'] as $value) {
+            <label><input type="checkbox" name="sexOfTenant[]"
+                          value="мужчина" <?php foreach ($propertyCharacteristic['sexOfTenant'] as $value) {
                 if ($value == "мужчина") {
                     echo "checked";
                     break;
                 }
             }
                 ?>>
-            мужчина</label>
+                мужчина</label>
             <br>
-            <label><input type="checkbox" name="sexOfTenant[]" value="женщина" <?php foreach ($propertyCharacteristic['sexOfTenant'] as $value) {
+            <label><input type="checkbox" name="sexOfTenant[]"
+                          value="женщина" <?php foreach ($propertyCharacteristic['sexOfTenant'] as $value) {
                 if ($value == "женщина") {
                     echo "checked";
                     break;
                 }
             }
                 ?>>
-            женщина</label>
+                женщина</label>
         </div>
     </div>
 
@@ -1312,59 +1440,65 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             Отношения между арендаторами:
         </div>
         <div class="objectDescriptionBody">
-            <label><input type="checkbox" name="relations[]" value="один человек" <?php foreach ($propertyCharacteristic['relations'] as $value) {
+            <label><input type="checkbox" name="relations[]"
+                          value="один человек" <?php foreach ($propertyCharacteristic['relations'] as $value) {
                 if ($value == "один человек") {
                     echo "checked";
                     break;
                 }
             }
                 ?>>
-            один человек</label>
+                один человек</label>
             <br>
-            <label><input type="checkbox" name="relations[]" value="семья" <?php foreach ($propertyCharacteristic['relations'] as $value) {
+            <label><input type="checkbox" name="relations[]"
+                          value="семья" <?php foreach ($propertyCharacteristic['relations'] as $value) {
                 if ($value == "семья") {
                     echo "checked";
                     break;
                 }
             }
                 ?>>
-            семья</label>
+                семья</label>
             <br>
-            <label><input type="checkbox" name="relations[]" value="пара" <?php foreach ($propertyCharacteristic['relations'] as $value) {
+            <label><input type="checkbox" name="relations[]"
+                          value="пара" <?php foreach ($propertyCharacteristic['relations'] as $value) {
                 if ($value == "пара") {
                     echo "checked";
                     break;
                 }
             }
                 ?>>
-            пара</label>
+                пара</label>
             <br>
-            <label><input type="checkbox" name="relations[]" value="2 мальчика" <?php foreach ($propertyCharacteristic['relations'] as $value) {
+            <label><input type="checkbox" name="relations[]"
+                          value="2 мальчика" <?php foreach ($propertyCharacteristic['relations'] as $value) {
                 if ($value == "2 мальчика") {
                     echo "checked";
                     break;
                 }
             }
                 ?>>
-            2 мальчика</label>
+                2 мальчика</label>
             <br>
-            <label><input type="checkbox" name="relations[]" value="2 девочки" <?php foreach ($propertyCharacteristic['relations'] as $value) {
+            <label><input type="checkbox" name="relations[]"
+                          value="2 девочки" <?php foreach ($propertyCharacteristic['relations'] as $value) {
                 if ($value == "2 девочки") {
                     echo "checked";
                     break;
                 }
             }
                 ?>>
-            2 девочки</label>
+                2 девочки</label>
             <br>
-            <label><input type="checkbox" name="relations[]" value="группа людей" <?php foreach ($propertyCharacteristic['relations'] as $value) {
+            <label><input type="checkbox" name="relations[]"
+                          value="группа людей" <?php foreach ($propertyCharacteristic['relations'] as $value) {
                 if ($value == "группа людей") {
                     echo "checked";
                     break;
                 }
             }
                 ?>>
-            группа людей</label>
+                группа людей</label>
         </div>
     </div>
 
@@ -1375,14 +1509,16 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="children">
                 <option value="0" <?php if ($propertyCharacteristic['children'] == "0") echo "selected";?>></option>
-                <option value="не имеет значения" <?php if ($propertyCharacteristic['children'] == "не имеет значения") echo "selected";?>>не
+                <option value="не имеет значения" <?php if ($propertyCharacteristic['children'] == "не имеет значения") echo "selected";?>>
+                    не
                     имеет значения
                 </option>
                 <option
-                    value="с детьми старше 4-х лет" <?php if ($propertyCharacteristic['children'] == "с детьми старше 4-х лет") echo "selected";?>>
+                        value="с детьми старше 4-х лет" <?php if ($propertyCharacteristic['children'] == "с детьми старше 4-х лет") echo "selected";?>>
                     с детьми старше 4-х лет
                 </option>
-                <option value="только без детей" <?php if ($propertyCharacteristic['children'] == "только без детей") echo "selected";?>>только
+                <option value="только без детей" <?php if ($propertyCharacteristic['children'] == "только без детей") echo "selected";?>>
+                    только
                     без детей
                 </option>
             </select>
@@ -1396,7 +1532,8 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <div class="objectDescriptionBody">
             <select name="animals">
                 <option value="0" <?php if ($propertyCharacteristic['animals'] == "0") echo "selected";?>></option>
-                <option value="не имеет значения" <?php if ($propertyCharacteristic['animals'] == "не имеет значения") echo "selected";?>>не имеет
+                <option value="не имеет значения" <?php if ($propertyCharacteristic['animals'] == "не имеет значения") echo "selected";?>>
+                    не имеет
                     значения
                 </option>
                 <option value="только без животных" <?php if ($propertyCharacteristic['animals'] == "только без животных") echo "selected";?>>
@@ -1410,144 +1547,226 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
 
 <div class="advertDescriptionChapter" id="specialConditions">
 
-    <div class="advertDescriptionChapterHeader">
-        Особые условия
-    </div>
+<div class="advertDescriptionChapterHeader">
+    Особые условия
+</div>
 
-    <div class="objectDescriptionItem" title="Этот номер будет использоваться только сотрудниками нашей компании">
-        <div class="objectDescriptionItemLabel">
-            Контактный номер телефона:
-        </div>
-        <div class="objectDescriptionBody">
-            <input type="text" name="contactTelephonNumber" size="15" value='<?php echo $propertyCharacteristic['contactTelephonNumber'];?>'>
-        </div>
+<div class="objectDescriptionItem" title="Этот номер будет использоваться только сотрудниками нашей компании">
+    <div class="objectDescriptionItemLabel">
+        Контактный номер телефона:
     </div>
-
-    <div class="objectDescriptionItem">
-        <div class="objectDescriptionItemLabel" style="line-height: 1.8em;">
-            Время для звонков:
-        </div>
-        <div class="objectDescriptionBody">
-            с
-            <select name="timeForRingBegin">
-                <option value="0" <?php if ($propertyCharacteristic['timeForRingBegin'] == "0") echo "selected";?>></option>
-                <option value="6:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "6:00") echo "selected";?>>6:00</option>
-                <option value="7:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "7:00") echo "selected";?>>7:00</option>
-                <option value="8:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "8:00") echo "selected";?>>8:00</option>
-                <option value="9:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "9:00") echo "selected";?>>9:00</option>
-                <option value="10:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "10:00") echo "selected";?>>10:00</option>
-                <option value="11:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "11:00") echo "selected";?>>11:00</option>
-                <option value="12:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "12:00") echo "selected";?>>12:00</option>
-                <option value="13:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "13:00") echo "selected";?>>13:00</option>
-                <option value="14:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "14:00") echo "selected";?>>14:00</option>
-                <option value="15:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "15:00") echo "selected";?>>15:00</option>
-                <option value="16:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "16:00") echo "selected";?>>16:00</option>
-                <option value="17:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "17:00") echo "selected";?>>17:00</option>
-                <option value="18:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "18:00") echo "selected";?>>18:00</option>
-                <option value="19:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "19:00") echo "selected";?>>19:00</option>
-                <option value="20:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "20:00") echo "selected";?>>20:00</option>
-                <option value="21:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "21:00") echo "selected";?>>21:00</option>
-                <option value="22:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "22:00") echo "selected";?>>22:00</option>
-                <option value="23:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "23:00") echo "selected";?>>23:00</option>
-                <option value="24:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "24:00") echo "selected";?>>24:00</option>
-            </select>
-            до
-            <select name="timeForRingEnd">
-                <option value="0" <?php if ($propertyCharacteristic['timeForRingEnd'] == "0") echo "selected";?>></option>
-                <option value="6:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "6:00") echo "selected";?>>6:00</option>
-                <option value="7:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "7:00") echo "selected";?>>7:00</option>
-                <option value="8:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "8:00") echo "selected";?>>8:00</option>
-                <option value="9:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "9:00") echo "selected";?>>9:00</option>
-                <option value="10:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "10:00") echo "selected";?>>10:00</option>
-                <option value="11:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "11:00") echo "selected";?>>11:00</option>
-                <option value="12:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "12:00") echo "selected";?>>12:00</option>
-                <option value="13:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "13:00") echo "selected";?>>13:00</option>
-                <option value="14:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "14:00") echo "selected";?>>14:00</option>
-                <option value="15:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "15:00") echo "selected";?>>15:00</option>
-                <option value="16:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "16:00") echo "selected";?>>16:00</option>
-                <option value="17:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "17:00") echo "selected";?>>17:00</option>
-                <option value="18:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "18:00") echo "selected";?>>18:00</option>
-                <option value="19:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "19:00") echo "selected";?>>19:00</option>
-                <option value="20:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "20:00") echo "selected";?>>20:00</option>
-                <option value="21:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "21:00") echo "selected";?>>21:00</option>
-                <option value="22:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "22:00") echo "selected";?>>22:00</option>
-                <option value="23:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "23:00") echo "selected";?>>23:00</option>
-                <option value="24:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "24:00") echo "selected";?>>24:00</option>
-            </select>
-        </div>
+    <div class="objectDescriptionBody">
+        <input type="text" name="contactTelephonNumber" size="15"
+               value='<?php echo $propertyCharacteristic['contactTelephonNumber'];?>'>
     </div>
+</div>
 
-    <div class="objectDescriptionItem">
-        <div class="objectDescriptionItemLabel">
-            Где проживает собственник:
-        </div>
-        <div class="objectDescriptionBody" style="min-width: 330px">
-            <select name="checking">
-                <option value="0"  <?php if ($propertyCharacteristic['checking'] == "0") echo "selected";?>></option>
-                <option
+<div class="objectDescriptionItem">
+    <div class="objectDescriptionItemLabel" style="line-height: 1.8em;">
+        Время для звонков:
+    </div>
+    <div class="objectDescriptionBody">
+        с
+        <select name="timeForRingBegin">
+            <option value="0" <?php if ($propertyCharacteristic['timeForRingBegin'] == "0") echo "selected";?>></option>
+            <option value="6:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "6:00") echo "selected";?>>
+                6:00
+            </option>
+            <option value="7:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "7:00") echo "selected";?>>
+                7:00
+            </option>
+            <option value="8:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "8:00") echo "selected";?>>
+                8:00
+            </option>
+            <option value="9:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "9:00") echo "selected";?>>
+                9:00
+            </option>
+            <option value="10:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "10:00") echo "selected";?>>
+                10:00
+            </option>
+            <option value="11:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "11:00") echo "selected";?>>
+                11:00
+            </option>
+            <option value="12:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "12:00") echo "selected";?>>
+                12:00
+            </option>
+            <option value="13:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "13:00") echo "selected";?>>
+                13:00
+            </option>
+            <option value="14:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "14:00") echo "selected";?>>
+                14:00
+            </option>
+            <option value="15:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "15:00") echo "selected";?>>
+                15:00
+            </option>
+            <option value="16:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "16:00") echo "selected";?>>
+                16:00
+            </option>
+            <option value="17:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "17:00") echo "selected";?>>
+                17:00
+            </option>
+            <option value="18:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "18:00") echo "selected";?>>
+                18:00
+            </option>
+            <option value="19:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "19:00") echo "selected";?>>
+                19:00
+            </option>
+            <option value="20:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "20:00") echo "selected";?>>
+                20:00
+            </option>
+            <option value="21:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "21:00") echo "selected";?>>
+                21:00
+            </option>
+            <option value="22:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "22:00") echo "selected";?>>
+                22:00
+            </option>
+            <option value="23:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "23:00") echo "selected";?>>
+                23:00
+            </option>
+            <option value="24:00" <?php if ($propertyCharacteristic['timeForRingBegin'] == "24:00") echo "selected";?>>
+                24:00
+            </option>
+        </select>
+        до
+        <select name="timeForRingEnd">
+            <option value="0" <?php if ($propertyCharacteristic['timeForRingEnd'] == "0") echo "selected";?>></option>
+            <option value="6:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "6:00") echo "selected";?>>
+                6:00
+            </option>
+            <option value="7:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "7:00") echo "selected";?>>
+                7:00
+            </option>
+            <option value="8:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "8:00") echo "selected";?>>
+                8:00
+            </option>
+            <option value="9:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "9:00") echo "selected";?>>
+                9:00
+            </option>
+            <option value="10:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "10:00") echo "selected";?>>
+                10:00
+            </option>
+            <option value="11:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "11:00") echo "selected";?>>
+                11:00
+            </option>
+            <option value="12:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "12:00") echo "selected";?>>
+                12:00
+            </option>
+            <option value="13:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "13:00") echo "selected";?>>
+                13:00
+            </option>
+            <option value="14:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "14:00") echo "selected";?>>
+                14:00
+            </option>
+            <option value="15:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "15:00") echo "selected";?>>
+                15:00
+            </option>
+            <option value="16:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "16:00") echo "selected";?>>
+                16:00
+            </option>
+            <option value="17:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "17:00") echo "selected";?>>
+                17:00
+            </option>
+            <option value="18:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "18:00") echo "selected";?>>
+                18:00
+            </option>
+            <option value="19:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "19:00") echo "selected";?>>
+                19:00
+            </option>
+            <option value="20:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "20:00") echo "selected";?>>
+                20:00
+            </option>
+            <option value="21:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "21:00") echo "selected";?>>
+                21:00
+            </option>
+            <option value="22:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "22:00") echo "selected";?>>
+                22:00
+            </option>
+            <option value="23:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "23:00") echo "selected";?>>
+                23:00
+            </option>
+            <option value="24:00" <?php if ($propertyCharacteristic['timeForRingEnd'] == "24:00") echo "selected";?>>
+                24:00
+            </option>
+        </select>
+    </div>
+</div>
+
+<div class="objectDescriptionItem">
+    <div class="objectDescriptionItemLabel">
+        Где проживает собственник:
+    </div>
+    <div class="objectDescriptionBody" style="min-width: 330px">
+        <select name="checking">
+            <option value="0"  <?php if ($propertyCharacteristic['checking'] == "0") echo "selected";?>></option>
+            <option
                     value="в другом городе" <?php if ($propertyCharacteristic['checking'] == "в другом городе") echo "selected";?>>
-                    в другом городе
-                </option>
-                <option
+                в другом городе
+            </option>
+            <option
                     value="отдельно" <?php if ($propertyCharacteristic['checking'] == "отдельно") echo "selected";?>>
-                    отдельно
-                </option>
-                <option
+                отдельно
+            </option>
+            <option
                     value="рядом (в качестве соседа)" <?php if ($propertyCharacteristic['checking'] == "рядом (в качестве соседа)") echo "selected";?>>
-                    рядом (в качестве соседа)
-                </option>
-            </select>
-        </div>
+                рядом (в качестве соседа)
+            </option>
+        </select>
     </div>
+</div>
 
-    <div class="objectDescriptionItem">
-        <div class="objectDescriptionItemLabel">
-            Комментарий:
-        </div>
-        <div class="objectDescriptionBody" style="min-width: 330px">
-            <textarea name="comment" maxlength="2000" rows="7" cols="43"><?php echo $propertyCharacteristic['comment'];?></textarea>
-        </div>
+<div class="objectDescriptionItem">
+    <div class="objectDescriptionItemLabel">
+        Комментарий:
     </div>
+    <div class="objectDescriptionBody" style="min-width: 330px">
+        <textarea name="comment" maxlength="2000" rows="7"
+                  cols="43"><?php echo $propertyCharacteristic['comment'];?></textarea>
+    </div>
+</div>
 
-    <?php if ($isAdmin['newOwner'] || $isAdmin['newAdvertAlien'] || $isAdmin['searchUser']): ?>
-    <div class="objectDescriptionItem">
-        <div class="objectDescriptionItemLabel">
-            Источник:
-        </div>
-        <div class="objectDescriptionBody" style="min-width: 330px">
-            <textarea name="sourceOfAdvert" maxlength="2000" rows="7" cols="43"><?php echo $propertyCharacteristic['sourceOfAdvert'];?></textarea>
-        </div>
+<?php if ($isAdmin['newOwner'] || $isAdmin['newAdvertAlien'] || $isAdmin['searchUser']): ?>
+<div class="objectDescriptionItem">
+    <div class="objectDescriptionItemLabel">
+        Источник:
     </div>
-    <div class="objectDescriptionItem">
-        <div class="objectDescriptionItemLabel">
-        </div>
-        <div class="objectDescriptionBody">
-            <a target="_blank" href="<?php echo $propertyCharacteristic['sourceOfAdvert'];?>">Быстрый доступ к Источнику</a>
-        </div>
+    <div class="objectDescriptionBody" style="min-width: 330px">
+        <textarea name="sourceOfAdvert" maxlength="2000" rows="7"
+                  cols="43"><?php echo $propertyCharacteristic['sourceOfAdvert'];?></textarea>
     </div>
+</div>
+<div class="objectDescriptionItem">
+    <div class="objectDescriptionItemLabel">
+    </div>
+    <div class="objectDescriptionBody">
+        <a target="_blank" href="<?php echo $propertyCharacteristic['sourceOfAdvert'];?>">Быстрый доступ к
+            Источнику</a>
+    </div>
+</div>
     <?php endif; ?>
 
-	<?php if ($isAdmin['newOwner'] || $isAdmin['newAdvertAlien'] || $isAdmin['searchUser']): ?>
-    <div class="objectDescriptionItem">
-        <div class="objectDescriptionItemLabel">
-            КОММЕНТАРИЙ ДЛЯ СОТРУДНИКОВ:
-        </div>
-        <div class="objectDescriptionBody" style="min-width: 330px">
-            <textarea name="adminComment" maxlength="2000" rows="7" cols="43"><?php echo $propertyCharacteristic['adminComment'];?></textarea>
-        </div>
+<?php if ($isAdmin['newOwner'] || $isAdmin['newAdvertAlien'] || $isAdmin['searchUser']): ?>
+<div class="objectDescriptionItem">
+    <div class="objectDescriptionItemLabel">
+        КОММЕНТАРИЙ ДЛЯ СОТРУДНИКОВ:
     </div>
-	<?php endif; ?>
+    <div class="objectDescriptionBody" style="min-width: 330px">
+        <textarea name="adminComment" maxlength="2000" rows="7"
+                  cols="43"><?php echo $propertyCharacteristic['adminComment'];?></textarea>
+    </div>
+</div>
+    <?php endif; ?>
 
 </div>
 
 <div class="bottomButton">
 
-    <?php if ($mode == "editLimited"):?>
+    <?php if ($mode == "editLimited"): ?>
     <a href="personal.php?compId=<?php echo $compId;?>&tabsId=3" style="margin-right: 10px;">Отмена</a>
     <?php endif;?>
 
-    <?php if (($isAdmin['newAdvertAlien'] || $isAdmin['searchUser']) && $propertyCharacteristic['completeness'] == "0" && $mode == "editFull"):?>
-    <a href="editadvert.php?action=removeAdvert<?php if ($propertyCharacteristic['id'] != "") echo "&propertyId=".$propertyCharacteristic['id'];?>" style="margin-right: 10px;">В архив</a>
+    <?php if (($isAdmin['newAdvertAlien'] || $isAdmin['searchUser']) && $propertyCharacteristic['completeness'] == "0" && $mode == "editFull"): ?>
+    <a href="editadvert.php?action=removeAdvert<?php if ($propertyCharacteristic['id'] != "") echo "&propertyId=" . $propertyCharacteristic['id'];?>"
+       style="margin-right: 10px;">В архив</a>
     <?php endif;?>
 
     <button type="submit" name="saveAdvertButton" id="saveAdvertButton" class="button mainButton">
@@ -1559,14 +1778,13 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
 
 </form>
 
-</div>
-<!-- /end.page_main_content -->
 <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
 <div class="page-buffer"></div>
 </div>
-<!-- /end.page_without_footer -->
+<!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail: support@svobodno.org
+    2013 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
+    support@svobodno.org
 </div>
 <!-- /end.footer -->
 

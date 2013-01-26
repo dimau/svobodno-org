@@ -16,8 +16,8 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Property.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) {
-	Logger::getLogger(GlobFunc::$loggerName)->log("removeOldAdverts.php:1 Ошибка инициализации соединения с БД:");
-	exit();
+    Logger::getLogger(GlobFunc::$loggerName)->log("removeOldAdverts.php:1 Ошибка инициализации соединения с БД:");
+    exit();
 }
 
 // Считаем время жизни для разных категорий объявлений
@@ -28,27 +28,27 @@ $expensive = time() - (14 * 24 * 60 * 60); // 14 дней для объявле�
 // Получаем полные данные по интересующим нас объявлениям из БД
 $stmt = DBconnect::get()->stmt_init();
 if (($stmt->prepare("SELECT * FROM property WHERE completeness = '0' AND ((realCostOfRenting <= 29000 AND reg_date < ?) OR (realCostOfRenting > 29000 AND realCostOfRenting <= 49000 AND reg_date < ?) OR (realCostOfRenting > 49000 AND reg_date < ?)) AND 0 = (SELECT COUNT(*) FROM requestToView WHERE property.id = requestToView.propertyId AND (status = 'Новая' OR status = 'Назначен просмотр' OR status = 'Отложена' OR status = 'Успешный просмотр') LIMIT 1)") === FALSE)
-	OR ($stmt->bind_param("iii", $cheap, $medium, $expensive) === FALSE)
-	OR ($stmt->execute() === FALSE)
-	OR (($res = $stmt->get_result()) === FALSE)
-	OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-	OR ($stmt->close() === FALSE)
+    OR ($stmt->bind_param("iii", $cheap, $medium, $expensive) === FALSE)
+    OR ($stmt->execute() === FALSE)
+    OR (($res = $stmt->get_result()) === FALSE)
+    OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+    OR ($stmt->close() === FALSE)
 ) {
-	//TODO: перенести в DBконнект и переделать строку логгирования
-	Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM property WHERE completeness = '0' AND ((realCostOfRenting <= 29000 AND reg_date < ".$cheap.") OR (realCostOfRenting > 29000 AND realCostOfRenting <= 49000 AND reg_date < ".$medium.") OR (realCostOfRenting > 49000 AND reg_date < ".$expensive.")) AND 0 = (SELECT COUNT(*) FROM requestToView WHERE property.id = requestToView.propertyId AND (status = 'Новая' OR status = 'Назначен просмотр' OR status = 'Отложена' OR status = 'Успешный просмотр') LIMIT 1)'. id логгера: removeOldAdverts.php:2. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-	//return array();
-	exit();
+    //TODO: перенести в DBконнект и переделать строку логгирования
+    Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM property WHERE completeness = '0' AND ((realCostOfRenting <= 29000 AND reg_date < " . $cheap . ") OR (realCostOfRenting > 29000 AND realCostOfRenting <= 49000 AND reg_date < " . $medium . ") OR (realCostOfRenting > 49000 AND reg_date < " . $expensive . ")) AND 0 = (SELECT COUNT(*) FROM requestToView WHERE property.id = requestToView.propertyId AND (status = 'Новая' OR status = 'Назначен просмотр' OR status = 'Отложена' OR status = 'Успешный просмотр') LIMIT 1)'. id логгера: removeOldAdverts.php:2. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+    //return array();
+    exit();
 }
 
 // Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
 for ($i = 0, $s = count($res); $i < $s; $i++) {
-	$res[$i] = DBconnect::conversionPropertyCharacteristicFromDBToView($res[$i]);
+    $res[$i] = DBconnect::conversionPropertyCharacteristicFromDBToView($res[$i]);
 }
 
 // Для каждого полученного объявления создаем объект и переносим его в архивную таблицу ("удаляем") как положено
 foreach ($res as $propertyArr) {
-	$property = new Property($propertyArr);
-	$property->unpublishAdvert();
+    $property = new Property($propertyArr);
+    $property->unpublishAdvert();
 }
 
 /********************************************************************************
@@ -56,7 +56,7 @@ foreach ($res as $propertyArr) {
  *******************************************************************************/
 
 $subject = 'Удаление устаревших объявлений';
-$msgHTML = "Найдено и перенесено в архив ".count($res)." устаревших чужих объявлений";
+$msgHTML = "Найдено и перенесено в архив " . count($res) . " устаревших чужих объявлений";
 
 GlobFunc::sendEmailToOperator($subject, $msgHTML);
 

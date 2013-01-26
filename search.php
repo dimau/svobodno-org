@@ -43,11 +43,11 @@ $allDistrictsInCity = DBconnect::selectDistrictsForCity("Екатеринбур�
  **************************************************************************************************************/
 
 if (isset($_GET['fastSearchButton'])) {
-	$searchRequest->writeParamsFastFromGET();
+    $searchRequest->writeParamsFastFromGET();
 }
 
 if (isset($_GET['extendedSearchButton'])) {
-	$searchRequest->writeParamsExtendedFromGET();
+    $searchRequest->writeParamsExtendedFromGET();
 }
 
 /***************************************************************************************************************
@@ -55,8 +55,8 @@ if (isset($_GET['extendedSearchButton'])) {
  **************************************************************************************************************/
 
 if (!isset($_GET['fastSearchButton']) && !isset($_GET['extendedSearchButton']) && $userIncoming->login()) {
-	$searchRequest->setUserId($userIncoming->getId());
-	$searchRequest->writeFromDB();
+    $searchRequest->setUserId($userIncoming->getId());
+    $searchRequest->writeFromDB();
 }
 
 /***************************************************************************************************************

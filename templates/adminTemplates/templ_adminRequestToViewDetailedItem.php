@@ -32,15 +32,16 @@
 			]</span>
 			<span class="content">
 				от
-				<?php
-				echo $requestToView['surname'] . " " . $requestToView['name'] . " " . $requestToView['secondName']
-				?>
+                <?php
+                echo $requestToView['surname'] . " " . $requestToView['name'] . " " . $requestToView['secondName']
+                ?>
 			</span>
     </div>
 
     <ul class="setOfInstructions">
         <li>
-            <a target="_blank" href='adminRequestToView.php?propertyId=<?php echo $requestToView['propertyId'];?>&requestToViewId=<?php echo $requestToView['id'];?>'>подробнее</a>
+            <a target="_blank"
+               href='adminRequestToView.php?propertyId=<?php echo $requestToView['propertyId'];?>&requestToViewId=<?php echo $requestToView['id'];?>'>подробнее</a>
         </li>
     </ul>
 
@@ -53,6 +54,7 @@
         <div class="tenantTimeEditBlock" style="display: none; margin: 10px 0 10px 0;">
             <textarea class="tenantTimeTextArea"
                       style="width: 40em; max-width: 100%; height: 250px;"><?php echo $requestToView['tenantTime'];?></textarea>
+
             <div>
                 <a class="tenantTimeSaveButton" style="cursor: pointer;">Сохранить</a>
                 <a class="tenantTimeCancelButton" style="cursor: pointer; margin-left: 15px;;">Отменить</a>
@@ -65,7 +67,9 @@
         <span class="tenantCommentText"><?php echo $requestToView['tenantComment'];?></span>
 
         <div class="tenantCommentEditBlock" style="display: none; margin: 10px 0 10px 0;">
-            <textarea class="tenantCommentTextArea" style="width: 40em; max-width: 100%; height: 250px;"><?php echo $requestToView['tenantComment'];?></textarea>
+            <textarea class="tenantCommentTextArea"
+                      style="width: 40em; max-width: 100%; height: 250px;"><?php echo $requestToView['tenantComment'];?></textarea>
+
             <div>
                 <a class="tenantCommentSaveButton" style="cursor: pointer;">Сохранить</a>
                 <a class="tenantCommentCancelButton" style="cursor: pointer; margin-left: 15px;;">Отменить</a>

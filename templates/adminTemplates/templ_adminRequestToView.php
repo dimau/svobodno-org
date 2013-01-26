@@ -43,11 +43,11 @@
             font-size: 1em;
         }
 
-		/* Используется для выделения описания той заявки на просмотр, что интересует админа */
-		.highlightedBlock {
-			padding: 5px;
-			border: 2px solid red;
-		}
+            /* Используется для выделения описания той заявки на просмотр, что интересует админа */
+        .highlightedBlock {
+            padding: 5px;
+            border: 2px solid red;
+        }
     </style>
     <!-- end CSS -->
 
@@ -65,50 +65,48 @@
 </head>
 
 <body>
-<div class="page_without_footer">
-    <div class="page_main_content">
-        <div class="headerOfPage">
-            Панель администратора -> Заявка на просмотр
+<div class="pageWithoutFooter">
+
+    <div class="headerOfPage">
+        Панель администратора -> Заявка на просмотр
+    </div>
+
+    <div class="simpleBlockForAnyContent">
+
+        <div style="float: left; width: 49%;">
+            <?php
+            // Шаблон для сведений о собственнике
+            require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminUserItem.php";
+            ?>
         </div>
 
-        <div class="simpleBlockForAnyContent">
+        <div style="float: right; width: 49%;">
+            <?php
+            // Шаблон для сведений об объекте недвижимости
+            require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminPropertyItem.php";
+            ?>
+        </div>
 
-            <div style="float: left; width: 49%;">
-				<?php
-				// Шаблон для сведений о собственнике
-				require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminUserItem.php";
-				?>
+        <div class="clearBoth"></div>
+        <hr>
+
+        <div style="margin-left: 40px;">
+            <?php foreach ($allRequestsToView as $requestToView): ?>
+            <div class="<?php if ($requestToView['id'] == $requestToViewId) echo "highlightedBlock";?>">
+                <?php require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminRequestToViewDetailedItem.php";?>
             </div>
-
-            <div style="float: right; width: 49%;">
-				<?php
-				// Шаблон для сведений об объекте недвижимости
-				require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminPropertyItem.php";
-				?>
-            </div>
-
-            <div class="clearBoth"></div>
             <hr>
-
-            <div style="margin-left: 40px;">
-				<?php foreach ($allRequestsToView as $requestToView): ?>
-					<div class="<?php if ($requestToView['id'] == $requestToViewId) echo "highlightedBlock";?>">
-						<?php require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminRequestToViewDetailedItem.php";?>
-					</div>
-                	<hr>
-				<?php endforeach; ?>
-            </div>
-
+            <?php endforeach; ?>
         </div>
 
     </div>
-    <!-- /end.page_main_content -->
+
     <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
     <div class="page-buffer"></div>
 </div>
-<!-- /end.page_without_footer -->
+<!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
+    2013 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
     support@svobodno.org
 </div>
 <!-- /end.footer -->

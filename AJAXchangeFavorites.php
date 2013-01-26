@@ -17,14 +17,14 @@ $userIncoming = new UserIncoming();
 
 // Вспомогательная функция отказа в доступе
 function accessDenied() {
-	header('Content-Type: text/xml; charset=UTF-8');
-	echo "<xml><span status='denied'></span></xml>";
-	exit();
+    header('Content-Type: text/xml; charset=UTF-8');
+    echo "<xml><span status='denied'></span></xml>";
+    exit();
 }
 
 // Проверяем, залогинен ли пользователь, если нет - то отказываем в доступе
 if (!$userIncoming->login()) {
-	accessDenied();
+    accessDenied();
 }
 
 // Получаем идентификатор объявления, которое пользователь хочет добавить/удалить в Избранное и действие, которое нужно совершить с объявлением (добавить в избранное или удалить)
@@ -35,12 +35,12 @@ if (isset($_POST['action'])) $action = htmlspecialchars($_POST['action'], ENT_QU
 
 // Если требуемое действие = Добавить в избранное, то записываем id объявления в БД, в поле favoritePropertiesId пользователя - тем самым фиксируем, что он добавил данное объявление к себе в избранные
 if ($action == "addToFavorites") {
-	if (!$userIncoming->addFavoritePropertiesId($propertyId)) accessDenied();
+    if (!$userIncoming->addFavoritePropertiesId($propertyId)) accessDenied();
 }
 
 // Если требуемое действие = Удалить из избранного, то удаляем id объявления из БД, из поля favoritePropertiesId пользователя
 if ($action == "removeFromFavorites") {
-	if (!$userIncoming->removeFavoritePropertiesId($propertyId)) accessDenied();
+    if (!$userIncoming->removeFavoritePropertiesId($propertyId)) accessDenied();
 }
 
 /*************************************************************************************

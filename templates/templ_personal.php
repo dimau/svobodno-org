@@ -52,7 +52,7 @@
 </head>
 
 <body>
-<div class="page_without_footer">
+<div class="pageWithoutFooter">
 
 <!-- Всплывающее поле для отображения списка ошибок, полученных при проверке данных на сервере (PHP)-->
 <div id="userMistakesBlock" class="ui-widget">
@@ -64,12 +64,12 @@
                         id="userMistakesText">Для продолжения, пожалуйста, дополните или исправьте следующие данные:</span>
             </p>
             <ol><?php
-				if (isset($errors) && count($errors) != 0) {
-					foreach ($errors as $value) {
-						echo "<li>$value</li>";
-					}
-				}
-				?></ol>
+                if (isset($errors) && count($errors) != 0) {
+                    foreach ($errors as $value) {
+                        echo "<li>$value</li>";
+                    }
+                }
+                ?></ol>
         </div>
     </div>
 </div>
@@ -108,184 +108,181 @@ $matterOfShortList = View::getMatterOfShortList($propertyFullArr, $favoritePrope
 $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullArr, $favoritePropertiesId, 1, "favorites");
 ?>
 
-<div class="page_main_content">
-    <div class="headerOfPage">
-        Личный кабинет
-    </div>
-    <div id="tabs">
-        <ul>
-            <li>
-                <a href="#tabs-1">Профиль</a>
-            </li>
-            <li>
-                <a href="#tabs-2">Уведомления<?php
-					// Сколько уведомлений не прочитано?
-					if ($amountUnreadMessages != 0) echo "<span class='amountOfNewMessagesBlock'> (<span class='amountOfNewMessages'>" . $amountUnreadMessages . "</span>)</span>"; ?>
-                </a>
-            </li>
-            <li>
-                <a href="#tabs-3">Мои объявления</a>
-            </li>
-            <li>
-                <a href="#tabs-4">Поиск</a>
-            </li>
-            <li>
-                <a href="#tabs-5">Избранное</a>
-            </li>
-        </ul>
+<div class="headerOfPage">
+    Личный кабинет
+</div>
+<div id="tabs">
+    <ul>
+        <li>
+            <a href="#tabs-1">Профиль</a>
+        </li>
+        <li>
+            <a href="#tabs-2">Уведомления<?php
+                // Сколько уведомлений не прочитано?
+                if ($amountUnreadMessages != 0) echo "<span class='amountOfNewMessagesBlock'> (<span class='amountOfNewMessages'>" . $amountUnreadMessages . "</span>)</span>"; ?>
+            </a>
+        </li>
+        <li>
+            <a href="#tabs-3">Мои объявления</a>
+        </li>
+        <li>
+            <a href="#tabs-4">Поиск</a>
+        </li>
+        <li>
+            <a href="#tabs-5">Избранное</a>
+        </li>
+    </ul>
 
-        <div id="tabs-1">
+    <div id="tabs-1">
 
-			<?php if ($correctEditProfileParameters !== FALSE): ?>
-            <!-- Блок с нередактируемыми параметрами Профайла не выдается только в 1 случае: если пользователь корректировал свои параметры, и они не прошли проверку -->
-            <div id="notEditingProfileParametersBlock">
-                <ul class="setOfInstructions">
-                    <li><a id="editProfileButton">редактировать</a></li>
-                </ul>
-				<?php
+        <?php if ($correctEditProfileParameters !== FALSE): ?>
+        <!-- Блок с нередактируемыми параметрами Профайла не выдается только в 1 случае: если пользователь корректировал свои параметры, и они не прошли проверку -->
+        <div id="notEditingProfileParametersBlock">
+            <ul class="setOfInstructions">
+                <li><a id="editProfileButton">редактировать</a></li>
+            </ul>
+            <?php
 
-				// Формируем и размещаем на странице блок для основной фотографии пользователя
-				echo View::getHTMLfotosWrapper("middle", TRUE, FALSE, $userFotoInformation['uploadedFoto']);
+            // Формируем и размещаем на странице блок для основной фотографии пользователя
+            echo View::getHTMLfotosWrapper("middle", TRUE, FALSE, $userFotoInformation['uploadedFoto']);
 
-				// Вставляем анкетные данные пользователя
-				require $_SERVER['DOCUMENT_ROOT'] . "/templates/notEditableBlocks/templ_notEditedProfile.php";
+            // Вставляем анкетные данные пользователя
+            require $_SERVER['DOCUMENT_ROOT'] . "/templates/notEditableBlocks/templ_notEditedProfile.php";
 
-				?>
-            </div>
-			<?php endif; ?>
+            ?>
+        </div>
+        <?php endif; ?>
 
-            <form method="post" action="personal.php?compId=<?php echo $compId;?>&action=saveProfileParameters"
-                  name="profileParameters" id="editingProfileParametersBlock"
-                  class="descriptionFieldsetsWrapper formWithFotos" enctype="multipart/form-data"
-                  style='<?php if ($correctEditProfileParameters !== FALSE) echo "display: none;"?>'>
+        <form method="post" action="personal.php?compId=<?php echo $compId;?>&action=saveProfileParameters"
+              name="profileParameters" id="editingProfileParametersBlock"
+              class="descriptionFieldsetsWrapper formWithFotos" enctype="multipart/form-data"
+              style='<?php if ($correctEditProfileParameters !== FALSE) echo "display: none;"?>'>
 
-				<?php
-				// Подключим форму для ввода и редактирования данных о ФИО, логине, контактах пользователя, а также о фотографиях
-				require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editablePersonalFIO.php";
+            <?php
+            // Подключим форму для ввода и редактирования данных о ФИО, логине, контактах пользователя, а также о фотографиях
+            require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editablePersonalFIO.php";
 
-				// Подключим форму для ввода и редактирования данных об образовании, работе и месте рождения
-				require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editablePersonalEducAndWork.php";
+            // Подключим форму для ввода и редактирования данных об образовании, работе и месте рождения
+            require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editablePersonalEducAndWork.php";
 
-				// Подключим форму для ввода и редактирования данных о социальных сетях пользователя
-				require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editablePersonalSocial.php";
-				?>
+            // Подключим форму для ввода и редактирования данных о социальных сетях пользователя
+            require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editablePersonalSocial.php";
+            ?>
 
-                <div class="clearBoth"></div>
-
-                <div class="bottomButton">
-                    <a href="personal.php?compId=<?php echo $compId; ?>&tabsId=1" style="margin-right: 10px;">Отмена</a>
-                    <button type="submit" name="saveProfileParameters" id="saveProfileParameters" class="button">
-                        Сохранить
-                    </button>
-                </div>
-
-                <div class="clearBoth"></div>
-
-            </form>
-            <!-- /end.descriptionFieldsetsWrapper -->
             <div class="clearBoth"></div>
 
-        </div>
-        <!-- /end.tabs-1 -->
-
-        <div id="tabs-2">
-			<?php
-			// Формируем и выдаем HTML списка уведомлений пользователя
-			echo View::getHTMLforMessages($messagesArr);
-			?>
-        </div>
-
-        <div id="tabs-3">
-            <a href="forowner.php" class="button" id="newAdvertButton">
-                Новое объявление
-            </a>
-
-			<?php
-			echo View::getHTMLforOwnersCollectionProperty($allPropertiesCharacteristic, $allPropertiesFotoInformation, $allPropertiesTenantPretenders);
-			?>
-
-        </div>
-
-        <div id="tabs-4">
-
-			<?php if ($userCharacteristic['typeTenant'] !== TRUE && $correctNewSearchRequest !== TRUE && $correctEditSearchRequest === NULL): ?>
-            <div class="shadowText">
-                На этой вкладке Вы можете задать параметры недвижимости, в соответствии с которыми ресурс Svobodno.org
-                будет
-                осуществлять
-                автоматический поиск объявлений на портале и будет оповещать Вас о появлении новых объектов.
-            </div>
-            <!-- Если пользователь еще не сформировал поисковый запрос (а значит не является арендатором) и он либо не нажимал на кнопку формирования запроса, либо нажимал, но не прошел проверку на полноту информации о пользователи, то ему доступна только кнопка формирования нового запроса. В ином случае будет отображаться сам поисковый запрос пользователя, либо форма для его заполнения -->
-            <form name="createSearchRequest" method="post"
-                  action="personal.php?compId=<?php echo $compId;?>&action=createSearchRequest">
-                <button type="submit" name="createSearchRequestButton" id='createSearchRequestButton'
-                        class='left-bottom'>
-                    Запрос на поиск
+            <div class="bottomButton">
+                <a href="personal.php?compId=<?php echo $compId; ?>&tabsId=1" style="margin-right: 10px;">Отмена</a>
+                <button type="submit" name="saveProfileParameters" id="saveProfileParameters" class="button">
+                    Сохранить
                 </button>
-            </form>
-			<?php endif;?>
-
-			<?php if ($userCharacteristic['typeTenant'] === TRUE && $correctEditSearchRequest !== FALSE): ?>
-            <!-- Если пользователь является арендатором и (если он редактировал пар-ры поиска) после редактирования параметров поиска ошибок не обнаружено, то у пользователя уже сформирован корректный поисковый запрос, который мы и показываем на этой вкладке -->
-            <div id="notEditedSearchRequestBlock">
-                <ul id="setOfInstructions" class="setOfInstructions">
-                    <li><a id="editSearchRequestButton">редактировать</a></li>
-                    <li><a href="personal.php?compId=<?php echo $compId;?>&action=deleteSearchRequest&tabsId=4"
-                           title="Удаляет запрос на поиск - кликните по этой ссылке, когда Вы найдете недвижимость">удалить</a>
-                    </li>
-                    <br>
-                </ul>
-				<?php
-				// Шаблон для представления нередактируемых параметров поисковго запроса пользователя
-				require $_SERVER['DOCUMENT_ROOT'] . "/templates/notEditableBlocks/templ_notEditedSearchRequest.php";
-				?>
             </div>
-			<?php endif;?>
 
-			<?php if ($userCharacteristic['typeTenant'] === TRUE || $correctNewSearchRequest === TRUE || $correctEditSearchRequest === FALSE): ?>
-            <!-- Если пользователь является арендатором, то вместе с отображением текущих параметров поискового запроса мы выдаем скрытую форму для их редактирования, также мы выдаем видимую форму для редактирования параметров поиска в случае, если пользователь нажал на кнопку Нового поискового запроса и проверка на корректность его данных Профиля профла успешно, а также в случае если пользователь корректировал данные поискового запроса, но они не прошли проверку -->
-            <form method="post" name="searchParameters" id="extendedSearchParametersBlock"
-                  action="personal.php?compId=<?php echo $compId;?>&action=saveSearchParameters">
+            <div class="clearBoth"></div>
 
-				<?php
-				// Подключим форму для ввода и редактирования данных о социальных сетях пользователя
-				require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editableSearchRequest.php";
-				?>
-
-                <div class="clearBoth"></div>
-                <div class="bottomButton">
-                    <a href="personal.php?compId=<?php echo $compId;?>&tabsId=4" style="margin-right: 10px;">Отмена</a>
-                    <button type="submit" name="saveSearchParametersButton" id="saveSearchParametersButton"
-                            class="button">
-                        Сохранить
-                    </button>
-                </div>
-
-                <div class="clearBoth"></div>
-            </form>
-			<?php endif;?>
-
-        </div>
-        <!-- /end.tabs-4 -->
-
-        <div id="tabs-5">
-			<?php
-			// Размещаем на странице HTML для результатов поиска (списка избранных объектов недвижимости)
-			require $_SERVER['DOCUMENT_ROOT'] . "/templates/searchResultBlocks/templ_searchResult.php";
-			?>
-        </div>
+        </form>
+        <!-- /end.descriptionFieldsetsWrapper -->
+        <div class="clearBoth"></div>
 
     </div>
-    <!-- /end.tabs -->
+    <!-- /end.tabs-1 -->
+
+    <div id="tabs-2">
+        <?php
+        // Формируем и выдаем HTML списка уведомлений пользователя
+        echo View::getHTMLforMessages($messagesArr);
+        ?>
+    </div>
+
+    <div id="tabs-3">
+        <a href="forowner.php" class="button" id="newAdvertButton">
+            Новое объявление
+        </a>
+
+        <?php
+        echo View::getHTMLforOwnersCollectionProperty($allPropertiesCharacteristic, $allPropertiesFotoInformation, $allPropertiesTenantPretenders);
+        ?>
+
+    </div>
+
+    <div id="tabs-4">
+
+        <?php if ($userCharacteristic['typeTenant'] !== TRUE && $correctNewSearchRequest !== TRUE && $correctEditSearchRequest === NULL): ?>
+        <div class="shadowText">
+            На этой вкладке Вы можете задать параметры недвижимости, в соответствии с которыми ресурс Svobodno.org
+            будет
+            осуществлять
+            автоматический поиск объявлений на портале и будет оповещать Вас о появлении новых объектов.
+        </div>
+        <!-- Если пользователь еще не сформировал поисковый запрос (а значит не является арендатором) и он либо не нажимал на кнопку формирования запроса, либо нажимал, но не прошел проверку на полноту информации о пользователи, то ему доступна только кнопка формирования нового запроса. В ином случае будет отображаться сам поисковый запрос пользователя, либо форма для его заполнения -->
+        <form name="createSearchRequest" method="post"
+              action="personal.php?compId=<?php echo $compId;?>&action=createSearchRequest">
+            <button type="submit" name="createSearchRequestButton" id='createSearchRequestButton'
+                    class='left-bottom'>
+                Запрос на поиск
+            </button>
+        </form>
+        <?php endif;?>
+
+        <?php if ($userCharacteristic['typeTenant'] === TRUE && $correctEditSearchRequest !== FALSE): ?>
+        <!-- Если пользователь является арендатором и (если он редактировал пар-ры поиска) после редактирования параметров поиска ошибок не обнаружено, то у пользователя уже сформирован корректный поисковый запрос, который мы и показываем на этой вкладке -->
+        <div id="notEditedSearchRequestBlock">
+            <ul id="setOfInstructions" class="setOfInstructions">
+                <li><a id="editSearchRequestButton">редактировать</a></li>
+                <li><a href="personal.php?compId=<?php echo $compId;?>&action=deleteSearchRequest&tabsId=4"
+                       title="Удаляет запрос на поиск - кликните по этой ссылке, когда Вы найдете недвижимость">удалить</a>
+                </li>
+                <br>
+            </ul>
+            <?php
+            // Шаблон для представления нередактируемых параметров поисковго запроса пользователя
+            require $_SERVER['DOCUMENT_ROOT'] . "/templates/notEditableBlocks/templ_notEditedSearchRequest.php";
+            ?>
+        </div>
+        <?php endif;?>
+
+        <?php if ($userCharacteristic['typeTenant'] === TRUE || $correctNewSearchRequest === TRUE || $correctEditSearchRequest === FALSE): ?>
+        <!-- Если пользователь является арендатором, то вместе с отображением текущих параметров поискового запроса мы выдаем скрытую форму для их редактирования, также мы выдаем видимую форму для редактирования параметров поиска в случае, если пользователь нажал на кнопку Нового поискового запроса и проверка на корректность его данных Профиля профла успешно, а также в случае если пользователь корректировал данные поискового запроса, но они не прошли проверку -->
+        <form method="post" name="searchParameters" id="extendedSearchParametersBlock"
+              action="personal.php?compId=<?php echo $compId;?>&action=saveSearchParameters">
+
+            <?php
+            // Подключим форму для ввода и редактирования данных о социальных сетях пользователя
+            require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editableSearchRequest.php";
+            ?>
+
+            <div class="clearBoth"></div>
+            <div class="bottomButton">
+                <a href="personal.php?compId=<?php echo $compId;?>&tabsId=4" style="margin-right: 10px;">Отмена</a>
+                <button type="submit" name="saveSearchParametersButton" id="saveSearchParametersButton"
+                        class="button">
+                    Сохранить
+                </button>
+            </div>
+
+            <div class="clearBoth"></div>
+        </form>
+        <?php endif;?>
+
+    </div>
+    <!-- /end.tabs-4 -->
+
+    <div id="tabs-5">
+        <?php
+        // Размещаем на странице HTML для результатов поиска (списка избранных объектов недвижимости)
+        require $_SERVER['DOCUMENT_ROOT'] . "/templates/searchResultBlocks/templ_searchResult.php";
+        ?>
+    </div>
 
 </div>
-<!-- /end.page_main_content -->
+<!-- /end.tabs -->
+
 <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
 <div class="page-buffer"></div>
 </div>
-<!-- /end.page_without_footer -->
+<!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
+    2013 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
     support@svobodno.org
 </div>
 <!-- /end.footer -->

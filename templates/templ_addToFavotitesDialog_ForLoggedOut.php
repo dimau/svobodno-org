@@ -1,7 +1,8 @@
 <div id="addToFavoritesDialog" title="Добавить в избранное">
 
     <div style="text-align: left; margin: 10px 0 10px 0;">Для добавления в избранное необходимо</div>
-    <div style="text-align: center; margin: 10px 0 10px 0;"><a href="login.php">Войти</a> или <a href="registration.php?typeTenant=TRUE">Зарегистрироваться</a></div>
+    <div style="text-align: center; margin: 10px 0 10px 0;"><a href="login.php">Войти</a> или <a
+            href="registration.php?typeTenant=TRUE">Зарегистрироваться</a></div>
 
     <div class="localHeader">Регистрация позволит:</div>
     <ul class="benefits" style="text-align: left;">

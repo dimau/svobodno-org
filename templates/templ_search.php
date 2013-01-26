@@ -32,12 +32,12 @@
             margin-left: 20px;
         }
 
-        /* Отступ под блок класса advertActions */
+            /* Отступ под блок класса advertActions */
         .realtyObject .listDescriptionSmall {
             margin-bottom: 21px;
         }
 
-        /* Отступ слева для описания объекта в баллуне */
+            /* Отступ слева для описания объекта в баллуне */
         .listDescriptionSmall.forBalloon {
             margin-left: 6px;
         }
@@ -47,11 +47,11 @@
 </head>
 
 <body>
-<div class="page_without_footer">
+<div class="pageWithoutFooter">
 
     <?php
-        // Сформируем и вставим заголовок страницы
-	require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+    // Сформируем и вставим заголовок страницы
+    require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
     ?>
 
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -68,27 +68,26 @@
     <script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
 
     <?php
-        // Пока пользователь любуется заголовком страницы, а браузер загружает нужные библиотеки, вычислим представление для результатов поиска. Размещать же его на странице мы будем несколько позже
-        $matterOfBalloonList = View::getMatterOfBalloonList($propertyFullArr, $favoritePropertiesId, "search");
-        $matterOfShortList = View::getMatterOfShortList($propertyFullArr, $favoritePropertiesId, 1, "search");
-        $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullArr, $favoritePropertiesId, 1, "search");
+    // Пока пользователь любуется заголовком страницы, а браузер загружает нужные библиотеки, вычислим представление для результатов поиска. Размещать же его на странице мы будем несколько позже
+    $matterOfBalloonList = View::getMatterOfBalloonList($propertyFullArr, $favoritePropertiesId, "search");
+    $matterOfShortList = View::getMatterOfShortList($propertyFullArr, $favoritePropertiesId, 1, "search");
+    $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullArr, $favoritePropertiesId, 1, "search");
     ?>
 
-    <div class="page_main_content">
-        <div class="headerOfPage">
-            Приятного поиска!
-        </div>
-        <div id="tabs">
-            <ul>
-                <li>
-                    <a href="#tabs-1">Быстрый поиск</a>
-                </li>
-                <li>
-                    <a href="#tabs-2">Расширенный поиск</a>
-                </li>
-            </ul>
-            <div id="tabs-1">
-                <form name="fastSearch" method="get">
+    <div class="headerOfPage">
+        Приятного поиска!
+    </div>
+    <div id="tabs">
+        <ul>
+            <li>
+                <a href="#tabs-1">Быстрый поиск</a>
+            </li>
+            <li>
+                <a href="#tabs-2">Расширенный поиск</a>
+            </li>
+        </ul>
+        <div id="tabs-1">
+            <form name="fastSearch" method="get">
 							<span id="fastSearchInput"> Я хочу арендовать
 								<select name="typeOfObjectFast" id="typeOfObjectFast">
                                     <option value="0" <?php if ($userSearchRequest['typeOfObject'] == "0") echo "selected";?>></option>
@@ -98,15 +97,18 @@
                                     <option value="комната" <?php if ($userSearchRequest['typeOfObject'] == "комната") echo "selected";?>>
                                         комната
                                     </option>
-                                    <option value="дом" <?php if ($userSearchRequest['typeOfObject'] == "дом") echo "selected";?>>дом,
+                                    <option value="дом" <?php if ($userSearchRequest['typeOfObject'] == "дом") echo "selected";?>>
+                                        дом,
                                         коттедж
                                     </option>
                                     <option value="таунхаус" <?php if ($userSearchRequest['typeOfObject'] == "таунхаус") echo "selected";?>>
                                         таунхаус
                                     </option>
-                                    <option value="дача" <?php if ($userSearchRequest['typeOfObject'] == "дача") echo "selected";?>>дача
+                                    <option value="дача" <?php if ($userSearchRequest['typeOfObject'] == "дача") echo "selected";?>>
+                                        дача
                                     </option>
-                                    <option value="гараж" <?php if ($userSearchRequest['typeOfObject'] == "гараж") echo "selected";?>>гараж
+                                    <option value="гараж" <?php if ($userSearchRequest['typeOfObject'] == "гараж") echo "selected";?>>
+                                        гараж
                                     </option>
                                 </select>
                                 в районе
@@ -134,46 +136,45 @@
                                     Найти
                                 </button>
                             </span>
-                </form>
-            </div>
-            <div id="tabs-2">
-                <form name="extendedSearch" method="get">
-
-                    <?php
-                        // Форма с параметрами поиска
-					require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editableSearchRequest.php";
-                    ?>
-
-                    <div class="bottomButton">
-                        <button type="submit" name="extendedSearchButton" id="extendedSearchButton" class="mainButton">
-                            Найти
-                        </button>
-                    </div>
-                    <div class="clearBoth"></div>
-
-                </form>
-            </div>
-            <!-- /end.tabs-2 -->
+            </form>
         </div>
+        <div id="tabs-2">
+            <form name="extendedSearch" method="get">
 
-        <?php
-            // Размещаем на странице HTML для результатов поиска
-		require $_SERVER['DOCUMENT_ROOT'] . "/templates/searchResultBlocks/templ_searchResult.php";
-        ?>
+                <?php
+                // Форма с параметрами поиска
+                require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editableSearchRequest.php";
+                ?>
 
-        <?php
-        // Модальное окно для незарегистрированных пользователей, которые нажимают на кнопку добавления в Избранное
-        if ($isLoggedIn === FALSE) require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_addToFavotitesDialog_ForLoggedOut.php";
-        ?>
+                <div class="bottomButton">
+                    <button type="submit" name="extendedSearchButton" id="extendedSearchButton" class="mainButton">
+                        Найти
+                    </button>
+                </div>
+                <div class="clearBoth"></div>
 
+            </form>
+        </div>
+        <!-- /end.tabs-2 -->
     </div>
-    <!-- /end.page_main_content -->
+
+    <?php
+    // Размещаем на странице HTML для результатов поиска
+    require $_SERVER['DOCUMENT_ROOT'] . "/templates/searchResultBlocks/templ_searchResult.php";
+    ?>
+
+    <?php
+    // Модальное окно для незарегистрированных пользователей, которые нажимают на кнопку добавления в Избранное
+    if ($isLoggedIn === FALSE) require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_addToFavotitesDialog_ForLoggedOut.php";
+    ?>
+
     <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
     <div class="page-buffer"></div>
 </div>
-<!-- /end.page_without_footer -->
+<!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail: support@svobodno.org
+    2013 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
+    support@svobodno.org
 </div>
 <!-- /end.footer -->
 
@@ -215,7 +216,7 @@
     $("#typeOfObject").change(notavailability);
 
     /* Проматываем на область результатов поиска */
-    $(document).ready(function() {
+    $(document).ready(function () {
         document.getElementsByClassName("choiceViewSearchResult")[0].scrollIntoView(true);
     });
 

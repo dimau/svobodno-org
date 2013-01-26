@@ -28,15 +28,15 @@ $isAdmin = $userIncoming->isAdmin();
 
 // Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
 if (!$userIncoming->login()) {
-	header('Location: login.php');
-	exit();
+    header('Location: login.php');
+    exit();
 }
 
 // Если пользователь не является администратором, то доступ к странице ему запрещен - разавторизуем его и перекинем на главную (в идеале нужно перекидывать на login.php)
 // Кроме того, проверяем, что у данного администратора есть право на поиск пользователей и вход в их Личные кабинеты
 if (!$isAdmin['searchUser']) {
-	header('Location: out.php');
-	exit();
+    header('Location: out.php');
+    exit();
 }
 
 /*************************************************************************************
@@ -59,8 +59,8 @@ $collectionProperty = new CollectionProperty();
  *******************************************************************************/
 
 if ($action == "allWithEarliestDate") {
-	$collectionProperty->buildAllWithEarliestDate();
-	$strHeaderOfPage = "Все объекты с назначенной датой просмотра";
+    $collectionProperty->buildAllWithEarliestDate();
+    $strHeaderOfPage = "Все объекты с назначенной датой просмотра";
 }
 
 /********************************************************************************
@@ -68,8 +68,8 @@ if ($action == "allWithEarliestDate") {
  *******************************************************************************/
 
 if ($action == "allRemovedWithRequestsToView") {
-	$collectionProperty->buildAllUnpublishedWithRequestToView();
-	$strHeaderOfPage = "Снятые с публикации объекты, по которым остались активные заявки на просмотр";
+    $collectionProperty->buildAllUnpublishedWithRequestToView();
+    $strHeaderOfPage = "Снятые с публикации объекты, по которым остались активные заявки на просмотр";
 }
 
 /********************************************************************************

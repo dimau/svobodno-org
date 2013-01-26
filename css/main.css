@@ -1,9 +1,5 @@
-/*
- * Detailed information about this CSS: h5bp.com/css
- */
-
 /* =============================================================================
-   ОСНОВЫ
+   БАЗА
    ========================================================================== */
 
 /* Для удобства указания размеров блокам - вводим для всего документа свойство box-sizing */
@@ -34,7 +30,7 @@ body {
     width: 100%;
     margin: 0;
     padding: 0;
-    font-family: 'Trebuchet MS', Tahoma, Verdana, Arial, sans-serif;
+    font-family: Tahoma, Arial, Verdana, sans-serif;
     font-size: 1em;
     line-height: 1.4;
     background: #f7f7f7;
@@ -47,12 +43,12 @@ body {
  */
 
 ::-moz-selection {
-    background: #FFE45C;
+    background: #6bbbca;
     text-shadow: none;
 }
 
 ::selection {
-    background: #FFE45C;
+    background: #6bbbca;
     text-shadow: none;
 }
 
@@ -72,17 +68,17 @@ img {
    ========================================================================== */
 
 a {
-    color: #1A238B;
+    color: #4b9baa;
     text-decoration: none;
     border-bottom: 1px dotted;
 }
 
 a:visited {
-    color: #1A238B;
+    color: #4b9baa;
 }
 
 a:hover {
-    color: #1A238B;
+    color: #e1465a;
     border-bottom: 1px solid;
 }
 
@@ -166,24 +162,6 @@ ul.listDescriptionSmall .headOfString {
 /* ======================================================================
    БЛОКИ Fieldset с полями ввода для ВВОДА И РЕДАКТИРОВАНИЯ ПАРАМЕТРОВ
    ====================================================================== */
-
-/*.required {
-    display: inline-block;
-    color: red;
-    width: 5px;
-}
-
-#addressForm {
-    clear: both;
-}
-
-.inputItem .label, .objectDescriptionItem .objectDescriptionLabel {
-    width: 300px;
-    text-align: right;
-    display: inline-block;
-    vertical-align: top;
-    margin-right: 7px;
-} */
 
 form {
     margin: 0;
@@ -498,6 +476,28 @@ button.mainButton:hover {
     border-color: #ff6f00 !important;
 }
 
+.buyButton {
+    display: inline-block;
+    width: 178px;
+    height: 177px;
+}
+
+.buyButton.rooms {
+    background: url(../img/button-380-normal.png);
+}
+
+.buyButton.flats {
+    background: url(../img/button-480-normal.png);
+}
+
+.buyButton.rooms:hover {
+    background: url(../img/button-380-light.png);
+}
+
+.buyButton.flats:hover {
+    background: url(../img/button-480-light.png);
+}
+
 /* =============================================================================
    ТАБЛИЦЫ
    ========================================================================== */
@@ -632,10 +632,35 @@ td, th {
    ========================================================================== */
 
 .header {
-    font-family: Georgia, "Times New Roman", Times, serif;
+    margin: 0; /* верхний отступ должен быть = 0, чтобы подвал был четко прижат к низу страницы */
+}
+
+.logoStripe {
     position: relative;
-    margin: 0; /* верхний отступ должен быть = 0, пояснения в padding-top*/
-    padding-top: 10px; /* Используем вместо margin-top 10px padding-top=10px, так как это позволяет прижать футер к низу страницы без появления полосы прокрутки */
+    height: 66px;
+    padding: 10px 0;
+}
+
+.iconBox {
+    background-image: url('../img/logo.png');
+    width: 193px;
+    height: 30px;
+    position: absolute;
+    left: 0;
+    top: 18px; /* Выставляет лого высотой в 30 пикселей посередине элемента .logoStripe */
+}
+
+/* Стили для минималистской формы входа */
+.enter {
+    position: absolute;
+    right: 0px;
+    top: 10px;
+    text-align: right;
+    font-size: 0.9em;
+}
+
+.amountOfNewMessages {
+    color: red;
 }
 
 .localHeader {
@@ -643,51 +668,14 @@ td, th {
     font-size: 1.1em;
 }
 
-.iconBox {
-    background-image: url('../img/brand.png');
-    width: 190px;
-    height: 40px;
-    position: absolute;
-    left: 0;
-    top: 1em;
-}
-
-.nameOfServiceBox {
-    min-width: 370px;
-    margin-left: 190px;
-    margin-right: 130px;
-    text-align: center;
-}
-
-.slogan {
-    font-size: 1.4em;
-}
-
-.underslogan {
-    font-size: 0.9em;
-    color: grey;
-}
-
-/* Стили для минималистской формы входа */
-.enter {
-    position: absolute;
-    right: 0px;
-    top: 0px;
-    text-align: right;
-}
-
-.amountOfNewMessages {
-    color: red;
-}
-
 /* =============================================================================
    ГЛАВНОЕ МЕНЮ
    ========================================================================== */
 
 .menu {
-    margin: 15px 0 0 0;
-    min-width: 500px;
+    margin: 0;
     text-align: center;
+    -webkit-filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.3));
 }
 
 .menu ul {
@@ -701,8 +689,14 @@ td, th {
 .menu ul li {
     display: inline-block;
     height: 3em;
+    background: #4b9baa; /* Для старых браузеров */
+    background: -moz-linear-gradient(top, #6bbbca, #4b9baa); /* Firefox 3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#6bbbca), color-stop(100%,#4b9baa)); /* Chrome 1-9, Safari 4-5 */
+    background: -webkit-linear-gradient(top, #6bbbca, #4b9baa); /* Chrome 10+, Safari 5.1+ */
+    background: -o-linear-gradient(top, #6bbbca, #4b9baa); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #6bbbca, #4b9baa); /* IE10 */
+    background: linear-gradient(top, #6bbbca, #4b9baa); /* CSS3 */
     line-height: 3em;
-    background: #336784 url('../img/bg_blue.jpg');
     text-align: center;
     vertical-align: middle;
 }
@@ -717,10 +711,19 @@ td, th {
     border-bottom-right-radius: 5px;
 }
 
+.menu ul li.selected {
+    border-bottom: 2px solid white;
+}
+
 .menu ul li.selected span {
     white-space: nowrap;
     font-size: 1.1em;
-    color: #a4a3a3;
+    color: #ffffff;
+}
+
+/* Если навести указатель мыши на пункт главного меню, то он будет подчеркунт белой полосой снизу */
+.menu ul li.choice:hover {
+    border-bottom: 2px solid white;
 }
 
 .menu ul li a {
@@ -733,14 +736,14 @@ td, th {
 }
 
 .menu ul li a:hover {
-    color: #cccccb;
+    color: #ffffff;
 }
 
 /* =============================================================================
    ОСНОВНОЕ СОДЕРЖИМОЕ СТРАНИЦЫ
    ========================================================================== */
 
-.page_without_footer {
+.pageWithoutFooter {
     min-height: 100%;
     margin: 0px auto -34px auto;
     width: 90%;
@@ -748,19 +751,15 @@ td, th {
     max-width: 1400px;
 }
 
-.page_main_content {
-    margin: 30px 0 0 0;
-}
-
 .headerOfPageContentBlock {
     position: relative;
 }
 
 .headerOfPage {
-    font-family: Georgia, "Times New Roman", Times, serif;
-    font-size: 1.3em;
-    text-align: left;
     padding: 6px 0px 6px 0px;
+    font-size: 1.3em;
+    color: #a5c30a;
+    text-align: left;
 }
 
 .headerOfPageContentBlock .headerOfPage {
@@ -794,6 +793,27 @@ td, th {
     min-width: 780px;
     max-width: 1400px;
     margin: 0px auto 0px auto;
+}
+
+/* =============================================================================
+   БЛОК ДЛЯ ВЫВОДА ИНФОРМАЦИИ НА СТРАНИЦЕ
+   ========================================================================== */
+
+/* Удалить - .simpleBlockForAnyContent*/
+.mainContentBlock {
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    background-color: #ffffff;
+    padding: 1em;
+}
+
+.tabsMenu {
+    font-size: 1em;
+
+}
+
+.tabContent {
+    font-size: 0.9em;
 }
 
 /* =============================================================================
@@ -902,7 +922,6 @@ td, th {
     width: 100%;
     background: #FFE45C;
     color: #000000;
-    font-family: tahoma;
     font-size: 10px;
     box-shadow: 1px 1px 6px #FFE45C;
     -moz-box-shadow: 1px 1px 6px #FFE45C;
@@ -1203,7 +1222,6 @@ td, th {
     color: #808080;
 }
 
-
 /* Стили для команд управления объявлением в режиме Список + Карта */
 .advertActions {
     /* Блок для ссылки подробнее под каждым объявлением в списке */
@@ -1342,7 +1360,7 @@ div.unread > div.newsHeader {
 
 /* Красивая внешняя граница у блоков с вкладками */
 #tabs {
-    border-color: #6A9D02;
+    border-color: #a5c30a;
     border-width: 2px;
     font-size: 1em;
 }
@@ -1379,6 +1397,7 @@ div.unread > div.newsHeader {
 .ui-datepicker {
     z-index: 5001 !important;
 }
+
 .ui-datepicker a {
     border-bottom: none;
 }

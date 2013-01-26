@@ -19,8 +19,8 @@ $userIncoming = new UserIncoming();
 
 // Если пользователь не авторизирован, то пересылаем юзера на страницу авторизации
 if (!$userIncoming->login()) {
-	header('Location: login.php');
-	exit();
+    header('Location: login.php');
+    exit();
 }
 
 /*************************************************************************************
@@ -37,8 +37,8 @@ if (isset($_GET['propertyId'])) $propertyId = intval(htmlspecialchars($_GET['pro
 
 // Если в строке не указан идентификатор объявления для редактирования, то пересылаем пользователя в личный кабинет
 if ($propertyId == "" || $propertyId == 0) {
-	header('Location: personal.php?tabsId=3');
-	exit();
+    header('Location: personal.php?tabsId=3');
+    exit();
 }
 
 /*************************************************************************************
@@ -47,7 +47,7 @@ if ($propertyId == "" || $propertyId == 0) {
 
 $property = new Property($propertyId);
 if (!$property->readCharacteristicFromDB() || !$property->readFotoInformationFromDB()) {
-	die('Ошибка при работе с базой данных (. Попробуйте зайти к нам немного позже.'); // Если получить данные из БД не удалось, то просим пользователя зайти к нам немного позже
+    die('Ошибка при работе с базой данных (. Попробуйте зайти к нам немного позже.'); // Если получить данные из БД не удалось, то просим пользователя зайти к нам немного позже
 }
 
 // Готовим массив со списком районов в городе пользователя
@@ -62,8 +62,8 @@ $errors = array();
 
 $isAdmin = $userIncoming->isAdmin();
 if ($property->getUserId() != $userIncoming->getId() AND !$isAdmin['searchUser'] AND !$isAdmin['newAdvertAlien']) {
-	header('Location: personal.php?tabsId=3');
-	exit();
+    header('Location: personal.php?tabsId=3');
+    exit();
 }
 
 /*************************************************************************************
@@ -77,7 +77,7 @@ if ($action == "removeAdvert") {
     if (($isAdmin['newAdvertAlien'] || $isAdmin['searchUser']) && $property->getCompleteness() == "0") {
         $errors = $property->unpublishAdvert();
         DBconnect::closeConnectToDB();
-        exit("Результат удаления объявления:<div style='color: red;'>".json_encode($errors)."</div>");
+        exit("Результат удаления объявления:<div style='color: red;'>" . json_encode($errors) . "</div>");
     }
 }
 
@@ -91,55 +91,55 @@ if ($action == "saveAdvert") {
     $initialStatus = $property->getStatus();
 
     // Если редактирует объявление админ, то его поля для редактирования не ограничены. Для собственника есть ограничения на редактируемые поля
-	if ($isAdmin['searchUser'] || $isAdmin['newAdvertAlien']) {
+    if ($isAdmin['searchUser'] || $isAdmin['newAdvertAlien']) {
         $property->writeCharacteristicFromPOST("full");
     } else {
         $property->writeCharacteristicFromPOST("limited");
     }
-	$property->writeFotoInformationFromPOST();
+    $property->writeFotoInformationFromPOST();
 
-	// Проверяем корректность данных объявления. Функции validate() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
-	// Если мы имеем дело с редактированием чужого объявления администратором, то проверки данных происходят по упрощенному способу
-	if ($property->getCompleteness() == "0") {
-		$errors = $property->validate("editAlienAdvert");
-	} else {
-		$errors = $property->validate("editAdvert");
-	}
+    // Проверяем корректность данных объявления. Функции validate() возвращает пустой array, если введённые данные верны и array с описанием ошибок в противном случае
+    // Если мы имеем дело с редактированием чужого объявления администратором, то проверки данных происходят по упрощенному способу
+    if ($property->getCompleteness() == "0") {
+        $errors = $property->validate("editAlienAdvert");
+    } else {
+        $errors = $property->validate("editAdvert");
+    }
 
-	// Если данные, указанные пользователем, корректны, сохраним данные объявления в базу данных
-	if (is_array($errors) && count($errors) == 0) {
+    // Если данные, указанные пользователем, корректны, сохраним данные объявления в базу данных
+    if (is_array($errors) && count($errors) == 0) {
 
-		// Сохраняем отредактированные параметры объявления на текущего пользователя
-		$correctSaveCharacteristicToDB = $property->saveCharacteristicToDB("edit");
+        // Сохраняем отредактированные параметры объявления на текущего пользователя
+        $correctSaveCharacteristicToDB = $property->saveCharacteristicToDB("edit");
 
-		if ($correctSaveCharacteristicToDB) {
+        if ($correctSaveCharacteristicToDB) {
 
-			// Сохраним информацию о фотографиях объекта недвижимости
-			$correctSaveFotoInformationToDB = $property->saveFotoInformationToDB();
+            // Сохраним информацию о фотографиях объекта недвижимости
+            $correctSaveFotoInformationToDB = $property->saveFotoInformationToDB();
 
-			if ($correctSaveFotoInformationToDB) {
+            if ($correctSaveFotoInformationToDB) {
 
                 // Если статус опубликованности у объявления меняется с "не опубликовано" на "опубликовано", то оповестим о новом объявлении пользователей
                 if ($initialStatus == "не опубликовано" && $property->getStatus() == "опубликовано") $property->notifyUsersAboutNewProperty();
 
-				// Пересылаем пользователя на страницу с подробным описанием его объявления - хороший способ убедиться в том, что все данные указаны верно
-				header('Location: property.php?propertyId=' . $property->getId());
-				exit();
+                // Пересылаем пользователя на страницу с подробным описанием его объявления - хороший способ убедиться в том, что все данные указаны верно
+                header('Location: property.php?propertyId=' . $property->getId());
+                exit();
 
-			} else {
+            } else {
 
-				$errors[] = 'К сожалению, при сохранении данных о фотографиях произошла ошибка: проверьте, пожалуйста, еще раз корректность Вашей информации и повторите попытку';
-				// Сохранении данных о фотках в БД не прошло - сами изменения в объявлении сохранене, но изменения в данных о фотографиях не сохранены.
-			}
+                $errors[] = 'К сожалению, при сохранении данных о фотографиях произошла ошибка: проверьте, пожалуйста, еще раз корректность Вашей информации и повторите попытку';
+                // Сохранении данных о фотках в БД не прошло - сами изменения в объявлении сохранене, но изменения в данных о фотографиях не сохранены.
+            }
 
 
-		} else {
+        } else {
 
-			$errors[] = 'К сожалению, при сохранении данных произошла ошибка: проверьте, пожалуйста, еще раз корректность Вашей информации и повторите попытку';
-			// Сохранении данных в БД не прошло - объявление не сохранено
-		}
+            $errors[] = 'К сожалению, при сохранении данных произошла ошибка: проверьте, пожалуйста, еще раз корректность Вашей информации и повторите попытку';
+            // Сохранении данных в БД не прошло - объявление не сохранено
+        }
 
-	}
+    }
 }
 
 /********************************************************************************

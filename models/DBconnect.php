@@ -7,65 +7,62 @@
  * 3. Данный класс самостоятельно выполняет преобразваония данных из формата хранения в БД в формат, с которым работает проект и наоборот.
  */
 
-class DBconnect
-{
-	/**
-	 * Cодержит объект соединения с базой данных класса mysqli (единственный на весь скрипт)
-	 * @var mysqli
-	 */
-	private static $connect;
+class DBconnect {
+    /**
+     * Cодержит объект соединения с базой данных класса mysqli (единственный на весь скрипт)
+     * @var mysqli
+     */
+    private static $connect;
 
-	/**
-	 * Возвращает объект mysqli для прямого обращения к БД
-	 *
-	 * @return mysqli|bool возвращает объект класса mysqli для прямой работы с БД в случае успеха (удалось получить соединение с БД) и FALSE в ином случае
-	 */
-	public static function get() {
-		if (self::$connect === NULL) { // Если соединение с БД еще не устанавливалось
-			self::$connect = self::connectToDB(); // Создаем объект соединения с БД
-		}
+    /**
+     * Возвращает объект mysqli для прямого обращения к БД
+     * @return mysqli|bool возвращает объект класса mysqli для прямой работы с БД в случае успеха (удалось получить соединение с БД) и FALSE в ином случае
+     */
+    public static function get() {
+        if (self::$connect === NULL) { // Если соединение с БД еще не устанавливалось
+            self::$connect = self::connectToDB(); // Создаем объект соединения с БД
+        }
 
-		return self::$connect; // Возвращаем объект соединения с БД. Либо FALSE, если установить соединение не удалось
-	}
+        return self::$connect; // Возвращаем объект соединения с БД. Либо FALSE, если установить соединение не удалось
+    }
 
-	/**
-	 * Метод возвращает объект соединения с БД (mysqli), либо FALSE
-	 * Метод отрабатывает один раз при вызове DBconnect::get();
-	 *
-	 * @return mysqli|bool
-	 */
-	private static function connectToDB() {
-		// Устанавливаем соединение с базой данных
-		$mysqli = new mysqli("localhost", "dimau1_dimau", "udvudv", "dimau1_homes");
+    /**
+     * Метод возвращает объект соединения с БД (mysqli), либо FALSE
+     * Метод отрабатывает один раз при вызове DBconnect::get();
+     * @return mysqli|bool возвращает объект класса mysqli или FALSE в случае ошибки при соединении с БД
+     */
+    private static function connectToDB() {
+        // Устанавливаем соединение с базой данных
+        $mysqli = new mysqli("localhost", "dimau1_dimau", "udvudv", "dimau1_homes");
 
-		// Проверим - удалось ли установить соединение
-		if (mysqli_connect_error()) {
-			// TODO: сохранить в лог ошибку подключения к БД: ('Ошибка подключения к базе данных (' . mysqli_connect_errno() . ') ' . mysqli_connect_error())
-			// TODO: сделать красивую страницу тех поддержки, на которую перенаправлять пользователя, если с БД связи нет
-			return FALSE;
-		}
+        // Проверим - удалось ли установить соединение
+        if (mysqli_connect_error()) {
+            // TODO: сохранить в лог ошибку подключения к БД: ('Ошибка подключения к базе данных (' . mysqli_connect_errno() . ') ' . mysqli_connect_error())
+            // TODO: сделать красивую страницу тех поддержки, на которую перенаправлять пользователя, если с БД связи нет
+            return FALSE;
+        }
 
-		// Устанавливаем кодировку
-		if (!$mysqli->set_charset("utf8")) {
-			// TODO: сохранить в лог ошибку изменения кодировки БД
-		}
+        // Устанавливаем кодировку
+        if (!$mysqli->set_charset("utf8")) {
+            // TODO: сохранить в лог ошибку изменения кодировки БД
+        }
 
-		// Если объект соединения с БД получен - вернем его в качестве результата работы конструктора
-		return $mysqli;
-	}
+        // Если объект соединения с БД получен - вернем его в качестве результата работы конструктора
+        return $mysqli;
+    }
 
-	// Функция закрывает соединение с БД
-	public static function closeConnectToDB() {
-		// Если соединения не было, то и закрывать нечего
-		if (self::$connect === FALSE || self::$connect === NULL) return TRUE;
+    // Функция закрывает соединение с БД
+    public static function closeConnectToDB() {
+        // Если соединения не было, то и закрывать нечего
+        if (self::$connect === FALSE || self::$connect === NULL) return TRUE;
 
-		if (self::$connect->close()) {
-			return TRUE;
-		} else {
-			// TODO: сохранить в лог ошибку закрытия соединения с БД
-			return FALSE;
-		}
-	}
+        if (self::$connect->close()) {
+            return TRUE;
+        } else {
+            // TODO: сохранить в лог ошибку закрытия соединения с БД
+            return FALSE;
+        }
+    }
 
     /**
      * Возвращает ассоциированный массив, который содержит полные данные (характеристику) по пользователю системы. Если ничего не найдено или произошла ошибка, вернет пустой массив
@@ -87,7 +84,7 @@ class DBconnect
             OR (($res = $res->fetch_assoc()) === NULL)
             OR ($stmt->close() === FALSE)
         ) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM users WHERE id = ".$userId." LIMIT 1'. id логгера: DBconnect::selectUserCharacteristic():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM users WHERE id = " . $userId . " LIMIT 1'. id логгера: DBconnect::selectUserCharacteristic():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return array();
         }
 
@@ -118,7 +115,7 @@ class DBconnect
             OR (($res = $res->fetch_assoc()) === NULL)
             OR ($stmt->close() === FALSE)
         ) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM users WHERE login = ".$login." LIMIT 1'. id логгера: DBconnect::selectUserCharacteristicForLogin():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM users WHERE login = " . $login . " LIMIT 1'. id логгера: DBconnect::selectUserCharacteristicForLogin():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return array();
         }
 
@@ -149,7 +146,7 @@ class DBconnect
             OR (($res = $res->fetch_assoc()) === NULL)
             OR ($stmt->close() === FALSE)
         ) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM users WHERE user_hash = ".$user_hash." LIMIT 1'. id логгера: DBconnect::selectUserCharacteristicForHash():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM users WHERE user_hash = " . $user_hash . " LIMIT 1'. id логгера: DBconnect::selectUserCharacteristicForHash():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return array();
         }
 
@@ -180,7 +177,7 @@ class DBconnect
             OR (($res = $res->fetch_assoc()) === NULL)
             OR ($stmt->close() === FALSE)
         ) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM property WHERE id = ".$propertyId."'. id логгера: DBconnect::selectPropertyCharacteristic():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM property WHERE id = " . $propertyId . "'. id логгера: DBconnect::selectPropertyCharacteristic():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return array();
         }
 
@@ -191,54 +188,54 @@ class DBconnect
         return $res;
     }
 
-	/**
-	 * Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одному из объектов недвижимости. Если ничего не найдено или произошла ошибка, вернет пустой массив
-	 * ВНИМАНИЕ: массивы могут быть расположены не в том же порядке, в каком идентификаторы располагались во входном массиве
-	 *
-	 * @param int|array $propertiesId - идентификатор объекта недвижимости, либо массив идентификаторов объектов недвижимости, по которым нужно получить данные
-	 * @return array
-	 */
-	public static function selectCharacteristicForProperties($propertiesId) {
+    /**
+     * Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одному из объектов недвижимости. Если ничего не найдено или произошла ошибка, вернет пустой массив
+     * ВНИМАНИЕ: массивы могут быть расположены не в том же порядке, в каком идентификаторы располагались во входном массиве
+     *
+     * @param int|array $propertiesId - идентификатор объекта недвижимости, либо массив идентификаторов объектов недвижимости, по которым нужно получить данные
+     * @return array
+     */
+    public static function selectCharacteristicForProperties($propertiesId) {
 
-		// Проверка входящих параметров
-		if (!isset($propertiesId)) return array();
-		if (is_array($propertiesId) && count($propertiesId) == 0) return array();
+        // Проверка входящих параметров
+        if (!isset($propertiesId)) return array();
+        if (is_array($propertiesId) && count($propertiesId) == 0) return array();
 
-		// Если нам на вход дали единичный идентификатор, то приведем его к виду массива
-		if (!is_array($propertiesId)) $propertiesId = array($propertiesId);
+        // Если нам на вход дали единичный идентификатор, то приведем его к виду массива
+        if (!is_array($propertiesId)) $propertiesId = array($propertiesId);
 
-		// Для надежности преобразование к целому типу членов массива и их проверка
-		for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
-			$propertiesId[$i] = intval($propertiesId[$i]);
-			if ($propertiesId[$i] == 0) return array(); // Если преобразование дало 0, значит один из членов массива не является идентификатором объекта недвижимости - входные данные некорректны
-		}
+        // Для надежности преобразование к целому типу членов массива и их проверка
+        for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
+            $propertiesId[$i] = intval($propertiesId[$i]);
+            if ($propertiesId[$i] == 0) return array(); // Если преобразование дало 0, значит один из членов массива не является идентификатором объекта недвижимости - входные данные некорректны
+        }
 
-		// Соберем условие для получения данных из БД
-		$strWHERE = " (";
-		for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
-			$strWHERE .= " id = '" . $propertiesId[$i] . "'";
-			if ($i < $s - 1) $strWHERE .= " OR";
-		}
-		$strWHERE .= " )";
+        // Соберем условие для получения данных из БД
+        $strWHERE = " (";
+        for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
+            $strWHERE .= " id = '" . $propertiesId[$i] . "'";
+            if ($i < $s - 1) $strWHERE .= " OR";
+        }
+        $strWHERE .= " )";
 
-		// Получаем данные из БД
-		$res = DBconnect::get()->query("SELECT * FROM property WHERE" . $strWHERE);
-		if ((DBconnect::get()->errno)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-		) {
-			// Логируем ошибку
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM property WHERE".$strWHERE."'. id логгера: DBconnect::selectCharacteristicForProperties():1. Выдаваемая ошибка: " . DBconnect::get()->errno . " " . DBconnect::get()->error . ". ID пользователя: не определено");
-			return array();
-		}
+        // Получаем данные из БД
+        $res = DBconnect::get()->query("SELECT * FROM property WHERE" . $strWHERE);
+        if ((DBconnect::get()->errno)
+            OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+        ) {
+            // Логируем ошибку
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM property WHERE" . $strWHERE . "'. id логгера: DBconnect::selectCharacteristicForProperties():1. Выдаваемая ошибка: " . DBconnect::get()->errno . " " . DBconnect::get()->error . ". ID пользователя: не определено");
+            return array();
+        }
 
-		// Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
-		for ($i = 0, $s = count($res); $i < $s; $i++) {
-			$res[$i] = DBconnect::conversionPropertyCharacteristicFromDBToView($res[$i]);
-		}
+        // Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
+        for ($i = 0, $s = count($res); $i < $s; $i++) {
+            $res[$i] = DBconnect::conversionPropertyCharacteristicFromDBToView($res[$i]);
+        }
 
-		// Вернем результат
-		return $res;
-	}
+        // Вернем результат
+        return $res;
+    }
 
     // Функция возвращает подробные сведения по объектам недвижимости из БД
     // В случае ошибки возвращает FALSE, елси данные получить не удалось, то пустой массив
@@ -304,350 +301,349 @@ class DBconnect
         return $propertyFullArr;
     }
 
-	/**
-	 * Функция возвращает массив массивов с названиями районов в городе $city
-	 *
-	 * @param string $city город, чей список районов мы хотим получить
-	 * @return array массив ассоциированных массивов, содержащих только один ключ-значение = названию района города
-	 */
-	public static function selectDistrictsForCity($city = "Екатеринбург")
-	{
-		// Проверка входных параметров
-		if ($city != "Екатеринбург") return array();
+    /**
+     * Функция возвращает массив массивов с названиями районов в городе $city
+     *
+     * @param string $city город, чей список районов мы хотим получить
+     * @return array массив ассоциированных массивов, содержащих только один ключ-значение = названию района города
+     */
+    public static function selectDistrictsForCity($city = "Екатеринбург") {
+        // Проверка входных параметров
+        if ($city != "Екатеринбург") return array();
 
-		// Получим из БД данные ($res) по пользователю с логином = $login
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("SELECT name FROM districts WHERE city=? ORDER BY name ASC") === FALSE)
-			OR ($stmt->bind_param("s", $city) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->get_result()) === FALSE)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT name FROM districts WHERE city = ".$city." ORDER BY name ASC'. id логгера: DBconnect::selectDistrictsForCity():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return array();
-		}
+        // Получим из БД данные ($res) по пользователю с логином = $login
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("SELECT name FROM districts WHERE city=? ORDER BY name ASC") === FALSE)
+            OR ($stmt->bind_param("s", $city) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->get_result()) === FALSE)
+            OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT name FROM districts WHERE city = " . $city . " ORDER BY name ASC'. id логгера: DBconnect::selectDistrictsForCity():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return array();
+        }
 
-		return $res;
-	}
+        return $res;
+    }
 
-	// Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одной из фотографий. Если ничего не найдено или произошла ошибка, вернет пустой массив
-	// На входе - временный идентификатор сессии загрузки фотографий ($fileUploadId)
-	public static function selectPhotosForFileUploadId($fileUploadId) {
+    // Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одной из фотографий. Если ничего не найдено или произошла ошибка, вернет пустой массив
+    // На входе - временный идентификатор сессии загрузки фотографий ($fileUploadId)
+    public static function selectPhotosForFileUploadId($fileUploadId) {
 
-		// Проверка входящих параметров
-		if (!isset($fileUploadId) || $fileUploadId == "") return array();
+        // Проверка входящих параметров
+        if (!isset($fileUploadId) || $fileUploadId == "") return array();
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("SELECT * FROM tempFotos WHERE fileUploadId = ?") === FALSE)
-			OR ($stmt->bind_param("s", $fileUploadId) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->get_result()) === FALSE)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM tempFotos WHERE fileUploadId=" . $fileUploadId . "'. id логгера: DBconnect::selectPhotosForFileUploadId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return array();
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("SELECT * FROM tempFotos WHERE fileUploadId = ?") === FALSE)
+            OR ($stmt->bind_param("s", $fileUploadId) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->get_result()) === FALSE)
+            OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM tempFotos WHERE fileUploadId=" . $fileUploadId . "'. id логгера: DBconnect::selectPhotosForFileUploadId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return array();
+        }
 
-		return $res;
-	}
+        return $res;
+    }
 
-	// Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одной из фотографий. Если ничего не найдено или произошла ошибка, вернет пустой массив
-	// На входе - идентификатор пользователя, чьи фотографии нужно получить (точнее данные по его фотографиям)
-	public static function selectPhotosForUser($userId) {
+    // Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одной из фотографий. Если ничего не найдено или произошла ошибка, вернет пустой массив
+    // На входе - идентификатор пользователя, чьи фотографии нужно получить (точнее данные по его фотографиям)
+    public static function selectPhotosForUser($userId) {
 
-		// Проверка входящих параметров
-		if (!isset($userId) || !is_int($userId)) return array();
+        // Проверка входящих параметров
+        if (!isset($userId) || !is_int($userId)) return array();
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("SELECT * FROM userFotos WHERE userId = ?") === FALSE)
-			OR ($stmt->bind_param("i", $userId) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->get_result()) === FALSE)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM userFotos WHERE userId=" . $userId . "'. Местонахождение кода: DBconnect::selectPhotosForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return array();
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("SELECT * FROM userFotos WHERE userId = ?") === FALSE)
+            OR ($stmt->bind_param("i", $userId) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->get_result()) === FALSE)
+            OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM userFotos WHERE userId=" . $userId . "'. Местонахождение кода: DBconnect::selectPhotosForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return array();
+        }
 
-		return $res;
-	}
+        return $res;
+    }
 
-	// Функция возвращает массив ассоциированных массивов с данными о фотографиях объекта недвижимости. В случае отсутствия фотографий, а также в случае получения ошибки возвращает пустой массив.
-	// На входе - идентификатор объекта недвижимости, по которому нужно получить фотографии
-	public static function selectPhotosForProperty($propertyId) {
+    // Функция возвращает массив ассоциированных массивов с данными о фотографиях объекта недвижимости. В случае отсутствия фотографий, а также в случае получения ошибки возвращает пустой массив.
+    // На входе - идентификатор объекта недвижимости, по которому нужно получить фотографии
+    public static function selectPhotosForProperty($propertyId) {
 
-		// Проверка входящих параметров
-		if (!isset($propertyId) || !is_int($propertyId)) return array();
+        // Проверка входящих параметров
+        if (!isset($propertyId) || !is_int($propertyId)) return array();
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("SELECT * FROM propertyFotos WHERE propertyId = ?") === FALSE)
-			OR ($stmt->bind_param("i", $propertyId) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->get_result()) === FALSE)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM propertyFotos WHERE propertyId = " . $propertyId . "'. Местонахождение кода: DBconnect::selectPhotosForProperty():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return array();
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("SELECT * FROM propertyFotos WHERE propertyId = ?") === FALSE)
+            OR ($stmt->bind_param("i", $propertyId) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->get_result()) === FALSE)
+            OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM propertyFotos WHERE propertyId = " . $propertyId . "'. Местонахождение кода: DBconnect::selectPhotosForProperty():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return array();
+        }
 
-		return $res;
-	}
+        return $res;
+    }
 
-	/**
-	 * Возвращает поисковый запрос пользователя
-	 *
-	 * @param int $userId идентификатор пользователя, чей поисковый запрос мы хотим получить
-	 * @return array массив ассоциативных массивов, содержащих параметры поисковых запросов (теоретически всегда должен быть только 1 ассоциативный массив внутри этого возвращаемого). Если ничего не найдено, то вернет пустой массив
-	 */
-	public static function selectSearchRequestForUser($userId) {
+    /**
+     * Возвращает поисковый запрос пользователя
+     *
+     * @param int $userId идентификатор пользователя, чей поисковый запрос мы хотим получить
+     * @return array массив ассоциативных массивов, содержащих параметры поисковых запросов (теоретически всегда должен быть только 1 ассоциативный массив внутри этого возвращаемого). Если ничего не найдено, то вернет пустой массив
+     */
+    public static function selectSearchRequestForUser($userId) {
 
-		// Проверка входящих параметров
-		if (!isset($userId) || !is_int($userId)) return array();
+        // Проверка входящих параметров
+        if (!isset($userId) || !is_int($userId)) return array();
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("SELECT * FROM searchRequests WHERE userId = ? LIMIT 1") === FALSE)
-			OR ($stmt->bind_param("i", $userId) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->get_result()) === FALSE)
-			OR (($res = $res->fetch_assoc()) === NULL)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM searchRequests WHERE userId = " . $userId . " LIMIT 1'. Местонахождение кода: DBconnect::selectSearchRequestForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return array();
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("SELECT * FROM searchRequests WHERE userId = ? LIMIT 1") === FALSE)
+            OR ($stmt->bind_param("i", $userId) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->get_result()) === FALSE)
+            OR (($res = $res->fetch_assoc()) === NULL)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM searchRequests WHERE userId = " . $userId . " LIMIT 1'. Местонахождение кода: DBconnect::selectSearchRequestForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return array();
+        }
 
-		// Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
+        // Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
         $res = DBconnect::conversionSearchRequestFromDBToView($res);
 
-		return $res;
-	}
+        return $res;
+    }
 
-	// Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одной из заявок. Если ничего не найдено или произошла ошибка, вернет пустой массив
-	// На входе - идентификатор объекта недвижимости, либо массив идентификаторов объектов недвижимости, по которым нужно найти все заявки на просмотр
-	public static function selectRequestsToViewForProperties($propertiesId) {
+    // Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одной из заявок. Если ничего не найдено или произошла ошибка, вернет пустой массив
+    // На входе - идентификатор объекта недвижимости, либо массив идентификаторов объектов недвижимости, по которым нужно найти все заявки на просмотр
+    public static function selectRequestsToViewForProperties($propertiesId) {
 
-		// Проверка входящих параметров
-		if (!isset($propertiesId)) return array();
-		if (is_array($propertiesId) && count($propertiesId) == 0) return array();
+        // Проверка входящих параметров
+        if (!isset($propertiesId)) return array();
+        if (is_array($propertiesId) && count($propertiesId) == 0) return array();
 
-		// Если нам на вход дали единичный идентификатор, то приведем его к виду массива
-		if (!is_array($propertiesId)) $propertiesId = array($propertiesId);
+        // Если нам на вход дали единичный идентификатор, то приведем его к виду массива
+        if (!is_array($propertiesId)) $propertiesId = array($propertiesId);
 
-		// Для надежности преобразование к целому типу членов массива и их проверка
-		for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
-			$propertiesId[$i] = intval($propertiesId[$i]);
-			if ($propertiesId[$i] == 0) return array(); // Если преобразование дало 0, значит один из членов массива не является идентификатором объекта недвижимости - входные данные некорректны
-		}
+        // Для надежности преобразование к целому типу членов массива и их проверка
+        for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
+            $propertiesId[$i] = intval($propertiesId[$i]);
+            if ($propertiesId[$i] == 0) return array(); // Если преобразование дало 0, значит один из членов массива не является идентификатором объекта недвижимости - входные данные некорректны
+        }
 
-		// Соберем условие для получения данных из БД
-		$strWHERE = " (";
-		for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
-			$strWHERE .= " propertyId = '" . $propertiesId[$i] . "'";
-			if ($i < $s - 1) $strWHERE .= " OR";
-		}
-		$strWHERE .= " )";
+        // Соберем условие для получения данных из БД
+        $strWHERE = " (";
+        for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
+            $strWHERE .= " propertyId = '" . $propertiesId[$i] . "'";
+            if ($i < $s - 1) $strWHERE .= " OR";
+        }
+        $strWHERE .= " )";
 
-		// Получаем данные из БД
-		$res = DBconnect::get()->query("SELECT * FROM requestToView WHERE" . $strWHERE . " ORDER BY status DESC");
-		if ((DBconnect::get()->errno)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-		) {
-			// Логируем ошибку
-			//TODO: сделать логирование ошибки
-			return array();
-		}
+        // Получаем данные из БД
+        $res = DBconnect::get()->query("SELECT * FROM requestToView WHERE" . $strWHERE . " ORDER BY status DESC");
+        if ((DBconnect::get()->errno)
+            OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+        ) {
+            // Логируем ошибку
+            //TODO: сделать логирование ошибки
+            return array();
+        }
 
-		// Вернем результат
-		return $res;
-	}
+        // Вернем результат
+        return $res;
+    }
 
-	// Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одной из заявок. Если ничего не найдено или произошла ошибка, вернет пустой массив
-	// На входе - статус, все заявки, имеющие который, будут находиться в выборке
-	public static function selectRequestsToViewForStatus($status) {
-		// Проверка входящих параметров
-		$allPermittedStatuses = array("Новая", "Ошибка при отправке", "Назначен просмотр", "Отложена", "Объект уже сдан", "Отказ собственника", "Отменена", "Безуспешный просмотр", "Успешный просмотр");
-		if (!isset($status) || !in_array($status, $allPermittedStatuses)) return array();
+    // Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одной из заявок. Если ничего не найдено или произошла ошибка, вернет пустой массив
+    // На входе - статус, все заявки, имеющие который, будут находиться в выборке
+    public static function selectRequestsToViewForStatus($status) {
+        // Проверка входящих параметров
+        $allPermittedStatuses = array("Новая", "Ошибка при отправке", "Назначен просмотр", "Отложена", "Объект уже сдан", "Отказ собственника", "Отменена", "Безуспешный просмотр", "Успешный просмотр");
+        if (!isset($status) || !in_array($status, $allPermittedStatuses)) return array();
 
-		// TODO: Выбирем сортировку результатов - в зависимости от статуса
+        // TODO: Выбирем сортировку результатов - в зависимости от статуса
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("SELECT * FROM requestToView WHERE status = ? ORDER BY id DESC") === FALSE)
-			OR ($stmt->bind_param("s", $status) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->get_result()) === FALSE)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM requestToView WHERE status = '" . $status . "' ORDER BY id DESC'. Местонахождение кода: DBconnect::selectRequestsToViewForStatus():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return array();
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("SELECT * FROM requestToView WHERE status = ? ORDER BY id DESC") === FALSE)
+            OR ($stmt->bind_param("s", $status) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->get_result()) === FALSE)
+            OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM requestToView WHERE status = '" . $status . "' ORDER BY id DESC'. Местонахождение кода: DBconnect::selectRequestsToViewForStatus():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return array();
+        }
 
-		// Если получить данные из БД удалось - вернем их
-		return $res;
-	}
+        // Если получить данные из БД удалось - вернем их
+        return $res;
+    }
 
-	// Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одной из заявок. Если ничего не найдено или произошла ошибка, вернет пустой массив
-	// На входе - id арендатора или массив id арендаторов, все заявки которых необходимо получить
-	public static function selectRequestsToViewForTenants($tenantsId) {
-		// Проверка входящих параметров
-		if (!isset($tenantsId)) return array();
-		if (is_array($tenantsId) && count($tenantsId) == 0) return array();
+    // Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одной из заявок. Если ничего не найдено или произошла ошибка, вернет пустой массив
+    // На входе - id арендатора или массив id арендаторов, все заявки которых необходимо получить
+    public static function selectRequestsToViewForTenants($tenantsId) {
+        // Проверка входящих параметров
+        if (!isset($tenantsId)) return array();
+        if (is_array($tenantsId) && count($tenantsId) == 0) return array();
 
-		// Если нам на вход дали единичный идентификатор, то приведем его к виду массива
-		if (!is_array($tenantsId)) $tenantsId = array($tenantsId);
+        // Если нам на вход дали единичный идентификатор, то приведем его к виду массива
+        if (!is_array($tenantsId)) $tenantsId = array($tenantsId);
 
-		// Для надежности преобразование к целому типу членов массива и их проверка
-		for ($i = 0, $s = count($tenantsId); $i < $s; $i++) {
-			$tenantsId[$i] = intval($tenantsId[$i]);
-			if ($tenantsId[$i] == 0) return array(); // Если преобразование дало 0, значит один из членов массива не является идентификатором пользователя - входные данные некорректны
-		}
+        // Для надежности преобразование к целому типу членов массива и их проверка
+        for ($i = 0, $s = count($tenantsId); $i < $s; $i++) {
+            $tenantsId[$i] = intval($tenantsId[$i]);
+            if ($tenantsId[$i] == 0) return array(); // Если преобразование дало 0, значит один из членов массива не является идентификатором пользователя - входные данные некорректны
+        }
 
-		// Соберем условие для получения данных из БД
-		$strWHERE = " (";
-		for ($i = 0, $s = count($tenantsId); $i < $s; $i++) {
-			$strWHERE .= " tenantId = '" . $tenantsId[$i] . "'";
-			if ($i < $s - 1) $strWHERE .= " OR";
-		}
-		$strWHERE .= " )";
+        // Соберем условие для получения данных из БД
+        $strWHERE = " (";
+        for ($i = 0, $s = count($tenantsId); $i < $s; $i++) {
+            $strWHERE .= " tenantId = '" . $tenantsId[$i] . "'";
+            if ($i < $s - 1) $strWHERE .= " OR";
+        }
+        $strWHERE .= " )";
 
-		// Получаем данные из БД
-		$res = DBconnect::get()->query("SELECT * FROM requestToView WHERE" . $strWHERE . " ORDER BY status DESC");
-		if ((DBconnect::get()->errno)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-		) {
-			// Логируем ошибку
-			//TODO: сделать логирование ошибки
-			return array();
-		}
+        // Получаем данные из БД
+        $res = DBconnect::get()->query("SELECT * FROM requestToView WHERE" . $strWHERE . " ORDER BY status DESC");
+        if ((DBconnect::get()->errno)
+            OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+        ) {
+            // Логируем ошибку
+            //TODO: сделать логирование ошибки
+            return array();
+        }
 
-		// Вернем результат
-		return $res;
-	}
+        // Вернем результат
+        return $res;
+    }
 
-	// Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одной из заявок. Если ничего не найдено или произошла ошибка, вернет пустой массив
-	public static function selectRequestsFromOwners() {
+    // Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одной из заявок. Если ничего не найдено или произошла ошибка, вернет пустой массив
+    public static function selectRequestsFromOwners() {
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("SELECT * FROM requestFromOwners ORDER BY regDate DESC") === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->get_result()) === FALSE)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM requestFromOwners ORDER BY regDate DESC'. Местонахождение кода: DBconnect::selectRequestsFromOwners():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return array();
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("SELECT * FROM requestFromOwners ORDER BY regDate DESC") === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->get_result()) === FALSE)
+            OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM requestFromOwners ORDER BY regDate DESC'. Местонахождение кода: DBconnect::selectRequestsFromOwners():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return array();
+        }
 
-		// Если получить данные из БД удалось - вернем их
-		return $res;
-	}
+        // Если получить данные из БД удалось - вернем их
+        return $res;
+    }
 
-	// Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одному из уведомлений. Если ничего не найдено или произошла ошибка, вернет пустой массив
-	// На входе - id уведомления
-	public static function selectMessageNewPropertyForId($messageId) {
+    // Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одному из уведомлений. Если ничего не найдено или произошла ошибка, вернет пустой массив
+    // На входе - id уведомления
+    public static function selectMessageNewPropertyForId($messageId) {
 
-		// Валидация входящих данных
-		if (!isset($messageId) || !is_int($messageId)) return array();
+        // Валидация входящих данных
+        if (!isset($messageId) || !is_int($messageId)) return array();
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("SELECT * FROM messagesNewProperty WHERE id = ?") === FALSE)
-			OR ($stmt->bind_param("i", $messageId) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->get_result()) === FALSE)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM messagesNewProperty WHERE id = " . $messageId . "'. Местонахождение кода: DBconnect::selectMessageNewPropertyForId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return array();
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("SELECT * FROM messagesNewProperty WHERE id = ?") === FALSE)
+            OR ($stmt->bind_param("i", $messageId) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->get_result()) === FALSE)
+            OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM messagesNewProperty WHERE id = " . $messageId . "'. Местонахождение кода: DBconnect::selectMessageNewPropertyForId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return array();
+        }
 
-		// Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
-		for ($i = 0, $s = count($res); $i < $s; $i++) {
-			$res[$i]['fotoArr'] = unserialize($res[$i]['fotoArr']);
-		}
+        // Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
+        for ($i = 0, $s = count($res); $i < $s; $i++) {
+            $res[$i]['fotoArr'] = unserialize($res[$i]['fotoArr']);
+        }
 
-		return $res;
-	}
+        return $res;
+    }
 
-	// Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одному из уведомлений. Если ничего не найдено или произошла ошибка, вернет пустой массив
-	// На входе - id пользователя, чьи уведомления мы хотим получить
-	public static function selectMessagesNewPropertyForUser($userId) {
+    // Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одному из уведомлений. Если ничего не найдено или произошла ошибка, вернет пустой массив
+    // На входе - id пользователя, чьи уведомления мы хотим получить
+    public static function selectMessagesNewPropertyForUser($userId) {
 
-		// Проверка входящих параметров
-		if (!isset($userId) || !is_int($userId)) return array();
+        // Проверка входящих параметров
+        if (!isset($userId) || !is_int($userId)) return array();
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("SELECT * FROM messagesNewProperty WHERE userId = ? ORDER BY isReaded ASC, timeIndex DESC") === FALSE)
-			OR ($stmt->bind_param("i", $userId) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->get_result()) === FALSE)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM messagesNewProperty WHERE userId = " . $userId . " ORDER BY isReaded ASC, timeIndex DESC'. Местонахождение кода: DBconnect::selectMessagesNewPropertyForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return array();
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("SELECT * FROM messagesNewProperty WHERE userId = ? ORDER BY isReaded ASC, timeIndex DESC") === FALSE)
+            OR ($stmt->bind_param("i", $userId) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->get_result()) === FALSE)
+            OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM messagesNewProperty WHERE userId = " . $userId . " ORDER BY isReaded ASC, timeIndex DESC'. Местонахождение кода: DBconnect::selectMessagesNewPropertyForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return array();
+        }
 
-		// Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
-		for ($i = 0, $s = count($res); $i < $s; $i++) {
-			$res[$i]['fotoArr'] = unserialize($res[$i]['fotoArr']);
-		}
+        // Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
+        for ($i = 0, $s = count($res); $i < $s; $i++) {
+            $res[$i]['fotoArr'] = unserialize($res[$i]['fotoArr']);
+        }
 
-		return $res;
-	}
+        return $res;
+    }
 
-	/**
-	 * Возвращает массив ассоциированных массивов из таблицы архивных объявлений, каждый из которых содержит данные по одному из объектов недвижимости. Если ничего не найдено или произошла ошибка, вернет пустой массив
-	 * ВНИМАНИЕ: массивы могут быть расположены не в том же порядке, в каком идентификаторы располагались во входном массиве
-	 *
-	 * @param int|array $propertiesId - идентификатор объекта недвижимости, либо массив идентификаторов объектов недвижимости, по которым нужно получить данные
-	 * @return array
-	 */
-	public static function selectPropertyCharacteristicFromArchive($propertiesId) {
+    /**
+     * Возвращает массив ассоциированных массивов из таблицы архивных объявлений, каждый из которых содержит данные по одному из объектов недвижимости. Если ничего не найдено или произошла ошибка, вернет пустой массив
+     * ВНИМАНИЕ: массивы могут быть расположены не в том же порядке, в каком идентификаторы располагались во входном массиве
+     *
+     * @param int|array $propertiesId - идентификатор объекта недвижимости, либо массив идентификаторов объектов недвижимости, по которым нужно получить данные
+     * @return array
+     */
+    public static function selectPropertyCharacteristicFromArchive($propertiesId) {
 
-		// Проверка входящих параметров
-		if (!isset($propertiesId)) return array();
-		if (is_array($propertiesId) && count($propertiesId) == 0) return array();
+        // Проверка входящих параметров
+        if (!isset($propertiesId)) return array();
+        if (is_array($propertiesId) && count($propertiesId) == 0) return array();
 
-		// Если нам на вход дали единичный идентификатор, то приведем его к виду массива
-		if (!is_array($propertiesId)) $propertiesId = array($propertiesId);
+        // Если нам на вход дали единичный идентификатор, то приведем его к виду массива
+        if (!is_array($propertiesId)) $propertiesId = array($propertiesId);
 
-		// Для надежности преобразование к целому типу членов массива и их проверка
-		for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
-			$propertiesId[$i] = intval($propertiesId[$i]);
-			if ($propertiesId[$i] == 0) return array(); // Если преобразование дало 0, значит один из членов массива не является идентификатором объекта недвижимости - входные данные некорректны
-		}
+        // Для надежности преобразование к целому типу членов массива и их проверка
+        for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
+            $propertiesId[$i] = intval($propertiesId[$i]);
+            if ($propertiesId[$i] == 0) return array(); // Если преобразование дало 0, значит один из членов массива не является идентификатором объекта недвижимости - входные данные некорректны
+        }
 
-		// Соберем условие для получения данных из БД
-		$strWHERE = " (";
-		for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
-			$strWHERE .= " id = '" . $propertiesId[$i] . "'";
-			if ($i < $s - 1) $strWHERE .= " OR";
-		}
-		$strWHERE .= " )";
+        // Соберем условие для получения данных из БД
+        $strWHERE = " (";
+        for ($i = 0, $s = count($propertiesId); $i < $s; $i++) {
+            $strWHERE .= " id = '" . $propertiesId[$i] . "'";
+            if ($i < $s - 1) $strWHERE .= " OR";
+        }
+        $strWHERE .= " )";
 
-		// Получаем данные из БД
-		$res = DBconnect::get()->query("SELECT * FROM archiveAdverts WHERE" . $strWHERE);
-		if ((DBconnect::get()->errno)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-		) {
-			// Логируем ошибку
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM archiveAdverts WHERE".$strWHERE."'. id логгера: DBconnect::selectPropertyCharacteristicFromArchive():1. Выдаваемая ошибка: " . DBconnect::get()->errno . " " . DBconnect::get()->error . ". ID пользователя: не определено");
-			return array();
-		}
+        // Получаем данные из БД
+        $res = DBconnect::get()->query("SELECT * FROM archiveAdverts WHERE" . $strWHERE);
+        if ((DBconnect::get()->errno)
+            OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+        ) {
+            // Логируем ошибку
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM archiveAdverts WHERE" . $strWHERE . "'. id логгера: DBconnect::selectPropertyCharacteristicFromArchive():1. Выдаваемая ошибка: " . DBconnect::get()->errno . " " . DBconnect::get()->error . ". ID пользователя: не определено");
+            return array();
+        }
 
-		// Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
-		for ($i = 0, $s = count($res); $i < $s; $i++) {
-			$res[$i] = DBconnect::conversionPropertyCharacteristicFromDBToView($res[$i]);
-		}
+        // Преобразование данных из формата хранения в БД в формат, с которым работают php скрипты
+        for ($i = 0, $s = count($res); $i < $s; $i++) {
+            $res[$i] = DBconnect::conversionPropertyCharacteristicFromDBToView($res[$i]);
+        }
 
-		// Вернем результат
-		return $res;
-	}
+        // Вернем результат
+        return $res;
+    }
 
     /**
      * Возвращает ассоциативный массив с идентификаторами ранее обработанных объявлений с сайта bazab2b за выбранный период
@@ -674,7 +670,7 @@ class DBconnect
             OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
             OR ($stmt->close() === FALSE)
         ) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM bazab2b WHERE date >= ".$initialDate." AND date <= ".$finalDate."'. Местонахождение кода: DBconnect::selectHandledAdvertsFromBazab2b():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM bazab2b WHERE date >= " . $initialDate . " AND date <= " . $finalDate . "'. Местонахождение кода: DBconnect::selectHandledAdvertsFromBazab2b():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return NULL;
         }
 
@@ -687,6 +683,32 @@ class DBconnect
     }
 
     /**
+     * Возвращает данные по оплаченному счету
+     * @param string $number идентификатор счета (номер счета)
+     * @return array ассоциативный массив, содержащих параметры счета, если счет не найден - пустой массив
+     */
+    public static function selectInvoiceForNumber($number) {
+
+        // Проверка входящих параметров
+        if (!isset($number)) return array();
+
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("SELECT * FROM invoices WHERE number = ? LIMIT 1") === FALSE)
+            OR ($stmt->bind_param("s", $number) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->get_result()) === FALSE)
+            OR (($res = $res->fetch_assoc()) === NULL)
+            OR ($stmt->close() === FALSE)
+        ) {
+            // Если счета с таким номером нет в БД, то операция $res->fetch_assoc() будет генерировать NULL вроде, так что в лог будет записываться ошибка даже в штатном режиме работы скрипта
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM invoices WHERE number = " . $number . " LIMIT 1'. Местонахождение кода: DBconnect::selectInvoiceForNumber():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return array();
+        }
+
+        return $res;
+    }
+
+    /**
      * Сохраняет данные об объекте недвижимости в БД
      *
      * @param array $paramsArr ассоциативный массив параметров пользователя
@@ -694,26 +716,26 @@ class DBconnect
      */
     public static function insertUserCharacteristic($paramsArr) {
 
-		// Проверка входящих параметров
-		if (!isset($paramsArr) || !is_array($paramsArr)) return FALSE;
+        // Проверка входящих параметров
+        if (!isset($paramsArr) || !is_array($paramsArr)) return FALSE;
 
-		// Подготовка данных к записи в БД
-		$paramsArr = DBconnect::conversionUserCharacteristicFromViewToDB($paramsArr);
+        // Подготовка данных к записи в БД
+        $paramsArr = DBconnect::conversionUserCharacteristicFromViewToDB($paramsArr);
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("INSERT INTO users SET typeTenant=?, typeOwner=?, name=?, secondName=?, surname=?, sex=?, nationality=?, birthday=?, login=?, password=?, telephon=?, emailReg=?, email=?, currentStatusEducation=?, almamater=?, speciality=?, kurs=?, ochnoZaochno=?, yearOfEnd=?, statusWork=?, placeOfWork=?, workPosition=?, regionOfBorn=?, cityOfBorn=?, shortlyAboutMe=?, vkontakte=?, odnoklassniki=?, facebook=?, twitter=?, lic=?, last_act=?, reg_date=?, favoritePropertiesId=?") === FALSE)
-			OR ($stmt->bind_param("ssssssssssssssssssssssssssssssiis", $paramsArr['typeTenant'], $paramsArr['typeOwner'], $paramsArr['name'], $paramsArr['secondName'], $paramsArr['surname'], $paramsArr['sex'], $paramsArr['nationality'], $paramsArr['birthday'], $paramsArr['login'], $paramsArr['password'], $paramsArr['telephon'], $paramsArr['emailReg'], $paramsArr['email'], $paramsArr['currentStatusEducation'], $paramsArr['almamater'], $paramsArr['speciality'], $paramsArr['kurs'], $paramsArr['ochnoZaochno'], $paramsArr['yearOfEnd'], $paramsArr['statusWork'], $paramsArr['placeOfWork'], $paramsArr['workPosition'], $paramsArr['regionOfBorn'], $paramsArr['cityOfBorn'], $paramsArr['shortlyAboutMe'], $paramsArr['vkontakte'], $paramsArr['odnoklassniki'], $paramsArr['facebook'], $paramsArr['twitter'], $paramsArr['lic'], $paramsArr['last_act'], $paramsArr['reg_date'], $paramsArr['favoritePropertiesId']) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->affected_rows) === -1)
-			OR ($res === 0)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO users SET typeTenant=".$paramsArr['typeTenant'].", typeOwner=".$paramsArr['typeOwner'].", name=".$paramsArr['name'].", secondName=".$paramsArr['secondName'].", surname=".$paramsArr['surname'].", sex=".$paramsArr['sex'].", nationality=".$paramsArr['nationality'].", birthday=".$paramsArr['birthday'].", login=".$paramsArr['login'].", password=".$paramsArr['password'].", telephon=".$paramsArr['telephon'].", emailReg=".$paramsArr['emailReg'].", email=".$paramsArr['email'].", currentStatusEducation=".$paramsArr['currentStatusEducation'].", almamater=".$paramsArr['almamater'].", speciality=".$paramsArr['speciality'].", kurs=".$paramsArr['kurs'].", ochnoZaochno=".$paramsArr['ochnoZaochno'].", yearOfEnd=".$paramsArr['yearOfEnd'].", statusWork=".$paramsArr['statusWork'].", placeOfWork=".$paramsArr['placeOfWork'].", workPosition=".$paramsArr['workPosition'].", regionOfBorn=".$paramsArr['regionOfBorn'].", cityOfBorn=".$paramsArr['cityOfBorn'].", shortlyAboutMe=".$paramsArr['shortlyAboutMe'].", vkontakte=".$paramsArr['vkontakte'].", odnoklassniki=".$paramsArr['odnoklassniki'].", facebook=".$paramsArr['facebook'].", twitter=".$paramsArr['twitter'].", lic=".$paramsArr['lic'].", last_act=".$paramsArr['last_act'].", reg_date=".$paramsArr['reg_date'].", favoritePropertiesId=".$paramsArr['favoritePropertiesId']."'. id логгера: DBconnect::insertUserCharacteristic():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return FALSE;
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("INSERT INTO users SET typeTenant=?, typeOwner=?, name=?, secondName=?, surname=?, sex=?, nationality=?, birthday=?, login=?, password=?, telephon=?, emailReg=?, email=?, currentStatusEducation=?, almamater=?, speciality=?, kurs=?, ochnoZaochno=?, yearOfEnd=?, statusWork=?, placeOfWork=?, workPosition=?, regionOfBorn=?, cityOfBorn=?, shortlyAboutMe=?, vkontakte=?, odnoklassniki=?, facebook=?, twitter=?, lic=?, last_act=?, reg_date=?, favoritePropertiesId=?, reviewRooms=?, reviewFlats=?") === FALSE)
+            OR ($stmt->bind_param("ssssssssssssssssssssssssssssssiisii", $paramsArr['typeTenant'], $paramsArr['typeOwner'], $paramsArr['name'], $paramsArr['secondName'], $paramsArr['surname'], $paramsArr['sex'], $paramsArr['nationality'], $paramsArr['birthday'], $paramsArr['login'], $paramsArr['password'], $paramsArr['telephon'], $paramsArr['emailReg'], $paramsArr['email'], $paramsArr['currentStatusEducation'], $paramsArr['almamater'], $paramsArr['speciality'], $paramsArr['kurs'], $paramsArr['ochnoZaochno'], $paramsArr['yearOfEnd'], $paramsArr['statusWork'], $paramsArr['placeOfWork'], $paramsArr['workPosition'], $paramsArr['regionOfBorn'], $paramsArr['cityOfBorn'], $paramsArr['shortlyAboutMe'], $paramsArr['vkontakte'], $paramsArr['odnoklassniki'], $paramsArr['facebook'], $paramsArr['twitter'], $paramsArr['lic'], $paramsArr['last_act'], $paramsArr['reg_date'], $paramsArr['favoritePropertiesId'], $paramsArr['reviewRooms'], $paramsArr['reviewFlats']) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($res === 0)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO users SET typeTenant=" . $paramsArr['typeTenant'] . ", typeOwner=" . $paramsArr['typeOwner'] . ", name=" . $paramsArr['name'] . ", secondName=" . $paramsArr['secondName'] . ", surname=" . $paramsArr['surname'] . ", sex=" . $paramsArr['sex'] . ", nationality=" . $paramsArr['nationality'] . ", birthday=" . $paramsArr['birthday'] . ", login=" . $paramsArr['login'] . ", password=" . $paramsArr['password'] . ", telephon=" . $paramsArr['telephon'] . ", emailReg=" . $paramsArr['emailReg'] . ", email=" . $paramsArr['email'] . ", currentStatusEducation=" . $paramsArr['currentStatusEducation'] . ", almamater=" . $paramsArr['almamater'] . ", speciality=" . $paramsArr['speciality'] . ", kurs=" . $paramsArr['kurs'] . ", ochnoZaochno=" . $paramsArr['ochnoZaochno'] . ", yearOfEnd=" . $paramsArr['yearOfEnd'] . ", statusWork=" . $paramsArr['statusWork'] . ", placeOfWork=" . $paramsArr['placeOfWork'] . ", workPosition=" . $paramsArr['workPosition'] . ", regionOfBorn=" . $paramsArr['regionOfBorn'] . ", cityOfBorn=" . $paramsArr['cityOfBorn'] . ", shortlyAboutMe=" . $paramsArr['shortlyAboutMe'] . ", vkontakte=" . $paramsArr['vkontakte'] . ", odnoklassniki=" . $paramsArr['odnoklassniki'] . ", facebook=" . $paramsArr['facebook'] . ", twitter=" . $paramsArr['twitter'] . ", lic=" . $paramsArr['lic'] . ", last_act=" . $paramsArr['last_act'] . ", reg_date=" . $paramsArr['reg_date'] . ", favoritePropertiesId=" . $paramsArr['favoritePropertiesId'] . ", reviewRooms=" . $paramsArr['reviewRooms'] . ", reviewFlats=" . $paramsArr['reviewFlats'] . "'. id логгера: DBconnect::insertUserCharacteristic():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
 
-		return TRUE;
-	}
+        return TRUE;
+    }
 
     /**
      * Сохраняет данные о новом объекте недвижимости в БД
@@ -737,159 +759,159 @@ class DBconnect
             OR ($res === 0)
             OR ($stmt->close() === FALSE)
         ) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO property SET userId=".$paramsArr['userId'].", typeOfObject=".$paramsArr['typeOfObject'].", dateOfEntry=".$paramsArr['dateOfEntry'].", termOfLease=".$paramsArr['termOfLease'].", dateOfCheckOut=".$paramsArr['dateOfCheckOut'].", amountOfRooms=".$paramsArr['amountOfRooms'].", adjacentRooms=".$paramsArr['adjacentRooms'].", amountOfAdjacentRooms=".$paramsArr['amountOfAdjacentRooms'].", typeOfBathrooms=".$paramsArr['typeOfBathrooms'].", typeOfBalcony=".$paramsArr['typeOfBalcony'].", balconyGlazed=".$paramsArr['balconyGlazed'].", roomSpace=".$paramsArr['roomSpace'].", totalArea=".$paramsArr['totalArea'].", livingSpace=".$paramsArr['livingSpace'].", kitchenSpace=".$paramsArr['kitchenSpace'].", floor=".$paramsArr['floor'].", totalAmountFloor=".$paramsArr['totalAmountFloor'].", numberOfFloor=".$paramsArr['numberOfFloor'].", concierge=".$paramsArr['concierge'].", intercom=".$paramsArr['intercom'].", parking=".$paramsArr['parking'].", city=".$paramsArr['city'].", district=".$paramsArr['district'].", coordX=".$paramsArr['coordX'].", coordY=".$paramsArr['coordY'].", address=".$paramsArr['address'].", apartmentNumber=".$paramsArr['apartmentNumber'].", subwayStation=".$paramsArr['subwayStation'].", distanceToMetroStation=".$paramsArr['distanceToMetroStation'].", currency=".$paramsArr['currency'].", costOfRenting=".$paramsArr['costOfRenting'].", realCostOfRenting=".$paramsArr['realCostOfRenting'].", utilities=".$paramsArr['utilities'].", costInSummer=".$paramsArr['costInSummer'].", costInWinter=".$paramsArr['costInWinter'].", electricPower=".$paramsArr['electricPower'].", bail=".$paramsArr['bail'].", bailCost=".$paramsArr['bailCost'].", prepayment=".$paramsArr['prepayment'].", compensationMoney=".$paramsArr['compensationMoney'].", compensationPercent=".$paramsArr['compensationPercent'].", repair=".$paramsArr['repair'].", furnish=".$paramsArr['furnish'].", windows=".$paramsArr['windows'].", internet=".$paramsArr['internet'].", telephoneLine=".$paramsArr['telephoneLine'].", cableTV=".$paramsArr['cableTV'].", furnitureInLivingArea=".$paramsArr['furnitureInLivingArea'].", furnitureInLivingAreaExtra=".$paramsArr['furnitureInLivingAreaExtra'].", furnitureInKitchen=".$paramsArr['furnitureInKitchen'].", furnitureInKitchenExtra=".$paramsArr['furnitureInKitchenExtra'].", appliances=".$paramsArr['appliances'].", appliancesExtra=".$paramsArr['appliancesExtra'].", sexOfTenant=".$paramsArr['sexOfTenant'].", relations=".$paramsArr['relations'].", children=".$paramsArr['children'].", animals=".$paramsArr['animals'].", contactTelephonNumber=".$paramsArr['contactTelephonNumber'].", timeForRingBegin=".$paramsArr['timeForRingBegin'].", timeForRingEnd=".$paramsArr['timeForRingEnd'].", checking=".$paramsArr['checking'].", comment=".$paramsArr['comment'].", last_act=".$paramsArr['last_act'].", reg_date=".$paramsArr['reg_date'].", status=".$paramsArr['status'].", earliestDate=".$paramsArr['earliestDate'].", earliestTimeHours=".$paramsArr['earliestTimeHours'].", earliestTimeMinutes=".$paramsArr['earliestTimeMinutes'].", adminComment=".$paramsArr['adminComment'].", completeness=".$paramsArr['completeness'].", sourceOfAdvert=".$paramsArr['sourceOfAdvert']."'. id логгера: DBconnect::insertPropertyCharacteristic():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO property SET userId=" . $paramsArr['userId'] . ", typeOfObject=" . $paramsArr['typeOfObject'] . ", dateOfEntry=" . $paramsArr['dateOfEntry'] . ", termOfLease=" . $paramsArr['termOfLease'] . ", dateOfCheckOut=" . $paramsArr['dateOfCheckOut'] . ", amountOfRooms=" . $paramsArr['amountOfRooms'] . ", adjacentRooms=" . $paramsArr['adjacentRooms'] . ", amountOfAdjacentRooms=" . $paramsArr['amountOfAdjacentRooms'] . ", typeOfBathrooms=" . $paramsArr['typeOfBathrooms'] . ", typeOfBalcony=" . $paramsArr['typeOfBalcony'] . ", balconyGlazed=" . $paramsArr['balconyGlazed'] . ", roomSpace=" . $paramsArr['roomSpace'] . ", totalArea=" . $paramsArr['totalArea'] . ", livingSpace=" . $paramsArr['livingSpace'] . ", kitchenSpace=" . $paramsArr['kitchenSpace'] . ", floor=" . $paramsArr['floor'] . ", totalAmountFloor=" . $paramsArr['totalAmountFloor'] . ", numberOfFloor=" . $paramsArr['numberOfFloor'] . ", concierge=" . $paramsArr['concierge'] . ", intercom=" . $paramsArr['intercom'] . ", parking=" . $paramsArr['parking'] . ", city=" . $paramsArr['city'] . ", district=" . $paramsArr['district'] . ", coordX=" . $paramsArr['coordX'] . ", coordY=" . $paramsArr['coordY'] . ", address=" . $paramsArr['address'] . ", apartmentNumber=" . $paramsArr['apartmentNumber'] . ", subwayStation=" . $paramsArr['subwayStation'] . ", distanceToMetroStation=" . $paramsArr['distanceToMetroStation'] . ", currency=" . $paramsArr['currency'] . ", costOfRenting=" . $paramsArr['costOfRenting'] . ", realCostOfRenting=" . $paramsArr['realCostOfRenting'] . ", utilities=" . $paramsArr['utilities'] . ", costInSummer=" . $paramsArr['costInSummer'] . ", costInWinter=" . $paramsArr['costInWinter'] . ", electricPower=" . $paramsArr['electricPower'] . ", bail=" . $paramsArr['bail'] . ", bailCost=" . $paramsArr['bailCost'] . ", prepayment=" . $paramsArr['prepayment'] . ", compensationMoney=" . $paramsArr['compensationMoney'] . ", compensationPercent=" . $paramsArr['compensationPercent'] . ", repair=" . $paramsArr['repair'] . ", furnish=" . $paramsArr['furnish'] . ", windows=" . $paramsArr['windows'] . ", internet=" . $paramsArr['internet'] . ", telephoneLine=" . $paramsArr['telephoneLine'] . ", cableTV=" . $paramsArr['cableTV'] . ", furnitureInLivingArea=" . $paramsArr['furnitureInLivingArea'] . ", furnitureInLivingAreaExtra=" . $paramsArr['furnitureInLivingAreaExtra'] . ", furnitureInKitchen=" . $paramsArr['furnitureInKitchen'] . ", furnitureInKitchenExtra=" . $paramsArr['furnitureInKitchenExtra'] . ", appliances=" . $paramsArr['appliances'] . ", appliancesExtra=" . $paramsArr['appliancesExtra'] . ", sexOfTenant=" . $paramsArr['sexOfTenant'] . ", relations=" . $paramsArr['relations'] . ", children=" . $paramsArr['children'] . ", animals=" . $paramsArr['animals'] . ", contactTelephonNumber=" . $paramsArr['contactTelephonNumber'] . ", timeForRingBegin=" . $paramsArr['timeForRingBegin'] . ", timeForRingEnd=" . $paramsArr['timeForRingEnd'] . ", checking=" . $paramsArr['checking'] . ", comment=" . $paramsArr['comment'] . ", last_act=" . $paramsArr['last_act'] . ", reg_date=" . $paramsArr['reg_date'] . ", status=" . $paramsArr['status'] . ", earliestDate=" . $paramsArr['earliestDate'] . ", earliestTimeHours=" . $paramsArr['earliestTimeHours'] . ", earliestTimeMinutes=" . $paramsArr['earliestTimeMinutes'] . ", adminComment=" . $paramsArr['adminComment'] . ", completeness=" . $paramsArr['completeness'] . ", sourceOfAdvert=" . $paramsArr['sourceOfAdvert'] . "'. id логгера: DBconnect::insertPropertyCharacteristic():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return FALSE;
         }
 
         return TRUE;
     }
 
-	// Сохраняет данные о чужом объявлении в архивную таблицу
-	// Возвращает TRUE в случае успеха и FALSE в случае неудачи
-	public static function insertPropertyCharacteristicToArchive($paramsArr) {
+    // Сохраняет данные о чужом объявлении в архивную таблицу
+    // Возвращает TRUE в случае успеха и FALSE в случае неудачи
+    public static function insertPropertyCharacteristicToArchive($paramsArr) {
 
-		// Проверка входящих параметров
-		if (!isset($paramsArr) || !is_array($paramsArr)) return FALSE;
+        // Проверка входящих параметров
+        if (!isset($paramsArr) || !is_array($paramsArr)) return FALSE;
 
-		// Подготовка данных к записи в БД
-		$paramsArr = DBconnect::conversionPropertyCharacteristicFromViewToDB($paramsArr);
+        // Подготовка данных к записи в БД
+        $paramsArr = DBconnect::conversionPropertyCharacteristicFromViewToDB($paramsArr);
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("INSERT INTO archiveAdverts SET id=?, userId=?, typeOfObject=?, dateOfEntry=?, termOfLease=?, dateOfCheckOut=?, amountOfRooms=?, adjacentRooms=?, amountOfAdjacentRooms=?, typeOfBathrooms=?, typeOfBalcony=?, balconyGlazed=?, roomSpace=?, totalArea=?, livingSpace=?, kitchenSpace=?, floor=?, totalAmountFloor=?, numberOfFloor=?, concierge=?, intercom=?, parking=?, city=?, district=?, coordX=?, coordY=?, address=?, apartmentNumber=?, subwayStation=?, distanceToMetroStation=?, currency=?, costOfRenting=?, realCostOfRenting=?, utilities=?, costInSummer=?, costInWinter=?, electricPower=?, bail=?, bailCost=?, prepayment=?, compensationMoney=?, compensationPercent=?, repair=?, furnish=?, windows=?, internet=?, telephoneLine=?, cableTV=?, furnitureInLivingArea=?, furnitureInLivingAreaExtra=?, furnitureInKitchen=?, furnitureInKitchenExtra=?, appliances=?, appliancesExtra=?, sexOfTenant=?, relations=?, children=?, animals=?, contactTelephonNumber=?, timeForRingBegin=?, timeForRingEnd=?, checking=?, comment=?, last_act=?, reg_date=?, status=?, earliestDate=?, earliestTimeHours=?, earliestTimeMinutes=?, adminComment=?, completeness=?, sourceOfAdvert=?") === FALSE)
-			OR ($stmt->bind_param("isssssssssssddddiiissssssssssisddsddssdsddsssssssssssssssssssssiisssssss", $paramsArr['id'], $paramsArr['userId'], $paramsArr['typeOfObject'], $paramsArr['dateOfEntry'], $paramsArr['termOfLease'], $paramsArr['dateOfCheckOut'], $paramsArr['amountOfRooms'], $paramsArr['adjacentRooms'], $paramsArr['amountOfAdjacentRooms'], $paramsArr['typeOfBathrooms'], $paramsArr['typeOfBalcony'], $paramsArr['balconyGlazed'], $paramsArr['roomSpace'], $paramsArr['totalArea'], $paramsArr['livingSpace'], $paramsArr['kitchenSpace'], $paramsArr['floor'], $paramsArr['totalAmountFloor'], $paramsArr['numberOfFloor'], $paramsArr['concierge'], $paramsArr['intercom'], $paramsArr['parking'], $paramsArr['city'], $paramsArr['district'], $paramsArr['coordX'], $paramsArr['coordY'], $paramsArr['address'], $paramsArr['apartmentNumber'], $paramsArr['subwayStation'], $paramsArr['distanceToMetroStation'], $paramsArr['currency'], $paramsArr['costOfRenting'], $paramsArr['realCostOfRenting'], $paramsArr['utilities'], $paramsArr['costInSummer'], $paramsArr['costInWinter'], $paramsArr['electricPower'], $paramsArr['bail'], $paramsArr['bailCost'], $paramsArr['prepayment'], $paramsArr['compensationMoney'], $paramsArr['compensationPercent'], $paramsArr['repair'], $paramsArr['furnish'], $paramsArr['windows'], $paramsArr['internet'], $paramsArr['telephoneLine'], $paramsArr['cableTV'], $paramsArr['furnitureInLivingArea'], $paramsArr['furnitureInLivingAreaExtra'], $paramsArr['furnitureInKitchen'], $paramsArr['furnitureInKitchenExtra'], $paramsArr['appliances'], $paramsArr['appliancesExtra'], $paramsArr['sexOfTenant'], $paramsArr['relations'], $paramsArr['children'], $paramsArr['animals'], $paramsArr['contactTelephonNumber'], $paramsArr['timeForRingBegin'], $paramsArr['timeForRingEnd'], $paramsArr['checking'], $paramsArr['comment'], $paramsArr['last_act'], $paramsArr['reg_date'], $paramsArr['status'], $paramsArr['earliestDate'], $paramsArr['earliestTimeHours'], $paramsArr['earliestTimeMinutes'], $paramsArr['adminComment'], $paramsArr['completeness'], $paramsArr['sourceOfAdvert']) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->affected_rows) === -1)
-			OR ($res === 0)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO archiveAdverts SET id = ".$paramsArr['id'].", userId=".$paramsArr['userId'].", typeOfObject=".$paramsArr['typeOfObject'].", dateOfEntry=".$paramsArr['dateOfEntry'].", termOfLease=".$paramsArr['termOfLease'].", dateOfCheckOut=".$paramsArr['dateOfCheckOut'].", amountOfRooms=".$paramsArr['amountOfRooms'].", adjacentRooms=".$paramsArr['adjacentRooms'].", amountOfAdjacentRooms=".$paramsArr['amountOfAdjacentRooms'].", typeOfBathrooms=".$paramsArr['typeOfBathrooms'].", typeOfBalcony=".$paramsArr['typeOfBalcony'].", balconyGlazed=".$paramsArr['balconyGlazed'].", roomSpace=".$paramsArr['roomSpace'].", totalArea=".$paramsArr['totalArea'].", livingSpace=".$paramsArr['livingSpace'].", kitchenSpace=".$paramsArr['kitchenSpace'].", floor=".$paramsArr['floor'].", totalAmountFloor=".$paramsArr['totalAmountFloor'].", numberOfFloor=".$paramsArr['numberOfFloor'].", concierge=".$paramsArr['concierge'].", intercom=".$paramsArr['intercom'].", parking=".$paramsArr['parking'].", city=".$paramsArr['city'].", district=".$paramsArr['district'].", coordX=".$paramsArr['coordX'].", coordY=".$paramsArr['coordY'].", address=".$paramsArr['address'].", apartmentNumber=".$paramsArr['apartmentNumber'].", subwayStation=".$paramsArr['subwayStation'].", distanceToMetroStation=".$paramsArr['distanceToMetroStation'].", currency=".$paramsArr['currency'].", costOfRenting=".$paramsArr['costOfRenting'].", realCostOfRenting=".$paramsArr['realCostOfRenting'].", utilities=".$paramsArr['utilities'].", costInSummer=".$paramsArr['costInSummer'].", costInWinter=".$paramsArr['costInWinter'].", electricPower=".$paramsArr['electricPower'].", bail=".$paramsArr['bail'].", bailCost=".$paramsArr['bailCost'].", prepayment=".$paramsArr['prepayment'].", compensationMoney=".$paramsArr['compensationMoney'].", compensationPercent=".$paramsArr['compensationPercent'].", repair=".$paramsArr['repair'].", furnish=".$paramsArr['furnish'].", windows=".$paramsArr['windows'].", internet=".$paramsArr['internet'].", telephoneLine=".$paramsArr['telephoneLine'].", cableTV=".$paramsArr['cableTV'].", furnitureInLivingArea=".$paramsArr['furnitureInLivingArea'].", furnitureInLivingAreaExtra=".$paramsArr['furnitureInLivingAreaExtra'].", furnitureInKitchen=".$paramsArr['furnitureInKitchen'].", furnitureInKitchenExtra=".$paramsArr['furnitureInKitchenExtra'].", appliances=".$paramsArr['appliances'].", appliancesExtra=".$paramsArr['appliancesExtra'].", sexOfTenant=".$paramsArr['sexOfTenant'].", relations=".$paramsArr['relations'].", children=".$paramsArr['children'].", animals=".$paramsArr['animals'].", contactTelephonNumber=".$paramsArr['contactTelephonNumber'].", timeForRingBegin=".$paramsArr['timeForRingBegin'].", timeForRingEnd=".$paramsArr['timeForRingEnd'].", checking=".$paramsArr['checking'].", comment=".$paramsArr['comment'].", last_act=".$paramsArr['last_act'].", reg_date=".$paramsArr['reg_date'].", status=".$paramsArr['status'].", earliestDate=".$paramsArr['earliestDate'].", earliestTimeHours=".$paramsArr['earliestTimeHours'].", earliestTimeMinutes=".$paramsArr['earliestTimeMinutes'].", adminComment=".$paramsArr['adminComment'].", completeness=".$paramsArr['completeness'].", sourceOfAdvert=".$paramsArr['sourceOfAdvert']."'. id логгера: DBconnect::insertPropertyCharacteristicToArchive():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return FALSE;
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("INSERT INTO archiveAdverts SET id=?, userId=?, typeOfObject=?, dateOfEntry=?, termOfLease=?, dateOfCheckOut=?, amountOfRooms=?, adjacentRooms=?, amountOfAdjacentRooms=?, typeOfBathrooms=?, typeOfBalcony=?, balconyGlazed=?, roomSpace=?, totalArea=?, livingSpace=?, kitchenSpace=?, floor=?, totalAmountFloor=?, numberOfFloor=?, concierge=?, intercom=?, parking=?, city=?, district=?, coordX=?, coordY=?, address=?, apartmentNumber=?, subwayStation=?, distanceToMetroStation=?, currency=?, costOfRenting=?, realCostOfRenting=?, utilities=?, costInSummer=?, costInWinter=?, electricPower=?, bail=?, bailCost=?, prepayment=?, compensationMoney=?, compensationPercent=?, repair=?, furnish=?, windows=?, internet=?, telephoneLine=?, cableTV=?, furnitureInLivingArea=?, furnitureInLivingAreaExtra=?, furnitureInKitchen=?, furnitureInKitchenExtra=?, appliances=?, appliancesExtra=?, sexOfTenant=?, relations=?, children=?, animals=?, contactTelephonNumber=?, timeForRingBegin=?, timeForRingEnd=?, checking=?, comment=?, last_act=?, reg_date=?, status=?, earliestDate=?, earliestTimeHours=?, earliestTimeMinutes=?, adminComment=?, completeness=?, sourceOfAdvert=?") === FALSE)
+            OR ($stmt->bind_param("isssssssssssddddiiissssssssssisddsddssdsddsssssssssssssssssssssiisssssss", $paramsArr['id'], $paramsArr['userId'], $paramsArr['typeOfObject'], $paramsArr['dateOfEntry'], $paramsArr['termOfLease'], $paramsArr['dateOfCheckOut'], $paramsArr['amountOfRooms'], $paramsArr['adjacentRooms'], $paramsArr['amountOfAdjacentRooms'], $paramsArr['typeOfBathrooms'], $paramsArr['typeOfBalcony'], $paramsArr['balconyGlazed'], $paramsArr['roomSpace'], $paramsArr['totalArea'], $paramsArr['livingSpace'], $paramsArr['kitchenSpace'], $paramsArr['floor'], $paramsArr['totalAmountFloor'], $paramsArr['numberOfFloor'], $paramsArr['concierge'], $paramsArr['intercom'], $paramsArr['parking'], $paramsArr['city'], $paramsArr['district'], $paramsArr['coordX'], $paramsArr['coordY'], $paramsArr['address'], $paramsArr['apartmentNumber'], $paramsArr['subwayStation'], $paramsArr['distanceToMetroStation'], $paramsArr['currency'], $paramsArr['costOfRenting'], $paramsArr['realCostOfRenting'], $paramsArr['utilities'], $paramsArr['costInSummer'], $paramsArr['costInWinter'], $paramsArr['electricPower'], $paramsArr['bail'], $paramsArr['bailCost'], $paramsArr['prepayment'], $paramsArr['compensationMoney'], $paramsArr['compensationPercent'], $paramsArr['repair'], $paramsArr['furnish'], $paramsArr['windows'], $paramsArr['internet'], $paramsArr['telephoneLine'], $paramsArr['cableTV'], $paramsArr['furnitureInLivingArea'], $paramsArr['furnitureInLivingAreaExtra'], $paramsArr['furnitureInKitchen'], $paramsArr['furnitureInKitchenExtra'], $paramsArr['appliances'], $paramsArr['appliancesExtra'], $paramsArr['sexOfTenant'], $paramsArr['relations'], $paramsArr['children'], $paramsArr['animals'], $paramsArr['contactTelephonNumber'], $paramsArr['timeForRingBegin'], $paramsArr['timeForRingEnd'], $paramsArr['checking'], $paramsArr['comment'], $paramsArr['last_act'], $paramsArr['reg_date'], $paramsArr['status'], $paramsArr['earliestDate'], $paramsArr['earliestTimeHours'], $paramsArr['earliestTimeMinutes'], $paramsArr['adminComment'], $paramsArr['completeness'], $paramsArr['sourceOfAdvert']) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($res === 0)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO archiveAdverts SET id = " . $paramsArr['id'] . ", userId=" . $paramsArr['userId'] . ", typeOfObject=" . $paramsArr['typeOfObject'] . ", dateOfEntry=" . $paramsArr['dateOfEntry'] . ", termOfLease=" . $paramsArr['termOfLease'] . ", dateOfCheckOut=" . $paramsArr['dateOfCheckOut'] . ", amountOfRooms=" . $paramsArr['amountOfRooms'] . ", adjacentRooms=" . $paramsArr['adjacentRooms'] . ", amountOfAdjacentRooms=" . $paramsArr['amountOfAdjacentRooms'] . ", typeOfBathrooms=" . $paramsArr['typeOfBathrooms'] . ", typeOfBalcony=" . $paramsArr['typeOfBalcony'] . ", balconyGlazed=" . $paramsArr['balconyGlazed'] . ", roomSpace=" . $paramsArr['roomSpace'] . ", totalArea=" . $paramsArr['totalArea'] . ", livingSpace=" . $paramsArr['livingSpace'] . ", kitchenSpace=" . $paramsArr['kitchenSpace'] . ", floor=" . $paramsArr['floor'] . ", totalAmountFloor=" . $paramsArr['totalAmountFloor'] . ", numberOfFloor=" . $paramsArr['numberOfFloor'] . ", concierge=" . $paramsArr['concierge'] . ", intercom=" . $paramsArr['intercom'] . ", parking=" . $paramsArr['parking'] . ", city=" . $paramsArr['city'] . ", district=" . $paramsArr['district'] . ", coordX=" . $paramsArr['coordX'] . ", coordY=" . $paramsArr['coordY'] . ", address=" . $paramsArr['address'] . ", apartmentNumber=" . $paramsArr['apartmentNumber'] . ", subwayStation=" . $paramsArr['subwayStation'] . ", distanceToMetroStation=" . $paramsArr['distanceToMetroStation'] . ", currency=" . $paramsArr['currency'] . ", costOfRenting=" . $paramsArr['costOfRenting'] . ", realCostOfRenting=" . $paramsArr['realCostOfRenting'] . ", utilities=" . $paramsArr['utilities'] . ", costInSummer=" . $paramsArr['costInSummer'] . ", costInWinter=" . $paramsArr['costInWinter'] . ", electricPower=" . $paramsArr['electricPower'] . ", bail=" . $paramsArr['bail'] . ", bailCost=" . $paramsArr['bailCost'] . ", prepayment=" . $paramsArr['prepayment'] . ", compensationMoney=" . $paramsArr['compensationMoney'] . ", compensationPercent=" . $paramsArr['compensationPercent'] . ", repair=" . $paramsArr['repair'] . ", furnish=" . $paramsArr['furnish'] . ", windows=" . $paramsArr['windows'] . ", internet=" . $paramsArr['internet'] . ", telephoneLine=" . $paramsArr['telephoneLine'] . ", cableTV=" . $paramsArr['cableTV'] . ", furnitureInLivingArea=" . $paramsArr['furnitureInLivingArea'] . ", furnitureInLivingAreaExtra=" . $paramsArr['furnitureInLivingAreaExtra'] . ", furnitureInKitchen=" . $paramsArr['furnitureInKitchen'] . ", furnitureInKitchenExtra=" . $paramsArr['furnitureInKitchenExtra'] . ", appliances=" . $paramsArr['appliances'] . ", appliancesExtra=" . $paramsArr['appliancesExtra'] . ", sexOfTenant=" . $paramsArr['sexOfTenant'] . ", relations=" . $paramsArr['relations'] . ", children=" . $paramsArr['children'] . ", animals=" . $paramsArr['animals'] . ", contactTelephonNumber=" . $paramsArr['contactTelephonNumber'] . ", timeForRingBegin=" . $paramsArr['timeForRingBegin'] . ", timeForRingEnd=" . $paramsArr['timeForRingEnd'] . ", checking=" . $paramsArr['checking'] . ", comment=" . $paramsArr['comment'] . ", last_act=" . $paramsArr['last_act'] . ", reg_date=" . $paramsArr['reg_date'] . ", status=" . $paramsArr['status'] . ", earliestDate=" . $paramsArr['earliestDate'] . ", earliestTimeHours=" . $paramsArr['earliestTimeHours'] . ", earliestTimeMinutes=" . $paramsArr['earliestTimeMinutes'] . ", adminComment=" . $paramsArr['adminComment'] . ", completeness=" . $paramsArr['completeness'] . ", sourceOfAdvert=" . $paramsArr['sourceOfAdvert'] . "'. id логгера: DBconnect::insertPropertyCharacteristicToArchive():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
 
-		return TRUE;
-	}
+        return TRUE;
+    }
 
-	// Сохраняет данные о фотографии в таблицу временного хранения tempFotos
-	// Возвращает TRUE в случае успеха и FALSE в случае неудачи
-	public static function insertPhotoForFileUploadId($paramsArr) {
+    // Сохраняет данные о фотографии в таблицу временного хранения tempFotos
+    // Возвращает TRUE в случае успеха и FALSE в случае неудачи
+    public static function insertPhotoForFileUploadId($paramsArr) {
 
-		// Проверка входящих параметров
-		if (!isset($paramsArr) || !is_array($paramsArr)) return FALSE;
+        // Проверка входящих параметров
+        if (!isset($paramsArr) || !is_array($paramsArr)) return FALSE;
 
-		// Сохраняем информацию о загруженной фотке в БД
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("INSERT INTO tempFotos (id, fileUploadId, folder, filename, extension, filesizeMb, regDate) VALUES (?,?,?,?,?,?,?)") === FALSE)
-			OR ($stmt->bind_param("sssssdi", $paramsArr['id'], $paramsArr['fileUploadId'], $paramsArr['folder'], $paramsArr['filename'], $paramsArr['extension'], $paramsArr['filesizeMb'], $paramsArr['regDate']) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->affected_rows) === -1)
-			OR ($res === 0)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO tempFotos (id, fileUploadId, folder, filename, extension, filesizeMb, regDate) VALUES (" . $paramsArr['id'] . "," . $paramsArr['fileUploadId'] . "," . $paramsArr['folder'] . "," . $paramsArr['filename'] . "," . $paramsArr['extension'] . "," . $paramsArr['filesizeMb'] . "," . $paramsArr['regDate'] . ")'. id логгера: DBconnect::insertPhotoForFileUploadId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return FALSE;
-		}
+        // Сохраняем информацию о загруженной фотке в БД
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("INSERT INTO tempFotos (id, fileUploadId, folder, filename, extension, filesizeMb, regDate) VALUES (?,?,?,?,?,?,?)") === FALSE)
+            OR ($stmt->bind_param("sssssdi", $paramsArr['id'], $paramsArr['fileUploadId'], $paramsArr['folder'], $paramsArr['filename'], $paramsArr['extension'], $paramsArr['filesizeMb'], $paramsArr['regDate']) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($res === 0)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO tempFotos (id, fileUploadId, folder, filename, extension, filesizeMb, regDate) VALUES (" . $paramsArr['id'] . "," . $paramsArr['fileUploadId'] . "," . $paramsArr['folder'] . "," . $paramsArr['filename'] . "," . $paramsArr['extension'] . "," . $paramsArr['filesizeMb'] . "," . $paramsArr['regDate'] . ")'. id логгера: DBconnect::insertPhotoForFileUploadId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
 
-		return TRUE;
-	}
+        return TRUE;
+    }
 
-	/**
-	 * Сохраняет новый поисковый запрос
-	 *
-	 * @param array $paramsArr ассоциативный массив параметров поискового запроса
-	 * @return bool TRUE в случае успеха и FALSE в случае неудачи
-	 */
-	public static function insertSearchRequestForUser($paramsArr) {
+    /**
+     * Сохраняет новый поисковый запрос
+     *
+     * @param array $paramsArr ассоциативный массив параметров поискового запроса
+     * @return bool TRUE в случае успеха и FALSE в случае неудачи
+     */
+    public static function insertSearchRequestForUser($paramsArr) {
 
-		// Проверка входящих параметров
-		if (!isset($paramsArr) || !is_array($paramsArr)) return FALSE;
+        // Проверка входящих параметров
+        if (!isset($paramsArr) || !is_array($paramsArr)) return FALSE;
 
-		// Подготовка данных к записи в БД
-		$paramsArr['amountOfRooms'] = serialize($paramsArr['amountOfRooms']);
-		$paramsArr['district'] = serialize($paramsArr['district']);
+        // Подготовка данных к записи в БД
+        $paramsArr['amountOfRooms'] = serialize($paramsArr['amountOfRooms']);
+        $paramsArr['district'] = serialize($paramsArr['district']);
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, regDate, needEmail, needSMS) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
-			OR ($stmt->bind_param("issssiiissssssssssiii", $paramsArr['userId'], $paramsArr['typeOfObject'], $paramsArr['amountOfRooms'], $paramsArr['adjacentRooms'], $paramsArr['floor'], $paramsArr['minCost'], $paramsArr['maxCost'], $paramsArr['pledge'], $paramsArr['prepayment'], $paramsArr['district'], $paramsArr['withWho'], $paramsArr['linksToFriends'], $paramsArr['children'], $paramsArr['howManyChildren'], $paramsArr['animals'], $paramsArr['howManyAnimals'], $paramsArr['termOfLease'], $paramsArr['additionalDescriptionOfSearch'], $paramsArr['regDate'], $paramsArr['needEmail'], $paramsArr['needSMS']) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->affected_rows) === -1)
-			OR ($res === 0)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, regDate, needEmail, needSMS) VALUES (".$paramsArr['userId'].",".$paramsArr['typeOfObject'].",".$paramsArr['amountOfRooms'].",".$paramsArr['adjacentRooms'].",".$paramsArr['floor'].",".$paramsArr['minCost'].",".$paramsArr['maxCost'].",".$paramsArr['pledge'].",".$paramsArr['prepayment'].",".$paramsArr['district'].",".$paramsArr['withWho'].",".$paramsArr['linksToFriends'].",".$paramsArr['children'].",".$paramsArr['howManyChildren'].",".$paramsArr['animals'].",".$paramsArr['howManyAnimals'].",".$paramsArr['termOfLease'].",".$paramsArr['additionalDescriptionOfSearch'].",".$paramsArr['regDate'].",".$paramsArr['needEmail'].",".$paramsArr['needSMS'].")'. id логгера: DBconnect::insertSearchRequestForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return FALSE;
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, regDate, needEmail, needSMS) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
+            OR ($stmt->bind_param("issssiiissssssssssiii", $paramsArr['userId'], $paramsArr['typeOfObject'], $paramsArr['amountOfRooms'], $paramsArr['adjacentRooms'], $paramsArr['floor'], $paramsArr['minCost'], $paramsArr['maxCost'], $paramsArr['pledge'], $paramsArr['prepayment'], $paramsArr['district'], $paramsArr['withWho'], $paramsArr['linksToFriends'], $paramsArr['children'], $paramsArr['howManyChildren'], $paramsArr['animals'], $paramsArr['howManyAnimals'], $paramsArr['termOfLease'], $paramsArr['additionalDescriptionOfSearch'], $paramsArr['regDate'], $paramsArr['needEmail'], $paramsArr['needSMS']) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($res === 0)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO searchRequests (userId, typeOfObject, amountOfRooms, adjacentRooms, floor, minCost, maxCost, pledge, prepayment, district, withWho, linksToFriends, children, howManyChildren, animals, howManyAnimals, termOfLease, additionalDescriptionOfSearch, regDate, needEmail, needSMS) VALUES (" . $paramsArr['userId'] . "," . $paramsArr['typeOfObject'] . "," . $paramsArr['amountOfRooms'] . "," . $paramsArr['adjacentRooms'] . "," . $paramsArr['floor'] . "," . $paramsArr['minCost'] . "," . $paramsArr['maxCost'] . "," . $paramsArr['pledge'] . "," . $paramsArr['prepayment'] . "," . $paramsArr['district'] . "," . $paramsArr['withWho'] . "," . $paramsArr['linksToFriends'] . "," . $paramsArr['children'] . "," . $paramsArr['howManyChildren'] . "," . $paramsArr['animals'] . "," . $paramsArr['howManyAnimals'] . "," . $paramsArr['termOfLease'] . "," . $paramsArr['additionalDescriptionOfSearch'] . "," . $paramsArr['regDate'] . "," . $paramsArr['needEmail'] . "," . $paramsArr['needSMS'] . ")'. id логгера: DBconnect::insertSearchRequestForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
 
-		return TRUE;
-	}
+        return TRUE;
+    }
 
-	/**
-	 * Сохраняет данные о новом уведомлении в БД. Если передан второй аргумент - массив идентификаторов арендаторов, то уведомление будет сохранено для каждого из них
-	 *
-	 * @param array $paramsArr параметры уведомления
-	 * @param array $listOfTargetUsers массив ассоциативных массивов, содержащих идентификаторы пользователей и их параметры рассылки (email и sms), для каждого из которых нужно сформировать данное уведомление
-	 * @return bool TRUE в случае успеха и FALSE в случае неудачи
-	 */
-	public static function insertMessageNewProperty($paramsArr, $listOfTargetUsers) {
+    /**
+     * Сохраняет данные о новом уведомлении в БД. Если передан второй аргумент - массив идентификаторов арендаторов, то уведомление будет сохранено для каждого из них
+     *
+     * @param array $paramsArr параметры уведомления
+     * @param array $listOfTargetUsers массив ассоциативных массивов, содержащих идентификаторы пользователей и их параметры рассылки (email и sms), для каждого из которых нужно сформировать данное уведомление
+     * @return bool TRUE в случае успеха и FALSE в случае неудачи
+     */
+    public static function insertMessageNewProperty($paramsArr, $listOfTargetUsers) {
 
-		// Проверка входящих параметров
-		if (!isset($paramsArr) || !is_array($paramsArr)) return FALSE;
-		if (isset($listOfTargetUsers) && (!is_array($listOfTargetUsers) || count($listOfTargetUsers) == 0)) return FALSE;
+        // Проверка входящих параметров
+        if (!isset($paramsArr) || !is_array($paramsArr)) return FALSE;
+        if (isset($listOfTargetUsers) && (!is_array($listOfTargetUsers) || count($listOfTargetUsers) == 0)) return FALSE;
 
-		// Подготовка данных к записи в БД
-		$paramsArr['fotoArr'] = serialize($paramsArr['fotoArr']);
+        // Подготовка данных к записи в БД
+        $paramsArr['fotoArr'] = serialize($paramsArr['fotoArr']);
 
-		// Если у нас целый массив арендаторов, для которых нужно сформировать уведомление
-		if (isset($listOfTargetUsers)) {
+        // Если у нас целый массив арендаторов, для которых нужно сформировать уведомление
+        if (isset($listOfTargetUsers)) {
 
-			// Инициализируем переменные, в которую поочередно будем складывать id и статусы оповещения пользователей из списка
-			$currentTargetUser = 0;
-			$currentNeedEmail = 0;
-			$currentNeedSMS = 0;
+            // Инициализируем переменные, в которую поочередно будем складывать id и статусы оповещения пользователей из списка
+            $currentTargetUser = 0;
+            $currentNeedEmail = 0;
+            $currentNeedSMS = 0;
 
-			$stmt = DBconnect::get()->stmt_init();
-			if (($stmt->prepare("INSERT INTO messagesNewProperty (userId, timeIndex, messageType, isReaded, fotoArr, targetId, needEmail, needSMS, typeOfObject, address, currency, costOfRenting, utilities, electricPower, amountOfRooms, adjacentRooms, amountOfAdjacentRooms, roomSpace, totalArea, livingSpace, kitchenSpace, totalAmountFloor, numberOfFloor) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
-				OR ($stmt->bind_param("iisssiiisssssssssssssii", $currentTargetUser, $paramsArr['timeIndex'], $paramsArr['messageType'], $paramsArr['isReaded'], $paramsArr['fotoArr'], $paramsArr['targetId'], $currentNeedEmail, $currentNeedSMS, $paramsArr['typeOfObject'], $paramsArr['address'], $paramsArr['currency'], $paramsArr['costOfRenting'], $paramsArr['utilities'], $paramsArr['electricPower'], $paramsArr['amountOfRooms'], $paramsArr['adjacentRooms'], $paramsArr['amountOfAdjacentRooms'], $paramsArr['roomSpace'], $paramsArr['totalArea'], $paramsArr['livingSpace'], $paramsArr['kitchenSpace'], $paramsArr['totalAmountFloor'], $paramsArr['numberOfFloor']) === FALSE)
-			) {
-				Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO messagesNewProperty (userId, timeIndex, messageType, isReaded, fotoArr, targetId, needEmail, needSMS, typeOfObject, address, currency, costOfRenting, utilities, electricPower, amountOfRooms, adjacentRooms, amountOfAdjacentRooms, roomSpace, totalArea, livingSpace, kitchenSpace, totalAmountFloor, numberOfFloor) VALUES (" . $currentTargetUser . ", " . $paramsArr['timeIndex'] . ", " . $paramsArr['messageType'] . ", " . $paramsArr['isReaded'] . ", " . $paramsArr['fotoArr'] . ", " . $paramsArr['targetId'] . ", " . $paramsArr['needEmail'] . ", " . $paramsArr['needSMS'] . ", " . $paramsArr['typeOfObject'] . ", " . $paramsArr['address'] . ", " . $paramsArr['currency'] . ", " . $paramsArr['costOfRenting'] . ", " . $paramsArr['utilities'] . ", " . $paramsArr['electricPower'] . ", " . $paramsArr['amountOfRooms'] . ", " . $paramsArr['adjacentRooms'] . ", " . $paramsArr['amountOfAdjacentRooms'] . ", " . $paramsArr['roomSpace'] . ", " . $paramsArr['totalArea'] . ", " . $paramsArr['livingSpace'] . ", " . $paramsArr['kitchenSpace'] . ", " . $paramsArr['totalAmountFloor'] . ", " . $paramsArr['numberOfFloor'] . ")'. id логгера: DBconnect::insertMessageNewProperty():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-				return FALSE;
-			}
+            $stmt = DBconnect::get()->stmt_init();
+            if (($stmt->prepare("INSERT INTO messagesNewProperty (userId, timeIndex, messageType, isReaded, fotoArr, targetId, needEmail, needSMS, typeOfObject, address, currency, costOfRenting, utilities, electricPower, amountOfRooms, adjacentRooms, amountOfAdjacentRooms, roomSpace, totalArea, livingSpace, kitchenSpace, totalAmountFloor, numberOfFloor) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
+                OR ($stmt->bind_param("iisssiiisssssssssssssii", $currentTargetUser, $paramsArr['timeIndex'], $paramsArr['messageType'], $paramsArr['isReaded'], $paramsArr['fotoArr'], $paramsArr['targetId'], $currentNeedEmail, $currentNeedSMS, $paramsArr['typeOfObject'], $paramsArr['address'], $paramsArr['currency'], $paramsArr['costOfRenting'], $paramsArr['utilities'], $paramsArr['electricPower'], $paramsArr['amountOfRooms'], $paramsArr['adjacentRooms'], $paramsArr['amountOfAdjacentRooms'], $paramsArr['roomSpace'], $paramsArr['totalArea'], $paramsArr['livingSpace'], $paramsArr['kitchenSpace'], $paramsArr['totalAmountFloor'], $paramsArr['numberOfFloor']) === FALSE)
+            ) {
+                Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO messagesNewProperty (userId, timeIndex, messageType, isReaded, fotoArr, targetId, needEmail, needSMS, typeOfObject, address, currency, costOfRenting, utilities, electricPower, amountOfRooms, adjacentRooms, amountOfAdjacentRooms, roomSpace, totalArea, livingSpace, kitchenSpace, totalAmountFloor, numberOfFloor) VALUES (" . $currentTargetUser . ", " . $paramsArr['timeIndex'] . ", " . $paramsArr['messageType'] . ", " . $paramsArr['isReaded'] . ", " . $paramsArr['fotoArr'] . ", " . $paramsArr['targetId'] . ", " . $paramsArr['needEmail'] . ", " . $paramsArr['needSMS'] . ", " . $paramsArr['typeOfObject'] . ", " . $paramsArr['address'] . ", " . $paramsArr['currency'] . ", " . $paramsArr['costOfRenting'] . ", " . $paramsArr['utilities'] . ", " . $paramsArr['electricPower'] . ", " . $paramsArr['amountOfRooms'] . ", " . $paramsArr['adjacentRooms'] . ", " . $paramsArr['amountOfAdjacentRooms'] . ", " . $paramsArr['roomSpace'] . ", " . $paramsArr['totalArea'] . ", " . $paramsArr['livingSpace'] . ", " . $paramsArr['kitchenSpace'] . ", " . $paramsArr['totalAmountFloor'] . ", " . $paramsArr['numberOfFloor'] . ")'. id логгера: DBconnect::insertMessageNewProperty():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+                return FALSE;
+            }
 
-			for ($i = 0, $s = count($listOfTargetUsers); $i < $s; $i++) {
+            for ($i = 0, $s = count($listOfTargetUsers); $i < $s; $i++) {
 
-				// Подставляем новый идентификатор пользователя и его статусы оповещения
-				$currentTargetUser = $listOfTargetUsers[$i]['userId'];
-				$currentNeedEmail = $listOfTargetUsers[$i]['needEmail'];
-				$currentNeedSMS = $listOfTargetUsers[$i]['needSMS'];
+                // Подставляем новый идентификатор пользователя и его статусы оповещения
+                $currentTargetUser = $listOfTargetUsers[$i]['userId'];
+                $currentNeedEmail = $listOfTargetUsers[$i]['needEmail'];
+                $currentNeedSMS = $listOfTargetUsers[$i]['needSMS'];
 
-				// Записываем в БД для него уведомление про новый объект недвижимости
-				if (($stmt->execute() === FALSE)
-					OR (($res = $stmt->affected_rows) === -1)
-					OR ($res === 0)
-				) {
-					Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO messagesNewProperty (userId, timeIndex, messageType, isReaded, fotoArr, targetId, needEmail, needSMS, typeOfObject, address, currency, costOfRenting, utilities, electricPower, amountOfRooms, adjacentRooms, amountOfAdjacentRooms, roomSpace, totalArea, livingSpace, kitchenSpace, totalAmountFloor, numberOfFloor) VALUES (" . $currentTargetUser . ", " . $paramsArr['timeIndex'] . ", " . $paramsArr['messageType'] . ", " . $paramsArr['isReaded'] . ", " . $paramsArr['fotoArr'] . ", " . $paramsArr['targetId'] . ", " . $currentNeedEmail . ", " . $currentNeedSMS . ", " . $paramsArr['typeOfObject'] . ", " . $paramsArr['address'] . ", " . $paramsArr['currency'] . ", " . $paramsArr['costOfRenting'] . ", " . $paramsArr['utilities'] . ", " . $paramsArr['electricPower'] . ", " . $paramsArr['amountOfRooms'] . ", " . $paramsArr['adjacentRooms'] . ", " . $paramsArr['amountOfAdjacentRooms'] . ", " . $paramsArr['roomSpace'] . ", " . $paramsArr['totalArea'] . ", " . $paramsArr['livingSpace'] . ", " . $paramsArr['kitchenSpace'] . ", " . $paramsArr['totalAmountFloor'] . ", " . $paramsArr['numberOfFloor'] . ")'. id логгера: DBconnect::insertMessageNewProperty():2. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-					// Продолжаем работу по формированию уведомлений, не обращая внимание, что для одного из пользователей выполнить операцию не удалось - ничего страшного
-				}
-			}
-			$stmt->close();
+                // Записываем в БД для него уведомление про новый объект недвижимости
+                if (($stmt->execute() === FALSE)
+                    OR (($res = $stmt->affected_rows) === -1)
+                    OR ($res === 0)
+                ) {
+                    Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO messagesNewProperty (userId, timeIndex, messageType, isReaded, fotoArr, targetId, needEmail, needSMS, typeOfObject, address, currency, costOfRenting, utilities, electricPower, amountOfRooms, adjacentRooms, amountOfAdjacentRooms, roomSpace, totalArea, livingSpace, kitchenSpace, totalAmountFloor, numberOfFloor) VALUES (" . $currentTargetUser . ", " . $paramsArr['timeIndex'] . ", " . $paramsArr['messageType'] . ", " . $paramsArr['isReaded'] . ", " . $paramsArr['fotoArr'] . ", " . $paramsArr['targetId'] . ", " . $currentNeedEmail . ", " . $currentNeedSMS . ", " . $paramsArr['typeOfObject'] . ", " . $paramsArr['address'] . ", " . $paramsArr['currency'] . ", " . $paramsArr['costOfRenting'] . ", " . $paramsArr['utilities'] . ", " . $paramsArr['electricPower'] . ", " . $paramsArr['amountOfRooms'] . ", " . $paramsArr['adjacentRooms'] . ", " . $paramsArr['amountOfAdjacentRooms'] . ", " . $paramsArr['roomSpace'] . ", " . $paramsArr['totalArea'] . ", " . $paramsArr['livingSpace'] . ", " . $paramsArr['kitchenSpace'] . ", " . $paramsArr['totalAmountFloor'] . ", " . $paramsArr['numberOfFloor'] . ")'. id логгера: DBconnect::insertMessageNewProperty():2. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+                    // Продолжаем работу по формированию уведомлений, не обращая внимание, что для одного из пользователей выполнить операцию не удалось - ничего страшного
+                }
+            }
+            $stmt->close();
 
-		} else {
+        } else {
 
-			// Сохраняем только 1 уведомление для 1 пользователя
-			$stmt = DBconnect::get()->stmt_init();
-			if (($stmt->prepare("INSERT INTO messagesNewProperty (userId, timeIndex, messageType, isReaded, fotoArr, targetId, needEmail, needSMS, typeOfObject, address, currency, costOfRenting, utilities, electricPower, amountOfRooms, adjacentRooms, amountOfAdjacentRooms, roomSpace, totalArea, livingSpace, kitchenSpace, totalAmountFloor, numberOfFloor) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
-				OR ($stmt->bind_param("iisssiiisssssssssssssii", $paramsArr['userId'], $paramsArr['timeIndex'], $paramsArr['messageType'], $paramsArr['isReaded'], $paramsArr['fotoArr'], $paramsArr['targetId'], $paramsArr['needEmail'], $paramsArr['needSMS'], $paramsArr['typeOfObject'], $paramsArr['address'], $paramsArr['currency'], $paramsArr['costOfRenting'], $paramsArr['utilities'], $paramsArr['electricPower'], $paramsArr['amountOfRooms'], $paramsArr['adjacentRooms'], $paramsArr['amountOfAdjacentRooms'], $paramsArr['roomSpace'], $paramsArr['totalArea'], $paramsArr['livingSpace'], $paramsArr['kitchenSpace'], $paramsArr['totalAmountFloor'], $paramsArr['numberOfFloor']) === FALSE)
-				OR ($stmt->execute() === FALSE)
-				OR (($res = $stmt->affected_rows) === -1)
-				OR ($res === 0)
-				OR ($stmt->close() === FALSE)
-			) {
-				Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO messagesNewProperty (userId, timeIndex, messageType, isReaded, fotoArr, targetId, needEmail, needSMS, typeOfObject, address, currency, costOfRenting, utilities, electricPower, amountOfRooms, adjacentRooms, amountOfAdjacentRooms, roomSpace, totalArea, livingSpace, kitchenSpace, totalAmountFloor, numberOfFloor) VALUES (" . $paramsArr['userId'] . ", " . $paramsArr['timeIndex'] . ", " . $paramsArr['messageType'] . ", " . $paramsArr['isReaded'] . ", " . $paramsArr['fotoArr'] . ", " . $paramsArr['targetId'] . ", " . $paramsArr['needEmail'] . ", " . $paramsArr['needSMS'] . ", " . $paramsArr['typeOfObject'] . ", " . $paramsArr['address'] . ", " . $paramsArr['currency'] . ", " . $paramsArr['costOfRenting'] . ", " . $paramsArr['utilities'] . ", " . $paramsArr['electricPower'] . ", " . $paramsArr['amountOfRooms'] . ", " . $paramsArr['adjacentRooms'] . ", " . $paramsArr['amountOfAdjacentRooms'] . ", " . $paramsArr['roomSpace'] . ", " . $paramsArr['totalArea'] . ", " . $paramsArr['livingSpace'] . ", " . $paramsArr['kitchenSpace'] . ", " . $paramsArr['totalAmountFloor'] . ", " . $paramsArr['numberOfFloor'] . ")'. id логгера: DBconnect::insertMessageNewProperty():3. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-				return FALSE;
-			}
-		}
+            // Сохраняем только 1 уведомление для 1 пользователя
+            $stmt = DBconnect::get()->stmt_init();
+            if (($stmt->prepare("INSERT INTO messagesNewProperty (userId, timeIndex, messageType, isReaded, fotoArr, targetId, needEmail, needSMS, typeOfObject, address, currency, costOfRenting, utilities, electricPower, amountOfRooms, adjacentRooms, amountOfAdjacentRooms, roomSpace, totalArea, livingSpace, kitchenSpace, totalAmountFloor, numberOfFloor) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)") === FALSE)
+                OR ($stmt->bind_param("iisssiiisssssssssssssii", $paramsArr['userId'], $paramsArr['timeIndex'], $paramsArr['messageType'], $paramsArr['isReaded'], $paramsArr['fotoArr'], $paramsArr['targetId'], $paramsArr['needEmail'], $paramsArr['needSMS'], $paramsArr['typeOfObject'], $paramsArr['address'], $paramsArr['currency'], $paramsArr['costOfRenting'], $paramsArr['utilities'], $paramsArr['electricPower'], $paramsArr['amountOfRooms'], $paramsArr['adjacentRooms'], $paramsArr['amountOfAdjacentRooms'], $paramsArr['roomSpace'], $paramsArr['totalArea'], $paramsArr['livingSpace'], $paramsArr['kitchenSpace'], $paramsArr['totalAmountFloor'], $paramsArr['numberOfFloor']) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($res = $stmt->affected_rows) === -1)
+                OR ($res === 0)
+                OR ($stmt->close() === FALSE)
+            ) {
+                Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO messagesNewProperty (userId, timeIndex, messageType, isReaded, fotoArr, targetId, needEmail, needSMS, typeOfObject, address, currency, costOfRenting, utilities, electricPower, amountOfRooms, adjacentRooms, amountOfAdjacentRooms, roomSpace, totalArea, livingSpace, kitchenSpace, totalAmountFloor, numberOfFloor) VALUES (" . $paramsArr['userId'] . ", " . $paramsArr['timeIndex'] . ", " . $paramsArr['messageType'] . ", " . $paramsArr['isReaded'] . ", " . $paramsArr['fotoArr'] . ", " . $paramsArr['targetId'] . ", " . $paramsArr['needEmail'] . ", " . $paramsArr['needSMS'] . ", " . $paramsArr['typeOfObject'] . ", " . $paramsArr['address'] . ", " . $paramsArr['currency'] . ", " . $paramsArr['costOfRenting'] . ", " . $paramsArr['utilities'] . ", " . $paramsArr['electricPower'] . ", " . $paramsArr['amountOfRooms'] . ", " . $paramsArr['adjacentRooms'] . ", " . $paramsArr['amountOfAdjacentRooms'] . ", " . $paramsArr['roomSpace'] . ", " . $paramsArr['totalArea'] . ", " . $paramsArr['livingSpace'] . ", " . $paramsArr['kitchenSpace'] . ", " . $paramsArr['totalAmountFloor'] . ", " . $paramsArr['numberOfFloor'] . ")'. id логгера: DBconnect::insertMessageNewProperty():3. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+                return FALSE;
+            }
+        }
 
-		return TRUE;
-	}
+        return TRUE;
+    }
 
     /**
      * Сохраняет идентификаторы успешно обработанного объявления с сайта bazab2b
@@ -915,12 +937,39 @@ class DBconnect
             OR ($res === 0)
             OR ($stmt->close() === FALSE)
         ) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO bazab2b (id, c_id, date) VALUES (".$id.",".$c_id.",".$date.")'. id логгера: DBconnect::insertHandledAdvertFromBazab2b():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO bazab2b (id, c_id, date) VALUES (" . $id . "," . $c_id . "," . $date . ")'. id логгера: DBconnect::insertHandledAdvertFromBazab2b():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return FALSE;
         }
 
         return TRUE;
     }
+
+    /**
+     * Сохраняет данные об оплате доступа к сервису
+     * @param $paramsArr
+     * @return bool Возвращает TRUE в случае успеха и FALSE в случае неудачи
+     */
+    public static function insertInvoice($paramsArr) {
+
+        // Проверка входящих параметров
+        if (!isset($paramsArr) || !is_array($paramsArr)) return FALSE;
+
+        // Сохраняем информацию в БД
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("INSERT INTO invoices (number, userId, status, cost, purchase, dateOfPayment) VALUES (?,?,?,?,?,?)") === FALSE)
+            OR ($stmt->bind_param("sisisi", $paramsArr['number'], $paramsArr['userId'], $paramsArr['status'], $paramsArr['cost'], $paramsArr['purchase'], $paramsArr['dateOfPayment']) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($res === 0)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO invoices (number, userId, status, cost, purchase, dateOfPayment) VALUES (" . $paramsArr['number'] . "," . $paramsArr['userId'] . "," . $paramsArr['status'] . "," . $paramsArr['cost'] . "," . $paramsArr['purchase'] . "," . $paramsArr['dateOfPayment'] . ")'. id логгера: DBconnect::insertInvoice():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
+
+        return TRUE;
+    }
+
 
     /**
      * Изменяет данные о пользователе в БД
@@ -944,7 +993,7 @@ class DBconnect
             OR ($res === 0)
             OR ($stmt->close() === FALSE)
         ) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE users SET typeTenant=".$paramsArr['typeTenant'].", typeOwner=".$paramsArr['typeOwner'].", name=".$paramsArr['name'].", secondName=".$paramsArr['secondName'].", surname=".$paramsArr['surname'].", sex=".$paramsArr['sex'].", nationality=".$paramsArr['nationality'].", birthday=".$paramsArr['birthday'].", login=".$paramsArr['login'].", password=".$paramsArr['password'].", telephon=".$paramsArr['telephon'].", emailReg=".$paramsArr['emailReg'].", email=".$paramsArr['email'].", currentStatusEducation=".$paramsArr['currentStatusEducation'].", almamater=".$paramsArr['almamater'].", speciality=".$paramsArr['speciality'].", kurs=".$paramsArr['kurs'].", ochnoZaochno=".$paramsArr['ochnoZaochno'].", yearOfEnd=".$paramsArr['yearOfEnd'].", statusWork=".$paramsArr['statusWork'].", placeOfWork=".$paramsArr['placeOfWork'].", workPosition=".$paramsArr['workPosition'].", regionOfBorn=".$paramsArr['regionOfBorn'].", cityOfBorn=".$paramsArr['cityOfBorn'].", shortlyAboutMe=".$paramsArr['shortlyAboutMe'].", vkontakte=".$paramsArr['vkontakte'].", odnoklassniki=".$paramsArr['odnoklassniki'].", facebook=".$paramsArr['facebook'].", twitter=".$paramsArr['twitter'].", lic=".$paramsArr['lic'].", last_act=".$paramsArr['last_act'].", reg_date=".$paramsArr['reg_date'].", favoritePropertiesId=".$paramsArr['favoritePropertiesId']." WHERE id=".$paramsArr['id']."'. id логгера: DBconnect::updateUserCharacteristic():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE users SET typeTenant=" . $paramsArr['typeTenant'] . ", typeOwner=" . $paramsArr['typeOwner'] . ", name=" . $paramsArr['name'] . ", secondName=" . $paramsArr['secondName'] . ", surname=" . $paramsArr['surname'] . ", sex=" . $paramsArr['sex'] . ", nationality=" . $paramsArr['nationality'] . ", birthday=" . $paramsArr['birthday'] . ", login=" . $paramsArr['login'] . ", password=" . $paramsArr['password'] . ", telephon=" . $paramsArr['telephon'] . ", emailReg=" . $paramsArr['emailReg'] . ", email=" . $paramsArr['email'] . ", currentStatusEducation=" . $paramsArr['currentStatusEducation'] . ", almamater=" . $paramsArr['almamater'] . ", speciality=" . $paramsArr['speciality'] . ", kurs=" . $paramsArr['kurs'] . ", ochnoZaochno=" . $paramsArr['ochnoZaochno'] . ", yearOfEnd=" . $paramsArr['yearOfEnd'] . ", statusWork=" . $paramsArr['statusWork'] . ", placeOfWork=" . $paramsArr['placeOfWork'] . ", workPosition=" . $paramsArr['workPosition'] . ", regionOfBorn=" . $paramsArr['regionOfBorn'] . ", cityOfBorn=" . $paramsArr['cityOfBorn'] . ", shortlyAboutMe=" . $paramsArr['shortlyAboutMe'] . ", vkontakte=" . $paramsArr['vkontakte'] . ", odnoklassniki=" . $paramsArr['odnoklassniki'] . ", facebook=" . $paramsArr['facebook'] . ", twitter=" . $paramsArr['twitter'] . ", lic=" . $paramsArr['lic'] . ", last_act=" . $paramsArr['last_act'] . ", reg_date=" . $paramsArr['reg_date'] . ", favoritePropertiesId=" . $paramsArr['favoritePropertiesId'] . " WHERE id=" . $paramsArr['id'] . "'. id логгера: DBconnect::updateUserCharacteristic():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return FALSE;
         }
 
@@ -953,7 +1002,6 @@ class DBconnect
 
     /**
      * Сохраняет в БД новое значение одного из статусов пользователя (typeTenant или typeOwner) - TRUE или FALSE
-     *
      * @param $userId идентификатор пользователя, чей статус меняем
      * @param $type какой именно статус (тип) меняем: "typeTenant" или "typeOwner"
      * @param $value на какое значение меняем: "TRUE" или "FALSE"
@@ -961,22 +1009,48 @@ class DBconnect
      */
     public static function updateUserCharacteristicTypeUser($userId, $type, $value) {
 
-		// Валидация входящих данных
-		if (!isset($userId) || !is_int($userId) || !isset($type) || !isset($value) || ($type != "typeTenant" && $type != "typeOwner") || ($value != "TRUE" && $value != "FALSE")) return FALSE;
+        // Валидация входящих данных
+        if (!isset($userId) || !is_int($userId) || !isset($type) || !isset($value) || ($type != "typeTenant" && $type != "typeOwner") || ($value != "TRUE" && $value != "FALSE")) return FALSE;
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("UPDATE users SET " . $type . " = '" . $value . "' WHERE id = ?") === FALSE)
-			OR ($stmt->bind_param("i", $userId) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->affected_rows) === -1)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE users SET " . $type . " = '" . $value . "' WHERE id = " . $userId . "'. id логгера: DBconnect::updateUserCharacteristicTypeUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return FALSE;
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("UPDATE users SET " . $type . " = '" . $value . "' WHERE id = ?") === FALSE)
+            OR ($stmt->bind_param("i", $userId) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE users SET " . $type . " = '" . $value . "' WHERE id = " . $userId . "'. id логгера: DBconnect::updateUserCharacteristicTypeUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
 
-		return TRUE;
-	}
+        return TRUE;
+    }
+
+    /**
+     * Изменяет в БД права пользователя на доступ к контактам собственников (дата и время окончания доступа)
+     * @param $userId идентификатор пользователя, чьи права меняем
+     * @param $reviewType какие именно права меняем: "reviewRooms" или "reviewFlats"
+     * @param $value время в формате timestamp, до которого действует право
+     * @return bool возвращает TRUE в случае успеха и FALSE в случае неудачи
+     */
+    public static function updateUserCharacteristicReviewRights($userId, $reviewType, $value) {
+
+        // Валидация входящих данных
+        if (!isset($userId) || !is_int($userId) || !isset($reviewType) || ($reviewType != "reviewRooms" && $reviewType != "reviewFlats") || !isset($value) || !is_int($value)) return FALSE;
+
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("UPDATE users SET " . $reviewType . " = " . $value . " WHERE id = ?") === FALSE)
+            OR ($stmt->bind_param("i", $userId) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE users SET " . $reviewType . " = " . $value . " WHERE id = " . $userId . "'. id логгера: DBconnect::updateUserCharacteristicReviewRights():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
+
+        return TRUE;
+    }
 
     // Изменяет данные об объекте недвижимости в БД
     // Возвращает TRUE в случае успеха и FALSE в случае неудачи
@@ -996,7 +1070,7 @@ class DBconnect
             OR ($res === 0)
             OR ($stmt->close() === FALSE)
         ) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE property SET userId=".$paramsArr['userId'].", typeOfObject=".$paramsArr['typeOfObject'].", dateOfEntry=".$paramsArr['dateOfEntry'].", termOfLease=".$paramsArr['termOfLease'].", dateOfCheckOut=".$paramsArr['dateOfCheckOut'].", amountOfRooms=".$paramsArr['amountOfRooms'].", adjacentRooms=".$paramsArr['adjacentRooms'].", amountOfAdjacentRooms=".$paramsArr['amountOfAdjacentRooms'].", typeOfBathrooms=".$paramsArr['typeOfBathrooms'].", typeOfBalcony=".$paramsArr['typeOfBalcony'].", balconyGlazed=".$paramsArr['balconyGlazed'].", roomSpace=".$paramsArr['roomSpace'].", totalArea=".$paramsArr['totalArea'].", livingSpace=".$paramsArr['livingSpace'].", kitchenSpace=".$paramsArr['kitchenSpace'].", floor=".$paramsArr['floor'].", totalAmountFloor=".$paramsArr['totalAmountFloor'].", numberOfFloor=".$paramsArr['numberOfFloor'].", concierge=".$paramsArr['concierge'].", intercom=".$paramsArr['intercom'].", parking=".$paramsArr['parking'].", city=".$paramsArr['city'].", district=".$paramsArr['district'].", coordX=".$paramsArr['coordX'].", coordY=".$paramsArr['coordY'].", address=".$paramsArr['address'].", apartmentNumber=".$paramsArr['apartmentNumber'].", subwayStation=".$paramsArr['subwayStation'].", distanceToMetroStation=".$paramsArr['distanceToMetroStation'].", currency=".$paramsArr['currency'].", costOfRenting=".$paramsArr['costOfRenting'].", realCostOfRenting=".$paramsArr['realCostOfRenting'].", utilities=".$paramsArr['utilities'].", costInSummer=".$paramsArr['costInSummer'].", costInWinter=".$paramsArr['costInWinter'].", electricPower=".$paramsArr['electricPower'].", bail=".$paramsArr['bail'].", bailCost=".$paramsArr['bailCost'].", prepayment=".$paramsArr['prepayment'].", compensationMoney=".$paramsArr['compensationMoney'].", compensationPercent=".$paramsArr['compensationPercent'].", repair=".$paramsArr['repair'].", furnish=".$paramsArr['furnish'].", windows=".$paramsArr['windows'].", internet=".$paramsArr['internet'].", telephoneLine=".$paramsArr['telephoneLine'].", cableTV=".$paramsArr['cableTV'].", furnitureInLivingArea=".$paramsArr['furnitureInLivingArea'].", furnitureInLivingAreaExtra=".$paramsArr['furnitureInLivingAreaExtra'].", furnitureInKitchen=".$paramsArr['furnitureInKitchen'].", furnitureInKitchenExtra=".$paramsArr['furnitureInKitchenExtra'].", appliances=".$paramsArr['appliances'].", appliancesExtra=".$paramsArr['appliancesExtra'].", sexOfTenant=".$paramsArr['sexOfTenant'].", relations=".$paramsArr['relations'].", children=".$paramsArr['children'].", animals=".$paramsArr['animals'].", contactTelephonNumber=".$paramsArr['contactTelephonNumber'].", timeForRingBegin=".$paramsArr['timeForRingBegin'].", timeForRingEnd=".$paramsArr['timeForRingEnd'].", checking=".$paramsArr['checking'].", comment=".$paramsArr['comment'].", last_act=".$paramsArr['last_act'].", reg_date=".$paramsArr['reg_date'].", status=".$paramsArr['status'].", earliestDate=".$paramsArr['earliestDate'].", earliestTimeHours=".$paramsArr['earliestTimeHours'].", earliestTimeMinutes=".$paramsArr['earliestTimeMinutes'].", adminComment=".$paramsArr['adminComment'].", completeness=".$paramsArr['completeness'].", sourceOfAdvert=".$paramsArr['sourceOfAdvert']." WHERE id=".$paramsArr['id']."'. id логгера: DBconnect::updatePropertyCharacteristic():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE property SET userId=" . $paramsArr['userId'] . ", typeOfObject=" . $paramsArr['typeOfObject'] . ", dateOfEntry=" . $paramsArr['dateOfEntry'] . ", termOfLease=" . $paramsArr['termOfLease'] . ", dateOfCheckOut=" . $paramsArr['dateOfCheckOut'] . ", amountOfRooms=" . $paramsArr['amountOfRooms'] . ", adjacentRooms=" . $paramsArr['adjacentRooms'] . ", amountOfAdjacentRooms=" . $paramsArr['amountOfAdjacentRooms'] . ", typeOfBathrooms=" . $paramsArr['typeOfBathrooms'] . ", typeOfBalcony=" . $paramsArr['typeOfBalcony'] . ", balconyGlazed=" . $paramsArr['balconyGlazed'] . ", roomSpace=" . $paramsArr['roomSpace'] . ", totalArea=" . $paramsArr['totalArea'] . ", livingSpace=" . $paramsArr['livingSpace'] . ", kitchenSpace=" . $paramsArr['kitchenSpace'] . ", floor=" . $paramsArr['floor'] . ", totalAmountFloor=" . $paramsArr['totalAmountFloor'] . ", numberOfFloor=" . $paramsArr['numberOfFloor'] . ", concierge=" . $paramsArr['concierge'] . ", intercom=" . $paramsArr['intercom'] . ", parking=" . $paramsArr['parking'] . ", city=" . $paramsArr['city'] . ", district=" . $paramsArr['district'] . ", coordX=" . $paramsArr['coordX'] . ", coordY=" . $paramsArr['coordY'] . ", address=" . $paramsArr['address'] . ", apartmentNumber=" . $paramsArr['apartmentNumber'] . ", subwayStation=" . $paramsArr['subwayStation'] . ", distanceToMetroStation=" . $paramsArr['distanceToMetroStation'] . ", currency=" . $paramsArr['currency'] . ", costOfRenting=" . $paramsArr['costOfRenting'] . ", realCostOfRenting=" . $paramsArr['realCostOfRenting'] . ", utilities=" . $paramsArr['utilities'] . ", costInSummer=" . $paramsArr['costInSummer'] . ", costInWinter=" . $paramsArr['costInWinter'] . ", electricPower=" . $paramsArr['electricPower'] . ", bail=" . $paramsArr['bail'] . ", bailCost=" . $paramsArr['bailCost'] . ", prepayment=" . $paramsArr['prepayment'] . ", compensationMoney=" . $paramsArr['compensationMoney'] . ", compensationPercent=" . $paramsArr['compensationPercent'] . ", repair=" . $paramsArr['repair'] . ", furnish=" . $paramsArr['furnish'] . ", windows=" . $paramsArr['windows'] . ", internet=" . $paramsArr['internet'] . ", telephoneLine=" . $paramsArr['telephoneLine'] . ", cableTV=" . $paramsArr['cableTV'] . ", furnitureInLivingArea=" . $paramsArr['furnitureInLivingArea'] . ", furnitureInLivingAreaExtra=" . $paramsArr['furnitureInLivingAreaExtra'] . ", furnitureInKitchen=" . $paramsArr['furnitureInKitchen'] . ", furnitureInKitchenExtra=" . $paramsArr['furnitureInKitchenExtra'] . ", appliances=" . $paramsArr['appliances'] . ", appliancesExtra=" . $paramsArr['appliancesExtra'] . ", sexOfTenant=" . $paramsArr['sexOfTenant'] . ", relations=" . $paramsArr['relations'] . ", children=" . $paramsArr['children'] . ", animals=" . $paramsArr['animals'] . ", contactTelephonNumber=" . $paramsArr['contactTelephonNumber'] . ", timeForRingBegin=" . $paramsArr['timeForRingBegin'] . ", timeForRingEnd=" . $paramsArr['timeForRingEnd'] . ", checking=" . $paramsArr['checking'] . ", comment=" . $paramsArr['comment'] . ", last_act=" . $paramsArr['last_act'] . ", reg_date=" . $paramsArr['reg_date'] . ", status=" . $paramsArr['status'] . ", earliestDate=" . $paramsArr['earliestDate'] . ", earliestTimeHours=" . $paramsArr['earliestTimeHours'] . ", earliestTimeMinutes=" . $paramsArr['earliestTimeMinutes'] . ", adminComment=" . $paramsArr['adminComment'] . ", completeness=" . $paramsArr['completeness'] . ", sourceOfAdvert=" . $paramsArr['sourceOfAdvert'] . " WHERE id=" . $paramsArr['id'] . "'. id логгера: DBconnect::updatePropertyCharacteristic():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return FALSE;
         }
 
@@ -1026,7 +1100,7 @@ class DBconnect
             OR ($res === 0)
             OR ($stmt->close() === FALSE)
         ) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE searchRequests SET userId=".$paramsArr['userId'].", typeOfObject=".$paramsArr['typeOfObject'].", amountOfRooms=".$paramsArr['amountOfRooms'].", adjacentRooms=".$paramsArr['adjacentRooms'].", floor=".$paramsArr['floor'].", minCost=".$paramsArr['minCost'].", maxCost=".$paramsArr['maxCost'].", pledge=".$paramsArr['pledge'].", prepayment=".$paramsArr['prepayment'].", district=".$paramsArr['district'].", withWho=".$paramsArr['withWho'].", linksToFriends=".$paramsArr['linksToFriends'].", children=".$paramsArr['children'].", howManyChildren=".$paramsArr['howManyChildren'].", animals=".$paramsArr['animals'].", howManyAnimals=".$paramsArr['howManyAnimals'].", termOfLease=".$paramsArr['termOfLease'].", additionalDescriptionOfSearch=".$paramsArr['additionalDescriptionOfSearch'].", regDate=".$paramsArr['regDate'].", needEmail=".$paramsArr['needEmail'].", needSMS=".$paramsArr['needSMS']." WHERE userId=".$paramsArr['userId']."'. id логгера: DBconnect::updateSearchRequestForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE searchRequests SET userId=" . $paramsArr['userId'] . ", typeOfObject=" . $paramsArr['typeOfObject'] . ", amountOfRooms=" . $paramsArr['amountOfRooms'] . ", adjacentRooms=" . $paramsArr['adjacentRooms'] . ", floor=" . $paramsArr['floor'] . ", minCost=" . $paramsArr['minCost'] . ", maxCost=" . $paramsArr['maxCost'] . ", pledge=" . $paramsArr['pledge'] . ", prepayment=" . $paramsArr['prepayment'] . ", district=" . $paramsArr['district'] . ", withWho=" . $paramsArr['withWho'] . ", linksToFriends=" . $paramsArr['linksToFriends'] . ", children=" . $paramsArr['children'] . ", howManyChildren=" . $paramsArr['howManyChildren'] . ", animals=" . $paramsArr['animals'] . ", howManyAnimals=" . $paramsArr['howManyAnimals'] . ", termOfLease=" . $paramsArr['termOfLease'] . ", additionalDescriptionOfSearch=" . $paramsArr['additionalDescriptionOfSearch'] . ", regDate=" . $paramsArr['regDate'] . ", needEmail=" . $paramsArr['needEmail'] . ", needSMS=" . $paramsArr['needSMS'] . " WHERE userId=" . $paramsArr['userId'] . "'. id логгера: DBconnect::updateSearchRequestForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return FALSE;
         }
 
@@ -1053,79 +1127,79 @@ class DBconnect
             OR (($res = $stmt->affected_rows) === -1)
             OR ($stmt->close() === FALSE)
         ) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE requestToView SET propertyId = ".$propertyIdNew." WHERE propertyId = ".$propertyIdOld."'. id логгера: DBconnect::updateRequestToViewForPropertyId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE requestToView SET propertyId = " . $propertyIdNew . " WHERE propertyId = " . $propertyIdOld . "'. id логгера: DBconnect::updateRequestToViewForPropertyId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return FALSE;
         }
 
         return TRUE;
     }
 
-	// Обновляет параметры уведомления класса "Новое подходящее объявление" в БД
-	public static function updateMessageNewProperty($paramsArr) {
+    // Обновляет параметры уведомления класса "Новое подходящее объявление" в БД
+    public static function updateMessageNewProperty($paramsArr) {
 
-		// Проверка входящих параметров
-		if (!isset($paramsArr) || !is_array($paramsArr)) return FALSE;
+        // Проверка входящих параметров
+        if (!isset($paramsArr) || !is_array($paramsArr)) return FALSE;
 
-		// Подготовка данных к записи в БД
-		$paramsArr['fotoArr'] = serialize($paramsArr['fotoArr']);
+        // Подготовка данных к записи в БД
+        $paramsArr['fotoArr'] = serialize($paramsArr['fotoArr']);
 
-		// Сохраняем информацию о загруженной фотке в БД
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("UPDATE messagesNewProperty SET userId = ?, timeIndex = ?, messageType = ?, isReaded = ?, fotoArr = ?, targetId = ?, needEmail = ?, needSMS = ?, typeOfObject = ?, address = ?, currency = ?, costOfRenting = ?, utilities = ?, electricPower = ?, amountOfRooms = ?, adjacentRooms = ?, amountOfAdjacentRooms = ?, roomSpace = ?, totalArea = ?, livingSpace = ?, kitchenSpace = ?, totalAmountFloor = ?, numberOfFloor = ? WHERE id = ?") === FALSE)
-			OR ($stmt->bind_param("iisssiiisssssssssssssiii", $paramsArr['userId'], $paramsArr['timeIndex'], $paramsArr['messageType'], $paramsArr['isReaded'], $paramsArr['fotoArr'], $paramsArr['targetId'], $paramsArr['needEmail'], $paramsArr['needSMS'], $paramsArr['typeOfObject'], $paramsArr['address'], $paramsArr['currency'], $paramsArr['costOfRenting'], $paramsArr['utilities'], $paramsArr['electricPower'], $paramsArr['amountOfRooms'], $paramsArr['adjacentRooms'], $paramsArr['amountOfAdjacentRooms'], $paramsArr['roomSpace'], $paramsArr['totalArea'], $paramsArr['livingSpace'], $paramsArr['kitchenSpace'], $paramsArr['totalAmountFloor'], $paramsArr['numberOfFloor'], $paramsArr['id']) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->affected_rows) === -1)
-			OR ($res === 0)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE messagesNewProperty SET userId = " . $paramsArr['userId'] . ", timeIndex = " . $paramsArr['timeIndex'] . ", messageType = " . $paramsArr['messageType'] . ", isReaded = " . $paramsArr['isReaded'] . ", fotoArr = " . $paramsArr['fotoArr'] . ", targetId = " . $paramsArr['targetId'] . ", needEmail = ". $paramsArr['needEmail'].", needSMS = " . $paramsArr['needSMS'] . ", typeOfObject = " . $paramsArr['typeOfObject'] . ", address = " . $paramsArr['address'] . ", currency = " . $paramsArr['currency'] . ", costOfRenting = " . $paramsArr['costOfRenting'] . ", utilities = " . $paramsArr['utilities'] . ", electricPower = " . $paramsArr['electricPower'] . ", amountOfRooms = " . $paramsArr['amountOfRooms'] . ", adjacentRooms = " . $paramsArr['adjacentRooms'] . ", amountOfAdjacentRooms = " . $paramsArr['amountOfAdjacentRooms'] . ", roomSpace = " . $paramsArr['roomSpace'] . ", totalArea = " . $paramsArr['totalArea'] . ", livingSpace = " . $paramsArr['livingSpace'] . ", kitchenSpace = " . $paramsArr['kitchenSpace'] . ", totalAmountFloor = " . $paramsArr['totalAmountFloor'] . ", numberOfFloor = " . $paramsArr['numberOfFloor'] . "'. id логгера: DBconnect::updateMessageNewProperty():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return FALSE;
-		}
+        // Сохраняем информацию о загруженной фотке в БД
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("UPDATE messagesNewProperty SET userId = ?, timeIndex = ?, messageType = ?, isReaded = ?, fotoArr = ?, targetId = ?, needEmail = ?, needSMS = ?, typeOfObject = ?, address = ?, currency = ?, costOfRenting = ?, utilities = ?, electricPower = ?, amountOfRooms = ?, adjacentRooms = ?, amountOfAdjacentRooms = ?, roomSpace = ?, totalArea = ?, livingSpace = ?, kitchenSpace = ?, totalAmountFloor = ?, numberOfFloor = ? WHERE id = ?") === FALSE)
+            OR ($stmt->bind_param("iisssiiisssssssssssssiii", $paramsArr['userId'], $paramsArr['timeIndex'], $paramsArr['messageType'], $paramsArr['isReaded'], $paramsArr['fotoArr'], $paramsArr['targetId'], $paramsArr['needEmail'], $paramsArr['needSMS'], $paramsArr['typeOfObject'], $paramsArr['address'], $paramsArr['currency'], $paramsArr['costOfRenting'], $paramsArr['utilities'], $paramsArr['electricPower'], $paramsArr['amountOfRooms'], $paramsArr['adjacentRooms'], $paramsArr['amountOfAdjacentRooms'], $paramsArr['roomSpace'], $paramsArr['totalArea'], $paramsArr['livingSpace'], $paramsArr['kitchenSpace'], $paramsArr['totalAmountFloor'], $paramsArr['numberOfFloor'], $paramsArr['id']) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($res === 0)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE messagesNewProperty SET userId = " . $paramsArr['userId'] . ", timeIndex = " . $paramsArr['timeIndex'] . ", messageType = " . $paramsArr['messageType'] . ", isReaded = " . $paramsArr['isReaded'] . ", fotoArr = " . $paramsArr['fotoArr'] . ", targetId = " . $paramsArr['targetId'] . ", needEmail = " . $paramsArr['needEmail'] . ", needSMS = " . $paramsArr['needSMS'] . ", typeOfObject = " . $paramsArr['typeOfObject'] . ", address = " . $paramsArr['address'] . ", currency = " . $paramsArr['currency'] . ", costOfRenting = " . $paramsArr['costOfRenting'] . ", utilities = " . $paramsArr['utilities'] . ", electricPower = " . $paramsArr['electricPower'] . ", amountOfRooms = " . $paramsArr['amountOfRooms'] . ", adjacentRooms = " . $paramsArr['adjacentRooms'] . ", amountOfAdjacentRooms = " . $paramsArr['amountOfAdjacentRooms'] . ", roomSpace = " . $paramsArr['roomSpace'] . ", totalArea = " . $paramsArr['totalArea'] . ", livingSpace = " . $paramsArr['livingSpace'] . ", kitchenSpace = " . $paramsArr['kitchenSpace'] . ", totalAmountFloor = " . $paramsArr['totalAmountFloor'] . ", numberOfFloor = " . $paramsArr['numberOfFloor'] . "'. id логгера: DBconnect::updateMessageNewProperty():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
 
-		return TRUE;
-	}
+        return TRUE;
+    }
 
-	// Удаляет описание (характеристику) объекта недвижимости
-	// Возвращает TRUE в случае успеха и FALSE в случае неудачи
-	public static function deletePropertyCharacteristicForId($propertyId) {
+    // Удаляет описание (характеристику) объекта недвижимости
+    // Возвращает TRUE в случае успеха и FALSE в случае неудачи
+    public static function deletePropertyCharacteristicForId($propertyId) {
 
-		// Валидация входный данных
-		if (!isset($propertyId) || !is_int($propertyId)) return FALSE;
+        // Валидация входный данных
+        if (!isset($propertyId) || !is_int($propertyId)) return FALSE;
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("DELETE FROM property WHERE id = ?") === FALSE)
-			OR ($stmt->bind_param("i", $propertyId) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->affected_rows) === -1)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM property WHERE id = " . $propertyId . "'. id логгера: DBconnect::deletePropertyCharacteristicForId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return FALSE;
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("DELETE FROM property WHERE id = ?") === FALSE)
+            OR ($stmt->bind_param("i", $propertyId) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM property WHERE id = " . $propertyId . "'. id логгера: DBconnect::deletePropertyCharacteristicForId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
 
-		return TRUE;
-	}
+        return TRUE;
+    }
 
-	// Удаляет все фотографии, загруженные по временному идентификатору сессии загрузки фотографий ($fileUploadId)
-	// Возвращает TRUE в случае успеха и FALSE в случае неудачи
-	public static function deletePhotosForFileUploadId($fileUploadId) {
+    // Удаляет все фотографии, загруженные по временному идентификатору сессии загрузки фотографий ($fileUploadId)
+    // Возвращает TRUE в случае успеха и FALSE в случае неудачи
+    public static function deletePhotosForFileUploadId($fileUploadId) {
 
-		// Валидация входный данных
-		if (!isset($fileUploadId) || $fileUploadId == "") return FALSE;
+        // Валидация входный данных
+        if (!isset($fileUploadId) || $fileUploadId == "") return FALSE;
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("DELETE FROM tempFotos WHERE fileUploadId = ?") === FALSE)
-			OR ($stmt->bind_param("s", $fileUploadId) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->affected_rows) === -1)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'. id логгера: DBconnect::deletePhotosForFileUploadId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return FALSE;
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("DELETE FROM tempFotos WHERE fileUploadId = ?") === FALSE)
+            OR ($stmt->bind_param("s", $fileUploadId) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM tempFotos WHERE fileUploadId = '" . $fileUploadId . "'. id логгера: DBconnect::deletePhotosForFileUploadId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
 
-		return TRUE;
-	}
+        return TRUE;
+    }
 
     // Удаляет все фотографии объекта недвижимости
     // Возвращает TRUE в случае успеха и FALSE в случае неудачи
@@ -1148,129 +1222,129 @@ class DBconnect
         return TRUE;
     }
 
-	// Удаляет поисковый запрос конкретного пользователя из БД
-	// Возвращает TRUE в случае успеха и FALSE в случае неудачи
-	public static function deleteSearchRequestsForUser($userId) {
+    // Удаляет поисковый запрос конкретного пользователя из БД
+    // Возвращает TRUE в случае успеха и FALSE в случае неудачи
+    public static function deleteSearchRequestsForUser($userId) {
 
-		// Валидация входный данных
-		if (!isset($userId) || !is_int($userId)) return FALSE;
+        // Валидация входный данных
+        if (!isset($userId) || !is_int($userId)) return FALSE;
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("DELETE FROM searchRequests WHERE userId = ?") === FALSE)
-			OR ($stmt->bind_param("i", $userId) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->affected_rows) === -1)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM searchRequests WHERE userId = " . $userId . "'. id логгера: DBconnect::deleteSearchRequestsForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return FALSE;
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("DELETE FROM searchRequests WHERE userId = ?") === FALSE)
+            OR ($stmt->bind_param("i", $userId) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM searchRequests WHERE userId = " . $userId . "'. id логгера: DBconnect::deleteSearchRequestsForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
 
-		return TRUE;
-	}
+        return TRUE;
+    }
 
-	// Удаляет все заявки на просмотр соответствующего пользователя (с $tenantId) по всем статусам кроме "Успешный просмотр"
-	// Возвращает TRUE в случае успеха и FALSE в случае неудачи
-	public static function deleteRequestsToViewForTenant($tenantId) {
+    // Удаляет все заявки на просмотр соответствующего пользователя (с $tenantId) по всем статусам кроме "Успешный просмотр"
+    // Возвращает TRUE в случае успеха и FALSE в случае неудачи
+    public static function deleteRequestsToViewForTenant($tenantId) {
 
-		// Валидация входный данных
-		if (!isset($tenantId) || !is_int($tenantId)) return FALSE;
+        // Валидация входный данных
+        if (!isset($tenantId) || !is_int($tenantId)) return FALSE;
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("DELETE FROM requestToView WHERE tenantId = ? AND status != 'Успешный просмотр'") === FALSE)
-			OR ($stmt->bind_param("i", $tenantId) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->affected_rows) === -1)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM requestToView WHERE tenantId = " . $tenantId . " AND status != 'Успешный просмотр''. id логгера: DBconnect::deleteRequestsToViewForTenant():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return FALSE;
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("DELETE FROM requestToView WHERE tenantId = ? AND status != 'Успешный просмотр'") === FALSE)
+            OR ($stmt->bind_param("i", $tenantId) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM requestToView WHERE tenantId = " . $tenantId . " AND status != 'Успешный просмотр''. id логгера: DBconnect::deleteRequestsToViewForTenant():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
 
-		return TRUE;
-	}
+        return TRUE;
+    }
 
-	// Удаляет заявку от собственника по ее id
-	// Возвращает TRUE в случае успеха и FALSE в случае неудачи
-	public static function deleteRequestFromOwnerForId($requestFromOwnerId) {
+    // Удаляет заявку от собственника по ее id
+    // Возвращает TRUE в случае успеха и FALSE в случае неудачи
+    public static function deleteRequestFromOwnerForId($requestFromOwnerId) {
 
-		// Валидация входных данных
-		if (!isset($requestFromOwnerId) || !is_int($requestFromOwnerId)) return FALSE;
+        // Валидация входных данных
+        if (!isset($requestFromOwnerId) || !is_int($requestFromOwnerId)) return FALSE;
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("DELETE FROM requestFromOwners WHERE id = ?") === FALSE)
-			OR ($stmt->bind_param("i", $requestFromOwnerId) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->affected_rows) === -1)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM requestFromOwners WHERE id = " . $requestFromOwnerId . "'. id логгера: DBconnect::deleteRequestFromOwnerForId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return FALSE;
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("DELETE FROM requestFromOwners WHERE id = ?") === FALSE)
+            OR ($stmt->bind_param("i", $requestFromOwnerId) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM requestFromOwners WHERE id = " . $requestFromOwnerId . "'. id логгера: DBconnect::deleteRequestFromOwnerForId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
 
-		return TRUE;
-	}
+        return TRUE;
+    }
 
-	// Удаляет все уведомления о новом подходящем объекте недвижимости из БД, предназначенные для пользователя $userId
-	// Возвращает TRUE в случае успеха и FALSE в случае неудачи
-	public static function deleteMessagesNewPropertyForUser($userId) {
+    // Удаляет все уведомления о новом подходящем объекте недвижимости из БД, предназначенные для пользователя $userId
+    // Возвращает TRUE в случае успеха и FALSE в случае неудачи
+    public static function deleteMessagesNewPropertyForUser($userId) {
 
-		// Валидация входный данных
-		if (!isset($userId) || !is_int($userId)) return FALSE;
+        // Валидация входный данных
+        if (!isset($userId) || !is_int($userId)) return FALSE;
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("DELETE FROM messagesNewProperty WHERE userId = ?") === FALSE)
-			OR ($stmt->bind_param("i", $userId) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->affected_rows) === -1)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM messagesNewProperty WHERE userId = " . $userId . "'. id логгера: DBconnect::deleteMessagesNewPropertyForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return FALSE;
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("DELETE FROM messagesNewProperty WHERE userId = ?") === FALSE)
+            OR ($stmt->bind_param("i", $userId) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM messagesNewProperty WHERE userId = " . $userId . "'. id логгера: DBconnect::deleteMessagesNewPropertyForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
 
-		return TRUE;
-	}
+        return TRUE;
+    }
 
-	// Удаляет все уведомления о новом подходящем объекте недвижимости из БД, касающиеся объекта $targetId
-	// Возвращает TRUE в случае успеха и FALSE в случае неудачи
-	public static function deleteMessagesNewPropertyForProperty($targetId) {
+    // Удаляет все уведомления о новом подходящем объекте недвижимости из БД, касающиеся объекта $targetId
+    // Возвращает TRUE в случае успеха и FALSE в случае неудачи
+    public static function deleteMessagesNewPropertyForProperty($targetId) {
 
-		// Валидация входных данных
-		if (!isset($targetId) || !is_int($targetId)) return FALSE;
+        // Валидация входных данных
+        if (!isset($targetId) || !is_int($targetId)) return FALSE;
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("DELETE FROM messagesNewProperty WHERE targetId = ?") === FALSE)
-			OR ($stmt->bind_param("i", $targetId) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->affected_rows) === -1)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM messagesNewProperty WHERE targetId = " . $targetId . "'. id логгера: DBconnect::deleteMessagesNewPropertyForProperty():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return FALSE;
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("DELETE FROM messagesNewProperty WHERE targetId = ?") === FALSE)
+            OR ($stmt->bind_param("i", $targetId) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM messagesNewProperty WHERE targetId = " . $targetId . "'. id логгера: DBconnect::deleteMessagesNewPropertyForProperty():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
 
-		return TRUE;
-	}
+        return TRUE;
+    }
 
-	// Удаляет уведомление о новом подходящем объекте недвижимости из БД по id
-	public static function deleteMessageNewPropertyForId($messageId) {
-		// Валидация входных данных
-		if (!isset($messageId) || !is_int($messageId)) return FALSE;
+    // Удаляет уведомление о новом подходящем объекте недвижимости из БД по id
+    public static function deleteMessageNewPropertyForId($messageId) {
+        // Валидация входных данных
+        if (!isset($messageId) || !is_int($messageId)) return FALSE;
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("DELETE FROM messagesNewProperty WHERE id = ?") === FALSE)
-			OR ($stmt->bind_param("i", $messageId) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->affected_rows) === -1)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM messagesNewProperty WHERE id = " . $messageId . "'. id логгера: DBconnect::deleteMessageNewPropertyForId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return FALSE;
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("DELETE FROM messagesNewProperty WHERE id = ?") === FALSE)
+            OR ($stmt->bind_param("i", $messageId) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'DELETE FROM messagesNewProperty WHERE id = " . $messageId . "'. id логгера: DBconnect::deleteMessageNewPropertyForId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
 
-		return TRUE;
-	}
+        return TRUE;
+    }
 
     // Удаляет описание (характеристику) объекта недвижимости из архивной таблицы
     // Возвращает TRUE в случае успеха и FALSE в случае неудачи
@@ -1293,84 +1367,84 @@ class DBconnect
         return TRUE;
     }
 
-	// Возвращает число = кол-ву всех непрочитанных уведомлений пользователя
-	public static function countUnreadMessagesForUser($userId) {
+    // Возвращает число = кол-ву всех непрочитанных уведомлений пользователя
+    public static function countUnreadMessagesForUser($userId) {
 
-		// Валидация входных параметров
-		if (!isset($userId) || !is_int($userId)) return 0;
+        // Валидация входных параметров
+        if (!isset($userId) || !is_int($userId)) return 0;
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("SELECT COUNT(*) FROM messagesNewProperty WHERE userId = ? AND isReaded = 'не прочитано'") === FALSE)
-			OR ($stmt->bind_param("i", $userId) === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->get_result()) === FALSE)
-			OR (($res = $res->fetch_row()) === FALSE)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT COUNT(*) FROM messagesNewProperty WHERE userId = '" . $userId . "' AND isReaded = 'не прочитано''. id логгера: DBconnect::countUnreadMessagesForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return 0;
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("SELECT COUNT(*) FROM messagesNewProperty WHERE userId = ? AND isReaded = 'не прочитано'") === FALSE)
+            OR ($stmt->bind_param("i", $userId) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->get_result()) === FALSE)
+            OR (($res = $res->fetch_row()) === FALSE)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT COUNT(*) FROM messagesNewProperty WHERE userId = '" . $userId . "' AND isReaded = 'не прочитано''. id логгера: DBconnect::countUnreadMessagesForUser():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return 0;
+        }
 
-		return $res[0];
-	}
+        return $res[0];
+    }
 
-	// Возвращает количество всех объявлений в БД со статусом "опубликовано"
-	public static function countAllPublishedProperties() {
+    // Возвращает количество всех объявлений в БД со статусом "опубликовано"
+    public static function countAllPublishedProperties() {
 
-		$stmt = DBconnect::get()->stmt_init();
-		if (($stmt->prepare("SELECT COUNT(*) FROM property WHERE status = 'опубликовано'") === FALSE)
-			OR ($stmt->execute() === FALSE)
-			OR (($res = $stmt->get_result()) === FALSE)
-			OR (($res = $res->fetch_row()) === FALSE)
-			OR ($stmt->close() === FALSE)
-		) {
-			Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT COUNT(*) FROM property WHERE status = 'опубликовано''. id логгера: DBconnect::countAllPublishedProperties():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-			return "";
-		}
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("SELECT COUNT(*) FROM property WHERE status = 'опубликовано'") === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->get_result()) === FALSE)
+            OR (($res = $res->fetch_row()) === FALSE)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT COUNT(*) FROM property WHERE status = 'опубликовано''. id логгера: DBconnect::countAllPublishedProperties():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return "";
+        }
 
-		return $res[0];
-	}
+        return $res[0];
+    }
 
-	// Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одному из пользователей. Если ничего не найдено или произошла ошибка, вернет пустой массив
-	// На входе - идентификатор пользователя, либо массив идентификаторов пользователей, по которым нужно получить данные
-	// ВНИМАНИЕ: массивы могут быть расположены не в том же порядке, в каком идентификаторы располагались во входном массиве
-	// TODO: переделать, переназвать
-	public static function getAllDataAboutCharacteristicUsers($usersId) {
+    // Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одному из пользователей. Если ничего не найдено или произошла ошибка, вернет пустой массив
+    // На входе - идентификатор пользователя, либо массив идентификаторов пользователей, по которым нужно получить данные
+    // ВНИМАНИЕ: массивы могут быть расположены не в том же порядке, в каком идентификаторы располагались во входном массиве
+    // TODO: переделать, переназвать
+    public static function getAllDataAboutCharacteristicUsers($usersId) {
 
-		// Проверка входящих параметров
-		if (!isset($usersId)) return array();
-		if (is_array($usersId) && count($usersId) == 0) return array();
+        // Проверка входящих параметров
+        if (!isset($usersId)) return array();
+        if (is_array($usersId) && count($usersId) == 0) return array();
 
-		// Если нам на вход дали единичный идентификатор, то приведем его к виду массива
-		if (!is_array($usersId)) $usersId = array($usersId);
+        // Если нам на вход дали единичный идентификатор, то приведем его к виду массива
+        if (!is_array($usersId)) $usersId = array($usersId);
 
-		// Для надежности преобразование к целому типу членов массива и их проверка
-		for ($i = 0, $s = count($usersId); $i < $s; $i++) {
-			$usersId[$i] = intval($usersId[$i]);
-			if ($usersId[$i] == 0) return array(); // Если преобразование дало 0, значит один из членов массива не является идентификатором объекта недвижимости - входные данные некорректны
-		}
+        // Для надежности преобразование к целому типу членов массива и их проверка
+        for ($i = 0, $s = count($usersId); $i < $s; $i++) {
+            $usersId[$i] = intval($usersId[$i]);
+            if ($usersId[$i] == 0) return array(); // Если преобразование дало 0, значит один из членов массива не является идентификатором объекта недвижимости - входные данные некорректны
+        }
 
-		// Соберем условие для получения данных из БД
-		$strWHERE = " (";
-		for ($i = 0, $s = count($usersId); $i < $s; $i++) {
-			$strWHERE .= " id = '" . $usersId[$i] . "'";
-			if ($i < $s - 1) $strWHERE .= " OR";
-		}
-		$strWHERE .= " )";
+        // Соберем условие для получения данных из БД
+        $strWHERE = " (";
+        for ($i = 0, $s = count($usersId); $i < $s; $i++) {
+            $strWHERE .= " id = '" . $usersId[$i] . "'";
+            if ($i < $s - 1) $strWHERE .= " OR";
+        }
+        $strWHERE .= " )";
 
-		// Получаем данные из БД
-		$res = DBconnect::get()->query("SELECT * FROM users WHERE" . $strWHERE);
-		if ((DBconnect::get()->errno)
-			OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-		) {
-			// Логируем ошибку
-			//TODO: сделать логирование ошибки
-			return array();
-		}
+        // Получаем данные из БД
+        $res = DBconnect::get()->query("SELECT * FROM users WHERE" . $strWHERE);
+        if ((DBconnect::get()->errno)
+            OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
+        ) {
+            // Логируем ошибку
+            //TODO: сделать логирование ошибки
+            return array();
+        }
 
-		// Вернем результат
-		return $res;
-	}
+        // Вернем результат
+        return $res;
+    }
 
     /**
      * Преобразование данных о пользователе из формата хранения в БД в формат, с которым работают php скрипты
@@ -1408,41 +1482,41 @@ class DBconnect
         return $user;
     }
 
-	/**
-	 * Преобразование данных об объекте недвижимости из формата хранения в БД в формат, с которым работают php скрипты
-	 *
-	 * @param array $property ассоциативный массив с параметрами объекта недвижимости
-	 * @return array исходный массив с преобразованными параметрами. Если на входе мусор, возвращает пустой массив
-	 */
-	public static function conversionPropertyCharacteristicFromDBToView($property) {
+    /**
+     * Преобразование данных об объекте недвижимости из формата хранения в БД в формат, с которым работают php скрипты
+     *
+     * @param array $property ассоциативный массив с параметрами объекта недвижимости
+     * @return array исходный массив с преобразованными параметрами. Если на входе мусор, возвращает пустой массив
+     */
+    public static function conversionPropertyCharacteristicFromDBToView($property) {
 
-		if (!isset($property) || !is_array($property)) return array();
+        if (!isset($property) || !is_array($property)) return array();
 
-		$property['dateOfEntry'] = GlobFunc::dateFromDBToView($property['dateOfEntry']);
-		$property['dateOfCheckOut'] = GlobFunc::dateFromDBToView($property['dateOfCheckOut']);
-		if ($property['roomSpace'] == 0) $property['roomSpace'] = "";
-		if ($property['totalArea'] == 0) $property['totalArea'] = "";
-		if ($property['livingSpace'] == 0) $property['livingSpace'] = "";
-		if ($property['kitchenSpace'] == 0) $property['kitchenSpace'] = "";
-		if ($property['floor'] == 0) $property['floor'] = "";
-		if ($property['totalAmountFloor'] == 0) $property['totalAmountFloor'] = "";
-		if ($property['numberOfFloor'] == 0) $property['numberOfFloor'] = "";
-		if ($property['distanceToMetroStation'] == 0) $property['distanceToMetroStation'] = "";
-		if ($property['costOfRenting'] == 0) $property['costOfRenting'] = "";
-		if ($property['costInSummer'] == 0) $property['costInSummer'] = "";
-		if ($property['costInWinter'] == 0) $property['costInWinter'] = "";
-		if ($property['bailCost'] == 0) $property['bailCost'] = "";
-		if ($property['compensationMoney'] == 0) $property['compensationMoney'] = "";
-		if ($property['compensationPercent'] == 0) $property['compensationPercent'] = "";
-		$property['furnitureInLivingArea'] = unserialize($property['furnitureInLivingArea']);
-		$property['furnitureInKitchen'] = unserialize($property['furnitureInKitchen']);
-		$property['appliances'] = unserialize($property['appliances']);
-		$property['sexOfTenant'] = unserialize($property['sexOfTenant']);
-		$property['relations'] = unserialize($property['relations']);
-		$property['earliestDate'] = GlobFunc::dateFromDBToView($property['earliestDate']);
+        $property['dateOfEntry'] = GlobFunc::dateFromDBToView($property['dateOfEntry']);
+        $property['dateOfCheckOut'] = GlobFunc::dateFromDBToView($property['dateOfCheckOut']);
+        if ($property['roomSpace'] == 0) $property['roomSpace'] = "";
+        if ($property['totalArea'] == 0) $property['totalArea'] = "";
+        if ($property['livingSpace'] == 0) $property['livingSpace'] = "";
+        if ($property['kitchenSpace'] == 0) $property['kitchenSpace'] = "";
+        if ($property['floor'] == 0) $property['floor'] = "";
+        if ($property['totalAmountFloor'] == 0) $property['totalAmountFloor'] = "";
+        if ($property['numberOfFloor'] == 0) $property['numberOfFloor'] = "";
+        if ($property['distanceToMetroStation'] == 0) $property['distanceToMetroStation'] = "";
+        if ($property['costOfRenting'] == 0) $property['costOfRenting'] = "";
+        if ($property['costInSummer'] == 0) $property['costInSummer'] = "";
+        if ($property['costInWinter'] == 0) $property['costInWinter'] = "";
+        if ($property['bailCost'] == 0) $property['bailCost'] = "";
+        if ($property['compensationMoney'] == 0) $property['compensationMoney'] = "";
+        if ($property['compensationPercent'] == 0) $property['compensationPercent'] = "";
+        $property['furnitureInLivingArea'] = unserialize($property['furnitureInLivingArea']);
+        $property['furnitureInKitchen'] = unserialize($property['furnitureInKitchen']);
+        $property['appliances'] = unserialize($property['appliances']);
+        $property['sexOfTenant'] = unserialize($property['sexOfTenant']);
+        $property['relations'] = unserialize($property['relations']);
+        $property['earliestDate'] = GlobFunc::dateFromDBToView($property['earliestDate']);
 
-		return $property;
-	}
+        return $property;
+    }
 
     /**
      * Преобразование данных о поисковом запросе пользователя из формата хранения в БД в формат, с которым работают php скрипты
@@ -1495,43 +1569,43 @@ class DBconnect
         return $user;
     }
 
-	/**
-	 * Преобразование данных об объекте недвижимости из формата, с которым работают php скрипты в формат хранения в БД
-	 *
-	 * @param array $property ассоциативный массив с параметрами объекта недвижимости
-	 * @return array исходный массив с преобразованными параметрами. Если на входе мусор, возвращает пустой массив
-	 */
-	public static function conversionPropertyCharacteristicFromViewToDB($property) {
+    /**
+     * Преобразование данных об объекте недвижимости из формата, с которым работают php скрипты в формат хранения в БД
+     *
+     * @param array $property ассоциативный массив с параметрами объекта недвижимости
+     * @return array исходный массив с преобразованными параметрами. Если на входе мусор, возвращает пустой массив
+     */
+    public static function conversionPropertyCharacteristicFromViewToDB($property) {
 
-		if (!isset($property) || !is_array($property)) return array();
+        if (!isset($property) || !is_array($property)) return array();
 
-		$property['dateOfEntry'] = GlobFunc::dateFromViewToDB($property['dateOfEntry']);
-		$property['dateOfCheckOut'] = GlobFunc::dateFromViewToDB($property['dateOfCheckOut']);
-		if ($property['roomSpace'] == "") $property['roomSpace'] = 0.00;
-		if ($property['totalArea'] == "") $property['totalArea'] = 0.00;
-		if ($property['livingSpace'] == "") $property['livingSpace'] = 0.00;
-		if ($property['kitchenSpace'] == "") $property['kitchenSpace'] = 0.00;
-		if ($property['floor'] == "") $property['floor'] = 0;
-		if ($property['totalAmountFloor'] == "") $property['totalAmountFloor'] = 0;
-		if ($property['numberOfFloor'] == "") $property['numberOfFloor'] = 0;
-		if ($property['distanceToMetroStation'] == "") $property['distanceToMetroStation'] = 0;
-		if ($property['costOfRenting'] == "") $property['costOfRenting'] = 0;
-		if ($property['costInSummer'] == "") $property['costInSummer'] = 0;
-		if ($property['costInWinter'] == "") $property['costInWinter'] = 0;
-		if ($property['bailCost'] == "") $property['bailCost'] = 0;
-		if ($property['compensationMoney'] == "") $property['compensationMoney'] = 0.00;
-		if ($property['compensationPercent'] == "") $property['compensationPercent'] = 0.00;
-		$property['furnitureInLivingArea'] = serialize($property['furnitureInLivingArea']);
-		$property['furnitureInKitchen'] = serialize($property['furnitureInKitchen']);
-		$property['appliances'] = serialize($property['appliances']);
-		$property['sexOfTenant'] = serialize($property['sexOfTenant']);
-		$property['relations'] = serialize($property['relations']);
-		$property['earliestDate'] = GlobFunc::dateFromViewToDB($property['earliestDate']);
+        $property['dateOfEntry'] = GlobFunc::dateFromViewToDB($property['dateOfEntry']);
+        $property['dateOfCheckOut'] = GlobFunc::dateFromViewToDB($property['dateOfCheckOut']);
+        if ($property['roomSpace'] == "") $property['roomSpace'] = 0.00;
+        if ($property['totalArea'] == "") $property['totalArea'] = 0.00;
+        if ($property['livingSpace'] == "") $property['livingSpace'] = 0.00;
+        if ($property['kitchenSpace'] == "") $property['kitchenSpace'] = 0.00;
+        if ($property['floor'] == "") $property['floor'] = 0;
+        if ($property['totalAmountFloor'] == "") $property['totalAmountFloor'] = 0;
+        if ($property['numberOfFloor'] == "") $property['numberOfFloor'] = 0;
+        if ($property['distanceToMetroStation'] == "") $property['distanceToMetroStation'] = 0;
+        if ($property['costOfRenting'] == "") $property['costOfRenting'] = 0;
+        if ($property['costInSummer'] == "") $property['costInSummer'] = 0;
+        if ($property['costInWinter'] == "") $property['costInWinter'] = 0;
+        if ($property['bailCost'] == "") $property['bailCost'] = 0;
+        if ($property['compensationMoney'] == "") $property['compensationMoney'] = 0.00;
+        if ($property['compensationPercent'] == "") $property['compensationPercent'] = 0.00;
+        $property['furnitureInLivingArea'] = serialize($property['furnitureInLivingArea']);
+        $property['furnitureInKitchen'] = serialize($property['furnitureInKitchen']);
+        $property['appliances'] = serialize($property['appliances']);
+        $property['sexOfTenant'] = serialize($property['sexOfTenant']);
+        $property['relations'] = serialize($property['relations']);
+        $property['earliestDate'] = GlobFunc::dateFromViewToDB($property['earliestDate']);
 
-		return $property;
-	}
+        return $property;
+    }
 
-	// Конструктор не используется (но чтобы его нельзя было вызвать снаружи защищен модификатором private), так как он возвращает объект класса DBconnect, а мне в переменной $connect нужен объект класса mysqli
-	private function __construct() {
-	}
+    // Конструктор не используется (но чтобы его нельзя было вызвать снаружи защищен модификатором private), так как он возвращает объект класса DBconnect, а мне в переменной $connect нужен объект класса mysqli
+    private function __construct() {
+    }
 }

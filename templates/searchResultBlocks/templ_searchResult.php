@@ -37,7 +37,15 @@
         <div id='headOfFullParametersList'>
             <div class='serviceMarks top left'></div>
             <div class="overFotosWrapper">Фото</div>
-            <div class="mainContent"><div class="address">Адрес</div><div class="amountOfRooms">Комнаты</div><div class="areaValues">Площадь</div><div class="floor">Этаж</div><div class="furniture">Мебель</div><div class='costOfRenting top right'>Цена</div><div class="clearBoth"></div></div>
+            <div class="mainContent">
+                <div class="address">Адрес</div>
+                <div class="amountOfRooms">Комнаты</div>
+                <div class="areaValues">Площадь</div>
+                <div class="floor">Этаж</div>
+                <div class="furniture">Мебель</div>
+                <div class='costOfRenting top right'>Цена</div>
+                <div class="clearBoth"></div>
+            </div>
         </div>
         <?php echo $matterOfFullParametersList; // Формируем содержимое таблицы со списком объявлений и расширенными данными по ним ?>
     </div>

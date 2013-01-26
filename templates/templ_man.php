@@ -5,7 +5,8 @@
     <!-- meta -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="Content-language" content="ru">
-    <meta name="description" content="<?php echo $userCharacteristic['surname'] . " " . $userCharacteristic['name'] . " " . $userCharacteristic['secondName']; ?>">
+    <meta name="description"
+          content="<?php echo $userCharacteristic['surname'] . " " . $userCharacteristic['name'] . " " . $userCharacteristic['secondName']; ?>">
     <!-- Если у пользователя IE: использовать последний доступный стандартный режим отображения независимо от <!DOCTYPE> -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <!-- Оптимизация отображения на мобильных устройствах -->
@@ -36,65 +37,63 @@
 </head>
 
 <body>
-<div class="page_without_footer">
+<div class="pageWithoutFooter">
 
     <?php
-        // Сформируем и вставим заголовок страницы
-	require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+    // Сформируем и вставим заголовок страницы
+    require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
     ?>
 
-    <div class="page_main_content">
-        <div class="headerOfPage">
-            Характеристика пользователя
-        </div>
-        <div id="tabs">
-            <ul>
-                <li>
-                    <a href="#tabs-1">Профиль</a>
-                </li>
-                <li>
-                    <a href="#tabs-2">Условия поиска</a>
-                </li>
-            </ul>
-            <div id="tabs-1">
-                <div id="notEditingProfileParametersBlock">
-                    <?php
-                        // Формируем и размещаем на странице блок для основной фотографии пользователя
-                        echo View::getHTMLfotosWrapper("middle", TRUE, FALSE, $userFotoInformation['uploadedFoto']);
-
-                        // Вставляем анкетные данные пользователя
-					require $_SERVER['DOCUMENT_ROOT'] . "/templates/notEditableBlocks/templ_notEditedProfile.php";
-                    ?>
-                </div>
-                <div class="clearBoth"></div>
-            </div>
-            <!-- /end.tabs-1 -->
-            <div id="tabs-2">
-                <?php if ($userSearchRequest == FALSE): ?>
-                <div class="shadowText">
-                    Пользователь не ищет недвижимость в данный момент
-                </div>
-                <?php endif;?>
-                <?php if ($userSearchRequest != FALSE): ?>
-                <div class="shadowText">
-                    Какого рода недвижимость ищет данный пользователь
-                </div>
-                <?php
-                    // Шаблон для представления нередактируемых параметров поисковго запроса пользователя
-                    require $_SERVER['DOCUMENT_ROOT'] . "/templates/notEditableBlocks/templ_notEditedSearchRequest.php";
-                ?>
-                <?php endif;?>
-            </div>
-            <!-- /end.tabs-2 -->
-        </div>
+    <div class="headerOfPage">
+        Характеристика пользователя
     </div>
-    <!-- /end.page_main_content -->
+    <div id="tabs">
+        <ul>
+            <li>
+                <a href="#tabs-1">Профиль</a>
+            </li>
+            <li>
+                <a href="#tabs-2">Условия поиска</a>
+            </li>
+        </ul>
+        <div id="tabs-1">
+            <div id="notEditingProfileParametersBlock">
+                <?php
+                // Формируем и размещаем на странице блок для основной фотографии пользователя
+                echo View::getHTMLfotosWrapper("middle", TRUE, FALSE, $userFotoInformation['uploadedFoto']);
+
+                // Вставляем анкетные данные пользователя
+                require $_SERVER['DOCUMENT_ROOT'] . "/templates/notEditableBlocks/templ_notEditedProfile.php";
+                ?>
+            </div>
+            <div class="clearBoth"></div>
+        </div>
+        <!-- /end.tabs-1 -->
+        <div id="tabs-2">
+            <?php if ($userSearchRequest == FALSE): ?>
+            <div class="shadowText">
+                Пользователь не ищет недвижимость в данный момент
+            </div>
+            <?php endif;?>
+            <?php if ($userSearchRequest != FALSE): ?>
+            <div class="shadowText">
+                Какого рода недвижимость ищет данный пользователь
+            </div>
+            <?php
+            // Шаблон для представления нередактируемых параметров поисковго запроса пользователя
+            require $_SERVER['DOCUMENT_ROOT'] . "/templates/notEditableBlocks/templ_notEditedSearchRequest.php";
+            ?>
+            <?php endif;?>
+        </div>
+        <!-- /end.tabs-2 -->
+    </div>
+
     <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
     <div class="page-buffer"></div>
 </div>
-<!-- /end.page_without_footer -->
+<!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2012 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
+    2013 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
     support@svobodno.org
 </div>
 <!-- /end.footer -->

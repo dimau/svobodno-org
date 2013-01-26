@@ -22,9 +22,9 @@ $userIncoming = new UserIncoming();
 
 // Попробуем получить адрес страницы, с которой пользователь попал на регистрацию. Проверим, что этот адрес относится к нашему домену
 if (isset($_SESSION['url_initial']) && preg_match('~^((http://svobodno.org)|(http://localhost))~', $_SESSION['url_initial'])) {
-	$url_initial = $_SESSION['url_initial'];
+    $url_initial = $_SESSION['url_initial'];
 } else {
-	$url_initial = "";
+    $url_initial = "";
 }
 
 /********************************************************************************

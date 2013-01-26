@@ -14,12 +14,12 @@ if (DBconnect::get() == FALSE) die('Ошибка подключения к ба�
 // $typeRes = "1" - выдача результата по отдельной операции с базой данных, крезультат по каждой из которых выводится в отдельную строку
 // $typeRes = "2" - выдача результата по набору однотипных операций с БД - в одну строку!
 function returnResultMySql($rez) {
-	if ($rez == FALSE) {
-		echo " <span style='color: red;'>FALSE(" . DBconnect::get()->errno . " " . DBconnect::get()->error . ")</span> ";
-	} else {
-		echo 1;
-	}
-	echo "<br>";
+    if ($rez == FALSE) {
+        echo " <span style='color: red;'>FALSE(" . DBconnect::get()->errno . " " . DBconnect::get()->error . ")</span> ";
+    } else {
+        echo 1;
+    }
+    echo "<br>";
 }
 
 // Создаем пользователей

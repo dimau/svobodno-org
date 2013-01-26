@@ -15,43 +15,43 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Property.php';
 
 // Получаем id объекта недвижимости, рассылку о котором нужно выполнить
 if (isset($_POST['propertyId']) && intval($_POST['propertyId']) != 0) {
-	$propertyId = intval($_POST['propertyId']);
+    $propertyId = intval($_POST['propertyId']);
 } else {
-	Logger::getLogger(GlobFunc::$loggerName)->log("Обращение к notificationAboutNewProperty.php без указания propertyId");
-	exit();
+    Logger::getLogger(GlobFunc::$loggerName)->log("Обращение к notificationAboutNewProperty.php без указания propertyId");
+    exit();
 }
 
 // Инициализируем модель для этого объекта недвижимости
 $property = new Property($propertyId);
 if (!$property->readCharacteristicFromDB() || !$property->readFotoInformationFromDB()) {
-	Logger::getLogger(GlobFunc::$loggerName)->log("notificationAboutNewProperty.php: не удалось выполнить считывание данных из БД по объекту:".$propertyId);
-	exit();
+    Logger::getLogger(GlobFunc::$loggerName)->log("notificationAboutNewProperty.php: не удалось выполнить считывание данных из БД по объекту:" . $propertyId);
+    exit();
 }
 
 // Получим список пользователей-арендаторов, под чьи поисковые запросы подходит этот объект
 $listOfTargetUsers = $property->whichTenantsAppropriate();
 if ($listOfTargetUsers == FALSE) {
-	Logger::getLogger(GlobFunc::$loggerName)->log("notificationAboutNewProperty.php: не удалось получить список id потенциальных арендаторов по объекту:".$propertyId);
-	exit();
+    Logger::getLogger(GlobFunc::$loggerName)->log("notificationAboutNewProperty.php: не удалось получить список id потенциальных арендаторов по объекту:" . $propertyId);
+    exit();
 }
 
 // Формируем уведомления по данному объекту
 if (!$property->sendMessagesAboutNewProperty($listOfTargetUsers)) {
-	Logger::getLogger(GlobFunc::$loggerName)->log("notificationAboutNewProperty.php: не удалось сформировать уведомления для потенциальных арендаторов по объекту:".$propertyId);
-	exit();
+    Logger::getLogger(GlobFunc::$loggerName)->log("notificationAboutNewProperty.php: не удалось сформировать уведомления для потенциальных арендаторов по объекту:" . $propertyId);
+    exit();
 }
 
 // Формируем и рассылаем email по тем пользователям, которые подписаны на такую рассылку
 $listOfTargetUsersForEmail = array();
 foreach ($listOfTargetUsers as $value) {
-	if ($value['needEmail'] = 1) $listOfTargetUsersForEmail[] = $value;
+    if ($value['needEmail'] == 1) $listOfTargetUsersForEmail[] = $value;
 }
 $property->sendEmailAboutNewProperty($listOfTargetUsersForEmail);
 
 // Формируем и рассылаем sms по тем пользователям, которые подписаны на такую рассылку
 $listOfTargetUsersForSMS = array();
 foreach ($listOfTargetUsers as $value) {
-    if ($value['needSMS'] = 1) $listOfTargetUsersForSMS[] = $value;
+    if ($value['needSMS'] == 1) $listOfTargetUsersForSMS[] = $value;
 }
 $property->sendSMSAboutNewProperty($listOfTargetUsersForSMS);
 

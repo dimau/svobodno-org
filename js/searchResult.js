@@ -250,7 +250,8 @@ function MapYandex(options) {
                     options:this.options,
                     properties:this.activeObject.properties
                 });
-                // прицепим новый макет к родителю
+                // Прицепим новый макет к родителю, предварительно очистив предыдущий макет
+                this.getParentElement().innerHTML = '';
                 subLayout.setParentElement(this.getParentElement());
             } else {
                 var applyContentThis = this;
@@ -274,7 +275,8 @@ function MapYandex(options) {
                                 properties:applyContentThis.activeObject.properties
                             });
 
-                            // прицепим новый макет к родителю
+                            // Прицепим новый макет к родителю, предварительно очистив предыдущий макет
+                            applyContentThis.getParentElement().innerHTML = '';
                             subLayout.setParentElement(applyContentThis.getParentElement());
 
                             // Цепляем colorBox для отображения галереи фотографий
@@ -294,12 +296,12 @@ function MapYandex(options) {
     var MyMainContentSubLayout = ymaps.templateLayoutFactory.createClass(
         '<div width="100">' +
             '$[properties.balloonContentBody]' +
-        '</div>'
+            '</div>'
     );
 
     // Создание экземпляра карты и его привязка к контейнеру с заданным id ("map")
     // TODO: Сделать инициализацию по любому идентификатору переданному через оптионс
-    self.initialization = function() {
+    self.initialization = function () {
         map = new ymaps.Map('map', {
             center:[56.829748, 60.617435], // В центре карты - Екатеринбург
             zoom:11, // Коэффициент первоначального масштабирования
@@ -308,7 +310,7 @@ function MapYandex(options) {
     };
 
     // Добавляет элементы управления на карту. Используется при инициализации
-    self.addControls = function() {
+    self.addControls = function () {
         map.controls.add('typeSelector'); // Выбор типа карты
         map.controls.add('smallZoomControl', { // Кнопка изменения масштаба - компактный вариант. Расположим её ниже и левее левого верхнего угла
             left:5,
@@ -318,19 +320,19 @@ function MapYandex(options) {
     };
 
     // Функция перестроения карты - используется при изменении размеров блока
-    self.reDrawMap = function() {
+    self.reDrawMap = function () {
         //map.setCenter([56.829748, 60.617435]);
         map.container.fitToViewport();
     };
 
     // TODO: Можно избавиться от этой функции?
-    self.reDrawMapFull = function() {
+    self.reDrawMapFull = function () {
         map.setCenter([56.829748, 60.617435]);
         map.container.fitToViewport();
     };
 
     // Размещает метки на карте в соответствии со сдаваемыми объектами недвижимости
-    self.placeMarkers = function() {
+    self.placeMarkers = function () {
 
         // Создаем кластеризатор. Который будет объединять в 1 метку близко расположенные метки и будет масштабироваться по клику
         cluster = new ymaps.Clusterer();
@@ -368,7 +370,7 @@ function MapYandex(options) {
     };
 
     // Обработчик клика по метке на Яндекс карте
-    self.onPlacemarkClick = function(event) {
+    self.onPlacemarkClick = function (event) {
 
         // Получаем параметры метки, в том числе id объекта недвижимости.
         var placemark = event.get('target');
@@ -418,20 +420,20 @@ function MapYandex(options) {
 
     // Пытается найти HTML содержимое для баллуна на странице
     // TODO: выяснить, что возвращает функция при невозможности получения html
-    self.getContentForBalloonFromPage = function(propertyid) {
+    self.getContentForBalloonFromPage = function (propertyid) {
         var balloonHTML = $("#allBalloons .balloonBlock[propertyId='" + propertyid + "']").html();
         return balloonHTML;
     };
 
     // Объединяет в галерею ColorBox фотографии открытого баллуна (нужно запускать каждый раз при открытии нового баллуна)
-    self.setColorBoxForOpenBalloon = function() {
+    self.setColorBoxForOpenBalloon = function () {
         $("#map .fotosWrapper .gallery").removeClass('cboxElement').colorbox({ opacity:0.7, rel:currentFotoGalleryIndex, current:'№ {current} из {total}' });
         currentFotoGalleryIndex++;
     };
 
     // Обработчик клика по строчке с кратким описанием объявления - отображает инфу в виде баллуна на карте
     // this = элементу с классом realtyObject, на котором был произведен клик
-    self.onShortListClick = function(event) {
+    self.onShortListClick = function (event) {
 
         var target = event.target;
 
@@ -457,7 +459,7 @@ function MapYandex(options) {
 }
 
 // Как только библиотека с Яндекс картами готова - инициализируем соответствующий объект как надо
-ymaps.ready(function() {
+ymaps.ready(function () {
 
     // Создаем объект класса MapYandex
     var mapYandex = new MapYandex({});
