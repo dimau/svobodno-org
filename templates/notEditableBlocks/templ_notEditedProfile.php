@@ -15,22 +15,30 @@
                 echo "нет";
             }
             if ($userCharacteristic['currentStatusEducation'] == "сейчас учусь") {
+                if ($userCharacteristic['sex'] == "мужской") {
+                    echo "студент ";
+                } elseif ($userCharacteristic['sex'] == "женский") {
+                    echo "студентка ";
+                } else {
+                    echo "студент(ка) ";
+                }
                 if ($userCharacteristic['almamater'] != "") echo $userCharacteristic['almamater'] . ", ";
                 if ($userCharacteristic['speciality'] != "") echo $userCharacteristic['speciality'] . ", ";
                 if ($userCharacteristic['ochnoZaochno'] != "0") echo $userCharacteristic['ochnoZaochno'] . ", ";
                 if ($userCharacteristic['kurs'] != "") echo "курс: " . $userCharacteristic['kurs'];
-                if ($userCharacteristic['almamater'] == "" && $userCharacteristic['speciality'] == "" && $userCharacteristic['ochnoZaochno'] == "0" && $userCharacteristic['kurs'] == "") {
-                    echo "студент";
-                }
             }
             if ($userCharacteristic['currentStatusEducation'] == "закончил") {
+                if ($userCharacteristic['sex'] == "мужской") {
+                    echo "закончил ";
+                } elseif ($userCharacteristic['sex'] == "женский") {
+                    echo "закончила ";
+                } else {
+                    echo "закончил(а) ";
+                }
                 if ($userCharacteristic['almamater'] != "") echo $userCharacteristic['almamater'] . ", ";
                 if ($userCharacteristic['speciality'] != "") echo $userCharacteristic['speciality'] . ", ";
                 if ($userCharacteristic['ochnoZaochno'] != "0") echo $userCharacteristic['ochnoZaochno'] . ", ";
-                if ($userCharacteristic['yearOfEnd'] != "") echo "<span style='white-space: nowrap;'>закончил в " . $userCharacteristic['yearOfEnd'] . " году</span>";
-                if ($userCharacteristic['almamater'] == "" && $userCharacteristic['speciality'] == "" && $userCharacteristic['ochnoZaochno'] == "0" && $userCharacteristic['yearOfEnd'] == "") {
-                    echo "закончил";
-                }
+                if ($userCharacteristic['yearOfEnd'] != "") echo "<span style='white-space: nowrap;'>в " . $userCharacteristic['yearOfEnd'] . " году</span>";
             }
             ?>
         </li>
@@ -43,14 +51,17 @@
                 echo "нет";
             }
             if ($userCharacteristic['statusWork'] == "работаю") {
-                if ($userCharacteristic['placeOfWork'] != "") {
-                    echo $userCharacteristic['placeOfWork'] . ", ";
-                }
-                if ($userCharacteristic['workPosition'] != "") {
-                    echo $userCharacteristic['workPosition'];
-                }
                 if ($userCharacteristic['placeOfWork'] == "" && $userCharacteristic['workPosition'] == "") {
                     echo "есть";
+                }
+                if ($userCharacteristic['placeOfWork'] != "" && $userCharacteristic['workPosition'] == "") {
+                    echo $userCharacteristic['placeOfWork'];
+                }
+                if ($userCharacteristic['placeOfWork'] == "" && $userCharacteristic['workPosition'] != "") {
+                    echo $userCharacteristic['workPosition'];
+                }
+                if ($userCharacteristic['placeOfWork'] != "" && $userCharacteristic['workPosition'] != "") {
+                    echo $userCharacteristic['placeOfWork'] . ", " . $userCharacteristic['workPosition'];
                 }
             }
             ?>

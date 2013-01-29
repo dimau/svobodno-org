@@ -38,9 +38,9 @@
             <?php
             // Задаем первоначальные ширины пунктов меню в % в зависимости от того, авторизован пользователь или нет (чтобы при загрузке пункты меню выглядели более-менее равномерно распределенными)
             if ($isLoggedIn) {
-                $width = array(13.08, 32.71, 30.84, 23.37); // ширины для каждого пункта меню определены в соответствии с количеством букв в каждом из них
+                $width = array(13.2, 33.96, 22.64, 30.2); // ширины для каждого пункта меню определены в соответствии с количеством букв в каждом из них
             } else {
-                $width = array(12.07, 31.03, 29.31, 27.58); //
+                $width = array(14.58, 37.5, 25, 22.92); //
             }
 
             // Элемент для выравнивания. С помощью JS при загрузке страницы и при изменении ее размеров всем сепараторам присвоим одинаковую ширину, которая заполнит расстояния между пунктами меню
@@ -63,19 +63,19 @@
             echo "<li class='separator'></li>";
 
             if ($_SERVER['PHP_SELF'] == "/forowner.php") {
-                echo ("<li class='selected choice' style='width:" . $width[2] . "%'><span>Подать объявление</span>");
+                echo ("<li class='selected choice' style='width:" . $width[2] . "%'><span>Собственнику</span>");
             } else {
-                echo ("<li class='choice' style='width:" . $width[2] . "%'><a href='forowner.php'>Подать объявление</a>");
+                echo ("<li class='choice' style='width:" . $width[2] . "%'><a href='forowner.php'>Собственнику</a>");
             }
 
             echo "<li class='separator'></li>";
 
-            if (!$isLoggedIn) { // Пункт меню "Заявка на аренду" выдается только авторизованным пользователям
+            if (!$isLoggedIn) { // Пункт меню "Заявка на аренду" выдается только неавторизованным пользователям
 
                 if ($_SERVER['PHP_SELF'] == "/registration.php") {
-                    echo ("<li class='selected choice' style='width:" . $width[3] . "%'><span>Заявка на аренду</span>");
+                    echo ("<li class='selected choice' style='width:" . $width[3] . "%'><span>Регистрация</span>");
                 } else {
-                    echo ("<li class='choice' style='width:" . $width[3] . "%'><a href='registration.php?typeTenant=true'>Заявка на аренду</a>");
+                    echo ("<li class='choice' style='width:" . $width[3] . "%'><a href='registration.php?typeTenant=true'>Регистрация</a>");
                 }
             }
 

@@ -179,7 +179,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
     <?php echo GlobFunc::getFirstCharUpper($propertyCharacteristic['typeOfObject']) . " по адресу: " . $propertyCharacteristic['address']; ?>
 </div>
 
-<div id="tabs">
+<div id="tabs" class="mainContentBlock">
 <ul>
     <li>
         <a href="#tabs-1">Описание</a>

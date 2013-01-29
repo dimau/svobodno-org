@@ -18,25 +18,25 @@
     <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
-        .simpleBlockForAnyContent {
+        .mainContentBlock {
             margin: 10px 0 10px 0;
             font-size: 0.9em;
             line-height: 2em;
         }
 
-        .simpleBlockForAnyContent .content {
+        .mainContentBlock .content {
             font-size: 1.1em;
             color: #6A9D02;
             font-weight: bold;
         }
 
-        .simpleBlockForAnyContent .setOfInstructions {
+        .mainContentBlock .setOfInstructions {
             float: left;
             margin-left: 15px;
             list-style: none;
         }
 
-        .simpleBlockForAnyContent .setOfInstructions li {
+        .mainContentBlock .setOfInstructions li {
             display: inline-block;
             margin-left: 10px;
             margin-right: 10px;
@@ -71,7 +71,7 @@
         Панель администратора -> <?php echo $strHeaderOfPage; ?>
     </div>
 
-    <div class="simpleBlockForAnyContent">
+    <div class="mainContentBlock">
         <?php foreach ($allPropertiesCharacteristic as $propertyCharacteristic): ?>
         <?php require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminPropertyItem.php"; ?>
         <hr>

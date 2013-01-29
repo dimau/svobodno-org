@@ -68,7 +68,7 @@
         Поможем сдать Вашу недвижимость!
     </div>
 
-    <div class="edited left simpleBlockForAnyContent" style="min-width: 430px;">
+    <div class="edited left mainContentBlock" style="min-width: 430px;">
 
         <?php if (!isset($errors) || (is_array($errors) && count($errors) != 0)): ?>
         <form name="requestFromOwnerForm" id="requestFromOwnerForm" method="post"
@@ -146,7 +146,7 @@
 
     </div>
 
-    <div class="simpleBlockForAnyContent"
+    <div class="mainContentBlock"
          style="float: left; width: 48.5%; min-width: 430px; margin-top: 10px; margin-bottom: 10px; margin-left: 1.4%; text-align: left;">
         <div class="localHeader">
             Что будет дальше?

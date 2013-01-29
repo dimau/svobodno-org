@@ -134,3 +134,28 @@ foreach ($messages as $message) {
         echo $e->getMessage(); //Boring error messages from anything else!
     }
 }
+
+
+<div class="mainContentBlock">
+
+    <ul class="tabsMenu">
+        <li class="tabsMenuItem selected" id="tabsMenuItem1">
+            <a>Арендатору</a>
+        </li>
+        <li class="tabsMenuItem">
+            <a>Собственнику</a>
+        </li>
+    </ul>
+
+    <div class="tabContent" id="tabContent1">
+
+    </div>
+
+    <div class="tabContent" id="tabContent2" style="display: none;">
+
+    </div>
+
+    <div class="clearBoth"></div>
+
+</div>
+<!-- /end.mainContentBlock -->

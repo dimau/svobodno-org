@@ -21,7 +21,6 @@ html {
     font-size: 100%;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
-    font-family: sans-serif;
     color: #222;
 }
 
@@ -69,8 +68,7 @@ img {
 
 a {
     color: #4b9baa;
-    text-decoration: none;
-    border-bottom: 1px dotted;
+    text-decoration: underline;
 }
 
 a:visited {
@@ -79,18 +77,13 @@ a:visited {
 
 a:hover {
     color: #e1465a;
-    border-bottom: 1px solid;
 }
 
 a:focus {
-    /*outline: thin dotted; так как при открытии модального окна без элементов ввода некрасиво выделяется рамочкой первая попавшаяся ссылка */
-    outline: none;
+    outline: none; /*outline: thin dotted; так как при открытии модального окна без элементов ввода некрасиво выделяется рамочкой первая попавшаяся ссылка */
 }
 
-/*
- * На всякий случай, убеждаемся, что св-во outline, задающее внешнюю границу элемента, обнулено
- */
-
+/* На всякий случай, убеждаемся, что св-во outline, задающее внешнюю границу элемента, обнулено */
 a:hover,
 a:active {
     outline: 0;
@@ -141,6 +134,11 @@ ul.listDescriptionSmall .headOfString {
 }
 
 /* Список преимуществ */
+.benefits {
+    margin: 1em 0 0 0;
+    padding: 0 0 0 20px;
+}
+
 .benefits li {
     list-style-image: url(../img/ui-icons_tick.png);
 }
@@ -175,7 +173,7 @@ form {
     margin-right: 0;
     padding: 0.75em;
     border-radius: 5px;
-    border: 1px solid #336784;
+    border: 1px solid #4b9baa;
     text-align: left;
     vertical-align: top;
 }
@@ -201,7 +199,7 @@ form {
 /* Заголовок блока с полями ввода */
 .edited legend {
     font-weight: bold;
-    color: #336784;
+    color: #4b9baa;
     border: 0;
     padding: 0;
     white-space: normal;
@@ -347,7 +345,7 @@ div.notEdited table td {
 }
 
 div.notEdited table tr {
-    border-bottom: 1px dotted #336784;
+    border-bottom: 1px dotted #4b9baa;
 }
 
 /* =============================================================================
@@ -365,10 +363,7 @@ textarea {
     font-size: 100%;
 }
 
-/*
- * Стили для заблокированных элементов ввода
- */
-
+/* Стили для заблокированных элементов ввода */
 button[disabled],
 input[disabled],
 select[disabled],
@@ -377,10 +372,7 @@ textarea[disabled] {
     background-color: #ffffff;
 }
 
-/*
- * 1. Define line-height as normal to match FF3/4 (set using !important in the UA stylesheet)
- */
-
+/* Define line-height as normal to match FF3/4 (set using !important in the UA stylesheet) */
 button,
 input {
     line-height: normal;
@@ -406,27 +398,19 @@ button span {
     white-space: nowrap;
 }
 
-/*
- * Re-set default cursor for disabled elements
- */
-
+/* Re-set default cursor for disabled elements */
 button[disabled],
 input[disabled] {
     cursor: default;
 }
 
-/*
- * Consistent box sizing and appearance
- */
-
+/* Consistent box sizing and appearance */
 input[type="checkbox"],
 input[type="radio"] {
     padding: 0;
 }
 
-/*
- * Remove inner padding and border in FF3/4: h5bp.com/l
- */
+/* Remove inner padding and border in FF3/4: h5bp.com/l */
 
 button::-moz-focus-inner,
 input::-moz-focus-inner {
@@ -476,10 +460,13 @@ button.mainButton:hover {
     border-color: #ff6f00 !important;
 }
 
+/* Кнопки для приобретения тарифов на доступ */
 .buyButton {
     display: inline-block;
     width: 178px;
     height: 177px;
+    padding: 0;
+    border: none;
 }
 
 .buyButton.rooms {
@@ -536,7 +523,7 @@ td, th {
 
 .fotosWrapper:hover {
     cursor: pointer;
-    border: 1px solid #808080;
+    border: 1px solid #e1465a;
     border-radius: 5px;
 }
 
@@ -619,14 +606,6 @@ td, th {
     border-bottom-right-radius: 5px;
 }
 
-/* Простая div-обертка для контента с белым фоном и зеленой рамкой */
-.simpleBlockForAnyContent {
-    border: 2px solid #6A9D02;
-    border-radius: 5px;
-    background-color: #ffffff;
-    padding: 10px;
-}
-
 /* =============================================================================
    ШАПКА СТРАНИЦЫ
    ========================================================================== */
@@ -638,7 +617,6 @@ td, th {
 .logoStripe {
     position: relative;
     height: 66px;
-    padding: 10px 0;
 }
 
 .iconBox {
@@ -660,12 +638,12 @@ td, th {
 }
 
 .amountOfNewMessages {
-    color: red;
+    color: #e1465a;
 }
 
 .localHeader {
-    margin: 10px 0 0 10px;
     font-size: 1.1em;
+    font-weight: bold;
 }
 
 /* =============================================================================
@@ -713,6 +691,7 @@ td, th {
 
 .menu ul li.selected {
     border-bottom: 2px solid white;
+    cursor: default;
 }
 
 .menu ul li.selected span {
@@ -752,13 +731,15 @@ td, th {
 }
 
 .headerOfPageContentBlock {
+    margin-top: 24px;
     position: relative;
 }
 
 .headerOfPage {
-    padding: 6px 0px 6px 0px;
-    font-size: 1.3em;
-    color: #a5c30a;
+    margin: 40px 0 2px 8px; /* Суммарный отступ от главного меню = 48px, из них примерно 8px приходятся на расстояние от верхушки заглавной буквы локального заголовка до верхней границы строки */
+    padding: 0;
+    font-size: 1.1em;
+    color: #000000;
     text-align: left;
 }
 
@@ -773,10 +754,6 @@ td, th {
     min-width: 100px;
     margin-left: 250px;
     margin-bottom: 10px;
-    padding: 5px;
-    border: 2px solid #6A9D02;
-    border-radius: 5px;
-    background-color: #ffffff;
     text-align: left;
 }
 
@@ -799,22 +776,51 @@ td, th {
    БЛОК ДЛЯ ВЫВОДА ИНФОРМАЦИИ НА СТРАНИЦЕ
    ========================================================================== */
 
-/* Удалить - .simpleBlockForAnyContent*/
+/* Блок с белым фоном и округлой серой границей для размещения основной информации страницы */
 .mainContentBlock {
+    padding: 1.2em;
     border: 1px solid #dddddd;
     border-radius: 8px;
     background-color: #ffffff;
-    padding: 1em;
-}
-
-.tabsMenu {
-    font-size: 1em;
-
-}
-
-.tabContent {
     font-size: 0.9em;
 }
+
+/* Список, содержащий заголовки для всех вкладок */
+.tabsMenu {
+    margin: 0 0 1em 0;
+    padding: 0;
+    list-style: none;
+    font-size: 1em;
+}
+
+/* Элемент списка класса tabsMenu - li */
+.tabsMenuItem {
+    display: inline-block;
+    margin: 0 1em 0 0;
+    padding: 0.25em 0.35em;
+    border-radius: 5px;
+    background: none;
+}
+
+/* Выбранный элемент списка класса tabsMenu */
+.tabsMenuItem.selected {
+    background-color: #4b9baa;
+}
+
+.tabsMenuItem a {
+    text-decoration: none;
+    border-bottom: 1px dotted;
+    cursor: pointer;
+}
+
+.tabsMenuItem.selected a {
+    border-bottom: none;
+    cursor: default;
+    color: #ffffff;
+}
+
+/* Содержимое вкладки */
+.tabContent {}
 
 /* =============================================================================
    ДИАЛОГОВОЕ ОКНО НА ОТДЕЛЬНОЙ СТРАНИЦЕ
@@ -823,7 +829,7 @@ td, th {
 .miniBlock {
     width: 600px;
     margin: 80px auto 0% auto;
-    border: 1px solid #336784;
+    border: 1px solid #4b9baa;
     border-radius: 5px;
     text-align: center;
     background-color: white;
@@ -1061,13 +1067,15 @@ td, th {
 /* Стили для выбора режима просмотра объявлений */
 .inUse {
     color: black !important;
+    text-decoration: none;
     border-bottom: none !important;
     cursor: default !important;
 }
 
 /* Стили для список + карта */
 .choiceViewSearchResult {
-    margin: 6px 0px 6px 0px;
+    margin: 16px 0px 6px 8px;
+    font-size: 0.9em;
 }
 
 #resultOnSearchPage {
@@ -1272,7 +1280,7 @@ td, th {
 }
 
 .news {
-    border: 1px solid #336784;
+    border: 1px solid #4b9baa;
     border-radius: 5px;
     padding: 5px;
     margin: 5px;
@@ -1358,31 +1366,67 @@ div.unread > div.newsHeader {
    Исправление jQuery UI проблем
    ====================================================================== */
 
-/* Красивая внешняя граница у блоков с вкладками */
-#tabs {
-    border-color: #a5c30a;
-    border-width: 2px;
-    font-size: 1em;
+/************ Вкладки ***/
+
+/* Свойства класса .tabsMenu */
+.ui-tabs .ui-tabs-nav {
+    margin: 0 0 1em 0 !important;
+    padding: 0 !important;
+    list-style: none;
+    border: none;
+    background: none;
+    font-weight: normal;
 }
 
-/* Оформление аккордеона */
-.accordion {
-    text-align: left;
+/* Свойства класса tabsMenuItem */
+.ui-tabs .ui-tabs-nav li {
+    margin: 0 1em 0 0 !important;
+    padding: 0.25em 0.35em !important;
+    border: none !important;
+    border-radius: 5px;
+    background: none !important;
 }
 
-.accordionContentUnit {
-    font-size: 0.9em;
+/* Свойства класса .tabsMenuItem.selected */
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected {
+    background-color: #4b9baa !important;
 }
 
-/* Не рисуем нижнюю границу у вкладок (как это происходит для обычных ссылок) */
+/* Свойства класса tabsMenuItem a */
 .ui-tabs .ui-tabs-nav li a {
-    border-bottom: none;
+    text-decoration: none !important;
+    border-bottom: 1px dotted !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    font-family: Tahoma, Arial, Verdana, sans-serif !important;
+    font-weight: normal !important;
+    color: #4b9baa !important;
 }
 
-/* Не рисуем нижнюю границу у заголовкой аккордеона (как это происходит для обычных ссылок) */
-.ui-accordion-header a {
-    border-bottom: none;
+/* Дополнительно пришлось явным образом указать цвет ссылки при наведении мышкой */
+.ui-tabs .ui-tabs-nav li a:hover {
+    color: #e1465a !important;
 }
+
+/* Свойства класса .tabsMenuItem.selected a */
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a {
+    border-bottom: none !important;
+    cursor: default !important;
+    color: #ffffff !important;
+}
+
+/* Свойства класса tabContent */
+.ui-tabs .ui-tabs-panel {
+    padding: 0 !important;
+}
+
+/* Если вкладка недоступна, то при наведении мыши, она не должна регаировать */
+.ui-tabs .ui-tabs-nav li.ui-state-disabled a:hover {
+    color: #4b9baa !important;
+    cursor: default !important;
+}
+
+/************ <end> Вкладки ***/
 
 /* Не рисуем нижнюю границу у крестика в модальном окне (которое появляется при нажатии на кнопку "Записаться на просмотр") */
 .ui-dialog-titlebar-close {
@@ -1399,5 +1443,11 @@ div.unread > div.newsHeader {
 }
 
 .ui-datepicker a {
+    text-decoration: none;
     border-bottom: none;
+}
+
+/* Шрифт везде как определено в правилах стиля body */
+.ui-widget {
+    font-family: Tahoma, Arial, Verdana, sans-serif;
 }

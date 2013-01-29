@@ -111,7 +111,7 @@ $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullA
 <div class="headerOfPage">
     Личный кабинет
 </div>
-<div id="tabs">
+<div id="tabs" class="mainContentBlock">
     <ul>
         <li>
             <a href="#tabs-1">Профиль</a>
@@ -126,7 +126,7 @@ $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullA
             <a href="#tabs-3">Мои объявления</a>
         </li>
         <li>
-            <a href="#tabs-4">Поиск</a>
+            <a href="#tabs-4">Условия поиска</a>
         </li>
         <li>
             <a href="#tabs-5">Избранное</a>

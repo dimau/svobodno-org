@@ -5,7 +5,7 @@
             href="registration.php?typeTenant=TRUE">Зарегистрироваться</a></div>
 
     <div class="localHeader">Регистрация позволит:</div>
-    <ul class="benefits" style="text-align: left;">
+    <ul class="benefits">
         <li>
             Записаться на просмотр любой недвижимости
         </li>

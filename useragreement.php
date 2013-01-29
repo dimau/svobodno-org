@@ -58,7 +58,7 @@
 
 <div class="pageWithoutFooter">
 
-<div class="simpleBlockForAnyContent">
+<div class="mainContentBlock" style="margin-top: 2em;">
 <div class="localHeader">
     Пользовательское соглашение
 </div>

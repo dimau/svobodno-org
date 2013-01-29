@@ -23,6 +23,7 @@ $userIncoming = new UserIncoming();
 // Инициализируем используемые в шаблоне(ах) переменные
 $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
 $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
+$userCharacteristic = array("id" => $userIncoming->getId());
 
 // Подсоединяем нужный основной шаблон
 require $_SERVER['DOCUMENT_ROOT'] . "/templates/" . "templ_index.php";

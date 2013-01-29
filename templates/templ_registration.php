@@ -94,16 +94,13 @@
         </div>
 
         <?php if ($userCharacteristic['typeTenant']): ?>
-        <div class="importantAddInfBlock">
+        <div class="importantAddInfBlock mainContentBlock">
             <div class="localHeader">
                 Регистрация позволит бесплатно:
             </div>
             <ul class="benefits">
                 <li>
-                    Записаться на просмотр любой недвижимости
-                </li>
-                <li>
-                    Получать уведомления о появлении подходящих вариантов недвижимости
+                    Получать e-mail уведомления о появлении подходящих вариантов недвижимости
                 </li>
                 <li>
                     Добавлять объявления в избранные и в любой момент просматривать их
@@ -112,6 +109,9 @@
                     Не указывать повторно условия поиска - портал все запомнит
                 </li>
             </ul>
+            <div style="margin-top: 1em;">
+                Кроме того, после регистрации Вы сможете получить премиум доступ к сервису Svobodno.org
+            </div>
         </div>
         <?php endif; ?>
 
@@ -121,7 +121,7 @@
     <form name="personalInformation" id="personalInformationForm" class="formWithFotos" method="post"
           enctype="multipart/form-data"
           action="registration.php?action=registration<?php if ($isAdmin['newAdvertAlien'] && $alienOwner == "true") echo "&alienOwner=true";?><?php if ($isOwner) echo "&typeOwner=true";?><?php if ($isTenant) echo "&typeTenant=true";?>">
-        <div id="tabs">
+        <div id="tabs" class="mainContentBlock">
             <ul>
                 <li>
                     <a href="#tabs-1">Личные данные</a>

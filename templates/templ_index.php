@@ -51,342 +51,193 @@
 
 <div class="pageWithoutFooter">
 
-<?php
+    <?php
 // Сформируем и вставим заголовок страницы
-require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
-?>
+    require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+    ?>
 
-<div class="carousel-container">
-    <div id="carousel">
-        <div class="carousel-feature">
-            <a href="#"><img class="carousel-image" alt="Image Caption"
-                             src="uploaded_files/8/big/8191e133c5de9ac88f6e2044f9fa1492.jpeg"></a>
+    <div class="carousel-container">
+        <div id="carousel">
+            <div class="carousel-feature">
+                <a href="#"><img class="carousel-image" alt="Image Caption"
+                                 src="uploaded_files/8/big/8191e133c5de9ac88f6e2044f9fa1492.jpeg"></a>
 
-            <div class="carousel-caption">
-                <p>
-                    Бесплатно для собственников<br>
-                    Низкая комиссия для арендаторов - 30%
-                </p>
+                <div class="carousel-caption">
+                    <p>
+                        Бесплатно для собственников<br>
+                        Низкая комиссия для арендаторов - 30%
+                    </p>
+                </div>
             </div>
-        </div>
-        <div class="carousel-feature">
-            <a href="#"><img class="carousel-image" alt="Image Caption"
-                             src="uploaded_files/a/big/abc59f61571d0be307c5a055edb26d4b.jpeg"></a>
+            <div class="carousel-feature">
+                <a href="#"><img class="carousel-image" alt="Image Caption"
+                                 src="uploaded_files/a/big/abc59f61571d0be307c5a055edb26d4b.jpeg"></a>
 
-            <div class="carousel-caption">
-                <p>
-                    Находим порядочных арендаторов<br>
-                    Подробные анкеты по каждому претенденту на Вашу недвижимость
-                </p>
+                <div class="carousel-caption">
+                    <p>
+                        Находим порядочных арендаторов<br>
+                        Подробные анкеты по каждому претенденту на Вашу недвижимость
+                    </p>
+                </div>
             </div>
-        </div>
-        <div class="carousel-feature">
-            <a href="#"><img class="carousel-image" alt="Image Caption"
-                             src="uploaded_files/b/big/b5a2f24d0ed2160c95701a94e2d6a72c.jpeg"></a>
+            <div class="carousel-feature">
+                <a href="#"><img class="carousel-image" alt="Image Caption"
+                                 src="uploaded_files/b/big/b5a2f24d0ed2160c95701a94e2d6a72c.jpeg"></a>
 
-            <div class="carousel-caption">
-                <p>
-                    Сдать жилье с нами - просто<br>
-                    Мы составим подробное описание Вашей недвижимости<br>
-                    Мы его опубликуем на всех городских ресурсах<br>
-                    Вам останется только выбрать арендатора
-                </p>
+                <div class="carousel-caption">
+                    <p>
+                        Сдать жилье с нами - просто<br>
+                        Мы составим подробное описание Вашей недвижимости<br>
+                        Мы его опубликуем на всех городских ресурсах<br>
+                        Вам останется только выбрать арендатора
+                    </p>
+                </div>
             </div>
-        </div>
-        <div class="carousel-feature">
-            <a href="#"><img class="carousel-image" alt="Image Caption"
-                             src="uploaded_files/c/big/ccb661a47f3f25dc25ca154234728f62.jpeg"></a>
+            <div class="carousel-feature">
+                <a href="#"><img class="carousel-image" alt="Image Caption"
+                                 src="uploaded_files/c/big/ccb661a47f3f25dc25ca154234728f62.jpeg"></a>
 
-            <div class="carousel-caption">
-                <p>
-                    Ежедневно от 70 до 150 новых объявлений с реальными данными
-                </p>
+                <div class="carousel-caption">
+                    <p>
+                        Ежедневно от 70 до 150 новых объявлений с реальными данными
+                    </p>
+                </div>
             </div>
-        </div>
-        <div class="carousel-feature">
-            <a href="#"><img class="carousel-image" alt="Image Caption"
-                             src="uploaded_files/7/big/70bcdb9e7b9648f145d097ed72c33a28.jpeg"></a>
+            <div class="carousel-feature">
+                <a href="#"><img class="carousel-image" alt="Image Caption"
+                                 src="uploaded_files/7/big/70bcdb9e7b9648f145d097ed72c33a28.jpeg"></a>
 
-            <div class="carousel-caption">
-                <p>
-                    Арендатор оплачивает комиссию только по факту заселения<br>
-                    Работаем с выездом
-                </p>
+                <div class="carousel-caption">
+                    <p>
+                        Арендатор оплачивает комиссию только по факту заселения<br>
+                        Работаем с выездом
+                    </p>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="mainContentBlock">
+    <div id="tabs" class="mainContentBlock">
 
-    <div class="tabsMenu">
-        <ul style="list-style: none; margin: 0 0 1em 0; padding: 0;">
-            <li class="tabsMenuItem" id="tabsMenuItem1"
-                style="display: inline-block; margin-right: 1em; background-color: #4b9baa; color: #ffffff; border-radius: 5px; padding: 0.25em 0.35em;">
-                <a style="color: #ffffff; text-decoration: none; border-bottom: none;">Арендатору</a>
+        <ul class="tabsMenu">
+            <li class="tabsMenuItem">
+                <a href="#tabs-1">Арендатору</a>
             </li>
-            <li class="tabsMenuItem" style="display: inline-block; margin: 0.5em;">
-                <a style="border-bottom: 1px dotted; color: #4b9baa;">Собственнику</a>
-            </li>
+            <!--<li class="tabsMenuItem">
+                <a href="#tabs-2">Собственнику</a>
+            </li>-->
         </ul>
-    </div>
 
-    <div class="tabContent" id="tabContent1">
+        <div id="tabs-1">
+            <div style="width: 49%; float: left;">
+                <p style="margin-top: 0;">
+                    Приветствуем Вас на сайте Svobodno.org! Тем, кто ищет жилье, мы предлагаем пройти 2 простых шага.
+                </p>
 
-        <div style="width: 49%; float: left;">
-            <p style="margin-top: 0;">
-                Приветствуем Вас на сайте Svobodno.org! Тем, кто ищет жилье, мы предлагаем пройти 2 простых шага.
-            </p>
-            <p>
+                <p>
+
                 <div style="font-weight: bold;">
                     1 шаг - Регистрация
                 </div>
                 <div>
-                    Регистрация позволит не только использовать поиск по интересующим Вас параметрам, но и добавлять объявления в избранные. Кроме того, Вы сможете получать e-mail уведомления о новых объектах, которые подходят под Ваши параметры поиска.
+                    Регистрация позволит не только использовать поиск по интересующим Вас параметрам, но и добавлять
+                    объявления в избранные. Кроме того, Вы сможете получать e-mail уведомления о новых объектах, которые
+                    подходят под Ваши условия поиска.
                 </div>
-            </p>
-            <p>
+                </p>
+                <p>
+
                 <div style="font-weight: bold;">
                     2 шаг - Премиум доступ
                 </div>
                 <div>
-                Получив премиум доступ, Вы сможете видеть контакты собственников заинтересовавших Вас объектов. Если объявление первоначально было опубликовано собственником на другом ресурсе, Вы увидите также исходную ссылку. Остальные преимущества премиум доступа перечислены в списке справа.
+                    Получив премиум доступ, Вы сможете видеть контакты собственников заинтересовавших Вас объектов. Если
+                    объявление первоначально было опубликовано собственником на другом ресурсе, Вы увидите также
+                    исходную
+                    ссылку. Остальные преимущества премиум доступа перечислены в списке справа.
                 </div>
-            </p>
-        </div>
-
-        <div style="width: 49%; float: right;">
-            <div>
-                <span style="font-weight: bold;">Преимущества премиум доступа:</span>
-                <ul class="benefits" style="text-align: left; padding: 0 0 0 20px;">
-                    <li>
-                        Автоматический подбор вариантов недвижимости
-                    </li>
-                    <li>
-                        Sms + email оповещение о новых подходящих под условия поиска объектах
-                    </li>
-                    <li>
-                        Избранные объявления (добавление/удаление/просмотр)
-                    </li>
-                    <li>
-                        Автоматическое применение условий поиска при авторизации на сайте
-                    </li>
-                    <li>
-                        Бланки необходимых документов и разъяснения по ним (договор аренды, лист расчетов с
-                        собственником)
-                    </li>
-                    <li>
-                        Техническая поддержка и консультирование по работе сайта
-                    </li>
-                </ul>
+                </p>
             </div>
 
-            <div style="margin-left: 15px;" class="buyButton rooms"></div>
-            <div class="buyButton flats"></div>
+            <div style="width: 49%; float: right;">
+                <div>
+                    <span style="font-weight: bold;">Преимущества премиум доступа:</span>
+                    <ul class="benefits">
+                        <li>
+                            Автоматический подбор вариантов недвижимости
+                        </li>
+                        <li>
+                            Sms + email оповещение о новых подходящих под условия поиска объектах
+                        </li>
+                        <li>
+                            Избранные объявления (добавление/удаление/просмотр)
+                        </li>
+                        <li>
+                            Автоматическое применение условий поиска при авторизации на сайте
+                        </li>
+                        <li>
+                            Бланки необходимых документов и разъяснения по ним (договор аренды, лист расчетов с
+                            собственником, расписка о получении оплаты...)
+                        </li>
+                        <li>
+                            Техническая поддержка и консультирование по работе сайта
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Заранее подгружаем картинки, которые нам понадобятся при наведении мышки на кнопки -->
+                <div style="margin: 1em 0 0 1em;">
+                    <div style="display: none;">
+                        <img src="img/button-380-light.png">
+                        <img src="img/button-480-light.png">
+                    </div>
+                    <form method="post" action="<?php if($isLoggedIn) echo "https://merchant.w1.ru/checkout/default.aspx"; else echo "registration.php";?>" accept-charset="UTF-8" style="display: inline-block;">
+                        <?php if ($isLoggedIn):?>
+                        <input type="hidden" name="WMI_MERCHANT_ID" value="185864873196"/>
+                        <input type="hidden" name="WMI_PAYMENT_AMOUNT" value="380"/>
+                        <input type="hidden" name="WMI_CURRENCY_ID" value="643"/>
+                        <input type="hidden" name="WMI_DESCRIPTION"
+                               value="Оплата доступа к порталу Svobodno.org: все данные по комнатам на 14 дней"/>
+                        <input type="hidden" name="WMI_SUCCESS_URL" value="http://svobodno.org/paymentSuccess.php"/>
+                        <input type="hidden" name="WMI_FAIL_URL" value="http://svobodno.org/paymentFail.php"/>
+                        <input type="hidden" name="WMI_PAYMENT_NO" value="<?php $invoiceNumber = uniqid("", TRUE); echo $invoiceNumber;?>"/>
+                        <input type="hidden" name="userId" value="<?php echo $userCharacteristic['id'];?>"/>
+                        <input type="hidden" name="purchase" value="reviewRooms14d"/>
+                        <!--<input type="hidden" name="WMI_SIGNATURE" value="<?php //echo $signature;?>"/> -->
+                        <?php endif;?>
+                        <button type="submit" class="buyButton rooms"></button>
+                    </form>
+                    <form method="post" action="<?php if($isLoggedIn) echo "https://merchant.w1.ru/checkout/default.aspx"; else echo "registration.php";?>" accept-charset="UTF-8" style="display: inline-block;">
+                        <?php if ($isLoggedIn):?>
+                        <input type="hidden" name="WMI_MERCHANT_ID" value="185864873196"/>
+                        <input type="hidden" name="WMI_PAYMENT_AMOUNT" value="480"/>
+                        <input type="hidden" name="WMI_CURRENCY_ID" value="643"/>
+                        <input type="hidden" name="WMI_DESCRIPTION"
+                               value="Оплата доступа к порталу Svobodno.org: все данные по квартирам на 14 дней"/>
+                        <input type="hidden" name="WMI_SUCCESS_URL" value="http://svobodno.org/paymentSuccess.php"/>
+                        <input type="hidden" name="WMI_FAIL_URL" value="http://svobodno.org/paymentFail.php"/>
+                        <input type="hidden" name="WMI_PAYMENT_NO" value="<?php $invoiceNumber = uniqid("", TRUE); echo $invoiceNumber;?>"/>
+                        <input type="hidden" name="userId" value="<?php echo $userCharacteristic['id'];?>"/>
+                        <input type="hidden" name="purchase" value="reviewFlats14d"/>
+                        <!--<input type="hidden" name="WMI_SIGNATURE" value="<?php //echo $signature;?>"/> -->
+                        <?php endif;?>
+                        <button type="submit" class="buyButton flats"></button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="clearBoth"></div>
+
         </div>
+        <!-- /end.tabs-1 -->
 
-
+        <!--<div id="tabs-2"></div><!-- /end.tabs-2 -->
 
     </div>
+    <!-- /end.tabs -->
 
-    <div class="tabContent" id="tabContent2" style="display: none;">
-        Вы можете опубликовать объявление о своей недвижимости у нас бесплатно
-    </div>
-
-    <div class="clearBoth"></div>
-
-</div>
-<!-- /end.mainContentBlock -->
-
-<script>
-
-</script>
-
-<!--<div id="tabs">
-
-<ul>
-<li>
-  <a href="#tabs-1">Арендатору</a>
-</li>
-<li>
-  <a href="#tabs-2">Собственнику</a>
-</li>
-</ul>
-
-<div id="tabs-1">
-<div class="benefitsBlock" style="width: 49.5%; display: inline-block; vertical-align: top;">
-  <div class="blockHeader">Почему мы - лучший выбор</div>
-  <div class="accordion">
-      <h3><a href="#">Оплата только по факту заселения</a></h3>
-      <div class="accordionContentUnit">
-          <p>
-              Мы не берем никаких авансов за свои услуги. Только после того, как Вы выберете
-              подходящий объект недвижимости, посмотрите его вживую и при нашей поддержке заключите
-              договор аренды с собственником, мы попросим выплатить соответствующую комиссию.
-          </p>
-      </div>
-
-      <h3><a href="#">Низкий размер комиссии</a></h3>
-      <div class="accordionContentUnit">
-          <p>
-              Размер нашей комиссии составляет 30% от месячной стоимости аренды. Это в 2 раза меньше,
-              чем средняя цена на такие услуги в городе (от 50% до 100%).
-          </p>
-      </div>
-
-      <h3><a href="#">Подробная и достоверная информация</a></h3>
-      <div class="accordionContentUnit">
-          <p>
-              Мы стараемся постоянно увеличивать количество подробных качественных объявлений с фотографиями на нашем портале для того, чтобы арендаторы, не выходя из дома, могли получить полное представление о той недвижимости, которая сейчас сдается в городе, а также сознательно выбрать лучшее предложение.
-          </p>
-          <p>
-              Для этого мы сами выезжаем на объекты к собственникам, согласившимся на такую схему работы, и сами формируем объявления.
-          </p>
-          <p>
-              Кроме того, мы публикуем объявления, полученные из баз собственников наших проверенных партнеров. Это гарантирует, что, в отличие от большинства других ресурсов, на нашем портале не будут публиковаться рекламные пустышки.
-          </p>
-      </div>
-
-      <h3><a href="#">Максимальный выбор жилья для аренды в городе</a></h3>
-      <div class="accordionContentUnit">
-          <p>
-              Кроме непосредственной работы с собственниками мы также работаем с базами собствеников от наших партнеров для того, чтобы Вы могли получить максимальный выбор арендного жилья в одном месте.
-          </p>
-          <p>
-              К сожалению, объявления, которые мы получаем от партнеров, далеко не всегда содержат полную информацию, фотографии объекта. Но мы верим, что ради максимального выбора недвижимости эти объявления также должны быть доступны нашим пользователям.
-          </p>
-      </div>
-      <h3><a href="#">Гарантия юридической безопасности сделки</a></h3>
-
-      <div class="accordionContentUnit">
-          <p>
-              При оформлении сделки наши специалисты проверят документы собственника, подтверждающие его право сдавать данную недвижимость, а также предложат договор, четко разграничивающий ответственность сторон (Наймодатель и Наниматель), их права и обязанности.
-          </p>
-          <p>
-              Это позволит Вам обезопасить себя от неправомерных требований собственника, а также, в случае возникновения той или иной неприятной ситуации, связанной с арендуемой недвижимостью, знать что нужно делать и кто несет ответственность.
-          </p>
-      </div>
-  </div>
-</div>
-<!-- /end.benefitsBlock -->
-
-<!--<div class="nextActionBlock"
-       style="width: 49.5%; display: inline-block; vertical-align: top; text-align: center;">
-      <div class="blockHeader">Что дальше?</div>
-      <a class="button mainButton" href="registration.php"><span
-          style="font-size: 1.1em;">Зарегистрируйтесь</span><br><span style="font-size: 0.9em;">и получите новые возможности</span></a>
-      <ul class="benefits" style="text-align: left;">
-          <li>
-              Записаться на просмотр любой недвижимости
-          </li>
-          <li>
-              Получать уведомления о появлении подходящих вариантов недвижимости
-          </li>
-          <li>
-              Добавлять объявления в избранные и в любой момент просматривать их
-          </li>
-          <li>
-              Не указывать повторно условия поиска - портал все запомнит
-          </li>
-      </ul>
-      или воспользуйтесь <a href="search.php">Поиском недвижимости</a>
-  </div>
-
-  <div class="clearBoth"></div>
-</div>
-<!-- /end.tabs-1 -->
-
-<!--<div id="tabs-2">
-  <div class="benefitsBlock"
-       style="width: 49.5%; display: inline-block; vertical-align: top; text-align: center;">
-      <div class="blockHeader">Почему мы - лучший выбор</div>
-      <div class="accordion">
-          <h3><a href="#">Бесплатность услуг</a></h3>
-
-          <div class="accordionContentUnit">
-              <p>
-                  Мы помогаем сдавать недвижимость бесплатно для собственников.
-              </p>
-          </div>
-          <h3><a href="#">Минимум действий – наш сотрудник приедет и все сделает</a></h3>
-
-          <div class="accordionContentUnit">
-              <p>
-                  Мы составим подробное объявление для Вашей недвижимости.
-              </p>
-
-              <p>
-                  Мы опубликуем объявление на всех интернет-ресурсах города для привлечения к нему
-                  максимального внимания потенциальных нанимателей (в том числе, на e1.ru, на 66.ru, на
-                  avito.ru и других ресурсах). Более того, мы ежедневно будем поднимать Ваше объявление в
-                  рейтинге для того, чтобы оно оставалось заметным для наибольшего числа потенциальных
-                  арендаторов. Также подробные данные о Вашей недвижимости будут размещены на нашем
-                  портале.
-              </p>
-          </div>
-          <h3><a href="#">Легко найти порядочных нанимателей</a></h3>
-
-          <div class="accordionContentUnit">
-              <p>
-                  Все арендаторы, желающие посмотреть Ваш объект недвижимости, заполняют на нашем сайте
-                  подробную анкету, которая сразу же передается Вам. Мы просим арендаторов указывать, в
-                  том числе, свои фотографии и ссылки на страницы в социальных сетях (одноклассники, в
-                  контакте, facebook, twitter).
-              </p>
-
-              <p>
-                  Таким образом, Вы сможете заранее составить свое мнение о потенциальном арендаторе и
-                  решить еще до показа: хотите Вы ему сдавать свою недвижимость или нет.
-              </p>
-          </div>
-          <h3><a href="#">Просто сдать недвижимость с первого показа</a></h3>
-
-          <div class="accordionContentUnit">
-              <p>
-                  Так как арендатор заранее подробно ознакомлен с Вашим объектом недвижимости, а Вы
-                  ознакомлены с его данными из анкеты, то с большой долей вероятности первый же показ
-                  закончится заключением договора аренды. Таким образом, Вы экономите свое время и силы
-                  при поиске порядочных нанимателей.
-              </p>
-          </div>
-          <h3><a href="#">Профессиональный договор аренды</a></h3>
-
-          <div class="accordionContentUnit">
-              <p>
-                  Договор аренды будет составлен нашим специалистом с учетом Ваших потребностей и
-                  особенностей Вашей недвижимости на основе шаблона, учитывающего лучшие практики в этой
-                  области.
-              </p>
-          </div>
-          <h3><a href="#">Полный контроль над Вашим объявлением </a></h3>
-
-          <div class="accordionContentUnit">
-              <p>
-                  Начав работать с нами, Вы получите личный кабинет на сайте, который позволит Вам в любой
-                  момент времени самостоятельно редактировать объявление, снимать его с публикации и
-                  наоборот – заново публиковать, а также просматривать анкеты всех потенциальных
-                  арендаторов, которые им заинтересовались.
-              </p>
-          </div>
-      </div>
-  </div>
-
-  <div class="nextActionBlock"
-       style="width: 49.5%; display: inline-block; vertical-align: top; text-align: center;">
-      <div class="blockHeader">Что дальше?</div>
-      <a class="button mainButton" href="forowner.php"><span style="font-size: 1.1em;">Подайте заявку</span><br><span
-              style="font-size: 0.9em;">наш специалист свяжется с Вами</span></a>
-  </div>
-
-  <div class="clearBoth"></div>
-</div>
-<!-- /end.tabs-2 -->
-
-<!--</div>
-<!-- /end.tabs -->
-
-<!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
-<div class="page-buffer"></div>
+    <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
+    <div class="page-buffer"></div>
 </div>
 <!-- /end.pageWithoutFooter -->
 <div class="footer">

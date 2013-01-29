@@ -47,7 +47,7 @@
     <div class="headerOfPage">
         Характеристика пользователя
     </div>
-    <div id="tabs">
+    <div id="tabs" class="mainContentBlock">
         <ul>
             <li>
                 <a href="#tabs-1">Профиль</a>

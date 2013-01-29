@@ -1,4 +1,4 @@
-<div class="simpleBlockForAnyContent">
+<div class="mainContentBlock">
     <?php require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminUserItem.php";?>
 
     <hr>

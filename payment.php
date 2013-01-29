@@ -1,9 +1,5 @@
 <?php
-
-$cost = "130.00";
 $invoiceNumber = uniqid("", TRUE); // уникальный идентификатор заказа - строка длиной в 23 символа
-$userId = 1;
-$purchase = "reviewRooms14d";
 ?>
 
 <form method="post" action="https://merchant.w1.ru/checkout/default.aspx" accept-charset="UTF-8">

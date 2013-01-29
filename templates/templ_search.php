@@ -77,7 +77,7 @@
     <div class="headerOfPage">
         Приятного поиска!
     </div>
-    <div id="tabs">
+    <div id="tabs" class="mainContentBlock" style="border: 2px solid #4b9baa;">
         <ul>
             <li>
                 <a href="#tabs-1">Быстрый поиск</a>
@@ -92,10 +92,10 @@
 								<select name="typeOfObjectFast" id="typeOfObjectFast">
                                     <option value="0" <?php if ($userSearchRequest['typeOfObject'] == "0") echo "selected";?>></option>
                                     <option value="квартира" <?php if ($userSearchRequest['typeOfObject'] == "квартира") echo "selected";?>>
-                                        квартира
+                                        квартиру
                                     </option>
                                     <option value="комната" <?php if ($userSearchRequest['typeOfObject'] == "комната") echo "selected";?>>
-                                        комната
+                                        комнату
                                     </option>
                                     <option value="дом" <?php if ($userSearchRequest['typeOfObject'] == "дом") echo "selected";?>>
                                         дом,
@@ -105,7 +105,7 @@
                                         таунхаус
                                     </option>
                                     <option value="дача" <?php if ($userSearchRequest['typeOfObject'] == "дача") echo "selected";?>>
-                                        дача
+                                        дачу
                                     </option>
                                     <option value="гараж" <?php if ($userSearchRequest['typeOfObject'] == "гараж") echo "selected";?>>
                                         гараж
