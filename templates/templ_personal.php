@@ -282,7 +282,7 @@ $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullA
 </div>
 <!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2013 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
+    2013 г. Если нужна помощь или хочется оставить отзыв (пожелание) на сервис Svobodno.org, свяжитесь с нами по телефону: 8-922-160-95-14, или e-mail:
     support@svobodno.org
 </div>
 <!-- /end.footer -->

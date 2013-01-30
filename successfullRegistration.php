@@ -8,6 +8,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Payment.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 
 // Удалось ли подключиться к БД?
@@ -34,6 +35,7 @@ if (isset($_SESSION['url_initial']) && preg_match('~^((http://svobodno.org)|(htt
 // Инициализируем используемые в шаблоне(ах) переменные
 $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
 $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
+$userCharacteristic = array("id" => $userIncoming->getId());
 //$url_initial
 
 // Подсоединяем нужный основной шаблон

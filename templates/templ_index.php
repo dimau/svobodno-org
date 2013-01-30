@@ -52,8 +52,7 @@
 <div class="pageWithoutFooter">
 
     <?php
-// Сформируем и вставим заголовок страницы
-    require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+        require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
     ?>
 
     <div class="carousel-container">
@@ -175,54 +174,20 @@
                         <li>
                             Автоматическое применение условий поиска при авторизации на сайте
                         </li>
-                        <li>
+                        <!--<li>
                             Бланки необходимых документов и разъяснения по ним (договор аренды, лист расчетов с
                             собственником, расписка о получении оплаты...)
-                        </li>
+                        </li>-->
                         <li>
                             Техническая поддержка и консультирование по работе сайта
                         </li>
                     </ul>
                 </div>
 
-                <!-- Заранее подгружаем картинки, которые нам понадобятся при наведении мышки на кнопки -->
                 <div style="margin: 1em 0 0 1em;">
-                    <div style="display: none;">
-                        <img src="img/button-380-light.png">
-                        <img src="img/button-480-light.png">
-                    </div>
-                    <form method="post" action="<?php if($isLoggedIn) echo "https://merchant.w1.ru/checkout/default.aspx"; else echo "registration.php";?>" accept-charset="UTF-8" style="display: inline-block;">
-                        <?php if ($isLoggedIn):?>
-                        <input type="hidden" name="WMI_MERCHANT_ID" value="185864873196"/>
-                        <input type="hidden" name="WMI_PAYMENT_AMOUNT" value="380"/>
-                        <input type="hidden" name="WMI_CURRENCY_ID" value="643"/>
-                        <input type="hidden" name="WMI_DESCRIPTION"
-                               value="Оплата доступа к порталу Svobodno.org: все данные по комнатам на 14 дней"/>
-                        <input type="hidden" name="WMI_SUCCESS_URL" value="http://svobodno.org/paymentSuccess.php"/>
-                        <input type="hidden" name="WMI_FAIL_URL" value="http://svobodno.org/paymentFail.php"/>
-                        <input type="hidden" name="WMI_PAYMENT_NO" value="<?php $invoiceNumber = uniqid("", TRUE); echo $invoiceNumber;?>"/>
-                        <input type="hidden" name="userId" value="<?php echo $userCharacteristic['id'];?>"/>
-                        <input type="hidden" name="purchase" value="reviewRooms14d"/>
-                        <!--<input type="hidden" name="WMI_SIGNATURE" value="<?php //echo $signature;?>"/> -->
-                        <?php endif;?>
-                        <button type="submit" class="buyButton rooms"></button>
-                    </form>
-                    <form method="post" action="<?php if($isLoggedIn) echo "https://merchant.w1.ru/checkout/default.aspx"; else echo "registration.php";?>" accept-charset="UTF-8" style="display: inline-block;">
-                        <?php if ($isLoggedIn):?>
-                        <input type="hidden" name="WMI_MERCHANT_ID" value="185864873196"/>
-                        <input type="hidden" name="WMI_PAYMENT_AMOUNT" value="480"/>
-                        <input type="hidden" name="WMI_CURRENCY_ID" value="643"/>
-                        <input type="hidden" name="WMI_DESCRIPTION"
-                               value="Оплата доступа к порталу Svobodno.org: все данные по квартирам на 14 дней"/>
-                        <input type="hidden" name="WMI_SUCCESS_URL" value="http://svobodno.org/paymentSuccess.php"/>
-                        <input type="hidden" name="WMI_FAIL_URL" value="http://svobodno.org/paymentFail.php"/>
-                        <input type="hidden" name="WMI_PAYMENT_NO" value="<?php $invoiceNumber = uniqid("", TRUE); echo $invoiceNumber;?>"/>
-                        <input type="hidden" name="userId" value="<?php echo $userCharacteristic['id'];?>"/>
-                        <input type="hidden" name="purchase" value="reviewFlats14d"/>
-                        <!--<input type="hidden" name="WMI_SIGNATURE" value="<?php //echo $signature;?>"/> -->
-                        <?php endif;?>
-                        <button type="submit" class="buyButton flats"></button>
-                    </form>
+                    <?php
+                    require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_paymentButtons.php";
+                    ?>
                 </div>
             </div>
 
@@ -241,7 +206,7 @@
 </div>
 <!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2013 г. Вопросы и пожелания по работе портала можно передавать по телефону: 8-922-160-95-14, e-mail:
+    2013 г. Если нужна помощь или хочется оставить отзыв (пожелание) на сервис Svobodno.org, свяжитесь с нами по телефону: 8-922-160-95-14, или e-mail:
     support@svobodno.org
 </div>
 <!-- /end.footer -->

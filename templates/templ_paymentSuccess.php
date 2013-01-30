@@ -5,48 +5,27 @@
     <!-- meta -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="Content-language" content="ru">
-    <meta name="description" content="Админка">
+    <meta name="description" content="Успешная оплата">
     <!-- Если у пользователя IE: использовать последний доступный стандартный режим отображения независимо от <!DOCTYPE> -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <!-- Оптимизация отображения на мобильных устройствах -->
     <!--<meta name="viewport" content="initialscale=1.0, width=device-width">-->
     <!-- end meta -->
 
-    <title>Админка: Заявки на просмотр</title>
+    <title>Успешная оплата</title>
 
     <!-- CSS -->
     <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
-        .mainContentBlock {
-            margin: 10px 0 10px 0;
-            font-size: 0.9em;
-            line-height: 2em;
+        .miniBlockContent {
+            text-align: center;
         }
 
-        .mainContentBlock .content {
-            font-size: 1.1em;
-            color: #6A9D02;
-            font-weight: bold;
-        }
-
-        .mainContentBlock .setOfInstructions {
-            float: left;
-            margin-left: 15px;
-            list-style: none;
-        }
-
-        .mainContentBlock .setOfInstructions li {
+        .miniBlockContent .text {
             display: inline-block;
-            margin-left: 10px;
-            margin-right: 10px;
-            font-size: 1em;
-        }
-
-            /* Используется для выделения описания той заявки на просмотр, что интересует админа */
-        .highlightedBlock {
-            padding: 5px;
-            border: 2px solid red;
+            text-align: center;
+            line-height: normal;
         }
     </style>
     <!-- end CSS -->
@@ -67,15 +46,36 @@
 <body>
 <div class="pageWithoutFooter">
 
-    <div class="headerOfPage">
-        Панель администратора -> Все заявки на просмотр со статусом "<?php echo $action;?>"
-    </div>
+    <?php
+    // Сформируем и вставим заголовок страницы
+    require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+    ?>
 
-    <div class="mainContentBlock">
-        <?php foreach ($allRequestsToView as $requestToView): ?>
-        <?php require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminRequestToViewDetailedItem.php"; ?>
-        <hr>
-        <?php endforeach; ?>
+    <div class="miniBlock">
+        <div class="miniBlockHeader">
+            Успешная оплата доступа к сервису Svobodno.org!
+        </div>
+        <div class="miniBlockContent">
+            <div class="text">
+                <p style="text-align: left;">
+                    Вам удалось успешно оплатить доступ к сервису Svobodno.org, мы благодарны Вам за то, что Вы выбрали наш сервис!
+                </p>
+
+                <p style="text-align: left;">
+                    Скорее всего, через несколько минут Вам автоматически откроется оплаченный доступ. Мы сообщим об этом по смс.
+                </p>
+
+                <p style="text-align: left;">
+                    Если оплаченный доступ не будет открыт в течение дня, обязательно сообщите об этом нам в техническую поддержку (8-922-160-95-14, email:
+                    support@svobodno.org).
+                </p>
+
+                <p style="text-align: left;">
+                    Ну а пока воспользуйтесь <a href="search.php">Поиском недвижимости</a>, добавив в избранные интересующие Вас объявления.
+                </p>
+            </div>
+        </div>
+        <div style="clear:both;"></div>
     </div>
 
     <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
@@ -90,7 +90,6 @@
 
 <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
 <script src="js/main.js"></script>
-<script src="js/admin.js"></script>
 <!-- end scripts -->
 
 </body>

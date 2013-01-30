@@ -112,19 +112,19 @@ class Payment {
         return TRUE;
     }
 
-    //TODO: доделать!
-    public function generateSignature() {
+    // Функция генерирует подпись к параметрам, указанным в форме оплаты. Параметры берутся непосредственно те, что указаны в форме, а не значения например переменных данного класса
+    // TODO: сейчас не используется
+    public function generateSignature($params) {
 
         // Собираем поля формы в ассоциативный массив
         $fields = array();
-        $fields["WMI_MERCHANT_ID"] = "119175088534";
-        $fields["WMI_PAYMENT_AMOUNT"] = "100.00";
-        $fields["WMI_CURRENCY_ID"] = "643";
-        $fields["WMI_PAYMENT_NO"] = "12345-001";
+        $fields["WMI_MERCHANT_ID"] = $params[''];
+        $fields["WMI_PAYMENT_AMOUNT"] = $params[''];
+        $fields["WMI_CURRENCY_ID"] = $params[''];
+        $fields["WMI_PAYMENT_NO"] = $params[''];
         $fields["WMI_DESCRIPTION"] = "BASE64:" . base64_encode("Payment for order #12345-001 in MYSHOP.com");
-        $fields["WMI_EXPIRED_DATE"] = "2019-12-31T23:59:59";
-        $fields["WMI_SUCCESS_URL"] = "https://myshop.com/w1/success.php";
-        $fields["WMI_FAIL_URL"] = "https://myshop.com/w1/fail.php";
+        $fields["WMI_SUCCESS_URL"] = $params[''];
+        $fields["WMI_FAIL_URL"] = $params[''];
         $fields["MyShopParam1"] = "Value1"; // Дополнительные параметры
         $fields["MyShopParam2"] = "Value2"; // интернет-магазина тоже участвуют
         $fields["MyShopParam3"] = "Value3"; // при формировании подписи!

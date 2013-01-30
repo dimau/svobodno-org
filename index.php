@@ -8,6 +8,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Payment.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 
 // Удалось ли подключиться к БД?

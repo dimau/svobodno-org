@@ -828,16 +828,20 @@ td, th {
 
 .miniBlock {
     width: 600px;
-    margin: 80px auto 0% auto;
-    border: 1px solid #4b9baa;
+    margin: 80px auto 0 auto;
+    border: 1px solid #dddddd;
     border-radius: 5px;
-    text-align: center;
     background-color: white;
+    font-size: 0.9em;
+    text-align: center;
 }
 
 .miniBlockHeader {
+    border: 1px solid #a5c30a;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
     line-height: 2em;
-    background-color: #6A9D02;
+    background-color: #a5c30a;
     color: white;
     text-align: center;
 }
