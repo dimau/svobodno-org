@@ -29,7 +29,6 @@ class MessageNewProperty {
 
     /**
      * КОНСТРУКТОР
-     *
      * Если в качестве параметра конструктора не указан id существующего уведомления, то конструктор инициализирует параметры объекта пустыми значениями.
      * Если объект создается под существующее уведомление, то нужно сразу указать id этого уведомления (в параметрах конструктора)
      * @param $messageId - идентификатор существующего (записанного ранее в БД) уведомления класса "Новый подходящий объект недвижимости"
@@ -57,7 +56,7 @@ class MessageNewProperty {
         if ($this->id != "") {
             if (!DBconnect::updateMessageNewProperty($this->getParams())) return FALSE;
         } else {
-            if (!DBconnect::insertMessageNewProperty($this->getParams())) return FALSE;
+            if (!DBconnect::insertMessageNewProperty($this->getParams(), NULL)) return FALSE;
         }
 
         return TRUE;

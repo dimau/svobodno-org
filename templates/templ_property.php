@@ -37,27 +37,6 @@
             margin-bottom: 0;
         }
 
-            /* Стиль блока с информацией о текущем статусе Заявки на просмотр */
-        .signUpToViewStatusBlock {
-            display: inline-block;
-            border: 2px solid #ff6f00;
-            border-radius: 5px;
-            padding: 5px 8px 5px 8px;
-            text-align: center;
-        }
-
-        .signUpToViewStatusBlock.inProgress,
-        .signUpToViewStatusBlock.confirmed {
-            color: #6A9D02;
-            font-weight: bold;
-        }
-
-        .signUpToViewStatusBlock.error,
-        .signUpToViewStatusBlock.failure {
-            color: red;
-            font-weight: bold;
-        }
-
         .furnitureList {
             margin: 0;
             padding: 0;
@@ -92,7 +71,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
 <script>
     $(document).ready(function () {
 
-        $("#signUpToViewDialog").dialog({
+        $("#getOwnerContactsDialog").dialog({
             autoOpen:false,
             modal:true,
             width:600,
@@ -100,12 +79,26 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
             draggable:true
         });
 
-        $(".signUpToViewButton").click(function () {
-            $("#signUpToViewDialog").dialog("open");
-        });
-
-        $("#signUpToViewDialogCancel").on('click', function () {
-            $("#signUpToViewDialog").dialog("close");
+        $(".getOwnerContactsButton").click(function () {
+            // Узнаем - заготовлено ли диалоговое окно на случай клика
+            var getOwnerContactsDialog = $("#getOwnerContactsDialog");
+            if (getOwnerContactsDialog.length == 1) {
+                getOwnerContactsDialog.dialog("open");
+            } else {
+                jQuery.post("AJAXGetPropertyData.php", {"propertyId":propertyId}, function (data) {
+                    if (data.access == "successful") {
+                        // Добавляем на страницу полученные с сервера данные о собственнике
+                        if (data.name != "") $(".ownerContactsName").html(data.name + " " + data.secondName);
+                        if (data.contactTelephonNumber != "") $(".ownerContactsTelephon").html(data.contactTelephonNumber);
+                        if (data.sourceOfAdvert != "") {
+                            $(".ownerContactsSourceOfAdvert a.ownerContactsSourceOfAdvertHref").html("Источник объявления").attr("href", data.sourceOfAdvert);
+                        }
+                        // Прячем кнопку запроса контактов собственника, показываем полученные данные
+                        $(".ownerContacts").css("display", "");
+                        $(".getOwnerContactsButton").css("display", "none");
+                    }
+                }, 'json');
+            }
         });
 
     });
@@ -197,10 +190,12 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
     ?>
 
     <ul class="setOfInstructions">
-        <?php
-        /* Пункт меню о Заявке на просмотр */
-        require $_SERVER['DOCUMENT_ROOT'] . "/templates/signUpToViewBlocks/templ_signUpToViewItem.php";
-        ?>
+        <li>
+            <?php
+                /* Контакты собственника */
+                require $_SERVER['DOCUMENT_ROOT'] . "/templates/getOwnerContactsBlocks/templ_getOwnerContactsItem.php";
+            ?>
+        </li>
         <li>
             <?php
             echo View::getHTMLforFavorites($propertyCharacteristic["id"], $favoritePropertiesId, "stringWithIcon");
@@ -218,13 +213,6 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
     <div class="clearBoth"></div>
 
 </div>
-
-<?php
-// Подключаем нужное модальное окно для Запроса на просмотр
-if ($isLoggedIn === FALSE) require $_SERVER['DOCUMENT_ROOT'] . "/templates/signUpToViewBlocks/templ_signUpToViewDialog_ForLoggedOut.php";
-if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] !== TRUE) require $_SERVER['DOCUMENT_ROOT'] . "/templates/signUpToViewBlocks/templ_signUpToViewDialog_ForOwner.php";
-if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require $_SERVER['DOCUMENT_ROOT'] . "/templates/signUpToViewBlocks/templ_signUpToViewDialog_ForTenant.php";
-?>
 
 <div class="objectDescription">
 
@@ -807,17 +795,6 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
         </tr>
             <?php endif; ?>
 
-        <?php if ($isAdmin['searchUser']): ?>
-        <tr>
-            <td colspan="2">
-                Источник:
-                <a href="<?php echo $propertyCharacteristic['sourceOfAdvert']; ?>">
-                    <?php echo $propertyCharacteristic['sourceOfAdvert']; ?>
-                </a>
-            </td>
-        </tr>
-            <?php endif; ?>
-
         </tbody>
     </table>
 </div>
@@ -825,28 +802,10 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
 <div class="clearBoth"></div>
 </div>
 </div>
+
 <div id="tabs-2">
     <!-- Карта Яндекса -->
     <div id="mapForAdvertView" style="width: 50%; min-width: 300px; height: 400px; float: left;"></div>
-
-    <ul class="setOfInstructions">
-        <?php
-        /* Оформляем пункт меню о Заявке на просмотр */
-        require $_SERVER['DOCUMENT_ROOT'] . "/templates/signUpToViewBlocks/templ_signUpToViewItem.php";
-        ?>
-        <li>
-            <?php
-            echo View::getHTMLforFavorites($propertyCharacteristic["id"], $favoritePropertiesId, "stringWithIcon");
-            ?>
-        </li>
-        <!-- TODO: добавить функциональность!
-		<li>
-			<a href="#"> отправить по e-mail</a>
-		</li>
-		<li>
-			<a href="#"> похожие объявления</a>
-		</li>-->
-    </ul>
 
     <div class="notEdited right">
         <input type="hidden" name="coordX"
@@ -894,6 +853,16 @@ if ($isLoggedIn === TRUE && $userCharacteristic['typeTenant'] === TRUE) require 
 // Модальное окно для незарегистрированных пользователей, которые нажимают на кнопку добавления в Избранное
 if ($isLoggedIn === FALSE) require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_addToFavotitesDialog_ForLoggedOut.php";
 ?>
+<?php
+// Подключаем нужное модальное окно для Запроса на получение контактов собственника
+if ($isLoggedIn === FALSE) {
+    require $_SERVER['DOCUMENT_ROOT'] . "/templates/getOwnerContactsBlocks/templ_getOwnerContactsDialog_ForLoggedOut.php";
+}
+if (($isLoggedIn === TRUE && $propertyCharacteristic['typeOfObject'] == "комната" && $userCharacteristic['reviewRooms'] < time()) OR
+    ($isLoggedIn === TRUE && $propertyCharacteristic['typeOfObject'] == "квартира" && $userCharacteristic['reviewFlats'] < time())) {
+    require $_SERVER['DOCUMENT_ROOT'] . "/templates/getOwnerContactsBlocks/templ_getOwnerContactsDialog_ForPayNo.php";
+}
+?>
 
 <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
 <div class="page-buffer"></div>
@@ -910,6 +879,7 @@ if ($isLoggedIn === FALSE) require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ
     var typeTenant = <?php if ($userCharacteristic['typeTenant']) echo "true"; else echo "false"; // Является ли регистрируемый пользователь арендатором ?>;
     var typeOwner = <?php if ($userCharacteristic['typeOwner']) echo "true"; else echo "false"; // Является ли регистрируемый пользователь собственником ?>;
     var isLoggedIn = <?php if ($isLoggedIn) echo "true"; else echo "false"; // Авторизованный ли пользователь к нам пришел ?>;
+    var propertyId = <?php echo $propertyCharacteristic['id']; // Идентификатор объекта недвижимости, чье описание мы смотрим ?>;
 </script>
 <!-- end scripts -->
 

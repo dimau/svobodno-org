@@ -36,7 +36,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Property.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/RequestToView.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
 
 // Удалось ли подключиться к БД?
@@ -48,15 +47,8 @@ $userIncoming = new UserIncoming();
 // Уточняем - имеет ли пользователь права админа.
 $isAdmin = $userIncoming->isAdmin();
 
-// Инициализируем модель запроса на просмотр данного объекта данным пользователем.
-// Если он уже записался на просмотр, то в модели будут содержаться данные его запроса (время, комментарий...)
-$signUpToView = new RequestToView($userIncoming->getId(), $propertyId);
+// TODO: узнаем - отправлял ли ранее пользователь заявку на получение контактов по этому объявлению
 
-// Инициализируем переменную для хранения информации об успешности/неуспешности отправки запроса на просмотр в БД
-$statusOfSaveParamsToDB = NULL;
-
-// Инициализируем массив для хранения данных об ошибках валидации формы запроса на просмотр
-$errors = array();
 
 /*************************************************************************************
  * Получаем данные объявления для просмотра, а также другие данные из БД
@@ -97,33 +89,6 @@ if ($property->getStatus() == "не опубликовано"
     exit();
 }
 
-/************************************************************************************
- * НОВЫЙ ЗАПРОС НА ПРОСМОТР. Если пользователь отправил форму запроса на просмотр объекта
- ***********************************************************************************/
-
-if ($action == "signUpToView") {
-
-    $signUpToView->writeParamsFromPOST();
-    $errors = $signUpToView->isParamsCorrect();
-    $statusOfSaveParamsToDB = $signUpToView->saveParamsToDB(); // вне зависимости от полноты заполнения формы (корректности) она будет отправлена на сервер и обработана. Это решение связано с тем, что сложно отобразить на клиенте пользователю - что он не заполнил поле в модальном окне, лень это реализовывать
-
-    // Оповестим операторов о появлении новой заявки на просмотр
-    if ($statusOfSaveParamsToDB) {
-
-        $subject = 'Заявка на просмотр: ' . $property->getAddress();
-
-        $msgHTML = "Поступила новая заявка на просмотр:<br>
-        Дата: " . date('d.m.Y H:i') . "<br>
-        Кто: " . $userIncoming->getSurname() . " " . $userIncoming->getName() . " " . $userIncoming->getSecondName() . "<br>
-        Объект: " . $property->getAddress() . "<br>
-        <a href='http://svobodno.org/adminAllRequestsToView.php?action=Новая'>Все новые заявки на просмотр</a>";
-
-        GlobFunc::sendEmailToOperator($subject, $msgHTML);
-    }
-
-    //TODO: новость для собственника о новом претенденте
-}
-
 /********************************************************************************
  * ФОРМИРОВАНИЕ ПРЕДСТАВЛЕНИЯ (View)
  *******************************************************************************/
@@ -131,17 +96,15 @@ if ($action == "signUpToView") {
 // Инициализируем используемые в шаблоне(ах) переменные
 $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
 $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
-$userCharacteristic = array('typeTenant' => $userIncoming->isTenant(), 'typeOwner' => $userIncoming->isOwner(), 'name' => $userIncoming->getName(), 'secondName' => $userIncoming->getSecondName(), 'surname' => $userIncoming->getSurname(), 'telephon' => $userIncoming->getTelephon()); // Но для данной страницы данный массив содержит только имя, отчество, фамилию, телефон пользователя
+$userCharacteristic = array('id' => $userIncoming->getId(), 'typeTenant' => $userIncoming->isTenant(), 'typeOwner' => $userIncoming->isOwner(), 'name' => $userIncoming->getName(), 'secondName' => $userIncoming->getSecondName(), 'surname' => $userIncoming->getSurname(), 'telephon' => $userIncoming->getTelephon(), 'reviewRooms' => $userIncoming->getReviewRooms(), 'reviewFlats' => $userIncoming->getReviewFlats()); // Но для данной страницы данный массив содержит только имя, отчество, фамилию, телефон пользователя
 $propertyCharacteristic = $property->getCharacteristicData();
 $propertyFotoInformation = $property->getFotoInformationData();
 $favoritePropertiesId = $userIncoming->getFavoritePropertiesId();
-$signUpToViewData = $signUpToView->getParams(); // Используется в templ_signUpToViewItem.php
 $furnitureInLivingArea = $property->getFurnitureInLivingAreaAll();
 $furnitureInKitchen = $property->getFurnitureInKitchenAll();
 $appliances = $property->getAppliancesAll();
-//$statusOfSaveParamsToDB // Используется в templ_signUpToViewItem.php
-//$errors
 //$isAdmin
+//TODO: передавать параметр - смотрел ли данный пользовтаель ранее контакты собственника
 
 // Подсоединяем нужный основной шаблон
 require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_property.php";

@@ -75,15 +75,10 @@
                 Пользователь не ищет недвижимость в данный момент
             </div>
             <?php endif;?>
-            <?php if ($userSearchRequest != FALSE): ?>
-            <div class="shadowText">
-                Какого рода недвижимость ищет данный пользователь
-            </div>
             <?php
             // Шаблон для представления нередактируемых параметров поисковго запроса пользователя
-            require $_SERVER['DOCUMENT_ROOT'] . "/templates/notEditableBlocks/templ_notEditedSearchRequest.php";
+            if ($userSearchRequest != FALSE) require $_SERVER['DOCUMENT_ROOT'] . "/templates/notEditableBlocks/templ_notEditedSearchRequest.php";
             ?>
-            <?php endif;?>
         </div>
         <!-- /end.tabs-2 -->
     </div>

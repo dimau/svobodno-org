@@ -76,9 +76,6 @@ class Property {
     private $last_act = "";
     private $reg_date = "";
     private $status = "";
-    private $earliestDate = "";
-    private $earliestTimeHours = "";
-    private $earliestTimeMinutes = "";
     private $adminComment = "";
     private $completeness = "";
     private $sourceOfAdvert = "";
@@ -633,9 +630,6 @@ class Property {
         if (isset($_POST['timeForRingEnd'])) $this->timeForRingEnd = htmlspecialchars($_POST['timeForRingEnd'], ENT_QUOTES);
         if (isset($_POST['checking'])) $this->checking = htmlspecialchars($_POST['checking'], ENT_QUOTES);
         if (isset($_POST['comment'])) $this->comment = htmlspecialchars($_POST['comment'], ENT_QUOTES);
-        if (isset($_POST['earliestDate']) && $mode == "full") $this->earliestDate = htmlspecialchars($_POST['earliestDate'], ENT_QUOTES);
-        if (isset($_POST['earliestTimeHours']) && $mode == "full") $this->earliestTimeHours = htmlspecialchars($_POST['earliestTimeHours'], ENT_QUOTES);
-        if (isset($_POST['earliestTimeMinutes']) && $mode == "full") $this->earliestTimeMinutes = htmlspecialchars($_POST['earliestTimeMinutes'], ENT_QUOTES);
         if (isset($_POST['adminComment']) && $mode == "full") $this->adminComment = htmlspecialchars($_POST['adminComment'], ENT_QUOTES);
         if (isset($_POST['sourceOfAdvert']) && $mode == "full") $this->sourceOfAdvert = htmlspecialchars($_POST['sourceOfAdvert'], ENT_QUOTES);
     }
@@ -719,9 +713,6 @@ class Property {
         $result['last_act'] = $this->last_act;
         $result['reg_date'] = $this->reg_date;
         $result['status'] = $this->status;
-        $result['earliestDate'] = $this->earliestDate;
-        $result['earliestTimeHours'] = $this->earliestTimeHours;
-        $result['earliestTimeMinutes'] = $this->earliestTimeMinutes;
         $result['adminComment'] = $this->adminComment;
         $result['completeness'] = $this->completeness;
         $result['ownerLogin'] = $this->ownerLogin;
@@ -1417,51 +1408,6 @@ class Property {
     }
 
     /**
-     * Устанавливает или меняет ближайшую дату просмотра у данного объекта.
-     * Но метод не сохраняет данные в БД - для этого нужно вызвать $this->saveCharacteristicToDB
-     * @param $earliestDate - новая дата просмотра в формате: 27.01.1987
-     * @param $earliestTimeHours - новый час просмотра в 24-х часовом формате
-     * @param $earliestTimeMinutes - новые минуты просмотра (от 0 до 59)
-     * @return bool - возвращает TRUE в случае успеха и FALSE в случае, если дата просмотра в БД не была изменена по каким-либо причинам
-     */
-    public function changeEarliestDate($earliestDate, $earliestTimeHours, $earliestTimeMinutes) {
-
-        // Валидация наличия входящих данных
-        if (!isset($earliestDate) OR
-            !isset($earliestTimeHours) OR
-            !isset($earliestTimeMinutes)
-        ) {
-            return FALSE;
-        }
-
-        // Если переданы пустые значения, то нужно сбросить дату/время ближайшего просмотра (это нормальный рабочий вариант входящих значений)
-        // Если переданы не пустые значения - хорошень их провалидируем
-        if ($earliestDate != "" || $earliestTimeHours != "" || $earliestTimeMinutes != "") {
-
-            // Преобразование входящих данных
-            $earliestDate = GlobFunc::dateFromDBToView(GlobFunc::dateFromViewToDB($earliestDate)); // Такое преобразование позволяет убедиться в том, что дата по формату соответствует всем критериям
-
-            // Валидация достоверности входящих данных
-            if ($earliestDate == "0000-00-00" OR
-                $earliestDate == "" OR
-                $earliestTimeHours < "00" OR
-                $earliestTimeHours > "23" OR
-                $earliestTimeMinutes < "00" OR
-                $earliestTimeMinutes > "59"
-            ) {
-                return FALSE;
-            }
-        }
-
-        // Изменим параметры даты и времени ближайшего просмотра
-        $this->earliestDate = $earliestDate;
-        $this->earliestTimeHours = $earliestTimeHours;
-        $this->earliestTimeMinutes = $earliestTimeMinutes;
-
-        return TRUE;
-    }
-
-    /**
      * Снимает с публикации объявление (для чужих объявлений - переносит в архивную базу)
      *     1. Изменить статус объекта на "не опубликовано" в БД
      *     2. Очистить дату и время ближайшего показа в БД
@@ -1477,14 +1423,8 @@ class Property {
         // Валидация начальных данных
         if ($this->id == "" || $this->status == "" || $this->completeness == "") return array("Не удалось снять с публикации объявление: недостаточно данных. Попробуйте повторить немного позже или свяжитесь с нами: 8-922-160-95-14");
 
-        // Если по объекту назначен ближайший просмотр, то его нельзя снять с публикации. Если просмотр прошел, то объявление должно быть прежде обработано оператором, а затем снято с публикации, если же просмотр еще не прошел, то прежде чем снимать объявление с публикации необходимо предупредить об отмене всех участников просмотра
-        if ($this->earliestDate != "") return array("Не удалось снять с публикации объявление: по нему назначен просмотр. Вы можете отменить просмотр, связавшись с нами по телефону 8-922-160-95-14");
-
         // Меняем параметры объекта
         $this->status = "не опубликовано";
-        $this->earliestDate = "";
-        $this->earliestTimeHours = "";
-        $this->earliestTimeMinutes = "";
         $this->dateOfEntry = "";
         $this->dateOfCheckOut = "";
 

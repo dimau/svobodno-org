@@ -213,12 +213,12 @@ class UserIncoming extends User {
             $propertiesId[] = $value['id'];
         }
 
-        // Получим все заявки на просмотр для этих объектов недвижимости
-        $allRequestToView = DBconnect::selectRequestsToViewForProperties($propertiesId);
+        // Получим все заявки на контакты собственника для этих объектов недвижимости
+        $allRequestForOwnerContacts = DBconnect::selectRequestsForOwnerContactsForProperties($propertiesId);
 
         // Перебираем массив, полученный из БД и собираем все id арендаторов, отправивших заявки на просмотр, в одномерный массив - без повторов
         $tenantsId = array();
-        foreach ($allRequestToView as $value) {
+        foreach ($allRequestForOwnerContacts as $value) {
             $tenantsId[] = $value['tenantId'];
         }
 

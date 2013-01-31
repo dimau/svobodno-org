@@ -779,14 +779,6 @@ class View {
             }
             $arrMyAdvertReplace['propertyId'] = $allPropertiesCharacteristic[$i]['id'];
 
-            // Дата и время ближайшего просмотра
-            $arrMyAdvertReplace['earliestDateName'] = "";
-            $arrMyAdvertReplace['earliestDate'] = "";
-            if ($allPropertiesCharacteristic[$i]['earliestDate'] != "" && $allPropertiesCharacteristic[$i]['earliestDate'] != "0000-00-00" && $allPropertiesCharacteristic[$i]['earliestTimeHours'] != "" && $allPropertiesCharacteristic[$i]['earliestTimeMinutes'] != "") {
-                $arrMyAdvertReplace['earliestDateName'] = "Назначен просмотр:";
-                $arrMyAdvertReplace['earliestDate'] = $allPropertiesCharacteristic[$i]['earliestDate'] . " в " . $allPropertiesCharacteristic[$i]['earliestTimeHours'] . ":" . $allPropertiesCharacteristic[$i]['earliestTimeMinutes'];
-            }
-
 
             /******* Список потенциальных арендаторов ******/
             $arrMyAdvertReplace['probableTenants'] = "";
@@ -857,7 +849,7 @@ class View {
 
             // Производим заполнение шаблона
             // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне
-            $arrMyAdvertTemplVar = array('{statusEng}', '{typeOfObject}', '{address}', '{apartmentNumber}', '{status}', '{fotosWrapper}', '{instructionPublish}', '{propertyId}', '{earliestDateName}', '{earliestDate}', '{probableTenants}', '{costOfRenting}', '{currency}', '{utilities}', '{electricPower}', '{bail}', '{prepayment}', '{termOfLease}', '{dateOfEntry}', '{dateOfCheckOut}', '{furnitureName}', '{furniture}', '{repairName}', '{repair}', '{contactTelephonNumber}', '{timeForRingBegin}', '{timeForRingEnd}');
+            $arrMyAdvertTemplVar = array('{statusEng}', '{typeOfObject}', '{address}', '{apartmentNumber}', '{status}', '{fotosWrapper}', '{instructionPublish}', '{propertyId}', '{probableTenants}', '{costOfRenting}', '{currency}', '{utilities}', '{electricPower}', '{bail}', '{prepayment}', '{termOfLease}', '{dateOfEntry}', '{dateOfCheckOut}', '{furnitureName}', '{furniture}', '{repairName}', '{repair}', '{contactTelephonNumber}', '{timeForRingBegin}', '{timeForRingEnd}');
             // Копируем html-текст шаблона
             $currentMyAdvert = str_replace($arrMyAdvertTemplVar, $arrMyAdvertReplace, $tmpl_MyAdvert);
 
@@ -890,9 +882,7 @@ class View {
         for ($i = 0, $s = count($messagesArr); $i < $s; $i++) {
 
             if ($messagesArr[$i]['messageType'] == "newProperty") $allMessagesHTML .= View::getHTMLforMessageNewProperty($messagesArr[$i]);
-            /*  if ($messagesArr[$i]['messageType'] == "newTenant") $allMessagesHTML .= View::getHTMLforMessageNewTenant($messagesArr[$i]);
-     if ($messagesArr[$i]['messageType'] == "requestToViewConfirmed") $allMessagesHTML .= View::getHTMLforMessageRequestToViewConfirmed($messagesArr[$i]);
-     if ($messagesArr[$i]['messageType'] == "editedTimeToView") $allMessagesHTML .= View::getHTMLforMessageEditedTimeToView($messagesArr[$i]); */
+            /*  if ($messagesArr[$i]['messageType'] == "newTenant") $allMessagesHTML .= View::getHTMLforMessageNewTenant($messagesArr[$i]); */
         }
 
         return $allMessagesHTML;

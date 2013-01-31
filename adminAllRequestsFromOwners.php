@@ -52,7 +52,7 @@ $requestFromOwnerId = "";
 if (isset($_GET['requestFromOwnerId'])) $requestFromOwnerId = intval(htmlspecialchars($_GET['requestFromOwnerId'], ENT_QUOTES));
 
 /********************************************************************************
- * ПОКАЗАТЬ СПИСОК ВСЕХ НЕОБРАБОТАННЫХ ЗАЯВОК ОТ СОБСТВЕННИКОВ
+ * УДАЛЕНИЕ ЗАЯВКИ СОБСТВЕННИКА
  *******************************************************************************/
 
 if ($action == "remove" && $requestFromOwnerId != "" && $requestFromOwnerId != 0) {

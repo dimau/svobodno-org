@@ -60,9 +60,8 @@ if (isset($_POST['address'])) $goalUser['address'] = htmlspecialchars($_POST['ad
 // Инициализируем массивы для хранения результатов
 $allUsers = array();
 $allProperties = array();
-$allRequestsToView = array();
 
-// ЗАПРОС К ТАБЛИЦЕ USERS. Если хотя одно поле из тех, что связаны с параметрами пользователя, а не его недвижимости заполнено
+// ЗАПРОС К ТАБЛИЦЕ USERS. Если хотя бы одно поле из тех, что связаны с параметрами пользователя, а не его недвижимости заполнено
 if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondName'] != "" || $goalUser['login'] != "" || $goalUser['telephon'] != "" || $goalUser['email'] != "") {
 
     // Инициализируем массив, в который будем собирать условия поиска
@@ -106,7 +105,6 @@ if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondNa
         }
     }
 
-
     // Собираем строку WHERE для поискового запроса к БД по соответствующим объектам недвижимости
     $strWHERE = "";
     if (is_array($allUsers) && count($allUsers) != 0) {
@@ -115,59 +113,16 @@ if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondNa
         }
     }
 
-    // Получим информацию по заявкам на просмотр от найденных пользователей
-    // Часть WHERE у данного запроса к таблице requestToView аналогична ранее собранному $strWHERE с той лишь разницей, что вместо userId используется tenantId
-    $strWHEREForRequestToView = str_replace("userId", "tenantId", $strWHERE);
-    if ($strWHEREForRequestToView != "") {
-        $res = DBconnect::get()->query("SELECT id, tenantId, propertyId, status FROM requestToView WHERE" . $strWHEREForRequestToView);
-        if ((DBconnect::get()->errno)
-            OR (($allRequestsToView = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
-        ) {
-            // Логируем ошибку
-            //TODO: сделать логирование ошибки
-            $allRequestsToView = array();
-        }
-    }
-
-    // Все полученные заявки на просмотр нужно дополнить информацией об адресах - для этого добавим в строку $strWHERE условия по нужным нам объектам
-    if (is_array($allRequestsToView) && count($allRequestsToView) != 0) {
-        foreach ($allRequestsToView as $value) {
-            if ($strWHERE != "") $strWHERE .= " OR (id = '" . $value['propertyId'] . "')"; else $strWHERE .= " (id = '" . $value['propertyId'] . "')";
-        }
-    }
-
     // Получим информацию по объектам недвижимости, которые принадлежат найденным пользователям
     // В итоге получим массив ($allProperties), каждый элемент которого представляет собой еще один массив параметров конкретного объекта недвижимости, принадлежащего одному из найденных выше пользователей
     if ($strWHERE != "") {
-        $res = DBconnect::get()->query("SELECT id, userId, typeOfObject, address, apartmentNumber, status, earliestDate, earliestTimeHours, earliestTimeMinutes, adminComment, completeness FROM property WHERE" . $strWHERE);
+        $res = DBconnect::get()->query("SELECT id, userId, typeOfObject, address, apartmentNumber, status, adminComment, completeness FROM property WHERE" . $strWHERE);
         if ((DBconnect::get()->errno)
             OR (($allProperties = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
         ) {
             // Логируем ошибку
             //TODO: сделать логирование ошибки
             $allProperties = array();
-        }
-    }
-
-    // Подкорректируем полученные данные для их нормального вывода на экран
-    for ($i = 0, $s = count($allProperties); $i < $s; $i++) {
-        $allProperties[$i]['earliestDate'] = GlobFunc::dateFromDBToView($allProperties[$i]['earliestDate']);
-    }
-
-    // Дополним данные о заявках на просмотр информацией об адресе соответствующего объекта (на который поступила заявка)
-    for ($i = 0, $s = count($allRequestsToView); $i < $s; $i++) {
-        $changed = FALSE;
-        foreach ($allProperties as $property) {
-            if ($allRequestsToView[$i]['propertyId'] == $property['id']) {
-                $allRequestsToView[$i]['address'] = $property['address'];
-                $allRequestsToView[$i]['apartmentNumber'] = $property['apartmentNumber'];
-                $changed = TRUE;
-                break;
-            }
-        }
-        if ($changed == FALSE) {
-            $allRequestsToView[$i]['address'] = "Объявление перенесено в архив";
-            $allRequestsToView[$i]['apartmentNumber'] = "";
         }
     }
 
@@ -191,7 +146,7 @@ if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondNa
     // Количество результатов ограничено первыми 40-ка, чтобы не перегружать БД
     // В итоге получим массив ($allProperties), каждый элемент которого представляет собой еще один массив параметров конкретного объекта недвижимости
     if ($strWHERE != "") {
-        $res = DBconnect::get()->query("SELECT id, userId, typeOfObject, address, apartmentNumber, status, earliestDate, earliestTimeHours, earliestTimeMinutes, adminComment, completeness FROM property WHERE" . $strWHERE . " LIMIT 40");
+        $res = DBconnect::get()->query("SELECT id, userId, typeOfObject, address, apartmentNumber, status, adminComment, completeness FROM property WHERE" . $strWHERE . " LIMIT 40");
         if ((DBconnect::get()->errno)
             OR (($allProperties = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
         ) {
@@ -229,8 +184,6 @@ if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondNa
         }
     }
 
-    // Если поиск производится по адресу недвижимости, то в выдаче будут только пользователи-собственники. Скорее всего у них запросов на просмотр (если только они одновременно не сдают и не снимают жилье), поэтому поиск по заявкам не будем осуществлять
-    $allRequestsToView = array();
 }
 
 /********************************************************************************
@@ -239,7 +192,6 @@ if ($goalUser['surname'] != "" || $goalUser['name'] != "" || $goalUser['secondNa
 
 //$allUsers  массив, каждый элемент которого представляет собой еще один массив параметров конкретного пользователя
 //$allProperties  массив, каждый элемент которого представляет собой еще один массив параметров конкретного объекта недвижимости, принадлежащего одному из найденных пользователей
-//$allRequestsToView	массив, каждый элемент которого представляет собой еще один массив параметров конкретной заявки на просмотр, принадлежащего одному из найденных пользователей
 
 // Подсоединяем нужный основной шаблон
 require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminFindUser.php";

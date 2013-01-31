@@ -27,7 +27,7 @@ $expensive = time() - (14 * 24 * 60 * 60); // 14 дней для объявле�
 
 // Получаем полные данные по интересующим нас объявлениям из БД
 $stmt = DBconnect::get()->stmt_init();
-if (($stmt->prepare("SELECT * FROM property WHERE completeness = '0' AND ((realCostOfRenting <= 29000 AND reg_date < ?) OR (realCostOfRenting > 29000 AND realCostOfRenting <= 49000 AND reg_date < ?) OR (realCostOfRenting > 49000 AND reg_date < ?)) AND 0 = (SELECT COUNT(*) FROM requestToView WHERE property.id = requestToView.propertyId AND (status = 'Новая' OR status = 'Назначен просмотр' OR status = 'Отложена' OR status = 'Успешный просмотр') LIMIT 1)") === FALSE)
+if (($stmt->prepare("SELECT * FROM property WHERE completeness = '0' AND ((realCostOfRenting <= 29000 AND reg_date < ?) OR (realCostOfRenting > 29000 AND realCostOfRenting <= 49000 AND reg_date < ?) OR (realCostOfRenting > 49000 AND reg_date < ?))") === FALSE)
     OR ($stmt->bind_param("iii", $cheap, $medium, $expensive) === FALSE)
     OR ($stmt->execute() === FALSE)
     OR (($res = $stmt->get_result()) === FALSE)
@@ -35,7 +35,7 @@ if (($stmt->prepare("SELECT * FROM property WHERE completeness = '0' AND ((realC
     OR ($stmt->close() === FALSE)
 ) {
     //TODO: перенести в DBконнект и переделать строку логгирования
-    Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM property WHERE completeness = '0' AND ((realCostOfRenting <= 29000 AND reg_date < " . $cheap . ") OR (realCostOfRenting > 29000 AND realCostOfRenting <= 49000 AND reg_date < " . $medium . ") OR (realCostOfRenting > 49000 AND reg_date < " . $expensive . ")) AND 0 = (SELECT COUNT(*) FROM requestToView WHERE property.id = requestToView.propertyId AND (status = 'Новая' OR status = 'Назначен просмотр' OR status = 'Отложена' OR status = 'Успешный просмотр') LIMIT 1)'. id логгера: removeOldAdverts.php:2. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+    Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM property WHERE completeness = '0' AND ((realCostOfRenting <= 29000 AND reg_date < " . $cheap . ") OR (realCostOfRenting > 29000 AND realCostOfRenting <= 49000 AND reg_date < " . $medium . ") OR (realCostOfRenting > 49000 AND reg_date < " . $expensive . "))'. id логгера: removeOldAdverts.php:2. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
     //return array();
     exit();
 }

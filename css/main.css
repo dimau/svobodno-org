@@ -1452,6 +1452,18 @@ div.unread > div.newsHeader {
 }
 
 /* Шрифт везде как определено в правилах стиля body */
-.ui-widget {
+.ui-widget,
+.ui-widget input,
+.ui-widget select,
+.ui-widget textarea,
+.ui-widget button {
+    font-family: Tahoma, Arial, Verdana, sans-serif;
+}
+
+/* Диалоговые окна - большой шрифт */
+.ui-dialog,
+.ui-widget,
+.ui-widget-content {
+    font-size: 0.9em;
     font-family: Tahoma, Arial, Verdana, sans-serif;
 }

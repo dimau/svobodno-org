@@ -57,8 +57,6 @@ if (isset($_POST['newValueArr'])) {
 
 // Если в запросе не указан идентификатор объекта недвижимости или команда, которую нужно выполнить, то отказываем в доступе
 if ($propertyId == "" || $propertyId == 0 || $action == "") GlobFunc::accessDenied();
-// Если нужно изменить дату/время ближайшего просмотра, а массив новых значений пуст, то отказываем в доступе
-if ($action == "changeEarliestDate" && (!is_array($newValueArr) || count($newValueArr) == 0)) GlobFunc::accessDenied();
 
 /*************************************************************************************
  * ИНИЦИАЛИЗАЦИЯ МОДЕЛИ ОБЪЕКТА НЕДВИЖИМОСТИ
@@ -66,19 +64,6 @@ if ($action == "changeEarliestDate" && (!is_array($newValueArr) || count($newVal
 
 $property = new Property($propertyId);
 if (!$property->readCharacteristicFromDB()) GlobFunc::accessDenied();
-
-/*************************************************************************************
- * НОВАЯ ДАТА ПРОСМОТРА ОБЪЕКТА
- *************************************************************************************/
-
-if ($action == "changeEarliestDate") {
-    if ($property->changeEarliestDate($newValueArr['earliestDate'], $newValueArr['earliestTimeHours'], $newValueArr['earliestTimeMinutes'])) {
-        // Параметры объекта сохраняются в БД только в том случае, если удалось успешно изменить дату и время ближайшего просмотра
-        if (!$property->saveCharacteristicToDB("edit")) GlobFunc::accessDenied();
-    } else {
-        GlobFunc::accessDenied();
-    }
-}
 
 /*************************************************************************************
  * СНЯТИЕ С ПУБЛИКАЦИИ ОБЪЕКТА (ПЕРЕНОС В АРХИВ ДЛЯ ЧУЖИХ ОБЪЯВЛЕНИЙ)
