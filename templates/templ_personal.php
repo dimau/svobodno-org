@@ -173,7 +173,7 @@ $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullA
 
             <div class="bottomButton">
                 <a href="personal.php?compId=<?php echo $compId; ?>&tabsId=1" style="margin-right: 10px;">Отмена</a>
-                <button type="submit" name="saveProfileParameters" id="saveProfileParameters" class="button">
+                <button type="submit" name="saveProfileParameters" id="saveProfileParameters" class="mainButton">
                     Сохранить
                 </button>
             </div>
@@ -195,9 +195,11 @@ $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullA
     </div>
 
     <div id="tabs-3">
-        <a href="forowner.php" class="button" id="newAdvertButton">
-            Новое объявление
-        </a>
+        <form name="linkToCreateAdvert" action="forowner.php">
+            <button type="submit" class="mainButton" id="newAdvertButton" >
+                Новое объявление
+            </button>
+        </form>
 
         <?php
         echo View::getHTMLforOwnersCollectionProperty($allPropertiesCharacteristic, $allPropertiesFotoInformation, $allPropertiesTenantPretenders);
@@ -209,16 +211,13 @@ $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullA
 
         <?php if ($userCharacteristic['typeTenant'] !== TRUE && $correctNewSearchRequest !== TRUE && $correctEditSearchRequest === NULL): ?>
         <div class="shadowText">
-            На этой вкладке Вы можете задать параметры недвижимости, в соответствии с которыми ресурс Svobodno.org
-            будет
-            осуществлять
-            автоматический поиск объявлений на портале и будет оповещать Вас о появлении новых объектов.
+            Укажите условия поиска, по которым Svobodno.org будет автоматически подбирать варианты недвижимости и оповещать Вас о них по sms или e-mail
         </div>
         <!-- Если пользователь еще не сформировал поисковый запрос (а значит не является арендатором) и он либо не нажимал на кнопку формирования запроса, либо нажимал, но не прошел проверку на полноту информации о пользователи, то ему доступна только кнопка формирования нового запроса. В ином случае будет отображаться сам поисковый запрос пользователя, либо форма для его заполнения -->
         <form name="createSearchRequest" method="post"
               action="personal.php?compId=<?php echo $compId;?>&action=createSearchRequest">
             <button type="submit" name="createSearchRequestButton" id='createSearchRequestButton'
-                    class='left-bottom'>
+                    class='left-bottom mainButton'>
                 Запрос на поиск
             </button>
         </form>
@@ -255,7 +254,7 @@ $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullA
             <div class="bottomButton">
                 <a href="personal.php?compId=<?php echo $compId;?>&tabsId=4" style="margin-right: 10px;">Отмена</a>
                 <button type="submit" name="saveSearchParametersButton" id="saveSearchParametersButton"
-                        class="button">
+                        class="mainButton">
                     Сохранить
                 </button>
             </div>

@@ -57,7 +57,7 @@
 
         .section.admin .headerSection {
             text-align: center;
-            font-size: 1.1em;
+            font-size: 14px;
             margin-bottom: 12px;
         }
 
@@ -119,14 +119,6 @@
                 <li>
                     <a href="newadvert.php?completeness=0" target="_blank">Новое чужое объявление</a>
                 </li>
-                <li>
-                    <form name="advertMerging" method="post" action="adminpanel.php?action=mergeAdverts">
-                        Слить чужое объявление
-                        <input name="alienAdvertId" type="text" value="" size="7"> с
-                        <input name="ourAdvertId" type="text" value="" size="7">
-                        <button type="submit">ок</button>
-                    </form>
-                </li>
             </ul>
             <div class="clearBoth"></div>
         </div>
@@ -162,7 +154,7 @@
                         <label>Адрес недвижимости</label> <input name="address" id="address" type="text" size="20">
                     </li>
                     <li>
-                        <button type="submit" name="findUserButton" id="findUserButton">Найти</button>
+                        <button type="submit" name="findUserButton" id="findUserButton" class="mainButton">Найти</button>
                     </li>
                 </ul>
             </form>

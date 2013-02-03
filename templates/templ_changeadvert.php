@@ -30,7 +30,12 @@
     <link rel="stylesheet" href="css/fileuploader.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
-            /* Стили для создания нового Объявления*/
+        /* Стили для больших блоков (глав) с описанием недвижимости */
+        .advertDescriptionChapter {
+            font-size: 14px;
+        }
+
+         /* Стили для создания нового Объявления*/
         .objectDescriptionItem .objectDescriptionItemLabel {
             min-width: 150px;
             width: 49%;
@@ -60,7 +65,7 @@
 
         .advertDescriptionChapterHeader {
             background-color: #6A9D02;
-            font-size: 1.2em;
+            font-size: 16px;
             padding-left: 15px;
             border-radius: 5px;
             color: white;
@@ -663,7 +668,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
 
                     </td>
                     <td>
-                        <button id="checkAddressButton" style='margin-left: 0.7em;'>Подтвердить адрес</button>
+                        <button id="checkAddressButton" class="mainButton" style='margin-left: 0.7em;'>Подтвердить адрес</button>
                     </td>
                 </tr>
                 <tr>
@@ -1769,7 +1774,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
        style="margin-right: 10px;">В архив</a>
     <?php endif;?>
 
-    <button type="submit" name="saveAdvertButton" id="saveAdvertButton" class="button mainButton">
+    <button type="submit" name="saveAdvertButton" id="saveAdvertButton" class="mainButton">
         Сохранить
     </button>
 

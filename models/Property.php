@@ -1038,9 +1038,6 @@ class Property {
             if ($this->prepayment == "0") $errors[] = 'Укажите: есть ли предоплата';
         }
 
-        if ($typeOfValidation == "newAdvert" || $typeOfValidation == "editAdvert" || $typeOfValidation == "newAlienAdvert" || $typeOfValidation == "editAlienAdvert") {
-            if ($this->compensationMoney == "" || $this->compensationPercent == "") $errors[] = 'Укажите величину единоразовой комиссии';
-        }
         if (!preg_match('/^\d{0,7}\.{0,1}\d{0,2}$/', $this->compensationMoney)) {
             $errors[] = 'Неправильный формат для величины единоразовой комиссии, используйте только цифры и точку, например: 1550.50';
         }
@@ -1183,15 +1180,15 @@ class Property {
         $searchLimits['minCost'] = "";
         $searchLimits['maxCost'] = "";
         if ($this->realCostOfRenting != "" && $this->realCostOfRenting != 0) {
-            $searchLimits['minCost'] = " (searchRequests.minCost <= " . $this->realCostOfRenting . ")";
-            $searchLimits['maxCost'] = " (searchRequests.maxCost >= " . $this->realCostOfRenting . ")";
+            $searchLimits['minCost'] = " (searchRequests.minCost = 0 OR searchRequests.minCost <= " . $this->realCostOfRenting . ")";
+            $searchLimits['maxCost'] = " (searchRequests.maxCost = 0 OR searchRequests.maxCost >= " . $this->realCostOfRenting . ")";
         }
 
         // Ограничение на максимальный залог
         // отношение realCostOfRenting / costOfRenting позволяет вычислить курс валюты, либо получить 1, если стоимость аренды указана собственником в рублях
         $searchLimits['pledge'] = "";
         if ($this->bailCost != "" && $this->realCostOfRenting != "" && $this->costOfRenting != "" && $this->bailCost != 0 && $this->realCostOfRenting != 0 && $this->costOfRenting != 0) {
-            $searchLimits['pledge'] = " (searchRequests.pledge >= " . $this->bailCost * $this->realCostOfRenting / $this->costOfRenting . ")";
+            $searchLimits['pledge'] = " (searchRequests.pledge = 0 OR searchRequests.pledge >= " . $this->bailCost * $this->realCostOfRenting / $this->costOfRenting . ")";
         }
 
         // Ограничение на максимальную предоплату
@@ -1262,12 +1259,11 @@ class Property {
 
         // Получаем идентификаторы и параметры рассылки всех пользователей-арендаторов, чьим поисковым запросам соответствует данный объект недвижимости
         $res = DBconnect::get()->query("SELECT searchRequests.userId AS userId, searchRequests.needEmail AS needEmail, searchRequests.needSMS AS needSMS, users.name AS name, users.email AS email, users.telephon AS telephon FROM searchRequests, users WHERE" . $strWHERE . " AND searchRequests.userId = users.id");
-        //$res = DBconnect::get()->query("SELECT searchRequests.userId, searchRequests.needEmail, searchRequests.needSMS, users.name, users.email, users.telephon FROM searchRequests, users WHERE" . $strWHERE." AND searchRequests.userId = users.id");
         if ((DBconnect::get()->errno)
             OR (($res = $res->fetch_all(MYSQLI_ASSOC)) == FALSE)
         ) {
             // Логируем ошибку
-            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT searchRequests.userId AS userId, searchRequests.needEmail AS needEmail, searchRequests.needSMS AS needSMS, user.name AS name, user.email AS email, user.telephon AS telephon FROM searchRequests, user WHERE" . $strWHERE . " AND searchRequests.userId = user.id'. id логгера: DBconnect::whichTenantsAppropriate():1. Выдаваемая ошибка: " . DBconnect::get()->errno . " " . DBconnect::get()->error . ". ID пользователя: не определено");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT searchRequests.userId AS userId, searchRequests.needEmail AS needEmail, searchRequests.needSMS AS needSMS, users.name AS name, users.email AS email, users.telephon AS telephon FROM searchRequests, users WHERE" . $strWHERE . " AND searchRequests.userId = users.id'. id логгера: DBconnect::whichTenantsAppropriate():1. Выдаваемая ошибка: " . DBconnect::get()->errno . " " . DBconnect::get()->error . ". ID пользователя: не определено");
             return FALSE;
         } else {
             for ($i = 0, $s = count($res); $i < $s; $i++) {

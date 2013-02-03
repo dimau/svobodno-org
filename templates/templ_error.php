@@ -42,7 +42,7 @@
     require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
     ?>
 
-    <div style="margin-top: 2em; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 1.1em; text-align: center;">
+    <div style="margin-top: 2em; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 16px; text-align: center;">
 
         <?php if (!isset($mode) || $mode == "notfound"): ?>
         Похоже, у нас нет такой страницы...<br>

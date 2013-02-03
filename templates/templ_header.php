@@ -36,36 +36,29 @@
     <div class="menu">
         <ul>
             <?php
-            // Задаем первоначальные ширины пунктов меню в % в зависимости от того, авторизован пользователь или нет (чтобы при загрузке пункты меню выглядели более-менее равномерно распределенными)
-            if ($isLoggedIn) {
-                $width = array(13.2, 33.96, 22.64, 30.2); // ширины для каждого пункта меню определены в соответствии с количеством букв в каждом из них
-            } else {
-                $width = array(14.58, 37.5, 25, 22.92); //
-            }
-
             // Элемент для выравнивания. С помощью JS при загрузке страницы и при изменении ее размеров всем сепараторам присвоим одинаковую ширину, которая заполнит расстояния между пунктами меню
             echo "<li class='left separator'></li>";
 
             if ($_SERVER['PHP_SELF'] == "/index.php") {
-                echo ("<li class='selected choice' style='width:" . $width[0] . "%'><span>Главная</span>");
+                echo ("<li class='selected choice' style='width: 70px;'><div>Главная</div>");
             } else {
-                echo ("<li class='choice ' style='width:" . $width[0] . "%'><a href='index.php'>Главная</a>");
+                echo ("<li class='choice' style='width: 70px;'><a href='index.php'>Главная</a>");
             }
 
             echo "<li class='separator'></li>";
 
             if ($_SERVER['PHP_SELF'] == "/search.php") {
-                echo ("<li class='selected choice' style='width:" . $width[1] . "%'><span>Найти недвижимость</span>");
+                echo ("<li class='selected choice' style='width: 177px;'><div>Найти недвижимость</div>");
             } else {
-                echo ("<li class='choice' style='width:" . $width[1] . "%'><a href='search.php'>Найти недвижимость</a>");
+                echo ("<li class='choice' style='width: 177px;'><a href='search.php'>Найти недвижимость</a>");
             }
 
             echo "<li class='separator'></li>";
 
             if ($_SERVER['PHP_SELF'] == "/forowner.php") {
-                echo ("<li class='selected choice' style='width:" . $width[2] . "%'><span>Собственнику</span>");
+                echo ("<li class='selected choice' style='width: 117px;'><div>Собственнику</div>");
             } else {
-                echo ("<li class='choice' style='width:" . $width[2] . "%'><a href='forowner.php'>Собственнику</a>");
+                echo ("<li class='choice' style='width: 117px;'><a href='forowner.php'>Собственнику</a>");
             }
 
             echo "<li class='separator'></li>";
@@ -73,9 +66,9 @@
             if (!$isLoggedIn) { // Пункт меню "Заявка на аренду" выдается только неавторизованным пользователям
 
                 if ($_SERVER['PHP_SELF'] == "/registration.php") {
-                    echo ("<li class='selected choice' style='width:" . $width[3] . "%'><span>Регистрация</span>");
+                    echo ("<li class='selected choice' style='width: 113px;'><div>Регистрация</div>");
                 } else {
-                    echo ("<li class='choice' style='width:" . $width[3] . "%'><a href='registration.php?typeTenant=true'>Регистрация</a>");
+                    echo ("<li class='choice' style='width: 113px;'><a href='registration.php?typeTenant=true'>Регистрация</a>");
                 }
             }
 
@@ -88,18 +81,19 @@
                 }
 
                 if ($_SERVER['PHP_SELF'] == "/fortenant.php") { // TODO: поменять ссылку, на которую нужно переходить fortenant - cltkfnm c gjvjom. JS правильное выделение ссылки при нахождении на вкладке уведомлений
-                    echo ("<li class='selected choice' style='width:" . $width[3] . "%'><span>Уведомления" . $amountUnreadMessagesText . "</span>");
+                    echo ("<li class='selected choice' style='width: 113px;'><div>Уведомления" . $amountUnreadMessagesText . "</div>");
                 } else {
-                    echo ("<li class='choice' style='width:" . $width[3] . "%'><a href='personal.php?tabsId=2'>Уведомления" . $amountUnreadMessagesText . "</a>");
+                    echo ("<li class='choice' style='width: 113px;'><a href='personal.php?tabsId=2'>Уведомления" . $amountUnreadMessagesText . "</a>");
                 }
             }
 
             echo "<li class='right separator'></li>";
-
             ?>
         </ul>
-        <div class="clearBoth"></div>
+
     </div>
+
+    <div class="clearBoth"></div>
 
     <?php
     // Подключаем шаблон для аналитики посещаемости страниц от гугла

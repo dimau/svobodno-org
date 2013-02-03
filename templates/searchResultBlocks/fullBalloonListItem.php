@@ -25,7 +25,7 @@
         </li>
     </ul>
     <div class='clearBoth'></div>
-    <div style='width:100%;'>
+    <div style='width:100%; font-size: 12px;'>
         <a href='property.php?propertyId={propertyId}' target='_blank'>подробнее</a>
 
         <div style='float: right;'>

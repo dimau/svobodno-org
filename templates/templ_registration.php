@@ -166,7 +166,7 @@
                 ?>
 
                 <div class="bottomControls">
-                    <button class="backButton">Назад</button>
+                    <a href="" class="backButton">Назад</a>
                     <button class="forwardButton mainButton">Далее</button>
                     <div class="clearBoth"></div>
                 </div>
@@ -185,7 +185,7 @@
 
                 <?php if ($userCharacteristic['typeTenant']): ?>
                 <div class="bottomControls">
-                    <button class="backButton">Назад</button>
+                    <a href="" class="backButton">Назад</a>
                     <button class="forwardButton mainButton">Далее</button>
                     <div class="clearBoth"></div>
                 </div>
@@ -199,7 +199,7 @@
                                 соглашения</a></label>
                     </div>
                     <div class="clearBoth"></div>
-                    <button class="backButton">Назад</button>
+                    <a href="" class="backButton">Назад</a>
                     <button type="submit" name="submitButton" class="submitButton mainButton">Отправить</button>
                     <div class="clearBoth"></div>
                 </div>
@@ -228,7 +228,7 @@
                                 соглашения</a></label>
                     </div>
                     <div class="clearBoth"></div>
-                    <button class="backButton">Назад</button>
+                    <a href="" class="backButton">Назад</a>
                     <button type="submit" name="submitButton" class="submitButton mainButton">Отправить</button>
                     <div class="clearBoth"></div>
                 </div>

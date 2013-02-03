@@ -351,7 +351,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         </tr>
             <?php endif; ?>
 
-        <?php if ($propertyCharacteristic['compensationMoney'] != "" && $propertyCharacteristic['currency'] != "" && $propertyCharacteristic['compensationPercent'] != "" && $propertyCharacteristic['compensationMoney'] != "0" && $propertyCharacteristic['currency'] != "0" && $propertyCharacteristic['compensationPercent'] != "0.00"): ?>
+        <?php if ($propertyCharacteristic['compensationMoney'] != "" && $propertyCharacteristic['currency'] != "" && $propertyCharacteristic['compensationPercent'] != "" && $propertyCharacteristic['currency'] != "0"): ?>
         <tr>
             <td class="objectDescriptionItemLabel">
                 Комиссия:

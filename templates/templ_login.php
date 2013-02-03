@@ -88,7 +88,7 @@
                     </tbody>
                 </table>
                 <div>
-                    <button type="submit" id="buttonSubmit" name="buttonSubmit">Войти</button>
+                    <button type="submit" id="buttonSubmit" class="mainButton" name="buttonSubmit">Войти</button>
                     <a class="buttonRegistration" href="registration.php">Зарегистрироваться</a>
 
                     <div class="clearBoth"></div>

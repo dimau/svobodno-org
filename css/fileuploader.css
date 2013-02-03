@@ -6,7 +6,6 @@
 
 .qq-upload-button {
     border: 1px solid #CCC;
-    background: #F6F6F6 url(images/ui-bg_glass_100_f6f6f6_1x400.png) 50% 50% repeat-x;
     border-radius: 5px;
     color: #336784;
     font-weight: bold;
@@ -19,7 +18,6 @@
 
 .qq-upload-button-hover {
     border: 1px solid #6A9D02;
-    background: #DEEAC8 url(images/ui-bg_highlight-hard_100_deeac8_1x100.png) 50% 50% repeat-x;
 }
 
 .qq-upload-button-focus {
@@ -115,6 +113,31 @@
 }
 
 /* Моя коррекция стилей: (первые коррекции я делал прямо по тексту) */
+
+.qq-upload-button {
+    font-weight: normal;
+    width: 200px;
+    line-height: 1.4;
+    display: block;
+    text-align: center;
+    font-size: 14px;
+
+    padding: 8px 12px 8px 12px;
+    border: none;
+    border-radius: 5px;
+    background: #e1465a; /* Для старых браузеров */
+    background: -moz-linear-gradient(top, #f95e72, #e1465a); /* Firefox 3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f95e72), color-stop(100%,#e1465a)); /* Chrome 1-9, Safari 4-5 */
+    background: -webkit-linear-gradient(top, #f95e72, #e1465a); /* Chrome 10+, Safari 5.1+ */
+    background: -o-linear-gradient(top, #f95e72, #e1465a); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #f95e72, #e1465a); /* IE10 */
+    background: linear-gradient(top, #f95e72, #e1465a); /* CSS3 */
+    color: white;
+}
+
+.qq-upload-button-hover {
+    background: #e1465a;
+}
 
 .qq-miniature {
     display: none;

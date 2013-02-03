@@ -60,9 +60,7 @@ $(document).ready(createUploader);
 // Деактивируем кнопку проверки адреса, если доступность полей для редактирования ограничена
 if (availability == "limited") {
     $(function () {
-        $("#checkAddressButton").button({
-            disabled:true
-        });
+        $("#checkAddressButton").attr("disabled","disabled").addClass("disabled");
     });
 }
 
@@ -293,12 +291,3 @@ function costOfRentingChanged() {
     $("#compensationMoney").val(compensationMoney);
     $("#compensationPercent").val(compensationPercent);
 }
-
-// Активируем кнопку сохранения параметров объявления
-$(function () {
-    $("#saveAdvertButton").button({
-        icons:{
-            primary:"ui-icon-disk"
-        }
-    });
-});

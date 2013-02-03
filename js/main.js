@@ -12,10 +12,6 @@ var validationIsNeeded = false;
  * ВЕШАЕМ ОБРАБОТЧИКИ СОБЫТИЙ
  **********************************************************************/
 
-// ГЛАВНОЕ МЕНЮ: делаем красивые (равномерные) отступы внутри плашки меню
-$(document).ready(changeMenuSeparatorWidth);
-$(window).resize(changeMenuSeparatorWidth);
-
 // jQUERY UI: инициализация элементов по умолчанию
 $(document).ready(initJQueryUI);
 
@@ -31,34 +27,6 @@ $(document).ready(initColorBox);
 /**********************************************************************
  * ФУНКЦИИ ОБРАБОТЧИКИ СОБЫТИЙ
  **********************************************************************/
-
-// Функция для выравнивания отступов внутри плашки главного меню
-function changeMenuSeparatorWidth() {
-    // Выясняем ширину области меню
-    var menuWidth = $(".menu").width();
-
-    // Приводим ширину пунктов меню к естественному виду
-    $(".menu .choice").each(function () {
-        $(this).css("width", "");
-    });
-
-    // Считаем остаток ширины на сепараторы
-    $(".menu .choice").each(function () {
-        menuWidth = menuWidth - $(this).width();
-    });
-
-    var separatorWidth = 0;
-    if ($(".menu .choice").length == 3) { // Отрабатываем в случае неавторизованного пользователя с 3 пунктами в меню
-        separatorWidth = (menuWidth - 5) / 4;
-    } else { // Отрабатываем в случае авторизованного пользователя, у которого больше 3 пунктов в меню
-        separatorWidth = (menuWidth - 5) / 5;
-    }
-
-    // Применяем вычисленную ширину ко всем сепараторам
-    $(".menu .separator").each(function () {
-        $(this).width(separatorWidth);
-    })
-}
 
 // Обработчик события клика по добавлению в избранное
 function addToFavorites() {
@@ -137,9 +105,6 @@ function initJQueryUI() {
 
     /* Инициализируем отображение вкладок при помощи jQuery UI */
     $("#tabs").tabs();
-
-    // Активируем кнопки через jQuery UI
-    $(".button").button();
 
     // Если на странице есть модальнео окно для незарегистрированного пользователя, который нажал на кнопку Добавить в избранное, то активируем его
     $("#addToFavoritesDialog").dialog({

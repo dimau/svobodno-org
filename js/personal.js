@@ -146,14 +146,6 @@ function decUnreadMessagesAmount() {
  * Вкладка Мои объявления
  ***********************************************************/
 
-// Активируем кнопки "Новое объявление" через jQuery UI - добавляем пиктограммку плюсика в кружочке
-$(function () {
-    $("#newAdvertButton").button({
-        icons:{
-            primary:"ui-icon-circle-plus"
-        }
-    });
-});
 
 /***********************************************************
  * Вкладка Поиск
@@ -163,15 +155,6 @@ $(function () {
 if ($('#extendedSearchParametersBlock').length) {
     if (typeTenant == true && correctEditSearchRequest != "FALSE") $('#extendedSearchParametersBlock').css('display', 'none');
 }
-
-// Активируем кнопку Нового поискового запроса, если она есть на странице
-$(function () {
-    $("button#createSearchRequestButton").button({
-        icons:{
-            primary:"ui-icon-circle-plus"
-        }
-    });
-});
 
 /* Сценарии для появления блока с подробным описанием сожителей */
 $("#withWho").on('change', withWho);

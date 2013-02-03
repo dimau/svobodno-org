@@ -18,7 +18,6 @@ html {
     margin: 0;
     padding: 0;
     height: 100%; /* эта строчка для прижатия подвала к низу страницы*/
-    font-size: 100%;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
     color: #222;
@@ -30,7 +29,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: Tahoma, Arial, Verdana, sans-serif;
-    font-size: 1em;
+    font-size: 16px;
     line-height: 1.4;
     background: #f7f7f7;
 }
@@ -109,7 +108,7 @@ ul.listDescriptionBig {
     list-style: none;
     text-align: left;
     line-height: 1.6em;
-    font-size: 1em;
+    font-size: 14px;
 }
 
 ul.listDescriptionBig .headOfString {
@@ -126,7 +125,7 @@ ul.listDescriptionSmall {
     list-style: none;
     text-align: left;
     line-height: 1.6em;
-    font-size: 0.9em;
+    font-size: 13px;
 }
 
 ul.listDescriptionSmall .headOfString {
@@ -320,7 +319,7 @@ div.notEdited.both {
 div.notEdited .legend {
     width: 100%;
     text-align: left;
-    font-size: 1.3em;
+    font-size: 16px;
     font-weight: bold;
     color: #336784;
     padding-top: 1em;
@@ -360,7 +359,7 @@ textarea {
     padding: 0.2em 0.4em;
     vertical-align: baseline;
     font-family: inherit;
-    font-size: 100%;
+    font-size: 14px;
 }
 
 /* Стили для заблокированных элементов ввода */
@@ -441,23 +440,29 @@ input[type=text], input[type=password], select, textarea {
     border-radius: 4px 4px 4px 4px;
 }
 
-/* Оформление ссылок-кнопок */
-a.button:focus {
-    outline: none;
-}
-
-/* Особенное выделение главных кнопок на страницах сайта */
-a.button.mainButton,
-button.mainButton {
-    border-color: #ffffff !important;
-    background: none !important;
-    background-color: #FF9340 !important;
+/* Главные кнопки на страницах сайта */
+.mainButton {
+    padding: 8px 12px 8px 12px !important;
+    border: none;
+    border-radius: 5px;
+    background: #e1465a !important; /* Для старых браузеров */
+    background: -moz-linear-gradient(top, #f95e72, #e1465a) !important; /* Firefox 3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f95e72), color-stop(100%,#e1465a)) !important; /* Chrome 1-9, Safari 4-5 */
+    background: -webkit-linear-gradient(top, #f95e72, #e1465a) !important; /* Chrome 10+, Safari 5.1+ */
+    background: -o-linear-gradient(top, #f95e72, #e1465a) !important; /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #f95e72, #e1465a) !important; /* IE10 */
+    background: linear-gradient(top, #f95e72, #e1465a) !important; /* CSS3 */
     color: white !important;
 }
 
-a.button.mainButton:hover,
-button.mainButton:hover {
-    border-color: #ff6f00 !important;
+.mainButton:hover {
+    background: #e1465a !important;
+}
+
+.mainButton.disabled {
+    border: 1px solid silver !important;
+    background: #ffffff !important;
+    color: silver !important;
 }
 
 /* Кнопки для приобретения тарифов на доступ */
@@ -566,7 +571,7 @@ td, th {
     margin-bottom: 0.36em;
     color: #808080;
     text-align: center;
-    font-size: 0.7em;
+    font-size: 11px;
     line-height: 1em;
 }
 
@@ -579,7 +584,7 @@ td, th {
 }
 
 .shadowText {
-    font-size: 0.8em;
+    font-size: 11px;
     color: #666666;
     margin-bottom: 10px;
 }
@@ -634,7 +639,7 @@ td, th {
     right: 0px;
     top: 10px;
     text-align: right;
-    font-size: 0.9em;
+    font-size: 14px;
 }
 
 .amountOfNewMessages {
@@ -642,7 +647,7 @@ td, th {
 }
 
 .localHeader {
-    font-size: 1.1em;
+    font-size: 16px;
     font-weight: bold;
 }
 
@@ -651,22 +656,27 @@ td, th {
    ========================================================================== */
 
 .menu {
+    display: table; /* Верстка главного меню в виде таблицы позволяет красиво реализовать резиновое меню без костылей с JS */
+    width: 100%;
+    table-layout: fixed; /* Браузер не переназначает ширину для ячеек фиксированной ширины */
     margin: 0;
-    text-align: center;
-    -webkit-filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.3));
+    border-radius: 5px;
+    -moz-box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3); /* Для Firefox */
+    -webkit-box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3); /* Для Safari и Chrome */
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
 }
 
 .menu ul {
-    list-style: none;
-    width: 100%;
-    padding: 0;
+    display: table-row;
     margin: 0;
-    white-space: nowrap;
+    padding: 0;
+    list-style: none;
 }
 
 .menu ul li {
-    display: inline-block;
+    display: table-cell;
     height: 3em;
+    padding: 0;
     background: #4b9baa; /* Для старых браузеров */
     background: -moz-linear-gradient(top, #6bbbca, #4b9baa); /* Firefox 3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#6bbbca), color-stop(100%,#4b9baa)); /* Chrome 1-9, Safari 4-5 */
@@ -675,8 +685,11 @@ td, th {
     background: -ms-linear-gradient(top, #6bbbca, #4b9baa); /* IE10 */
     background: linear-gradient(top, #6bbbca, #4b9baa); /* CSS3 */
     line-height: 3em;
+    white-space: nowrap;
     text-align: center;
     vertical-align: middle;
+    font-size: 18px;
+    overflow: visible;
 }
 
 .menu ul li.left {
@@ -689,32 +702,23 @@ td, th {
     border-bottom-right-radius: 5px;
 }
 
-.menu ul li.selected {
+.menu ul li.selected div {
+    height: 3em;
     border-bottom: 2px solid white;
     cursor: default;
-}
-
-.menu ul li.selected span {
-    white-space: nowrap;
-    font-size: 1.1em;
     color: #ffffff;
-}
-
-/* Если навести указатель мыши на пункт главного меню, то он будет подчеркунт белой полосой снизу */
-.menu ul li.choice:hover {
-    border-bottom: 2px solid white;
 }
 
 .menu ul li a {
     display: block;
+    height: 3em;
     text-decoration: none;
     border-bottom: none;
-    white-space: nowrap;
-    font-size: 1.1em;
-    color: white;
+    color: #ffffff;
 }
 
 .menu ul li a:hover {
+    border-bottom: 2px solid white;
     color: #ffffff;
 }
 
@@ -738,7 +742,7 @@ td, th {
 .headerOfPage {
     margin: 40px 0 2px 8px; /* Суммарный отступ от главного меню = 48px, из них примерно 8px приходятся на расстояние от верхушки заглавной буквы локального заголовка до верхней границы строки */
     padding: 0;
-    font-size: 1.1em;
+    font-size: 18px;
     color: #000000;
     text-align: left;
 }
@@ -755,6 +759,12 @@ td, th {
     margin-left: 250px;
     margin-bottom: 10px;
     text-align: left;
+}
+
+.textNoResults {
+    margin-top: 2em;
+    margin-left: 1em;
+    font-size: 14px;
 }
 
 .page-buffer {
@@ -782,7 +792,7 @@ td, th {
     border: 1px solid #dddddd;
     border-radius: 8px;
     background-color: #ffffff;
-    font-size: 0.9em;
+    font-size: 14px;
 }
 
 /* Список, содержащий заголовки для всех вкладок */
@@ -790,7 +800,7 @@ td, th {
     margin: 0 0 1em 0;
     padding: 0;
     list-style: none;
-    font-size: 1em;
+    font-size: 14px;
 }
 
 /* Элемент списка класса tabsMenu - li */
@@ -832,7 +842,7 @@ td, th {
     border: 1px solid #dddddd;
     border-radius: 5px;
     background-color: white;
-    font-size: 0.9em;
+    font-size: 14px;
     text-align: center;
 }
 
@@ -956,7 +966,6 @@ td, th {
     -moz-box-shadow: 1px 4px 5px #FFE45C;
     -webkit-box-shadow: 1px 1px 5px #FFE45C;
     font-size: 0px;
-
 }
 
 .errorBlock .errorArrow .line10 {
@@ -1079,7 +1088,7 @@ td, th {
 /* Стили для список + карта */
 .choiceViewSearchResult {
     margin: 16px 0px 6px 8px;
-    font-size: 0.9em;
+    font-size: 14px;
 }
 
 #resultOnSearchPage {
@@ -1091,7 +1100,7 @@ td, th {
 .numberOfRealtyObject {
     color: #808080;
     text-align: center;
-    font-size: 0.7em;
+    font-size: 11px;
 }
 
 #map.fixedTopBlock {
@@ -1120,6 +1129,7 @@ td, th {
     border-left: 2px solid silver;
     background-color: white;
     text-align: center;
+    font-size: 13px;
 }
 
 /* Выделение объявления, над которым завис курсор зеленой рамочкой */
@@ -1153,6 +1163,7 @@ td, th {
     color: #336784;
     text-align: center;
     font-weight: bold;
+    font-size: 14px;
 }
 
 /* Особые стили для каждого типа данных, содержащихся в описании */
@@ -1230,7 +1241,6 @@ td, th {
 /* Стили для типа объекта и района в подробном описании объекта */
 .realtyObject .mainContent .address .typeOfObjectString,
 .realtyObject .mainContent .address .districtString {
-    font-size: 0.9em;
     color: #808080;
 }
 
@@ -1242,7 +1252,7 @@ td, th {
     left: 6px;
     right: 6px;
     text-align: right;
-    font-size: 0.9em;
+    font-size: 12px;
 }
 
 .advertActions a {
@@ -1262,9 +1272,10 @@ td, th {
 }
 
 .headOfBalloon {
+    margin-bottom: 5px;
     color: #336784;
     text-align: center;
-    font-size: 1.2em;
+    font-size: 16px;
 }
 
 /* =============================================================================================================
@@ -1347,7 +1358,7 @@ div.unread > div.newsHeader {
 }
 
 .FIO {
-    font-size: 1.1em;
+    font-size: 16px;
     font-weight: bold;
 }
 
@@ -1464,6 +1475,6 @@ div.unread > div.newsHeader {
 .ui-dialog,
 .ui-widget,
 .ui-widget-content {
-    font-size: 0.9em;
+    font-size: 14px;
     font-family: Tahoma, Arial, Verdana, sans-serif;
 }

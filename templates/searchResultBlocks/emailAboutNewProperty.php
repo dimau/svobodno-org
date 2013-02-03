@@ -2,7 +2,7 @@
     <div class="mainContent">
         Здравствуйте, {name}!<br>
         У нас хорошая новость: появилось объявление, которое, возможно, Вам подойдет!
-        <ul style="max-width: 36em; padding: 0; margin: 10px 5px 10px 20px; list-style: none; text-align: left; line-height: 1.8em; font-size: 1em;">
+        <ul style="max-width: 36em; padding: 0; margin: 10px 5px 10px 20px; list-style: none; text-align: left; line-height: 1.8em;">
             <li>
                 <span style="color: #808080;">{typeOfObject}</span> {address}
             </li>

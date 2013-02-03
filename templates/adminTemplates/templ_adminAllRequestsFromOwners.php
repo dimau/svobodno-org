@@ -20,12 +20,12 @@
     <style>
         .mainContentBlock {
             margin: 10px 0 10px 0;
-            font-size: 0.9em;
+            font-size: 14px;
             line-height: 2em;
         }
 
         .mainContentBlock .content {
-            font-size: 1.1em;
+            font-size: 16px;
             color: #6A9D02;
             font-weight: bold;
         }
@@ -40,7 +40,7 @@
             display: inline-block;
             margin-left: 10px;
             margin-right: 10px;
-            font-size: 1em;
+            font-size: 14px;
         }
 
             /* Используется для выделения описания той заявки на просмотр, что интересует админа */

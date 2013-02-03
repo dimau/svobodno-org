@@ -620,14 +620,14 @@ class View {
         $allAmountAdverts = DBconnect::countAllPublishedProperties();
 
         if ($typeOfRequest == "search") $searchResultHTML .= "
-                    <tr><td><div style='margin-top: 2em; margin-left: 1em;'>
+                    <tr><td><div class='textNoResults'>
                         К сожалению, поиск не дал результатов<br>
                         Попробуйте изменить условия поиска<br><br>
                         Посмотреть все объекты в Екатеринбурге: <a href='search.php?fastSearchButton='>" . $allAmountAdverts . " шт.</a></div></td></tr>
                     ";
 
         if ($typeOfRequest == "favorites") $searchResultHTML .= "
-                    <tr><td><div style='margin-top: 2em; margin-left: 1em;'>
+                    <tr><td><div class='textNoResults'>
                         Вы пока ничего не добавили в Избранное<br><br>
                         Посмотреть все объекты в Екатеринбурге: <a href='search.php?fastSearchButton='>" . $allAmountAdverts . " шт.</a></div></td></tr>
                     ";
@@ -868,10 +868,10 @@ class View {
      */
     public static function getHTMLforMessages($messagesArr) {
 
-        // Если массив с уведомлениями пользователя не передан, то возвращаем пустую строку вместо HTML
+        // Если массив с уведомлениями пользователя не передан, то возвращаем специальное сообщение вместо HTML
         if (!isset($messagesArr) || !is_array($messagesArr) || count($messagesArr) == 0) {
             return "<div class='shadowText'>
-                            На этой вкладке располагается информация о важных событиях, случившихся на ресурсе Svobodno.org, как например: появление новых потенциальных арендаторов, заинтересовавшихся Вашим объявлением, или новых объявлений, которые подходят под Ваш запрос
+                            На текущий момент уведомлений для Вас нет
                         </div>";
         }
 

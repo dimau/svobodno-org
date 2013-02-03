@@ -23,16 +23,7 @@
     <link rel="stylesheet" href="css/colorbox.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
-            /* Стили для параметров поиска*/
-        #fastSearchInput {
-            line-height: 2.4;
-        }
-
-        #extendedSearchButton {
-            margin-left: 20px;
-        }
-
-            /* Отступ под блок класса advertActions */
+        /* Отступ под блок класса advertActions */
         .realtyObject .listDescriptionSmall {
             margin-bottom: 21px;
         }
@@ -88,54 +79,54 @@
         </ul>
         <div id="tabs-1">
             <form name="fastSearch" method="get">
-							<span id="fastSearchInput"> Я хочу арендовать
-								<select name="typeOfObjectFast" id="typeOfObjectFast">
-                                    <option value="0" <?php if ($userSearchRequest['typeOfObject'] == "0") echo "selected";?>></option>
-                                    <option value="квартира" <?php if ($userSearchRequest['typeOfObject'] == "квартира") echo "selected";?>>
-                                        квартиру
-                                    </option>
-                                    <option value="комната" <?php if ($userSearchRequest['typeOfObject'] == "комната") echo "selected";?>>
-                                        комнату
-                                    </option>
-                                    <option value="дом" <?php if ($userSearchRequest['typeOfObject'] == "дом") echo "selected";?>>
-                                        дом,
-                                        коттедж
-                                    </option>
-                                    <option value="таунхаус" <?php if ($userSearchRequest['typeOfObject'] == "таунхаус") echo "selected";?>>
-                                        таунхаус
-                                    </option>
-                                    <option value="дача" <?php if ($userSearchRequest['typeOfObject'] == "дача") echo "selected";?>>
-                                        дачу
-                                    </option>
-                                    <option value="гараж" <?php if ($userSearchRequest['typeOfObject'] == "гараж") echo "selected";?>>
-                                        гараж
-                                    </option>
-                                </select>
-                                в районе
-                                <select name="districtFast" id="districtFast">
-                                    <option value="0"></option>
-                                    <?php
-                                    if (isset($allDistrictsInCity)) {
-                                        foreach ($allDistrictsInCity as $value) { // Для каждого названия района формируем option в селекте
-                                            echo "<option value='" . $value['name'] . "'";
-                                            if (isset($userSearchRequest['district'][0]) && $value['name'] == $userSearchRequest['district'][0]) echo "selected"; // В качестве выбранного в селекте назначаем первый район из списка выбранных пользователем
-                                            echo ">" . $value['name'] . "</option>";
-                                        }
-                                    }
-                                    ?>
-                                </select>
-								стоимостью от
-								<input type="text" name="minCostFast" id="minCostFast" size="10"
-                                       maxlength="8" value='<?php echo $userSearchRequest['minCost'];?>'>
-								до
-								<input type="text" name="maxCostFast" id="maxCostFast" size="10"
-                                       maxlength="8" value='<?php echo $userSearchRequest['maxCost'];?>'>
-								руб./мес.
-								&nbsp;
-								<button type="submit" name="fastSearchButton" id="fastSearchButton" class="mainButton">
-                                    Найти
-                                </button>
-                            </span>
+		        <span id="fastSearchInput">
+                Я хочу арендовать
+					<select name="typeOfObjectFast" id="typeOfObjectFast">
+                        <option value="0" <?php if ($userSearchRequest['typeOfObject'] == "0") echo "selected";?>></option>
+                        <option value="квартира" <?php if ($userSearchRequest['typeOfObject'] == "квартира") echo "selected";?>>
+                            квартиру
+                        </option>
+                        <option value="комната" <?php if ($userSearchRequest['typeOfObject'] == "комната") echo "selected";?>>
+                            комнату
+                        </option>
+                        <option value="дом" <?php if ($userSearchRequest['typeOfObject'] == "дом") echo "selected";?>>
+                            дом,
+                            коттедж
+                        </option>
+                        <option value="таунхаус" <?php if ($userSearchRequest['typeOfObject'] == "таунхаус") echo "selected";?>>
+                            таунхаус
+                        </option>
+                        <option value="дача" <?php if ($userSearchRequest['typeOfObject'] == "дача") echo "selected";?>>
+                            дачу
+                        </option>
+                        <option value="гараж" <?php if ($userSearchRequest['typeOfObject'] == "гараж") echo "selected";?>>
+                            гараж
+                        </option>
+                    </select>
+                в районе
+                    <select name="districtFast" id="districtFast">
+                        <option value="0"></option>
+                        <?php
+                        if (isset($allDistrictsInCity)) {
+                            foreach ($allDistrictsInCity as $value) { // Для каждого названия района формируем option в селекте
+                                echo "<option value='" . $value['name'] . "'";
+                                if (isset($userSearchRequest['district'][0]) && $value['name'] == $userSearchRequest['district'][0]) echo "selected"; // В качестве выбранного в селекте назначаем первый район из списка выбранных пользователем
+                                echo ">" . $value['name'] . "</option>";
+                            }
+                        }
+                        ?>
+                    </select>
+				стоимостью от
+					<input type="text" name="minCostFast" id="minCostFast" size="10"
+                           maxlength="8" value='<?php echo $userSearchRequest['minCost'];?>'>
+				до
+					<input type="text" name="maxCostFast" id="maxCostFast" size="10"
+                           maxlength="8" value='<?php echo $userSearchRequest['maxCost'];?>'>
+				руб./мес. &nbsp;
+					<button type="submit" name="fastSearchButton" id="fastSearchButton" class="mainButton">
+                        Найти
+                    </button>
+                </span>
             </form>
         </div>
         <div id="tabs-2">
@@ -173,7 +164,8 @@
 </div>
 <!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2013 г. Если нужна помощь или хочется оставить отзыв (пожелание) на сервис Svobodno.org, свяжитесь с нами по телефону: 8-922-160-95-14, или e-mail:
+    2013 г. Если нужна помощь или хочется оставить отзыв (пожелание) на сервис Svobodno.org, свяжитесь с нами по
+    телефону: 8-922-160-95-14, или e-mail:
     support@svobodno.org
 </div>
 <!-- /end.footer -->
