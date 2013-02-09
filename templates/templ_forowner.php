@@ -61,7 +61,7 @@
 
     <?php
     // Сформируем и вставим заголовок страницы
-    require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+    require $websiteRoot . "/templates/templ_header.php";
     ?>
 
     <div class="headerOfPage">

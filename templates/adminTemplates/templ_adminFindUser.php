@@ -76,7 +76,7 @@
         <li>
             <?php
             // Возвращает HTML для блока с описанием 1 пользователя
-            require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminFindUserItem.php";
+            require $websiteRoot . "/templates/adminTemplates/templ_adminFindUserItem.php";
             ?>
         </li>
         <?php endforeach; ?>

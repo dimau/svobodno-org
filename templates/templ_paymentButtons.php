@@ -4,6 +4,7 @@
     <img src="img/button-480-light.png">
 </div>
 
+<?php if (!isset($propertyCharacteristic['typeOfObject']) || (isset($propertyCharacteristic['typeOfObject']) && $propertyCharacteristic['typeOfObject'] == "комната")):?>
 <form method="post" action="<?php if($isLoggedIn) echo "https://merchant.w1.ru/checkout/default.aspx"; else echo "registration.php";?>" accept-charset="UTF-8" style="display: inline-block;">
     <?php if ($isLoggedIn):?>
     <input type="hidden" name="WMI_MERCHANT_ID" value="185864873196"/>
@@ -19,7 +20,9 @@
     <?php endif;?>
     <button type="submit" class="buyButton rooms"></button>
 </form>
+<?php endif;?>
 
+<?php if (!isset($propertyCharacteristic['typeOfObject']) || (isset($propertyCharacteristic['typeOfObject']) && $propertyCharacteristic['typeOfObject'] == "квартира")):?>
 <form method="post" action="<?php if($isLoggedIn) echo "https://merchant.w1.ru/checkout/default.aspx"; else echo "registration.php";?>" accept-charset="UTF-8" style="display: inline-block;">
     <?php if ($isLoggedIn):?>
     <input type="hidden" name="WMI_MERCHANT_ID" value="185864873196"/>
@@ -35,3 +38,4 @@
     <?php endif;?>
     <button type="submit" class="buyButton flats"></button>
 </form>
+<?php endif;?>

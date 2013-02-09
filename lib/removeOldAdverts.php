@@ -7,12 +7,12 @@
  */
 
 // Подключаем необходимые модели, классы
-if (!isset($_SERVER['DOCUMENT_ROOT']) || $_SERVER['DOCUMENT_ROOT'] == "") $_SERVER['DOCUMENT_ROOT'] = "/var/www/dimau/data/www/svobodno.org"; // так как cron не инициализирует переменную окружения $_SERVER['DOCUMENT_ROOT'] (а точнее инициализирует ее пустой строкой), приходиться использовать костыль
-require_once $_SERVER['DOCUMENT_ROOT'] . '/lib/class.phpmailer.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Property.php';
+if (isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] != "") $websiteRoot = $_SERVER['DOCUMENT_ROOT']; else $websiteRoot = "/var/www/dimau/data/www/svobodno.org"; // так как cron не инициализирует переменную окружения $_SERVER['DOCUMENT_ROOT'] (а точнее инициализирует ее пустой строкой), приходиться использовать костыль
+require_once $websiteRoot . '/lib/class.phpmailer.php';
+require_once $websiteRoot . '/models/DBconnect.php';
+require_once $websiteRoot . '/models/GlobFunc.php';
+require_once $websiteRoot . '/models/Logger.php';
+require_once $websiteRoot . '/models/Property.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) {

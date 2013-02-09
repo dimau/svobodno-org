@@ -267,7 +267,11 @@ function MapYandex(options) {
                         // Проверка на адекватность полученного HTML для баллуна
                         if (balloonHTML != null) {
 
+                            // Обновляем контент у баллуна полученным объявлением
                             applyContentThis.activeObject.properties.set('balloonContentBody', balloonHTML);
+                            // Перестраиваем шаблон, чтобы он принял размеры контента
+                            applyContentThis.rebuild();
+
                             // Для того, чтобы макет автоматически изменялся при обновлении данных
                             // в геообъекте, создадим дочерний макет через фабрику
                             var subLayout = new MyMainContentSubLayout({

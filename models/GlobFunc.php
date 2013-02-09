@@ -105,7 +105,8 @@ class GlobFunc {
         $emails = array("support@svobodno.org");
 
         // Подключаем класс для отправки e-mail, если он ранее еще не был подключен
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/lib/class.phpmailer.php';
+        if (isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] != "") $websiteRoot = $_SERVER['DOCUMENT_ROOT']; else $websiteRoot = "/var/www/dimau/data/www/svobodno.org"; // так как cron не инициализирует переменную окружения $_SERVER['DOCUMENT_ROOT'] (а точнее инициализирует ее пустой строкой), приходиться использовать костыль
+        require_once $websiteRoot . '/lib/class.phpmailer.php';
 
         // Готовим и отправляем e-mail
         $mail = new PHPMailer(true); //defaults to using php "mail()"; the true param means it will throw exceptions on errors, which we need to catch
@@ -115,6 +116,7 @@ class GlobFunc {
             $mail->AddReplyTo('support@svobodno.org', 'Svobodno.org');
             $mail->Subject = $subject;
             $mail->MsgHTML($msgHTML);
+            $mail->ClearAddresses();
             foreach ($emails as $email) {
                 $mail->AddAddress($email);
             }

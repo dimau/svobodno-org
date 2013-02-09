@@ -2,12 +2,13 @@
 /* На данный URL приходят запросы от сервиса приема оплаты с данными по оплаченным пользователями счетам */
 
 // Подключаем нужные модели и представления
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserFull.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Payment.php';
+$websiteRoot = $_SERVER['DOCUMENT_ROOT'];
+require_once $websiteRoot . '/models/DBconnect.php';
+require_once $websiteRoot . '/models/GlobFunc.php';
+require_once $websiteRoot . '/models/Logger.php';
+require_once $websiteRoot . '/models/User.php';
+require_once $websiteRoot . '/models/UserFull.php';
+require_once $websiteRoot . '/models/Payment.php';
 
 // Создаем объект для работы с оплатой
 $payment = new Payment();

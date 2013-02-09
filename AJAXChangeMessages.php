@@ -5,12 +5,13 @@
 session_start();
 
 // Подключаем нужные модели и представления
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/MessageNewProperty.php';
+$websiteRoot = $_SERVER['DOCUMENT_ROOT'];
+require_once $websiteRoot . '/models/DBconnect.php';
+require_once $websiteRoot . '/models/GlobFunc.php';
+require_once $websiteRoot . '/models/Logger.php';
+require_once $websiteRoot . '/models/User.php';
+require_once $websiteRoot . '/models/UserIncoming.php';
+require_once $websiteRoot . '/models/MessageNewProperty.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.'); // TODO: Вернуть ошибку

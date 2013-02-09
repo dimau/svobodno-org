@@ -1,5 +1,5 @@
 <div class="mainContentBlock">
-    <?php require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminUserItem.php";?>
+    <?php require $websiteRoot . "/templates/adminTemplates/templ_adminUserItem.php";?>
 
     <hr>
 
@@ -7,7 +7,7 @@
         <?php
         foreach ($allProperties as $propertyCharacteristic) {
             if ($propertyCharacteristic['userId'] == $userCharacteristic['id']) {
-                require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminPropertyItem.php";
+                require $websiteRoot . "/templates/adminTemplates/templ_adminPropertyItem.php";
             }
         }
         ?>

@@ -251,7 +251,8 @@ class View {
      */
     public static function getFullBalloonHTML($oneProperty, $favoritePropertiesId = array()) {
         // Получим HTML шаблон блока из файла
-        $templ = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/templates/searchResultBlocks/fullBalloonListItem.php');
+        if (isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] != "") $websiteRoot = $_SERVER['DOCUMENT_ROOT']; else $websiteRoot = "/var/www/dimau/data/www/svobodno.org";
+        $templ = file_get_contents($websiteRoot . '/templates/searchResultBlocks/fullBalloonListItem.php');
 
         // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне баллуна
         $arrBalloonReplace = array();
@@ -400,7 +401,8 @@ class View {
      */
     public static function getShortListItemHTML($oneProperty, $favoritePropertiesId = array(), $number) {
         // Получим HTML шаблон блока из файла
-        $tmpl_shortAdvert = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/templates/searchResultBlocks/shortListItem.php');
+        if (isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] != "") $websiteRoot = $_SERVER['DOCUMENT_ROOT']; else $websiteRoot = "/var/www/dimau/data/www/svobodno.org";
+        $tmpl_shortAdvert = file_get_contents($websiteRoot . '/templates/searchResultBlocks/shortListItem.php');
 
         // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне shortList строки таблицы
         $arrShortListReplace = array();
@@ -510,7 +512,8 @@ class View {
      */
     public static function getFullParametersListItemHTML($oneProperty, $favoritePropertiesId = array(), $number) {
         // Получим HTML шаблон блока из файла
-        $tmpl_extendedAdvert = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/templates/searchResultBlocks/fullListItem.php');
+        if (isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] != "") $websiteRoot = $_SERVER['DOCUMENT_ROOT']; else $websiteRoot = "/var/www/dimau/data/www/svobodno.org";
+        $tmpl_extendedAdvert = file_get_contents($websiteRoot . '/templates/searchResultBlocks/fullListItem.php');
 
         // Инициализируем массив, в который будут сохранены значения, используемые для замены констант в шаблоне
         $arrExtendedListReplace = array();
@@ -637,7 +640,8 @@ class View {
 
     public static function getHTMLforEmailAboutNewProperty($oneProperty) {
         // Получим HTML шаблон
-        $tmpl_shortAdvert = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/templates/searchResultBlocks/emailAboutNewProperty.php');
+        if (isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] != "") $websiteRoot = $_SERVER['DOCUMENT_ROOT']; else $websiteRoot = "/var/www/dimau/data/www/svobodno.org";
+        $tmpl_shortAdvert = file_get_contents($websiteRoot . '/templates/searchResultBlocks/emailAboutNewProperty.php');
 
         // Инициализируем массив, в который будут сохранены значения, используемые для замены в шаблоне shortList строки таблицы
         $arrShortListReplace = array();
@@ -734,7 +738,8 @@ class View {
         if (!is_array($allPropertiesCharacteristic) || count($allPropertiesCharacteristic) == 0 || !is_array($allPropertiesFotoInformation) || !is_array($allPropertiesTenantPretenders)) return "";
 
         // Получим из файла HTML шаблон блока для описания отдельного объекта недвижимости
-        $tmpl_MyAdvert = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/templates/templ_descriptionPropertyForOwner.php');
+        if (isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] != "") $websiteRoot = $_SERVER['DOCUMENT_ROOT']; else $websiteRoot = "/var/www/dimau/data/www/svobodno.org";
+        $tmpl_MyAdvert = file_get_contents($websiteRoot . '/templates/templ_descriptionPropertyForOwner.php');
 
         // Создаем бриф для каждого объявления пользователя на основе шаблона (для вкладки МОИ ОБЪЯВЛЕНИЯ), и в цикле объединяем их в один HTML блок - $briefOfAdverts.
         // Если объявлений у пользователя несколько, то в переменную, содержащую весь HTML - $briefOfAdverts, записываем каждое из них последовательно
@@ -896,7 +901,8 @@ class View {
      */
     public static function getHTMLforMessageNewProperty($sourceArr) {
         // Получим HTML шаблон блока из файла
-        $templ = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/templates/messagesBlocks/templ_messageNewProperty.php');
+        if (isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] != "") $websiteRoot = $_SERVER['DOCUMENT_ROOT']; else $websiteRoot = "/var/www/dimau/data/www/svobodno.org";
+        $templ = file_get_contents($websiteRoot . '/templates/messagesBlocks/templ_messageNewProperty.php');
 
         // Если массив с параметрами уведомления не передан, то возвращаем пустую строку вместо HTML блока
         if (!isset($sourceArr) || !is_array($sourceArr)) {

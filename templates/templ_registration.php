@@ -85,7 +85,7 @@
 
     <?php
     // Сформируем и вставим заголовок страницы
-    require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+    require $websiteRoot . "/templates/templ_header.php";
     ?>
 
     <div class="headerOfPageContentBlock">
@@ -146,7 +146,7 @@
 
                 <?php
                 // Подключим форму для ввода и редактирования данных о ФИО, логине, контактах пользователя, а также о фотографиях
-                require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editablePersonalFIO.php";
+                require $websiteRoot . "/templates/editableBlocks/templ_editablePersonalFIO.php";
                 ?>
 
                 <div class="bottomControls">
@@ -162,7 +162,7 @@
 
                 <?php
                 // Подключим форму для ввода и редактирования данных об образовании, работе и месте рождения
-                require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editablePersonalEducAndWork.php";
+                require $websiteRoot . "/templates/editableBlocks/templ_editablePersonalEducAndWork.php";
                 ?>
 
                 <div class="bottomControls">
@@ -180,7 +180,7 @@
 
                 <?php
                 // Подключим форму для ввода и редактирования данных о социальных сетях пользователя
-                require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editablePersonalSocial.php";
+                require $websiteRoot . "/templates/editableBlocks/templ_editablePersonalSocial.php";
                 ?>
 
                 <?php if ($userCharacteristic['typeTenant']): ?>
@@ -217,7 +217,7 @@
 
                 <?php
                 // Подключим форму для ввода и редактирования данных о поисковом запросе пользователя
-                require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editableSearchRequest.php";
+                require $websiteRoot . "/templates/editableBlocks/templ_editableSearchRequest.php";
                 ?>
 
                 <div class="bottomControls">

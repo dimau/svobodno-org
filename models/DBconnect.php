@@ -647,37 +647,56 @@ class DBconnect {
     }
 
     /**
-     * Возвращает ассоциативный массив с идентификаторами ранее обработанных объявлений с сайта bazab2b за выбранный период
-     * Функция используется при регулярном парсинге сайта bazab2b для проверки того, что найденное объявление еще не обрабатывалось
-     *
+     * Возвращает ассоциативный массив с идентификаторами ранее обработанных объявлений за выбранный период
+     * Функция используется при регулярном парсинге сайтов объявлений для проверки того, что найденное объявление еще не обрабатывалось
+     * @param string $mode режим работы функции: bazab2b, e1
      * @param $initialDate начальная дата выборки в формате PHP: 27.01.1987
      * @param $finalDate конечная дата выборки в формате PHP: 27.01.1987
-     * @return array ассоциативный массив, ключ = id объявления, значение = c_id объявления
+     * @return array Для e1 - массив идентификаторов, Для bazab2b - ассоциативный массив, ключ = id объявления, значение = c_id объявления
      */
-    public static function selectHandledAdvertsFromBazab2b($initialDate, $finalDate) {
+    public static function selectHandledAdverts($mode, $initialDate, $finalDate) {
 
         // Проверка входящих параметров
-        if (!isset($initialDate) || !isset($finalDate)) return NULL;
+        if (!isset($initialDate) || !isset($finalDate) || !isset($mode)) return NULL;
+        if ($mode != "bazab2b" && $mode != "e1") return NULL;
 
         // Преобразование даты к формату БД
         $initialDate = GlobFunc::dateFromViewToDB($initialDate);
         $finalDate = GlobFunc::dateFromViewToDB($finalDate);
 
+        // В зависимости от режима выбираем таблицу для запроса
+        switch ($mode) {
+            case "bazab2b":
+                $tableName = "bazab2b";
+                break;
+            case "e1":
+                $tableName = "e1";
+                break;
+        }
+
         $stmt = DBconnect::get()->stmt_init();
-        if (($stmt->prepare("SELECT * FROM bazab2b WHERE date >= ? AND date <= ?") === FALSE)
+        if (($stmt->prepare("SELECT * FROM " . $tableName . " WHERE date >= ? AND date <= ?") === FALSE)
             OR ($stmt->bind_param("ss", $initialDate, $finalDate) === FALSE)
             OR ($stmt->execute() === FALSE)
             OR (($res = $stmt->get_result()) === FALSE)
             OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
             OR ($stmt->close() === FALSE)
         ) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM bazab2b WHERE date >= " . $initialDate . " AND date <= " . $finalDate . "'. Местонахождение кода: DBconnect::selectHandledAdvertsFromBazab2b():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM " . $tableName . " WHERE date >= " . $initialDate . " AND date <= " . $finalDate . "'. Местонахождение кода: DBconnect::selectHandledAdverts():1. Режим: '" . $mode. "'. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return NULL;
         }
 
-        $resultArr = array();
-        foreach ($res as $value) {
-            $resultArr[$value['id']] = $value['c_id'];
+        // Преобразование результата к нужному виду
+        if ($mode == "bazab2b") {
+            $resultArr = array();
+            foreach ($res as $value) {
+                $resultArr[$value['id']] = $value['c_id'];
+            }
+        } else {
+            $resultArr = array();
+            foreach ($res as $value) {
+                $resultArr[] = $value['id'];
+            }
         }
 
         return $resultArr;
@@ -961,6 +980,36 @@ class DBconnect {
             OR ($stmt->close() === FALSE)
         ) {
             Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO bazab2b (id, c_id, date) VALUES (" . $id . "," . $c_id . "," . $date . ")'. id логгера: DBconnect::insertHandledAdvertFromBazab2b():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
+
+        return TRUE;
+    }
+
+    /**
+     * Сохраняет идентификатор успешно обработанного объявления с сайта e1
+     * @param int $id идентификатор объявления
+     * @param string $date дата публикации объявления в формате PHP: 27.01.1987
+     * @return bool Возвращает TRUE в случае успеха и FALSE в случае неудачи
+     */
+    public static function insertHandledAdvertFromE1($id, $date) {
+
+        // Проверка входящих параметров
+        if (!isset($id) || !isset($date)) return FALSE;
+
+        // Преобразование даты в формат БД
+        $date = GlobFunc::dateFromViewToDB($date);
+
+        // Сохраняем информацию в БД
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("INSERT INTO e1 (id, date) VALUES (?,?)") === FALSE)
+            OR ($stmt->bind_param("ss", $id, $date) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($res === 0)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO e1 (id, date) VALUES (" . $id . "," . $date . ")'. id логгера: DBconnect::insertHandledAdvertFromE1():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return FALSE;
         }
 

@@ -3,12 +3,13 @@
 session_start();
 
 // Подключаем нужные модели и представления
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
+$websiteRoot = $_SERVER['DOCUMENT_ROOT'];
+require_once $websiteRoot . '/models/DBconnect.php';
+require_once $websiteRoot . '/models/GlobFunc.php';
+require_once $websiteRoot . '/models/Logger.php';
+require_once $websiteRoot . '/models/User.php';
+require_once $websiteRoot . '/models/UserIncoming.php';
+require_once $websiteRoot . '/views/View.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
@@ -31,7 +32,7 @@ $isLoggedIn = $userIncoming->login(); // Используется в templ_heade
 $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 
 // Подсоединяем нужный основной шаблон
-require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_passwordRecovery.php";
+require $websiteRoot . "/templates/templ_passwordRecovery.php";
 
 /********************************************************************************
  * Закрываем соединение с БД

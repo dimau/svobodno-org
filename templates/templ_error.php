@@ -39,7 +39,7 @@
 
     <?php
     // Сформируем и вставим заголовок страницы
-    require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+    require $websiteRoot . "/templates/templ_header.php";
     ?>
 
     <div style="margin-top: 2em; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 16px; text-align: center;">

@@ -1333,6 +1333,7 @@ class Property {
             $MsgHTML = str_replace("{name}", $tenant['name'], $MsgHTML);
             try {
                 $mail->MsgHTML($MsgHTML);
+                $mail->ClearAddresses();
                 $mail->AddAddress($tenant['email'], $tenant['name']);
                 $mail->Send();
                 //$mail->AltBody = 'To view the message, please use an HTML compatible email viewer!'; // optional - MsgHTML will create an alternate automatically

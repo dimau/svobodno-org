@@ -49,7 +49,8 @@
 
     <?php
     // Подключаем шаблон для аналитики посещаемости страниц от гугла
-    require $_SERVER['DOCUMENT_ROOT'] . "/templates/" . "templ-googleAnalytics.php";
+    $websiteRoot = $_SERVER['DOCUMENT_ROOT'];
+    require $websiteRoot . "/templates/" . "templ-googleAnalytics.php";
     ?>
 
 </head>

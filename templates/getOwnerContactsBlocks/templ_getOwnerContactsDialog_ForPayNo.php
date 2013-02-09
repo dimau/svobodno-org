@@ -6,7 +6,7 @@
 
     <div style="margin: 0 auto 1em auto; text-align: center;">
         <?php
-        require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_paymentButtons.php";
+        require $websiteRoot . "/templates/templ_paymentButtons.php";
         ?>
     </div>
 

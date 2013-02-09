@@ -5,7 +5,8 @@
  */
 
 // Подключаем нужные модели и представления
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
+$websiteRoot = $_SERVER['DOCUMENT_ROOT'];
+require_once $websiteRoot . '/models/DBconnect.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
@@ -46,6 +47,7 @@ districts,
 currencies,
 archiveAdverts,
 bazab2b,
+e1,
 invoices
 ");
 
@@ -559,7 +561,7 @@ echo "archiveAdverts: ";
 if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
 /****************************************************************************
- * СПИСОК ОБРАБОТАННЫХ ОБЪЯВЛЕНИЙ ИЗ БАЗЫ САЙТА bazaB2B
+ * СПИСОК ОБРАБОТАННЫХ ОБЪЯВЛЕНИЙ ИЗ БАЗЫ САЙТА bazaB2B, e1
  ***************************************************************************/
 
 DBconnect::get()->query("CREATE TABLE bazab2b (
@@ -569,6 +571,14 @@ DBconnect::get()->query("CREATE TABLE bazab2b (
 )");
 
 echo "bazab2b: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
+DBconnect::get()->query("CREATE TABLE e1 (
+  id VARCHAR(15) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'id идентификатор объявления на сайте e1',
+  date DATE COMMENT 'Дата публикации объявления'
+)");
+
+echo "e1: ";
 if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
 /****************************************************************************

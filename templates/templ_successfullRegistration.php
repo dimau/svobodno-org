@@ -48,7 +48,7 @@
 
     <?php
     // Сформируем и вставим заголовок страницы
-    require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+    require $websiteRoot . "/templates/templ_header.php";
     ?>
 
     <div class="miniBlock">
@@ -61,7 +61,7 @@
                     Теперь Вы можете оплатить премиум доступ для просмотра контактов собственников
                 </p>
                 <?php
-                require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_paymentButtons.php";
+                require $websiteRoot . "/templates/templ_paymentButtons.php";
                 ?>
             </div>
             <div class="text">

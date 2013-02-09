@@ -44,7 +44,7 @@
 <div class="pageWithoutFooter">
 
     <?php
-        require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+        require $websiteRoot . "/templates/templ_header.php";
     ?>
 
     <div class="carousel-container">
@@ -77,7 +77,7 @@
 
                 <div class="carousel-caption">
                     <p>
-                        Примерно 30% исходных объявлений имеет фотографии<br>
+                        Примерно 30% исходных объявлений имеют фотографии<br>
                         Просматривайте их на премиум доступе!
                     </p>
                 </div>
@@ -176,7 +176,7 @@
 
                 <div style="margin: 1em 0 0 1em;">
                     <?php
-                    require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_paymentButtons.php";
+                    require $websiteRoot . "/templates/templ_paymentButtons.php";
                     ?>
                 </div>
             </div>

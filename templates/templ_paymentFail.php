@@ -48,7 +48,7 @@
 
     <?php
     // Сформируем и вставим заголовок страницы
-    require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+    require $websiteRoot . "/templates/templ_header.php";
     ?>
 
     <div class="miniBlock">
@@ -63,7 +63,7 @@
 
                 <p style="text-align: left;">
                     <?php
-                    require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_paymentButtons.php";
+                    require $websiteRoot . "/templates/templ_paymentButtons.php";
                     ?>
                 </p>
             </div>

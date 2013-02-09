@@ -6,12 +6,13 @@
  */
 
 // Подключаем необходимые модели, классы
-require_once $_SERVER['DOCUMENT_ROOT'] . '/lib/class.phpmailer.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Property.php';
+if (isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] != "") $websiteRoot = $_SERVER['DOCUMENT_ROOT']; else $websiteRoot = "/var/www/dimau/data/www/svobodno.org";
+require_once $websiteRoot . '/lib/class.phpmailer.php';
+require_once $websiteRoot . '/models/DBconnect.php';
+require_once $websiteRoot . '/models/GlobFunc.php';
+require_once $websiteRoot . '/models/Logger.php';
+require_once $websiteRoot . '/views/View.php';
+require_once $websiteRoot . '/models/Property.php';
 
 // Получаем id объекта недвижимости, рассылку о котором нужно выполнить
 if (isset($_POST['propertyId']) && intval($_POST['propertyId']) != 0) {
@@ -56,10 +57,10 @@ foreach ($listOfTargetUsers as $value) {
 $property->sendSMSAboutNewProperty($listOfTargetUsersForSMS);
 
 // Оповестить оператора о подходящем варианте для клиента
-foreach ($listOfTargetUsers as $value) {
+/*foreach ($listOfTargetUsers as $value) {
     $subject = 'Подходящий вариант';
     $msgHTML = "Новый подходящий вариант:<br>
                 Для пользователя: <a href='http://svobodno.org/man.php?compId=" . GlobFunc::idToCompId($value['userId']) . "'>" . $value['name'] . " " . $value['telephon'] . "</a><br>
                 Подробное объявление: <a href='http://svobodno.org/property.php?propertyId=" . $property->getId() . "'>" . $property->getAddress() . "</a>";
     GlobFunc::sendEmailToOperator($subject, $msgHTML);
-}
+}*/

@@ -17,7 +17,9 @@ class Logger {
     // КОНСТРУКТОР
     // Конструктор будет использоваться внутри класса, непосредственно при логировании мы будем пользоваться функцией getLogger
     public function __construct($name, $file = NULL) {
-        Logger::$PATH = $_SERVER['DOCUMENT_ROOT'] . '/logs';
+
+        if (isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] != "") $websiteRoot = $_SERVER['DOCUMENT_ROOT']; else $websiteRoot = "/var/www/dimau/data/www/svobodno.org"; // так как cron не инициализирует переменную окружения $_SERVER['DOCUMENT_ROOT'] (а точнее инициализирует ее пустой строкой), приходиться использовать костыль
+        Logger::$PATH = $websiteRoot . '/logs';
         $this->name = $name;
         $this->file = $file;
 
@@ -63,7 +65,9 @@ class Logger {
         $log = '';
         $log .= "\r\n"; // Добавим перенос строки для виндовс (смотреть в блокноте)
         // зафиксируем дату и время происходящего
-        $log .= '[' . date('D M d H:i:s Y', time()) . '] ';
+        $currentDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
+        $currentDate = $currentDate->format("D M d H:i:s Y");
+        $log .= "[" . $currentDate . "] ";
         // если мы отправили в функцию больше одного параметра,
         // выведем их тоже
         if (func_num_args() > 1) {

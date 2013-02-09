@@ -5,7 +5,8 @@
  */
 
 // Подключаем нужные модели и представления
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
+$websiteRoot = $_SERVER['DOCUMENT_ROOT'];
+require_once $websiteRoot . '/models/DBconnect.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');

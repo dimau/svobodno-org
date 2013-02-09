@@ -41,7 +41,7 @@
 
     <?php
     // Сформируем и вставим заголовок страницы
-    require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+    require $websiteRoot . "/templates/templ_header.php";
     ?>
 
     <div class="headerOfPage">
@@ -63,7 +63,7 @@
                 echo View::getHTMLfotosWrapper("middle", TRUE, FALSE, $userFotoInformation['uploadedFoto']);
 
                 // Вставляем анкетные данные пользователя
-                require $_SERVER['DOCUMENT_ROOT'] . "/templates/notEditableBlocks/templ_notEditedProfile.php";
+                require $websiteRoot . "/templates/notEditableBlocks/templ_notEditedProfile.php";
                 ?>
             </div>
             <div class="clearBoth"></div>
@@ -77,7 +77,7 @@
             <?php endif;?>
             <?php
             // Шаблон для представления нередактируемых параметров поисковго запроса пользователя
-            if ($userSearchRequest != FALSE) require $_SERVER['DOCUMENT_ROOT'] . "/templates/notEditableBlocks/templ_notEditedSearchRequest.php";
+            if ($userSearchRequest != FALSE) require $websiteRoot . "/templates/notEditableBlocks/templ_notEditedSearchRequest.php";
             ?>
         </div>
         <!-- /end.tabs-2 -->

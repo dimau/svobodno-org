@@ -73,7 +73,7 @@
 
     <div class="mainContentBlock">
         <?php foreach ($allRequestsFromOwners as $requestFromOwner): ?>
-        <?php require $_SERVER['DOCUMENT_ROOT'] . "/templates/adminTemplates/templ_adminRequestFromOwnerItem.php"; ?>
+        <?php require $websiteRoot . "/templates/adminTemplates/templ_adminRequestFromOwnerItem.php"; ?>
         <hr>
         <?php endforeach; ?>
     </div>

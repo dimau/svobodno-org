@@ -12,13 +12,16 @@ if (isset($_GET['action'])) $action = htmlspecialchars($_GET['action'], ENT_QUOT
 $propertyId = "";
 if (isset($_GET['propertyId'])) $propertyId = intval(htmlspecialchars($_GET['propertyId'], ENT_QUOTES));
 
+// Определим корень сайта
+$websiteRoot = $_SERVER['DOCUMENT_ROOT'];
+
 // Если в запросе не указан идентификатор объявления для редактирования, то пересылаем пользователя на спец страницу
 if ($propertyId == "" || $propertyId == 0) {
     // Инициализируем используемые в шаблоне(ах) переменные
     $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
     $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
     $mode = "notfound";
-    require $_SERVER['DOCUMENT_ROOT'] . '/templates/templ_error.php';
+    require $websiteRoot . '/templates/templ_error.php';
     exit();
 }
 
@@ -30,13 +33,13 @@ if ($propertyId == "" || $propertyId == 0) {
 session_start();
 
 // Подключаем нужные модели и представления
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/DBconnect.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/GlobFunc.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Logger.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/User.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/UserIncoming.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/models/Property.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/views/View.php';
+require_once $websiteRoot . '/models/DBconnect.php';
+require_once $websiteRoot . '/models/GlobFunc.php';
+require_once $websiteRoot . '/models/Logger.php';
+require_once $websiteRoot . '/models/User.php';
+require_once $websiteRoot . '/models/UserIncoming.php';
+require_once $websiteRoot . '/models/Property.php';
+require_once $websiteRoot . '/views/View.php';
 
 // Удалось ли подключиться к БД?
 if (DBconnect::get() == FALSE) die('Ошибка подключения к базе данных (. Попробуйте зайти к нам немного позже.');
@@ -64,7 +67,7 @@ if (!$property->readCharacteristicFromDB()) {
     $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
     $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
     $mode = "notfound";
-    require $_SERVER['DOCUMENT_ROOT'] . '/templates/templ_error.php';
+    require $websiteRoot . '/templates/templ_error.php';
     exit();
 }
 
@@ -85,7 +88,7 @@ if ($property->getStatus() == "не опубликовано"
     $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
     $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
     $mode = "accessdenied";
-    require $_SERVER['DOCUMENT_ROOT'] . '/templates/templ_error.php';
+    require $websiteRoot . '/templates/templ_error.php';
     exit();
 }
 
@@ -107,7 +110,7 @@ $appliances = $property->getAppliancesAll();
 //TODO: передавать параметр - смотрел ли данный пользовтаель ранее контакты собственника
 
 // Подсоединяем нужный основной шаблон
-require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_property.php";
+require $websiteRoot . "/templates/templ_property.php";
 
 /********************************************************************************
  * Закрываем соединение с БД

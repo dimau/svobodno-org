@@ -76,12 +76,12 @@
 
 <?php
 // Сформируем и вставим заголовок страницы
-require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+require $websiteRoot . "/templates/templ_header.php";
 ?>
 
 <?php
 // Модальное окно для незарегистрированных пользователей, которые нажимают на кнопку добавления в Избранное
-if ($isLoggedIn === FALSE) require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_addToFavotitesDialog_ForLoggedOut.php";
+if ($isLoggedIn === FALSE) require $websiteRoot . "/templates/templ_addToFavotitesDialog_ForLoggedOut.php";
 ?>
 
 <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -147,7 +147,7 @@ $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullA
             echo View::getHTMLfotosWrapper("middle", TRUE, FALSE, $userFotoInformation['uploadedFoto']);
 
             // Вставляем анкетные данные пользователя
-            require $_SERVER['DOCUMENT_ROOT'] . "/templates/notEditableBlocks/templ_notEditedProfile.php";
+            require $websiteRoot . "/templates/notEditableBlocks/templ_notEditedProfile.php";
 
             ?>
         </div>
@@ -160,13 +160,13 @@ $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullA
 
             <?php
             // Подключим форму для ввода и редактирования данных о ФИО, логине, контактах пользователя, а также о фотографиях
-            require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editablePersonalFIO.php";
+            require $websiteRoot . "/templates/editableBlocks/templ_editablePersonalFIO.php";
 
             // Подключим форму для ввода и редактирования данных об образовании, работе и месте рождения
-            require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editablePersonalEducAndWork.php";
+            require $websiteRoot . "/templates/editableBlocks/templ_editablePersonalEducAndWork.php";
 
             // Подключим форму для ввода и редактирования данных о социальных сетях пользователя
-            require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editablePersonalSocial.php";
+            require $websiteRoot . "/templates/editableBlocks/templ_editablePersonalSocial.php";
             ?>
 
             <div class="clearBoth"></div>
@@ -235,7 +235,7 @@ $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullA
             </ul>
             <?php
             // Шаблон для представления нередактируемых параметров поисковго запроса пользователя
-            require $_SERVER['DOCUMENT_ROOT'] . "/templates/notEditableBlocks/templ_notEditedSearchRequest.php";
+            require $websiteRoot . "/templates/notEditableBlocks/templ_notEditedSearchRequest.php";
             ?>
         </div>
         <?php endif;?>
@@ -247,7 +247,7 @@ $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullA
 
             <?php
             // Подключим форму для ввода и редактирования данных о социальных сетях пользователя
-            require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editableSearchRequest.php";
+            require $websiteRoot . "/templates/editableBlocks/templ_editableSearchRequest.php";
             ?>
 
             <div class="clearBoth"></div>
@@ -269,7 +269,7 @@ $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullA
     <div id="tabs-5">
         <?php
         // Размещаем на странице HTML для результатов поиска (списка избранных объектов недвижимости)
-        require $_SERVER['DOCUMENT_ROOT'] . "/templates/searchResultBlocks/templ_searchResult.php";
+        require $websiteRoot . "/templates/searchResultBlocks/templ_searchResult.php";
         ?>
     </div>
 

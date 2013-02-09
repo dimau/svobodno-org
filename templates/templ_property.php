@@ -52,7 +52,7 @@
 
 <?php
 // Сформируем и вставим заголовок страницы
-require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+require $websiteRoot . "/templates/templ_header.php";
 ?>
 
 <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -90,7 +90,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
                         // Добавляем на страницу полученные с сервера данные о собственнике
                         if (data.name != "") $(".ownerContactsName").html(data.name + " " + data.secondName);
                         if (data.contactTelephonNumber != "") $(".ownerContactsTelephon").html(data.contactTelephonNumber);
-                        if (data.sourceOfAdvert != "") {
+                        if (data.sourceOfAdvert != "" && data.sourceOfAdvert.substr(0,18) != "http://bazab2b.ru/") {
                             $(".ownerContactsSourceOfAdvert a.ownerContactsSourceOfAdvertHref").html("Источник объявления").attr("href", data.sourceOfAdvert);
                         }
                         // Прячем кнопку запроса контактов собственника, показываем полученные данные
@@ -193,7 +193,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
         <li>
             <?php
                 /* Контакты собственника */
-                require $_SERVER['DOCUMENT_ROOT'] . "/templates/getOwnerContactsBlocks/templ_getOwnerContactsItem.php";
+                require $websiteRoot . "/templates/getOwnerContactsBlocks/templ_getOwnerContactsItem.php";
             ?>
         </li>
         <li>
@@ -851,16 +851,16 @@ require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
 
 <?php
 // Модальное окно для незарегистрированных пользователей, которые нажимают на кнопку добавления в Избранное
-if ($isLoggedIn === FALSE) require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_addToFavotitesDialog_ForLoggedOut.php";
+if ($isLoggedIn === FALSE) require $websiteRoot . "/templates/templ_addToFavotitesDialog_ForLoggedOut.php";
 ?>
 <?php
 // Подключаем нужное модальное окно для Запроса на получение контактов собственника
 if ($isLoggedIn === FALSE) {
-    require $_SERVER['DOCUMENT_ROOT'] . "/templates/getOwnerContactsBlocks/templ_getOwnerContactsDialog_ForLoggedOut.php";
+    require $websiteRoot . "/templates/getOwnerContactsBlocks/templ_getOwnerContactsDialog_ForLoggedOut.php";
 }
 if (($isLoggedIn === TRUE && $propertyCharacteristic['typeOfObject'] == "комната" && $userCharacteristic['reviewRooms'] < time()) OR
     ($isLoggedIn === TRUE && $propertyCharacteristic['typeOfObject'] == "квартира" && $userCharacteristic['reviewFlats'] < time())) {
-    require $_SERVER['DOCUMENT_ROOT'] . "/templates/getOwnerContactsBlocks/templ_getOwnerContactsDialog_ForPayNo.php";
+    require $websiteRoot . "/templates/getOwnerContactsBlocks/templ_getOwnerContactsDialog_ForPayNo.php";
 }
 ?>
 

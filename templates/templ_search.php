@@ -42,7 +42,7 @@
 
     <?php
     // Сформируем и вставим заголовок страницы
-    require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_header.php";
+    require $websiteRoot . "/templates/templ_header.php";
     ?>
 
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -134,7 +134,7 @@
 
                 <?php
                 // Форма с параметрами поиска
-                require $_SERVER['DOCUMENT_ROOT'] . "/templates/editableBlocks/templ_editableSearchRequest.php";
+                require $websiteRoot . "/templates/editableBlocks/templ_editableSearchRequest.php";
                 ?>
 
                 <div class="bottomButton">
@@ -151,12 +151,12 @@
 
     <?php
     // Размещаем на странице HTML для результатов поиска
-    require $_SERVER['DOCUMENT_ROOT'] . "/templates/searchResultBlocks/templ_searchResult.php";
+    require $websiteRoot . "/templates/searchResultBlocks/templ_searchResult.php";
     ?>
 
     <?php
     // Модальное окно для незарегистрированных пользователей, которые нажимают на кнопку добавления в Избранное
-    if ($isLoggedIn === FALSE) require $_SERVER['DOCUMENT_ROOT'] . "/templates/templ_addToFavotitesDialog_ForLoggedOut.php";
+    if ($isLoggedIn === FALSE) require $websiteRoot . "/templates/templ_addToFavotitesDialog_ForLoggedOut.php";
     ?>
 
     <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
