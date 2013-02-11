@@ -703,6 +703,32 @@ class DBconnect {
     }
 
     /**
+     * Возвращает данные по конкретному номеру телефона
+     * @param int $phoneNumber идентификатор счета (номер счета)
+     * @return array ассоциативный массив, содержащих параметры счета, если счет не найден - пустой массив
+     */
+    public static function selectKnownPhoneNumber($phoneNumber) {
+
+        // Проверка входящих параметров
+        if (!isset($phoneNumber) || !is_int($phoneNumber)) return array();
+
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("SELECT * FROM knownPhoneNumbers WHERE phoneNumber = ? LIMIT 1") === FALSE)
+            OR ($stmt->bind_param("i", $phoneNumber) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->get_result()) === FALSE)
+            OR (($res = $res->fetch_assoc()) === NULL)
+            OR ($stmt->close() === FALSE)
+        ) {
+            // Если не найдено данных по такому номеру телефона, то операция $res->fetch_assoc() будет генерировать NULL вроде, так что в лог будет записываться ошибка даже в штатном режиме работы скрипта
+            Logger::getLogger(GlobFunc::$loggerName)->log("SELECT * FROM knownPhoneNumbers WHERE phoneNumber = " . $phoneNumber . " LIMIT 1'. Местонахождение кода: DBconnect::selectKnownPhoneNumber():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return array();
+        }
+
+        return $res;
+    }
+
+    /**
      * Возвращает данные по оплаченному счету
      * @param string $number идентификатор счета (номер счета)
      * @return array ассоциативный массив, содержащих параметры счета, если счет не найден - пустой массив
@@ -1017,6 +1043,32 @@ class DBconnect {
     }
 
     /**
+     * Сохраняет данные о телефоне
+     * @param $paramsArr
+     * @return bool Возвращает TRUE в случае успеха и FALSE в случае неудачи
+     */
+    public static function insertKnownPhoneNumber($paramsArr) {
+
+        // Проверка входящих параметров
+        if (!isset($paramsArr) || !is_array($paramsArr)) return FALSE;
+
+        // Сохраняем информацию в БД
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("INSERT INTO knownPhoneNumbers (phoneNumber, status, dateOfLastPublication) VALUES (?,?,?)") === FALSE)
+            OR ($stmt->bind_param("isi", $paramsArr['phoneNumber'], $paramsArr['status'], $paramsArr['dateOfLastPublication']) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($res === 0)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO knownPhoneNumbers (phoneNumber, status, dateOfLastPublication) VALUES (" . $paramsArr['phoneNumber'] . "," . $paramsArr['status'] . "," . $paramsArr['dateOfLastPublication'] . ")'. id логгера: DBconnect::insertKnownPhoneNumber():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
+
+        return TRUE;
+    }
+
+    /**
      * Сохраняет данные об оплате доступа к сервису
      * @param $paramsArr
      * @return bool Возвращает TRUE в случае успеха и FALSE в случае неудачи
@@ -1198,6 +1250,28 @@ class DBconnect {
             OR ($stmt->close() === FALSE)
         ) {
             Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE messagesNewProperty SET userId = " . $paramsArr['userId'] . ", timeIndex = " . $paramsArr['timeIndex'] . ", messageType = " . $paramsArr['messageType'] . ", isReaded = " . $paramsArr['isReaded'] . ", fotoArr = " . $paramsArr['fotoArr'] . ", targetId = " . $paramsArr['targetId'] . ", needEmail = " . $paramsArr['needEmail'] . ", needSMS = " . $paramsArr['needSMS'] . ", typeOfObject = " . $paramsArr['typeOfObject'] . ", address = " . $paramsArr['address'] . ", currency = " . $paramsArr['currency'] . ", costOfRenting = " . $paramsArr['costOfRenting'] . ", utilities = " . $paramsArr['utilities'] . ", electricPower = " . $paramsArr['electricPower'] . ", amountOfRooms = " . $paramsArr['amountOfRooms'] . ", adjacentRooms = " . $paramsArr['adjacentRooms'] . ", amountOfAdjacentRooms = " . $paramsArr['amountOfAdjacentRooms'] . ", roomSpace = " . $paramsArr['roomSpace'] . ", totalArea = " . $paramsArr['totalArea'] . ", livingSpace = " . $paramsArr['livingSpace'] . ", kitchenSpace = " . $paramsArr['kitchenSpace'] . ", totalAmountFloor = " . $paramsArr['totalAmountFloor'] . ", numberOfFloor = " . $paramsArr['numberOfFloor'] . "'. id логгера: DBconnect::updateMessageNewProperty():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
+
+        return TRUE;
+    }
+
+    // Обновляет параметры телефонного номера агента/собственника в БД
+    public static function updateKnownPhoneNumberDate($phoneNumber, $date) {
+
+        // Проверка входящих параметров
+        if (!isset($phoneNumber) || !isset($date)) return FALSE;
+
+        // Сохраняем информацию о загруженной фотке в БД
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("UPDATE knownPhoneNumbers SET dateOfLastPublication = ? WHERE phoneNumber = ?") === FALSE)
+            OR ($stmt->bind_param("ii", $date, $phoneNumber) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($res === 0)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE knownPhoneNumbers SET dateOfLastPublication = " . $date . " WHERE phoneNumber = " . $phoneNumber . "' id логгера: DBconnect::updateKnownPhoneNumberDate():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return FALSE;
         }
 

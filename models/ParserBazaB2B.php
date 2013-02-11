@@ -93,6 +93,7 @@ class ParserBazaB2B extends ParserBasic {
         $this->advertShortDescriptionDOM = NULL;
         $this->c_id = NULL;
         $this->id = NULL;
+        $this->phoneNumber = NULL;
         $this->advertFullDescriptionDOM = NULL;
 
         return TRUE;
@@ -311,8 +312,6 @@ class ParserBazaB2B extends ParserBasic {
         return $params;
     }
 
-
-
     /**
      * Функция проверяет, обрабатывалось ли данное объявление ранее
      * @return bool возвращает TRUE, если текущее объявление уже обрабатывалось, FALSE в случае, если не обрабатывалось
@@ -331,8 +330,6 @@ class ParserBazaB2B extends ParserBasic {
 
         return FALSE;
     }
-
-
 
     /**
      * Функция возвращает TRUE, если данное объявление по дате публикации уже не попадает во временное окно актуальности объявлений.
@@ -371,8 +368,6 @@ class ParserBazaB2B extends ParserBasic {
         }
 
     }
-
-
 
     /**
      * Функция запоминает в БД, что данное объявление успешно обработано, что позволит избежать его повторной обработки

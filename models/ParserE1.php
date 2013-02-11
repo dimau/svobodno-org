@@ -89,6 +89,7 @@ class ParserE1 extends ParserBasic {
         $this->advertShortDescriptionNumber = 1;
         $this->advertShortDescriptionDOM = NULL;
         $this->id = NULL;
+        $this->phoneNumber = NULL;
         $this->advertFullDescriptionDOM = NULL;
 
         return TRUE;
@@ -145,12 +146,53 @@ class ParserE1 extends ParserBasic {
         // Сохраним в параметры объекта DOM-объект страницы со списком объявлений
         $this->advertFullDescriptionDOM = str_get_html($pageHTML);
 
+        // Находим основной раздел страницы, помещенной в таблицу, в которую помещены все блоки с описанием объявления - именно с этой частью страницы мы и будем дальше работать
+        $this->advertFullDescriptionDOM = $this->advertFullDescriptionDOM->find("body table", 3)->find("tr", 0)->find("td", 3);
+
         return TRUE;
     }
 
+    /**
+     * Метод достает из подробного описания объявления телефон контактного лица
+     * @return bool TRUE в случае успешного нахождения телефонного номера и FALSE в противном случае
+     */
+    public function getPhoneNumber() {
 
+        // Если в объявлении есть фотографии, то блок с контактами расположен в 5-ой таблице, иначе пятой таблицы не будет в этом объявлении
+        if (!($phoneNumber = $this->advertFullDescriptionDOM->find("table", 4)->find("tr", 1)->find("td", 0)->find("tr", 1)->find("td", 1)->plaintext)) {
+            // Блок с контактами в объявлении без фотографий
+            $phoneNumber = $this->advertFullDescriptionDOM->find("table", 3)->find("tr", 1)->find("td", 0)->find("tr", 1)->find("td", 1)->plaintext;
+        }
 
+        // Если достать номер телефона со страницы не удалось
+        if (!$phoneNumber) return FALSE;
 
+        // Приведем телефонный номер к стандартному виду
+        if (!($phoneNumber = $this->phoneNumberNormalization($phoneNumber, "Екатеринбург"))) return FALSE;
+
+        // Есть телефонный номер!
+        $this->phoneNumber = $phoneNumber;
+
+        // Задача успешно выполнена
+        return TRUE;
+    }
+
+    /**
+     * Метод проверяет наличие признаков агента в подробном описании объявления
+     * @return bool TRUE в случае успешного нахождения признаков агента и FALSE в противном случае
+     */
+    public function hasSignsAgent() {
+
+        // Проверяем наличие блока с заголовком "Информация об агентстве:"
+        if ($this->advertFullDescriptionDOM->find("table", 5)->find("tr td b", 0)->plaintext == "Информация об агентстве:"
+            OR $this->advertFullDescriptionDOM->find("table", 4)->find("tr td b", 0)->plaintext == "Информация об агентстве:"
+        ) {
+            return TRUE;
+        }
+
+        // Признаки агентства не обнаружены
+        return FALSE;
+    }
 
     /**
      * Функция для парсинга данных по конкретному объявлению с сайта e1.ru
@@ -158,59 +200,75 @@ class ParserE1 extends ParserBasic {
      */
     public function parseFullAdvert() {
 
-        // Собираем массив, каждый член которого - некоторый параметр объекта недвижимости
-        $tableRows = $this->advertFullDescriptionDOM->find("table tr");
+        // Валидация исходных данных
+        if (!$this->advertFullDescriptionDOM || !$this->id) return FALSE;
 
         // Готовим массив, в который сложим параметры объявления
         $params = array();
 
+        // TODO: добавить в модель новый параметр - наличие фотографий в исходном объявлении
+        // Выясним - есть ли в объявлении фотографии
+        if ($this->advertFullDescriptionDOM->find("table", 2)->find("tr td b", 0)->plaintext == "Фотографии:") {
+            $params['sourceAdvertWithPhotos'] = TRUE;
+        } else {
+            $params['sourceAdvertWithPhotos'] = FALSE;
+        }
+
+        // Достанем комментарий
+        if ($params['sourceAdvertWithPhotos']) {
+            if ($this->advertFullDescriptionDOM->find("table", 3)->find("tr td b", 0)->plaintext == "Дополнительные сведения:") {
+                $params['comment'] = $this->advertFullDescriptionDOM->find("table", 3)->find("tr td p", 0)->plaintext;
+            }
+        } else {
+            if ($this->advertFullDescriptionDOM->find("table", 2)->find("tr td b", 0)->plaintext == "Дополнительные сведения:") {
+                $params['comment'] = $this->advertFullDescriptionDOM->find("table", 2)->find("tr td p", 0)->plaintext;
+            }
+        }
+
+        // РАЗБИРАЕМ СТРУКТУРИРОВАННЫЕ ДАННЫЕ ОБЪЯВЛЕНИЯ
+
+        // Собираем массив, каждый член которого - некоторый параметр объекта недвижимости
+        $tableRows = $this->advertFullDescriptionDOM->find("table", 1)->find("tr", 1)->find("tr");
+
         // Тип объекта
-        $params['typeOfObject'] = $this->getTypeOfObject();
+        // TODO: Сделать более универсальный способ определения типа объекта
+        $params['typeOfObject'] = "квартира";
 
         // Номер квартиры - его необходимо обязательно указывать и указывать уникальное значение, иначе объявление невозможно будет уникально идентифицировать
         $params['apartmentNumber'] = mt_rand(1000, 100000);
+
+        // Источник
+        $params['sourceOfAdvert'] = "http://www.e1.ru/business/realty/" . $this->id;
 
         // Перебираем все имеющиеся параметры объявления и заполняет соответствующие параметры ассоциативного массива
         foreach ($tableRows as $oneParam) {
 
             // Получим название параметра
-            $paramName = $oneParam->find("td b", 0)->plaintext;
+            $paramName = $oneParam->find("td", 0)->plaintext;
 
-            // Стоимость аренды и комиссия
-            if ($paramName == "Цена:") {
-                $value = $oneParam->find("td", 1)->plaintext;
-                if ($value != "") {
-                    $params['costOfRenting'] = intval($value);
-                    $params['currency'] = "руб.";
-                    $params['compensationMoney'] = 0;
-                    $params['compensationPercent'] = 0;
+            // Смежные комнаты
+            if ($paramName == "Количество смежных комнат:") {
+                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                if ($value == "ни одной") {
+                    $params['adjacentRooms'] = "нет";
+                } else {
+                    $params['adjacentRooms'] = "да";
+                    $params['amountOfAdjacentRooms'] = intval($value);
                 }
                 continue;
             }
 
             // Количество комнат
-            if ($paramName == "Комнат:") {
-                $value = $oneParam->find("td", 1)->plaintext;
-                if ($value != "") $params['amountOfRooms'] = intval($value);
-                continue;
-            }
-
-            // Смежные комнаты
-            if ($paramName == "Смежных комнат:") {
-                $value = $oneParam->find("td", 1)->plaintext;
-                if ($value == "ни одной") {
-                    $params['adjacentRooms'] = "нет";
-                } else {
-                    $params['adjacentRooms'] = "да";
-                    $params['amountOfAdjacentRooms'] = intval($oneParam->find("td", 1)->plaintext);
-                }
+            if ($paramName == "Кол-во комнат в квартире:") {
+                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                if (isset($value) && $value != "") $params['amountOfRooms'] = intval($value);
                 continue;
             }
 
             // Площадь
-            if ($paramName == "Площадь:") {
-                $value = $oneParam->find("td", 1)->plaintext;
-                if ($value != "") $value = explode("/", $value); else continue;
+            if ($paramName == "Общая площадь, кв.м.") {
+                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                if (isset($value) && $value != "") $value = explode("/", $value); else continue;
                 if ($params['typeOfObject'] == "комната") {
                     if (isset($value[0])) $params['roomSpace'] = floatval($value[0]);
                 }
@@ -222,52 +280,54 @@ class ParserE1 extends ParserBasic {
                 continue;
             }
 
-            // Этаж
-            if ($paramName == "Этаж:") {
-                $value = $oneParam->find("td", 1)->plaintext;
-                if ($value != "") $floorArr = explode("/", $value); else continue;
-                if (isset($floorArr[0])) $params['floor'] = intval($floorArr[0]);
-                if (isset($floorArr[1])) $params['totalAmountFloor'] = intval($floorArr[1]);
-                continue;
-            }
-
-            // Район
-            if ($paramName == "Район:") {
-                $value = $oneParam->find("td", 1);
-                if (isset($value)) $value = $value->plaintext; else $value = "0";
-                if ($value == "Новая Сортировка") $value = "Сортировка новая";
-                if ($value == "Старая Сортировка") $value = "Сортировка старая";
-                if ($value == "Виз") $value = "ВИЗ";
-                if ($value == "Юго-Западный") $value = "Юго-запад";
-                $params['district'] = $value;
-                continue;
-            }
-
-            // Адрес
-            if ($paramName == "Адрес:" || $paramName == "Адрес: ") {
-                $value = $oneParam->find("td", 1)->find("a", 0);
-                if (isset($value)) $params['address'] = $value->plaintext;
-                continue;
-            }
-
-            // Доп. сведения
-            if ($paramName == "Доп. сведения:") {
-                $value = $oneParam->find("td", 1)->plaintext;
-                if (!isset($params['comment']) || $params['comment'] == "") $params['comment'] = $value; else $params['comment'] .= $value;
+            // Стоимость аренды и комиссия
+            if ($paramName == "Цена:") {
+                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                if (isset($value) && $value != "") {
+                    $value = str_replace(array(" ", "р"), "", $value);
+                    $params['costOfRenting'] = intval($value);
+                    $params['currency'] = "руб.";
+                    $params['compensationMoney'] = 0;
+                    $params['compensationPercent'] = 0;
+                }
                 continue;
             }
 
             // Ком. платежи
-            if ($paramName == "Ком. платежи:") {
-                $value = $oneParam->find("td", 1)->plaintext;
+            if ($paramName == "Коммунальные платежи:") {
+                $value = $oneParam->find("td", 1)->find("b")->plaintext;
                 if ($value == "Оплачиваются дополнительно") $params['utilities'] = "да";
                 if ($value == "Включены в стоимость") $params['utilities'] = "нет";
                 continue;
             }
 
+            // Адрес
+            if ($paramName == "Адрес:") {
+                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                if (isset($value)) $params['address'] = $value;
+                continue;
+            }
+
+            // Этаж
+            if ($paramName == "Этаж:") {
+                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                if (isset($value) && $value != "") $floorArr = explode("/", $value); else continue;
+                if (isset($floorArr[0])) $params['floor'] = intval($floorArr[0]);
+                if (isset($floorArr[1])) $params['totalAmountFloor'] = intval($floorArr[1]);
+                continue;
+            }
+
+            // Санузел
+            if ($paramName == "Сан узел:") {
+                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                if (!isset($value) && $value == "") continue;
+                if ($value == "Раздельный") $params['typeOfBathrooms'] = "раздельный";
+                continue;
+            }
+
             // Мебель
             if ($paramName == "Мебель:") {
-                $value = $oneParam->find("td", 1)->plaintext;
+                $value = $oneParam->find("td", 1)->find("b")->plaintext;
                 if ($value == "Есть") {
                     $params['furnitureInLivingAreaExtra'] = "Есть";
                     $params['furnitureInKitchenExtra'] = "Есть";
@@ -275,39 +335,42 @@ class ParserE1 extends ParserBasic {
                 continue;
             }
 
-            // Техника
-            if ($paramName == "Техника: ") {
-                $params['appliancesExtra'] = "";
-                $value = $oneParam->find("td", 1)->find("img");
-                foreach ($value as $one) {
-                    if ($one->src == "/img/hol.png") $params['appliancesExtra'] .= "холодильник, ";
-                    if ($one->src == "/img/tv.png") $params['appliancesExtra'] .= "телевизор, ";
-                    if ($one->src == "/img/stir.png") $params['appliancesExtra'] .= "стиральная машина, ";
-                }
+            // Балкон/лоджия
+            if ($paramName == "Лоджия:") {
+                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                if (!isset($value) && $value == "") continue;
+                if ($value == "Лоджия") $params['typeOfBalcony'] = "лоджия";
+                if ($value == "Балкон") $params['typeOfBalcony'] = "балкон";
                 continue;
             }
 
-            // Источник
-            $paramName = $oneParam->find("td", 0)->plaintext;
-            if ($paramName == "Источник") {
-                $value = $oneParam->find("td a font b", 0)->plaintext;
-                if ($value == "" && $oneParam->find("td", 1)->plaintext == "Добавлено на наш сайт") $value = "http://bazab2b.ru/?c_id=" . $this->c_id . "&&id=" . $this->id . "&modal=1"; // Для объявлений добавленных напрямую в базуБ2Б
-                $params['sourceOfAdvert'] = $value;
+            // Город
+            if ($paramName == "Город:") {
+                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                if (isset($value) && $value != "") $params['city'] = $value;
+                continue;
+            }
+
+            // Район
+            if ($paramName == "Район:") {
+                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                if (!isset($value) || $value == "") $value = "0";
+                /*if ($value == "Новая Сортировка") $value = "Сортировка новая";
+                if ($value == "Старая Сортировка") $value = "Сортировка старая";
+                if ($value == "Виз") $value = "ВИЗ";
+                if ($value == "Юго-Западный") $value = "Юго-запад";*/
+                $params['district'] = $value;
+                continue;
             }
         }
 
-        // Проверяем, удалось ли получить ссылку на источник объявления, если нет - значит пользователь, под которым мы запросили данные не авторизован, нужно повторить процедуру
+        // Проверяем, удалось ли получить ссылку на источник объявления
         if (!isset($params['sourceOfAdvert']) || $params['sourceOfAdvert'] == "") {
             return FALSE;
         }
 
         return $params;
     }
-
-
-
-
-
 
     /**
      * Функция проверяет, обрабатывалось ли данное объявление ранее

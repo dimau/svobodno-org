@@ -5,7 +5,7 @@
 
 class ParserBasic {
 
-    protected $mode; // Режим работы парсера (определяется сайтом, который парсим)
+    protected $mode; // Режим работы парсера (определяется сайтом, который парсим и категорией объявлений, которые в этот раз парсятся на данном сайте)
     protected $login; // Логин для доступа к сайту (используется только, если он необходим)
     protected $password; // Пароль для доступа к сайту (используется только, если он необходим)
     protected $actualDayAmountForAdvert = 2; // Количество дней, за которые парсер проверяет объявления из списка. Если ему попадается объявление, опубликованное ранее данного количества дней назад, то он прекращает свою работу. 1 - только сегодняшние объявления, 2 - сегодняшние и вчерашние и так далее.
@@ -15,6 +15,7 @@ class ParserBasic {
     protected $advertShortDescriptionDOM; // DOM-объект строки таблицы (единичного элемента списка объявлений). Содержит краткое описание объявления, обрабатываемого в данный момент
     protected $advertShortDescriptionNumber = -1; // Номер строки таблицы (единичного элемента списка объявлений), обрабатываемого в данный момент (находится в $advertShortDescriptionDOM) Непосредственно перед получением сведений по новому объявлению счетчик увеличивается на 1
     protected $id; // Идентификатор объявления на сайте
+    protected $phoneNumber; // Телефон контактного лица по обрабатываемому объявлению
     protected $advertFullDescriptionDOM; // DOM-объект страницы с подробным описанием объявления
 
     /**
@@ -44,7 +45,7 @@ class ParserBasic {
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30); // Максимальное время ожидания ответа от сервера в секундах
         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17'); // Установим значение поля User-agent для маскировки под обычного пользователя
         if ($proxy) {
-            curl_setopt($ch, CURLOPT_PROXY, '195.34.237.159:3128'); // адрес прокси-сервера для анонимности
+            curl_setopt($ch, CURLOPT_PROXY, '188.64.128.1:3128'); // адрес прокси-сервера для анонимности
             //curl_setopt($ch, CURLOPT_PROXYUSERPWD,'user:pass'); // если необходимо предоставить имя пользователя и пароль для прокси
         }
         if ($cookieFileName != "") {
@@ -67,6 +68,90 @@ class ParserBasic {
 
         // Выдаем результат работы, в случае ошибки FALSE
         return $data;
+    }
+
+    /**
+     * Метод нормализует телефонный номер, приводя его к виду: 9221431615 или 3432801542
+     * @param string $phoneNumber строка, содержащая телефонный номер в формате UTF-8
+     * @param string $mode строка, содержащая название города, для которого мы нормализуем номер телефона.
+     * @return int|bool число, соответствующее телефонному номеру в нормализованном виде, либо FALSE в случае неудачи
+     */
+    protected function phoneNumberNormalization($phoneNumber, $mode = "Екатеринбург") {
+
+        // Убираем лишние символы
+        $phoneNumber = str_replace(array(" ", "+", "(", ")", "-"), "", $phoneNumber);
+
+        // Количество цифр в телефонном номере
+        $phoneNumberLength = iconv_strlen($phoneNumber, 'UTF-8');
+
+
+        // Убираем лишнее или дополняем телефонный номер до нормального состояния
+        if ($phoneNumberLength == 11) {
+
+            // Если номер содержит 8 или 7 в качестве 11-ой цифры - убираем ее
+            $firstChar = mb_substr($phoneNumber, 0, 1, 'UTF-8');
+            if ($firstChar == "7" || $firstChar == "8") $phoneNumber = mb_substr($phoneNumber, 1, 10, 'UTF-8');
+
+        } elseif ($phoneNumberLength == 7) {
+
+            // Если номер слишком короткий (городкой для Екб), то дополняем его кодом города 343
+            if ($mode == "Екатеринбург") $phoneNumber = "343" . $phoneNumber;
+        }
+
+
+        // Проверим - цифр в телефонном номере должно быть ровно 10
+        if (preg_match('/^[0-9]{10}$/', $phoneNumber)) {
+
+            // Приведем строку к целому числу, в таком виде номер будет храниться в БД
+            $phoneNumber = intval($phoneNumber);
+
+            // Возвращаем результат
+            return $phoneNumber;
+
+        } else {
+
+            // Получен некорректный телефонный номер
+            return FALSE;
+        }
+
+    }
+
+    /**
+     * Возвращает ключевые данные о телефонном номере (статус обладателя [агент/собственник/..] и дата последнего использования)
+     * @return array
+     */
+    public function getDataAboutPhoneNumber() {
+
+        // Вернем ассоциативный массив с данными о телефоне, если он ранее был уже сохранен в БД, либо пустой массив
+        return DBconnect::selectKnownPhoneNumber($this->phoneNumber);
+    }
+
+    /**
+     * Запоминает новый телефонный номер и его статус в БД
+     * @param string $status строка, содержащая тип контактного лица по этому телефонному номеру
+     * @return bool Возвращает TRUE в случае успеха и FALSE в случае неудачи
+     */
+    public function newKnownPhoneNumber($status) {
+
+        // Проверка наличия необходимых данных
+        if (!isset($this->phoneNumber) || !is_int($this->phoneNumber)) return FALSE;
+        if (!isset($status) || ($status != "агент" && $status != "собственник" && $status != "арендатор")) return FALSE;
+
+        // Добавляем данные в БД и сразу возвращаем результат
+        return DBconnect::insertKnownPhoneNumber(array("phoneNumber" => $this->phoneNumber, "status" => $status, "dateOfLastPublication" => time()));
+    }
+
+    /**
+     * Запоминает новый телефонный номер и его статус в БД
+     * @return bool Возвращает TRUE в случае успеха и FALSE в случае неудачи
+     */
+    public function updateDateKnownPhoneNumber() {
+
+        // Проверка наличия необходимых данных
+        if (!isset($this->phoneNumber) || !is_int($this->phoneNumber)) return FALSE;
+
+        // Добавляем данные в БД и сразу возвращаем результат
+        return DBconnect::updateKnownPhoneNumberDate($this->phoneNumber, time());
     }
 
 }
