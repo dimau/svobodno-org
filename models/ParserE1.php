@@ -50,7 +50,11 @@ class ParserE1 extends ParserBasic {
      * Сохраняет загруженную страницу в $advertsListDOM
      * @return bool TRUE в случае успешной загрузки и FALSE в противном случае
      */
+    // TODO: сейчас отрабатывает список только для ОДНОКОМНАТНЫХ КВАРТИР
     public function loadNextAdvertsList() {
+
+        // Очищаем данные от предыдущего списка объявлений
+        $this->advertsListDOM = NULL;
 
         // Говорят, что в библиотеке SimpleHTMLDOM могут наблюдаться утечки памяти, на всякий случай чистим после каждого цикла работы
         if (isset($this->advertsListDOM)) $this->advertsListDOM->clear();
@@ -59,12 +63,12 @@ class ParserE1 extends ParserBasic {
         $this->advertsListNumber++;
 
         // Вычисляем URL запрашиваемой страницы
-        $url = 'http://www.e1.ru/business/realty/search.php?s_obj_type=1&rq=0&op_type=2&city_id=1&region_id=0&area_all=-1&sb=8&ob=2&p=' . $this->advertsListNumber;
+        $url = 'http://www.e1.ru/business/realty/search.php?s_obj_type=1&rq=1&op_type=2&city_id=1&region_id=0&area_all=-1&sb=8&ob=2&p=' . $this->advertsListNumber;
 
         // Фиксируем в логах факт загрузки новой страницы со списком объявлений
         Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->loadNextAdvertsList():1 Загружаем новую страницу со списком объявлений с e1, url: '" . $url . "'");
 
-        // Неспосредственно выполняем запрос к серверу
+        // Непосредственно выполняем запрос к серверу
         $pageHTML = $this->curlRequest($url, "", "", FALSE);
 
         // Если получить HTML страницы не удалось
@@ -76,21 +80,21 @@ class ParserE1 extends ParserBasic {
         // Получаем DOM-объект и сохраняем его в параметры
         $this->advertsListDOM = str_get_html($pageHTML);
 
-        // Получим таблицу с кратким описанием объявлений
-        $this->advertsListDOM = $this->advertsListDOM->find('body table', 3)->find('tr td', 3)->find('table', 1);
-
         // Убедимся, что на странице есть список объявлений. Иначе мы можем бесконечно загружать 404 страницу или подобные ей.
-        if ($this->advertsListDOM->find('tr', 2) === NULL) {
+        if (!isset($this->advertsListDOM)) {
             Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->loadNextAdvertsList():3 Полученная страница со списком объявлений с сайта e1 не содержит список объявлений, по адресу: '" . $url . "'");
             return FALSE;
         }
 
-        // Сбрасываем параметры текущего обрабатываемого краткого описания объявления на значения по умолчанию
-        $this->advertShortDescriptionNumber = 1;
-        $this->advertShortDescriptionDOM = NULL;
-        $this->id = NULL;
-        $this->phoneNumber = NULL;
-        $this->advertFullDescriptionDOM = NULL;
+        // Убедимся, что парсер не застрял на какой-либо ошибке на странице и не превысил лимит в 90 скачиваний страницы со списком объявлений за 1 раз
+        // TODO: test - настоящий лимит = 90
+        if ($this->advertsListNumber >= 4) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->loadNextAdvertsList():4 Достигли лимита в 90 страниц со списком объявлений за 1 раз работы парсера");
+            return FALSE;
+        }
+
+        // Сбрасываем счетчик текущего обрабатываемого краткого описания объявления на значение по умолчанию. Первые 3 tr относятся к заголовку таблицы.
+        $this->advertShortDescriptionNumber = 2;
 
         return TRUE;
     }
@@ -99,24 +103,34 @@ class ParserE1 extends ParserBasic {
      * Достает следующее краткое описание объявления из текущего списка.
      * При первом использовании достает самое первое краткое описание объявления из текущего списка.
      * Сохраняет полученный DOM-объект в $advertShortDescriptionDOM
-     * @return bool TRUE в случае успешной загрузки и FALSE в противном случае
+     * @return bool TRUE в случае успешного выделения кратких сведений по объявлению. FALSE в противном случае. Важно, что tr не всегда на самом деле содержит краткие сведения по объявлению, иногда это просто заголовок таблицы, в этом случае, у него не будет id.
      */
     public function getNextAdvertShortDescription() {
 
+        // Очищаем данные о предыдущем объявлении
+        $this->advertShortDescriptionDOM = NULL;
+        $this->id = NULL;
+        $this->phoneNumber = NULL;
+        $this->advertFullDescriptionDOM = NULL;
+
         $this->advertShortDescriptionNumber++;
-        $currentShortAdvert = $this->advertsListDOM->find('tr', $this->advertShortDescriptionNumber);
+        $currentShortAdvert = $this->advertsListDOM->find('tr[valign=top]', $this->advertShortDescriptionNumber);
 
         // Если получить DOM-модель краткого описания объявления не удалось или мы достигли подвала таблицы с объявлениями - прекращаем
-        if ($currentShortAdvert === NULL || $this->advertShortDescriptionNumber == 28) return FALSE;
+        if ($currentShortAdvert === NULL) return FALSE;
 
         // Сохраняем результат в параметры
         $this->advertShortDescriptionDOM = $currentShortAdvert;
 
+        // Важно помнить о том, что tr не всегда содержит информацию по конкретному объявлению, поэтому нужно проверять, есть ли у этой строки id объявления.
         // Сохраняем идентификаторы соответствующего объявления на сайте e1 в параметры объекта
-        $href = $this->advertShortDescriptionDOM->find('td nobr a', 0)->href;
-        $this->id = $href;
-
-        return TRUE;
+        if ($href = $this->advertShortDescriptionDOM->find('td nobr a', 0)) {
+            $this->id = $href->href;
+            return TRUE;
+        } else {
+            // Если полученный в $this->advertShortDescriptionDOM элемент оказался не кратким описанием объявления, а чем-то иным, то рекурсивно вызываем этот же метод - пока не найдем краткое описание объявления или пока не достигнем конца списка
+            return $this->getNextAdvertShortDescription();
+        }
     }
 
     /**
@@ -141,13 +155,20 @@ class ParserE1 extends ParserBasic {
         }
 
         // Меняем кодировку с windows-1251 на utf-8
-        //$pageHTML = iconv("windows-1251", "UTF-8", $pageHTML);
+        $pageHTML = iconv("windows-1251", "UTF-8", $pageHTML);
 
         // Сохраним в параметры объекта DOM-объект страницы со списком объявлений
         $this->advertFullDescriptionDOM = str_get_html($pageHTML);
+        if (!isset($this->advertFullDescriptionDOM)) return FALSE;
 
         // Находим основной раздел страницы, помещенной в таблицу, в которую помещены все блоки с описанием объявления - именно с этой частью страницы мы и будем дальше работать
-        $this->advertFullDescriptionDOM = $this->advertFullDescriptionDOM->find("body table", 3)->find("tr", 0)->find("td", 3);
+        // TODO: test
+        //$this->advertFullDescriptionDOM = $this->advertFullDescriptionDOM->find("body table", 3)->find("tr", 0)->find("td", 3);
+        //$this->advertFullDescriptionDOM = $this->advertFullDescriptionDOM->find('body', 0)->children(10)->children(0)->children(0)->children(3);
+
+        // TODO: test
+        //Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: успешно загрузили полное описание объявления: ".$this->advertFullDescriptionDOM);
+        //exit();
 
         return TRUE;
     }
@@ -158,14 +179,16 @@ class ParserE1 extends ParserBasic {
      */
     public function getPhoneNumber() {
 
-        // Если в объявлении есть фотографии, то блок с контактами расположен в 5-ой таблице, иначе пятой таблицы не будет в этом объявлении
-        if (!($phoneNumber = $this->advertFullDescriptionDOM->find("table", 4)->find("tr", 1)->find("td", 0)->find("tr", 1)->find("td", 1)->plaintext)) {
-            // Блок с контактами в объявлении без фотографий
-            $phoneNumber = $this->advertFullDescriptionDOM->find("table", 3)->find("tr", 1)->find("td", 0)->find("tr", 1)->find("td", 1)->plaintext;
+        // Найдем на странице телефон контактного лица
+        $pretenders = $this->advertFullDescriptionDOM->find("tr[valign=top]");
+        foreach ($pretenders as $value) {
+            if ($value->children(0) !== NULL && $value->children(0)->plaintext == "Телефон:") {
+                $phoneNumber = $value->children(1)->plaintext;
+            }
         }
 
         // Если достать номер телефона со страницы не удалось
-        if (!$phoneNumber) return FALSE;
+        if (!isset($phoneNumber)) return FALSE;
 
         // Приведем телефонный номер к стандартному виду
         if (!($phoneNumber = $this->phoneNumberNormalization($phoneNumber, "Екатеринбург"))) return FALSE;

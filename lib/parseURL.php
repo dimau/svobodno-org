@@ -35,7 +35,7 @@
  * 13. Проверяем наличие фотографий
  * 14. Парсим комментарий
  *      15. Получаем координаты примерные на яндекс карте, название адреса оставляем такое же как указал собственник. Если адрес не удалось найти или район левый указан, то не публикуем - отправляем обьявление оператору
- *      16. Сохраняем обьявление в базу и, в идеале, сразу публикуем его
+ * 16. Сохраняем обьявление в базу и, в идеале, сразу публикуем его
  *
  */
 
@@ -133,6 +133,9 @@ switch ($mode) {
 // Для некоторых ресурсов необходима авторизация на сайте
 if ($mode == "bazab2b") $parser->authorization();
 
+//TODO: test
+$jk = 0;
+
 // В цикле закачиваем страницы со списками объявлений и обрабатываем каждую из них (начиная с самой актуальной - первой).
 // Вплоть до момента, пока не доберемся до объявления со временем публикации позже, чем наша граница актуальности (задается в классе ParserBazaB2B в переменной actualDayAmountForAdvert)
 while ($parser->loadNextAdvertsList()) {
@@ -141,19 +144,41 @@ while ($parser->loadNextAdvertsList()) {
     // Формируем соответствующие объявления в нашей базе (если ранее они не были сформированы).
     while ($parser->getNextAdvertShortDescription()) {
 
+        //TODO: test
+        if ($jk >= 5) {
+            DBconnect::closeConnectToDB();
+            exit();
+        }
+        $jk++;
+
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: работаем с объявлением номер X");
+
         // Проверить, работали ли мы с этим объявлением уже. Если да, то сразу переходим к следующему
         if ($parser->isAdvertAlreadyHandled()) {
+            //TODO: test
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: объявление ранее обработано");
             continue;
         }
 
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: объявление еще не обработано");
+
         // Если мы достигли конца временного диапазона актуальности объявлений, то необходимо остановить обработку страницы на этом объявлении
         if ($parser->isStopHandling()) {
+            //TODO: test
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: дата публикации объявления слишком поздняя");
             DBconnect::closeConnectToDB();
             exit();
         }
 
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: подходящая дата публикации - работаем далее");
+
         // Загрузим подробные сведения по этому объявлению
         if (!$parser->loadFullAdvertDescription()) {
+            //TODO: test
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: не удалось загрузить страницу с полное описание объявления");
             continue;
         }
 
@@ -162,19 +187,37 @@ while ($parser->loadNextAdvertsList()) {
 
             // Получим телефон контактного лица по объявлению
             if (!$parser->getPhoneNumber()) {
-                // TODO: отправить объявление оператору?
+                //TODO: test
+                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: не удалось получить телефонный номер из объявления");
+
+                // Оповещаем операторов о новом объявлении, у которого не удалось определить номер телефона
+                $subject = 'Объявление на ' . $mode . ' без телефонного номера';
+                $msgHTML = "Новое объявление на " . $mode . " без телефонного номера: http://www.e1.ru/business/realty/" . $parser->getId();
+                GlobFunc::sendEmailToOperator($subject, $msgHTML);
                 continue;
             }
+
+            //TODO: test
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: телефонный номер получен");
 
             // Проверяем телефонный номер по БД
             $dataAboutPhoneNumber = $parser->getDataAboutPhoneNumber();
 
+            //TODO: test
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: проверили телефонный номер по БД - ".json_encode($dataAboutPhoneNumber));
+
             // В зависимости от статуса контактного лица по этому номеру выполняем определенные действия
             if (count($dataAboutPhoneNumber) == 0 || ($dataAboutPhoneNumber['status'] == "агент" && $dataAboutPhoneNumber['dateOfLastPublication'] < time() - 31449600)) {
+
+                //TODO: test
+                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: номер телефона еще не известен БД");
 
                 // Если номер телефона еще не известен БД. А также, если это номер телефона агента, который использовался последний раз больше, чем год назад
                 // Проверяем признаки объявления от агента
                 if ($parser->hasSignsAgent()) {
+
+                    //TODO: test
+                    Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: обнаружены признаки агента в объявлении");
 
                     // Если в объявлении есть признаки агентства, то добавляем телефон в БД как агента и переходим к следующему объявлению
                     $parser->newKnownPhoneNumber("агент");
@@ -182,11 +225,17 @@ while ($parser->loadNextAdvertsList()) {
 
                 } else {
 
+                    //TODO: test
+                    Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: признаки агента не обнаружены в объявлении");
+
                     // Если в объявлении нет признаков агентства, то добавляем телефон в БД как телефон собственника
                     $parser->newKnownPhoneNumber("собственник");
                 }
 
             } elseif ($dataAboutPhoneNumber['status'] == "собственник" || $dataAboutPhoneNumber['status'] == "арендатор") {
+
+                //TODO: test
+                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: телефонный номер принадлежит собственнику");
 
                 // Если это номер собственника - боремся с дубликатами
                 // TODO: есть ли опубликованные объявления с таким номером телефона.
@@ -194,6 +243,9 @@ while ($parser->loadNextAdvertsList()) {
                 // TODO: если есть с полнотой 0 - дополняем исходное объявление
 
             } elseif ($dataAboutPhoneNumber['status'] == "агент" && $dataAboutPhoneNumber['dateOfLastPublication'] >= time() - 31449600) {
+
+                //TODO: test
+                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: телефонный номер принадлежит агенту");
 
                 // Если это телефонный номер агента и он использовался последний раз менее года назад (31449600 секунд) - игнорируем объявление. Проверка на срок год нужна, так как агент мог отказаться от данного номера, и номер мог быть переназначен хорошему человеку
                 // Актуализируем дату последнего использования телефонного номера
@@ -205,16 +257,27 @@ while ($parser->loadNextAdvertsList()) {
 
         // Преобразуем подробные сведения по объявлению к виду ассоциативного массива
         if (!($paramsArr = $parser->parseFullAdvert())) {
+            //TODO: test
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: не удалось распарсить подробное объявление");
+
             if ($mode == "bazab2b") $parser->authorization();
             continue;
         }
 
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: удалось распарсить полное объявление");
+
         // Проверим, что объявление относится к Екатеринбургу. Если нет, считаем его успешно обработанным и не добавляем в базу
         if (!isset($paramsArr['city']) || $paramsArr['city'] != "Екатеринбург") {
+            //TODO: test
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: объявление не из Екатеринбурга");
+
             $parser->setAdvertIsHandled();
-            DBconnect::closeConnectToDB();
-            exit();
+            continue;
         }
+
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: объявление относится к Екатеринбургу");
 
         // Инициализируем модель и сохраняем данные в БД
         $property = new Property($paramsArr);
@@ -225,9 +288,15 @@ while ($parser->loadNextAdvertsList()) {
 
         // Добавим объявление в список успешно обработанных, чтобы избежать в будущем его повторной обработки
         if (!$parser->setAdvertIsHandled()) {
+            //TODO: test
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: не удалось отметить объявление как обработанное");
+
             DBconnect::closeConnectToDB();
             exit();
         }
+
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: отметили объявление как обработанное");
 
         // Оповещаем операторов о новом объявлении на сайте bazab2b.ru
         $subject = 'Объявление на ' . $mode;

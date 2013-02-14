@@ -174,6 +174,9 @@ class ParserBazaB2B extends ParserBasic {
         // Тип объекта
         $params['typeOfObject'] = $this->getTypeOfObject();
 
+        // Город месторасположения
+        $params['city'] = "Екатеринбург";
+
         // Номер квартиры - его необходимо обязательно указывать и указывать уникальное значение, иначе объявление невозможно будет уникально идентифицировать
         $params['apartmentNumber'] = mt_rand(1000, 100000);
 
