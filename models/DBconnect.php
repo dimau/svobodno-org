@@ -704,17 +704,17 @@ class DBconnect {
 
     /**
      * Возвращает данные по конкретному номеру телефона
-     * @param int $phoneNumber идентификатор счета (номер счета)
+     * @param string $phoneNumber номер телефона
      * @return array ассоциативный массив, содержащих параметры счета, если счет не найден - пустой массив
      */
     public static function selectKnownPhoneNumber($phoneNumber) {
 
         // Проверка входящих параметров
-        if (!isset($phoneNumber) || !is_int($phoneNumber)) return array();
+        if (!isset($phoneNumber)) return array();
 
         $stmt = DBconnect::get()->stmt_init();
         if (($stmt->prepare("SELECT * FROM knownPhoneNumbers WHERE phoneNumber = ? LIMIT 1") === FALSE)
-            OR ($stmt->bind_param("i", $phoneNumber) === FALSE)
+            OR ($stmt->bind_param("s", $phoneNumber) === FALSE)
             OR ($stmt->execute() === FALSE)
             OR (($res = $stmt->get_result()) === FALSE)
             OR (($res = $res->fetch_assoc()) === NULL)
@@ -1055,7 +1055,7 @@ class DBconnect {
         // Сохраняем информацию в БД
         $stmt = DBconnect::get()->stmt_init();
         if (($stmt->prepare("INSERT INTO knownPhoneNumbers (phoneNumber, status, dateOfLastPublication) VALUES (?,?,?)") === FALSE)
-            OR ($stmt->bind_param("isi", $paramsArr['phoneNumber'], $paramsArr['status'], $paramsArr['dateOfLastPublication']) === FALSE)
+            OR ($stmt->bind_param("ssi", $paramsArr['phoneNumber'], $paramsArr['status'], $paramsArr['dateOfLastPublication']) === FALSE)
             OR ($stmt->execute() === FALSE)
             OR (($res = $stmt->affected_rows) === -1)
             OR ($res === 0)
@@ -1265,7 +1265,7 @@ class DBconnect {
         // Сохраняем информацию о загруженной фотке в БД
         $stmt = DBconnect::get()->stmt_init();
         if (($stmt->prepare("UPDATE knownPhoneNumbers SET dateOfLastPublication = ? WHERE phoneNumber = ?") === FALSE)
-            OR ($stmt->bind_param("ii", $date, $phoneNumber) === FALSE)
+            OR ($stmt->bind_param("is", $date, $phoneNumber) === FALSE)
             OR ($stmt->execute() === FALSE)
             OR (($res = $stmt->affected_rows) === -1)
             OR ($res === 0)

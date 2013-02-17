@@ -587,7 +587,7 @@ if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TR
  ***************************************************************************/
 
 DBconnect::get()->query("CREATE TABLE knownPhoneNumbers (
-  phoneNumber INT(10) NOT NULL PRIMARY KEY COMMENT 'Телефонный номер',
+  phoneNumber VARCHAR(10) NOT NULL PRIMARY KEY CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Телефонный номер',
   status VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Статус телефонного номера: агент, собственник, арендатор (статус используется, если обладатель номера ищет человека на подселение к себе)',
   dateOfLastPublication INT(11) COMMENT 'Дата последней публикации объявления с указанием данного номера телефона в качестве контактного, в формате timestamp. Это позволит отслеживать устаревшие данные по номерам телефонов - если телефон долго не используется, то, возможно, стоит пересмотреть его статус'
 )");

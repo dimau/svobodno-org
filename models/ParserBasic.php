@@ -39,7 +39,7 @@ class ParserBasic {
 
         // Инициализация библиотеки curl.
         if (!($ch = curl_init())) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->curlRequest():1 Ошибка при инициализации curl. Не удалось получить страницу с сайта bazaB2B по адресу: " . $url);
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBasic.php->curlRequest():1 Ошибка при инициализации curl. Не удалось получить страницу с сайта bazaB2B по адресу: " . $url);
             return FALSE;
         }
         curl_setopt($ch, CURLOPT_URL, $url); // Устанавливаем URL запроса
@@ -78,7 +78,7 @@ class ParserBasic {
      * Метод нормализует телефонный номер, приводя его к виду: 9221431615 или 3432801542
      * @param string $phoneNumber строка, содержащая телефонный номер в формате UTF-8
      * @param string $mode строка, содержащая название города, для которого мы нормализуем номер телефона.
-     * @return int|bool число, соответствующее телефонному номеру в нормализованном виде, либо FALSE в случае неудачи
+     * @return string|bool строка, соответствующая телефонному номеру в нормализованном виде, либо FALSE в случае неудачи. К сожалению, телефонный номер не может быть представлен как число из-за ограничения на максимальное целое число в php
      */
     protected function phoneNumberNormalization($phoneNumber, $mode = "Екатеринбург") {
 
@@ -87,7 +87,6 @@ class ParserBasic {
 
         // Количество цифр в телефонном номере
         $phoneNumberLength = iconv_strlen($phoneNumber, 'UTF-8');
-
 
         // Убираем лишнее или дополняем телефонный номер до нормального состояния
         if ($phoneNumberLength == 11) {
@@ -102,12 +101,8 @@ class ParserBasic {
             if ($mode == "Екатеринбург") $phoneNumber = "343" . $phoneNumber;
         }
 
-
         // Проверим - цифр в телефонном номере должно быть ровно 10
         if (preg_match('/^[0-9]{10}$/', $phoneNumber)) {
-
-            // Приведем строку к целому числу, в таком виде номер будет храниться в БД
-            $phoneNumber = intval($phoneNumber);
 
             // Возвращаем результат
             return $phoneNumber;
@@ -115,6 +110,7 @@ class ParserBasic {
         } else {
 
             // Получен некорректный телефонный номер
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBasic.php->phoneNumberNormalization():1 получен некорректный телефонный номер: ".$phoneNumber);
             return FALSE;
         }
 
@@ -138,8 +134,14 @@ class ParserBasic {
     public function newKnownPhoneNumber($status) {
 
         // Проверка наличия необходимых данных
-        if (!isset($this->phoneNumber) || !is_int($this->phoneNumber)) return FALSE;
-        if (!isset($status) || ($status != "агент" && $status != "собственник" && $status != "арендатор")) return FALSE;
+        if (!isset($this->phoneNumber)) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBasic.php->newKnownPhoneNumber():1 не указан телефонный номер");
+            return FALSE;
+        }
+        if (!isset($status) || ($status != "агент" && $status != "собственник" && $status != "арендатор")) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBasic.php->newKnownPhoneNumber():2 не указан статус контактного лица для телефонного номера или он не корректен");
+            return FALSE;
+        }
 
         // Добавляем данные в БД и сразу возвращаем результат
         return DBconnect::insertKnownPhoneNumber(array("phoneNumber" => $this->phoneNumber, "status" => $status, "dateOfLastPublication" => time()));
@@ -152,7 +154,7 @@ class ParserBasic {
     public function updateDateKnownPhoneNumber() {
 
         // Проверка наличия необходимых данных
-        if (!isset($this->phoneNumber) || !is_int($this->phoneNumber)) return FALSE;
+        if (!isset($this->phoneNumber)) return FALSE;
 
         // Добавляем данные в БД и сразу возвращаем результат
         return DBconnect::updateKnownPhoneNumberDate($this->phoneNumber, time());

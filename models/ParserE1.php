@@ -21,6 +21,9 @@ class ParserE1 extends ParserBasic {
 
         // Получим список уже ранее обработанных объявлений
         $this->readHandledAdverts();
+
+        // TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: ид уже обрабоатнных объявлений: ".json_encode($this->handledAdverts));
     }
 
     /**
@@ -61,6 +64,12 @@ class ParserE1 extends ParserBasic {
 
         // Увеличиваем счетчик текущей страницы списка объявлений
         $this->advertsListNumber++;
+
+        // TODO: test
+        if ($this->advertsListNumber >= 1) {
+            DBconnect::closeConnectToDB();
+            exit();
+        }
 
         // Вычисляем URL запрашиваемой страницы
         $url = 'http://www.e1.ru/business/realty/search.php?s_obj_type=1&rq=1&op_type=2&city_id=1&region_id=0&area_all=-1&sb=8&ob=2&p=' . $this->advertsListNumber;
@@ -116,6 +125,13 @@ class ParserE1 extends ParserBasic {
         $this->advertShortDescriptionNumber++;
         $currentShortAdvert = $this->advertsListDOM->find('tr[valign=top]', $this->advertShortDescriptionNumber);
 
+        // TODO: test
+        if ($this->advertShortDescriptionNumber >= 4) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: достигли 5-ого объявления - заканчиваем парсинг");
+            DBconnect::closeConnectToDB();
+            exit();
+        }
+
         // Если получить DOM-модель краткого описания объявления не удалось или мы достигли подвала таблицы с объявлениями - прекращаем
         if ($currentShortAdvert === NULL) return FALSE;
 
@@ -126,6 +142,10 @@ class ParserE1 extends ParserBasic {
         // Сохраняем идентификаторы соответствующего объявления на сайте e1 в параметры объекта
         if ($href = $this->advertShortDescriptionDOM->find('td nobr a', 0)) {
             $this->id = $href->href;
+
+            //TODO: test
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: работаем с объявлением номер X");
+
             return TRUE;
         } else {
             // Если полученный в $this->advertShortDescriptionDOM элемент оказался не кратким описанием объявления, а чем-то иным, то рекурсивно вызываем этот же метод - пока не найдем краткое описание объявления или пока не достигнем конца списка
@@ -159,7 +179,10 @@ class ParserE1 extends ParserBasic {
 
         // Сохраним в параметры объекта DOM-объект страницы со списком объявлений
         $this->advertFullDescriptionDOM = str_get_html($pageHTML);
-        if (!isset($this->advertFullDescriptionDOM)) return FALSE;
+        if (!isset($this->advertFullDescriptionDOM)) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->loadFullAdvertDescription():2 не удалось разобрать страницу с полным описанием объявления");
+            return FALSE;
+        }
 
         // Находим основной раздел страницы, помещенной в таблицу, в которую помещены все блоки с описанием объявления - именно с этой частью страницы мы и будем дальше работать
         // TODO: test
@@ -167,8 +190,11 @@ class ParserE1 extends ParserBasic {
         //$this->advertFullDescriptionDOM = $this->advertFullDescriptionDOM->find('body', 0)->children(10)->children(0)->children(0)->children(3);
 
         // TODO: test
-        //Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: успешно загрузили полное описание объявления: ".$this->advertFullDescriptionDOM);
+        //Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: успешно загрузили полное описание объявления: ".$pageHTML);
         //exit();
+
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: удалось успешно загрузить страницу с полное описание объявления");
 
         return TRUE;
     }
@@ -188,13 +214,25 @@ class ParserE1 extends ParserBasic {
         }
 
         // Если достать номер телефона со страницы не удалось
-        if (!isset($phoneNumber)) return FALSE;
+        if (!isset($phoneNumber)) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->getPhoneNumber():1 не удалось получить телефонный номер из объявления с id = ".$this->id);
+            return FALSE;
+        }
+
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: телефонный номер: ".$phoneNumber);
 
         // Приведем телефонный номер к стандартному виду
-        if (!($phoneNumber = $this->phoneNumberNormalization($phoneNumber, "Екатеринбург"))) return FALSE;
+        if (!($phoneNumber = $this->phoneNumberNormalization($phoneNumber, "Екатеринбург"))) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->getPhoneNumber():2 не удалось нормализовать телефонный номер из объявления с id = ".$this->id);
+            return FALSE;
+        }
 
         // Есть телефонный номер!
         $this->phoneNumber = $phoneNumber;
+
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: преобразованный телефонный номер: ".$this->phoneNumber);
 
         // Задача успешно выполнена
         return TRUE;
@@ -207,10 +245,11 @@ class ParserE1 extends ParserBasic {
     public function hasSignsAgent() {
 
         // Проверяем наличие блока с заголовком "Информация об агентстве:"
-        if ($this->advertFullDescriptionDOM->find("table", 5)->find("tr td b", 0)->plaintext == "Информация об агентстве:"
-            OR $this->advertFullDescriptionDOM->find("table", 4)->find("tr td b", 0)->plaintext == "Информация об агентстве:"
-        ) {
-            return TRUE;
+        $pretenders = $this->advertFullDescriptionDOM->find("td[bgcolor=#bababa]");
+        foreach ($pretenders as $value) {
+            if ($value->children(0) !== NULL && $value->children(0)->plaintext == "Информация об агентстве:") {
+                return TRUE;
+            }
         }
 
         // Признаки агентства не обнаружены
@@ -224,34 +263,32 @@ class ParserE1 extends ParserBasic {
     public function parseFullAdvert() {
 
         // Валидация исходных данных
-        if (!$this->advertFullDescriptionDOM || !$this->id) return FALSE;
+        if (!$this->advertFullDescriptionDOM || !$this->id) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->parseFullAdvert():1 не удалось запустить парсинг объявления - не хватает исходных данных");
+            return FALSE;
+        }
 
         // Готовим массив, в который сложим параметры объявления
         $params = array();
 
         // TODO: добавить в модель новый параметр - наличие фотографий в исходном объявлении
-        // Выясним - есть ли в объявлении фотографии
-        if ($this->advertFullDescriptionDOM->find("table", 2)->find("tr td b", 0)->plaintext == "Фотографии:") {
-            $params['sourceAdvertWithPhotos'] = TRUE;
-        } else {
-            $params['sourceAdvertWithPhotos'] = FALSE;
-        }
-
-        // Достанем комментарий
-        if ($params['sourceAdvertWithPhotos']) {
-            if ($this->advertFullDescriptionDOM->find("table", 3)->find("tr td b", 0)->plaintext == "Дополнительные сведения:") {
-                $params['comment'] = $this->advertFullDescriptionDOM->find("table", 3)->find("tr td p", 0)->plaintext;
+        // Выясним - есть ли в объявлении фотографии и комментарий
+        $params['sourceAdvertWithPhotos'] = FALSE;
+        $params['comment'] = "";
+        $pretenders = $this->advertFullDescriptionDOM->find("td[bgcolor=#bababa]");
+        foreach ($pretenders as $value) {
+            if ($value->children(0) !== NULL && $value->children(0)->plaintext == "Фотографии:") {
+                $params['sourceAdvertWithPhotos'] = TRUE;
             }
-        } else {
-            if ($this->advertFullDescriptionDOM->find("table", 2)->find("tr td b", 0)->plaintext == "Дополнительные сведения:") {
-                $params['comment'] = $this->advertFullDescriptionDOM->find("table", 2)->find("tr td p", 0)->plaintext;
+            if ($value->children(0) !== NULL && $value->children(0)->plaintext == "Дополнительные сведения:") {
+                $params['comment'] = $value->parent()->next_sibling()->children(0)->children(0)->plaintext;
             }
         }
 
         // РАЗБИРАЕМ СТРУКТУРИРОВАННЫЕ ДАННЫЕ ОБЪЯВЛЕНИЯ
 
         // Собираем массив, каждый член которого - некоторый параметр объекта недвижимости
-        $tableRows = $this->advertFullDescriptionDOM->find("table", 1)->find("tr", 1)->find("tr");
+        $tableRows = $this->advertFullDescriptionDOM->find("tr[valign=top]");
 
         // Тип объекта
         // TODO: Сделать более универсальный способ определения типа объекта
@@ -263,15 +300,30 @@ class ParserE1 extends ParserBasic {
         // Источник
         $params['sourceOfAdvert'] = "http://www.e1.ru/business/realty/" . $this->id;
 
+        // Телефон контактного лица
+        $params['contactTelephonNumber'] = $this->phoneNumber;
+
         // Перебираем все имеющиеся параметры объявления и заполняет соответствующие параметры ассоциативного массива
         foreach ($tableRows as $oneParam) {
 
             // Получим название параметра
-            $paramName = $oneParam->find("td", 0)->plaintext;
+            if ($oneParam->find("td", 0) !== NULL) {
+                $paramName = $oneParam->find("td", 0)->plaintext;
+
+                // TODO: test
+                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: парсим структурированную строку: ".$paramName);
+
+            } else {
+
+                // TODO: test
+                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: парсим структурированную строку - не нашли название параметра!");
+
+                continue;
+            }
 
             // Смежные комнаты
             if ($paramName == "Количество смежных комнат:") {
-                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
                 if ($value == "ни одной") {
                     $params['adjacentRooms'] = "нет";
                 } else {
@@ -283,14 +335,14 @@ class ParserE1 extends ParserBasic {
 
             // Количество комнат
             if ($paramName == "Кол-во комнат в квартире:") {
-                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
                 if (isset($value) && $value != "") $params['amountOfRooms'] = intval($value);
                 continue;
             }
 
             // Площадь
             if ($paramName == "Общая площадь, кв.м.") {
-                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
                 if (isset($value) && $value != "") $value = explode("/", $value); else continue;
                 if ($params['typeOfObject'] == "комната") {
                     if (isset($value[0])) $params['roomSpace'] = floatval($value[0]);
@@ -305,7 +357,7 @@ class ParserE1 extends ParserBasic {
 
             // Стоимость аренды и комиссия
             if ($paramName == "Цена:") {
-                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
                 if (isset($value) && $value != "") {
                     $value = str_replace(array(" ", "р"), "", $value);
                     $params['costOfRenting'] = intval($value);
@@ -318,7 +370,7 @@ class ParserE1 extends ParserBasic {
 
             // Ком. платежи
             if ($paramName == "Коммунальные платежи:") {
-                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
                 if ($value == "Оплачиваются дополнительно") $params['utilities'] = "да";
                 if ($value == "Включены в стоимость") $params['utilities'] = "нет";
                 continue;
@@ -326,14 +378,14 @@ class ParserE1 extends ParserBasic {
 
             // Адрес
             if ($paramName == "Адрес:") {
-                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                $value = $oneParam->find("td", 1)->find("b", 0)->find('text', 0)->plaintext;
                 if (isset($value)) $params['address'] = $value;
                 continue;
             }
 
             // Этаж
             if ($paramName == "Этаж:") {
-                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
                 if (isset($value) && $value != "") $floorArr = explode("/", $value); else continue;
                 if (isset($floorArr[0])) $params['floor'] = intval($floorArr[0]);
                 if (isset($floorArr[1])) $params['totalAmountFloor'] = intval($floorArr[1]);
@@ -342,7 +394,7 @@ class ParserE1 extends ParserBasic {
 
             // Санузел
             if ($paramName == "Сан узел:") {
-                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
                 if (!isset($value) && $value == "") continue;
                 if ($value == "Раздельный") $params['typeOfBathrooms'] = "раздельный";
                 continue;
@@ -350,7 +402,7 @@ class ParserE1 extends ParserBasic {
 
             // Мебель
             if ($paramName == "Мебель:") {
-                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
                 if ($value == "Есть") {
                     $params['furnitureInLivingAreaExtra'] = "Есть";
                     $params['furnitureInKitchenExtra'] = "Есть";
@@ -360,7 +412,7 @@ class ParserE1 extends ParserBasic {
 
             // Балкон/лоджия
             if ($paramName == "Лоджия:") {
-                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
                 if (!isset($value) && $value == "") continue;
                 if ($value == "Лоджия") $params['typeOfBalcony'] = "лоджия";
                 if ($value == "Балкон") $params['typeOfBalcony'] = "балкон";
@@ -369,28 +421,37 @@ class ParserE1 extends ParserBasic {
 
             // Город
             if ($paramName == "Город:") {
-                $value = $oneParam->find("td", 1)->find("b")->plaintext;
+                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
                 if (isset($value) && $value != "") $params['city'] = $value;
                 continue;
             }
 
             // Район
             if ($paramName == "Район:") {
-                $value = $oneParam->find("td", 1)->find("b")->plaintext;
-                if (!isset($value) || $value == "") $value = "0";
+                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
+                // Если строку с районом получили, то уберем пробел в начале (особенность e1)
+                if (!isset($value) || $value == "") $value = "0"; else $value = mb_substr($value, 1);
                 /*if ($value == "Новая Сортировка") $value = "Сортировка новая";
                 if ($value == "Старая Сортировка") $value = "Сортировка старая";
                 if ($value == "Виз") $value = "ВИЗ";
                 if ($value == "Юго-Западный") $value = "Юго-запад";*/
                 $params['district'] = $value;
+
+                //TODO: test
+                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: район: '". $params['district'] ."'");
+
                 continue;
             }
         }
 
         // Проверяем, удалось ли получить ссылку на источник объявления
         if (!isset($params['sourceOfAdvert']) || $params['sourceOfAdvert'] == "") {
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->parseFullAdvert():2 не удалось успешно завершить парсинг объявления - не определена ссылка на исходное объявление");
             return FALSE;
         }
+
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: удалось распарсить полное объявление: ".json_encode($params));
 
         return $params;
     }
@@ -406,8 +467,17 @@ class ParserE1 extends ParserBasic {
 
         // Проверяем по массиву $this->handledAdverts - было ли данное объявление уже обработано или нет
         foreach ($this->handledAdverts as $value) {
-            if ($value == $this->id) return TRUE;
+            if ($value == $this->id) {
+
+                //TODO: test
+                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: объявление ранее обработано");
+
+                return TRUE;
+            }
         }
+
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: объявление еще не обработано");
 
         return FALSE;
     }
@@ -426,12 +496,24 @@ class ParserE1 extends ParserBasic {
         $publicationData = explode(".", $publicationData);
         $date = new DateTime(date("Y") . "-" . $publicationData[1] . "-" . $publicationData[0], new DateTimeZone('Asia/Yekaterinburg'));
 
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: дата публикации объявления: ".$date->format('Y-m-d H:i:s'));
+
         // Если объявление было опубликовано ранее, чем $this->actualDayAmountForAdvert дня назад, то нужно остановить парсинг
         $interval = $currentDate->diff($date);
         $interval = intval($interval->format("%d"));
         if ($interval >= $this->actualDayAmountForAdvert) {
+
+            //TODO: test
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: дата публикации объявления слишком поздняя");
+
             return TRUE;
+
         } else {
+
+            //TODO: test
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: подходящая дата публикации - работаем далее");
+
             return FALSE;
         }
 
@@ -447,6 +529,7 @@ class ParserE1 extends ParserBasic {
         $publicationData = $this->advertShortDescriptionDOM->find('td', 7)->plaintext;
         $publicationData = explode(".", $publicationData);
         $date = new DateTime(date("Y") . "-" . $publicationData[1] . "-" . $publicationData[0], new DateTimeZone('Asia/Yekaterinburg'));
+        $date = $date->format("d.m.Y");
 
         // Сохраняем идентификаторы объявления в БД и сразу выдаем результат
         return DBconnect::insertHandledAdvertFromE1($this->id, $date);
