@@ -159,7 +159,6 @@ class DBconnect {
 
     /**
      * Возвращает ассоциированный массив, который содержит полные данные по объекту недвижимости. Если ничего не найдено или произошла ошибка, вернет пустой массив
-     *
      * @param int $propertyId - идентификатор объекта недвижимости, по которому нужно получить данные
      * @return array - ассоциированный массив, содержащий все параметры характеристики объекта недвижимости
      */
@@ -186,6 +185,39 @@ class DBconnect {
 
         // Вернем результат
         return $res;
+    }
+
+    /**
+     * Возвращает массив идентификаторов объектов недвижимости, у которых контактный номер телефона указан = параметру $contactTelephonNumber. Если ничего не найдено или произошла ошибка, вернет пустой массив
+     * @param string $contactTelephonNumber - контактный номер телефона по которому осуществляется поиск
+     * @return array - массив идентификаторов объектов недвижимости. Либо пустой массив
+     */
+    public static function selectPropertiesIdForContactTelephonNumber($contactTelephonNumber) {
+
+        // Проверка входящих параметров
+        if (!isset($contactTelephonNumber)) return array();
+
+        // Получим из БД данные ($res) по искомому объекту недвижимости
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("SELECT id FROM property WHERE contactTelephonNumber = ?") === FALSE)
+            OR ($stmt->bind_param("s", $contactTelephonNumber) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->get_result()) === FALSE)
+            OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === NULL)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT id FROM property WHERE contactTelephonNumber = " . $contactTelephonNumber . "'. id логгера: DBconnect::selectPropertiesIdForContactTelephonNumber():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return array();
+        }
+
+        // Приведем результат к простому массиву
+        $resultArr = array();
+        foreach ($res as $value) {
+            $resultArr[] = $value['id'];
+        }
+
+        // Вернем результат
+        return $resultArr;
     }
 
     /**
@@ -703,9 +735,40 @@ class DBconnect {
     }
 
     /**
+     * Возвращает массив, состоящий из 3-х идентификаторов последних успешно обработанных объявлений для данного режима парсинга
+     * @param string $mode режим, для которого нужно получить идентификаторы
+     * @return array массив, состоящий из 3-х идентификаторов последних успешно обработанных объявлений для данного режима парсинга. Либо пустой массив.
+     */
+    public static function selectLastSuccessfulHandledAdvertsId($mode) {
+
+        // Проверка входящих параметров
+        if (!isset($mode)) return array();
+
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("SELECT * FROM lastSuccessfulHandledAdvertsId WHERE mode = ? LIMIT 3") === FALSE)
+            OR ($stmt->bind_param("s", $mode) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->get_result()) === FALSE)
+            OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === NULL)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("SELECT id FROM lastSuccessfulHandledAdvertsId WHERE mode = " . $mode . " LIMIT 3'. Местонахождение кода: DBconnect::selectLastSuccessfulHandledAdvertsId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return array();
+        }
+
+        // Преобразование к простому массиву
+        $arr = array();
+        foreach ($res as $value) {
+            $arr[] = $value["id"];
+        }
+
+        return $arr;
+    }
+
+    /**
      * Возвращает данные по конкретному номеру телефона
      * @param string $phoneNumber номер телефона
-     * @return array ассоциативный массив, содержащих параметры счета, если счет не найден - пустой массив
+     * @return array ассоциативный массив, содержащий параметры телефонного номера, если номер не найден в БД - пустой массив
      */
     public static function selectKnownPhoneNumber($phoneNumber) {
 
@@ -1256,13 +1319,77 @@ class DBconnect {
         return TRUE;
     }
 
-    // Обновляет параметры телефонного номера агента/собственника в БД
+    // Обновляет идентификаторы 3-х первых обработанных объявлений за последнюю успешную сессию парсинга в режиме $mode
+    public static function updateLastSuccessfulHandledAdvertsId($mode, $newSuccessfulHandledAdvertsId) {
+
+        // Проверка входящих параметров
+        if (!isset($mode) || !isset($newSuccessfulHandledAdvertsId)) return FALSE;
+
+        // Готовим выражение
+        $stmt = DBconnect::get()->stmt_init();
+        if ($stmt->prepare("UPDATE lastSuccessfulHandledAdvertsId SET id = ? WHERE mode = ? AND indexNumber = ?") === FALSE) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. id логгера: DBconnect::updateLastSuccessfulHandledAdvertsId():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
+
+        // Меняем значение идентификатора для каждого из 3-х объявлений
+        foreach ($newSuccessfulHandledAdvertsId as $key => $value) {
+            if (($stmt->bind_param("ssi", $value, $mode, $key) === FALSE)
+                OR ($stmt->execute() === FALSE)
+                OR (($res = $stmt->affected_rows) === -1)
+            ) {
+                Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE lastSuccessfulHandledAdvertsId SET id = " . $value . " WHERE mode = " . $mode . " AND indexNumber = " . $key . "' id логгера: DBconnect::updateLastSuccessfulHandledAdvertsId():2. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+                $stmt->close();
+                return FALSE;
+            }
+
+        }
+
+        // Закрываем выражение
+        $stmt->close();
+
+        return TRUE;
+    }
+
+    /**
+     * Обновляет параметры телефонного номера агента/собственника в БД - статус
+     * @param string $phoneNumber телефонный номер, чью дату и время последнего использования мы будем менять
+     * @param $status новый статус контактного лица по данному телефонному номеру: агент, собственник, арендатор
+     * @return bool TRUE в случае успеха и FALSE в противном случае
+     */
+    public static function updateKnownPhoneNumberStatus($phoneNumber, $status) {
+
+        // Проверка входящих параметров
+        if (!isset($phoneNumber) || !isset($status)) return FALSE;
+        if ($status != "агент" && $status != "собственник" && $status != "арендатор") return FALSE;
+
+        // Сохраняем информацию о загруженной фотке в БД
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("UPDATE knownPhoneNumbers SET status = ? WHERE phoneNumber = ?") === FALSE)
+            OR ($stmt->bind_param("ss", $status, $phoneNumber) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE knownPhoneNumbers SET status = " . $status . " WHERE phoneNumber = " . $phoneNumber . "' id логгера: DBconnect::updateKnownPhoneNumberStatus():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
+
+        return TRUE;
+    }
+
+    /**
+     * Обновляет параметры телефонного номера агента/собственника в БД - дату/время последнего использования
+     * @param string $phoneNumber телефонный номер, чью дату и время последнего использования мы будем менять
+     * @param int $date - новое значение даты/времени последнего использования телефонного номера
+     * @return bool TRUE в случае успеха и FALSE в противном случае
+     */
     public static function updateKnownPhoneNumberDate($phoneNumber, $date) {
 
         // Проверка входящих параметров
         if (!isset($phoneNumber) || !isset($date)) return FALSE;
 
-        // Сохраняем информацию о загруженной фотке в БД
+        // Сохраняем информацию в БД
         $stmt = DBconnect::get()->stmt_init();
         if (($stmt->prepare("UPDATE knownPhoneNumbers SET dateOfLastPublication = ? WHERE phoneNumber = ?") === FALSE)
             OR ($stmt->bind_param("is", $date, $phoneNumber) === FALSE)

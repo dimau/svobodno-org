@@ -48,6 +48,7 @@ currencies,
 archiveAdverts,
 bazab2b,
 e1,
+lastSuccessfulHandledAdvertsId,
 knownPhoneNumbers,
 invoices
 ");
@@ -580,6 +581,33 @@ DBconnect::get()->query("CREATE TABLE e1 (
 )");
 
 echo "e1: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
+/****************************************************************************
+ * СПИСОК ID ПОСЛЕДНИХ УСПЕШНО ОБРАБОТАННЫХ ОБЪЯВЛЕНИЙ ИЗ БАЗЫ САЙТА bazaB2B, e1
+ * Если парсер при разборе страницы со списком объявлений встречает объявление из одним из этих id, он заканчивает работу
+ ***************************************************************************/
+
+DBconnect::get()->query("CREATE TABLE lastSuccessfulHandledAdvertsId (
+  id VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'идентификатор объявления',
+  mode VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'режим работы парсера, при котором было достигнуто данное объявление',
+  indexNumber INT(1) COMMENT 'Место идентификатора: 1, 2, 3'
+)");
+
+echo "lastSuccessfulHandledAdvertsId: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
+// Записываем в таблицу первоначальные параметры
+DBconnect::get()->query("INSERT INTO lastSuccessfulHandledAdvertsId (id, mode, indexNumber) VALUES
+    ('0', 'bazab2b', 0),
+    ('0', 'bazab2b', 1),
+    ('0', 'bazab2b', 2),
+    ('0', 'e1', 0),
+    ('0', 'e1', 1),
+    ('0', 'e1', 2)
+    ");
+
+echo "Запись первоначальной инфы об успешно обработанных объявлениях: ";
 if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
 /****************************************************************************

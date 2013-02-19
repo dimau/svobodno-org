@@ -8,28 +8,22 @@ class ParserE1 extends ParserBasic {
     /**
      * КОНСТРУКТОР
      */
-    public function __construct() {
+    public function __construct($mode) {
 
         // Выполняем конструктор базового класса
-        parent::__construct();
-
-        // Устанавливаем режим работы парсера
-        $this->mode = "e1";
+        parent::__construct($mode);
 
         // Для e1 нумерация листов со списками объявлений начинается с 0. При первом использовании счетчик увеличит -1 до 0
         $this->advertsListNumber = -1;
 
         // Получим список уже ранее обработанных объявлений
         $this->readHandledAdverts();
-
-        // TODO: test
-        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: ид уже обрабоатнных объявлений: ".json_encode($this->handledAdverts));
     }
 
     /**
      * Получение списка уже обработанных объявлений с данного сайта
      */
-    private function readHandledAdverts() {
+    protected function readHandledAdverts() {
 
         // Получить идентификаторы всех обработанных объявлений за срок = actualDayAmountForAdvert от текущего дня
         $finalDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
@@ -65,12 +59,6 @@ class ParserE1 extends ParserBasic {
         // Увеличиваем счетчик текущей страницы списка объявлений
         $this->advertsListNumber++;
 
-        // TODO: test
-        if ($this->advertsListNumber >= 1) {
-            DBconnect::closeConnectToDB();
-            exit();
-        }
-
         // Вычисляем URL запрашиваемой страницы
         $url = 'http://www.e1.ru/business/realty/search.php?s_obj_type=1&rq=1&op_type=2&city_id=1&region_id=0&area_all=-1&sb=8&ob=2&p=' . $this->advertsListNumber;
 
@@ -95,13 +83,6 @@ class ParserE1 extends ParserBasic {
             return FALSE;
         }
 
-        // Убедимся, что парсер не застрял на какой-либо ошибке на странице и не превысил лимит в 90 скачиваний страницы со списком объявлений за 1 раз
-        // TODO: test - настоящий лимит = 90
-        if ($this->advertsListNumber >= 4) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->loadNextAdvertsList():4 Достигли лимита в 90 страниц со списком объявлений за 1 раз работы парсера");
-            return FALSE;
-        }
-
         // Сбрасываем счетчик текущего обрабатываемого краткого описания объявления на значение по умолчанию. Первые 3 tr относятся к заголовку таблицы.
         $this->advertShortDescriptionNumber = 2;
 
@@ -111,7 +92,7 @@ class ParserE1 extends ParserBasic {
     /**
      * Достает следующее краткое описание объявления из текущего списка.
      * При первом использовании достает самое первое краткое описание объявления из текущего списка.
-     * Сохраняет полученный DOM-объект в $advertShortDescriptionDOM
+     * Сохраняет полученный DOM-объект в $advertShortDescriptionDOM, а также сохраняет идентификатор загруженного объявления в $id
      * @return bool TRUE в случае успешного выделения кратких сведений по объявлению. FALSE в противном случае. Важно, что tr не всегда на самом деле содержит краткие сведения по объявлению, иногда это просто заголовок таблицы, в этом случае, у него не будет id.
      */
     public function getNextAdvertShortDescription() {
@@ -126,11 +107,11 @@ class ParserE1 extends ParserBasic {
         $currentShortAdvert = $this->advertsListDOM->find('tr[valign=top]', $this->advertShortDescriptionNumber);
 
         // TODO: test
-        if ($this->advertShortDescriptionNumber >= 4) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: достигли 5-ого объявления - заканчиваем парсинг");
+        /*if ($this->advertShortDescriptionNumber >= 12) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: достигли 10-ого объявления - заканчиваем парсинг");
             DBconnect::closeConnectToDB();
             exit();
-        }
+        }*/
 
         // Если получить DOM-модель краткого описания объявления не удалось или мы достигли подвала таблицы с объявлениями - прекращаем
         if ($currentShortAdvert === NULL) return FALSE;
@@ -431,10 +412,11 @@ class ParserE1 extends ParserBasic {
                 $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
                 // Если строку с районом получили, то уберем пробел в начале (особенность e1)
                 if (!isset($value) || $value == "") $value = "0"; else $value = mb_substr($value, 1);
-                /*if ($value == "Новая Сортировка") $value = "Сортировка новая";
-                if ($value == "Старая Сортировка") $value = "Сортировка старая";
+                if ($value == "С.Сортировка") $value = "Сортировка старая";
+                if ($value == "Юго-Западный") $value = "Юго-запад";
+                /*if ($value == "Старая Сортировка") $value = "Сортировка старая";
                 if ($value == "Виз") $value = "ВИЗ";
-                if ($value == "Юго-Западный") $value = "Юго-запад";*/
+                */
                 $params['district'] = $value;
 
                 //TODO: test
@@ -486,7 +468,7 @@ class ParserE1 extends ParserBasic {
      * Функция возвращает TRUE, если данное объявление по дате публикации уже не попадает во временное окно актуальности объявлений.
      * @return bool возвращает TRUE, если данное объявление по дате публикации уже не попадает во временное окно актуальности объявлений.
      */
-    public function isStopHandling() {
+    public function isTooLateDate() {
 
         // Получим текущую дату
         $currentDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
@@ -531,8 +513,13 @@ class ParserE1 extends ParserBasic {
         $date = new DateTime(date("Y") . "-" . $publicationData[1] . "-" . $publicationData[0], new DateTimeZone('Asia/Yekaterinburg'));
         $date = $date->format("d.m.Y");
 
-        // Сохраняем идентификаторы объявления в БД и сразу выдаем результат
-        return DBconnect::insertHandledAdvertFromE1($this->id, $date);
+        // Сохраняем идентификаторы объявления в БД и выдаем результат
+        $res = DBconnect::insertHandledAdvertFromE1($this->id, $date);
+
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: статус отметить объявление как обработанное: '". $res ."'");
+
+        return $res;
     }
 
 }

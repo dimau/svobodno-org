@@ -6,6 +6,8 @@
 class ParserBasic {
 
     protected $mode; // Режим работы парсера (определяется сайтом, который парсим и категорией объявлений, которые в этот раз парсятся на данном сайте)
+    protected $lastSuccessfulHandledAdvertsId; // 3 идентификатора для последних успешно обработанных объявлений (это те объявления с которых в прошлый успешный раз начал обработку парсер, а значит дальше которых не имеет смысла ходить текущему парсеру - все, что расположено дальше этих 3-х объявлений уже успешно обработано)
+    protected $newSuccessfulHandledAdvertsId = array(); // Идентификаторы первых 3-х объявлений, которые обрабатываются в этой сессии парсера. В случае успешного окончания парсинга они заменят в БД $lastSuccessfulHandledAdvertsId.
     protected $login; // Логин для доступа к сайту (используется только, если он необходим)
     protected $password; // Пароль для доступа к сайту (используется только, если он необходим)
     protected $actualDayAmountForAdvert = 2; // Количество дней, за которые парсер проверяет объявления из списка. Если ему попадается объявление, опубликованное ранее данного количества дней назад, то он прекращает свою работу. 1 - только сегодняшние объявления, 2 - сегодняшние и вчерашние и так далее.
@@ -21,10 +23,97 @@ class ParserBasic {
     /**
      * КОНСТРУКТОР
      */
-    protected function __construct() {}
+    protected function __construct($mode) {
+
+        // Устанавливаем режим работы парсера
+        $this->mode = $mode;
+
+        // Получим список 3-х идентификаторов для последних успешно обработанных объявлений в данном режиме
+        $this->lastSuccessfulHandledAdvertsId = DBconnect::selectLastSuccessfulHandledAdvertsId($mode);
+
+        if (count($this->lastSuccessfulHandledAdvertsId) != 3) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBasic.php->__construct:1 Парсинг в режиме " . $mode . " остановлен, так как не удалось получить сведения о 3-х последних успешно обработанных объявлениях");
+            DBconnect::closeConnectToDB();
+            exit();
+        }
+
+    }
 
     public function getId() {
         return $this->id;
+    }
+
+    /**
+     * Проверяет, совпало ли данное объявление из одним из трех объявлений, первыми обраотанных в прошлый успешный раз парсинга
+     * @return bool TRUE, в случае если данное объявление относится к трем объявлениям, первыми обработанным в прошлый успешный раз парсинга. FALSE в противном случае
+     */
+    public function isAdvertLastSuccessfulHandled() {
+        foreach ($this->lastSuccessfulHandledAdvertsId as $value) {
+            if ($value == $this->id) {
+
+                //TODO: test
+                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: Достигли объявления, успешно обработанного в прошлый раз!");
+
+                return TRUE;
+            }
+        }
+
+        return FALSE;
+    }
+
+    /**
+     * Ограничивает парсер загрузкой максимум 90 страниц со списком объявлений за 1 раз.
+     * Позволяет обезопасить нас и ресурс-источник объявлений от шибок в парсере или на самом ресурсе, связанных с запросом за короткий промежуток времени большого количества страниц
+     * @return bool TRUE если парсер загрузил уже 90-ую страницу со списком объявлений, FALSE в противном случае
+     */
+    public function isTooManyAdvertsLists() {
+        // TODO: test - настоящий лимит = 90
+        if ($this->advertsListNumber >= 2) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBasic.php->isTooManyAdvertsLists():1 Достигли лимита в 90 страниц со списком объявлений за 1 раз работы парсера в режиме: ".$this->mode);
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
+
+    /**
+     * Проверяет, является ли данное объявление одним из первых 3-х, обрабатываемых в данную сессию парсинга. Если является, то метод запоминает идентификатор объявления
+     * @return bool Всегда возвращает TRUE
+     */
+    public function checkAdvertForOneOfFirst() {
+
+        $count = count($this->newSuccessfulHandledAdvertsId);
+
+        // Если в текущую сессию парсинга мы уже поймали 3 первых обработанных объявления, то более ничего не требуется
+        if ($count >= 3) return TRUE;
+
+        // Если в текущую сессию парсинга мы еще не запомнили 3-х объявлений, то добавляем
+        $this->newSuccessfulHandledAdvertsId[$count] = $this->id;
+
+        return TRUE;
+    }
+
+    /**
+     * Метод вызывается при успешном окончании сессии парсинга для сохранения идентификаторов первых трех объявлений, с которых данная сессия была начата
+     * @return bool TRUE в случае успеха и FALSE в противном случае
+     */
+    public function saveNewLastSuccessfulHandledAdvertsId() {
+
+        // Загружаем следующие объявления и достаем из них идентификаторы, пока их количество не станет = 3
+        while (($count = count($this->newSuccessfulHandledAdvertsId)) < 3) {
+
+            // Загружаем следующее объявление и достаем из него идентификатор
+            if ($this->getNextAdvertShortDescription()) {
+                $this->newSuccessfulHandledAdvertsId[$count] = $this->id;
+            } else {
+                Logger::getLogger(GlobFunc::$loggerName)->log("ParserBasic.php->saveNewLastSuccessfulHandledAdvertsId():1 Не удалось получить краткое описание объявления для того, чтобы достать из него id. В режиме: '" . $this->mode . "'. Попытка достать идентификатор №" . $count);
+                return FALSE;
+            }
+        }
+
+        // Сохраняем в БД идентификаторы первых 3-х объявлений, с которых началась данная успешная сессия парсинга
+        return DBconnect::updateLastSuccessfulHandledAdvertsId($this->mode, $this->newSuccessfulHandledAdvertsId);
+
     }
 
     /**
@@ -123,7 +212,12 @@ class ParserBasic {
     public function getDataAboutPhoneNumber() {
 
         // Вернем ассоциативный массив с данными о телефоне, если он ранее был уже сохранен в БД, либо пустой массив
-        return DBconnect::selectKnownPhoneNumber($this->phoneNumber);
+        $res = DBconnect::selectKnownPhoneNumber($this->phoneNumber);
+
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: проверили телефонный номер по БД - ".json_encode($res));
+
+        return $res;
     }
 
     /**
@@ -148,16 +242,40 @@ class ParserBasic {
     }
 
     /**
-     * Запоминает новый телефонный номер и его статус в БД
+     * Обновляет дату последнего использования для телефонного номера
      * @return bool Возвращает TRUE в случае успеха и FALSE в случае неудачи
      */
     public function updateDateKnownPhoneNumber() {
-
-        // Проверка наличия необходимых данных
-        if (!isset($this->phoneNumber)) return FALSE;
-
-        // Добавляем данные в БД и сразу возвращаем результат
         return DBconnect::updateKnownPhoneNumberDate($this->phoneNumber, time());
     }
 
+    /**
+     * Изменяет статус контактного лица по телефонному номеру
+     * @param string $status новый статус контактного лица по телефонному номеру
+     * @return bool Возвращает TRUE в случае успеха и FALSE в случае неудачи
+     */
+    public function changeStatusKnownPhoneNumber($status) {
+        return DBconnect::updateKnownPhoneNumberStatus($this->phoneNumber, $status);
+    }
+
+    /*************************************************************************************
+     * ПЕРЕОПРЕДЕЛЯЕМЫЕ В КЛАССАХ ПОТОМКАХ ФУНКЦИИ
+     * Перечисление ключевых функций, которые должны быть опеределены в каждмо классе потомке, внутри базового класса позволяет вызывать эти методы классов потомков из методов базового класса (это называется виртуальные функции, полиморфизм)
+     ************************************************************************************/
+
+    protected function readHandledAdverts() {}
+
+    protected function loadNextAdvertsList() {}
+
+    protected function getNextAdvertShortDescription() {}
+
+    protected function loadFullAdvertDescription() {}
+
+    protected function parseFullAdvert() {}
+
+    protected function isAdvertAlreadyHandled() {}
+
+    protected function isTooLateDate() {}
+
+    protected function setAdvertIsHandled() {}
 }

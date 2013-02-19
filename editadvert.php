@@ -83,6 +83,45 @@ if ($action == "removeAdvert") {
 }
 
 /*************************************************************************************
+ * Команда от админа на удаление объявления от агента и внесение телефона в список агентов
+ ************************************************************************************/
+
+if ($action == "markAsAgentAdvert") {
+
+    // Только админ может пометить объявление агентским в форме редактирования
+    // Это удобно при первичном редактировании и публикации оператором автоматически распарсенного объявления из чужой базы
+    if ($isAdmin['newAdvertAlien'] || $isAdmin['searchUser']) {
+
+        // Внесем телефонный номер в БД как агентский, либо изменим статус уже имеющейся записи про данный телефонный номер на "агент"
+        if (count(DBconnect::selectKnownPhoneNumber($property->getContactTelephonNumber())) == 0) {
+            // Такого телефонного номера еще нет в БД
+            DBconnect::insertKnownPhoneNumber(array("phoneNumber" => $property->getContactTelephonNumber(), "status" => "агент", "dateOfLastPublication" => time()));
+        } else {
+            // Такой телефонный номер уже есть в БД
+            DBconnect::updateKnownPhoneNumberStatus($property->getContactTelephonNumber(), "агент");
+            DBconnect::updateKnownPhoneNumberDate($property->getContactTelephonNumber(), time());
+        }
+
+        // Снимаем объявление с публикации и переносим его в архив, если оно было получено с чужого ресурса (полнота = 0)
+        $errors = $property->unpublishAdvert();
+
+        // Просматриваем базу объявлений в поисках такого же контактного номера. Если находим объявления, в которых контактный номер тот же самый, то также снимаем их с публикации и переносим в архив
+        $propertiesId = DBconnect::selectPropertiesIdForContactTelephonNumber($property->getContactTelephonNumber());
+        foreach ($propertiesId as $value) {
+            $tempProperty = new Property($value);
+            if (!$tempProperty->readCharacteristicFromDB() || !$tempProperty->readFotoInformationFromDB()) {
+                $errors[] = 'Не удалось инициализировать модель, снять с публикации и удалить (по причине того, что это агент) объявление с id = ' . $value;
+            } else {
+                $errors = array_merge($errors, $tempProperty->unpublishAdvert());
+            }
+        }
+
+        DBconnect::closeConnectToDB();
+        exit("Результат выполнения переноса объявления в разряд от агентов:<div style='color: red;'>" . json_encode($errors) . "</div>");
+    }
+}
+
+/*************************************************************************************
  * Если пользователь заполнил и отослал форму - проверяем ее
  ************************************************************************************/
 

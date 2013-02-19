@@ -10,13 +10,10 @@ class ParserBazaB2B extends ParserBasic {
     /**
      * КОНСТРУКТОР
      */
-    public function __construct() {
+    public function __construct($mode) {
 
         // Выполняем конструктор базового класса
-        parent::__construct();
-
-        // Устанавливаем режим работы парсера
-        $this->mode = "bazab2b";
+        parent::__construct($mode);
 
         // Устанавливаем логин и пароль для доступа к сайту
         $this->login = "testagent";
@@ -29,7 +26,7 @@ class ParserBazaB2B extends ParserBasic {
     /**
      * Получение списка уже обработанных объявлений с данного сайта
      */
-    private function readHandledAdverts() {
+    protected function readHandledAdverts() {
 
         // Получить идентификаторы всех обработанных объявлений за срок = actualDayAmountForAdvert от текущего дня
         $finalDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
@@ -102,10 +99,17 @@ class ParserBazaB2B extends ParserBasic {
     /**
      * Достает следующее краткое описание объявления из текущего списка.
      * При первом использовании достает самое первое краткое описание объявления из текущего списка.
-     * Сохраняет полученный DOM-объект в $advertShortDescriptionDOM
+     * Сохраняет полученный DOM-объект в $advertShortDescriptionDOM, а также сохраняет идентификаторы загруженного объявления в $id и $c_id
      * @return bool TRUE в случае успешной загрузки и FALSE в противном случае
      */
     public function getNextAdvertShortDescription() {
+
+        // Очищаем данные о предыдущем объявлении
+        $this->advertShortDescriptionDOM = NULL;
+        $this->id = NULL;
+        $this->c_id = NULL;
+        $this->phoneNumber = NULL;
+        $this->advertFullDescriptionDOM = NULL;
 
         $this->advertShortDescriptionNumber++;
         $currentShortAdvert = $this->advertsListDOM->find('.poisk .chr-wite', $this->advertShortDescriptionNumber);
@@ -338,7 +342,7 @@ class ParserBazaB2B extends ParserBasic {
      * Функция возвращает TRUE, если данное объявление по дате публикации уже не попадает во временное окно актуальности объявлений.
      * @return bool возвращает TRUE, если данное объявление по дате публикации уже не попадает во временное окно актуальности объявлений.
      */
-    public function isStopHandling() {
+    public function isTooLateDate() {
 
         // Получим текущую дату
         $currentDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
@@ -356,7 +360,7 @@ class ParserBazaB2B extends ParserBasic {
                 $date = new DateTime(date("Y") . "-" . $publicationMonth . "-" . $publicationDate, new DateTimeZone('Asia/Yekaterinburg'));
             } else {
                 // Если не удалось получить ни время, ни дату публикации
-                Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->isStopHandling():1 Не удалось получить ни время, ни дату публикации объекта с сайта bazaB2B по адресу: " . "http://bazab2b.ru/?c_id=" . $this->c_id . "&&id=" . $this->id . "&modal=1");
+                Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->isTooLateDate():1 Не удалось получить ни время, ни дату публикации объекта с сайта bazaB2B по адресу: " . "http://bazab2b.ru/?c_id=" . $this->c_id . "&&id=" . $this->id . "&modal=1");
                 return TRUE;
             }
         }
