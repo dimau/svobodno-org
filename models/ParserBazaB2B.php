@@ -87,11 +87,6 @@ class ParserBazaB2B extends ParserBasic {
 
         // Сбрасываем параметры текущего обрабатываемого краткого описания объявления на значения по умолчанию
         $this->advertShortDescriptionNumber = -1;
-        $this->advertShortDescriptionDOM = NULL;
-        $this->c_id = NULL;
-        $this->id = NULL;
-        $this->phoneNumber = NULL;
-        $this->advertFullDescriptionDOM = NULL;
 
         return TRUE;
     }
@@ -159,6 +154,10 @@ class ParserBazaB2B extends ParserBasic {
 
         // Сохраним в параметры объекта DOM-объект страницы со списком объявлений
         $this->advertFullDescriptionDOM = str_get_html($pageHTML);
+        if (!isset($this->advertFullDescriptionDOM)) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->loadFullAdvertDescription():2 не удалось разобрать страницу с полным описанием объявления");
+            return FALSE;
+        }
 
         return TRUE;
     }

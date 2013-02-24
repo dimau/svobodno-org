@@ -78,7 +78,7 @@ class View {
         // Заполняем шаблон
         // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне баллуна
         $arrTemplVar = array('{isInteractive}', '{forTable}', '{size}', '{gallery}', '{urlFotoPrimary}', '{hrefFotoPrimary}', '{numberOfFotos}', '{hiddensLinksToOtherFotos}');
-        // Копируем html-текст шаблона баллуна
+        // Подставляем данные в шаблон
         $fotosWrapperHTML = str_replace($arrTemplVar, $arrForReplace, $templ);
 
         return $fotosWrapperHTML;
@@ -302,10 +302,6 @@ class View {
             $arrBalloonReplace['utilities'] = "включены в стоимость";
             $arrBalloonReplace['utilitiesName'] = "Ком. услуги:";
         }
-        $arrBalloonReplace['compensationMoney'] = "";
-        if (isset($oneProperty['compensationMoney'])) $arrBalloonReplace['compensationMoney'] = $oneProperty['compensationMoney'];
-        $arrBalloonReplace['compensationPercent'] = "";
-        if (isset($oneProperty['compensationPercent'])) $arrBalloonReplace['compensationPercent'] = $oneProperty['compensationPercent'];
 
         // Комнаты
         if (isset($oneProperty['amountOfRooms']) && $oneProperty['amountOfRooms'] != "0") {
@@ -384,7 +380,7 @@ class View {
 
         // Производим заполнение шаблона баллуна
         // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне баллуна
-        $arrBalloonTemplVar = array('{coordX}', '{coordY}', '{propertyId}', '{typeOfObject}', '{address}', '{fotosWrapper}', '{costOfRenting}', '{currency}', '{costOfRentingName}', '{utilities}', '{utilitiesName}', '{compensationMoney}', '{compensationPercent}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValuesName}', '{areaValues}', '{areaValuesMeasure}', '{floorName}', '{floor}', '{furnitureName}', '{furniture}', '{favorites}');
+        $arrBalloonTemplVar = array('{coordX}', '{coordY}', '{propertyId}', '{typeOfObject}', '{address}', '{fotosWrapper}', '{costOfRenting}', '{currency}', '{costOfRentingName}', '{utilities}', '{utilitiesName}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValuesName}', '{areaValues}', '{areaValuesMeasure}', '{floorName}', '{floor}', '{furnitureName}', '{furniture}', '{favorites}');
         // Копируем html-текст шаблона баллуна
         $currentAdvertBalloonList = str_replace($arrBalloonTemplVar, $arrBalloonReplace, $templ);
 

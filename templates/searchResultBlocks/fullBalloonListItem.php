@@ -9,9 +9,6 @@
             <span class='headOfString'>{utilitiesName}</span> {utilities}
         </li>
         <li>
-            <span class='headOfString'>Комиссия:</span> {compensationMoney} {currency} ({compensationPercent}%)
-        </li>
-        <li>
             <span class='headOfString'>{amountOfRoomsName}</span> {amountOfRooms}{adjacentRooms}
         </li>
         <li>

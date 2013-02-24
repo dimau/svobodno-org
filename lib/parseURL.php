@@ -55,7 +55,7 @@ require_once $websiteRoot . '/models/ParserBasic.php';
 require_once $websiteRoot . '/models/Property.php';
 
 // Получаем параметр для идентификаци режима работы (а точнее ресурса, который нужно пропарсить сейчас) - передается как параметр команды для cron
-if (isset($argv[1]) && ($argv[1] == "e1" || $argv[1] == "bazab2b")) {
+if (isset($argv[1]) && ($argv[1] == "e1Kv1k" || $argv[1] == "e1Kv2k" || $argv[1] == "e1Kv3k" || $argv[1] == "e1Kv4k" || $argv[1] == "e1Kv5k" || $argv[1] == "e1Kom" || $argv[1] == "66ruKv" || $argv[1] == "66ruKom" || $argv[1] == "bazab2b")) {
     $mode = $argv[1];
 } else {
     Logger::getLogger(GlobFunc::$loggerName)->log("parseURL.php:1 Обращение к parseURL.php без указания mode");
@@ -73,9 +73,19 @@ if (DBconnect::get() == FALSE) {
 
 // Подключим соответствующую модель и инициализируем для нее объект парсера, который собственно и содержит все необходимые сведения и методы для парсинга сайта
 switch ($mode) {
-    case "e1":
+    case "e1Kv1k":
+    case "e1Kv2k":
+    case "e1Kv3k":
+    case "e1Kv4k":
+    case "e1Kv5k":
+    case "e1Kom":
         require_once $websiteRoot . '/models/ParserE1.php';
         $parser = new ParserE1($mode);
+        break;
+    case "66ruKv":
+    case "66ruKom":
+        require_once $websiteRoot . '/models/Parser66ru.php';
+        $parser = new Parser66ru($mode);
         break;
     case "bazab2b":
         require_once $websiteRoot . '/models/ParserBazaB2B.php';
@@ -135,7 +145,15 @@ switch ($mode) {
  * АВТОРИЗАЦИЯ НА РЕСУРСЕ ИСТОЧНИКЕ
  ************************************************************************************/
 
-if ($mode == "bazab2b") $parser->authorization();
+// Для базыБ2Б 2 раза подряд пытаемся авторизоваться, если не получается - заканчиваем работу - дальнейшие действия не имеют смысла (адрес и телефон по объявлению будут недоступны)
+if ($mode == "bazab2b") {
+    if (!$parser->authorization()) {
+        if (!$parser->authorization()) {
+            DBconnect::closeConnectToDB();
+            exit();
+        }
+    }
+}
 
 /*************************************************************************************
  * ПОЛУЧАЕМ СПИСОК СВЕЖИХ ОБЪЯВЛЕНИЙ
@@ -215,14 +233,14 @@ while ($parser->loadNextAdvertsList()) {
             if (count($dataAboutPhoneNumber) == 0) {
 
                 //TODO: test
-                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: номер телефона еще не известен БД");
+                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера: номер телефона еще не известен БД");
 
                 // Если номер телефона еще не известен БД. А также, если это номер телефона агента, который использовался последний раз больше, чем год назад
                 // Проверяем признаки объявления от агента
                 if ($parser->hasSignsAgent()) {
 
                     //TODO: test
-                    Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: Новый номер - обнаружены признаки агента в объявлении");
+                    Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера: Новый номер - обнаружены признаки агента в объявлении");
 
                     // Если в объявлении есть признаки агентства, то добавляем телефон в БД как агента и переходим к следующему объявлению
                     $parser->newKnownPhoneNumber("агент");
@@ -232,7 +250,7 @@ while ($parser->loadNextAdvertsList()) {
                 } else {
 
                     //TODO: test
-                    Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: Новый номер - признаки агента не обнаружены в объявлении");
+                    Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера: Новый номер - признаки агента не обнаружены в объявлении");
 
                     // Если в объявлении нет признаков агентства, то добавляем телефон в БД как телефон собственника
                     $parser->newKnownPhoneNumber("собственник");
@@ -242,7 +260,7 @@ while ($parser->loadNextAdvertsList()) {
             } elseif ($dataAboutPhoneNumber['status'] == "собственник" || $dataAboutPhoneNumber['status'] == "арендатор") {
 
                 //TODO: test
-                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: телефонный номер принадлежит собственнику");
+                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера: телефонный номер принадлежит собственнику");
 
                 // Если это номер собственника - боремся с дубликатами
                 // TODO: есть ли опубликованные объявления с таким номером телефона.
@@ -256,7 +274,7 @@ while ($parser->loadNextAdvertsList()) {
             } elseif ($dataAboutPhoneNumber['status'] == "агент" && $dataAboutPhoneNumber['dateOfLastPublication'] >= time() - 31449600) { // Телефон агента, который использовался менее года назад последний раз
 
                 //TODO: test
-                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: телефонный номер принадлежит агенту");
+                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера: телефонный номер принадлежит агенту");
 
                 // Если это телефонный номер агента и он использовался последний раз менее года назад (31449600 секунд) - игнорируем объявление. Проверка на срок год нужна, так как агент мог отказаться от данного номера, и номер мог быть переназначен хорошему человеку
                 // Актуализируем дату последнего использования телефонного номера
@@ -268,13 +286,13 @@ while ($parser->loadNextAdvertsList()) {
             } elseif ($dataAboutPhoneNumber['status'] == "агент" && $dataAboutPhoneNumber['dateOfLastPublication'] < time() - 31449600) { // Телефон агента, который использовался более года назад последний раз
 
                 //TODO: test
-                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: телефонный номер принадлежит агенту, использовался более года назад последний раз");
+                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера: телефонный номер принадлежит агенту, использовался более года назад последний раз");
 
                 // Проверяем признаки объявления от агента
                 if ($parser->hasSignsAgent()) {
 
                     //TODO: test
-                    Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: обнаружены признаки агента в объявлении");
+                    Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера: обнаружены признаки агента в объявлении");
 
                     // Если в объявлении есть признаки агентства, то добавляем телефон в БД как агента и переходим к следующему объявлению
                     $parser->updateDateKnownPhoneNumber();
@@ -284,7 +302,7 @@ while ($parser->loadNextAdvertsList()) {
                 } else {
 
                     //TODO: test
-                    Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: признаки агента не обнаружены в объявлении");
+                    Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера: признаки агента не обнаружены в объявлении");
 
                     // Обновить статус (с агента на собственника) и дату последнего использования телефонного номера
                     $parser->changeStatusKnownPhoneNumber("собственник");
@@ -311,7 +329,7 @@ while ($parser->loadNextAdvertsList()) {
         // Проверим, что объявление относится к Екатеринбургу. Если нет, считаем его успешно обработанным и не добавляем в базу
         if (!isset($paramsArr['city']) || $paramsArr['city'] != "Екатеринбург") {
             //TODO: test
-            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: объявление не из Екатеринбурга");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера: объявление не из Екатеринбурга");
 
             $parser->setAdvertIsHandled();
             continue;

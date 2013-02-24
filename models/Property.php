@@ -79,6 +79,7 @@ class Property {
     private $adminComment = "";
     private $completeness = "";
     private $sourceOfAdvert = "";
+    private $hasPhotos = FALSE;
 
     private $fileUploadId = "";
     private $uploadedFoto = array(); // В переменной будет храниться информация о загруженных фотографиях. Представляет собой массив ассоциированных массивов
@@ -721,6 +722,7 @@ class Property {
         $result['completeness'] = $this->completeness;
         $result['ownerLogin'] = $this->ownerLogin;
         $result['sourceOfAdvert'] = $this->sourceOfAdvert;
+        $result['hasPhotos'] = $this->hasPhotos;
 
         return $result;
     }

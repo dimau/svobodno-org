@@ -184,7 +184,8 @@ DBconnect::get()->query("CREATE TABLE property (
         status VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'опубликовано' COMMENT 'Статус объявления: опубликовано или не опубликовано. Сразу после создания объявление становится неопубликованным',
         adminComment TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Комментарий сотрудников компании - админов',
 		completeness VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Признак полноты данных об объекте (значения: 1/0). Если объявление получено из чужой базы, то его полнота устанавливается в 0 (то есть никаких особых требований к полноте не предъявляется). Если с данным объектом проведена полная работа и получены полные и достоверные данные, то его полнота устанавливается в 1 (при редактировании данных мы требуем соблюдения их полноты)',
-		sourceOfAdvert TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Ссылка на страницу с описанием объявления в источнике (для чужих объявлений - e1.ru, 66.ru и т.д.)'
+		sourceOfAdvert TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Ссылка на страницу с описанием объявления в источнике (для чужих объявлений - e1.ru, 66.ru и т.д.)',
+        hasPhotos INT(1) COMMENT 'Флаг хранит признак наличия или отсутствия фотографий в исходном объявлении: 1 - фотографии есть в исходном объявлении, 0 - фотографий в исходном объявлении нет'
 )");
 
 echo "property: ";
@@ -556,7 +557,8 @@ DBconnect::get()->query("CREATE TABLE archiveAdverts (
         status VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'опубликовано' COMMENT 'Статус объявления: опубликовано или не опубликовано. Сразу после создания объявление становится неопубликованным',
         adminComment TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Комментарий сотрудников компании - админов',
 		completeness VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Признак полноты данных об объекте (значения: 1/0). Если объявление получено из чужой базы, то его полнота устанавливается в 0 (то есть никаких особых требований к полноте не предъявляется). Если с данным объектом проведена полная работа и получены полные и достоверные данные, то его полнота устанавливается в 1 (при редактировании данных мы требуем соблюдения их полноты)',
-		sourceOfAdvert TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Ссылка на страницу с описанием объявления в источнике (для чужих объявлений - e1.ru, 66.ru и т.д.)'
+		sourceOfAdvert TEXT CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Ссылка на страницу с описанием объявления в источнике (для чужих объявлений - e1.ru, 66.ru и т.д.)',
+		hasPhotos INT(1) COMMENT 'Флаг хранит признак наличия или отсутствия фотографий в исходном объявлении: 1 - фотографии есть в исходном объявлении, 0 - фотографий в исходном объявлении нет'
 )");
 
 echo "archiveAdverts: ";
@@ -583,13 +585,21 @@ DBconnect::get()->query("CREATE TABLE e1 (
 echo "e1: ";
 if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
+DBconnect::get()->query("CREATE TABLE 66ru (
+  id VARCHAR(70) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'id идентификатор объявления на сайте 66.ru',
+  date DATE COMMENT 'Дата публикации объявления'
+)");
+
+echo "66ru: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
 /****************************************************************************
  * СПИСОК ID ПОСЛЕДНИХ УСПЕШНО ОБРАБОТАННЫХ ОБЪЯВЛЕНИЙ ИЗ БАЗЫ САЙТА bazaB2B, e1
  * Если парсер при разборе страницы со списком объявлений встречает объявление из одним из этих id, он заканчивает работу
  ***************************************************************************/
 
 DBconnect::get()->query("CREATE TABLE lastSuccessfulHandledAdvertsId (
-  id VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'идентификатор объявления',
+  id VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'идентификатор объявления',
   mode VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'режим работы парсера, при котором было достигнуто данное объявление',
   indexNumber INT(1) COMMENT 'Место идентификатора: 1, 2, 3'
 )");
@@ -602,9 +612,30 @@ DBconnect::get()->query("INSERT INTO lastSuccessfulHandledAdvertsId (id, mode, i
     ('0', 'bazab2b', 0),
     ('0', 'bazab2b', 1),
     ('0', 'bazab2b', 2),
-    ('0', 'e1', 0),
-    ('0', 'e1', 1),
-    ('0', 'e1', 2)
+    ('0', 'e1Kv1k', 0),
+    ('0', 'e1Kv1k', 1),
+    ('0', 'e1Kv1k', 2),
+    ('0', 'e1Kv2k', 0),
+    ('0', 'e1Kv2k', 1),
+    ('0', 'e1Kv2k', 2),
+    ('0', 'e1Kv3k', 0),
+    ('0', 'e1Kv3k', 1),
+    ('0', 'e1Kv3k', 2),
+    ('0', 'e1Kv4k', 0),
+    ('0', 'e1Kv4k', 1),
+    ('0', 'e1Kv4k', 2),
+    ('0', 'e1Kv5k', 0),
+    ('0', 'e1Kv5k', 1),
+    ('0', 'e1Kv5k', 2),
+    ('0', 'e1Kom', 0),
+    ('0', 'e1Kom', 1),
+    ('0', 'e1Kom', 2),
+    ('0', '66ruKv', 0),
+    ('0', '66ruKv', 1),
+    ('0', '66ruKv', 2),
+    ('0', '66ruKom', 0),
+    ('0', '66ruKom', 1),
+    ('0', '66ruKom', 2)
     ");
 
 echo "Запись первоначальной инфы об успешно обработанных объявлениях: ";
@@ -615,7 +646,7 @@ if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TR
  ***************************************************************************/
 
 DBconnect::get()->query("CREATE TABLE knownPhoneNumbers (
-  phoneNumber VARCHAR(10) NOT NULL PRIMARY KEY CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Телефонный номер',
+  phoneNumber VARCHAR(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL PRIMARY KEY COMMENT 'Телефонный номер',
   status VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Статус телефонного номера: агент, собственник, арендатор (статус используется, если обладатель номера ищет человека на подселение к себе)',
   dateOfLastPublication INT(11) COMMENT 'Дата последней публикации объявления с указанием данного номера телефона в качестве контактного, в формате timestamp. Это позволит отслеживать устаревшие данные по номерам телефонов - если телефон долго не используется, то, возможно, стоит пересмотреть его статус'
 )");

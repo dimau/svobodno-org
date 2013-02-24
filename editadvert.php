@@ -90,7 +90,8 @@ if ($action == "markAsAgentAdvert") {
 
     // Только админ может пометить объявление агентским в форме редактирования
     // Это удобно при первичном редактировании и публикации оператором автоматически распарсенного объявления из чужой базы
-    if ($isAdmin['newAdvertAlien'] || $isAdmin['searchUser']) {
+    // Кроме того, проверяем, что контактный телефон указан в объявлении, в противном случае ничего не делаем
+    if (($isAdmin['newAdvertAlien'] || $isAdmin['searchUser']) && $property->getContactTelephonNumber() != "") {
 
         // Внесем телефонный номер в БД как агентский, либо изменим статус уже имеющейся записи про данный телефонный номер на "агент"
         if (count(DBconnect::selectKnownPhoneNumber($property->getContactTelephonNumber())) == 0) {
