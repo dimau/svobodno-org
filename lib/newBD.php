@@ -586,7 +586,7 @@ echo "e1: ";
 if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
 DBconnect::get()->query("CREATE TABLE 66ru (
-  id VARCHAR(70) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'id идентификатор объявления на сайте 66.ru',
+  id VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'id идентификатор объявления на сайте 66.ru',
   date DATE COMMENT 'Дата публикации объявления'
 )");
 

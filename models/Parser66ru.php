@@ -13,6 +13,18 @@ class Parser66ru extends ParserBasic {
         // Выполняем конструктор базового класса
         parent::__construct($mode);
 
+        // На 66.ru парсим только сегодняшние и вчерашние объявления
+        $this->actualDayAmountForAdvert = 2;
+
+        // Для 66.ru нумерация страниц со списками объявлений начинается с 1. При первом использовании счетчик увеличится с 0 до 1
+        $this->advertsListNumber = 0;
+
+        // Для 66.ru признаки окончания парсинга (дошли до объявления из категории lastSuccessfulHandledAdvertsId или до объявления с датой публикации старше, чем допустимо) проверяются, начиная только со второй страницы со списком объявлений, так как на первой странице новые объявления могут появляться не вверху списка а где-то в середине.
+        $this->minAdvertsListForHandling = 1;
+
+        // Определим максимальное количество страниц со списками объявлений для парсинга в 1 сессию
+        $this->maxAdvertsListForHandling = 15;
+
         // Получим список уже ранее обработанных объявлений
         $this->readHandledAdverts();
     }
@@ -127,6 +139,8 @@ class Parser66ru extends ParserBasic {
         if ($href = $this->advertShortDescriptionDOM->find('td a', 0)) {
 
             // Проверка на агентство
+            // TODO: test
+            /*
             $agencyStatus = $this->advertShortDescriptionDOM->find('td', 1)->innertext;
             $agencyStatus = explode("<br />", $agencyStatus);
             $agencyStatus = $agencyStatus[1];
@@ -139,11 +153,12 @@ class Parser66ru extends ParserBasic {
                 return $this->getNextAdvertShortDescription();
             }
 
-            // Получим идентификатор объявления. Необходимо удалить вот эту общую часть url (/realty/doska/live/) подробного описания объявления для выделения уникального минимального идентификатора объявления
-            $this->id = mb_substr($href->href, 19, iconv_strlen($href->href, 'UTF-8') - 19, 'UTF-8');
-
             //TODO: test
             Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера 66ru: работаем с объявлением номер X, объявление не от агентства: '".$agencyStatus."'");
+            */
+
+            // Получим идентификатор объявления. Необходимо удалить вот эту общую часть url (/realty/doska/live/) подробного описания объявления для выделения уникального минимального идентификатора объявления
+            $this->id = mb_substr($href->href, 19, iconv_strlen($href->href, 'UTF-8') - 19, 'UTF-8');
 
             return TRUE;
         } else {
@@ -261,9 +276,8 @@ class Parser66ru extends ParserBasic {
         $comment = $this->advertFullDescriptionDOM->find(".b-content-card_item__hightline-20", 0)->parent()->children(7);
         if (isset($comment) && $comment->tag == "p") {
             $params['comment'] = $comment->innertext;
-            // Для удаления на конце строки служебных символов <br/> выполним:
-            $lengthComment = iconv_strlen($params['comment'], 'UTF-8');
-            $params['comment'] = mb_substr($params['comment'], 0, $lengthComment - 5, 'UTF-8');
+            // Удалим служебные символы "<br/>", которые 66.ru ставит после каждого абзаца текста в комментарии:
+            $params['comment'] = str_replace("<br/>", "", $params['comment']);
         }
 
         // РАЗБИРАЕМ СТРУКТУРИРОВАННЫЕ ДАННЫЕ ОБЪЯВЛЕНИЯ
@@ -284,21 +298,33 @@ class Parser66ru extends ParserBasic {
         $params['contactTelephonNumber'] = $this->phoneNumber;
 
         // Стоимость аренды
-        $value = $this->advertFullDescriptionDOM->find(".b-content-card_item__cost b", 0)->plaintext;
-        $params['costOfRenting'] = intval($value);
+        $value = $this->advertFullDescriptionDOM->find(".b-content-card_item__cost b", 0)->innertext;
+        if ($value == "договорная") {
+            $params['costOfRenting'] = 0;
+        } else {
+            $value = str_replace("&nbsp;", "", $value); // Убираем пробел между тысячами и оставшейся частью стоимости аренды
+            $params['costOfRenting'] = intval($value);
+        }
         $params['currency'] = "руб.";
         $params['compensationMoney'] = 0;
         $params['compensationPercent'] = 0;
 
         // Адрес
         $value = $this->advertFullDescriptionDOM->find("h1", 0)->plaintext;
-        if ($this->mode == "66ruKv") {
+        // Берем только ту часть, которая расположена между "Сдам комнату...," _________________ и "(район)"
+        $beginOfAddressTemplate = "~^(.*?)(,){1}\s~"; // Шаблон начала адрес в виде: "Сдам 1-к. квартиру, "
+        $endOfAddressTemplate = "~\s\((.*?)\)$~"; // Шаблон конца адреса, в котором отмечен район в виде: " (Центр)"
+        if ($value = preg_replace(array($beginOfAddressTemplate, $endOfAddressTemplate), "", $value)) {
+            $params['address'] = $value;
+        }
+
+        /*if ($this->mode == "66ruKv") {
             // Пропускаем начало строки: "Сдам X-к. квартиру, "
             $params['address'] = mb_substr($value, 20, iconv_strlen($value, 'UTF-8') - 20, 'UTF-8');
         } elseif ($this->mode == "66ruKom") {
             // Пропускаем начало строки: "Сдам комнату в 4-к. квартире, "
             $params['address'] = mb_substr($value, 30, iconv_strlen($value, 'UTF-8') - 30, 'UTF-8');
-        }
+        }*/
 
         // Перебираем все имеющиеся параметры объявления и заполняет соответствующие параметры ассоциативного массива
         foreach ($tableRows as $oneParam) {
@@ -314,7 +340,8 @@ class Parser66ru extends ParserBasic {
             if ($paramName == "Район") {
                 $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
                 if (!isset($value) || $value == "") $value = "0";
-                /*if ($value == "С.Сортировка") $value = "Сортировка старая";*/
+                if ($value == "ЖБИ (Комсомольский)") $value = "ЖБИ";
+                if ($value == "Старая Сортировка") $value = "Сортировка старая";
                 if ($value == "Новая Сортировка") $value = "Сортировка новая";
                 if ($value == "Юго-Западный") $value = "Юго-запад";
                 $params['district'] = $value;
@@ -409,6 +436,9 @@ class Parser66ru extends ParserBasic {
      * @return bool возвращает TRUE, если данное объявление по дате публикации уже не попадает во временное окно актуальности объявлений.
      */
     public function isTooLateDate() {
+
+        // Если парсер работает со страницей списка объявлений, номер которой меньше или равен номеру страницы, до которого парсер обязан доходить за 1 сессию парсинга, то данная причина окончания парсинга не применяется
+        if ($this->advertsListNumber <= $this->minAdvertsListForHandling) return FALSE;
 
         // Получим текущую дату
         $currentDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));

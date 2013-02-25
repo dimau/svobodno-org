@@ -1,47 +1,9 @@
 <?php
 
 /**********************************************************************************
- * БАЗА ДАННЫХ
- *********************************************************************************/
-
-// Функция выполняет запросы к БД
-function executeSQL($DBlink, $request, $paramsType, $paramsArr) {
-
-    $stmt = mysqli_prepare($DBlink, $request);
-    if ($stmt) {
-
-        // Подготовим массив для передачи в mysqli_stmt_bind_param
-        $arr = array($stmt, $paramsType);
-        $arr = array_merge($arr, $paramsArr);
-
-        call_user_func_array('mysqli_stmt_bind_param', $arr);
-        mysqli_stmt_execute($stmt);
-        $res = mysqli_affected_rows($DBlink);
-        mysqli_stmt_close($stmt);
-    }
-
-    return $res;
-}
-
-// Получить результаты выполнения SQL запроса SELECT в виде массива ассоциированных массивов
-function getResultSQLSelect($DBlink, $request) {
-    $res = mysqli_query($DBlink, mysqli_real_escape_string($DBlink, $request));
-    if ($res != FALSE) {
-        $value = mysqli_fetch_all($res, MYSQLI_ASSOC); // Получаем массив массивов, каждый из которых содержит параметры отдельной строки БД
-    } else {
-        $value = array();
-        // TODO: сообщить в лог об ошибке обращения к БД!
-    }
-    if ($res != FALSE) mysqli_free_result($res); // Очищаем занятую память
-
-    return $value;
-}
-
-
-/**********************************************************************************
  * man.php
  *********************************************************************************/
-
+/*
 // Получаем список пользователей, чьей недвижимостью интересовался наш пользователь ($userId) в качестве арендатора, и чьи анкеты он имеет право смотреть
 $tenantsWithSignUpToViewRequest = array();
 if ($rez = mysql_query("SELECT interestingPropertysId FROM searchRequests WHERE userId = '" . $userId . "'")) {
@@ -69,11 +31,11 @@ if ($rez = mysql_query("SELECT interestingPropertysId FROM searchRequests WHERE 
         }
     }
 }
-
+*/
 /**********************************************************************************
  * оповещение по email для уведомлений
  *********************************************************************************/
-
+/*
 // Получим максимум 100 уведомлений для обработки - обработка уведомлений порционно позволяет снизить негативный эффект в случае повторной обработки (если вдруг запустится второй экземпляр скрипта пока работает первый)
 $messages = DBconnect::selectMessagesForEmail(100);
 $amountMessages = count($messages);
@@ -134,11 +96,11 @@ foreach ($messages as $message) {
         echo $e->getMessage(); //Boring error messages from anything else!
     }
 }
-
+*/
 /**********************************************************************************
  * НОвая верстка для блока с вкладками
  *********************************************************************************/
-
+/*
 <div class="mainContentBlock">
 
     <ul class="tabsMenu">
@@ -161,4 +123,4 @@ foreach ($messages as $message) {
     <div class="clearBoth"></div>
 
 </div>
-<!-- /end.mainContentBlock -->
+<!-- /end.mainContentBlock --> */

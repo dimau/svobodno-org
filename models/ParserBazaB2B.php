@@ -19,6 +19,18 @@ class ParserBazaB2B extends ParserBasic {
         $this->login = "testagent";
         $this->password = "tsettest";
 
+        // На bazaB2B парсим только сегодняшние и вчерашние объявления
+        $this->actualDayAmountForAdvert = 2;
+
+        // Для bazaB2B нумерация страниц со списками объявлений начинается с 1. При первом использовании счетчик увеличится с 0 до 1
+        $this->advertsListNumber = 0;
+
+        // Для bazaB2B признаки окончания парсинга (дошли до объявления из категории lastSuccessfulHandledAdvertsId или до объявления с датой публикации старше, чем допустимо) проверяются, начиная с первого объявления. Таким образом, парсер может остановить свою работу даже на первом объявлении, если на нем выполнятся признаки окончания парсинга.
+        $this->minAdvertsListForHandling = 0;
+
+        // Определим максимальное количество страниц со списками объявлений для парсинга в 1 сессию
+        $this->maxAdvertsListForHandling = 6;
+
         // Получим список уже ранее обработанных объявлений
         $this->readHandledAdverts();
     }
@@ -342,6 +354,9 @@ class ParserBazaB2B extends ParserBasic {
      * @return bool возвращает TRUE, если данное объявление по дате публикации уже не попадает во временное окно актуальности объявлений.
      */
     public function isTooLateDate() {
+
+        // Если парсер работает со страницей списка объявлений, номер которой меньше или равен номеру страницы , до которого парсер обязан доходить за 1 сессию парсинга, то данная причина окончания парсинга не применяется
+        if ($this->advertsListNumber <= $this->minAdvertsListForHandling) return FALSE;
 
         // Получим текущую дату
         $currentDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
