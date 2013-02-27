@@ -36,27 +36,6 @@ class ParserBazaB2B extends ParserBasic {
     }
 
     /**
-     * Получение списка уже обработанных объявлений с данного сайта
-     */
-    protected function readHandledAdverts() {
-
-        // Получить идентификаторы всех обработанных объявлений за срок = actualDayAmountForAdvert от текущего дня
-        $finalDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
-        $finalDate = $finalDate->format('d.m.Y');
-        $initialDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
-        $initialDate->modify('-' . $this->actualDayAmountForAdvert . ' day');
-        $initialDate = $initialDate->format('d.m.Y');
-        $this->handledAdverts = DBconnect::selectHandledAdverts("bazab2b", $initialDate, $finalDate);
-
-        // Если получить список уже обработанных объявлений с сайта bazab2b получить не удалось, то прекращаем выполнение скрипта от греха подальше
-        if ($this->handledAdverts === NULL || !is_array($this->handledAdverts)) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->readHandledAdverts:1 Парсинг сайта bazaB2B остановлен, так как не удалось получить сведения о ранее загруженных объявлениях");
-            DBconnect::closeConnectToDB();
-            exit();
-        }
-    }
-
-    /**
      * Загружает следующую страницу со списком объявлений с сайта bazaB2B.
      * При первом использовании загружает первую страницу списка объявлений.
      * Сохраняет загруженную страницу в $advertsListDOM

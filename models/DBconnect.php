@@ -712,6 +712,14 @@ class DBconnect {
             case "66ruKom":
                 $tableName = "66ru";
                 break;
+            case "avitoKvEkat":
+            case "avitoKomEkat":
+                $tableName = "avito";
+                break;
+            case "slandoKvEkat":
+            case "slandoKomEkat":
+                $tableName = "slando";
+                break;
         }
 
         $stmt = DBconnect::get()->stmt_init();
@@ -1112,6 +1120,14 @@ class DBconnect {
             case "66ruKom":
                 $table = "66ru";
                 break;
+            case "avitoKvEkat":
+            case "avitoKomEkat":
+                $table = "avito";
+                break;
+            case "slandoKvEkat":
+            case "slandoKomEkat":
+                $table = "slando";
+                break;
             default:
                 // Если передана строка режима, не соответствующая ни одному варианту, то прекращаем выполнение функции
                 return FALSE;
@@ -1370,7 +1386,6 @@ class DBconnect {
                 $stmt->close();
                 return FALSE;
             }
-
         }
 
         // Закрываем выражение

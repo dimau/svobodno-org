@@ -30,27 +30,6 @@ class Parser66ru extends ParserBasic {
     }
 
     /**
-     * Получение списка уже обработанных объявлений с данного сайта
-     */
-    protected function readHandledAdverts() {
-
-        // Получить идентификаторы всех обработанных объявлений за срок = actualDayAmountForAdvert от текущего дня
-        $finalDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
-        $finalDate = $finalDate->format('d.m.Y');
-        $initialDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
-        $initialDate->modify('-' . $this->actualDayAmountForAdvert . ' day');
-        $initialDate = $initialDate->format('d.m.Y');
-        $this->handledAdverts = DBconnect::selectHandledAdverts($this->mode, $initialDate, $finalDate);
-
-        // Если получить список уже обработанных объявлений с сайта bazab2b получить не удалось, то прекращаем выполнение скрипта от греха подальше
-        if ($this->handledAdverts === NULL || !is_array($this->handledAdverts)) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Parser66ru.php->readHandledAdverts:1 Парсинг сайта 66.ru остановлен, так как не удалось получить сведения о ранее загруженных объявлениях");
-            DBconnect::closeConnectToDB();
-            exit();
-        }
-    }
-
-    /**
      * Загружает следующую страницу со списком объявлений с сайта 66.ru.
      * При первом использовании загружает первую страницу списка объявлений.
      * Сохраняет загруженную страницу в $advertsListDOM
@@ -317,14 +296,6 @@ class Parser66ru extends ParserBasic {
         if ($value = preg_replace(array($beginOfAddressTemplate, $endOfAddressTemplate), "", $value)) {
             $params['address'] = $value;
         }
-
-        /*if ($this->mode == "66ruKv") {
-            // Пропускаем начало строки: "Сдам X-к. квартиру, "
-            $params['address'] = mb_substr($value, 20, iconv_strlen($value, 'UTF-8') - 20, 'UTF-8');
-        } elseif ($this->mode == "66ruKom") {
-            // Пропускаем начало строки: "Сдам комнату в 4-к. квартире, "
-            $params['address'] = mb_substr($value, 30, iconv_strlen($value, 'UTF-8') - 30, 'UTF-8');
-        }*/
 
         // Перебираем все имеющиеся параметры объявления и заполняет соответствующие параметры ассоциативного массива
         foreach ($tableRows as $oneParam) {

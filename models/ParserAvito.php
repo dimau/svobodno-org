@@ -1,9 +1,9 @@
 <?php
 /**
- * Класс для парсинга E1.ru
+ * Класс для парсинга avito.ru
  */
 
-class ParserE1 extends ParserBasic {
+class ParserAvito extends ParserBasic {
 
     /**
      * КОНСТРУКТОР
@@ -13,24 +13,24 @@ class ParserE1 extends ParserBasic {
         // Выполняем конструктор базового класса
         parent::__construct($mode);
 
-        // На e1 парсим только сегодняшние объявления
-        $this->actualDayAmountForAdvert = 1;
+        // На avito.ru парсим только сегодняшние и вчерашние объявления
+        $this->actualDayAmountForAdvert = 2;
 
-        // Для e1 нумерация листов со списками объявлений начинается с 0. При первом использовании счетчик увеличит -1 до 0
-        $this->advertsListNumber = -1;
+        // Для avito.ru нумерация страниц со списками объявлений начинается с 1. При первом использовании счетчик увеличится с 0 до 1
+        $this->advertsListNumber = 0;
 
-        // Для e1 признаки окончания парсинга (дошли до объявления из категории lastSuccessfulHandledAdvertsId или до объявления с датой публикации старше, чем допустимо) проверяются, начиная с первого объявления. Таким образом, парсер может остановить свою работу даже на первом объявлении, если на нем выполнятся признаки окончания парсинга.
-        $this->minAdvertsListForHandling = -1;
+        // Для avito.ru игнорируем платные объявления на верху списка, остальные расположены в порядке даты публикации. Это позволяет нам не накладывать обязательства полностью проходить 1 или несколько страниц.
+        $this->minAdvertsListForHandling = 0;
 
         // Определим максимальное количество страниц со списками объявлений для парсинга в 1 сессию
-        $this->maxAdvertsListForHandling = 30;
+        $this->maxAdvertsListForHandling = 6;
 
         // Получим список уже ранее обработанных объявлений
         $this->readHandledAdverts();
     }
 
     /**
-     * Загружает следующую страницу со списком объявлений с сайта e1.
+     * Загружает следующую страницу со списком объявлений с сайта avito.ru.
      * При первом использовании загружает первую страницу списка объявлений.
      * Сохраняет загруженную страницу в $advertsListDOM
      * @return bool TRUE в случае успешной загрузки и FALSE в противном случае
@@ -48,52 +48,43 @@ class ParserE1 extends ParserBasic {
 
         // Вычисляем URL запрашиваемой страницы
         switch ($this->mode) {
-            case "e1Kv1k":
-                $url = 'http://www.e1.ru/business/realty/search.php?s_obj_type=1&rq=1&op_type=2&city_id=1&region_id=0&area_all=-1&sb=8&ob=2&p=' . $this->advertsListNumber;
+            case "avitoKvEkat":
+                $url = 'http://www.avito.ru/ekaterinburg/kvartiry?user=1&params=201_1060.504_5256&p=' . $this->advertsListNumber;
                 break;
-            case "e1Kv2k":
-                $url = 'http://www.e1.ru/business/realty/search.php?s_obj_type=1&rq=2&op_type=2&city_id=1&region_id=0&area_all=-1&sb=8&ob=2&p=' . $this->advertsListNumber;
-                break;
-            case "e1Kv3k":
-                $url = 'http://www.e1.ru/business/realty/search.php?s_obj_type=1&rq=3&op_type=2&city_id=1&region_id=0&area_all=-1&sb=8&ob=2&p=' . $this->advertsListNumber;
-                break;
-            case "e1Kv4k":
-                $url = 'http://www.e1.ru/business/realty/search.php?s_obj_type=1&rq=4&op_type=2&city_id=1&region_id=0&area_all=-1&sb=8&ob=2&p=' . $this->advertsListNumber;
-                break;
-            case "e1Kv5k":
-                $url = 'http://www.e1.ru/business/realty/search.php?s_obj_type=1&rq=5&op_type=2&city_id=1&region_id=0&area_all=-1&sb=8&ob=2&p=' . $this->advertsListNumber;
-                break;
-            case "e1Kom":
-                $url = 'http://www.e1.ru/business/realty/search.php?s_obj_type=2&rq=0&op_type=2&city_id=1&region_id=0&area_all=-1&sb=8&ob=2&p=' . $this->advertsListNumber;
+            case "avitoKomEkat":
+                $url = 'http://www.avito.ru/ekaterinburg/komnaty?user=1&params=200_1055.596_6203&p=' . $this->advertsListNumber;
                 break;
             default:
-                Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->loadNextAdvertsList():1 Не удалось определить адрес для загрузки списка объявлений с сайта e1 для режима: '" . $this->mode . "'");
+                Logger::getLogger(GlobFunc::$loggerName)->log("ParserAvito.php->loadNextAdvertsList():1 Не удалось определить адрес для загрузки списка объявлений с сайта avito.ru для режима: '" . $this->mode . "'");
                 return FALSE;
         }
 
         // Фиксируем в логах факт загрузки новой страницы со списком объявлений
-        Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->loadNextAdvertsList():2 Загружаем новую страницу со списком объявлений с e1, url: '" . $url . "'");
+        Logger::getLogger(GlobFunc::$loggerName)->log("ParserAvito.php->loadNextAdvertsList():2 Загружаем новую страницу со списком объявлений с avito.ru, url: '" . $url . "'");
 
         // Непосредственно выполняем запрос к серверу
         $pageHTML = $this->curlRequest($url, "", "", FALSE);
 
         // Если получить HTML страницы не удалось
         if (!$pageHTML) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->loadNextAdvertsList():3 Не удалось получить страницу со списком объявлений с сайта e1 по адресу: '" . $url . "', получена страница: '" . $pageHTML . "'");
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserAvito.php->loadNextAdvertsList():3 Не удалось получить страницу со списком объявлений с сайта avito.ru по адресу: '" . $url . "', получена страница: '" . $pageHTML . "'");
             return FALSE;
         }
 
         // Получаем DOM-объект и сохраняем его в параметры
         $this->advertsListDOM = str_get_html($pageHTML);
 
+        // Найдем таблицу со списком объявлений
+        if (isset($this->advertsListDOM)) $this->advertsListDOM = $this->advertsListDOM->find(".l_i", 0);
+
         // Убедимся, что на странице есть список объявлений. Иначе мы можем бесконечно загружать 404 страницу или подобные ей.
         if (!isset($this->advertsListDOM)) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->loadNextAdvertsList():4 Полученная страница со списком объявлений с сайта e1 не содержит список объявлений, по адресу: '" . $url . "'");
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserAvito.php->loadNextAdvertsList():4 Полученная страница со списком объявлений с сайта avito.ru не содержит список объявлений, по адресу: '" . $url . "'");
             return FALSE;
         }
 
-        // Сбрасываем счетчик текущего обрабатываемого краткого описания объявления на значение по умолчанию. Первые 3 tr относятся к заголовку таблицы.
-        $this->advertShortDescriptionNumber = 2;
+        // Сбрасываем счетчик текущего обрабатываемого краткого описания объявления на значение по умолчанию. Первый tr относится к заголовку таблицы.
+        $this->advertShortDescriptionNumber = 0;
 
         return TRUE;
     }
@@ -113,7 +104,7 @@ class ParserE1 extends ParserBasic {
         $this->advertFullDescriptionDOM = NULL;
 
         $this->advertShortDescriptionNumber++;
-        $currentShortAdvert = $this->advertsListDOM->find('tr[valign=top]', $this->advertShortDescriptionNumber);
+        $currentShortAdvert = $this->advertsListDOM->find('.t_i_i', $this->advertShortDescriptionNumber);
 
         // Если получить DOM-модель краткого описания объявления не удалось или мы достигли подвала таблицы с объявлениями - прекращаем
         if ($currentShortAdvert === NULL) return FALSE;
@@ -121,15 +112,31 @@ class ParserE1 extends ParserBasic {
         // Сохраняем результат в параметры
         $this->advertShortDescriptionDOM = $currentShortAdvert;
 
-        // Важно помнить о том, что tr не всегда содержит информацию по конкретному объявлению, поэтому нужно проверять, есть ли у этой строки id объявления.
-        // Кроме того, проверяем, что данное объявление не является предложением краткосрочной аренды (не имеет картинку с часами). Краткосрочную аренду игнорируем.
-        // Сохраняем идентификаторы соответствующего объявления на сайте e1 в параметры объекта
-        if (($href = $this->advertShortDescriptionDOM->find('td nobr a', 0)) // Проверка на то, что мы получили строку с кратким описанием объявления
-            AND ($this->advertShortDescriptionDOM->find('td nobr img', 0) === NULL) // Проверка на отсутствие признака краткосрочной аренды
-        ) {
+        // Важно помнить о том, что полученный $currentShortAdvert не всегда содержит информацию по конкретному объявлению, поэтому нужно проверять, есть ли у этой строки id объявления.
+        // Кроме того, проверяем, что данное объявление не является проплаченным. Проплаченные объявления игнорируем.
+        // Сохраняем идентификатор соответствующего объявления на сайте avito.ru в параметры объекта
+        if ($href = $this->advertShortDescriptionDOM->find('.t_i_h3 a', 0)) {
+
+            // Проверяем объявление на проплаченность
+            if ($this->advertShortDescriptionDOM->find('.t_i_payed', 0)) {
+
+                //TODO: test
+                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Avito: Объявление оказалось проплаченным");
+
+                // Если полученный в $this->advertShortDescriptionDOM элемент оказался проплаченным объявлением, то рекурсивно вызываем этот же метод - пока не найдем краткое описание объявления или пока не достигнем конца списка
+                return $this->getNextAdvertShortDescription();
+            }
+
+            //TODO: test
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Avito: работаем с объявлением номер X, объявление не от агентства");
+
+            // Получим идентификатор объявления.
             $this->id = $href->href;
+
             return TRUE;
+
         } else {
+
             // Если полученный в $this->advertShortDescriptionDOM элемент оказался не кратким описанием объявления, а чем-то иным, то рекурсивно вызываем этот же метод - пока не найдем краткое описание объявления или пока не достигнем конца списка
             return $this->getNextAdvertShortDescription();
         }
@@ -145,26 +152,29 @@ class ParserE1 extends ParserBasic {
         if (isset($this->advertFullDescriptionDOM)) $this->advertFullDescriptionDOM->clear();
 
         // Вычисляем URL запрашиваемой страницы
-        $url = "http://www.e1.ru/business/realty/" . $this->id;
+        $url = "http://www.avito.ru" . $this->id;
 
         // Непосредственно выполняем запрос к серверу
         $pageHTML = $this->curlRequest($url, "", "", FALSE);
 
         // Если загрузить страницу не удалось - сообщим об этом
         if (!$pageHTML) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->loadFullAdvertDescription():1 Не удалось получить страницу с подробным описанием объекта с сайта e1 по адресу:" . $url);
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserAvito.php->loadFullAdvertDescription():1 Не удалось получить страницу с подробным описанием объекта с сайта avito.ru по адресу:" . $url);
             return FALSE;
         }
 
         // Меняем кодировку с windows-1251 на utf-8
-        $pageHTML = iconv("windows-1251", "UTF-8", $pageHTML);
+        //$pageHTML = iconv("windows-1251", "UTF-8", $pageHTML);
 
         // Сохраним в параметры объекта DOM-объект страницы с подробным описанием объявления
         $this->advertFullDescriptionDOM = str_get_html($pageHTML);
         if (!isset($this->advertFullDescriptionDOM)) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->loadFullAdvertDescription():2 не удалось разобрать страницу с полным описанием объявления");
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserAvito.php->loadFullAdvertDescription():2 не удалось разобрать страницу с полным описанием объявления");
             return FALSE;
         }
+
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Avito: удалось успешно загрузить страницу с полное описание объявления");
 
         return TRUE;
     }
@@ -175,29 +185,33 @@ class ParserE1 extends ParserBasic {
      */
     public function getPhoneNumber() {
 
-        // Найдем на странице телефон контактного лица
-        $pretenders = $this->advertFullDescriptionDOM->find("tr[valign=top]");
-        foreach ($pretenders as $value) {
-            if ($value->children(0) !== NULL && $value->children(0)->plaintext == "Телефон:") {
-                $phoneNumber = $value->children(1)->plaintext;
-            }
+        // Найдем на странице ссылку на картинку с телефоном контактного лица
+        if ($phoneNumber = $this->advertFullDescriptionDOM->find(".goods-card__contacts-phones__item", 0)) {
+            $phoneNumber = $phoneNumber->phone;
         }
 
         // Если достать номер телефона со страницы не удалось
         if (!isset($phoneNumber)) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->getPhoneNumber():1 не удалось получить телефонный номер из объявления с id = ".$this->id);
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserAvito.php->getPhoneNumber():1 не удалось получить телефонный номер из объявления с id = ".$this->id);
             return FALSE;
         }
 
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Avito: телефонный номер: ".$phoneNumber);
+
         // Приведем телефонный номер к стандартному виду
         if (!($phoneNumber = $this->phoneNumberNormalization($phoneNumber, "Екатеринбург"))) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->getPhoneNumber():2 не удалось нормализовать телефонный номер из объявления с id = ".$this->id);
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserAvito.php->getPhoneNumber():2 не удалось нормализовать телефонный номер из объявления с id = ".$this->id);
             return FALSE;
         }
 
         // Есть телефонный номер!
         $this->phoneNumber = $phoneNumber;
 
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Avito: преобразованный телефонный номер: ".$this->phoneNumber);
+
+        // Задача успешно выполнена
         return TRUE;
     }
 
@@ -206,54 +220,45 @@ class ParserE1 extends ParserBasic {
      * @return bool TRUE в случае успешного нахождения признаков агента и FALSE в противном случае
      */
     public function hasSignsAgent() {
-
-        // Проверяем наличие блока с заголовком "Информация об агентстве:"
-        $pretenders = $this->advertFullDescriptionDOM->find("td[bgcolor=#bababa]");
-        foreach ($pretenders as $value) {
-            if ($value->children(0) !== NULL && $value->children(0)->plaintext == "Информация об агентстве:") {
-                return TRUE;
-            }
-        }
-
-        // Признаки агентства не обнаружены
+        // Объявления от агентств отсеиваются еще на этапе перебора краткого описания.
         return FALSE;
     }
 
     /**
-     * Функция для парсинга данных по конкретному объявлению с сайта e1.ru
+     * Функция для парсинга данных по конкретному объявлению с сайта avito.ru
      * @return array|bool ассоциативный массив параметров объекта недвижимости, если отсутствют ключевые параметры (сейчас только источник объявления), то возвращает FALSE
      */
     public function parseFullAdvert() {
 
         // Валидация исходных данных
         if (!$this->advertFullDescriptionDOM || !$this->id) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->parseFullAdvert():1 не удалось запустить парсинг объявления - не хватает исходных данных");
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserAvito.php->parseFullAdvert():1 не удалось запустить парсинг объявления - не хватает исходных данных");
             return FALSE;
         }
 
         // Готовим массив, в который сложим параметры объявления
         $params = array();
 
-        // Выясним - есть ли в объявлении фотографии и комментарий
-        $params['hasPhotos'] = FALSE;
+        // Выясним - есть ли в объявлении фотографии
+        if ($this->advertFullDescriptionDOM->find(".b-content-card_item__wrap__picture", 0)) {
+            $params['hasPhotos'] = TRUE;
+        } else {
+            $params['hasPhotos'] = FALSE;
+        }
+
+        // Выясним - есть ли в объявлении комментарий
         $params['comment'] = "";
-        $pretenders = $this->advertFullDescriptionDOM->find("td[bgcolor=#bababa]");
-        foreach ($pretenders as $value) {
-            if ($value->children(0) !== NULL && $value->children(0)->plaintext == "Фотографии:") {
-                $params['hasPhotos'] = TRUE;
-            }
-            if ($value->children(0) !== NULL && $value->children(0)->plaintext == "Дополнительные сведения:") {
-                $params['comment'] = $value->parent()->next_sibling()->children(0)->children(0)->innertext;
-                // Для удаления на конце строки служебных символов </font> выполним:
-                $lengthComment = iconv_strlen($params['comment'], 'UTF-8');
-                $params['comment'] = mb_substr($params['comment'], 0, $lengthComment - 7, 'UTF-8');
-            }
+        $comment = $this->advertFullDescriptionDOM->find(".b-content-card_item__hightline-20", 0)->parent()->children(7);
+        if (isset($comment) && $comment->tag == "p") {
+            $params['comment'] = $comment->innertext;
+            // Удалим служебные символы "<br/>", которые avito.ru ставит после каждого абзаца текста в комментарии:
+            $params['comment'] = str_replace("<br/>", "", $params['comment']);
         }
 
         // РАЗБИРАЕМ СТРУКТУРИРОВАННЫЕ ДАННЫЕ ОБЪЯВЛЕНИЯ
 
         // Собираем массив, каждый член которого - некоторый параметр объекта недвижимости
-        $tableRows = $this->advertFullDescriptionDOM->find("tr[valign=top]");
+        $tableRows = $this->advertFullDescriptionDOM->find(".b-content-card_item__features tr");
 
         // Тип объекта
         $params['typeOfObject'] = $this->getTypeOfObject();
@@ -262,10 +267,31 @@ class ParserE1 extends ParserBasic {
         $params['apartmentNumber'] = mt_rand(1000, 100000);
 
         // Источник
-        $params['sourceOfAdvert'] = "http://www.e1.ru/business/realty/" . $this->id;
+        $params['sourceOfAdvert'] = "http://www.66.ru/realty/doska/live/" . $this->id;
 
         // Телефон контактного лица
         $params['contactTelephonNumber'] = $this->phoneNumber;
+
+        // Стоимость аренды
+        $value = $this->advertFullDescriptionDOM->find(".b-content-card_item__cost b", 0)->innertext;
+        if ($value == "договорная") {
+            $params['costOfRenting'] = 0;
+        } else {
+            $value = str_replace("&nbsp;", "", $value); // Убираем пробел между тысячами и оставшейся частью стоимости аренды
+            $params['costOfRenting'] = intval($value);
+        }
+        $params['currency'] = "руб.";
+        $params['compensationMoney'] = 0;
+        $params['compensationPercent'] = 0;
+
+        // Адрес
+        $value = $this->advertFullDescriptionDOM->find("h1", 0)->plaintext;
+        // Берем только ту часть, которая расположена между "Сдам комнату...," _________________ и "(район)"
+        $beginOfAddressTemplate = "~^(.*?)(,){1}\s~"; // Шаблон начала адрес в виде: "Сдам 1-к. квартиру, "
+        $endOfAddressTemplate = "~\s\((.*?)\)$~"; // Шаблон конца адреса, в котором отмечен район в виде: " (Центр)"
+        if ($value = preg_replace(array($beginOfAddressTemplate, $endOfAddressTemplate), "", $value)) {
+            $params['address'] = $value;
+        }
 
         // Перебираем все имеющиеся параметры объявления и заполняет соответствующие параметры ассоциативного массива
         foreach ($tableRows as $oneParam) {
@@ -277,120 +303,58 @@ class ParserE1 extends ParserBasic {
                 continue;
             }
 
-            // Смежные комнаты
-            if ($paramName == "Количество смежных комнат:") {
+            // Район
+            if ($paramName == "Район") {
                 $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
-                if ($value == "ни одной") {
-                    $params['adjacentRooms'] = "нет";
-                } else {
-                    $params['adjacentRooms'] = "да";
-                    $params['amountOfAdjacentRooms'] = intval($value);
-                }
-                continue;
-            }
-
-            // Количество комнат
-            if ($paramName == "Кол-во комнат в квартире:") {
-                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
-                if (isset($value) && $value != "") $params['amountOfRooms'] = intval($value);
-                continue;
-            }
-
-            // Площадь
-            if ($paramName == "Общая площадь, кв.м.") {
-                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
-                if (isset($value) && $value != "") $value = explode("/", $value); else continue;
-                if ($params['typeOfObject'] == "комната") {
-                    if (isset($value[0])) $params['roomSpace'] = floatval($value[0]);
-                }
-                if ($params['typeOfObject'] == "квартира" || $params['typeOfObject'] == "0") {
-                    if (isset($value[0])) $params['totalArea'] = floatval($value[0]);
-                    if (isset($value[1])) $params['livingSpace'] = floatval($value[1]);
-                    if (isset($value[2])) $params['kitchenSpace'] = floatval($value[2]);
-                }
-                continue;
-            }
-
-            // Стоимость аренды и комиссия
-            if ($paramName == "Цена:") {
-                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
-                if (isset($value) && $value != "") {
-                    $value = str_replace(array(" ", "р"), "", $value);
-                    $params['costOfRenting'] = intval($value);
-                    $params['currency'] = "руб.";
-                    $params['compensationMoney'] = 0;
-                    $params['compensationPercent'] = 0;
-                }
-                continue;
-            }
-
-            // Ком. платежи
-            if ($paramName == "Коммунальные платежи:") {
-                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
-                if ($value == "Оплачиваются дополнительно") $params['utilities'] = "да";
-                if ($value == "Включены в стоимость") $params['utilities'] = "нет";
-                continue;
-            }
-
-            // Адрес
-            if ($paramName == "Адрес:") {
-                $value = $oneParam->find("td", 1)->find("b", 0)->find('text', 0)->plaintext;
-                if (isset($value)) $params['address'] = $value;
-                continue;
-            }
-
-            // Этаж
-            if ($paramName == "Этаж:<br>             ") {
-                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
-                if (isset($value) && $value != "") $floorArr = explode("/", $value); else continue;
-                if (isset($floorArr[0])) $params['floor'] = intval($floorArr[0]);
-                if (isset($floorArr[1])) $params['totalAmountFloor'] = intval($floorArr[1]);
-                continue;
-            }
-
-            // Санузел
-            if ($paramName == "Сан узел:") {
-                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
-                if (!isset($value) && $value == "") continue;
-                if ($value == "Раздельный") $params['typeOfBathrooms'] = "раздельный";
-                continue;
-            }
-
-            // Мебель
-            if ($paramName == "Мебель:") {
-                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
-                if ($value == "Есть") {
-                    $params['furnitureInLivingAreaExtra'] = "Есть";
-                    $params['furnitureInKitchenExtra'] = "Есть";
-                }
-                continue;
-            }
-
-            // Балкон/лоджия
-            if ($paramName == "Лоджия:") {
-                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
-                if (!isset($value) && $value == "") continue;
-                if ($value == "Лоджия") $params['typeOfBalcony'] = "лоджия";
-                if ($value == "Балкон") $params['typeOfBalcony'] = "балкон";
+                if (!isset($value) || $value == "") $value = "0";
+                if ($value == "ЖБИ (Комсомольский)") $value = "ЖБИ";
+                if ($value == "Старая Сортировка") $value = "Сортировка старая";
+                if ($value == "Новая Сортировка") $value = "Сортировка новая";
+                if ($value == "Юго-Западный") $value = "Юго-запад";
+                $params['district'] = $value;
                 continue;
             }
 
             // Город
-            if ($paramName == "Город:") {
+            if ($paramName == "Город") {
                 $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
                 if (isset($value) && $value != "") $params['city'] = $value;
                 continue;
             }
 
-            // Район
-            if ($paramName == "Район:") {
+            // Площадь
+            if ($paramName == "Общая площадь") {
                 $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
-                // Если строку с районом получили, то уберем пробел в начале (особенность e1)
-                if (!isset($value) || $value == "") $value = "0"; else $value = mb_substr($value, 1);
-                if ($value == "С.Сортировка") $value = "Сортировка старая";
-                if ($value == "Н.Сортировка") $value = "Сортировка новая";
-                if ($value == "Юго-Западный") $value = "Юго-запад";
-                $params['district'] = $value;
+                if (isset($value) && $value != "") $params['totalArea'] = $value;
+                continue;
+            }
+            if ($paramName == "Жилая площадь") {
+                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
+                if (isset($value) && $value != "") $params['livingSpace'] = $value;
+                continue;
+            }
+            if ($paramName == "Площадь комнаты") {
+                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
+                if (isset($value) && $value != "") $params['roomSpace'] = $value;
+                continue;
+            }
+
+            // Количество комнат
+            if ($paramName == "Количество комнат") {
+                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
+                if (isset($value) && $value != "") $params['amountOfRooms'] = intval($value);
+                continue;
+            }
+
+            // Этаж
+            if ($paramName == "Этажей в доме") {
+                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
+                if (isset($value) && $value != "") $params['totalAmountFloor'] = intval($value);
+                continue;
+            }
+            if ($paramName == "Этаж") {
+                $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
+                if (isset($value) && $value != "") $params['floor'] = intval($value);
                 continue;
             }
 
@@ -398,9 +362,12 @@ class ParserE1 extends ParserBasic {
 
         // Проверяем, удалось ли получить ссылку на источник объявления
         if (!isset($params['sourceOfAdvert']) || $params['sourceOfAdvert'] == "") {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->parseFullAdvert():2 не удалось успешно завершить парсинг объявления - не определена ссылка на исходное объявление");
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserAvito.php->parseFullAdvert():2 не удалось успешно завершить парсинг объявления - не определена ссылка на исходное объявление");
             return FALSE;
         }
+
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Avito: удалось распарсить полное объявление: ".json_encode($params));
 
         return $params;
     }
@@ -416,8 +383,17 @@ class ParserE1 extends ParserBasic {
 
         // Проверяем по массиву $this->handledAdverts - было ли данное объявление уже обработано или нет
         foreach ($this->handledAdverts as $value) {
-            if ($value == $this->id) return TRUE;
+            if ($value == $this->id) {
+
+                //TODO: test
+                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Avito: объявление ранее обработано");
+
+                return TRUE;
+            }
         }
+
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Avito: объявление еще не обработано");
 
         return FALSE;
     }
@@ -434,17 +410,33 @@ class ParserE1 extends ParserBasic {
         // Получим текущую дату
         $currentDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
 
-        // Получим значения времени и даты публикации для данного объявления
-        $publicationData = $this->advertShortDescriptionDOM->find('td', 7)->plaintext;
-        $publicationData = explode(".", $publicationData);
-        $date = new DateTime(date("Y") . "-" . $publicationData[1] . "-" . $publicationData[0], new DateTimeZone('Asia/Yekaterinburg'));
+        // Получим значения даты публикации для данного объявления
+        $publicationData = $this->advertShortDescriptionDOM->find('.b-content-table__items-date', 0)->innertext;
+        if ($publicationData == "<em>сегодня</em>") {
+            $date = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
+        } else {
+            $publicationData = explode(".", $publicationData);
+            $date = new DateTime(date("Y") . "-" . $publicationData[1] . "-" . $publicationData[0], new DateTimeZone('Asia/Yekaterinburg'));
+        }
+
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Avito: дата публикации объявления: ".$date->format('Y-m-d H:i:s'));
 
         // Если объявление было опубликовано ранее, чем $this->actualDayAmountForAdvert дня назад, то нужно остановить парсинг
         $interval = $currentDate->diff($date);
         $interval = intval($interval->format("%d"));
         if ($interval >= $this->actualDayAmountForAdvert) {
+
+            //TODO: test
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Avito: дата публикации объявления слишком поздняя");
+
             return TRUE;
+
         } else {
+
+            //TODO: test
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Avito: подходящая дата публикации - работаем далее");
+
             return FALSE;
         }
 
@@ -457,13 +449,22 @@ class ParserE1 extends ParserBasic {
     public function setAdvertIsHandled() {
 
         // Получим дату публикации для данного объявления
-        $publicationData = $this->advertShortDescriptionDOM->find('td', 7)->plaintext;
-        $publicationData = explode(".", $publicationData);
-        $date = new DateTime(date("Y") . "-" . $publicationData[1] . "-" . $publicationData[0], new DateTimeZone('Asia/Yekaterinburg'));
+        $publicationData = $this->advertShortDescriptionDOM->find('.b-content-table__items-date', 0)->innertext;
+        if ($publicationData == "<em>сегодня</em>") {
+            $date = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
+        } else {
+            $publicationData = explode(".", $publicationData);
+            $date = new DateTime(date("Y") . "-" . $publicationData[1] . "-" . $publicationData[0], new DateTimeZone('Asia/Yekaterinburg'));
+        }
         $date = $date->format("d.m.Y");
 
         // Сохраняем идентификаторы объявления в БД и выдаем результат
-        return DBconnect::insertHandledAdvert($this->mode, $this->id, $date);
+        $res = DBconnect::insertHandledAdvert($this->mode, $this->id, $date);
+
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Avito: статус отметить объявление как обработанное: '". $res ."'");
+
+        return $res;
     }
 
     /**
@@ -474,14 +475,10 @@ class ParserE1 extends ParserBasic {
 
         // Определяем тип объекта недвижимости на основе режима работы парсинга
         switch ($this->mode) {
-            case "e1Kv1k":
-            case "e1Kv2k":
-            case "e1Kv3k":
-            case "e1Kv4k":
-            case "e1Kv5k":
+            case "avitoKvEkat":
                 $typeOfObject = "квартира";
                 break;
-            case "e1Kom":
+            case "avitoKomEkat":
                 $typeOfObject = "комната";
                 break;
             default:

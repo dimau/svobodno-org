@@ -48,6 +48,9 @@ currencies,
 archiveAdverts,
 bazab2b,
 e1,
+66ru,
+avito,
+slando,
 lastSuccessfulHandledAdvertsId,
 knownPhoneNumbers,
 invoices
@@ -593,6 +596,22 @@ DBconnect::get()->query("CREATE TABLE 66ru (
 echo "66ru: ";
 if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
+DBconnect::get()->query("CREATE TABLE avito (
+  id VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'id идентификатор объявления на сайте avito.ru',
+  date DATE COMMENT 'Дата публикации объявления'
+)");
+
+echo "avito: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
+DBconnect::get()->query("CREATE TABLE slando (
+  id VARCHAR(200) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'id идентификатор объявления на сайте slando.ru',
+  date DATE COMMENT 'Дата публикации объявления'
+)");
+
+echo "slando: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
 /****************************************************************************
  * СПИСОК ID ПОСЛЕДНИХ УСПЕШНО ОБРАБОТАННЫХ ОБЪЯВЛЕНИЙ ИЗ БАЗЫ САЙТА bazaB2B, e1
  * Если парсер при разборе страницы со списком объявлений встречает объявление из одним из этих id, он заканчивает работу
@@ -635,7 +654,19 @@ DBconnect::get()->query("INSERT INTO lastSuccessfulHandledAdvertsId (id, mode, i
     ('0', '66ruKv', 2),
     ('0', '66ruKom', 0),
     ('0', '66ruKom', 1),
-    ('0', '66ruKom', 2)
+    ('0', '66ruKom', 2),
+    ('0', 'avitoKvEkat', 0),
+    ('0', 'avitoKvEkat', 1),
+    ('0', 'avitoKvEkat', 2),
+    ('0', 'avitoKomEkat', 0),
+    ('0', 'avitoKomEkat', 1),
+    ('0', 'avitoKomEkat', 2),
+    ('0', 'slandoKvEkat', 0),
+    ('0', 'slandoKvEkat', 1),
+    ('0', 'slandoKvEkat', 2),
+    ('0', 'slandoKomEkat', 0),
+    ('0', 'slandoKomEkat', 1),
+    ('0', 'slandoKomEkat', 2)
     ");
 
 echo "Запись первоначальной инфы об успешно обработанных объявлениях: ";
