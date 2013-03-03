@@ -1771,9 +1771,11 @@ require $websiteRoot . "/templates/templ_header.php";
 
     <?php if (($isAdmin['newAdvertAlien'] || $isAdmin['searchUser']) && $propertyCharacteristic['completeness'] == "0" && $mode == "editFull"): ?>
     <a href="editadvert.php?action=removeAdvert<?php if ($propertyCharacteristic['id'] != "") echo "&propertyId=" . $propertyCharacteristic['id'];?>"
-       style="margin-right: 10px;">В архив</a>
+       style="margin-right: 15px;">В архив</a>
+    <a href="editadvert.php?action=markAsOwnerAdvert<?php if ($propertyCharacteristic['id'] != "") echo "&propertyId=" . $propertyCharacteristic['id'];?>"
+       style="margin-right: 15px;">Это собственник</a>
     <a href="editadvert.php?action=markAsAgentAdvert<?php if ($propertyCharacteristic['id'] != "") echo "&propertyId=" . $propertyCharacteristic['id'];?>"
-       style="margin-right: 10px;">Это агент!</a>
+       style="margin-right: 15px;">Это агент!</a>
     <?php endif;?>
 
     <button type="submit" name="saveAdvertButton" id="saveAdvertButton" class="mainButton">

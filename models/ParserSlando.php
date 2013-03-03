@@ -1,9 +1,9 @@
 <?php
 /**
- * Класс для парсинга 66.ru
+ * Класс для парсинга slando.ru
  */
 
-class Parser66ru extends ParserBasic {
+class ParserSlando extends ParserBasic {
 
     /**
      * КОНСТРУКТОР
@@ -13,24 +13,24 @@ class Parser66ru extends ParserBasic {
         // Выполняем конструктор базового класса
         parent::__construct($mode);
 
-        // На 66.ru парсим только сегодняшние и вчерашние объявления. Вчерашние нужны так как, когда парсер запускается первый раз за день в его списке будут вчерашние объявления, а в списке идентификаторов уже обработанных объявлений еще ничего не будет, что приведет к тому, что парсер повторно обработает вчерашние объявления с первой страницы как новые
-        $this->actualDayAmountForAdvert = 2;
+        // На slando парсим только сегодняшние объявления
+        $this->actualDayAmountForAdvert = 1;
 
-        // Для 66.ru нумерация страниц со списками объявлений начинается с 1. При первом использовании счетчик увеличится с 0 до 1
+        // Для slando нумерация страниц со списками объявлений начинается с 1. При первом использовании счетчик увеличится с 0 до 1
         $this->advertsListNumber = 0;
 
-        // Для 66.ru признаки окончания парсинга (дошли до объявления из категории lastSuccessfulHandledAdvertsId или до объявления с датой публикации старше, чем допустимо) проверяются, начиная только со второй страницы со списком объявлений, так как на первой странице новые объявления могут появляться не вверху списка а где-то в середине.
-        $this->minAdvertsListForHandling = 1;
+        // Для slando игнорируем платные объявления на верху списка, остальные расположены в порядке даты публикации. Это позволяет нам не накладывать обязательства полностью проходить 1 или несколько страниц.
+        $this->minAdvertsListForHandling = 0;
 
         // Определим максимальное количество страниц со списками объявлений для парсинга в 1 сессию
-        $this->maxAdvertsListForHandling = 7;
+        $this->maxAdvertsListForHandling = 12;
 
         // Получим список уже ранее обработанных объявлений
         $this->readHandledAdverts();
     }
 
     /**
-     * Загружает следующую страницу со списком объявлений с сайта 66.ru.
+     * Загружает следующую страницу со списком объявлений с сайта slando.
      * При первом использовании загружает первую страницу списка объявлений.
      * Сохраняет загруженную страницу в $advertsListDOM
      * @return bool TRUE в случае успешной загрузки и FALSE в противном случае
@@ -51,38 +51,38 @@ class Parser66ru extends ParserBasic {
 
         // Вычисляем URL запрашиваемой страницы
         switch ($this->mode) {
-            case "66ruKv":
-                $url = 'http://www.66.ru/realty/doska/live/?sort_dir=-1&price_to=&object_type=kv&full_area=&location=ekb&action_type=lease&sort_by=shuffle_order_2&price_from=&page=' . $this->advertsListNumber;
+            case "slandoKvEkat":
+                $url = 'http://ekaterinburg.sve.slando.ru/nedvizhimost/arenda-kvartir/dolgosrochnaya-arenda-kvartir/?search%5Bprivate_business%5D=private&page=' . $this->advertsListNumber;
                 break;
-            case "66ruKom":
-                $url = 'http://www.66.ru/realty/doska/live/?sort_dir=-1&price_to=&object_type=room&full_area=&location=ekb&action_type=lease&sort_by=shuffle_order_2&price_from=&page=' . $this->advertsListNumber;
+            case "slandoKomEkat":
+                $url = 'http://ekaterinburg.sve.slando.ru/nedvizhimost/arenda-komnat/dolgosrochnaya-arenda-komnat/?search%5Bprivate_business%5D=private&page=' . $this->advertsListNumber;
                 break;
             default:
-                Logger::getLogger(GlobFunc::$loggerName)->log("Parser66ru.php->loadNextAdvertsList():1 Не удалось определить адрес для загрузки списка объявлений с сайта 66.ru для режима: '" . $this->mode . "'");
+                Logger::getLogger(GlobFunc::$loggerName)->log("ParserSlando.php->loadNextAdvertsList():1 Не удалось определить адрес для загрузки списка объявлений с сайта slando для режима: '" . $this->mode . "'");
                 return FALSE;
         }
 
         // Фиксируем в логах факт загрузки новой страницы со списком объявлений
-        Logger::getLogger(GlobFunc::$loggerName)->log("Parser66ru.php->loadNextAdvertsList():2 Загружаем новую страницу со списком объявлений в режиме " . $this->mode . ", url: '" . $url . "'");
+        Logger::getLogger(GlobFunc::$loggerName)->log("ParserSlando.php->loadNextAdvertsList():2 Загружаем новую страницу со списком объявлений в режиме " . $this->mode . ", url: '" . $url . "'");
 
         // Непосредственно выполняем запрос к серверу
         $pageHTML = $this->curlRequest($url, "", "", FALSE);
 
         // Если получить HTML страницы не удалось
         if (!$pageHTML) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Parser66ru.php->loadNextAdvertsList():3 Работа парсера в режиме " . $this->mode . " остановлена. Не удалось получить страницу со списком объявлений с сайта 66.ru по адресу: '" . $url . "', получена страница: '" . $pageHTML . "'");
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserSlando.php->loadNextAdvertsList():3 Работа парсера в режиме " . $this->mode . " остановлена. Не удалось получить страницу со списком объявлений, по адресу: '" . $url . "', получена страница: '" . $pageHTML . "'");
             return FALSE;
         }
 
         // Получаем DOM-объект и сохраняем его в параметры
         $this->advertsListDOM = str_get_html($pageHTML);
 
-        // Найдем таблицу со списком объявлений
-        if (isset($this->advertsListDOM)) $this->advertsListDOM = $this->advertsListDOM->find(".b-content-table__items", 0);
+        // Найдем таблицу со списком обычных (не проплаченных) объявлений
+        if (isset($this->advertsListDOM)) $this->advertsListDOM = $this->advertsListDOM->find("#offers_table", 0);
 
         // Убедимся, что на странице есть список объявлений. Иначе мы можем бесконечно загружать 404 страницу или подобные ей.
         if (!isset($this->advertsListDOM)) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Parser66ru.php->loadNextAdvertsList():4 Работа парсера в режиме " . $this->mode . " остановлена. Полученная страница со списком объявлений с сайта 66.ru не содержит список объявлений, по адресу: '" . $url . "'");
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserSlando.php->loadNextAdvertsList():4 Работа парсера в режиме " . $this->mode . " остановлена. Полученная страница со списком объявлений с сайта slando не содержит список объявлений, по адресу: '" . $url . "'");
             return FALSE;
         }
 
@@ -107,7 +107,7 @@ class Parser66ru extends ParserBasic {
         $this->advertFullDescriptionDOM = NULL;
 
         $this->advertShortDescriptionNumber++;
-        $currentShortAdvert = $this->advertsListDOM->find('tr', $this->advertShortDescriptionNumber);
+        $currentShortAdvert = $this->advertsListDOM->find('[summary=Объявление] tr', $this->advertShortDescriptionNumber);
 
         // Если получить DOM-модель краткого описания объявления не удалось или мы достигли подвала таблицы с объявлениями - прекращаем
         if ($currentShortAdvert === NULL) return FALSE;
@@ -115,39 +115,32 @@ class Parser66ru extends ParserBasic {
         // Сохраняем результат в параметры
         $this->advertShortDescriptionDOM = $currentShortAdvert;
 
-        // Важно помнить о том, что tr не всегда содержит информацию по конкретному объявлению, поэтому нужно проверять, есть ли у этой строки id объявления.
-        // Кроме того, проверяем, что данное объявление не является предложением от агентства. Предложения от агентств игнорируем.
-        // Сохраняем идентификатор соответствующего объявления на сайте 66.ru в параметры объекта
-        if ($href = $this->advertShortDescriptionDOM->find('td a', 0)) {
-
-            // Проверка на агентство
-            // TODO: test
-            /*
-            $agencyStatus = $this->advertShortDescriptionDOM->find('td', 1)->innertext;
-            $agencyStatus = explode("<br />", $agencyStatus);
-            $agencyStatus = $agencyStatus[1];
-            if ($agencyStatus == "агентство                                               ") {
-
-                //TODO: test
-                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера 66ru: Объявление оказалось от агентства: '".$agencyStatus."'");
-
-                // Если полученный в $this->advertShortDescriptionDOM элемент оказался объявлением от агентства, то рекурсивно вызываем этот же метод - пока не найдем краткое описание объявления или пока не достигнем конца списка
-                return $this->getNextAdvertShortDescription();
-            }
+        // Важно помнить о том, что полученный $currentShortAdvert может не содержать информацию по конкретному объявлению, поэтому нужно проверять, есть ли у этой строки id объявления.
+        // Важно помнить о том, что мы разбираем таблицу с обычными объявлениями, а верхние топовые проплаченные объявления не трогаем. Это удобно с технической точки зрения: чтобы не отрабатывать дату публикации и обработанность для них (иначе мы закончим так и не начав парсить страницу)
+        // Сохраняем идентификатор соответствующего объявления на сайте slando в параметры объекта
+        if ($href = $this->advertShortDescriptionDOM->find('td', 2)->find("a", 0)) {
 
             //TODO: test
-            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера 66ru: работаем с объявлением номер X, объявление не от агентства: '".$agencyStatus."'");
-            */
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Slando: работаем с объявлением номер X");
 
-            // Получим идентификатор объявления. Необходимо удалить вот эту общую часть url (/realty/doska/live/) подробного описания объявления для выделения уникального минимального идентификатора объявления
-            $this->id = mb_substr($href->href, 19, iconv_strlen($href->href, 'UTF-8') - 19, 'UTF-8');
+            // Получим идентификатор объявления.
+            $this->id = $href->href;
 
             return TRUE;
+
         } else {
+
             // Если полученный в $this->advertShortDescriptionDOM элемент оказался не кратким описанием объявления, а чем-то иным, то рекурсивно вызываем этот же метод - пока не найдем краткое описание объявления или пока не достигнем конца списка
             return $this->getNextAdvertShortDescription();
         }
     }
+
+
+
+
+
+
+
 
     /**
      * Загружает страницу с подробным описанием объявления и помещает ее в $this->advertFullDescriptionDOM в виде DOM-объекта
@@ -159,14 +152,14 @@ class Parser66ru extends ParserBasic {
         if (isset($this->advertFullDescriptionDOM)) $this->advertFullDescriptionDOM->clear();
 
         // Вычисляем URL запрашиваемой страницы
-        $url = "http://www.66.ru/realty/doska/live/" . $this->id;
+        $url = "http://www.avito.ru" . $this->id;
 
         // Непосредственно выполняем запрос к серверу
         $pageHTML = $this->curlRequest($url, "", "", FALSE);
 
         // Если загрузить страницу не удалось - сообщим об этом
         if (!$pageHTML) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Parser66ru.php->loadFullAdvertDescription():1 Не удалось получить страницу с подробным описанием объекта с сайта 66.ru по адресу:" . $url);
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserSlando.php->loadFullAdvertDescription():1 Не удалось получить страницу с подробным описанием объекта с сайта slando по адресу:" . $url);
             return FALSE;
         }
 
@@ -176,9 +169,12 @@ class Parser66ru extends ParserBasic {
         // Сохраним в параметры объекта DOM-объект страницы с подробным описанием объявления
         $this->advertFullDescriptionDOM = str_get_html($pageHTML);
         if (!isset($this->advertFullDescriptionDOM)) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Parser66ru.php->loadFullAdvertDescription():2 не удалось разобрать страницу с полным описанием объявления");
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserSlando.php->loadFullAdvertDescription():2 не удалось разобрать страницу с полным описанием объявления");
             return FALSE;
         }
+
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Slando: удалось успешно загрузить страницу с полное описание объявления");
 
         return TRUE;
     }
@@ -189,25 +185,31 @@ class Parser66ru extends ParserBasic {
      */
     public function getPhoneNumber() {
 
-        // Найдем на странице телефон контактного лица
+        // Найдем на странице ссылку на картинку с телефоном контактного лица
         if ($phoneNumber = $this->advertFullDescriptionDOM->find(".goods-card__contacts-phones__item", 0)) {
             $phoneNumber = $phoneNumber->phone;
         }
 
         // Если достать номер телефона со страницы не удалось
         if (!isset($phoneNumber)) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Parser66ru.php->getPhoneNumber():1 не удалось получить телефонный номер из объявления с id = ".$this->id);
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserSlando.php->getPhoneNumber():1 не удалось получить телефонный номер из объявления с id = ".$this->id);
             return FALSE;
         }
 
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Slando: телефонный номер: ".$phoneNumber);
+
         // Приведем телефонный номер к стандартному виду
         if (!($phoneNumber = $this->phoneNumberNormalization($phoneNumber, "Екатеринбург"))) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Parser66ru.php->getPhoneNumber():2 не удалось нормализовать телефонный номер из объявления с id = ".$this->id);
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserSlando.php->getPhoneNumber():2 не удалось нормализовать телефонный номер из объявления с id = ".$this->id);
             return FALSE;
         }
 
         // Есть телефонный номер!
         $this->phoneNumber = $phoneNumber;
+
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Slando: преобразованный телефонный номер: ".$this->phoneNumber);
 
         // Задача успешно выполнена
         return TRUE;
@@ -223,14 +225,14 @@ class Parser66ru extends ParserBasic {
     }
 
     /**
-     * Функция для парсинга данных по конкретному объявлению с сайта 66.ru
+     * Функция для парсинга данных по конкретному объявлению с сайта slando
      * @return array|bool ассоциативный массив параметров объекта недвижимости, если отсутствют ключевые параметры (сейчас только источник объявления), то возвращает FALSE
      */
     public function parseFullAdvert() {
 
         // Валидация исходных данных
         if (!$this->advertFullDescriptionDOM || !$this->id) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Parser66ru.php->parseFullAdvert():1 не удалось запустить парсинг объявления - не хватает исходных данных");
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserSlando.php->parseFullAdvert():1 не удалось запустить парсинг объявления - не хватает исходных данных");
             return FALSE;
         }
 
@@ -249,7 +251,7 @@ class Parser66ru extends ParserBasic {
         $comment = $this->advertFullDescriptionDOM->find(".b-content-card_item__hightline-20", 0)->parent()->children(7);
         if (isset($comment) && $comment->tag == "p") {
             $params['comment'] = $comment->innertext;
-            // Удалим служебные символы "<br/>", которые 66.ru ставит после каждого абзаца текста в комментарии:
+            // Удалим служебные символы "<br/>", которые slando ставит после каждого абзаца текста в комментарии:
             $params['comment'] = str_replace("<br/>", "", $params['comment']);
         }
 
@@ -360,9 +362,12 @@ class Parser66ru extends ParserBasic {
 
         // Проверяем, удалось ли получить ссылку на источник объявления
         if (!isset($params['sourceOfAdvert']) || $params['sourceOfAdvert'] == "") {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Parser66ru.php->parseFullAdvert():2 не удалось успешно завершить парсинг объявления - не определена ссылка на исходное объявление");
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserSlando.php->parseFullAdvert():2 не удалось успешно завершить парсинг объявления - не определена ссылка на исходное объявление");
             return FALSE;
         }
+
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Slando: удалось распарсить полное объявление: ".json_encode($params));
 
         return $params;
     }
@@ -388,20 +393,23 @@ class Parser66ru extends ParserBasic {
             $date = new DateTime(date("Y") . "-" . $publicationData[1] . "-" . $publicationData[0], new DateTimeZone('Asia/Yekaterinburg'));
         }
 
+        //TODO: test
+        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Slando: дата публикации объявления: ".$date->format('Y-m-d H:i:s'));
+
         // Если объявление было опубликовано ранее, чем $this->actualDayAmountForAdvert дня назад, то нужно остановить парсинг
         $interval = $currentDate->diff($date);
         $interval = intval($interval->format("%d"));
         if ($interval >= $this->actualDayAmountForAdvert) {
 
             //TODO: test
-            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера 66ru: Останавливаем парсинг в режиме " . $this->mode . ". Дата публикации объявления " . $date->format('Y-m-d H:i:s') . " слишком поздняя");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Slando: дата публикации объявления слишком поздняя");
 
             return TRUE;
 
         } else {
 
             //TODO: test
-            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера 66ru: подходящая дата публикации " . $date->format('Y-m-d H:i:s') . " - работаем далее");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Slando: подходящая дата публикации - работаем далее");
 
             return FALSE;
         }
@@ -416,10 +424,10 @@ class Parser66ru extends ParserBasic {
 
         // Определяем тип объекта недвижимости на основе режима работы парсинга
         switch ($this->mode) {
-            case "66ruKv":
+            case "slandoKvEkat":
                 $typeOfObject = "квартира";
                 break;
-            case "66ruKom":
+            case "slandoKomEkat":
                 $typeOfObject = "комната";
                 break;
             default:

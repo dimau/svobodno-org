@@ -5,7 +5,7 @@
 
 class ParserBasic {
 
-    protected $mode; // Режим работы парсера (определяется сайтом, который парсим и категорией объявлений, которые в этот раз парсятся на данном сайте). Допустимые варианты: e1Kv1k (e1 квартиры однокомнатные), e1Kv2k, e1Kv3k, e1Kv4k, e1Kv5k, e1Kom (e1 комнаты), 66ruKv (66.ru квартиры), 66ruKom (66.ru комнаты), bazab2b (сайт bazaB2B)
+    protected $mode; // Режим работы парсера (определяется сайтом, который парсим и категорией объявлений, которые в этот раз парсятся на данном сайте). Допустимые варианты: e1Kv1k (e1 квартиры однокомнатные), e1Kv2k, e1Kv3k, e1Kv4k, e1Kv5k, e1Kom (e1 комнаты), 66ruKv (66.ru квартиры), 66ruKom (66.ru комнаты)
     protected $actualDayAmountForAdvert = 2; // Количество дней, за которые парсер проверяет объявления из списка. Если ему попадается объявление, опубликованное ранее данного количества дней назад, то он прекращает свою работу. 1 - только сегодняшние объявления, 2 - сегодняшние и вчерашние и так далее.
     protected $minAdvertsListForHandling = 0; // Упрощенно этот параметр можно воспринимать как минмальное количество страниц со списками объявлений, которые должны быть обработаны за 1 сессию парсинга. Более точное определение: если текущий $this->advertsListNumber <= $this->minAdvertsListForHandling, то обработка объявлений на этой странице будет продолжена, даже несмотря на наступление признаков прекращения парсинга (поздняя дата публикации текущего обрабатываемого объявления или нахождение объявления из разряда lastSuccessfulHandledAdvertsId). Этот параметр позволяет успешно игнорировать признаки наступления прекращения парсинга для рекламных объявлений, которые обычно постоянно находятся вверху списка (пример - avito), а также игнорировать то, что среди рекламных самых верхних в списке объявлений могут попадаться объявления с крайне старой датой публикации (пример - avito).
     protected $maxAdvertsListForHandling = 10; // Упрощенно этот параметр можно воспринимать как максимальное количество страниц со списками объявлений, которые могут быть загружены парсером за 1 сессию парсинга. Более точное определение: если текущий $this->advertsListNumber >= $this->maxAdvertsListForHandling, то работа парсера прекращается. Этот параметр обеспечивает защиту от зависания в работе парсера, когда по той или иной причине он может как сумасшедший начать запрашивать без остановки все новые и новые страницы со списками объявлений.
@@ -50,7 +50,7 @@ class ParserBasic {
      */
     protected function readHandledAdverts() {
 
-        // Получить идентификаторы всех обработанных объявлений с датами публикации, которые отличаются не более чем на actualDayAmountForAdvert от текущего дня
+        // Получить идентификаторы всех обработанных объявлений за период времени от текущего дня и на actualDayAmountForAdvert дней назад. Например, если actualDayAmountForAdvert = 1, то метод вернет идентификаторы всех объявлений, бработанных за текущий день. Если actualDayAmountForAdvert = 2, то метод вернет идентификаторы всех объявлений, обработанных за текущий и вчерашний день.
         $finalDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
         $finalDate = $finalDate->format('d.m.Y');
         $initialDate = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
@@ -154,7 +154,7 @@ class ParserBasic {
 
         // Инициализация библиотеки curl.
         if (!($ch = curl_init())) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBasic.php->curlRequest():1 Ошибка при инициализации curl. Не удалось получить страницу с сайта bazaB2B по адресу: " . $url);
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserBasic.php->curlRequest():1 Ошибка при инициализации curl. Не удалось получить страницу по адресу: " . $url);
             return FALSE;
         }
         curl_setopt($ch, CURLOPT_URL, $url); // Устанавливаем URL запроса
@@ -164,7 +164,7 @@ class ParserBasic {
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30); // Максимальное время ожидания ответа от сервера в секундах
         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17'); // Установим значение поля User-agent для маскировки под обычного пользователя
         if ($proxy) {
-            curl_setopt($ch, CURLOPT_PROXY, '195.46.178.230:3128'); // адрес прокси-сервера для анонимности
+            curl_setopt($ch, CURLOPT_PROXY, '84.47.172.129:3128'); // адрес прокси-сервера для анонимности
             //curl_setopt($ch, CURLOPT_PROXYUSERPWD,'user:pass'); // если необходимо предоставить имя пользователя и пароль для прокси
         }
         if ($cookieFileName != "") {
@@ -239,10 +239,6 @@ class ParserBasic {
 
         // Вернем ассоциативный массив с данными о телефоне, если он ранее был уже сохранен в БД, либо пустой массив
         $res = DBconnect::selectKnownPhoneNumber($this->phoneNumber);
-
-        //TODO: test
-        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: проверили телефонный номер по БД - ".json_encode($res));
-
         return $res;
     }
 
@@ -258,7 +254,7 @@ class ParserBasic {
             Logger::getLogger(GlobFunc::$loggerName)->log("ParserBasic.php->newKnownPhoneNumber():1 не указан телефонный номер");
             return FALSE;
         }
-        if (!isset($status) || ($status != "агент" && $status != "собственник" && $status != "арендатор")) {
+        if (!isset($status) || ($status != "агент" && $status != "собственник" && $status != "арендатор" && $status != "не определен")) {
             Logger::getLogger(GlobFunc::$loggerName)->log("ParserBasic.php->newKnownPhoneNumber():2 не указан статус контактного лица для телефонного номера или он не корректен");
             return FALSE;
         }
@@ -284,6 +280,43 @@ class ParserBasic {
         return DBconnect::updateKnownPhoneNumberStatus($this->phoneNumber, $status);
     }
 
+    /**
+     * Функция проверяет, обрабатывалось ли данное объявление ранее
+     * @return bool возвращает TRUE, если текущее объявление уже обрабатывалось, FALSE в случае, если не обрабатывалось
+     */
+    public function isAdvertAlreadyHandled() {
+
+        /* Опознавательные идентификаторы всех обработанных за последнее время объявлений сохраняются в БД по мере обработки каждого объявления
+           Сравнение идентификаторов текущего объявления с сохраненными позволяет гарантированно убедиться в том, что данное объявление еще не сохранялось в мою БД */
+
+        // Проверяем по массиву $this->handledAdverts - было ли данное объявление уже обработано или нет
+        foreach ($this->handledAdverts as $value) {
+            if ($value == $this->id) {
+
+                //TODO: test
+                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: Объявление успешно обработано ранее");
+
+                return TRUE;
+            }
+        }
+
+        return FALSE;
+    }
+
+    /**
+     * Функция запоминает в БД, что данное объявление успешно обработано, что позволит избежать его повторной обработки
+     * @return bool возвращает TRUE в случае успеха и FALSE в противном случае
+     */
+    public function setAdvertIsHandled() {
+
+        // В качестве даты использования объявления указываем текущую. В отличие от способа с указанием даты публикации объявления, фиксация объявления в базе с указанием текущей даты позволит избежать многократной повторной обработки оплаченных объявлений и поднятых вверх списка (несмотря на древнюю дату публикации) на сайтах avito, 66.ru ...
+        $date = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
+        $date = $date->format("d.m.Y");
+
+        // Сохраняем идентификаторы объявления в БД и выдаем результат
+        return DBconnect::insertHandledAdvert($this->mode, $this->id, $date);
+    }
+
     /*************************************************************************************
      * ПЕРЕОПРЕДЕЛЯЕМЫЕ В КЛАССАХ ПОТОМКАХ ФУНКЦИИ
      * Перечисление ключевых функций, которые должны быть опеределены в каждмо классе потомке, внутри базового класса позволяет вызывать эти методы классов потомков из методов базового класса (это называется виртуальные функции, полиморфизм)
@@ -297,9 +330,5 @@ class ParserBasic {
 
     protected function parseFullAdvert() {}
 
-    protected function isAdvertAlreadyHandled() {}
-
     protected function isTooLateDate() {}
-
-    protected function setAdvertIsHandled() {}
 }

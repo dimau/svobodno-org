@@ -46,6 +46,9 @@ class ParserAvito extends ParserBasic {
         // Увеличиваем счетчик текущей страницы списка объявлений
         $this->advertsListNumber++;
 
+        // Проверка на превышение лимита по количеству загрузок страниц со списком объявлений. Это защита от ошибок в парсере, которая призвана обезопасить ресурс донор от падения
+        if ($this->isTooManyAdvertsLists()) return FALSE;
+
         // Вычисляем URL запрашиваемой страницы
         switch ($this->mode) {
             case "avitoKvEkat":
@@ -60,14 +63,14 @@ class ParserAvito extends ParserBasic {
         }
 
         // Фиксируем в логах факт загрузки новой страницы со списком объявлений
-        Logger::getLogger(GlobFunc::$loggerName)->log("ParserAvito.php->loadNextAdvertsList():2 Загружаем новую страницу со списком объявлений с avito.ru, url: '" . $url . "'");
+        Logger::getLogger(GlobFunc::$loggerName)->log("ParserAvito.php->loadNextAdvertsList():2 Загружаем новую страницу со списком объявлений в режиме " . $this->mode . ", url: '" . $url . "'");
 
         // Непосредственно выполняем запрос к серверу
         $pageHTML = $this->curlRequest($url, "", "", FALSE);
 
         // Если получить HTML страницы не удалось
         if (!$pageHTML) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserAvito.php->loadNextAdvertsList():3 Не удалось получить страницу со списком объявлений с сайта avito.ru по адресу: '" . $url . "', получена страница: '" . $pageHTML . "'");
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserAvito.php->loadNextAdvertsList():3 Работа парсера в режиме " . $this->mode . " остановлена. Не удалось получить страницу со списком объявлений с сайта avito.ru по адресу: '" . $url . "', получена страница: '" . $pageHTML . "'");
             return FALSE;
         }
 
@@ -79,7 +82,7 @@ class ParserAvito extends ParserBasic {
 
         // Убедимся, что на странице есть список объявлений. Иначе мы можем бесконечно загружать 404 страницу или подобные ей.
         if (!isset($this->advertsListDOM)) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserAvito.php->loadNextAdvertsList():4 Полученная страница со списком объявлений с сайта avito.ru не содержит список объявлений, по адресу: '" . $url . "'");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Работа парсера в режиме " . $this->mode . " остановлена. ParserAvito.php->loadNextAdvertsList():4 Полученная страница со списком объявлений с сайта avito.ru не содержит список объявлений, по адресу: '" . $url . "'");
             return FALSE;
         }
 
@@ -373,32 +376,6 @@ class ParserAvito extends ParserBasic {
     }
 
     /**
-     * Функция проверяет, обрабатывалось ли данное объявление ранее
-     * @return bool возвращает TRUE, если текущее объявление уже обрабатывалось, FALSE в случае, если не обрабатывалось
-     */
-    public function isAdvertAlreadyHandled() {
-
-        /* Опознавательные идентификаторы всех обработанных за последнее время объявлений сохраняются в БД по мере обработки каждого объявления
-           Сравнение идентификаторов текущего объявления с сохраненными позволяет гарантированно убедиться в том, что данное объявление еще не сохранялось в мою БД */
-
-        // Проверяем по массиву $this->handledAdverts - было ли данное объявление уже обработано или нет
-        foreach ($this->handledAdverts as $value) {
-            if ($value == $this->id) {
-
-                //TODO: test
-                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Avito: объявление ранее обработано");
-
-                return TRUE;
-            }
-        }
-
-        //TODO: test
-        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Avito: объявление еще не обработано");
-
-        return FALSE;
-    }
-
-    /**
      * Функция возвращает TRUE, если данное объявление по дате публикации уже не попадает во временное окно актуальности объявлений.
      * @return bool возвращает TRUE, если данное объявление по дате публикации уже не попадает во временное окно актуальности объявлений.
      */
@@ -440,31 +417,6 @@ class ParserAvito extends ParserBasic {
             return FALSE;
         }
 
-    }
-
-    /**
-     * Функция запоминает в БД, что данное объявление успешно обработано, что позволит избежать его повторной обработки
-     * @return bool возвращает TRUE в случае успеха и FALSE в противном случае
-     */
-    public function setAdvertIsHandled() {
-
-        // Получим дату публикации для данного объявления
-        $publicationData = $this->advertShortDescriptionDOM->find('.b-content-table__items-date', 0)->innertext;
-        if ($publicationData == "<em>сегодня</em>") {
-            $date = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg'));
-        } else {
-            $publicationData = explode(".", $publicationData);
-            $date = new DateTime(date("Y") . "-" . $publicationData[1] . "-" . $publicationData[0], new DateTimeZone('Asia/Yekaterinburg'));
-        }
-        $date = $date->format("d.m.Y");
-
-        // Сохраняем идентификаторы объявления в БД и выдаем результат
-        $res = DBconnect::insertHandledAdvert($this->mode, $this->id, $date);
-
-        //TODO: test
-        Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера Avito: статус отметить объявление как обработанное: '". $res ."'");
-
-        return $res;
     }
 
     /**

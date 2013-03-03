@@ -46,6 +46,9 @@ class ParserE1 extends ParserBasic {
         // Увеличиваем счетчик текущей страницы списка объявлений
         $this->advertsListNumber++;
 
+        // Проверка на превышение лимита по количеству загрузок страниц со списком объявлений. Это защита от ошибок в парсере, которая призвана обезопасить ресурс донор от падения
+        if ($this->isTooManyAdvertsLists()) return FALSE;
+
         // Вычисляем URL запрашиваемой страницы
         switch ($this->mode) {
             case "e1Kv1k":
@@ -72,14 +75,14 @@ class ParserE1 extends ParserBasic {
         }
 
         // Фиксируем в логах факт загрузки новой страницы со списком объявлений
-        Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->loadNextAdvertsList():2 Загружаем новую страницу со списком объявлений с e1, url: '" . $url . "'");
+        Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->loadNextAdvertsList():2 Загружаем новую страницу со списком объявлений в режиме " . $this->mode . ", url: '" . $url . "'");
 
         // Непосредственно выполняем запрос к серверу
         $pageHTML = $this->curlRequest($url, "", "", FALSE);
 
         // Если получить HTML страницы не удалось
         if (!$pageHTML) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->loadNextAdvertsList():3 Не удалось получить страницу со списком объявлений с сайта e1 по адресу: '" . $url . "', получена страница: '" . $pageHTML . "'");
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->loadNextAdvertsList():3 Работа парсера в режиме " . $this->mode . " остановлена. Не удалось получить страницу со списком объявлений с сайта e1 по адресу: '" . $url . "', получена страница: '" . $pageHTML . "'");
             return FALSE;
         }
 
@@ -88,7 +91,7 @@ class ParserE1 extends ParserBasic {
 
         // Убедимся, что на странице есть список объявлений. Иначе мы можем бесконечно загружать 404 страницу или подобные ей.
         if (!isset($this->advertsListDOM)) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->loadNextAdvertsList():4 Полученная страница со списком объявлений с сайта e1 не содержит список объявлений, по адресу: '" . $url . "'");
+            Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->loadNextAdvertsList():4 Работа парсера в режиме " . $this->mode . " остановлена. Полученная страница со списком объявлений с сайта e1 не содержит список объявлений, по адресу: '" . $url . "'");
             return FALSE;
         }
 
@@ -124,10 +127,13 @@ class ParserE1 extends ParserBasic {
         // Важно помнить о том, что tr не всегда содержит информацию по конкретному объявлению, поэтому нужно проверять, есть ли у этой строки id объявления.
         // Кроме того, проверяем, что данное объявление не является предложением краткосрочной аренды (не имеет картинку с часами). Краткосрочную аренду игнорируем.
         // Сохраняем идентификаторы соответствующего объявления на сайте e1 в параметры объекта
-        if (($href = $this->advertShortDescriptionDOM->find('td nobr a', 0)) // Проверка на то, что мы получили строку с кратким описанием объявления
+        if (($href = $this->advertShortDescriptionDOM->children(0)) // Проверка на то, что мы получили строку с кратким описанием объявления - за счет проверки наличия ссылки на подробное описание данного объявления в положенном месте
+            AND ($href = $href->children(0))
+            AND ($href = $href->children(0))
+            AND ($href = $href->href)
             AND ($this->advertShortDescriptionDOM->find('td nobr img', 0) === NULL) // Проверка на отсутствие признака краткосрочной аренды
         ) {
-            $this->id = $href->href;
+            $this->id = $href;
             return TRUE;
         } else {
             // Если полученный в $this->advertShortDescriptionDOM элемент оказался не кратким описанием объявления, а чем-то иным, то рекурсивно вызываем этот же метод - пока не найдем краткое описание объявления или пока не достигнем конца списка
@@ -353,6 +359,7 @@ class ParserE1 extends ParserBasic {
                 $value = $oneParam->find("td", 1)->find("b", 0)->plaintext;
                 if (!isset($value) && $value == "") continue;
                 if ($value == "Раздельный") $params['typeOfBathrooms'] = "раздельный";
+                if ($value == "Два совмещенных") $params['typeOfBathrooms'] = "2 шт.";
                 continue;
             }
 
@@ -390,6 +397,7 @@ class ParserE1 extends ParserBasic {
                 if ($value == "С.Сортировка") $value = "Сортировка старая";
                 if ($value == "Н.Сортировка") $value = "Сортировка новая";
                 if ($value == "Юго-Западный") $value = "Юго-запад";
+                if ($value == "Чермет") $value = "Вторчермет";
                 $params['district'] = $value;
                 continue;
             }
@@ -403,23 +411,6 @@ class ParserE1 extends ParserBasic {
         }
 
         return $params;
-    }
-
-    /**
-     * Функция проверяет, обрабатывалось ли данное объявление ранее
-     * @return bool возвращает TRUE, если текущее объявление уже обрабатывалось, FALSE в случае, если не обрабатывалось
-     */
-    public function isAdvertAlreadyHandled() {
-
-        /* Опознавательные идентификаторы всех обработанных за последнее время объявлений сохраняются в БД по мере обработки каждого объявления
-           Сравнение идентификаторов текущего объявления с сохраненными позволяет гарантированно убедиться в том, что данное объявление еще не сохранялось в мою БД */
-
-        // Проверяем по массиву $this->handledAdverts - было ли данное объявление уже обработано или нет
-        foreach ($this->handledAdverts as $value) {
-            if ($value == $this->id) return TRUE;
-        }
-
-        return FALSE;
     }
 
     /**
@@ -448,22 +439,6 @@ class ParserE1 extends ParserBasic {
             return FALSE;
         }
 
-    }
-
-    /**
-     * Функция запоминает в БД, что данное объявление успешно обработано, что позволит избежать его повторной обработки
-     * @return bool возвращает TRUE в случае успеха и FALSE в противном случае
-     */
-    public function setAdvertIsHandled() {
-
-        // Получим дату публикации для данного объявления
-        $publicationData = $this->advertShortDescriptionDOM->find('td', 7)->plaintext;
-        $publicationData = explode(".", $publicationData);
-        $date = new DateTime(date("Y") . "-" . $publicationData[1] . "-" . $publicationData[0], new DateTimeZone('Asia/Yekaterinburg'));
-        $date = $date->format("d.m.Y");
-
-        // Сохраняем идентификаторы объявления в БД и выдаем результат
-        return DBconnect::insertHandledAdvert($this->mode, $this->id, $date);
     }
 
     /**

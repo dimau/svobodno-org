@@ -46,7 +46,6 @@ messagesNewTenant,
 districts,
 currencies,
 archiveAdverts,
-bazab2b,
 e1,
 66ru,
 avito,
@@ -568,17 +567,8 @@ echo "archiveAdverts: ";
 if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
 /****************************************************************************
- * СПИСОК ОБРАБОТАННЫХ ОБЪЯВЛЕНИЙ ИЗ БАЗЫ САЙТА bazaB2B, e1
+ * СПИСОК ИДЕНТИФИКАТОРОВ ОБРАБОТАННЫХ ОБЪЯВЛЕНИЙ
  ***************************************************************************/
-
-DBconnect::get()->query("CREATE TABLE bazab2b (
-  id VARCHAR(10) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'id идентификатор объявления на сайте bazab2b',
-  c_id VARCHAR(10) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'c_id идентификатор объявления на сайте bazab2b',
-  date DATE COMMENT 'Дата публикации объявления'
-)");
-
-echo "bazab2b: ";
-if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
 DBconnect::get()->query("CREATE TABLE e1 (
   id VARCHAR(15) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'id идентификатор объявления на сайте e1',
@@ -613,7 +603,7 @@ echo "slando: ";
 if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
 /****************************************************************************
- * СПИСОК ID ПОСЛЕДНИХ УСПЕШНО ОБРАБОТАННЫХ ОБЪЯВЛЕНИЙ ИЗ БАЗЫ САЙТА bazaB2B, e1
+ * СПИСОК ID ПОСЛЕДНИХ УСПЕШНО ОБРАБОТАННЫХ ОБЪЯВЛЕНИЙ
  * Если парсер при разборе страницы со списком объявлений встречает объявление из одним из этих id, он заканчивает работу
  ***************************************************************************/
 
@@ -628,9 +618,6 @@ if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TR
 
 // Записываем в таблицу первоначальные параметры
 DBconnect::get()->query("INSERT INTO lastSuccessfulHandledAdvertsId (id, mode, indexNumber) VALUES
-    ('0', 'bazab2b', 0),
-    ('0', 'bazab2b', 1),
-    ('0', 'bazab2b', 2),
     ('0', 'e1Kv1k', 0),
     ('0', 'e1Kv1k', 1),
     ('0', 'e1Kv1k', 2),
@@ -678,7 +665,7 @@ if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TR
 
 DBconnect::get()->query("CREATE TABLE knownPhoneNumbers (
   phoneNumber VARCHAR(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL PRIMARY KEY COMMENT 'Телефонный номер',
-  status VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Статус телефонного номера: агент, собственник, арендатор (статус используется, если обладатель номера ищет человека на подселение к себе)',
+  status VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Статус телефонного номера: не определен, агент, собственник, арендатор (статус используется, если обладатель номера ищет человека на подселение к себе). Если парсер не обнаружил признаков агентства, то первоначально такому номеру присваивается статус - Не определен. Данный статус может изменить оператор',
   dateOfLastPublication INT(11) COMMENT 'Дата последней публикации объявления с указанием данного номера телефона в качестве контактного, в формате timestamp. Это позволит отслеживать устаревшие данные по номерам телефонов - если телефон долго не используется, то, возможно, стоит пересмотреть его статус'
 )");
 
@@ -699,6 +686,17 @@ DBconnect::get()->query("CREATE TABLE invoices (
 )");
 
 echo "invoices: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
+/****************************************************************************
+ * СЛУЖЕБНАЯ ТАБЛИЦА СО СПИСКОМ ПОВТОРЯЮЩИХСЯ ТЕЛЕФОНОВ НЕ АГЕНТОВ
+ ***************************************************************************/
+
+DBconnect::get()->query("CREATE TABLE duplicatePhoneNumbers (
+  phoneNumber VARCHAR(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL PRIMARY KEY COMMENT 'Телефонный номер'
+)");
+
+echo "duplicatePhoneNumbers: ";
 if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
 
 /****************************************************************************

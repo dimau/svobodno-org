@@ -133,6 +133,10 @@ class Property {
         return $this->contactTelephonNumber;
     }
 
+    public function getSourceOfAdvert() {
+        return $this->sourceOfAdvert;
+    }
+
     // Устанавливает id собственника для данного объявления
     // Используется при полуавтоматическом парсинге объявлений из чужих баз
     public function setOwnerLogin($ownerLogin) {

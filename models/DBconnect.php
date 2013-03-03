@@ -221,6 +221,40 @@ class DBconnect {
     }
 
     /**
+     * Возвращает массив идентификаторов объектов недвижимости, с полнотой = 0 (сграбленные с чужих ресурсов) в количестве $amount штук с самыми старыми датами актуализации.
+     * Метод используется для актуализации объявлений, собранных с ресурсов-доноров
+     * @param string $amount - максимальное количество идентификаторов, которые должен вернуть метод
+     * @return array - массив идентификаторов объектов недвижимости. Либо пустой массив (в случае ошибки)
+     */
+    public static function selectPropertiesIdForLastAct($amount) {
+
+        // Проверка входящих параметров
+        if (!isset($amount) || !is_int($amount)) return array();
+
+        // Получим из БД данные ($res)
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("SELECT id FROM property WHERE completeness = 0 ORDER BY last_act ASC LIMIT ?") === FALSE)
+            OR ($stmt->bind_param("i", $amount) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->get_result()) === FALSE)
+            OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === NULL)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT id FROM property WHERE 1 ORDER BY last_act ASC LIMIT " . $amount . "'. id логгера: DBconnect::selectPropertiesIdForLastAct():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return array();
+        }
+
+        // Приведем результат к простому массиву
+        $resultArr = array();
+        foreach ($res as $value) {
+            $resultArr[] = $value['id'];
+        }
+
+        // Вернем результат
+        return $resultArr;
+    }
+
+    /**
      * Возвращает массив ассоциированных массивов, каждый из которых содержит данные по одному из объектов недвижимости. Если ничего не найдено или произошла ошибка, вернет пустой массив
      * ВНИМАНИЕ: массивы могут быть расположены не в том же порядке, в каком идентификаторы располагались во входном массиве
      *
@@ -681,10 +715,10 @@ class DBconnect {
     /**
      * Возвращает ассоциативный массив с идентификаторами ранее обработанных объявлений за выбранный период
      * Функция используется при регулярном парсинге сайтов объявлений для проверки того, что найденное объявление еще не обрабатывалось
-     * @param string $mode режим работы функции: bazab2b, e1Kv1k, e1Kv2k, e1Kv3k, e1Kv4k, e1Kv5k, e1Kom
+     * @param string $mode режим работы функции: e1Kv1k, e1Kv2k, e1Kv3k, e1Kv4k, e1Kv5k, e1Kom
      * @param $initialDate начальная дата выборки в формате PHP: 27.01.1987
      * @param $finalDate конечная дата выборки в формате PHP: 27.01.1987
-     * @return array Для e1 - массив идентификаторов, Для bazab2b - ассоциативный массив, ключ = id объявления, значение = c_id объявления
+     * @return array массив идентификаторов
      */
     public static function selectHandledAdverts($mode, $initialDate, $finalDate) {
 
@@ -697,9 +731,6 @@ class DBconnect {
 
         // В зависимости от режима выбираем таблицу для запроса
         switch ($mode) {
-            case "bazab2b":
-                $tableName = "bazab2b";
-                break;
             case "e1Kv1k":
             case "e1Kv2k":
             case "e1Kv3k":
@@ -723,28 +754,21 @@ class DBconnect {
         }
 
         $stmt = DBconnect::get()->stmt_init();
-        if (($stmt->prepare("SELECT * FROM " . $tableName . " WHERE date >= ? AND date <= ?") === FALSE)
+        if (($stmt->prepare("SELECT * FROM " . $tableName . " WHERE date > ? AND date <= ?") === FALSE)
             OR ($stmt->bind_param("ss", $initialDate, $finalDate) === FALSE)
             OR ($stmt->execute() === FALSE)
             OR (($res = $stmt->get_result()) === FALSE)
             OR (($res = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
             OR ($stmt->close() === FALSE)
         ) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM " . $tableName . " WHERE date >= " . $initialDate . " AND date <= " . $finalDate . "'. Местонахождение кода: DBconnect::selectHandledAdverts():1. Режим: '" . $mode. "'. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'SELECT * FROM " . $tableName . " WHERE date > " . $initialDate . " AND date <= " . $finalDate . "'. Местонахождение кода: DBconnect::selectHandledAdverts():1. Режим: '" . $mode . "'. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return NULL;
         }
 
         // Преобразование результата к нужному виду
-        if ($mode == "bazab2b") {
-            $resultArr = array();
-            foreach ($res as $value) {
-                $resultArr[$value['id']] = $value['c_id'];
-            }
-        } else {
-            $resultArr = array();
-            foreach ($res as $value) {
-                $resultArr[] = $value['id'];
-            }
+        $resultArr = array();
+        foreach ($res as $value) {
+            $resultArr[] = $value['id'];
         }
 
         return $resultArr;
@@ -1061,37 +1085,6 @@ class DBconnect {
     }
 
     /**
-     * Сохраняет идентификаторы успешно обработанного объявления с сайта bazab2b
-     * @param int $c_id тоже какой-то идентификатор объявления
-     * @param int $id идентификатор объявления
-     * @param string $date дата публикации объявления в формате PHP: 27.01.1987
-     * @return bool Возвращает TRUE в случае успеха и FALSE в случае неудачи
-     */
-    public static function insertHandledAdvertFromBazab2b($c_id, $id, $date) {
-
-        // Проверка входящих параметров
-        if (!isset($c_id) || !is_int($c_id) || !isset($id) || !is_int($id) || !isset($date) || !is_string($date)) return FALSE;
-
-        // Преобразование даты в формат БД
-        $date = GlobFunc::dateFromViewToDB($date);
-
-        // Сохраняем информацию в БД
-        $stmt = DBconnect::get()->stmt_init();
-        if (($stmt->prepare("INSERT INTO bazab2b (id, c_id, date) VALUES (?,?,?)") === FALSE)
-            OR ($stmt->bind_param("iis", $id, $c_id, $date) === FALSE)
-            OR ($stmt->execute() === FALSE)
-            OR (($res = $stmt->affected_rows) === -1)
-            OR ($res === 0)
-            OR ($stmt->close() === FALSE)
-        ) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO bazab2b (id, c_id, date) VALUES (" . $id . "," . $c_id . "," . $date . ")'. id логгера: DBconnect::insertHandledAdvertFromBazab2b():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
-            return FALSE;
-        }
-
-        return TRUE;
-    }
-
-    /**
      * Сохраняет идентификатор успешно обработанного объявления с сайта e1
      * @param string $mode режим работы парсера - позволяет определить в какую таблицу записывать данные
      * @param int $id идентификатор объявления
@@ -1169,6 +1162,31 @@ class DBconnect {
             OR ($stmt->close() === FALSE)
         ) {
             Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO knownPhoneNumbers (phoneNumber, status, dateOfLastPublication) VALUES (" . $paramsArr['phoneNumber'] . "," . $paramsArr['status'] . "," . $paramsArr['dateOfLastPublication'] . ")'. id логгера: DBconnect::insertKnownPhoneNumber():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
+
+        return TRUE;
+    }
+
+    /**
+     * Сохраняет данные о дублирующем телефоне
+     * @param string $phoneNumber
+     * @return bool Возвращает TRUE в случае успеха и FALSE в случае неудачи
+     */
+    public static function insertDuplicatePhoneNumber($phoneNumber) {
+
+        // Проверка входящих параметров
+        if (!isset($phoneNumber)) return FALSE;
+
+        // Сохраняем информацию в БД
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("INSERT INTO duplicatePhoneNumbers (phoneNumber) VALUES (?)") === FALSE)
+            OR ($stmt->bind_param("s", $phoneNumber) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO duplicatePhoneNumbers (phoneNumber) VALUES (" . $phoneNumber . ")'. id логгера: DBconnect::insertDuplicatePhoneNumber():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return FALSE;
         }
 
@@ -1404,7 +1422,7 @@ class DBconnect {
 
         // Проверка входящих параметров
         if (!isset($phoneNumber) || !isset($status)) return FALSE;
-        if ($status != "агент" && $status != "собственник" && $status != "арендатор") return FALSE;
+        if ($status != "агент" && $status != "собственник" && $status != "арендатор" && $status != "не определен") return FALSE;
 
         // Сохраняем информацию о загруженной фотке в БД
         $stmt = DBconnect::get()->stmt_init();
