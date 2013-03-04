@@ -8,50 +8,142 @@ class AdvertsRelevanceChecker {
     /**
      * КОНСТРУКТОР
      */
-    private function __construct() {
+    private function __construct() { }
 
-    }
-
-
+    /**
+     * Проверяет актуальность объявления, подробное описание которого на ресурсе источнике расположено по адресу $sourceURL
+     * @param $sourceURL ссылка на подробное описание объявления на ресурсе источнике
+     * @return bool TRUE в случае, если объявление еще актуально (или проверить его актуальность не удалось) и FALSE в противном случае
+     */
     public static function checkAdvertRelevance($sourceURL) {
 
         // Понимаем, какой именно ресурс является источником для данного объявления
-        if (preg_match('/^http://www.e1.ru/', $sourceURL)) {
+        if (preg_match('~^http://www\.e1\.ru~', $sourceURL)) {
             $sourceName = "e1.ru";
-        } elseif (preg_match('/^http://www.66.ru', $sourceURL)) {
+        } elseif (preg_match('~^http://www\.66\.ru~', $sourceURL)) {
             $sourceName = "66.ru";
+        } elseif (preg_match('~^http://ekaterinburg\.sve\.slando\.ru~', $sourceURL)) { // TODO: только для Екатеринбурга
+            $sourceName = "slando.ru";
+        } elseif (preg_match('~^http://www\.avito\.ru~', $sourceURL)) {
+            $sourceName = "avito.ru";
         } else {
             Logger::getLogger(GlobFunc::$loggerName)->log("AdvertsRelevanceChecker->checkAdvertRelevance():1 Не удалось получить название ресурса источника для " . $sourceURL);
-            return FALSE; //TODO: или что-то другое возвращать при ошибке?
+            return TRUE;
         }
 
         // Получаем страницу с подробным описание объявления
         $pageHTML = AdvertsRelevanceChecker::curlRequest($sourceURL, "", "", FALSE);
         // Если получить HTML страницы не удалось
         if (!$pageHTML) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("AdvertsRelevanceChecker.php->loadNextAdvertsList():3 Не удалось получить страницу с подробным описанием объявления");
-            return FALSE;
+            Logger::getLogger(GlobFunc::$loggerName)->log("AdvertsRelevanceChecker.php->checkAdvertRelevance():2 Не удалось получить страницу с подробным описанием объявления по адресу: " . $sourceURL);
+            return TRUE;
         }
-        // Получаем DOM-объект
-        $pageHTML = str_get_html($pageHTML);
+
+        // Если это необходимо, меняем кодировку страницы перед получением ее DOM модели
+        if ($sourceName == "e1.ru") {
+            // Для e1 меняем кодировку с windows-1251 на utf-8
+            $pageHTML = iconv("windows-1251", "UTF-8", $pageHTML);
+        }
+
+        // Получаем DOM-объект для страницы
+        $sourcePage = str_get_html($pageHTML);
+        if (!isset($sourcePage)) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("AdvertsRelevanceChecker.php->checkAdvertRelevance():3 не удалось разобрать страницу с полным описанием объявления");
+            return TRUE;
+        }
 
         // Вызываем соответствующий метод для проверки признаков неактуального объявления (снятого с публикации на ресурсе источнике)
         switch ($sourceName) {
-            case "e1.ru":
-                AdvertsRelevanceChecker::checkE1Advert();
-                break;
-            case "66.ru":
-
-                break;
+            case "e1.ru": return AdvertsRelevanceChecker::checkAdvertForE1($sourcePage);
+            case "66.ru": return AdvertsRelevanceChecker::checkAdvertFor66($sourcePage);
+            case "slando.ru": return AdvertsRelevanceChecker::checkAdvertForSlando($sourcePage);
+            case "avito.ru": return AdvertsRelevanceChecker::checkAdvertForAvito($sourcePage);
+            default:
+                Logger::getLogger(GlobFunc::$loggerName)->log("AdvertsRelevanceChecker->checkAdvertRelevance():4 Не существует метода проверки актуальности для ресурса с таким названием: " . $sourceName . ". Таким образом, не удалось обработать объявление по адресу: " . $sourceURL);
+                return TRUE;
         }
-
-
-
-
     }
 
-    public static function checkE1Advert() {
+    /**
+     * Проверяет наличие признаков неактуальности на странице с подробным описанием объявления с сайта e1.ru
+     * @param $sourcePage DOM модель страницы с подробным описанием текущего проверяемого объявления (с сайта источника)
+     * @return bool TRUE, если объявление остается актуальным и FALSE в противном случае (если обнаружены признаки неактуальности)
+     */
+    private static function checkAdvertForE1($sourcePage) {
 
+        $pretenders = $sourcePage->find("td[valign=top]");
+        foreach ($pretenders as $pretender) {
+            if (($one = $pretender->children(4)) !== NULL) {
+                if (($one->plaintext == "Извините, объявление было удалено или потеряло актуальность") OR
+                    ((($one = $one->children(0)) !== NULL) AND ($one->plaintext == "Извините, объявление потеряло акуальность или было удалено"))
+                   )
+                {
+                    // Объявление потеряло свою актуальность
+                    return FALSE;
+                }
+            }
+        }
+
+        // Признаки неактуальности у объявления не обнаружены
+        return TRUE;
+    }
+
+    /**
+     * Проверяет наличие признаков неактуальности на странице с подробным описанием объявления с сайта 66.ru
+     * @param $sourcePage DOM модель страницы с подробным описанием текущего проверяемого объявления (с сайта источника)
+     * @return bool TRUE, если объявление остается актуальным и FALSE в противном случае (если обнаружены признаки неактуальности)
+     */
+    private static function checkAdvertFor66($sourcePage) {
+
+        $pretender = $sourcePage->find(".steps_head", 0);
+        if (isset($pretender) && $pretender->plaintext == "404 - нет такой страницы ") {
+            // Объявление потеряло свою актуальность
+            return FALSE;
+        }
+
+        $pretender = $sourcePage->find(".b-content-card_item__hightline-20", 0)->parent()->children(8);
+        if (isset($pretender) && preg_match('~Это объявление устарело или потеряло актуальность~', $pretender->innertext)) {
+            // Объявление потеряло свою актуальность
+            return FALSE;
+        }
+
+        // Признаки неактуальности у объявления не обнаружены
+        return TRUE;
+    }
+
+    /**
+     * Проверяет наличие признаков неактуальности на странице с подробным описанием объявления с сайта slando.ru
+     * @param $sourcePage DOM модель страницы с подробным описанием текущего проверяемого объявления (с сайта источника)
+     * @return bool TRUE, если объявление остается актуальным и FALSE в противном случае (если обнаружены признаки неактуальности)
+     */
+    private static function checkAdvertForSlando($sourcePage) {
+
+        if ((($pretender = $sourcePage->find(".box note", 0)) !== NULL) AND
+            (($pretender = $pretender->children(0)) !== NULL) AND
+            (preg_match('~Это объявление закрыто\. Оно более не актуально\.~', $pretender->innertext))
+        ) {
+            // Объявление потеряло свою актуальность
+            return FALSE;
+        }
+
+        // Признаки неактуальности у объявления не обнаружены
+        return TRUE;
+    }
+
+    /**
+     * Проверяет наличие признаков неактуальности на странице с подробным описанием объявления с сайта avito.ru
+     * @param $sourcePage DOM модель страницы с подробным описанием текущего проверяемого объявления (с сайта источника)
+     * @return bool TRUE, если объявление остается актуальным и FALSE в противном случае (если обнаружены признаки неактуальности)
+     */
+    private static function checkAdvertForAvito($sourcePage) {
+
+        if ($sourcePage->f) {
+            // Объявление потеряло свою актуальность
+            return FALSE;
+        }
+
+        // Признаки неактуальности у объявления не обнаружены
+        return TRUE;
     }
 
     /**
@@ -62,7 +154,7 @@ class AdvertsRelevanceChecker {
      * @param bool $proxy - логический параметр, указывает, нужно ли использовать анонимный прокси-сервер
      * @return bool|mixed возвращает DOM полученной страницы
      */
-    private function curlRequest($url, $post = "", $cookieFileName = "", $proxy = FALSE) {
+    private static function curlRequest($url, $post = "", $cookieFileName = "", $proxy = FALSE) {
 
         // Инициализация библиотеки curl.
         if (!($ch = curl_init())) {

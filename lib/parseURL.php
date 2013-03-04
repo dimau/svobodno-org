@@ -349,9 +349,9 @@ while ($parser->loadNextAdvertsList()) {
         }
 
         // Оповещаем операторов о новом объявлении
-        $subject = 'Объявление на ' . $mode;
+        /*$subject = 'Объявление на ' . $mode;
         $msgHTML = "Новое объявление на " . $mode . ": <a href='http://svobodno.org/editadvert.php?propertyId=" . $property->getId() . "'>" . $property->getAddress() . "</a>";
-        GlobFunc::sendEmailToOperator($subject, $msgHTML);
+        GlobFunc::sendEmailToOperator($subject, $msgHTML);*/
     }
 
     // Когда мы переберем все объявления на текущей странице списка объявлений, то следующим шагом автоматически загрузится следующая страница - и все по новой

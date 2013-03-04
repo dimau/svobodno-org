@@ -37,12 +37,15 @@ if (DBconnect::get() == FALSE) {
 }
 
 // Получим идентификаторы 50 самых старых объявлений
-$advertsId = DBconnect::selectPropertiesIdForLastAct(50);
+$advertsId = DBconnect::selectPropertiesIdForLastAct(20);
 if (count($advertsId) == 0) {
     Logger::getLogger(GlobFunc::$loggerName)->log("checkAdvertsRelevance.php:3 Не удалось получить список id объявлений для проверки их актуальности");
     DBconnect::closeConnectToDB();
     exit();
 }
+
+// TODO: test
+$test = "";
 
 // Перебираем все полученные объявления и проверяем каждое на актуальность
 foreach ($advertsId as $propertyId) {
@@ -56,8 +59,24 @@ foreach ($advertsId as $propertyId) {
     $sourceURL = $property->getSourceOfAdvert();
 
     // Проверяем актуальность объявления-источника
+    $isRelevance = AdvertsRelevanceChecker::checkAdvertRelevance($sourceURL);
 
+    if ($isRelevance) { // Если объявление еще актуально
+        // Меняем дату последней проверки актуальности / редактирования объявления на текущую.
+        // Изменение даты последнего редактирования (last_act) происходит автоматически при пересохранении объявления
+        $property->saveCharacteristicToDB("edit");
+    } else { // Если объявление уже НЕ актуально - снимаем его с публикации на нашем ресурсе
+        $property->unpublishAdvert();
+    }
+
+    // TODO: test
+    $test .= "Адрес источника: '" . $sourceURL . "'. Результат проверки: '" . $isRelevance . "' Время последней проверки: " . GlobFunc::timestampFromDBToView(time()) . "    <br>";
 }
+
+// TODO: test
+$subject = 'Отчет по неактуальным объявлениям';
+$msgHTML = $test;
+GlobFunc::sendEmailToOperator($subject, $msgHTML);
 
 /********************************************************************************
  * Закрываем соединение с БД
