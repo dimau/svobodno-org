@@ -404,6 +404,7 @@ class ParserE1 extends ParserBasic {
 
         }
 
+        // Проверки, при невыполнении которых, объявление нужно будет попытаться распарсить еще раз в следующий подход
         // Проверяем, удалось ли получить ссылку на источник объявления
         if (!isset($params['sourceOfAdvert']) || $params['sourceOfAdvert'] == "") {
             Logger::getLogger(GlobFunc::$loggerName)->log("ParserE1.php->parseFullAdvert():2 не удалось успешно завершить парсинг объявления - не определена ссылка на исходное объявление");

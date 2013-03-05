@@ -317,6 +317,48 @@ class ParserBasic {
         return DBconnect::insertHandledAdvert($this->mode, $this->id, $date);
     }
 
+    /**
+     * Метод проверяет, похожи ли 2 адреса
+     * @param $firstAddress первый адрес для проверки
+     * @param $secondAddress второй адрес для проверки
+     * @return bool возвращает TRUE в случае хорошего коэффициента совпадения (адреса одинаковые) и FALSE в противном случае
+     */
+    public function isAddressSimilar($firstAddress, $secondAddress) {
+
+        // Преобразуем строки с адресами в нижний регистр
+        $firstAddress = strtolower($firstAddress);
+        $secondAddress = strtolower($secondAddress);
+
+        // Убираем лишние символы
+        $firstAddress = str_replace(array("ул.", "ул ", "улица ", ",", ".", " "), "", $firstAddress);
+        $secondAddress = str_replace(array("ул.", "ул ", "улица ", ",", ".", " "), "", $secondAddress);
+
+        // Разбираем строки в массивы посимвольно
+        $firstAddress = str_split($firstAddress);
+        $secondAddress = str_split($secondAddress);
+
+        // Инициализируем счетчик совпадений букв в адресах
+        $counter = 0;
+
+        // Берем поочередно буквы из первого массива и удаляем первую попавшуюся такую же букву во втором, считаем совпадения
+        foreach ($firstAddress as $char) {
+            for ($i = 0, $s = count($secondAddress); $i < $s; $i++) {
+                if ($char == $secondAddress[$i]) {
+                    $counter++;
+                    unset($secondAddress[$i]);
+                    $secondAddress = array_values($secondAddress);
+                    break;
+                }
+            }
+        }
+
+        // Считаем коэффициент совпадения строк (сколько букв из первого адреса присутствуют во втором по отношению к их общему количеству в первом адресе)
+        $ratio = $counter / count($firstAddress);
+
+        // Если коэффициент совпадения адресов выше, чем 0.9, то можно считать их одинаковыми
+        if ($ratio >= 0.9) return TRUE; else return FALSE;
+    }
+
     /*************************************************************************************
      * ПЕРЕОПРЕДЕЛЯЕМЫЕ В КЛАССАХ ПОТОМКАХ ФУНКЦИИ
      * Перечисление ключевых функций, которые должны быть опеределены в каждмо классе потомке, внутри базового класса позволяет вызывать эти методы классов потомков из методов базового класса (это называется виртуальные функции, полиморфизм)

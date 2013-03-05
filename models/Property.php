@@ -117,6 +117,18 @@ class Property {
         return $this->userId;
     }
 
+    public function getTypeOfObject() {
+        return $this->typeOfObject;
+    }
+
+    public function getAmountOfRooms() {
+        return $this->amountOfRooms;
+    }
+
+    public function getFloor() {
+        return $this->floor;
+    }
+
     public function getAddress() {
         return $this->address;
     }
