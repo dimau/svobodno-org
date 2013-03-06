@@ -386,10 +386,12 @@ while ($parser->loadNextAdvertsList()) {
                     // TODO: Пока же временное решение - отбрасываем и не обрабатываем далее объявление-дубликат
                     // TODO: если ссылка на объявление источник отличается от текущей, то занести ее новым членом в массив ссылок на объявления источники для данного объявления
 
-                    // Оповещаем операторов о вычислении дубликата
-                    $subject = 'Дубликат!';
-                    $msgHTML = "Объявление дубликат по адресу <a href='" . $paramsArr['sourceOfAdvert'] . "'> " . $paramsArr['address'] . "</a> . Дубликат для объявления <a href='http://svobodno.org/editadvert.php?propertyId=" . $tempProperty->getId() . "'>" . $tempProperty->getAddress() . "</a>";
-                    GlobFunc::sendEmailToOperator($subject, $msgHTML);
+                    // Оповещаем операторов о вычислении дубликата, если адреса объявлений источников отличаются
+                    if ($paramsArr['sourceOfAdvert'] != $tempProperty->getSourceOfAdvert()) {
+                        $subject = 'Дубликат!';
+                        $msgHTML = "Объявление дубликат (с различными источниками) по адресу <a href='" . $paramsArr['sourceOfAdvert'] . "'> " . $paramsArr['address'] . "</a> . Дубликат для объявления <a href='http://svobodno.org/editadvert.php?propertyId=" . $tempProperty->getId() . "'>" . $tempProperty->getAddress() . "</a>";
+                        GlobFunc::sendEmailToOperator($subject, $msgHTML);
+                    }
 
                     // Поднимаем флаг, обозначающий объявление-дубликат
                     $isDuplicate = TRUE;
@@ -400,8 +402,20 @@ while ($parser->loadNextAdvertsList()) {
 
             }
 
-            // Запишем обнаруженный дублирующий телефонный номер в специальную таблицу. Так как письма зачастую на e-mail не доходят, то оператору нужно работать с этой таблицей
-            if (!$isDuplicate) DBconnect::insertDuplicatePhoneNumber($dataAboutPhoneNumber['phoneNumber']);
+            // Если полученное объявление не дублирует ни одно из имеющихся, то запишем обнаруженный дублирующий телефонный номер в специальную таблицу. Так как письма зачастую на e-mail не доходят, то оператору нужно работать с этой таблицей
+            // Кроме того, необходимо сохранить объявление в БД
+            if (!$isDuplicate) {
+
+                // Добавим телефонный номер в список дублирующих
+                DBconnect::insertDuplicatePhoneNumber($dataAboutPhoneNumber['phoneNumber']);
+
+                // Сохраним объявление в БД
+                $property = new Property($paramsArr);
+                $property->setCompleteness("0");
+                $property->setStatus("не опубликовано");
+                $property->setOwnerLogin("owner"); // Используем в качестве логина собственника логин служебного собственника owner, на которого сохраняются все чужие объявления
+                $correctSaveCharacteristicToDB = $property->saveCharacteristicToDB("new");
+            }
 
             // Обновляем дату последнего использования телефонного номера
             $parser->updateDateKnownPhoneNumber();

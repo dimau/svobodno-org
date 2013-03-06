@@ -37,7 +37,7 @@ if (DBconnect::get() == FALSE) {
 }
 
 // Получим идентификаторы 50 самых старых объявлений
-$advertsId = DBconnect::selectPropertiesIdForLastAct(20);
+$advertsId = DBconnect::selectPropertiesIdForLastAct(50);
 if (count($advertsId) == 0) {
     Logger::getLogger(GlobFunc::$loggerName)->log("checkAdvertsRelevance.php:3 Не удалось получить список id объявлений для проверки их актуальности");
     DBconnect::closeConnectToDB();
