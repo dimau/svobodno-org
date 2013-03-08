@@ -392,17 +392,8 @@ class Parser66ru extends ParserBasic {
         $interval = $currentDate->diff($date);
         $interval = intval($interval->format("%d"));
         if ($interval >= $this->actualDayAmountForAdvert) {
-
-            //TODO: test
-            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера 66ru: Останавливаем парсинг в режиме " . $this->mode . ". Дата публикации объявления " . $date->format('Y-m-d H:i:s') . " слишком поздняя");
-
             return TRUE;
-
         } else {
-
-            //TODO: test
-            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера 66ru: подходящая дата публикации " . $date->format('Y-m-d H:i:s') . " - работаем далее");
-
             return FALSE;
         }
 

@@ -69,14 +69,14 @@ foreach ($advertsId as $propertyId) {
         $property->unpublishAdvert();
     }
 
-    // TODO: test
-    $test .= "Адрес источника: '" . $sourceURL . "'. Результат проверки: '" . $isRelevance . "' Время последней проверки: " . GlobFunc::timestampFromDBToView(time()) . "    <br>";
+    // Составляем отчет по работе робота, чтобы отправить его по e-mail оператору
+    //$test .= "Адрес источника: '" . $sourceURL . "'. Результат проверки: '" . $isRelevance . "' Время последней проверки: " . GlobFunc::timestampFromDBToView(time()) . "    <br>";
 }
 
-// TODO: test
-$subject = 'Отчет по неактуальным объявлениям';
+// Отправляем отчет по работе робота оператору
+/*$subject = 'Отчет по неактуальным объявлениям';
 $msgHTML = $test;
-GlobFunc::sendEmailToOperator($subject, $msgHTML);
+GlobFunc::sendEmailToOperator($subject, $msgHTML);*/
 
 /********************************************************************************
  * Закрываем соединение с БД

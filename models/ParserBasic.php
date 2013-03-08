@@ -77,10 +77,6 @@ class ParserBasic {
 
         foreach ($this->lastSuccessfulHandledAdvertsId as $value) {
             if ($value == $this->id) {
-
-                //TODO: test
-                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: Достигли объявления, успешно обработанного в прошлый раз!");
-
                 return TRUE;
             }
         }
@@ -292,10 +288,6 @@ class ParserBasic {
         // Проверяем по массиву $this->handledAdverts - было ли данное объявление уже обработано или нет
         foreach ($this->handledAdverts as $value) {
             if ($value == $this->id) {
-
-                //TODO: test
-                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера e1: Объявление успешно обработано ранее");
-
                 return TRUE;
             }
         }

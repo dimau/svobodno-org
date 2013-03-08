@@ -269,8 +269,6 @@ while ($parser->loadNextAdvertsList()) {
 
         // Номер еще не известен БД, в объявлении обнаружены признаки агента
         if ($methodOfAction == "newAgent") {
-            //TODO: test
-            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера: Новый номер - обнаружены признаки агента в объявлении");
             // Если в объявлении есть признаки агентства, то добавляем телефон в БД как агента и переходим к следующему объявлению
             $parser->newKnownPhoneNumber("агент");
             $parser->setAdvertIsHandled();
@@ -279,16 +277,12 @@ while ($parser->loadNextAdvertsList()) {
 
         // Номер еще не известен БД, в объявлении НЕ обнаружены признаки агента
         if ($methodOfAction == "newNotDefined") {
-            //TODO: test
-            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера: Новый номер - признаки агента не обнаружены в объявлении");
             // Если в объявлении нет признаков агентства, то добавляем телефон в БД как телефон со статусом "не определен"
             $parser->newKnownPhoneNumber("не определен");
         }
 
         // Номер телефона принадлежал агенту и использовался последний раз менее 40 дней назад
         if ($methodOfAction == "agentInPresent") {
-            //TODO: test
-            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера: телефонный номер принадлежит агенту");
             // Если это телефонный номер агента и он использовался последний раз менее 40 дней назад (3456000 секунд) - игнорируем объявление. Проверка на срок 40 дней нужна, так как агент мог отказаться от данного номера, и номер мог быть переназначен хорошему человеку
             // Актуализируем дату последнего использования телефонного номера
             $parser->updateDateKnownPhoneNumber();
@@ -298,8 +292,6 @@ while ($parser->loadNextAdvertsList()) {
 
         // Номер телефона принадлежал агенту, использовался им последний раз более 40 дней назад. В объявлении обнаружены признаки агента
         if ($methodOfAction == "agentInPastAndPresent") {
-            //TODO: test
-            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера: телефонный номер принадлежит агенту, использовался более 40 дней назад последний раз. Обнаружены признаки агента в объявлении");
             // Если в объявлении есть признаки агентства, то добавляем телефон в БД как агента и переходим к следующему объявлению
             $parser->updateDateKnownPhoneNumber();
             $parser->setAdvertIsHandled();
@@ -308,8 +300,6 @@ while ($parser->loadNextAdvertsList()) {
 
         // Номер телефона принадлежал агенту, использовался им последний раз более 40 дней назад. В объявлении НЕ обнаружены признаки агента
         if ($methodOfAction == "agentInPastAndNotDefinedInPresent") {
-            //TODO: test
-            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера: телефонный номер принадлежит агенту, использовался более 40 дней назад последний раз. Признаки агента не обнаружены в объявлении");
             // Обновить статус (с агента на не определен) и дату последнего использования телефонного номера
             $parser->changeStatusKnownPhoneNumber("не определен");
             $parser->updateDateKnownPhoneNumber();
@@ -318,12 +308,8 @@ while ($parser->loadNextAdvertsList()) {
         // Объявления с таким номером телефона уже встречались роботу (есть в БД), номер телефона не классифицирован как агентский.
         // В базе нет объявлений с таким же контактным номером телефона (возможно такие объявления есть в архиве)
         if ($methodOfAction == "ownerInPastNewAdvert") {
-            //TODO: test
-            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера: телефонный номер принадлежит лицу со статусом " . $dataAboutPhoneNumber['status']);
-
             // Запишем обнаруженный дублирующий телефонный номер в специальную таблицу. Так как письма зачастую на e-mail не доходят, то оператору нужно работать с этой таблицей
             DBconnect::insertDuplicatePhoneNumber($dataAboutPhoneNumber['phoneNumber']);
-
             // Обновляем дату последнего использования телефонного номера
             $parser->updateDateKnownPhoneNumber();
         }
@@ -331,8 +317,6 @@ while ($parser->loadNextAdvertsList()) {
         // Объявления с таким номером телефона уже встречались роботу (есть в БД), номер телефона не классифицирован как агентский.
         // В базе уже есть объявления с таким же контактным номером телефона
         if ($methodOfAction == "ownerInPastExistingAdvert") {
-            //TODO: test
-            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера: телефонный номер принадлежит лицу со статусом " . $dataAboutPhoneNumber['status']);
 
             // TODO: такое может случиться по одной из следующих причин:
             // 1. Это объявление-дубликат от собственника
@@ -355,8 +339,6 @@ while ($parser->loadNextAdvertsList()) {
 
             // Проверим, что объявление относится к Екатеринбургу. Если нет, считаем его успешно обработанным и не добавляем в базу
             if (!isset($paramsArr['city']) || $paramsArr['city'] != "Екатеринбург") {
-                //TODO: test
-                Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера: объявление не из Екатеринбурга");
                 $parser->setAdvertIsHandled();
                 continue;
             }
@@ -374,12 +356,13 @@ while ($parser->loadNextAdvertsList()) {
                     Logger::getLogger(GlobFunc::$loggerName)->log("parseURL.php:4 Не удалось инициализировать модель с id = '" . $value . "' и проверить на дубликат объявление по телефонному номеру " . $dataAboutPhoneNumber['phoneNumber']);
                 }
 
-                // Проверяем на совпадение адреса и ключевых параметров
-                if ((isset($paramsArr['address'])) AND
+                // Проверяем на совпадение url источника ИЛИ на совпадение адреса и ключевых параметров 2-х объявлений
+                if (($paramsArr['sourceOfAdvert'] == $tempProperty->getSourceOfAdvert()) OR
+                    ((isset($paramsArr['address'])) AND
                     ($parser->isAddressSimilar($paramsArr['address'], $tempProperty->getAddress())) AND
                     ($paramsArr['typeOfObject'] == $tempProperty->getTypeOfObject()) AND
                     (!isset($paramsArr['floor']) || $tempProperty->getFloor() == "" || $paramsArr['floor'] == 0 || $paramsArr['floor'] == $tempProperty->getFloor()) AND
-                    (!isset($paramsArr['amountOfRooms']) || $tempProperty->getAmountOfRooms() == "0" || $paramsArr['amountOfRooms'] == 0 || $paramsArr['amountOfRooms'] == $tempProperty->getAmountOfRooms())
+                    (!isset($paramsArr['amountOfRooms']) || $tempProperty->getAmountOfRooms() == "0" || $paramsArr['amountOfRooms'] == 0 || $paramsArr['amountOfRooms'] == $tempProperty->getAmountOfRooms()))
                 ) {
 
                     // TODO: Если ключевые параметры и адрес совпали, то дополняем исходное объявление данными текущего обрабатываемого объявления
@@ -447,8 +430,6 @@ while ($parser->loadNextAdvertsList()) {
 
         // Проверим, что объявление относится к Екатеринбургу. Если нет, считаем его успешно обработанным и не добавляем в базу
         if (!isset($paramsArr['city']) || $paramsArr['city'] != "Екатеринбург") {
-            //TODO: test
-            Logger::getLogger(GlobFunc::$loggerName)->log("Тестирование парсера: объявление не из Екатеринбурга");
             $parser->setAdvertIsHandled();
             continue;
         }
