@@ -740,7 +740,7 @@ td, th {
 }
 
 .headerOfPage {
-    margin: 40px 0 2px 8px; /* Суммарный отступ от главного меню = 48px, из них примерно 8px приходятся на расстояние от верхушки заглавной буквы локального заголовка до верхней границы строки */
+    margin: 40px 0 4px 8px; /* Суммарный отступ от главного меню = 48px, из них примерно 8px приходятся на расстояние от верхушки заглавной буквы локального заголовка до верхней границы строки */
     padding: 0;
     font-size: 18px;
     color: #000000;
@@ -1085,18 +1085,32 @@ td, th {
     cursor: default !important;
 }
 
-/* Стили для список + карта */
+/* Выбор варианта отображения результатов поиска - список, список + карта, карта */
 .choiceViewSearchResult {
     margin: 16px 0px 6px 8px;
     font-size: 14px;
 }
 
+/* Непосредственно блок с результатами поиска в выбранном представлении */
 #resultOnSearchPage {
     width: 100%;
+    height: 100%;
     margin: 10px auto;
     position: relative;
 }
 
+/* Стили для списка объявлений - с картой или без карты */
+#shortListOfRealtyObjects {
+    width: 50%;
+    float: left;
+}
+
+#fullParametersListOfRealtyObjects {
+    width: 100%;
+    float: none;
+}
+
+/* Порядковый номер объявления в списке */
 .numberOfRealtyObject {
     color: #808080;
     text-align: center;
@@ -1115,13 +1129,7 @@ td, th {
     top: auto;
 }
 
-/* Стили для списка объявлений - с картой или без карты */
-.listOfRealtyObjects {
-    width: 50%;
-    float: left;
-}
-
-/* Стиль по умолчанию для отдельного объявления в списке */
+/* Стили для отдельного объявления в списке */
 .realtyObject {
     width: 100%;
     border-top: 2px solid silver;
@@ -1130,6 +1138,16 @@ td, th {
     background-color: white;
     text-align: center;
     font-size: 13px;
+}
+
+#shortListOfRealtyObjects .realtyObject {
+    padding-top: 8px;
+    padding-right: 8px;
+}
+
+#fullParametersListOfRealtyObjects .realtyObject {
+    padding-top: 8px;
+    padding-bottom: 8px;
 }
 
 /* Выделение объявления, над которым завис курсор зеленой рамочкой */
@@ -1152,6 +1170,7 @@ td, th {
     border-bottom: 2px solid #6a9d02;
 }
 
+/* Заголовок таблицы представления Список */
 #headOfFullParametersList {
     background-color: #ffffff;
     border-top: 2px solid #336784;
@@ -1166,31 +1185,47 @@ td, th {
     font-size: 14px;
 }
 
-/* Особые стили для каждого типа данных, содержащихся в описании */
+/* Стили для блока со служебными метками (номер, избранное, наличие фотографий) */
 .realtyObject .serviceMarks,
 #headOfFullParametersList .serviceMarks {
-    padding-top: 7px;
     float: left;
-    width: 25px;
+    width: 30px;
 }
 
-.realtyObject .overFotosWrapper,
-#headOfFullParametersList .overFotosWrapper {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    float: left;
-    width: 140px;
-}
-
+/* Стили для блока, содержащего основную информацию по объявлению - все кроме служебных меток */
 .realtyObject .mainContent,
 #headOfFullParametersList .mainContent {
     position: relative; /* Чтобы абсолютно позиционированная ссылка Подробнее не уезжала из ячейки */
-    padding-top: 5px;
-    margin-left: 170px;
+    margin-left: 30px; /* Отступ для .serviceMarks */
     white-space: nowrap;
 }
 
-.realtyObject .mainContent .address,
+/* Стили для блоков с информацией по объявлению в представлении Список + карта */
+#shortListOfRealtyObjects .realtyObject .mainContent {
+    padding-bottom: 21px; /* Отступ снизу для управляющих ссылок, например, Подробнее */
+}
+
+#shortListOfRealtyObjects .realtyObject .mainContent .addressInShort {
+    float: left;
+    font-size: 16px;
+}
+
+#shortListOfRealtyObjects .realtyObject .mainContent .costOfRentingInShort {
+    float: right;
+}
+
+#shortListOfRealtyObjects .realtyObject .mainContent .costOfRentingInShort .costOfRentingInShortString {
+    font-size: 16px;
+}
+
+#shortListOfRealtyObjects .realtyObject .mainContent .secondaryOption {
+    display:inline-block;
+    width: 33%;
+    text-align: left;
+}
+
+/* Стили для блоков с информацией по объявлению в представлении Список */
+#fullParametersListOfRealtyObjects .realtyObject .mainContent .address,
 #headOfFullParametersList .address {
     display: inline-block;
     vertical-align: middle;
@@ -1198,7 +1233,7 @@ td, th {
     white-space: normal;
 }
 
-.realtyObject .mainContent .amountOfRooms,
+#fullParametersListOfRealtyObjects .realtyObject .mainContent .amountOfRooms,
 #headOfFullParametersList .amountOfRooms {
     display: inline-block;
     vertical-align: middle;
@@ -1206,7 +1241,7 @@ td, th {
     white-space: normal;
 }
 
-.realtyObject .mainContent .areaValues,
+#fullParametersListOfRealtyObjects .realtyObject .mainContent .areaValues,
 #headOfFullParametersList .areaValues {
     display: inline-block;
     vertical-align: middle;
@@ -1214,7 +1249,7 @@ td, th {
     white-space: normal;
 }
 
-.realtyObject .mainContent .floor,
+#fullParametersListOfRealtyObjects .realtyObject .mainContent .floor,
 #headOfFullParametersList .floor {
     display: inline-block;
     vertical-align: middle;
@@ -1222,7 +1257,7 @@ td, th {
     white-space: normal;
 }
 
-.realtyObject .mainContent .furniture,
+#fullParametersListOfRealtyObjects .realtyObject .mainContent .furniture,
 #headOfFullParametersList .furniture {
     display: inline-block;
     vertical-align: middle;
@@ -1230,7 +1265,7 @@ td, th {
     white-space: normal;
 }
 
-.realtyObject .mainContent .costOfRenting,
+#fullParametersListOfRealtyObjects .realtyObject .mainContent .costOfRenting,
 #headOfFullParametersList .costOfRenting {
     display: inline-block;
     vertical-align: middle;
@@ -1239,8 +1274,8 @@ td, th {
 }
 
 /* Стили для типа объекта и района в подробном описании объекта */
-.realtyObject .mainContent .address .typeOfObjectString,
-.realtyObject .mainContent .address .districtString {
+#fullParametersListOfRealtyObjects .realtyObject .mainContent .address .typeOfObjectString,
+#fullParametersListOfRealtyObjects .realtyObject .mainContent .address .districtString {
     color: #808080;
 }
 
@@ -1249,8 +1284,8 @@ td, th {
     /* Блок для ссылки подробнее под каждым объявлением в списке */
     position: absolute;
     bottom: 6px;
-    left: 6px;
-    right: 6px;
+    left: 0px;
+    right: 0px;
     text-align: right;
     font-size: 12px;
 }
@@ -1271,11 +1306,17 @@ td, th {
     right: 0px;
 }
 
+/* Заголовок баллуна на карте */
 .headOfBalloon {
     margin-bottom: 5px;
     color: #336784;
     text-align: center;
     font-size: 16px;
+}
+
+/* Вспомогательный класс для серых наименований параметров в кратком описании объектов */
+.unimportantText {
+    color: #808080;
 }
 
 /* =============================================================================================================

@@ -414,10 +414,6 @@ class View {
         $arrShortListReplace['favorites'] = "";
         $arrShortListReplace['favorites'] = View::getHTMLforFavorites($oneProperty['id'], $favoritePropertiesId, "onlyIcon");
 
-        // Фото
-        $arrShortListReplace['fotosWrapper'] = "";
-        $arrShortListReplace['fotosWrapper'] = View::getHTMLfotosWrapper("small", TRUE, TRUE, $oneProperty['propertyFotos']);
-
         // Тип
         $arrShortListReplace['typeOfObject'] = "";
         if ($oneProperty['typeOfObject'] != "" && $oneProperty['typeOfObject'] != "0") $arrShortListReplace['typeOfObject'] = GlobFunc::getFirstCharUpper($oneProperty['typeOfObject']) . ":";
@@ -429,25 +425,29 @@ class View {
         // Стоимость
         $arrShortListReplace['costOfRenting'] = "";
         $arrShortListReplace['currency'] = "";
-        $arrShortListReplace['costOfRentingName'] = "";
         $arrShortListReplace['utilities'] = "";
-        if (isset($oneProperty['costOfRenting']) && $oneProperty['costOfRenting'] != "" && $oneProperty['costOfRenting'] != "0.00" && isset($oneProperty['currency']) && $oneProperty['currency'] != "" && $oneProperty['currency'] != "0") {
+        if ($oneProperty['costOfRenting'] != "" && $oneProperty['costOfRenting'] != "0.00" && isset($oneProperty['currency']) && $oneProperty['currency'] != "" && $oneProperty['currency'] != "0") {
             $arrShortListReplace['costOfRenting'] = $oneProperty['costOfRenting'];
             $arrShortListReplace['currency'] = $oneProperty['currency'] . "/мес.";
-            $arrShortListReplace['costOfRentingName'] = "Плата:";
-            if (isset($oneProperty['utilities']) && $oneProperty['utilities'] == "да") $arrShortListReplace['utilities'] = " <span style='white-space: nowrap;'>+ ком.усл.</span>";
+            if ($oneProperty['utilities'] == "да") $arrShortListReplace['utilities'] = " <span style='white-space: nowrap;'>+ ком.усл.</span>";
+            if ($oneProperty['utilities'] == "нет") $arrShortListReplace['utilities'] = " <span style='white-space: nowrap;'> (ком.вкл.)</span>";
         }
 
         // Комнаты
-        if (isset($oneProperty['amountOfRooms']) && $oneProperty['amountOfRooms'] != "0") {
-            $arrShortListReplace['amountOfRoomsName'] = "Комнат:";
-            $arrShortListReplace['amountOfRooms'] = $oneProperty['amountOfRooms'];
-        } else {
+        if ($oneProperty['typeOfObject'] == "гараж") {
             $arrShortListReplace['amountOfRoomsName'] = "";
             $arrShortListReplace['amountOfRooms'] = "";
+        } else {
+            $arrShortListReplace['amountOfRoomsName'] = "Комнат:";
+            if ($oneProperty['amountOfRooms'] != "0") {
+                $arrShortListReplace['amountOfRooms'] = $oneProperty['amountOfRooms'];
+            } else {
+                $arrShortListReplace['amountOfRooms'] = "";
+            }
         }
-        if (isset($oneProperty['adjacentRooms']) && $oneProperty['adjacentRooms'] == "да") {
-            if (isset($oneProperty['amountOfAdjacentRooms']) && $oneProperty['amountOfAdjacentRooms'] != "0") {
+
+        if ($oneProperty['adjacentRooms'] == "да") {
+            if ($oneProperty['amountOfAdjacentRooms'] != "0") {
                 $arrShortListReplace['adjacentRooms'] = ", смежных: " . $oneProperty['amountOfAdjacentRooms'];
             } else {
                 $arrShortListReplace['adjacentRooms'] = ", смежные";
@@ -458,40 +458,43 @@ class View {
 
         // Площади помещений
         $arrShortListReplace['areaValues'] = "";
-        $arrShortListReplace['areaValuesName'] = "";
         $arrShortListReplace['areaValuesMeasure'] = "";
-        if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "квартира" && $oneProperty['typeOfObject'] != "дом" && $oneProperty['typeOfObject'] != "таунхаус" && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж" && $oneProperty['roomSpace'] != "") {
+        if ($oneProperty['typeOfObject'] != "квартира" && $oneProperty['typeOfObject'] != "дом" && $oneProperty['typeOfObject'] != "таунхаус" && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж" && $oneProperty['roomSpace'] != "") {
             $arrShortListReplace['areaValues'] .= $oneProperty['roomSpace'];
         }
-        if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната" && $oneProperty['totalArea'] != "") {
+        if ($oneProperty['typeOfObject'] != "комната" && $oneProperty['totalArea'] != "") {
             $arrShortListReplace['areaValues'] .= $oneProperty['totalArea'];
         }
-        if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "комната" && $oneProperty['typeOfObject'] != "гараж" && $oneProperty['livingSpace'] != "") {
-            $arrShortListReplace['areaValues'] .= " / " . $oneProperty['livingSpace'];
+        if ($oneProperty['typeOfObject'] != "комната" && $oneProperty['typeOfObject'] != "гараж" && $oneProperty['livingSpace'] != "") {
+            $arrShortListReplace['areaValues'] .= "/" . $oneProperty['livingSpace'];
         }
         if (isset($oneProperty['typeOfObject']) && $oneProperty['typeOfObject'] != "дача" && $oneProperty['typeOfObject'] != "гараж" && $oneProperty['kitchenSpace'] != "") {
-            $arrShortListReplace['areaValues'] .= " / " . $oneProperty['kitchenSpace'];
+            $arrShortListReplace['areaValues'] .= "/" . $oneProperty['kitchenSpace'];
         }
         if ($arrShortListReplace['areaValues'] != "") {
-            $arrShortListReplace['areaValuesName'] = "Площадь:";
             $arrShortListReplace['areaValuesMeasure'] = "м²";
         }
 
         // Этаж
         $arrShortListReplace['floorName'] = "";
         $arrShortListReplace['floor'] = "";
-        if (isset($oneProperty['floor']) && isset($oneProperty['totalAmountFloor']) && $oneProperty['floor'] != "" && $oneProperty['totalAmountFloor'] != "") {
+        if ($oneProperty['typeOfObject'] == "квартира" || $oneProperty['typeOfObject'] == "комната") {
             $arrShortListReplace['floorName'] = "Этаж:";
-            $arrShortListReplace['floor'] = $oneProperty['floor'] . " из " . $oneProperty['totalAmountFloor'];
-        }
-        if (isset($oneProperty['numberOfFloor']) && $oneProperty['numberOfFloor'] != "") {
+            if ($oneProperty['floor'] != "" || $oneProperty['totalAmountFloor'] != "") {
+                $arrShortListReplace['floor'] = $oneProperty['floor'] . " из " . $oneProperty['totalAmountFloor'];
+            }
+        } elseif ($oneProperty['typeOfObject'] == "дом" || $oneProperty['typeOfObject'] == "таунхаус" || $oneProperty['typeOfObject'] == "дача") {
             $arrShortListReplace['floorName'] = "Этажность:";
-            $arrShortListReplace['floor'] = $oneProperty['numberOfFloor'];
+            if ($oneProperty['numberOfFloor'] != "") {
+                $arrShortListReplace['floor'] = $oneProperty['numberOfFloor'];
+            }
+        } else {
+            $arrShortListReplace['floorName'] = "";
         }
 
         // Производим заполнение шаблона строки (блока) shortList таблицы по данному объекту недвижимости
         // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне
-        $arrShortListTemplVar = array('{propertyId}', '{number}', '{favorites}', '{fotosWrapper}', '{typeOfObject}', '{address}', '{costOfRenting}', '{currency}', '{costOfRentingName}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{areaValuesName}', '{areaValuesMeasure}', '{floorName}', '{floor}');
+        $arrShortListTemplVar = array('{propertyId}', '{number}', '{favorites}', '{typeOfObject}', '{address}', '{costOfRenting}', '{currency}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{areaValuesMeasure}', '{floorName}', '{floor}');
         // Копируем html-текст шаблона блока (строки таблицы)
         $currentAdvertShortList = str_replace($arrShortListTemplVar, $arrShortListReplace, $tmpl_shortAdvert);
 
@@ -500,7 +503,6 @@ class View {
 
     /**
      * Возвращает HTML для блока с подробным описанием объекта недвижимости (используется при отображении результатов поиска в режиме "Список")
-     *
      * @param $oneProperty - ассоциированный массив данных по конкретному объявлению
      * @param array $favoritePropertiesId - массив со списком идентификаторов избранных объектов текущего пользователя
      * @param $number - указывает какое число нужно присвоить блоку для его нумераци в выдаче

@@ -1801,10 +1801,10 @@ class DBconnect {
 
         $property['dateOfEntry'] = GlobFunc::dateFromDBToView($property['dateOfEntry']);
         $property['dateOfCheckOut'] = GlobFunc::dateFromDBToView($property['dateOfCheckOut']);
-        if ($property['roomSpace'] == 0) $property['roomSpace'] = "";
-        if ($property['totalArea'] == 0) $property['totalArea'] = "";
-        if ($property['livingSpace'] == 0) $property['livingSpace'] = "";
-        if ($property['kitchenSpace'] == 0) $property['kitchenSpace'] = "";
+        if ($property['roomSpace'] == 0) $property['roomSpace'] = ""; else $property['roomSpace'] = intval($property['roomSpace']);
+        if ($property['totalArea'] == 0) $property['totalArea'] = ""; else $property['totalArea'] = intval($property['totalArea']);
+        if ($property['livingSpace'] == 0) $property['livingSpace'] = ""; else $property['livingSpace'] = intval($property['livingSpace']);
+        if ($property['kitchenSpace'] == 0) $property['kitchenSpace'] = ""; else $property['kitchenSpace'] = intval($property['kitchenSpace']);
         if ($property['floor'] == 0) $property['floor'] = "";
         if ($property['totalAmountFloor'] == 0) $property['totalAmountFloor'] = "";
         if ($property['numberOfFloor'] == 0) $property['numberOfFloor'] = "";

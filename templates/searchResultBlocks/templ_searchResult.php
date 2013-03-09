@@ -11,7 +11,7 @@
     </span>
 </div>
 
-<div id='resultOnSearchPage' style='height: 100%;'>
+<div id='resultOnSearchPage'>
 
     <!-- Блоки с баллунами для Яндекс карты -->
     <div id='allBalloons' style='display: none;'>
@@ -33,10 +33,9 @@
     <!-- Раздел с подробными сведения по каждому объявлению -->
     <div class='clearBoth'></div>
     <div class='listOfRealtyObjects' id='fullParametersListOfRealtyObjects'
-         style='display: none; width: 100%; float:none;'>
+         style='display: none;'>
         <div id='headOfFullParametersList'>
             <div class='serviceMarks top left'></div>
-            <div class="overFotosWrapper">Фото</div>
             <div class="mainContent">
                 <div class="address">Адрес</div>
                 <div class="amountOfRooms">Комнаты</div>

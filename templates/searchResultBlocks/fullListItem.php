@@ -3,9 +3,6 @@
         <div class='numberOfRealtyObject'>{number}</div>
         {favorites}
     </div>
-    <div class="overFotosWrapper">
-        {fotosWrapper}
-    </div>
     <div class="mainContent">
         <div class="address"><span class="typeOfObjectString">{typeOfObject}</span><span class="districtString">{district}</span><a
                 class="linkToDescription" href="property.php?propertyId={propertyId}" target="_blank">{address}</a>
