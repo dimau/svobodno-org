@@ -80,7 +80,6 @@ if ($action == "registration") {
 
     // Запишем POST параметры в модели
     $user->writeCharacteristicFromPOST();
-    $user->writeFotoInformationFromPOST();
     $searchRequest->writeParamsFromPOST();
 
     // Проверяем корректность данных пользователя.
@@ -97,10 +96,6 @@ if ($action == "registration") {
 
         // Если сохранение Личных данных пользователя прошло успешно, то считаем, что пользователь уже зарегистрирован, выполняем сохранение в БД остальных данных (фотографии и поисковый запрос)
         if ($user->saveCharacteristicToDB("new")) {
-
-            // Сохраним информацию о фотографиях пользователя
-            // Функция вызывать необходимо независимо от того, есть ли в uploadedFoto информация о фотографиях или нет, так как при регистрации пользователь мог сначала выбрать фотографии, а затем их удалить. В этом случае $this->saveFotoInformationToDB почистит БД и серве от удаленных пользователем файлов
-            $user->saveFotoInformationToDB();
 
             // Сохраняем поисковый запрос, если пользователь регистрируется в качестве арендатора
             if ($user->isTenant()) {
@@ -152,7 +147,6 @@ if ($action == "registration") {
 $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
 $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
 $userCharacteristic = $user->getCharacteristicData();
-$userFotoInformation = $user->getFotoInformationData();
 $userSearchRequest = $searchRequest->getSearchRequestData();
 $mode = "registration";
 $isTenant = $user->isTenant(); // Пригодится для составления правильного GET запроса, по которому будет отправляться форма регистрации

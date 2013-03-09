@@ -43,9 +43,6 @@
                     Пол
                 </td>
                 <td class="itemRequired">
-                    <?php if ($userCharacteristic['typeTenant']) {
-                    echo "*";
-                } ?>
                 </td>
                 <td class="itemBody">
                     <select name="sex" id="sex">
@@ -96,52 +93,10 @@
                     День рождения
                 </td>
                 <td class="itemRequired">
-                    <?php if ($userCharacteristic['typeTenant']) {
-                    echo "*";
-                } ?>
                 </td>
                 <td class="itemBody">
                     <input name="birthday" id="birthday" type="text"
                            placeholder="дд.мм.гггг" value='<?php echo $userCharacteristic['birthday'];?>'>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </fieldset>
-
-    <fieldset class="edited right private" style="display: block;">
-        <legend>
-            Логин и пароль
-        </legend>
-        <table>
-            <tbody>
-            <tr title="Используйте в качестве логина ваш e-mail или телефон">
-                <td class="itemLabel">
-                    Логин
-                </td>
-                <td class="itemRequired">
-                    <?php if ($mode == "registration") echo "*";?>
-                </td>
-                <td class="itemBody">
-                    <?php
-                    if ($mode == "registration") {
-                        echo "<input type='text' name='login' id='login' maxlength='50' value='" . $userCharacteristic['login'] . "'>";
-                    } else {
-                        echo $userCharacteristic['login'];
-                    }
-                    ?>
-                </td>
-            </tr>
-            <tr>
-                <td class="itemLabel">
-                    Пароль
-                </td>
-                <td class="itemRequired">
-                    *
-                </td>
-                <td class="itemBody">
-                    <input type="password" name="password" id="password"
-                           maxlength="50" value='<?php echo $userCharacteristic['password'];?>'>
                 </td>
             </tr>
             </tbody>
@@ -162,8 +117,7 @@
                     *
                 </td>
                 <td class="itemBody">
-                    <input type="text" name="telephon" id="telephon"
-                           value='<?php echo $userCharacteristic['telephon'];?>'>
+                    <?php echo $userCharacteristic['telephon'];?>
                 </td>
             </tr>
             <tr>
@@ -176,10 +130,21 @@
                     <input type="text" name="email" id="email" value='<?php echo $userCharacteristic['email'];?>'>
                 </td>
             </tr>
+            <tr>
+                <td class="itemLabel">
+                    Пароль
+                </td>
+                <td class="itemRequired">
+                    *
+                </td>
+                <td class="itemBody">
+                    <input type="password" name="password" id="password"
+                           maxlength="50" value='<?php echo $userCharacteristic['password'];?>'>
+                </td>
+            </tr>
             </tbody>
         </table>
     </fieldset>
-
 
     <fieldset id='fotoWrapperBlock' class="edited fullWidth" style="min-width: 300px;">
         <legend

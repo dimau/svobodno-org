@@ -110,7 +110,8 @@ class UserFull extends User {
             // Вычисляем дату и время регистрации пользователя
             $this->reg_date = time();
             // Для нового пользователя всегда тип собственника сбрасываем в FALSE (пока под этим пользователем не появится хотя бы 1 объявление)
-            $this->typeOwner = "FALSE";
+            // TODO: в будущем когда появится возможность пользователю сразу сформировать объявление при регистрации в качестве собственника, нужно эту строчку удалить
+            $this->typeOwner = FALSE;
 
             // Непосредственное сохранение характеристики пользователя в БД
             if (!DBconnect::insertUserCharacteristic($this->getCharacteristicData())) return FALSE;
@@ -356,7 +357,7 @@ class UserFull extends User {
 
     // Записать в качестве параметров user-а значения, полученные через POST запрос
     public function writeCharacteristicFromPOST() {
-        //TODO: не проверять и не менять $_POST['login'], если происходит редактирование существующего пользователя (теоретически можно через POST параметр заслать новый логин и метод его поменяет для ранее зарегистрированного пользователя)
+        //TODO: не проверять и не менять $_POST['telephon'], если происходит редактирование существующего пользователя (теоретически можно через POST параметр заслать новый номер телефона и метод его поменяет для ранее зарегистрированного пользователя)
 
         if (isset($_POST['name'])) $this->name = htmlspecialchars($_POST['name'], ENT_QUOTES);
         if (isset($_POST['secondName'])) $this->secondName = htmlspecialchars($_POST['secondName'], ENT_QUOTES);
@@ -364,9 +365,13 @@ class UserFull extends User {
         if (isset($_POST['sex'])) $this->sex = htmlspecialchars($_POST['sex'], ENT_QUOTES);
         if (isset($_POST['nationality'])) $this->nationality = htmlspecialchars($_POST['nationality'], ENT_QUOTES);
         if (isset($_POST['birthday'])) $this->birthday = htmlspecialchars($_POST['birthday'], ENT_QUOTES);
-        if (isset($_POST['login'])) $this->login = htmlspecialchars($_POST['login'], ENT_QUOTES);
         if (isset($_POST['password'])) $this->password = htmlspecialchars($_POST['password'], ENT_QUOTES);
-        if (isset($_POST['telephon'])) $this->telephon = htmlspecialchars($_POST['telephon'], ENT_QUOTES);
+        if (isset($_POST['telephon'])) {
+            $this->telephon = htmlspecialchars($_POST['telephon'], ENT_QUOTES);
+            // Логин пользователя - это внутренний параметр портала, который всегда соответствует номеру телефона пользователя.
+            // Через POST параметры мы можем получить только номер телефона, а дальше перезаписываем его как значение логина
+            $this->login = $this->telephon;
+        }
         if (isset($_POST['email'])) $this->email = htmlspecialchars($_POST['email'], ENT_QUOTES);
 
         if (isset($_POST['currentStatusEducation'])) $this->currentStatusEducation = htmlspecialchars($_POST['currentStatusEducation'], ENT_QUOTES);
@@ -397,7 +402,6 @@ class UserFull extends User {
         if (isset($_POST['fileUploadId'])) $this->fileUploadId = htmlspecialchars($_POST['fileUploadId'], ENT_QUOTES);
         if (isset($_POST['uploadedFoto'])) $this->uploadedFoto = json_decode($_POST['uploadedFoto'], TRUE); // Массив объектов со сведениями о загруженных фотографиях сериализуется в JSON формат на клиенте и передается как содержимое атрибута value одного единственного INPUT hidden
         if (isset($_POST['primaryFotoRadioButton'])) $this->primaryFotoId = htmlspecialchars($_POST['primaryFotoRadioButton'], ENT_QUOTES);
-
     }
 
     // Получить ассоциированный массив с данными Анкеты (Характеристики) пользователя (для использования в представлении)
@@ -475,16 +479,10 @@ class UserFull extends User {
         // Проверки для блока "Личные данные"
         if ($this->name == "") $errors[] = 'Укажите имя';
         if (strlen($this->name) > 50) $errors[] = 'Слишком длинное имя. Можно указать не более 50-ти символов';
+
         if (strlen($this->secondName) > 50) $errors[] = 'Слишком длинное отчество. Можно указать не более 50-ти символов';
         if (strlen($this->surname) > 50) $errors[] = 'Слишком длинная фамилия. Можно указать не более 50-ти символов';
 
-        if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "createSearchRequest") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE)) {
-            if ($this->sex == "0") $errors[] = 'Укажите пол';
-        }
-
-        if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "createSearchRequest") || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE)) {
-            if ($this->birthday == "") $errors[] = 'Укажите дату рождения';
-        }
         if ($this->birthday != "") {
             if (!preg_match('/^\d\d.\d\d.\d\d\d\d$/', $this->birthday)) $errors[] = 'Неправильный формат даты рождения, должен быть: дд.мм.гггг'; else {
                 if (substr($this->birthday, 0, 2) < "01" || substr($this->birthday, 0, 2) > "31") $errors[] = 'Проверьте дату Дня рождения (допустимо от 01 до 31)';
@@ -493,8 +491,6 @@ class UserFull extends User {
             }
         }
 
-        if ($this->login == "") $errors[] = 'Укажите логин';
-        if (strlen($this->login) > 50) $errors[] = "Слишком длинный логин. Можно указать не более 50-ти символов";
         // Проверяем логин на занятость. Это нужно делать только при регистрации, так как в дальнейшем логин пользователя невозможно изменить
         if ($typeOfValidation == "registration" || $typeOfValidation == "newAlienOwner") {
             if ($this->login != "" && strlen($this->login) <= 50) {
@@ -507,9 +503,9 @@ class UserFull extends User {
                     OR ($stmt->close() === FALSE)
                 ) {
                     // TODO: Сохранить в лог ошибку работы с БД ($stmt->errno . $stmt->error)
-                    $error[] = "Не удалось проверить логин на занятость: ошибка обращения к базе данных (. Попробуйте зайти к нам немного позже.";
+                    $error[] = "Не удалось проверить, зарегистрирован ли уже пользователь с таким номером телефона: ошибка обращения к базе данных (. Попробуйте зайти к нам немного позже.";
                 } else {
-                    if (count($res) != 0) $errors[] = 'Пользователь с таким логином уже существует, укажите другой логин';
+                    if (count($res) != 0) $errors[] = 'Пользователь с таким номером телефона уже зарегистрирован, укажите другой номер телефона или восстановите пароль к существующей учетной записи';
                 }
             }
         }
@@ -524,18 +520,12 @@ class UserFull extends User {
         if ($this->email != "" && !preg_match("/^(([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+\.)*([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]{2,5}$/", $this->email)) $errors[] = 'Укажите, пожалуйста, Ваш настоящий e-mail (указанный Вами e-mail не прошел проверку формата)';
 
         // Проверки для блока "Образование"
-        if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest") {
-            if ($this->currentStatusEducation == "0") $errors[] = 'Укажите Ваше образование';
-        }
         if (isset($this->almamater) && strlen($this->almamater) > 100) $errors[] = 'Слишком длинное название учебного заведения (используйте не более 100 символов)';
         if (isset($this->speciality) && strlen($this->speciality) > 100) $errors[] = 'Слишком длинное название специальности (используйте не более 100 символов)';
         if (isset($this->kurs) && strlen($this->kurs) > 30) $errors[] = 'Курс. Указана слишком длинная строка (используйте не более 30 символов)';
         if ($this->yearOfEnd != "" && !preg_match("/^[12]{1}[0-9]{3}$/", $this->yearOfEnd)) $errors[] = 'Укажите год окончания учебного заведения в формате: "гггг". Например: 2007';
 
         // Проверки для блока "Работа"
-        if (($typeOfValidation == "registration" && $typeTenant == TRUE) || ($typeOfValidation == "validateProfileParameters" && $typeTenant == TRUE) || $typeOfValidation == "createSearchRequest") {
-            if ($this->statusWork == "0") $errors[] = 'Укажите, работаете ли Вы';
-        }
         if (isset($this->placeOfWork) && strlen($this->placeOfWork) > 100) $errors[] = 'Слишком длинное наименование места работы (используйте не более 100 символов)';
         if (isset($this->workPosition) && strlen($this->workPosition) > 100) $errors[] = 'Слишком длинное название должности (используйте не более 100 символов)';
 
@@ -600,17 +590,15 @@ class UserFull extends User {
         } else {
             $this->typeTenant = FALSE;
         }
-        if (!isset($_GET['typeTenant']) && !isset($_GET['typeOwner'])) {
-            $this->typeTenant = TRUE;
-        }
-
 
         if (isset($_GET['typeOwner'])) {
             $this->typeOwner = TRUE;
         } else {
             $this->typeOwner = FALSE;
         }
+
         if (!isset($_GET['typeTenant']) && !isset($_GET['typeOwner'])) {
+            $this->typeTenant = TRUE;
             $this->typeOwner = TRUE;
         }
 

@@ -9,9 +9,6 @@
                 Вы работаете?
             </td>
             <td class="itemRequired">
-                <?php if ($userCharacteristic['typeTenant']) {
-                echo "*";
-            } ?>
             </td>
             <td class="itemBody">
                 <select name="statusWork" id="statusWork">
@@ -63,9 +60,6 @@
                 Вы учитесь?
             </td>
             <td class="itemRequired">
-                <?php if ($userCharacteristic['typeTenant']) {
-                echo "*";
-            } ?>
             </td>
             <td class="itemBody">
                 <select name="currentStatusEducation" id="currentStatusEducation">

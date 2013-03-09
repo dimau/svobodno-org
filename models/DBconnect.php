@@ -1855,19 +1855,19 @@ class DBconnect {
         if (!isset($user) || !is_array($user)) return array();
 
         if ($user['typeTenant'] === TRUE) {
-            $typeTenant = "TRUE";
+            $user['typeTenant'] = "TRUE";
         } elseif ($user['typeTenant'] === FALSE) {
-            $typeTenant = "FALSE";
+            $user['typeTenant'] = "FALSE";
         } else {
-            $typeTenant = "FALSE";
+            $user['typeTenant'] = "FALSE";
         }
 
         if ($user['typeOwner'] === TRUE) {
-            $typeOwner = "TRUE";
+            $user['typeOwner'] = "TRUE";
         } elseif ($user['typeOwner'] === FALSE) {
-            $typeOwner = "FALSE";
+            $user['typeOwner'] = "FALSE";
         } else {
-            $typeOwner = "FALSE";
+            $user['typeOwner'] = "FALSE";
         }
 
         $user['birthday'] = GlobFunc::dateFromViewToDB($user['birthday']);

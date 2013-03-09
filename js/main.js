@@ -421,15 +421,9 @@ function executeValidation(pageName, tabNumber) {
     if (pageName == "registration") {
         switch (tabNumber) {
             case 0:
-                errors = personalFIO_validation();
+                errors = personalForRegistration_validation();
                 break;
             case 1:
-                errors = personalEducAndWork_validation();
-                break;
-            case 2:
-                errors = personalSocial_validation();
-                break;
-            case 3:
                 errors = searchRequest_validation();
                 break;
         }
@@ -441,6 +435,44 @@ function executeValidation(pageName, tabNumber) {
 
     // Возвращаем количество ошибок
     return errors;
+}
+
+// Функция валидации для вкладки с личными параметрами страницы регистрации
+function personalForRegistration_validation() {
+
+    var err = 0;
+
+    if ($('#name').val() == '') {
+        buildErrorMessageBlock("name", "Укажите имя");
+        err++;
+    }
+    if ($('#name').val().length > 50) {
+        buildErrorMessageBlock("name", "Не более 50-ти символов");
+        err++;
+    }
+    if ($('#telephon').val() == '') {
+        buildErrorMessageBlock("telephon", "Укажите контактный (мобильный) телефон");
+        err++;
+    } else {
+        if (!/^[0-9]{10}$/.test($('#telephon').val())) {
+            buildErrorMessageBlock("telephon", "Укажите, пожалуйста, Ваш мобильный номер без 8-ки, например: 9226470019");
+            err++;
+        }
+    }
+    if ($('#password').val() == '') {
+        buildErrorMessageBlock("password", "Укажите пароль");
+        err++;
+    }
+    if ($('#email').val() != '' && !/^(([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+\.)*([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]{2,5}$/.test($('#email').val())) {
+        buildErrorMessageBlock("email", "E-mail не соответствует формату: попробуйте ввести e-mail еще раз или указать другой электронный адрес");
+        err++;
+    }
+    if ($('#lic').attr('checked') != "checked") {
+        buildErrorMessageBlock("lic", "Регистрация возможна только при согласии с условиями лицензионного соглашения");
+        err++;
+    }
+
+    return err;
 }
 
 // Функция валидации для основных данных пользователя
@@ -470,14 +502,6 @@ function personalFIO_validation() {
     }
 
     // Пол, внешность, ДР
-    if ($('#sex').val() == '0' && typeTenant) {
-        buildErrorMessageBlock("sex", "Укажите пол");
-        err++;
-    }
-    if ($('#birthday').val() == '' && typeTenant) {
-        buildErrorMessageBlock("birthday", "Укажите дату рождения");
-        err++;
-    }
     if ($('#birthday').val() != '') {
         if (!/^\d\d.\d\d.\d\d\d\d$/.test($('#birthday').val())) {
             buildErrorMessageBlock("birthday", "Неправильный формат даты рождения, должен быть: дд.мм.гггг, например: 01.01.1980");
@@ -499,14 +523,6 @@ function personalFIO_validation() {
     }
 
     // Логин и пароль
-    if ($('#login').val() == '') {
-        buildErrorMessageBlock("login", "Укажите логин");
-        err++;
-    }
-    if ($('#login').val().length > 50) {
-        buildErrorMessageBlock("login", "Не более 50-ти символов");
-        err++;
-    }
     if ($('#password').val() == '') {
         buildErrorMessageBlock("password", "Укажите пароль");
         err++;
@@ -529,6 +545,7 @@ function personalFIO_validation() {
 
     return err;
 }
+
 // Функция валидации для данных об образовании и работе
 function personalEducAndWork_validation() {
     var err = 0;
@@ -536,10 +553,6 @@ function personalEducAndWork_validation() {
     // Понимаем роль пользователя, так как некоторые поля обязательны для арендатора, но необязательны для собственника
     if (typeTenant === undefined) typeTenant = false;
 
-    if ($('#currentStatusEducation').val() == '0' && typeTenant) {
-        buildErrorMessageBlock("currentStatusEducation", "Укажите, учитесь ли Вы");
-        err++;
-    } else {
         // Образование
         if ($('#almamater').val().length > 100) {
             buildErrorMessageBlock("almamater", "Не более 100 символов");
@@ -557,13 +570,8 @@ function personalEducAndWork_validation() {
             buildErrorMessageBlock("yearOfEnd", "Укажите год окончания учебного заведения в формате: \"гггг\". Например: 2007");
             err++;
         }
-    }
 
     // Работа
-    if ($('#statusWork').val() == '0' && typeTenant) {
-        buildErrorMessageBlock("statusWork", "Укажите, работаете ли Вы");
-        err++;
-    } else {
         if ($('#placeOfWork').val().length > 100) {
             buildErrorMessageBlock("placeOfWork", "Не более 100 символов");
             err++;
@@ -572,7 +580,6 @@ function personalEducAndWork_validation() {
             buildErrorMessageBlock("workPosition", "Не более 100 символов");
             err++;
         }
-    }
 
     // Коротко о себе
     if ($('#regionOfBorn').val().length > 50) {
@@ -648,31 +655,8 @@ function searchRequest_validation() {
         buildErrorMessageBlock("pledge", "Неправильный формат числа (проверьте: только числа, не более 8 символов)");
         err++;
     }
-
     if ($('#minCost').val() > $('#maxCost').val()) {
         buildErrorMessageBlock("#minCost", "Минимальная стоимость аренды не может быть больше, чем максимальная");
-        err++;
-    }
-
-    if ($('#withWho').val() == "0" && $('#typeOfObject').val() != "гараж") {
-        buildErrorMessageBlock("withWho", "Обязательное поле");
-        err++;
-    }
-    if ($('#children').val() == "0" && $('#typeOfObject').val() != "гараж") {
-        buildErrorMessageBlock("children", "Обязательное поле");
-        err++;
-    }
-    if ($('#animals').val() == "0" && $('#typeOfObject').val() != "гараж") {
-        buildErrorMessageBlock("animals", "Обязательное поле");
-        err++;
-    }
-    if ($('#termOfLease').val() == "0") {
-        buildErrorMessageBlock("termOfLease", "Обязательное поле");
-        err++;
-    }
-
-    if ($('#tabs-4 #lic').length && $('#tabs-4 #lic').attr('checked') != "checked") {
-        buildErrorMessageBlock("lic", "Регистрация возможна только при согласии с условиями лицензионного соглашения");
         err++;
     }
 

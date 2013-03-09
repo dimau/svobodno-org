@@ -58,7 +58,7 @@
         <div class="miniBlockContent">
             <div>
                 <p style="text-align: center;">
-                    Теперь Вы можете оплатить премиум доступ для просмотра контактов собственников
+                    Теперь Вы можете оплатить премиум доступ для просмотра фотографий и ссылок на исходные объявления
                 </p>
                 <?php
                 require $websiteRoot . "/templates/templ_paymentButtons.php";

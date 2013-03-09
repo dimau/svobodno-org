@@ -268,9 +268,8 @@
             <td class="itemLabel">
                 Как собираетесь проживать
             </td>
-            <?php
-            if ($mode == "search") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
-            ?>
+            <td class="itemRequired">
+            </td>
             <td class="itemBody">
                 <select name="withWho" id="withWho">
                     <option value="0" <?php if ($userSearchRequest['withWho'] == "0") echo "selected";?>></option>
@@ -313,9 +312,8 @@
             <td class="itemLabel">
                 Дети
             </td>
-            <?php
-            if ($mode == "search") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
-            ?>
+            <td class="itemRequired">
+            </td>
             <td class="itemBody">
                 <select name="children" id="children">
                     <option value="0" <?php if ($userSearchRequest['children'] == "0") echo "selected";?>></option>
@@ -352,9 +350,8 @@
             <td class="itemLabel">
                 Домашние животные
             </td>
-            <?php
-            if ($mode == "search") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
-            ?>
+            <td class="itemRequired">
+            </td>
             <td class="itemBody">
                 <select name="animals" id="animals">
                     <option value="0" <?php if ($userSearchRequest['animals'] == "0") echo "selected";?>></option>
@@ -386,9 +383,8 @@
             <td class="itemLabel">
                 Срок аренды
             </td>
-            <?php
-            if ($mode == "search") echo "<td class='itemRequired'></td>"; else echo "<td class='itemRequired typeTenantRequired'>*</td>";
-            ?>
+            <td class="itemRequired">
+            </td>
             <td class="itemBody">
                 <select name="termOfLease" id="termOfLease">
                     <option value="0" <?php if ($userSearchRequest['termOfLease'] == "0") echo "selected";?>></option>

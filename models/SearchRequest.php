@@ -187,7 +187,6 @@ class SearchRequest {
 
     /**
      * Проверка корректности параметров поискового запроса
-     *
      * @param string $typeOfValidation режим проверки параметров поискового запроса
      * $typeOfValidation = personalRequest - режим строгой (полной) проверки поискового запроса конкретного пользователя, параметры которого мы сохраним в БД и будем показывать собственникам вместе с анкетой пользователя (используется при регистрации арендатора и при редактировании параметров в личном кабинете)
      * $typeOfValidation = oneTimeRequest - режим проверки указанных пользователем параметров поиска для единоразового использования на странице поиска (search.php), без перспективы сохранения в БД.
@@ -209,18 +208,6 @@ class SearchRequest {
         }
         if ($typeOfValidation == "personalRequest") {
             if ($this->minCost > $this->maxCost) $errors[] = 'Минимальная стоимость аренды не может быть больше, чем максимальная. Исправьте поля, в которых указаны Ваши требования к диапазону стоимости аренды';
-        }
-        if ($typeOfValidation == "personalRequest") {
-            if ($this->withWho == "0" && $this->typeOfObject != "гараж") $errors[] = 'Укажите, как Вы собираетесь проживать в арендуемой недвижимости (с кем)';
-        }
-        if ($typeOfValidation == "personalRequest") {
-            if ($this->children == "0" && $this->typeOfObject != "гараж") $errors[] = 'Укажите, собираетесь ли Вы проживать вместе с детьми или без них';
-        }
-        if ($typeOfValidation == "personalRequest") {
-            if ($this->animals == "0" && $this->typeOfObject != "гараж") $errors[] = 'Укажите, собираетесь ли Вы проживать вместе с животными или без них';
-        }
-        if ($typeOfValidation == "personalRequest") {
-            if ($this->termOfLease == "0") $errors[] = 'Укажите предполагаемый срок аренды';
         }
 
         return $errors; // Возвращаем список ошибок, если все в порядке, то он будет пуст

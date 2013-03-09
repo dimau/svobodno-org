@@ -19,7 +19,10 @@
     <link rel="stylesheet" href="css/fileuploader.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
-            /* Основные стили для элементов управления формы */
+        .benefits {
+            margin-top: 0;
+        }
+
         .bottomControls {
             padding: 10px 0px 0px 0px;
         }
@@ -30,15 +33,6 @@
 
         .forwardButton, .submitButton {
             float: right;
-        }
-
-            /* Стили для страницы социальных сетей */
-        fieldset.edited.social {
-            width: auto;
-        }
-
-        fieldset.edited.social input[type=text] {
-            width: 400px;
         }
     </style>
     <!-- end CSS -->
@@ -88,53 +82,20 @@
     require $websiteRoot . "/templates/templ_header.php";
     ?>
 
-    <div class="headerOfPageContentBlock">
-        <div class="headerOfPage">
-            Зарегистрируйтесь
-        </div>
-
-        <?php if ($userCharacteristic['typeTenant']): ?>
-        <div class="importantAddInfBlock mainContentBlock">
-            <div class="localHeader">
-                Регистрация позволит бесплатно:
-            </div>
-            <ul class="benefits">
-                <li>
-                    Получать e-mail уведомления о появлении подходящих вариантов недвижимости
-                </li>
-                <li>
-                    Добавлять объявления в избранные и в любой момент просматривать их
-                </li>
-                <li>
-                    Не указывать повторно условия поиска - портал все запомнит
-                </li>
-            </ul>
-            <div style="margin-top: 1em;">
-                Кроме того, после регистрации Вы сможете получить премиум доступ к сервису Svobodno.org
-            </div>
-        </div>
-        <?php endif; ?>
-
-        <div class="clearBoth"></div>
+    <div class="headerOfPage">
+        Зарегистрируйтесь
     </div>
 
-    <form name="personalInformation" id="personalInformationForm" class="formWithFotos" method="post"
-          enctype="multipart/form-data"
+    <form name="personalInformation" id="personalInformationForm" method="post"
           action="registration.php?action=registration<?php if ($isAdmin['newAdvertAlien'] && $alienOwner == "true") echo "&alienOwner=true";?><?php if ($isOwner) echo "&typeOwner=true";?><?php if ($isTenant) echo "&typeTenant=true";?>">
         <div id="tabs" class="mainContentBlock">
             <ul>
                 <li>
                     <a href="#tabs-1">Личные данные</a>
                 </li>
-                <li>
-                    <a href="#tabs-2">Образование / Работа</a>
-                </li>
-                <li>
-                    <a href="#tabs-3">Социальные сети</a>
-                </li>
                 <?php if ($userCharacteristic['typeTenant']): ?>
                 <li>
-                    <a href="#tabs-4">Что ищете?</a>
+                    <a href="#tabs-2">Что ищете?</a>
                 </li>
                 <?php endif; ?>
             </ul>
@@ -144,53 +105,81 @@
                     <span style="color: red">*</span> - обязательное поле
                 </div>
 
-                <?php
-                // Подключим форму для ввода и редактирования данных о ФИО, логине, контактах пользователя, а также о фотографиях
-                require $websiteRoot . "/templates/editableBlocks/templ_editablePersonalFIO.php";
-                ?>
+                <fieldset class="edited left private">
+                    <legend>
+                        Личные данные
+                    </legend>
+                    <table>
+                        <tbody>
+                        <tr title="Как к Вам обращаться?">
+                            <td class="itemLabel">
+                                Имя
+                            </td>
+                            <td class="itemRequired">
+                                *
+                            </td>
+                            <td class="itemBody">
+                                <input name="name" id="name" type="text" autofocus value='<?php echo $userCharacteristic['name']?>'>
+                            </td>
+                        </tr>
+                        <tr title="Мобильный, например: 9224527541. Будет использоваться в качестве логина">
+                            <td class="itemLabel">
+                                Телефон
+                            </td>
+                            <td class="itemRequired">
+                                *
+                            </td>
+                            <td class="itemBody">
+                                <input type="text" name="telephon" id="telephon"
+                                       value='<?php echo $userCharacteristic['telephon'];?>'>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="itemLabel">
+                                Пароль
+                            </td>
+                            <td class="itemRequired">
+                                *
+                            </td>
+                            <td class="itemBody">
+                                <input type="password" name="password" id="password"
+                                       maxlength="50" value='<?php echo $userCharacteristic['password'];?>'>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="itemLabel">
+                                E-mail
+                            </td>
+                            <td class="itemRequired">
+                            </td>
+                            <td class="itemBody">
+                                <input type="text" name="email" id="email" value='<?php echo $userCharacteristic['email'];?>'>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </fieldset>
 
-                <div class="bottomControls">
-                    <button class="forwardButton mainButton">Далее</button>
-                    <div class="clearBoth"></div>
-                </div>
-            </div>
+                <fieldset class="edited right private">
+                    <legend>
+                        Регистрация позволит бесплатно
+                    </legend>
+                    <ul class="benefits">
+                        <li>
+                            Получать контактные телефоны собственников
+                        </li>
+                        <li>
+                            Добавлять объявления в избранные и в любой момент просматривать их
+                        </li>
+                        <li>
+                            Не указывать повторно условия поиска - портал все запомнит
+                        </li>
+                    </ul>
+                    <div style="margin-top: 1em;">
+                        Кроме того, после регистрации Вы сможете получить премиум доступ к сервису Svobodno.org
+                    </div>
+                </fieldset>
 
-            <div id="tabs-2">
-                <div class="shadowText">
-                    <span style="color: red">*</span> - обязательное поле
-                </div>
-
-                <?php
-                // Подключим форму для ввода и редактирования данных об образовании, работе и месте рождения
-                require $websiteRoot . "/templates/editableBlocks/templ_editablePersonalEducAndWork.php";
-                ?>
-
-                <div class="bottomControls">
-                    <a href="" class="backButton">Назад</a>
-                    <button class="forwardButton mainButton">Далее</button>
-                    <div class="clearBoth"></div>
-                </div>
-            </div>
-
-            <div id="tabs-3">
-                <div class="shadowText">
-                    Вы можете указать адрес своей личной страницы в одной или нескольких социальных сетях. Чем больше
-                    собственник может узнать о Вас хорошего, тем больше шансов арендовать интересующий Вас объект.
-                </div>
-
-                <?php
-                // Подключим форму для ввода и редактирования данных о социальных сетях пользователя
-                require $websiteRoot . "/templates/editableBlocks/templ_editablePersonalSocial.php";
-                ?>
-
-                <?php if ($userCharacteristic['typeTenant']): ?>
-                <div class="bottomControls">
-                    <a href="" class="backButton">Назад</a>
-                    <button class="forwardButton mainButton">Далее</button>
-                    <div class="clearBoth"></div>
-                </div>
-                <?php endif; ?>
-                <?php if (!$userCharacteristic['typeTenant']): ?>
                 <div class="bottomControls">
                     <div style="float: right; margin-bottom: 10px; text-align: left;">
                         <label><input type="checkbox" name="lic" id="lic"
@@ -199,20 +188,22 @@
                                 соглашения</a></label>
                     </div>
                     <div class="clearBoth"></div>
-                    <a href="" class="backButton">Назад</a>
-                    <button type="submit" name="submitButton" class="submitButton mainButton">Отправить</button>
+                    <?php if ($userCharacteristic['typeTenant']): ?>
+                        <button class="forwardButton mainButton">Далее</button>
+                    <?php else: ?>
+                        <button type="submit" name="submitButton" class="submitButton mainButton">Отправить</button>
+                    <?php endif; ?>
                     <div class="clearBoth"></div>
                 </div>
-                <?php endif; ?>
             </div>
+            <!-- /end.tabs-1 -->
 
             <?php if ($userCharacteristic['typeTenant']): ?>
-            <div id="tabs-4">
+            <div id="tabs-2">
                 <div class="shadowText">
                     Заполните форму как можно подробнее, это позволит системе подобрать для Вас наиболее интересные
                     предложения
                     <br>
-                    <span style="color: red">*</span> - обязательное поле
                 </div>
 
                 <?php
@@ -221,21 +212,15 @@
                 ?>
 
                 <div class="bottomControls">
-                    <div style="float: right; margin-bottom: 10px; text-align: left;">
-                        <label><input type="checkbox" name="lic" id="lic"
-                                      value="yes" <?php if ($userCharacteristic['lic'] == "yes") echo "checked";?>> Я
-                            принимаю условия <a href="useragreement.php" target="_blank">лицензионного
-                                соглашения</a></label>
-                    </div>
-                    <div class="clearBoth"></div>
                     <a href="" class="backButton">Назад</a>
                     <button type="submit" name="submitButton" class="submitButton mainButton">Отправить</button>
                     <div class="clearBoth"></div>
                 </div>
 
             </div>
-            <!-- /end.tabs-4 -->
+            <!-- /end.tabs-2 -->
             <?php endif;?>
+
         </div>
         <!-- /end.tabs -->
 
@@ -256,10 +241,6 @@
     var typeTenant = <?php if ($userCharacteristic['typeTenant']) echo "true"; else echo "false"; // Является ли регистрируемый пользователь арендатором ?>;
     var typeOwner = <?php if ($userCharacteristic['typeOwner']) echo "true"; else echo "false"; // Является ли регистрируемый пользователь собственником ?>;
     var isAlienOwnerRegistration = <?php if ($isAdmin['newAdvertAlien'] && $alienOwner == "true") echo "true"; else echo "false"; // Если регистрируется новый чужой собственник, то JS проверки на заполненность полей не проводятся ?>;
-    var uploadedFoto = JSON.parse('<?php echo json_encode($userFotoInformation['uploadedFoto']);
-    // Сервер сохранит в эту переменную данные о загруженных фотографиях в формате JSON
-    // Переменная uploadedFoto содержит массив объектов, каждый из которых представляет информацию по 1 фотографии
-    ?>');
 </script>
 <script src="js/main.js"></script>
 <script src="js/registration.js"></script>

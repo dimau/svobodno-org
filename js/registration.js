@@ -3,32 +3,13 @@ $(function () {
     $("#tabs").tabs("option", "disabled", [1, 2, 3]);
 });
 
-// Вставляем календарь для выбора дня рождения
-$(function () {
-    $("#birthday").datepicker({
-        changeMonth:true,
-        changeYear:true,
-        minDate:new Date(1900, 0, 1),
-        maxDate:new Date(2004, 11, 31),
-        defaultDate:new Date(1987, 0, 27),
-        yearRange:"1900:2004"
-    });
-    $("#birthday").datepicker($.datepicker.regional["ru"]);
-
-});
-
-// Подготовим возможность загрузки и редактирования фотографий
-$(document).ready(createUploader);
-
 /* Активируем механизм скрытия ненужных полей в зависимости от заполнения формы */
 // При изменении перечисленных здесь полей функция notavailability пробегает форму с целью показать нужные элементы и скрыть ненужные
 $(document).ready(notavailability);
-$("#currentStatusEducation").change(notavailability);
-$("#statusWork").change(notavailability);
 $("#typeOfObject").change(notavailability);
 
-// Функционал, который выполняется только при наличии вкладки 4 (Поиск)
-if (document.getElementById("tabs-4")) {
+// Функционал, который выполняется только при наличии вкладки с поисковым запросом
+if (document.getElementById("tabs-2")) {
 
     /* Сценарии для появления блока с подробным описанием сожителей */
     $("#withWho").on('change', withWho);
@@ -172,34 +153,18 @@ $(".submitButton").click(function () {
     var errOnTab = 0;
     if (!isAlienOwnerRegistration) {
         switch (currentTabId) {
-            case 2:
+            case 0:
                 $("#tabs").tabs().tabs('select', 0);
                 errOnTab = executeValidation("registration", 0);
-                if (errOnTab != 0)  break;
-
-                $("#tabs").tabs().tabs('select', 1);
-                errOnTab = executeValidation("registration", 1);
-                if (errOnTab != 0)  break;
-
-                $("#tabs").tabs().tabs('select', 2);
-                errOnTab = executeValidation("registration", 2);
                 break;
 
-            case 3:
+            case 1:
                 $("#tabs").tabs().tabs('select', 0);
                 errOnTab = executeValidation("registration", 0);
                 if (errOnTab != 0)  break;
 
                 $("#tabs").tabs().tabs('select', 1);
                 errOnTab = executeValidation("registration", 1);
-                if (errOnTab != 0)  break;
-
-                $("#tabs").tabs().tabs('select', 2);
-                errOnTab = executeValidation("registration", 2);
-                if (errOnTab != 0)  break;
-
-                $("#tabs").tabs().tabs('select', 3);
-                errOnTab = executeValidation("registration", 3);
                 break;
         }
     }

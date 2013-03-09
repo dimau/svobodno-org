@@ -71,8 +71,8 @@
                     <tr>
                         <td><label>Логин: </label></td>
                         <td>
-                            <input type="text" name="login" size="23" tabindex="0"
-                                   placeholder=" e-mail или телефон" autofocus>
+                            <input type="text" name="telephon" size="23" tabindex="0"
+                                   placeholder="Ваш номер телефона" autofocus>
                         </td>
                     </tr>
                     <tr>
