@@ -128,24 +128,6 @@ function getNextRealtyObjects(lastRealtyObjectsId, lastNumber) {
         // Актуализируем местоположение карты. Чтобы карта не сдвигалась после окончания загрузки новых блоков с данными в списки
         changeMapPosition();
 
-        /************* Активируем ColorBox для просмотра в модальном окне галереи фотографий по клику на миниатюре *************/
-        // Это необходимо сделать для вновь загруженных объектов
-        for (i = 0; i < propertyIdArr.length; i++) {
-
-            /* Для представления результатов поиска в виде карты с баллунами */
-            $("#allBalloons .balloonBlock[propertyId='" + propertyIdArr[i] + "'] .gallery").colorbox({ opacity:0.7, rel:currentFotoGalleryIndex, current:'№ {current} из {total}' });
-            currentFotoGalleryIndex++;
-
-            /* Для представления результатов поиска список + карта */
-            $("#shortListOfRealtyObjects .realtyObject[propertyId='" + propertyIdArr[i] + "'] .gallery").colorbox({ opacity:0.7, rel:currentFotoGalleryIndex, current:'№ {current} из {total}' });
-            currentFotoGalleryIndex++;
-
-            /* Для представления результатов поиска в виде списка */
-            $("#fullParametersListOfRealtyObjects .realtyObject[propertyId='" + propertyIdArr[i] + "'] .gallery").colorbox({ opacity:0.7, rel:currentFotoGalleryIndex, current:'№ {current} из {total}' });
-            currentFotoGalleryIndex++;
-
-        }
-
         // Разблокируем обработку прокрутки страницы для новых загрузок с сервера
         blockOfScrollHandler = false;
 
@@ -285,9 +267,6 @@ function MapYandex(options) {
                             applyContentThis.getParentElement().innerHTML = '';
                             subLayout.setParentElement(applyContentThis.getParentElement());
 
-                            // Цепляем colorBox для отображения галереи фотографий
-                            self.setColorBoxForOpenBalloon();
-
                             // Также в случае успеха, сохраняем данные по баллуну для данного объекта на странице с целью уменьшения количества запросов к серверу
                             $("#allBalloons").append(balloonHTML);
                         }
@@ -391,7 +370,6 @@ function MapYandex(options) {
 
             // Обновляем поле "body" у properties метки
             placemark.properties.set('balloonContentBody', balloonHTML);
-            self.setColorBoxForOpenBalloon();
 
         } else { // Если данные по этому объекту еще не были подгружены на страницу, то обращаемся к серверу
 
@@ -409,7 +387,6 @@ function MapYandex(options) {
                         // Обновляем поле "body" у properties метки
                         // TODO: научиться яво передавать переменную placemark в эту функцию из self.onPlacemarkClick м вынести эту функцию в отдельную в данном классе
                         placemark.properties.set('balloonContentBody', balloonHTML);
-                        self.setColorBoxForOpenBalloon();
 
                         // Также в случае успеха, сохраняем данные по баллуну для данного объекта на странице с целью уменьшения количества запросов к серверу
                         $("#allBalloons").append(balloonHTML);
@@ -431,12 +408,6 @@ function MapYandex(options) {
         return balloonHTML;
     };
 
-    // Объединяет в галерею ColorBox фотографии открытого баллуна (нужно запускать каждый раз при открытии нового баллуна)
-    self.setColorBoxForOpenBalloon = function () {
-        $("#map .fotosWrapper .gallery").removeClass('cboxElement').colorbox({ opacity:0.7, rel:currentFotoGalleryIndex, current:'№ {current} из {total}' });
-        currentFotoGalleryIndex++;
-    };
-
     // Обработчик клика по строчке с кратким описанием объявления - отображает инфу в виде баллуна на карте
     // this = элементу с классом realtyObject, на котором был произведен клик
     self.onShortListClick = function (event) {
@@ -456,9 +427,6 @@ function MapYandex(options) {
             [coordX, coordY], // Позиция балуна
             { contentBody:balloonContentBodyVar } // Свойства балуна
         );
-
-        // Навешиваем на фотографии только что сформированного HTML баллуна галерею colorBox
-        self.setColorBoxForOpenBalloon();
 
         return true; // чтобы дать возможность отработать и другим обработчикам клика (например, для добавления/удаления в избранное, просмотра объявления подробнее)
     };

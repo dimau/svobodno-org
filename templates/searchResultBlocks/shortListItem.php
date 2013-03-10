@@ -2,6 +2,7 @@
     <div class="serviceMarks">
         <div class='numberOfRealtyObject'>{number}</div>
         {favorites}
+        {hasPhotos}
     </div>
     <div class="mainContent">
         <div class="addressInShort">
@@ -10,8 +11,7 @@
         <div class="costOfRentingInShort">
             <span class="costOfRentingInShortString">{costOfRenting}</span> <span class="unimportantText">{currency}</span> <span class="unimportantText">{utilities}</span>
         </div>
-        <div class="clearBoth"></div>
-        <div>
+        <div class="secondaryOptionsBlock">
             <div class="secondaryOption">
                 <span class="unimportantText">{amountOfRoomsName}</span> {amountOfRooms}{adjacentRooms}
             </div>

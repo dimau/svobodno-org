@@ -1074,7 +1074,7 @@ td, th {
 }
 
 /* =============================================================================
-   Стили для результатов поиска (таблица, карта, таблица + карта) и избранных объявлений
+   РЕЗУЛЬТАТЫ ПОИСКА И ИЗБРАННЫЕ ОБЪЯВЛЕНИЯ
    ========================================================================== */
 
 /* Стили для выбора режима просмотра объявлений */
@@ -1170,21 +1170,6 @@ td, th {
     border-bottom: 2px solid #6a9d02;
 }
 
-/* Заголовок таблицы представления Список */
-#headOfFullParametersList {
-    background-color: #ffffff;
-    border-top: 2px solid #336784;
-    border-left: 2px solid #336784;
-    border-right: 2px solid #336784;
-    border-top-right-radius: 5px;
-    border-top-left-radius: 5px;
-    line-height: 2em;
-    color: #336784;
-    text-align: center;
-    font-weight: bold;
-    font-size: 14px;
-}
-
 /* Стили для блока со служебными метками (номер, избранное, наличие фотографий) */
 .realtyObject .serviceMarks,
 #headOfFullParametersList .serviceMarks {
@@ -1199,6 +1184,10 @@ td, th {
     margin-left: 30px; /* Отступ для .serviceMarks */
     white-space: nowrap;
 }
+
+/* =============================================================================
+   РЕЗУЛЬТАТЫ ПОИСКА: СПИСОК + КАРТА
+   ========================================================================== */
 
 /* Стили для блоков с информацией по объявлению в представлении Список + карта */
 #shortListOfRealtyObjects .realtyObject .mainContent {
@@ -1218,10 +1207,65 @@ td, th {
     font-size: 16px;
 }
 
+#shortListOfRealtyObjects .realtyObject .mainContent .secondaryOptionsBlock {
+    clear: right;
+    padding-top: 12px;
+}
+
 #shortListOfRealtyObjects .realtyObject .mainContent .secondaryOption {
-    display:inline-block;
+    display: inline-block;
     width: 33%;
     text-align: left;
+}
+
+/* Если экран меньше 1052px в ширину, то второстепенные характеристики в кратком описании объявления нужно сделать в несколько строк */
+@media screen and (max-width: 1052px) {
+    #shortListOfRealtyObjects .realtyObject .mainContent .secondaryOptionsBlock {
+        padding-top: 4px;
+    }
+
+    #shortListOfRealtyObjects .realtyObject .mainContent .secondaryOption {
+        display: block;
+        width: 100%;
+    }
+}
+
+/* Стили для команд управления объявлением в режиме Список + Карта */
+.advertActions {
+    /* Блок для ссылки подробнее под каждым объявлением в списке */
+    position: absolute;
+    bottom: 6px;
+    left: 0px;
+    right: 0px;
+    text-align: right;
+    font-size: 12px;
+}
+
+.advertActions a {
+    opacity: 0;
+}
+
+.realtyObject:hover .advertActions a {
+    opacity: 1;
+}
+
+/* =============================================================================
+   РЕЗУЛЬТАТЫ ПОИСКА: СПИСОК
+   ========================================================================== */
+
+/* Заголовок таблицы представления Список */
+#headOfFullParametersList {
+    background-color: #ffffff;
+    border-top: 2px solid #336784;
+    border-left: 2px solid #336784;
+    border-right: 2px solid #336784;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    line-height: 2em;
+    color: #336784;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
 }
 
 /* Стили для блоков с информацией по объявлению в представлении Список */
@@ -1279,24 +1323,9 @@ td, th {
     color: #808080;
 }
 
-/* Стили для команд управления объявлением в режиме Список + Карта */
-.advertActions {
-    /* Блок для ссылки подробнее под каждым объявлением в списке */
-    position: absolute;
-    bottom: 6px;
-    left: 0px;
-    right: 0px;
-    text-align: right;
-    font-size: 12px;
-}
-
-.advertActions a {
-    opacity: 0;
-}
-
-.realtyObject:hover .advertActions a {
-    opacity: 1;
-}
+/* =============================================================================
+   РЕЗУЛЬТАТЫ ПОИСКА: КАРТА
+   ========================================================================== */
 
 /* Режим только карты */
 #map {
@@ -1306,15 +1335,35 @@ td, th {
     right: 0px;
 }
 
-/* Заголовок баллуна на карте */
-.headOfBalloon {
-    margin-bottom: 5px;
-    color: #336784;
-    text-align: center;
+.ballonBody {
+    font-size: 13px;
+    min-width: 250px;
+}
+
+.ballonBody .addressString {
     font-size: 16px;
 }
 
-/* Вспомогательный класс для серых наименований параметров в кратком описании объектов */
+.ballonBody .costOfRenting {
+    float: right;
+}
+
+.ballonBody .costOfRentingString {
+    font-size: 16px;
+}
+
+.ballonBody .secondaryOptionsBlock {
+    clear: right;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.ballonBody .secondaryOption {
+    display: block;
+    width: 100%;
+}
+
+/* Вспомогательный класс для серых наименований параметров в кратком описании объектов и в баллуне */
 .unimportantText {
     color: #808080;
 }

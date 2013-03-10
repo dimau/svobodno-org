@@ -20,18 +20,8 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
-    <link rel="stylesheet" href="css/colorbox.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
-        /* Отступ под блок класса advertActions */
-        .realtyObject .listDescriptionSmall {
-            margin-bottom: 21px;
-        }
-
-            /* Отступ слева для описания объекта в баллуне */
-        .listDescriptionSmall.forBalloon {
-            margin-left: 6px;
-        }
     </style>
     <!-- end CSS -->
 
@@ -53,8 +43,6 @@
     </script>
     <!-- jQuery UI с моей темой оформления -->
     <script src="js/vendor/jquery-ui-1.8.22.custom.min.js"></script>
-    <!-- ColorBox - плагин jQuery, позволяющий делать модальное окно для просмотра фотографий -->
-    <script src="js/vendor/jquery.colorbox-min.js"></script>
     <!-- Загружаем библиотеку для работы с картой от Яндекса -->
     <script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
 

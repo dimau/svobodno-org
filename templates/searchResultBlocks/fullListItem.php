@@ -2,6 +2,7 @@
     <div class="serviceMarks">
         <div class='numberOfRealtyObject'>{number}</div>
         {favorites}
+        {hasPhotos}
     </div>
     <div class="mainContent">
         <div class="address"><span class="typeOfObjectString">{typeOfObject}</span><span class="districtString">{district}</span><a
