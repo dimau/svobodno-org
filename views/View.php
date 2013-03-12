@@ -284,6 +284,8 @@ class View {
             $arrBalloonReplace['currency'] = $oneProperty['currency'] . "/мес.";
             if ($oneProperty['utilities'] == "да") $arrBalloonReplace['utilities'] = " <span style='white-space: nowrap;'>+ ком.усл.</span>";
             if ($oneProperty['utilities'] == "нет") $arrBalloonReplace['utilities'] = " <span style='white-space: nowrap;'> (ком.вкл.)</span>";
+        } else {
+            $arrBalloonReplace['costOfRenting'] = "цена договорная";
         }
 
         // Комнаты
@@ -410,6 +412,8 @@ class View {
             $arrShortListReplace['currency'] = $oneProperty['currency'] . "/мес.";
             if ($oneProperty['utilities'] == "да") $arrShortListReplace['utilities'] = " <span style='white-space: nowrap;'>+ ком.усл.</span>";
             if ($oneProperty['utilities'] == "нет") $arrShortListReplace['utilities'] = " <span style='white-space: nowrap;'> (ком.вкл.)</span>";
+        } else {
+            $arrShortListReplace['costOfRenting'] = "цена договорная";
         }
 
         // Комнаты
@@ -584,6 +588,8 @@ class View {
             $arrExtendedListReplace['costOfRenting'] = "<span title='стоимость аренды в месяц'>" . $oneProperty['costOfRenting'] . " " . $oneProperty['currency'] . "</span><br>";
             if ($oneProperty['utilities'] == "да") $arrExtendedListReplace['utilities'] = "<span title='коммунальные услуги оплачиваются дополнительно'>+ ком. усл.</span><br>";
             if ($oneProperty['utilities'] == "нет") $arrExtendedListReplace['utilities'] = "<span title='коммунальные услуги включены в стоимость'> (ком.вкл.)</span><br>";
+        } else {
+            $arrExtendedListReplace['costOfRenting'] = "договорная";
         }
 
         // Производим заполнение шаблона строки (блока) fullParametersList таблицы по данному объекту недвижимости

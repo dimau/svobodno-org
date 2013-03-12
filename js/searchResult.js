@@ -227,7 +227,7 @@ function MapYandex(options) {
             if (balloonHTML != null) {
                 this.activeObject.properties.set('balloonContentBody', balloonHTML);
                 // Перестраиваем шаблон, чтобы он принял размеры контента
-                this.rebuild();
+                // this.rebuild();
                 // Для того, чтобы макет автоматически изменялся при обновлении данных
                 // в геообъекте, создадим дочерний макет через фабрику
                 var subLayout = new MyMainContentSubLayout({
@@ -254,7 +254,7 @@ function MapYandex(options) {
                             // Обновляем контент у баллуна полученным объявлением
                             applyContentThis.activeObject.properties.set('balloonContentBody', balloonHTML);
                             // Перестраиваем шаблон, чтобы он принял размеры контента
-                            applyContentThis.rebuild();
+                            // applyContentThis.rebuild();
 
                             // Для того, чтобы макет автоматически изменялся при обновлении данных
                             // в геообъекте, создадим дочерний макет через фабрику

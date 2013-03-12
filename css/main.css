@@ -1346,6 +1346,7 @@ td, th {
 
 .ballonBody .costOfRenting {
     float: right;
+    margin-top: 4px;
 }
 
 .ballonBody .costOfRentingString {

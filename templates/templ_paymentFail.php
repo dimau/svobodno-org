@@ -63,7 +63,7 @@
 
                 <p style="text-align: left;">
                     <?php
-                    require $websiteRoot . "/templates/templ_paymentButtons.php";
+                    // require $websiteRoot . "/templates/templ_paymentButtons.php";
                     ?>
                 </p>
             </div>

@@ -61,7 +61,7 @@
                     Теперь Вы можете оплатить премиум доступ для просмотра фотографий и ссылок на исходные объявления
                 </p>
                 <?php
-                require $websiteRoot . "/templates/templ_paymentButtons.php";
+                // require $websiteRoot . "/templates/templ_paymentButtons.php";
                 ?>
             </div>
             <div class="text">
