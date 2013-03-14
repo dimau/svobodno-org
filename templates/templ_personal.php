@@ -81,7 +81,7 @@ require $websiteRoot . "/templates/templ_header.php";
 
 <?php
 // Модальное окно для незарегистрированных пользователей, которые нажимают на кнопку добавления в Избранное
-if ($isLoggedIn === FALSE) require $websiteRoot . "/templates/templ_addToFavotitesDialog_ForLoggedOut.php";
+if ($isLoggedIn === FALSE) require $websiteRoot . "/templates/modalWindows/templ_addToFavotitesDialog_ForLoggedOut.php";
 ?>
 
 <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -281,8 +281,7 @@ $matterOfFullParametersList = View::getMatterOfFullParametersList($propertyFullA
 </div>
 <!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2013 г. Если нужна помощь или хочется оставить отзыв (пожелание) на сервис Svobodno.org, свяжитесь с нами по телефону: 8-922-160-95-14, или e-mail:
-    support@svobodno.org
+    2013 г. Мы будем рады ответить на Ваши вопросы, отзывы, предложения по телефону: 8-922-160-95-14, или e-mail: support@svobodno.org
 </div>
 <!-- /end.footer -->
 

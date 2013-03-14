@@ -49,19 +49,24 @@ if (!$user->readCharacteristicFromDB()) {
 }
 
 // Назначаем права пользователю
-if ($payment->getPurchase() == "reviewRooms14d") { // Если оплачен тариф на просмотр комнат в течение 14 дней
-    $reviewType = "reviewRooms";
-    $value = 14;
-} elseif ($payment->getPurchase() == "reviewFlats14d") { // Если оплачен тариф на просмотр квартир в течение 14 дней
-    $reviewType = "reviewFlats";
-    $value = 14;
-} else {
-    Logger::getLogger(GlobFunc::$loggerName)->log("Пользователь оплатил неизвестный тариф. id логгера: paymentResult.php:4, id пользователя: '" . $payment->getUserId() . "' тариф: '" . $payment->getPurchase() . "'");
-    Payment::returnRepeatLater();
-    DBconnect::closeConnectToDB();
-    exit();
+switch ($payment->getPurchase()) {
+    case "reviewFull1d": // Премиум-доступ на 1 сутки
+        $value = 1;
+        break;
+    case "reviewFull10d": // Премиум-доступ на 10 дней
+        $value = 10;
+        break;
+    case "reviewFull30d": // Премиум-доступ на 30 дней
+        $value = 30;
+        break;
+    default:
+        Logger::getLogger(GlobFunc::$loggerName)->log("Пользователь оплатил неизвестный тариф. id логгера: paymentResult.php:4, id пользователя: '" . $payment->getUserId() . "' тариф: '" . $payment->getPurchase() . "'");
+        Payment::returnRepeatLater();
+        DBconnect::closeConnectToDB();
+        exit();
 }
-if (!$user->setUserRights($reviewType, $value)) {
+
+if (!$user->setUserRights($value)) {
     Logger::getLogger(GlobFunc::$loggerName)->log("Не удалось изменить права пользователя. id логгера: paymentResult.php:5, id пользователя: " . $payment->getUserId() . "' тариф: '" . $payment->getPurchase() . "'");
     Payment::returnRepeatLater();
     DBconnect::closeConnectToDB();

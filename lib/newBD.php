@@ -52,7 +52,8 @@ avito,
 slando,
 lastSuccessfulHandledAdvertsId,
 knownPhoneNumbers,
-invoices
+invoices,
+duplicatePhoneNumbers
 ");
 
 echo "Удаление старых таблиц: ";
@@ -101,8 +102,7 @@ DBconnect::get()->query("CREATE TABLE users (
         typeTenant VARCHAR(5) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Равен строке true, если пользователь в данный момент ищет недвижимость (является потенциальным арендатором), в том числе, обязательно имеет поисковый запрос',
         typeOwner VARCHAR(5) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Равен строке true, если пользователь указал хотя бы 1 объявление по сдаче в аренду недвижимости (является собственником)(не имеет значение - опубликованное или нет)',
         typeAdmin VARCHAR(15) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'Содержит строку, указывающую какие привилегии администратора имеет данный пользователь. Для каждой привилегии может быть установлено состояние: 0 (выключена) или 1 (включена), состояние NULL характеризует обычного пользователя (не админа). 1-ый признак - есть ли право создавать новые объекты под существующими пользователями, 2-ой признак - есть ли право создавать новые объявления (без проверки полноты реквизитов) для объектов из чужих баз по недвижимости, 3-ий признак - есть ли право на поиск пользователей и входа в их Личные кабинеты под аккаунтом админа',
-        reviewRooms INT(11) COMMENT 'Время действия прав пользователя на доступ к полной информации по комнатам с точностью до секунд в формате timestamp (до какого момента времени)',
-        reviewFlats INT(11) COMMENT 'Время действия прав пользователя на доступ к полной информации по квартирам с точностью до секунд в формате timestamp (до какого момента времени)'
+        reviewFull INT(11) COMMENT 'Время действия прав пользователя на доступ к полной информации по объявлениям (время окончания премиум доступа) с точностью до секунд в формате timestamp (до какого момента времени)'
 )");
 
 echo "users: ";
@@ -681,7 +681,7 @@ DBconnect::get()->query("CREATE TABLE invoices (
   userId INT(11) NOT NULL COMMENT 'Идентификатор пользователя, для которого выставлен счет',
   status VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'текущий статус счета: выставлен, оплачен, ошибка',
   cost INT(6) COMMENT 'Сумма счета, которую должен оплатить клиент',
-  purchase VARCHAR(30) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тариф доступа к порталу, приобретенный пользователем по данной оплате: reviewRooms14d, reviewFlats14d',
+  purchase VARCHAR(30) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тариф доступа к порталу, приобретенный пользователем по данной оплате: reviewRooms14d, reviewFlats14d, reviewFull10d',
   dateOfPayment INT(11) COMMENT 'Дата и время успешной обработки оплаты в формате timestamp'
 )");
 

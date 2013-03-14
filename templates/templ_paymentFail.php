@@ -5,7 +5,7 @@
     <!-- meta -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="Content-language" content="ru">
-    <meta name="description" content="Успешная оплата">
+    <meta name="description" content="Ошибка при оплате">
     <!-- Если у пользователя IE: использовать последний доступный стандартный режим отображения независимо от <!DOCTYPE> -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <!-- Оптимизация отображения на мобильных устройствах -->
@@ -19,13 +19,12 @@
     <link rel="stylesheet" href="css/main.css">
     <style>
         .miniBlockContent {
-            text-align: center;
+            text-align: left;
         }
 
-        .miniBlockContent .text {
-            display: inline-block;
+        .miniBlockContent .paymentButtonsBlock {
+            margin-top: 10px;
             text-align: center;
-            line-height: normal;
         }
     </style>
     <!-- end CSS -->
@@ -52,23 +51,24 @@
     ?>
 
     <div class="miniBlock">
-        <div class="miniBlockHeader">
-            Ошибка при оплате доступа к сервису Svobodno.org!
-        </div>
-        <div class="miniBlockContent">
-            <div class="text">
-                <p style="text-align: left;">
-                    К сожалению, произошла ошибка при попытке оплаты доступа к сервису Svobodno.org, мы будем рады, если Вы проявите настойчивость и повторите попытку.
-                </p>
 
-                <p style="text-align: left;">
-                    <?php
-                    // require $websiteRoot . "/templates/templ_paymentButtons.php";
-                    ?>
-                </p>
+        <div class="miniBlockHeader">
+            Ошибка при оплате премиум доступа к сервису Svobodno.org!
+        </div>
+
+        <div class="miniBlockContent">
+            <div>
+                К сожалению, произошла ошибка при попытке оплаты премиум доступа к сервису Svobodno.org.
+                Мы будем рады, если Вы проявите настойчивость и повторите попытку.
+            </div>
+            <div class="paymentButtonsBlock">
+                <?php
+                require $websiteRoot . "/templates/templ_paymentButtons.php";
+                ?>
             </div>
         </div>
-        <div style="clear:both;"></div>
+
+        <div class="clearBoth"></div>
     </div>
 
     <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
@@ -76,7 +76,7 @@
 </div>
 <!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2013 г. Если нужна помощь или хочется оставить отзыв (пожелание) на сервис Svobodno.org, свяжитесь с нами по телефону: 8-922-160-95-14, или e-mail:
+    2013 г. Мы будем рады ответить на Ваши вопросы, отзывы, предложения по телефону: 8-922-160-95-14, или e-mail:
     support@svobodno.org
 </div>
 <!-- /end.footer -->

@@ -20,20 +20,69 @@
     <link rel="stylesheet" href="css/colorbox.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
-        .setOfInstructions {
-            text-align: left;
-            margin: 10px 0 20px 10px;
+            /* Блок с кратким описанием объявления */
+        .shortlyAboutAdvert {
+            margin-bottom: 20px;
         }
 
-        .setOfInstructions li {
+        .shortlyAboutAdvert .address {
+            text-align: left;
+        }
+
+        .shortlyAboutAdvert .address .addressString {
+            font-size: 22px;
+            white-space: normal;
+        }
+
+        .shortlyAboutAdvert .costOfRenting {
+            float: right;
+            padding-left: 2em; /* Чтобы цена не сливалась с адресом при маленьком разрешении и длинном адресе */
+            text-align: right;
+        }
+
+        .shortlyAboutAdvert .costOfRenting .costOfRentingString {
+            font-size: 22px;
+        }
+
+        .shortlyAboutAdvert .secondaryOptionsBlock {
+            clear: right;
+            padding-top: 12px;
+        }
+
+        .shortlyAboutAdvert .secondaryOption {
+            display: inline-block;
+            width: 32%;
+            text-align: left;
+        }
+
+            /* Если экран меньше 1052px в ширину, то второстепенные характеристики в кратком описании объявления нужно сделать в несколько строк */
+        @media screen and (max-width: 1150px) {
+            .shortlyAboutAdvert .secondaryOptionsBlock {
+                padding-top: 6px;
+            }
+
+            .shortlyAboutAdvert .secondaryOptionsBlock .secondaryOption {
+                display: block;
+                width: 100%;
+            }
+        }
+
+            /* Блок с командами управления объявлением */
+        .setOfInstructions {
+            float: left;
+            text-align: left;
+            margin: 0;
+        }
+
+        .setOfInstructions .instruction {
             margin: 6px 0 6px 0;
         }
 
-        .setOfInstructions li:first-child {
+        .setOfInstructions .instruction:first-child {
             margin-top: 0;
         }
 
-        .setOfInstructions li:last-child {
+        .setOfInstructions .instruction:last-child {
             margin-bottom: 0;
         }
 
@@ -88,12 +137,21 @@ require $websiteRoot . "/templates/templ_header.php";
                 jQuery.post("AJAXGetPropertyData.php", {"propertyId":propertyId}, function (data) {
                     if (data.access == "successful") {
                         // Добавляем на страницу полученные с сервера данные о собственнике
-                        if (data.name != "") $(".ownerContactsName").html(data.name + " " + data.secondName);
+                        if (data.name != "") {
+                            $(".ownerContactsName").html(data.name + " " + data.secondName);
+                        } else {
+                            $(".ownerContactsName").html("Телефонный номер:");
+                        }
                         if (data.contactTelephonNumber != "") $(".ownerContactsTelephon").html(data.contactTelephonNumber);
                         if (data.sourceOfAdvert != "") $(".ownerContactsSourceOfAdvert a.ownerContactsSourceOfAdvertHref").html("Источник объявления").attr("href", data.sourceOfAdvert);
                         // Прячем кнопку запроса контактов собственника, показываем полученные данные
                         $(".ownerContacts").css("display", "");
                         $(".getOwnerContactsButton").css("display", "none");
+
+                        // Если пользователь не оплатил премиум-доступ, то выдадим рекламное сообщение
+                        if (!isPremiumAccess) {
+                            $(".ourAd").show();
+                        }
                     }
                 }, 'json');
             }
@@ -113,6 +171,7 @@ require $websiteRoot . "/templates/templ_header.php";
         // Непосредственно инициализируем карту
         if (coordX != "" && coordY != "") {
             var map = new ymaps.Map('mapForAdvertView', {
+                type:"yandex#satellite",
                 // При инициализации карты, обязательно нужно указать
                 // ее центр и коэффициент масштабирования
                 center:[$("#coordX").val(), $("#coordY").val()],
@@ -167,51 +226,142 @@ require $websiteRoot . "/templates/templ_header.php";
 </script>
 
 <div class="headerOfPage">
-    <?php echo GlobFunc::getFirstCharUpper($propertyCharacteristic['typeOfObject']) . " по адресу: " . $propertyCharacteristic['address']; ?>
+    Характеристика недвижимости
 </div>
 
-<div id="tabs" class="mainContentBlock">
-<ul>
-    <li>
-        <a href="#tabs-1">Описание</a>
-    </li>
-    <li>
-        <a href="#tabs-2">Местоположение</a>
-    </li>
-</ul>
-<div id="tabs-1">
+<div class="mainContentBlock">
 
-<div>
-    <?php
-    // Формируем и размещаем на странице блок для фотографий объекта недвижимости
-    echo View::getHTMLfotosWrapper("middle", TRUE, FALSE, $propertyFotoInformation['uploadedFoto']);
-    ?>
+<!-- Карта Яндекса -->
+<div id="mapForAdvertView"
+     style="float: left; width: 50%; height: 400px; padding-right: 0.6em;"></div>
+
+<!-- Основные сведения по объекту и команды управления -->
+<div style="float: right; width: 50%; padding-left: 0.6em;">
+    <!-- Краткая сводка по объявлению -->
+    <div class='shortlyAboutAdvert'>
+        <div class="costOfRenting">
+            <div>
+            <span class="costOfRentingString">
+                <?php if ($propertyCharacteristic['costOfRenting'] != "" && $propertyCharacteristic['costOfRenting'] != "0.00") echo $propertyCharacteristic['costOfRenting']; else echo "цена договорная"; ?>
+            </span>
+            <span class="unimportantText">
+                <?php if ($propertyCharacteristic['currency'] != "0") echo $propertyCharacteristic['currency']; ?>
+            </span>
+            </div>
+            <div class="unimportantText">
+                <?php if ($propertyCharacteristic['utilities'] == "да") echo " <span style='white-space: nowrap;' title='коммунальные платежи оплачиваются отдельно'>+ ком. усл.</span>"; elseif ($propertyCharacteristic['utilities'] == "нет") echo " <span style='white-space: nowrap;' title='коммунальные платежи включены в стоимость'> (ком. вкл.)</span>"; ?>
+            </div>
+        </div>
+        <div class="address">
+            <div class="addressString">
+                <?php echo $propertyCharacteristic['address'];?>
+            </div>
+            <div>
+                <span class="unimportantText"><?php if ($propertyCharacteristic['typeOfObject'] != "0") echo GlobFunc::getFirstCharUpper($propertyCharacteristic['typeOfObject']); ?>
+                    / <?php if ($propertyCharacteristic['district'] != "0") echo $propertyCharacteristic['district']; ?></span>
+            </div>
+        </div>
+        <div class="secondaryOptionsBlock">
+            <div class="secondaryOption">
+                <span class="unimportantText">
+                    <?php if ($propertyCharacteristic['typeOfObject'] != "гараж") echo "Комнат:";?>
+                </span>
+                <?php if ($propertyCharacteristic['amountOfRooms'] != "0") echo $propertyCharacteristic['amountOfRooms'];?>
+                <?php if ($propertyCharacteristic['adjacentRooms'] == "да") if ($propertyCharacteristic['amountOfAdjacentRooms'] != "0" && $propertyCharacteristic['amountOfRooms'] > 2) echo ", смежных: " . $propertyCharacteristic['amountOfAdjacentRooms']; else echo ", смежные"; ?>
+            </div>
+            <div class="secondaryOption">
+                <span class="unimportantText">
+                    Площадь:
+                </span>
+                <span style="white-space: nowrap;">
+                <?php
+                    if ($propertyCharacteristic['typeOfObject'] != "квартира" && $propertyCharacteristic['typeOfObject'] != "дом" && $propertyCharacteristic['typeOfObject'] != "таунхаус" && $propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['roomSpace'] != "") echo $propertyCharacteristic['roomSpace'];
+                    if ($propertyCharacteristic['typeOfObject'] != "комната" && $propertyCharacteristic['totalArea'] != "") echo $propertyCharacteristic['totalArea'];
+                    if ($propertyCharacteristic['typeOfObject'] != "комната" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['livingSpace'] != "") echo "/" . $propertyCharacteristic['livingSpace'];
+                    if ($propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['kitchenSpace'] != "") echo "/" . $propertyCharacteristic['kitchenSpace'];
+                    if ($propertyCharacteristic['roomSpace'] != "" || $propertyCharacteristic['totalArea'] != "" || $propertyCharacteristic['livingSpace'] != "" || $propertyCharacteristic['kitchenSpace'] != "") echo " м²";
+                    ?>
+                </span>
+            </div>
+            <div class="secondaryOption">
+                <span class="unimportantText">
+                    <?php
+                    if ($propertyCharacteristic['typeOfObject'] == "квартира" || $propertyCharacteristic['typeOfObject'] == "комната") echo "Этаж:";
+                    if ($propertyCharacteristic['typeOfObject'] == "дом" || $propertyCharacteristic['typeOfObject'] == "таунхаус" || $propertyCharacteristic['typeOfObject'] == "дача") echo "Этажей:";
+                    ?>
+                </span>
+                <?php
+                if ($propertyCharacteristic['floor'] != "" || $propertyCharacteristic['totalAmountFloor'] != "") $propertyCharacteristic['floor'] . " из " . $propertyCharacteristic['totalAmountFloor'];
+                if ($propertyCharacteristic['numberOfFloor'] != "") echo $propertyCharacteristic['numberOfFloor'];
+                ?>
+            </div>
+        </div>
+    </div>
+
+    <?php if ($propertyCharacteristic['comment'] != ""): ?>
+    <div style="margin-bottom: 20px;">
+        <?php echo $propertyCharacteristic['comment']; ?>
+    </div>
+    <?php endif; ?>
 
     <ul class="setOfInstructions">
-        <li>
-            <?php
-                /* Контакты собственника */
-                require $websiteRoot . "/templates/getOwnerContactsBlocks/templ_getOwnerContactsItem.php";
-            ?>
+        <li class="instruction">
+            <button class='mainButton getOwnerContactsButton'>
+                Контакты собственника
+            </button>
+            <div class="ownerContacts" style="display: none; margin-bottom: 20px;">
+                <div>
+                    <span class="ownerContactsName"></span>
+                    <span class="ownerContactsTelephon"></span>
+                </div>
+                <div class="ownerContactsSourceOfAdvert">
+                    <a class="ownerContactsSourceOfAdvertHref" href=""></a>
+                </div>
+                <div class="ourAd" style="display: none; margin-top: 6px;">
+                    <button class="mainButton" style="float: right;">
+                        к оплате
+                    </button>
+                    Приобретите <span style="font-weight: bold;">Премиум-доступ</span> <span style="white-space: nowrap;">(от 50 руб.), чтобы:</span>
+                    <ul class="benefits">
+                        <li>
+                            Просматривать исходные объявления с ФОТОГРАФИЯМИ недвижимости
+                        </li>
+                        <li>
+                            Получать e-mail оповещения о появлении новых подходящих Вам объектов
+                        </li>
+                        <li>
+                            Помочь ресурсу и в следующий раз воспользоваться таким же удобным и дешевым сервисом
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </li>
-        <li>
+        <li class="instruction">
             <?php
             echo View::getHTMLforFavorites($propertyCharacteristic["id"], $favoritePropertiesId, "stringWithIcon");
             ?>
         </li>
+        <li class="instruction">
+            <a href="#"> не актуально</a>
+        </li>
+        <li class="instruction">
+            <a href="#"> ошибка в описании</a>
+        </li>
+        <li class="instruction">
+            <a href="#"> это агент</a>
+        </li>
         <!-- TODO: добавить функциональность!
-		<li>
-			<a href="#"> отправить по e-mail</a>
-		</li>
-		<li>
-			<a href="#"> похожие объявления</a>
-		</li>-->
+        <li class="instruction">
+            <a href="#"> отправить по e-mail</a>
+        </li>
+        <li class="instruction">
+            <a href="#"> похожие объявления</a>
+        </li>-->
     </ul>
-
-    <div class="clearBoth"></div>
 
 </div>
 
+<!-- Подробные сведения по объекту -->
 <div class="objectDescription">
 
 <div class="notEdited left">
@@ -331,6 +481,16 @@ require $websiteRoot . "/templates/templ_header.php";
         </tr>
             <?php endif; ?>
 
+        <?php if ($propertyCharacteristic['checking'] != "" && $propertyCharacteristic['checking'] != "0"): ?>
+        <tr>
+            <td class='objectDescriptionItemLabel'>
+                Где проживает собственник:
+            </td>
+            <td class='objectDescriptionBody'>
+                <span><?php echo $propertyCharacteristic['checking']; ?></span>
+            </td>
+        </tr>
+            <?php endif; ?>
         </tbody>
     </table>
 </div>
@@ -765,100 +925,58 @@ require $websiteRoot . "/templates/templ_header.php";
 </div>
     <?php endif; ?>
 
-<div class="notEdited both">
+<div class="notEdited right">
     <div class='legend'>
-        Комментарий
+        Расположение
     </div>
+    <input type="hidden" name="coordX"
+           id="coordX" <?php echo "value='" . $propertyCharacteristic['coordX'] . "'";?>>
+    <input type="hidden" name="coordY"
+           id="coordY" <?php echo "value='" . $propertyCharacteristic['coordY'] . "'";?>>
     <table>
         <tbody>
-
-        <?php if ($propertyCharacteristic['comment'] != ""): ?>
         <tr>
-            <td colspan="2">
-                <span>
-                    <?php echo $propertyCharacteristic['comment']; ?>
-                </span>
+            <td class="objectDescriptionItemLabel">
+                Город:
+            </td>
+            <td class="objectDescriptionBody">
+                <span><?php echo $propertyCharacteristic['city'];?></span>
             </td>
         </tr>
-            <?php endif; ?>
-
-        <?php if ($propertyCharacteristic['checking'] != "" && $propertyCharacteristic['checking'] != "0"): ?>
         <tr>
-            <td colspan="2">
-                Где проживает собственник:
-                <span>
-                    <?php echo $propertyCharacteristic['checking']; ?>
-                </span>
+            <td class="objectDescriptionItemLabel">
+                Район:
+            </td>
+            <td class="objectDescriptionBody">
+                <span><?php if ($propertyCharacteristic['district'] != "" && $propertyCharacteristic['district'] != "0") echo $propertyCharacteristic['district'];?></span>
             </td>
         </tr>
-            <?php endif; ?>
-
+        <tr>
+            <td class="objectDescriptionItemLabel">
+                Адрес:
+            </td>
+            <td class="objectDescriptionBody">
+                <span><?php echo $propertyCharacteristic['address'];?></span>
+            </td>
+        </tr>
+        <?php
+        if ($propertyCharacteristic['subwayStation'] != "0" && $propertyCharacteristic['subwayStation'] != "нет") echo "<tr><td class='objectDescriptionItemLabel'>Станция метро рядом:</td><td class='objectDescriptionBody'><span>" . $propertyCharacteristic['subwayStation'] . ",<br>" . $propertyCharacteristic['distanceToMetroStation'] . " мин. ходьбы" . "</span></td></tr>";
+        ?>
         </tbody>
     </table>
 </div>
 
 <div class="clearBoth"></div>
 </div>
-</div>
 
-<div id="tabs-2">
-    <!-- Карта Яндекса -->
-    <div id="mapForAdvertView" style="width: 50%; min-width: 300px; height: 400px; float: left;"></div>
-
-    <div class="notEdited right">
-        <input type="hidden" name="coordX"
-               id="coordX" <?php echo "value='" . $propertyCharacteristic['coordX'] . "'";?>>
-        <input type="hidden" name="coordY"
-               id="coordY" <?php echo "value='" . $propertyCharacteristic['coordY'] . "'";?>>
-        <table>
-            <tbody>
-            <tr>
-                <td class="objectDescriptionItemLabel">
-                    Город:
-                </td>
-                <td class="objectDescriptionBody">
-                    <span><?php echo $propertyCharacteristic['city'];?></span>
-                </td>
-            </tr>
-            <tr>
-                <td class="objectDescriptionItemLabel">
-                    Район:
-                </td>
-                <td class="objectDescriptionBody">
-                    <span><?php if ($propertyCharacteristic['district'] != "" && $propertyCharacteristic['district'] != "0") echo $propertyCharacteristic['district'];?></span>
-                </td>
-            </tr>
-            <tr>
-                <td class="objectDescriptionItemLabel">
-                    Адрес:
-                </td>
-                <td class="objectDescriptionBody">
-                    <span><?php echo $propertyCharacteristic['address'];?></span>
-                </td>
-            </tr>
-            <?php
-            if ($propertyCharacteristic['subwayStation'] != "0" && $propertyCharacteristic['subwayStation'] != "нет") echo "<tr><td class='objectDescriptionItemLabel'>Станция метро рядом:</td><td class='objectDescriptionBody'><span>" . $propertyCharacteristic['subwayStation'] . ",<br>" . $propertyCharacteristic['distanceToMetroStation'] . " мин. ходьбы" . "</span></td></tr>";
-            ?>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="clearBoth"></div>
-</div>
 </div>
 
 <?php
-// Модальное окно для незарегистрированных пользователей, которые нажимают на кнопку добавления в Избранное
-if ($isLoggedIn === FALSE) require $websiteRoot . "/templates/templ_addToFavotitesDialog_ForLoggedOut.php";
-?>
-<?php
-// Подключаем нужное модальное окно для Запроса на получение контактов собственника
 if ($isLoggedIn === FALSE) {
-    require $websiteRoot . "/templates/getOwnerContactsBlocks/templ_getOwnerContactsDialog_ForLoggedOut.php";
-}
-if (($isLoggedIn === TRUE && $propertyCharacteristic['typeOfObject'] == "комната" && $userCharacteristic['reviewRooms'] < time()) OR
-    ($isLoggedIn === TRUE && $propertyCharacteristic['typeOfObject'] == "квартира" && $userCharacteristic['reviewFlats'] < time())) {
-    require $websiteRoot . "/templates/getOwnerContactsBlocks/templ_getOwnerContactsDialog_ForPayNo.php";
+    // Модальное окно для незарегистрированных пользователей, которые нажимают на кнопку добавления в Избранное
+    require $websiteRoot . "/templates/modalWindows/templ_addToFavotitesDialog_ForLoggedOut.php";
+    // Подключаем нужное модальное окно для Запроса на получение контактов собственника
+    require $websiteRoot . "/templates/modalWindows/templ_getOwnerContactsDialog_ForLoggedOut.php";
 }
 ?>
 
@@ -867,8 +985,7 @@ if (($isLoggedIn === TRUE && $propertyCharacteristic['typeOfObject'] == "ком�
 </div>
 <!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2013 г. Если нужна помощь или хочется оставить отзыв (пожелание) на сервис Svobodno.org, свяжитесь с нами по телефону: 8-922-160-95-14, или e-mail:
-    support@svobodno.org
+    2013 г. Мы будем рады ответить на Ваши вопросы, отзывы, предложения по телефону: 8-922-160-95-14, или e-mail: support@svobodno.org
 </div>
 <!-- /end.footer -->
 
@@ -877,6 +994,7 @@ if (($isLoggedIn === TRUE && $propertyCharacteristic['typeOfObject'] == "ком�
     var typeTenant = <?php if ($userCharacteristic['typeTenant']) echo "true"; else echo "false"; // Является ли регистрируемый пользователь арендатором ?>;
     var typeOwner = <?php if ($userCharacteristic['typeOwner']) echo "true"; else echo "false"; // Является ли регистрируемый пользователь собственником ?>;
     var isLoggedIn = <?php if ($isLoggedIn) echo "true"; else echo "false"; // Авторизованный ли пользователь к нам пришел ?>;
+    var isPremiumAccess = <?php if ($userCharacteristic['reviewFull'] > time()) echo "true"; else echo "false"; // Оплатил ли пользователь премиум-доступ ?>;
     var propertyId = <?php echo $propertyCharacteristic['id']; // Идентификатор объекта недвижимости, чье описание мы смотрим ?>;
 </script>
 <!-- end scripts -->

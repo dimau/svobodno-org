@@ -19,13 +19,25 @@
     <link rel="stylesheet" href="css/main.css">
     <style>
         .miniBlockContent {
+            text-align: left;
+        }
+
+        .miniBlockContent .strong {
+            font-weight: bold;
+        }
+
+        .miniBlockContent .benefits {
+            margin: 10px 0 0 0;
+            padding-left: 20px;
+        }
+
+        .miniBlockContent .paymentButtonsBlock {
+            margin-top: 10px;
             text-align: center;
         }
 
-        .miniBlockContent .text {
-            display: inline-block;
-            text-align: center;
-            line-height: normal;
+        .miniBlockContent .alterHref {
+            margin-top: 10px;
         }
     </style>
     <!-- end CSS -->
@@ -52,35 +64,52 @@
     ?>
 
     <div class="miniBlock">
+
         <div class="miniBlockHeader">
             Вы успешно зарегистрировались на портале Svobodno.org!
         </div>
+
         <div class="miniBlockContent">
+
             <div>
-                <p style="text-align: center;">
-                    Теперь Вы можете оплатить премиум доступ для просмотра фотографий и ссылок на исходные объявления
-                </p>
+                Теперь Вы можете оплатить <span class="strong">Премиум доступ</span>, чтобы:
+            </div>
+            <ul class="benefits">
+                <li>
+                    Просматривать исходные объявления с ФОТОГРАФИЯМИ недвижимости
+                </li>
+                <li>
+                    Получать e-mail оповещения о появлении новых подходящих Вам объектов
+                </li>
+                <li>
+                    Помочь ресурсу и в следующий раз воспользоваться таким же удобным и дешевым сервисом
+                </li>
+            </ul>
+
+            <div class="paymentButtonsBlock">
                 <?php
-                // require $websiteRoot . "/templates/templ_paymentButtons.php";
+                require $websiteRoot . "/templates/templ_paymentButtons.php";
                 ?>
             </div>
-            <div class="text">
-                <p style="text-align: left;">
-                    <?php
-                    if ($url_initial != "" && $url_initial != "http://svobodno.org/index.php" && $url_initial != "http://localhost/index.php" && $url_initial != "http://svobodno.org/" && $url_initial != "http://localhost/") {
-                        echo "<a href='" . $url_initial . "'>Вернуться на страницу</a>, с которой Вы перешли к регистрации";
-                    } else {
-                        echo "Воспользоваться <a href='search.php'>Поиском недвижимости</a>";
-                    }
-                    ?>
-                </p>
 
-                <p style="text-align: left;">
-                    Либо посетить <a href="personal.php">Личный кабинет</a>
-                </p>
+            <div class="alterHref">
+                <?php
+                if ($url_initial != "" && $url_initial != "http://svobodno.org/index.php" && $url_initial != "http://localhost/index.php" && $url_initial != "http://svobodno.org/" && $url_initial != "http://localhost/") {
+                    echo "<a href='" . $url_initial . "'>Вернуться на страницу</a>, с которой Вы перешли к регистрации";
+                } else {
+                    echo "Воспользоваться <a href='search.php'>Поиском недвижимости</a>";
+                }
+                ?>
             </div>
+
+            <div class="alterHref">
+                Либо посетить <a href="personal.php">Личный кабинет</a>
+            </div>
+
         </div>
-        <div style="clear:both;"></div>
+
+        <div class="clearBoth"></div>
+
     </div>
 
     <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
@@ -88,7 +117,7 @@
 </div>
 <!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2013 г. Если нужна помощь или хочется оставить отзыв (пожелание) на сервис Svobodno.org, свяжитесь с нами по телефону: 8-922-160-95-14, или e-mail:
+    2013 г. Мы будем рады ответить на Ваши вопросы, отзывы, предложения по телефону: 8-922-160-95-14, или e-mail:
     support@svobodno.org
 </div>
 <!-- /end.footer -->

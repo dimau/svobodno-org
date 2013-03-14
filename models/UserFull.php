@@ -445,8 +445,7 @@ class UserFull extends User {
         $result['last_act'] = $this->last_act;
         $result['reg_date'] = $this->reg_date;
         $result['favoritePropertiesId'] = $this->favoritePropertiesId;
-        $result['reviewRooms'] = $this->reviewRooms;
-        $result['reviewFlats'] = $this->reviewFlats;
+        $result['reviewFull'] = $this->reviewFull;
 
         return $result;
     }
@@ -478,10 +477,10 @@ class UserFull extends User {
 
         // Проверки для блока "Личные данные"
         if ($this->name == "") $errors[] = 'Укажите имя';
-        if (strlen($this->name) > 50) $errors[] = 'Слишком длинное имя. Можно указать не более 50-ти символов';
+        if (mb_strlen($this->name, "utf-8") > 50) $errors[] = 'Слишком длинное имя. Можно указать не более 50-ти символов';
 
-        if (strlen($this->secondName) > 50) $errors[] = 'Слишком длинное отчество. Можно указать не более 50-ти символов';
-        if (strlen($this->surname) > 50) $errors[] = 'Слишком длинная фамилия. Можно указать не более 50-ти символов';
+        if (mb_strlen($this->secondName, "utf-8") > 50) $errors[] = 'Слишком длинное отчество. Можно указать не более 50-ти символов';
+        if (mb_strlen($this->surname, "utf-8") > 50) $errors[] = 'Слишком длинная фамилия. Можно указать не более 50-ти символов';
 
         if ($this->birthday != "") {
             if (!preg_match('/^\d\d.\d\d.\d\d\d\d$/', $this->birthday)) $errors[] = 'Неправильный формат даты рождения, должен быть: дд.мм.гггг'; else {
@@ -493,7 +492,7 @@ class UserFull extends User {
 
         // Проверяем логин на занятость. Это нужно делать только при регистрации, так как в дальнейшем логин пользователя невозможно изменить
         if ($typeOfValidation == "registration" || $typeOfValidation == "newAlienOwner") {
-            if ($this->login != "" && strlen($this->login) <= 50) {
+            if ($this->login != "" && mb_strlen($this->login, "utf-8") <= 50) {
                 $stmt = DBconnect::get()->stmt_init();
                 if (($stmt->prepare("SELECT id FROM users WHERE login=?") === FALSE)
                     OR ($stmt->bind_param("s", $this->login) === FALSE)
@@ -520,28 +519,28 @@ class UserFull extends User {
         if ($this->email != "" && !preg_match("/^(([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+\.)*([a-zA-Z0-9_-]|[!#$%\*\/\?\|^\{\}`~&'\+=])+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]{2,5}$/", $this->email)) $errors[] = 'Укажите, пожалуйста, Ваш настоящий e-mail (указанный Вами e-mail не прошел проверку формата)';
 
         // Проверки для блока "Образование"
-        if (isset($this->almamater) && strlen($this->almamater) > 100) $errors[] = 'Слишком длинное название учебного заведения (используйте не более 100 символов)';
-        if (isset($this->speciality) && strlen($this->speciality) > 100) $errors[] = 'Слишком длинное название специальности (используйте не более 100 символов)';
-        if (isset($this->kurs) && strlen($this->kurs) > 30) $errors[] = 'Курс. Указана слишком длинная строка (используйте не более 30 символов)';
+        if (isset($this->almamater) && mb_strlen($this->almamater, "utf-8") > 100) $errors[] = 'Слишком длинное название учебного заведения (используйте не более 100 символов)';
+        if (isset($this->speciality) && mb_strlen($this->speciality, "utf-8") > 100) $errors[] = 'Слишком длинное название специальности (используйте не более 100 символов)';
+        if (isset($this->kurs) && mb_strlen($this->kurs, "utf-8") > 30) $errors[] = 'Курс. Указана слишком длинная строка (используйте не более 30 символов)';
         if ($this->yearOfEnd != "" && !preg_match("/^[12]{1}[0-9]{3}$/", $this->yearOfEnd)) $errors[] = 'Укажите год окончания учебного заведения в формате: "гггг". Например: 2007';
 
         // Проверки для блока "Работа"
-        if (isset($this->placeOfWork) && strlen($this->placeOfWork) > 100) $errors[] = 'Слишком длинное наименование места работы (используйте не более 100 символов)';
-        if (isset($this->workPosition) && strlen($this->workPosition) > 100) $errors[] = 'Слишком длинное название должности (используйте не более 100 символов)';
+        if (isset($this->placeOfWork) && mb_strlen($this->placeOfWork, "utf-8") > 100) $errors[] = 'Слишком длинное наименование места работы (используйте не более 100 символов)';
+        if (isset($this->workPosition) && mb_strlen($this->workPosition, "utf-8") > 100) $errors[] = 'Слишком длинное название должности (используйте не более 100 символов)';
 
         // Проверки для блока "Коротко о себе"
-        if (isset($this->regionOfBorn) && strlen($this->regionOfBorn) > 50) $errors[] = 'Слишком длинное наименование региона, в котором Вы родились (используйте не более 50 символов)';
-        if (isset($this->cityOfBorn) && strlen($this->cityOfBorn) > 50) $errors[] = 'Слишком длинное наименование города, в котором Вы родились (используйте не более 50 символов)';
+        if (isset($this->regionOfBorn) && mb_strlen($this->regionOfBorn, "utf-8") > 50) $errors[] = 'Слишком длинное наименование региона, в котором Вы родились (используйте не более 50 символов)';
+        if (isset($this->cityOfBorn) && mb_strlen($this->cityOfBorn, "utf-8") > 50) $errors[] = 'Слишком длинное наименование города, в котором Вы родились (используйте не более 50 символов)';
 
         // Проверки для блока "Социальные сети"
-        if (strlen($this->vkontakte) > 100) $errors[] = 'Указана слишком длинная ссылка на личную страницу Вконтакте (используйте не более 100 символов)';
-        if (strlen($this->vkontakte) > 0 && !preg_match("/vk\.com/", $this->vkontakte)) $errors[] = 'Укажите, пожалуйста, Вашу настоящую личную страницу Вконтакте, либо оставьте поле пустым (ссылка должна содержать строчку "vk.com")';
-        if (strlen($this->odnoklassniki) > 100) $errors[] = 'Указана слишком длинная ссылка на личную страницу в Одноклассниках (используйте не более 100 символов)';
-        if (strlen($this->odnoklassniki) > 0 && !preg_match("/www\.odnoklassniki\.ru\/profile\//", $this->odnoklassniki)) $errors[] = 'Укажите, пожалуйста, Вашу настоящую личную страницу в Одноклассниках, либо оставьте поле пустым (ссылка должна содержать строчку "www.odnoklassniki.ru/profile/")';
-        if (strlen($this->facebook) > 100) $errors[] = 'Указана слишком длинная ссылка на личную страницу на Facebook (используйте не более 100 символов)';
-        if (strlen($this->facebook) > 0 && !preg_match("/www\.facebook\.com\/profile\.php/", $this->facebook)) $errors[] = 'Укажите, пожалуйста, Вашу настоящую личную страницу на Facebook, либо оставьте поле пустым (ссылка должна содержать строчку с "www.facebook.com/profile.php")';
-        if (strlen($this->twitter) > 100) $errors[] = 'Указана слишком длинная ссылка на личную страницу в Twitter (используйте не более 100 символов)';
-        if (strlen($this->twitter) > 0 && !preg_match("/twitter\.com/", $this->twitter)) $errors[] = 'Укажите, пожалуйста, Вашу настоящую личную страницу в Twitter, либо оставьте поле пустым (ссылка должна содержать строчку "twitter.com")';
+        if (mb_strlen($this->vkontakte, "utf-8") > 100) $errors[] = 'Указана слишком длинная ссылка на личную страницу Вконтакте (используйте не более 100 символов)';
+        if (mb_strlen($this->vkontakte, "utf-8") > 0 && !preg_match("/vk\.com/", $this->vkontakte)) $errors[] = 'Укажите, пожалуйста, Вашу настоящую личную страницу Вконтакте, либо оставьте поле пустым (ссылка должна содержать строчку "vk.com")';
+        if (mb_strlen($this->odnoklassniki, "utf-8") > 100) $errors[] = 'Указана слишком длинная ссылка на личную страницу в Одноклассниках (используйте не более 100 символов)';
+        if (mb_strlen($this->odnoklassniki, "utf-8") > 0 && !preg_match("/www\.odnoklassniki\.ru\/profile\//", $this->odnoklassniki)) $errors[] = 'Укажите, пожалуйста, Вашу настоящую личную страницу в Одноклассниках, либо оставьте поле пустым (ссылка должна содержать строчку "www.odnoklassniki.ru/profile/")';
+        if (mb_strlen($this->facebook, "utf-8") > 100) $errors[] = 'Указана слишком длинная ссылка на личную страницу на Facebook (используйте не более 100 символов)';
+        if (mb_strlen($this->facebook, "utf-8") > 0 && !preg_match("/www\.facebook\.com\/profile\.php/", $this->facebook)) $errors[] = 'Укажите, пожалуйста, Вашу настоящую личную страницу на Facebook, либо оставьте поле пустым (ссылка должна содержать строчку с "www.facebook.com/profile.php")';
+        if (mb_strlen($this->twitter, "utf-8") > 100) $errors[] = 'Указана слишком длинная ссылка на личную страницу в Twitter (используйте не более 100 символов)';
+        if (mb_strlen($this->twitter, "utf-8") > 0 && !preg_match("/twitter\.com/", $this->twitter)) $errors[] = 'Укажите, пожалуйста, Вашу настоящую личную страницу в Twitter, либо оставьте поле пустым (ссылка должна содержать строчку "twitter.com")';
 
         // Проверка согласия пользователя с лицензией
         if ($typeOfValidation == "registration") {
@@ -552,16 +551,15 @@ class UserFull extends User {
     }
 
     /**
-     * Устанавливает (изменяет) права пользователя (reviewRooms, reviewFlats) на просмотр контактов собственников
+     * Устанавливает (изменяет) права пользователя на просмотр полной информации по объявлению (время премиум доступа)
      * На текущий момент времени умеет только увеличивать срок действия прав на указанное количество времени
-     * @param string $reviewType конкретное право, срок действия которого нужно изменить (reviewRooms, reviewFlats)
      * @param int $value количество дней, на которые нужно увеличить срок действия права
      * @return bool результат выполнения операции - TRUE в случае успеха, FALSE в случае ошибки
      */
-    public function setUserRights($reviewType, $value) {
+    public function setUserRights($value) {
 
         // Валидация входных данных
-        if (!isset($reviewType) || ($reviewType != "reviewRooms" && $reviewType != "reviewFlats") || !isset($value) || !is_int($value)) return FALSE;
+        if (!isset($value) || !is_int($value)) return FALSE;
 
         // Перевести количество дней в количество секунд
         $value = $value * 24 * 60 * 60;
@@ -569,17 +567,9 @@ class UserFull extends User {
         $currentTime = time();
 
         // Вычисляем время окончания действия данного типа права для пользователя в зависимости от того, имеет он уже доступ данного типа или нет?
-        if ($reviewType == "reviewRooms") {
-            // Кончился ли у данного пользователя срок действия доступа к контактам собственников
-            if ($this->getReviewRooms() < $currentTime) $newValue = $currentTime + $value; else $newValue = $this->getReviewRooms() + $value;
-        } elseif ($reviewType == "reviewFlats") {
-            // Кончился ли у данного пользователя срок действия доступа к контактам собственников
-            if ($this->getReviewFlats() < $currentTime) $newValue = $currentTime + $value; else $newValue = $this->getReviewFlats() + $value;
-        } else {
-            return FALSE;
-        }
+        if ($this->getReviewFull() < $currentTime) $newValue = $currentTime + $value; else $newValue = $this->getReviewFull() + $value;
 
-        return DBconnect::updateUserCharacteristicReviewRights($this->id, $reviewType, $newValue);
+        return DBconnect::updateUserCharacteristicReviewRights($this->id, $newValue);
     }
 
     // Если пользователь еще только регистрируется, то необходимо установить его статус в зависимости от строки запроса, по которой была запрошена страница регистрации. В этом строке могут быть указана доп. параметры - в качестве арендатора или в качестве собственника регистрируется пользователь

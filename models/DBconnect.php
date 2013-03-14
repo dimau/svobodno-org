@@ -872,14 +872,14 @@ class DBconnect {
         $paramsArr = DBconnect::conversionUserCharacteristicFromViewToDB($paramsArr);
 
         $stmt = DBconnect::get()->stmt_init();
-        if (($stmt->prepare("INSERT INTO users SET typeTenant=?, typeOwner=?, name=?, secondName=?, surname=?, sex=?, nationality=?, birthday=?, login=?, password=?, telephon=?, emailReg=?, email=?, currentStatusEducation=?, almamater=?, speciality=?, kurs=?, ochnoZaochno=?, yearOfEnd=?, statusWork=?, placeOfWork=?, workPosition=?, regionOfBorn=?, cityOfBorn=?, shortlyAboutMe=?, vkontakte=?, odnoklassniki=?, facebook=?, twitter=?, lic=?, last_act=?, reg_date=?, favoritePropertiesId=?, reviewRooms=?, reviewFlats=?") === FALSE)
-            OR ($stmt->bind_param("ssssssssssssssssssssssssssssssiisii", $paramsArr['typeTenant'], $paramsArr['typeOwner'], $paramsArr['name'], $paramsArr['secondName'], $paramsArr['surname'], $paramsArr['sex'], $paramsArr['nationality'], $paramsArr['birthday'], $paramsArr['login'], $paramsArr['password'], $paramsArr['telephon'], $paramsArr['emailReg'], $paramsArr['email'], $paramsArr['currentStatusEducation'], $paramsArr['almamater'], $paramsArr['speciality'], $paramsArr['kurs'], $paramsArr['ochnoZaochno'], $paramsArr['yearOfEnd'], $paramsArr['statusWork'], $paramsArr['placeOfWork'], $paramsArr['workPosition'], $paramsArr['regionOfBorn'], $paramsArr['cityOfBorn'], $paramsArr['shortlyAboutMe'], $paramsArr['vkontakte'], $paramsArr['odnoklassniki'], $paramsArr['facebook'], $paramsArr['twitter'], $paramsArr['lic'], $paramsArr['last_act'], $paramsArr['reg_date'], $paramsArr['favoritePropertiesId'], $paramsArr['reviewRooms'], $paramsArr['reviewFlats']) === FALSE)
+        if (($stmt->prepare("INSERT INTO users SET typeTenant=?, typeOwner=?, name=?, secondName=?, surname=?, sex=?, nationality=?, birthday=?, login=?, password=?, telephon=?, emailReg=?, email=?, currentStatusEducation=?, almamater=?, speciality=?, kurs=?, ochnoZaochno=?, yearOfEnd=?, statusWork=?, placeOfWork=?, workPosition=?, regionOfBorn=?, cityOfBorn=?, shortlyAboutMe=?, vkontakte=?, odnoklassniki=?, facebook=?, twitter=?, lic=?, last_act=?, reg_date=?, favoritePropertiesId=?, reviewFull=?") === FALSE)
+            OR ($stmt->bind_param("ssssssssssssssssssssssssssssssiisi", $paramsArr['typeTenant'], $paramsArr['typeOwner'], $paramsArr['name'], $paramsArr['secondName'], $paramsArr['surname'], $paramsArr['sex'], $paramsArr['nationality'], $paramsArr['birthday'], $paramsArr['login'], $paramsArr['password'], $paramsArr['telephon'], $paramsArr['emailReg'], $paramsArr['email'], $paramsArr['currentStatusEducation'], $paramsArr['almamater'], $paramsArr['speciality'], $paramsArr['kurs'], $paramsArr['ochnoZaochno'], $paramsArr['yearOfEnd'], $paramsArr['statusWork'], $paramsArr['placeOfWork'], $paramsArr['workPosition'], $paramsArr['regionOfBorn'], $paramsArr['cityOfBorn'], $paramsArr['shortlyAboutMe'], $paramsArr['vkontakte'], $paramsArr['odnoklassniki'], $paramsArr['facebook'], $paramsArr['twitter'], $paramsArr['lic'], $paramsArr['last_act'], $paramsArr['reg_date'], $paramsArr['favoritePropertiesId'], $paramsArr['reviewFull']) === FALSE)
             OR ($stmt->execute() === FALSE)
             OR (($res = $stmt->affected_rows) === -1)
             OR ($res === 0)
             OR ($stmt->close() === FALSE)
         ) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO users SET typeTenant=" . $paramsArr['typeTenant'] . ", typeOwner=" . $paramsArr['typeOwner'] . ", name=" . $paramsArr['name'] . ", secondName=" . $paramsArr['secondName'] . ", surname=" . $paramsArr['surname'] . ", sex=" . $paramsArr['sex'] . ", nationality=" . $paramsArr['nationality'] . ", birthday=" . $paramsArr['birthday'] . ", login=" . $paramsArr['login'] . ", password=" . $paramsArr['password'] . ", telephon=" . $paramsArr['telephon'] . ", emailReg=" . $paramsArr['emailReg'] . ", email=" . $paramsArr['email'] . ", currentStatusEducation=" . $paramsArr['currentStatusEducation'] . ", almamater=" . $paramsArr['almamater'] . ", speciality=" . $paramsArr['speciality'] . ", kurs=" . $paramsArr['kurs'] . ", ochnoZaochno=" . $paramsArr['ochnoZaochno'] . ", yearOfEnd=" . $paramsArr['yearOfEnd'] . ", statusWork=" . $paramsArr['statusWork'] . ", placeOfWork=" . $paramsArr['placeOfWork'] . ", workPosition=" . $paramsArr['workPosition'] . ", regionOfBorn=" . $paramsArr['regionOfBorn'] . ", cityOfBorn=" . $paramsArr['cityOfBorn'] . ", shortlyAboutMe=" . $paramsArr['shortlyAboutMe'] . ", vkontakte=" . $paramsArr['vkontakte'] . ", odnoklassniki=" . $paramsArr['odnoklassniki'] . ", facebook=" . $paramsArr['facebook'] . ", twitter=" . $paramsArr['twitter'] . ", lic=" . $paramsArr['lic'] . ", last_act=" . $paramsArr['last_act'] . ", reg_date=" . $paramsArr['reg_date'] . ", favoritePropertiesId=" . $paramsArr['favoritePropertiesId'] . ", reviewRooms=" . $paramsArr['reviewRooms'] . ", reviewFlats=" . $paramsArr['reviewFlats'] . "'. id логгера: DBconnect::insertUserCharacteristic():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO users SET typeTenant=" . $paramsArr['typeTenant'] . ", typeOwner=" . $paramsArr['typeOwner'] . ", name=" . $paramsArr['name'] . ", secondName=" . $paramsArr['secondName'] . ", surname=" . $paramsArr['surname'] . ", sex=" . $paramsArr['sex'] . ", nationality=" . $paramsArr['nationality'] . ", birthday=" . $paramsArr['birthday'] . ", login=" . $paramsArr['login'] . ", password=" . $paramsArr['password'] . ", telephon=" . $paramsArr['telephon'] . ", emailReg=" . $paramsArr['emailReg'] . ", email=" . $paramsArr['email'] . ", currentStatusEducation=" . $paramsArr['currentStatusEducation'] . ", almamater=" . $paramsArr['almamater'] . ", speciality=" . $paramsArr['speciality'] . ", kurs=" . $paramsArr['kurs'] . ", ochnoZaochno=" . $paramsArr['ochnoZaochno'] . ", yearOfEnd=" . $paramsArr['yearOfEnd'] . ", statusWork=" . $paramsArr['statusWork'] . ", placeOfWork=" . $paramsArr['placeOfWork'] . ", workPosition=" . $paramsArr['workPosition'] . ", regionOfBorn=" . $paramsArr['regionOfBorn'] . ", cityOfBorn=" . $paramsArr['cityOfBorn'] . ", shortlyAboutMe=" . $paramsArr['shortlyAboutMe'] . ", vkontakte=" . $paramsArr['vkontakte'] . ", odnoklassniki=" . $paramsArr['odnoklassniki'] . ", facebook=" . $paramsArr['facebook'] . ", twitter=" . $paramsArr['twitter'] . ", lic=" . $paramsArr['lic'] . ", last_act=" . $paramsArr['last_act'] . ", reg_date=" . $paramsArr['reg_date'] . ", favoritePropertiesId=" . $paramsArr['favoritePropertiesId'] . ", reviewFull=" . $paramsArr['reviewFull'] . "'. id логгера: DBconnect::insertUserCharacteristic():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return FALSE;
         }
 
@@ -1278,23 +1278,22 @@ class DBconnect {
     /**
      * Изменяет в БД права пользователя на доступ к контактам собственников (дата и время окончания доступа)
      * @param $userId идентификатор пользователя, чьи права меняем
-     * @param $reviewType какие именно права меняем: "reviewRooms" или "reviewFlats"
      * @param $value время в формате timestamp, до которого действует право
      * @return bool возвращает TRUE в случае успеха и FALSE в случае неудачи
      */
-    public static function updateUserCharacteristicReviewRights($userId, $reviewType, $value) {
+    public static function updateUserCharacteristicReviewRights($userId, $value) {
 
         // Валидация входящих данных
-        if (!isset($userId) || !is_int($userId) || !isset($reviewType) || ($reviewType != "reviewRooms" && $reviewType != "reviewFlats") || !isset($value) || !is_int($value)) return FALSE;
+        if (!isset($userId) || !is_int($userId) || !isset($value) || !is_int($value)) return FALSE;
 
         $stmt = DBconnect::get()->stmt_init();
-        if (($stmt->prepare("UPDATE users SET " . $reviewType . " = " . $value . " WHERE id = ?") === FALSE)
-            OR ($stmt->bind_param("i", $userId) === FALSE)
+        if (($stmt->prepare("UPDATE users SET reviewFull = ? WHERE id = ?") === FALSE)
+            OR ($stmt->bind_param("ii", $value, $userId) === FALSE)
             OR ($stmt->execute() === FALSE)
             OR (($res = $stmt->affected_rows) === -1)
             OR ($stmt->close() === FALSE)
         ) {
-            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE users SET " . $reviewType . " = " . $value . " WHERE id = " . $userId . "'. id логгера: DBconnect::updateUserCharacteristicReviewRights():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'UPDATE users SET reviewFull = " . $value . " WHERE id = " . $userId . "'. id логгера: DBconnect::updateUserCharacteristicReviewRights():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return FALSE;
         }
 

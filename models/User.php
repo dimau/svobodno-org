@@ -12,8 +12,7 @@ class User {
     protected $typeTenant = FALSE;
     protected $typeOwner = FALSE;
     protected $typeAdmin = FALSE;
-    protected $reviewRooms = 0;
-    protected $reviewFlats = 0;
+    protected $reviewFull = 0;
 
     public function getId() {
         return $this->id;
@@ -62,11 +61,7 @@ class User {
         return $result;
     }
 
-    public function getReviewRooms() {
-        return $this->reviewRooms;
-    }
-
-    public function getReviewFlats() {
-        return $this->reviewFlats;
+    public function getReviewFull() {
+        return $this->reviewFull;
     }
 }

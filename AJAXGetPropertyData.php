@@ -52,9 +52,12 @@ if (!$property->readCharacteristicFromDB()) echo json_encode(array('access' => '
 if ($property->getStatus() != "опубликовано") echo json_encode(array('access' => 'denied'));
 $propertyData = $property->getCharacteristicData();
 
-// Если пользователь не оплатил доступ к контактам собственников по такого рода объявлениям, то отказываем в доступе
-if ($propertyData['typeOfObject'] == "квартира" && $userIncoming->getReviewFlats() < time()) echo json_encode(array('access' => 'denied'));
-if ($propertyData['typeOfObject'] == "комната" && $userIncoming->getReviewRooms() < time()) echo json_encode(array('access' => 'denied'));
+// Если у пользователя оплачен премиум-доступ, то вернем ему еще и источник объявления
+if ($userIncoming->getReviewFull() >= time()) {
+    $sourceOfAdvert = $propertyData['sourceOfAdvert'];
+} else {
+    $sourceOfAdvert = "";
+}
 //TODO: проверить чтобы время сравнивалось в одинаковом часовом поясе
 
 /*************************************************************************************
@@ -72,7 +75,7 @@ if (count($existRequest) == 0) DBconnect::insertRequestForOwnerContacts(array("t
  * ВОЗВРАЩАЕМ КОНТАКТЫ СОБСТВЕННИКА
  *************************************************************************************/
 
-echo json_encode(array('access' => 'successful', 'name' => '', 'secondName' => '', 'contactTelephonNumber' => $propertyData['contactTelephonNumber'], 'sourceOfAdvert' => $propertyData['sourceOfAdvert']));
+echo json_encode(array('access' => 'successful', 'name' => '', 'secondName' => '', 'contactTelephonNumber' => "+7" . $propertyData['contactTelephonNumber'], 'sourceOfAdvert' => $sourceOfAdvert));
 
 /********************************************************************************
  * Закрываем соединение с БД

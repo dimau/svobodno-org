@@ -465,31 +465,6 @@ input[type=text], input[type=password], select, textarea {
     color: silver !important;
 }
 
-/* Кнопки для приобретения тарифов на доступ */
-.buyButton {
-    display: inline-block;
-    width: 178px;
-    height: 177px;
-    padding: 0;
-    border: none;
-}
-
-.buyButton.rooms {
-    background: url(../img/button-380-normal.png);
-}
-
-.buyButton.flats {
-    background: url(../img/button-480-normal.png);
-}
-
-.buyButton.rooms:hover {
-    background: url(../img/button-380-light.png);
-}
-
-.buyButton.flats:hover {
-    background: url(../img/button-480-light.png);
-}
-
 /* =============================================================================
    ТАБЛИЦЫ
    ========================================================================== */
@@ -1066,14 +1041,6 @@ td, th {
 }
 
 /* =============================================================================
-   ПАРАМЕТРЫ ПОИСКА
-   ========================================================================== */
-
-.searchChapter {
-    display: inline-block;
-}
-
-/* =============================================================================
    РЕЗУЛЬТАТЫ ПОИСКА И ИЗБРАННЫЕ ОБЪЯВЛЕНИЯ
    ========================================================================== */
 
@@ -1110,23 +1077,22 @@ td, th {
     float: none;
 }
 
+.ballonBody {
+    font-size: 14px;
+    min-width: 300px;
+    white-space: nowrap;
+}
+
+/* Вспомогательный класс для серых наименований параметров в кратком описании объектов и в баллуне */
+.unimportantText {
+    color: #808080;
+}
+
 /* Порядковый номер объявления в списке */
 .numberOfRealtyObject {
     color: #808080;
     text-align: center;
     font-size: 11px;
-}
-
-#map.fixedTopBlock {
-    position: fixed;
-    top: 0px;
-}
-
-#map.absoluteBottomBlock {
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-    top: auto;
 }
 
 /* Стили для отдельного объявления в списке */
@@ -1137,7 +1103,7 @@ td, th {
     border-left: 2px solid silver;
     background-color: white;
     text-align: center;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 #shortListOfRealtyObjects .realtyObject {
@@ -1174,42 +1140,59 @@ td, th {
 .realtyObject .serviceMarks,
 #headOfFullParametersList .serviceMarks {
     float: left;
-    width: 30px;
+    width: 32px;
+}
+
+#shortListOfRealtyObjects .realtyObject .serviceMarks {
+    padding-top: 4px; /* Дополнительный отступ сверху для того, чтобы выровнять порядковый номер с маленькой первой буквой адреса объекта */
 }
 
 /* Стили для блока, содержащего основную информацию по объявлению - все кроме служебных меток */
 .realtyObject .mainContent,
 #headOfFullParametersList .mainContent {
     position: relative; /* Чтобы абсолютно позиционированная ссылка Подробнее не уезжала из ячейки */
-    margin-left: 30px; /* Отступ для .serviceMarks */
+    margin-left: 32px; /* Отступ для .serviceMarks */
     white-space: nowrap;
+}
+
+#shortListOfRealtyObjects .realtyObject .mainContent {
+    padding-bottom: 21px; /* Отступ снизу для управляющих ссылок, например, Подробнее */
 }
 
 /* =============================================================================
    РЕЗУЛЬТАТЫ ПОИСКА: СПИСОК + КАРТА
    ========================================================================== */
 
-/* Стили для блоков с информацией по объявлению в представлении Список + карта */
-#shortListOfRealtyObjects .realtyObject .mainContent {
-    padding-bottom: 21px; /* Отступ снизу для управляющих ссылок, например, Подробнее */
+#shortListOfRealtyObjects .realtyObject .mainContent .address {
+    text-align: left;
 }
 
-#shortListOfRealtyObjects .realtyObject .mainContent .addressInShort {
-    float: left;
+#shortListOfRealtyObjects .realtyObject .mainContent .address .addressString,
+.ballonBody .addressString {
     font-size: 16px;
+    white-space: normal;
 }
 
-#shortListOfRealtyObjects .realtyObject .mainContent .costOfRentingInShort {
+#shortListOfRealtyObjects .realtyObject .mainContent .costOfRenting,
+.ballonBody .costOfRenting {
     float: right;
+    padding-left: 2em; /* Чтобы цена не сливалась с адресом при маленьком разрешении и длинном адресе */
+    text-align: right;
 }
 
-#shortListOfRealtyObjects .realtyObject .mainContent .costOfRentingInShort .costOfRentingInShortString {
+#shortListOfRealtyObjects .realtyObject .mainContent .costOfRenting .costOfRentingString,
+.ballonBody .costOfRentingString {
     font-size: 16px;
 }
 
-#shortListOfRealtyObjects .realtyObject .mainContent .secondaryOptionsBlock {
+#shortListOfRealtyObjects .realtyObject .mainContent .secondaryOptionsBlock,
+.ballonBody .secondaryOptionsBlock {
     clear: right;
-    padding-top: 12px;
+    padding-top: 6px;
+}
+
+.ballonBody .secondaryOptionsBlock {
+    padding-bottom: 6px;
 }
 
 #shortListOfRealtyObjects .realtyObject .mainContent .secondaryOption {
@@ -1218,12 +1201,13 @@ td, th {
     text-align: left;
 }
 
-/* Если экран меньше 1052px в ширину, то второстепенные характеристики в кратком описании объявления нужно сделать в несколько строк */
-@media screen and (max-width: 1052px) {
-    #shortListOfRealtyObjects .realtyObject .mainContent .secondaryOptionsBlock {
-        padding-top: 4px;
-    }
+.ballonBody .secondaryOption {
+    display: block;
+    width: 100%;
+}
 
+/* Если экран меньше 1052px в ширину, то второстепенные характеристики в кратком описании объявления нужно сделать в несколько строк */
+@media screen and (max-width: 1150px) {
     #shortListOfRealtyObjects .realtyObject .mainContent .secondaryOption {
         display: block;
         width: 100%;
@@ -1238,7 +1222,6 @@ td, th {
     left: 0px;
     right: 0px;
     text-align: right;
-    font-size: 12px;
 }
 
 .advertActions a {
@@ -1247,6 +1230,10 @@ td, th {
 
 .realtyObject:hover .advertActions a {
     opacity: 1;
+}
+
+.balloonAdvertActions {
+    text-align: right;
 }
 
 /* =============================================================================
@@ -1327,7 +1314,6 @@ td, th {
    РЕЗУЛЬТАТЫ ПОИСКА: КАРТА
    ========================================================================== */
 
-/* Режим только карты */
 #map {
     width: 50%;
     position: absolute;
@@ -1335,38 +1321,16 @@ td, th {
     right: 0px;
 }
 
-.ballonBody {
-    font-size: 13px;
-    min-width: 250px;
+#map.fixedTopBlock {
+    position: fixed;
+    top: 0px;
 }
 
-.ballonBody .addressString {
-    font-size: 16px;
-}
-
-.ballonBody .costOfRenting {
-    float: right;
-    margin-top: 4px;
-}
-
-.ballonBody .costOfRentingString {
-    font-size: 16px;
-}
-
-.ballonBody .secondaryOptionsBlock {
-    clear: right;
-    padding-top: 4px;
-    padding-bottom: 4px;
-}
-
-.ballonBody .secondaryOption {
-    display: block;
-    width: 100%;
-}
-
-/* Вспомогательный класс для серых наименований параметров в кратком описании объектов и в баллуне */
-.unimportantText {
-    color: #808080;
+#map.absoluteBottomBlock {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    top: auto;
 }
 
 /* =============================================================================================================

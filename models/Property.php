@@ -979,9 +979,9 @@ class Property {
             if ($this->coordX != "" && $this->coordY != "") {
                 if (!preg_match('/^\d{0,3}\.\d{0,10}$/', $this->coordX) || !preg_match('/^\d{0,3}\.\d{0,10}$/', $this->coordY)) $errors[] = 'Убедитесь, что на карте метка указывает на Ваш дом';
             }
-            if (strlen($this->address) > 60) $errors[] = 'Указан слишком длинный адрес (используйте не более 60 символов)';
+            if (mb_strlen($this->address, "utf-8") > 60) $errors[] = 'Указан слишком длинный адрес (используйте не более 60 символов)';
             if ($this->apartmentNumber == "" && $this->typeOfObject != "0" && $this->typeOfObject != "дом" && $this->typeOfObject != "дача" && $this->typeOfObject != "гараж") $errors[] = 'Укажите номер квартиры';
-            if (strlen($this->apartmentNumber) > 20) $errors[] = 'Указан слишком длинный номер квартиры (используйте не более 20 символов)';
+            if (mb_strlen($this->apartmentNumber, "utf-8") > 20) $errors[] = 'Указан слишком длинный номер квартиры (используйте не более 20 символов)';
         }
         // Убеждаемся что данный пользователь еще не публиковал объявлений по этому адресу. Не стоит позволять публиковать несколько разных объявлений одному человеку с привязкой к одному и тому же адресу
         if ($typeOfValidation == "newAdvert" || $typeOfValidation == "newAlienAdvert") {

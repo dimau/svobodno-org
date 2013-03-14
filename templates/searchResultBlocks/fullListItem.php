@@ -1,8 +1,12 @@
 <div class='realtyObject' propertyId='{propertyId}'>
     <div class="serviceMarks">
         <div class='numberOfRealtyObject'>{number}</div>
-        {favorites}
-        {hasPhotos}
+        <div>
+            {favorites}
+        </div>
+        <div>
+            {hasPhotos}
+        </div>
     </div>
     <div class="mainContent">
         <div class="address"><span class="typeOfObjectString">{typeOfObject}</span><span class="districtString">{district}</span><a

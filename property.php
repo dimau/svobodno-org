@@ -99,7 +99,7 @@ if ($property->getStatus() == "не опубликовано"
 // Инициализируем используемые в шаблоне(ах) переменные
 $isLoggedIn = $userIncoming->login(); // Используется в templ_header.php
 $amountUnreadMessages = $userIncoming->getAmountUnreadMessages(); // Количество непрочитанных уведомлений пользователя
-$userCharacteristic = array('id' => $userIncoming->getId(), 'typeTenant' => $userIncoming->isTenant(), 'typeOwner' => $userIncoming->isOwner(), 'name' => $userIncoming->getName(), 'secondName' => $userIncoming->getSecondName(), 'surname' => $userIncoming->getSurname(), 'telephon' => $userIncoming->getTelephon(), 'reviewRooms' => $userIncoming->getReviewRooms(), 'reviewFlats' => $userIncoming->getReviewFlats()); // Но для данной страницы данный массив содержит только имя, отчество, фамилию, телефон пользователя
+$userCharacteristic = array('id' => $userIncoming->getId(), 'typeTenant' => $userIncoming->isTenant(), 'typeOwner' => $userIncoming->isOwner(), 'name' => $userIncoming->getName(), 'secondName' => $userIncoming->getSecondName(), 'surname' => $userIncoming->getSurname(), 'telephon' => $userIncoming->getTelephon(), 'reviewFull' => $userIncoming->getReviewFull()); // Но для данной страницы данный массив содержит только имя, отчество, фамилию, телефон пользователя
 $propertyCharacteristic = $property->getCharacteristicData();
 $propertyFotoInformation = $property->getFotoInformationData();
 $favoritePropertiesId = $userIncoming->getFavoritePropertiesId();

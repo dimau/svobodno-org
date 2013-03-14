@@ -2,7 +2,6 @@
     <div class='newsHeader'>
         Новое предложение по Вашему поиску
     </div>
-    {fotosWrapper}
     <ul class='setOfInstructions'>
         <li>
             <a class="isReadedTrueMessage">{isReadedTrue}</a>

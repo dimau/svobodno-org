@@ -66,7 +66,7 @@
             </li>
         </ul>
         <div id="tabs-1">
-            <form name="fastSearch" method="get">
+            <form name="fastSearch" method="get" style="line-height: 1.6em;">
 		        <span id="fastSearchInput">
                 Я хочу арендовать
 					<select name="typeOfObjectFast" id="typeOfObjectFast">
@@ -104,6 +104,7 @@
                         }
                         ?>
                     </select>
+                    <span style="white-space: nowrap;">
 				стоимостью от
 					<input type="text" name="minCostFast" id="minCostFast" size="10"
                            maxlength="8" value='<?php echo $userSearchRequest['minCost'];?>'>
@@ -114,6 +115,7 @@
 					<button type="submit" name="fastSearchButton" id="fastSearchButton" class="mainButton">
                         Найти
                     </button>
+                        </span>
                 </span>
             </form>
         </div>
@@ -144,7 +146,7 @@
 
     <?php
     // Модальное окно для незарегистрированных пользователей, которые нажимают на кнопку добавления в Избранное
-    if ($isLoggedIn === FALSE) require $websiteRoot . "/templates/templ_addToFavotitesDialog_ForLoggedOut.php";
+    if ($isLoggedIn === FALSE) require $websiteRoot . "/templates/modalWindows/templ_addToFavotitesDialog_ForLoggedOut.php";
     ?>
 
     <!-- Блок для прижатия подвала к низу страницы без закрытия части контента, его CSS высота доллжна быть = высоте футера -->
@@ -152,9 +154,7 @@
 </div>
 <!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2013 г. Если нужна помощь или хочется оставить отзыв (пожелание) на сервис Svobodno.org, свяжитесь с нами по
-    телефону: 8-922-160-95-14, или e-mail:
-    support@svobodno.org
+    2013 г. Мы будем рады ответить на Ваши вопросы, отзывы, предложения по телефону: 8-922-160-95-14, или e-mail: support@svobodno.org
 </div>
 <!-- /end.footer -->
 
