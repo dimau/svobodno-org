@@ -285,7 +285,8 @@ DBconnect::get()->query("CREATE TABLE searchRequests (
         additionalDescriptionOfSearch TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
         regDate INT(11) COMMENT 'Дата и время создания поискового запроса',
         needEmail INT(1) DEFAULT 0 COMMENT 'Требуется ли оповещать пользователя по email о появлении новых подходящих под его запрос объектов недвижимости: 0 = не требуется, 1 = требуется',
-        needSMS INT(1) DEFAULT 0 COMMENT 'Требуется ли оповещать пользователя по смс о появлении новых подходящих под его запрос объектов недвижимости: 0 = не требуется, 1 = требуется'
+        needSMS INT(1) DEFAULT 0 COMMENT 'Требуется ли оповещать пользователя по смс о появлении новых подходящих под его запрос объектов недвижимости: 0 = не требуется, 1 = требуется',
+        typeOfSorting VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'Тип сортировки результатов поиска/избранных объявлений, который последний раз выбирал пользователь: costAscending, costDescending, publicationDateDescending'
 )");
 
 echo "searchRequests: ";
@@ -357,6 +358,7 @@ DBconnect::get()->query("CREATE TABLE messagesNewProperty (
         totalArea DEC(7, 2) COMMENT 'Площадь общая в м2',
         livingSpace DEC(7, 2) COMMENT 'Площадь жилая в м2',
         kitchenSpace DEC(7, 2) COMMENT 'Площадь кухни в м2',
+        floor INT COMMENT 'Этаж, на котором расположена квартира, комната',
         totalAmountFloor INT COMMENT 'Общее количество этажей в доме, в котором расположена квартира, комната',
         numberOfFloor INT COMMENT 'Этажность дома, дачи, таунхауса'
     )");

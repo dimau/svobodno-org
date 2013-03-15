@@ -1,5 +1,5 @@
-<!-- Элементы управления для выбора формы представления результатов выдачи (карта, список, карта + список) -->
-<div class='choiceViewSearchResult'>
+<div class="controlPanelSearchResult">
+    <div class='choiceViewSearchResult'>
     <span id='expandList'>
         <a href='#'>Список</a>&nbsp;&nbsp;&nbsp;
     </span>
@@ -9,6 +9,24 @@
     <span id='expandMap'>
         <a href='#'>Карта</a>
     </span>
+    </div>
+    <?php if ($mode == "search"): ?>
+    <div class="choiceTypeOfSorting">
+        сортировка
+        <select name="typeOfSortingSelect" id="typeOfSortingSelect">
+            <option value="costAscending" <?php if ($userSearchRequest['typeOfSorting'] == "costAscending") echo "selected";?>>
+                по возрастанию цены
+            </option>
+            <option value="costDescending" <?php if ($userSearchRequest['typeOfSorting'] == "costDescending") echo "selected";?>>
+                по убыванию цены
+            </option>
+            <option value="publicationDateDescending" <?php if ($userSearchRequest['typeOfSorting'] == "publicationDateDescending") echo "selected";?>>
+                по дате публикации
+            </option>
+        </select>
+    </div>
+    <?php endif; ?>
+    <div class="clearBoth"></div>
 </div>
 
 <div id='resultOnSearchPage'>

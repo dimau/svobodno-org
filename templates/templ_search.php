@@ -22,6 +22,9 @@
     <link rel="stylesheet" href="css/jquery-ui-1.8.22.custom.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
+        #fastSearch {
+            line-height: 3em;
+        }
     </style>
     <!-- end CSS -->
 
@@ -66,7 +69,7 @@
             </li>
         </ul>
         <div id="tabs-1">
-            <form name="fastSearch" method="get" style="line-height: 1.6em;">
+            <form name="fastSearch" id="fastSearch" method="get">
 		        <span id="fastSearchInput">
                 Я хочу арендовать
 					<select name="typeOfObjectFast" id="typeOfObjectFast">
@@ -117,10 +120,14 @@
                     </button>
                         </span>
                 </span>
+
+                <input type="hidden" name="typeOfSortingFast" id="typeOfSortingFast" value="<?php echo $userSearchRequest['typeOfSorting'];?>">
             </form>
         </div>
+
         <div id="tabs-2">
-            <form name="extendedSearch" method="get">
+
+            <form name="extendedSearch" id="extendedSearch" method="get">
 
                 <?php
                 // Форма с параметрами поиска
@@ -134,7 +141,10 @@
                 </div>
                 <div class="clearBoth"></div>
 
+                <input type="hidden" name="typeOfSorting" id="typeOfSorting" value="<?php echo $userSearchRequest['typeOfSorting'];?>">
+
             </form>
+
         </div>
         <!-- /end.tabs-2 -->
     </div>

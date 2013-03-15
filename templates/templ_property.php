@@ -120,12 +120,23 @@ require $websiteRoot . "/templates/templ_header.php";
 <script>
     $(document).ready(function () {
 
-        $("#getOwnerContactsDialog").dialog({
+        $("#getOwnerContactsDialog, #paymentDialog").dialog({
             autoOpen:false,
             modal:true,
             width:600,
             dialogClass:"edited",
             draggable:true
+        });
+
+        $(".paymentButton").click(function () {
+            // Узнаем - заготовлено ли диалоговое окно на случай клика
+            var paymentDialog = $("#paymentDialog");
+            if (paymentDialog.length == 1) {
+                paymentDialog.dialog("open");
+                return true;
+            } else {
+                return false;
+            }
         });
 
         $(".getOwnerContactsButton").click(function () {
@@ -155,6 +166,30 @@ require $websiteRoot . "/templates/templ_header.php";
                     }
                 }, 'json');
             }
+        });
+
+        $("#lostRelevance").click(function() {
+            // Заменяем на странице ссылку на сообщение
+            $("#lostRelevance").html("Спасибо, мы проверим объявление!");
+            // Сообщим об этом на сервер
+            jQuery.post("AJAXChangePropertyData.php", {"propertyId":propertyId, "action":"lostRelevance"}, function (data) {
+                if (data.access == "successful") {
+                    // Если что-то нужно сделать после получения успешного ответа от сервера
+                }
+            }, 'json');
+            return false;
+        });
+
+        $("#errorInDescription").click(function () {
+            // Заменяем на странице ссылку на сообщение
+            $("#errorInDescription").html("Спасибо, мы проверим объявление!");
+            // Сообщим об этом на сервер
+            jQuery.post("AJAXChangePropertyData.php", {"propertyId":propertyId, "action":"errorInDescription"}, function (data) {
+                if (data.access == "successful") {
+                    // Если что-то нужно сделать после получения успешного ответа от сервера
+                }
+            }, 'json');
+            return false;
         });
 
     });
@@ -275,11 +310,11 @@ require $websiteRoot . "/templates/templ_header.php";
                 </span>
                 <span style="white-space: nowrap;">
                 <?php
-                    if ($propertyCharacteristic['typeOfObject'] != "квартира" && $propertyCharacteristic['typeOfObject'] != "дом" && $propertyCharacteristic['typeOfObject'] != "таунхаус" && $propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['roomSpace'] != "") echo $propertyCharacteristic['roomSpace'];
-                    if ($propertyCharacteristic['typeOfObject'] != "комната" && $propertyCharacteristic['totalArea'] != "") echo $propertyCharacteristic['totalArea'];
-                    if ($propertyCharacteristic['typeOfObject'] != "комната" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['livingSpace'] != "") echo "/" . $propertyCharacteristic['livingSpace'];
-                    if ($propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж" && $propertyCharacteristic['kitchenSpace'] != "") echo "/" . $propertyCharacteristic['kitchenSpace'];
-                    if ($propertyCharacteristic['roomSpace'] != "" || $propertyCharacteristic['totalArea'] != "" || $propertyCharacteristic['livingSpace'] != "" || $propertyCharacteristic['kitchenSpace'] != "") echo " м²";
+                    if ($propertyCharacteristic['roomSpace'] != "" && $propertyCharacteristic['typeOfObject'] == "комната") echo $propertyCharacteristic['roomSpace'];
+                    if ($propertyCharacteristic['totalArea'] != "" && ($propertyCharacteristic['typeOfObject'] != "комната" || $propertyCharacteristic['roomSpace'] == "")) echo $propertyCharacteristic['totalArea'];
+                    if ($propertyCharacteristic['livingSpace'] != "" && $propertyCharacteristic['typeOfObject'] != "комната" && $propertyCharacteristic['typeOfObject'] != "гараж") echo "/" . $propertyCharacteristic['livingSpace'];
+                    if ($propertyCharacteristic['kitchenSpace'] != "" && $propertyCharacteristic['typeOfObject'] != "дача" && $propertyCharacteristic['typeOfObject'] != "гараж") echo "/" . $propertyCharacteristic['kitchenSpace'];
+                    if (($propertyCharacteristic['roomSpace'] != "" && $propertyCharacteristic['typeOfObject'] == "комната") || $propertyCharacteristic['totalArea'] != "" || $propertyCharacteristic['livingSpace'] != "" || $propertyCharacteristic['kitchenSpace'] != "") echo " м²";
                     ?>
                 </span>
             </div>
@@ -318,7 +353,7 @@ require $websiteRoot . "/templates/templ_header.php";
                     <a class="ownerContactsSourceOfAdvertHref" href=""></a>
                 </div>
                 <div class="ourAd" style="display: none; margin-top: 6px;">
-                    <button class="mainButton" style="float: right;">
+                    <button class="mainButton paymentButton" style="float: right;">
                         к оплате
                     </button>
                     Приобретите <span style="font-weight: bold;">Премиум-доступ</span> <span style="white-space: nowrap;">(от 50 руб.), чтобы:</span>
@@ -341,15 +376,14 @@ require $websiteRoot . "/templates/templ_header.php";
             echo View::getHTMLforFavorites($propertyCharacteristic["id"], $favoritePropertiesId, "stringWithIcon");
             ?>
         </li>
-        <li class="instruction">
-            <a href="#"> не актуально</a>
+        <?php if ($isLoggedIn):?>
+        <li class="instruction" id="lostRelevance">
+            <a href=""> не актуально</a>
         </li>
-        <li class="instruction">
-            <a href="#"> ошибка в описании</a>
+        <li class="instruction" id="errorInDescription">
+            <a href=""> ошибка в описании</a>
         </li>
-        <li class="instruction">
-            <a href="#"> это агент</a>
-        </li>
+        <?php endif; ?>
         <!-- TODO: добавить функциональность!
         <li class="instruction">
             <a href="#"> отправить по e-mail</a>
@@ -977,6 +1011,8 @@ if ($isLoggedIn === FALSE) {
     require $websiteRoot . "/templates/modalWindows/templ_addToFavotitesDialog_ForLoggedOut.php";
     // Подключаем нужное модальное окно для Запроса на получение контактов собственника
     require $websiteRoot . "/templates/modalWindows/templ_getOwnerContactsDialog_ForLoggedOut.php";
+} elseif ($isLoggedIn === TRUE && $userCharacteristic['reviewFull'] < time()) {
+    require $websiteRoot . "/templates/modalWindows/templ_paymentDialog_ForPayNo.php";
 }
 ?>
 

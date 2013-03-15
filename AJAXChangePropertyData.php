@@ -4,6 +4,7 @@ session_start();
 
 // Подключаем нужные модели и представления
 $websiteRoot = $_SERVER['DOCUMENT_ROOT'];
+require_once $websiteRoot . '/lib/class.phpmailer.php';
 require_once $websiteRoot . '/models/DBconnect.php';
 require_once $websiteRoot . '/models/GlobFunc.php';
 require_once $websiteRoot . '/models/Logger.php';
@@ -29,8 +30,8 @@ if (!$userIncoming->login()) {
     GlobFunc::accessDenied();
 }
 
-// Если пользователь не является администратором, то доступ к скрипту ему запрещен
-if (!$isAdmin['searchUser']) {
+// Если пользователь не является администратором, то не сможет снять с публикации объявление
+if ($action == "unpublishAdvert" && !$isAdmin['searchUser']) {
     GlobFunc::accessDenied();
 }
 
@@ -72,6 +73,28 @@ if (!$property->readCharacteristicFromDB()) GlobFunc::accessDenied();
 
 if ($action == "unpublishAdvert") {
     if (count($property->unpublishAdvert()) != 0) GlobFunc::accessDenied();
+}
+
+/*************************************************************************************
+ * ОБЪЯВЛЕНИЕ НЕ АКТУАЛЬНО (ПОЛЬЗОВАТЕЛЬ СООБЩАЕТ О ПОТЕРЕ АКТУАЛЬНОСТИ ОБЪЯВЛЕНИЕМ)
+ *************************************************************************************/
+
+if ($action == "lostRelevance") {
+    // Оповещаем операторов о неактуальном объявлении
+    $subject = 'Объявление потеряло актуальность';
+    $msgHTML = "Пользователь <a href='http://svobodno.org/man.php?compId=" . GlobFunc::idToCompId($userIncoming->getId()) . "'>" . $userIncoming->getName() . " (id = " . $userIncoming->getId() . ")</a> сообщил, что объявление <a href='http://svobodno.org/editadvert.php?propertyId=" . $property->getId() . "'>" . $property->getAddress() . "</a> больше не является актуальным";
+    GlobFunc::sendEmailToOperator($subject, $msgHTML);
+}
+
+/*************************************************************************************
+ * ОБЪЯВЛЕНИЕ СОДЕРЖИТ ОШИБКУ В ОПИСАНИИ (ПОЛЬЗОВАТЕЛЬ СООБЩАЕТ ОБ ЭТОМ)
+ *************************************************************************************/
+
+if ($action == "errorInDescription") {
+    // Оповещаем операторов об ошибке в объявлении
+    $subject = 'Ошибка в описании объявления';
+    $msgHTML = "Пользователь <a href='http://svobodno.org/man.php?compId=" . GlobFunc::idToCompId($userIncoming->getId()) . "'>" . $userIncoming->getName() . " (id = " . $userIncoming->getId() . ")</a> сообщил, что объявление <a href='http://svobodno.org/editadvert.php?propertyId=" . $property->getId() . "'>" . $property->getAddress() . "</a> содержит ошибки";
+    GlobFunc::sendEmailToOperator($subject, $msgHTML);
 }
 
 /*************************************************************************************

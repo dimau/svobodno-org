@@ -63,7 +63,7 @@
             </div>
             <div class="paymentButtonsBlock">
                 <?php
-                require $websiteRoot . "/templates/templ_paymentButtons.php";
+                //require $websiteRoot . "/templates/templ_paymentButtons.php";
                 ?>
             </div>
         </div>

@@ -95,12 +95,21 @@ class UserIncoming extends User {
         return TRUE;
     }
 
-    // Вычисляет массивы: 1. C краткими данными (id, coordX, coordY) о ВСЕХ избранных объектах недвижимости
-    // 2. Кроме того по первым $amountFullProperties объектам недвижимости вычисляет полные данные, даже с фотографиями.
-    // Объекты недвижимости отсортированы в обоих массивах по увеличению стоимости аренды с учетом коммунальных платежей
-    public function searchProperties($amountFullProperties) {
+    /**
+     * Вычисляет массивы:
+     * 1. C краткими данными (id, coordX, coordY) о ВСЕХ избранных объектах недвижимости
+     * 2. Кроме того по первым $amountFullProperties объектам недвижимости вычисляет полные данные, даже с фотографиями.
+     * @param $amountFullProperties количество первых объявлений, по которым нужно получить полные данные
+     * @param $typeOfSorting тип сортировки результатов: costAscending, costDescending, publicationDateDescending
+     * @return bool TRUE в случае успешного завершения выполнения алгоритма и FALSE в противном случае
+     */
+    public function searchProperties($amountFullProperties, $typeOfSorting) {
+
+        // Валидация входных данных
+        if (!isset($amountFullProperties) || !isset($typeOfSorting)) return FALSE;
+
         // Получим минимальные данные (id, coordX, coordY) по всем объектам недвижимости, подходящим под параметры поискового запроса
-        $this->findPropertyLightArr();
+        $this->findPropertyLightArr($typeOfSorting);
 
         // Получим полные данные по первым $amountFullProperties объектам недвижимости
         $this->findPropertyFullArr($amountFullProperties);
@@ -125,13 +134,32 @@ class UserIncoming extends User {
         // Если был удален хотя бы 1 элемент, переиндексируем массив
         if ($markForSort) $this->propertyLightArr = array_values($this->propertyLightArr);
 
+        return TRUE;
     }
 
     // Метод записывает в параметр $this->propertyLightArr массив массивов, содержащий минимальные данные по всем объектам недвижимости, соответствующим данным условиям поиска
-    private function findPropertyLightArr() {
+    private function findPropertyLightArr($typeOfSorting) {
 
         // Убедимся, что список идентификаторов объектов недвижимости представляет собой массив и его длина не равна нулю
-        if (!is_array($this->favoritePropertiesId) || count($this->favoritePropertiesId) == 0) $this->propertyLightArr = array();
+        if (!is_array($this->favoritePropertiesId) || count($this->favoritePropertiesId) == 0) {
+            $this->propertyLightArr = array();
+            return FALSE;
+        }
+
+        // Выбираем вариант сортировки
+        switch ($typeOfSorting) {
+            case "costAscending":
+                $typeOfSortingString = "realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting ASC";
+                break;
+            case "costDescending":
+                $typeOfSortingString = "realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting DESC";
+                break;
+            case "publicationDateDescending":
+                $typeOfSortingString = "reg_date DESC";
+                break;
+            default:
+                return FALSE;
+        }
 
         // Собираем строку WHERE для поискового запроса к БД
         $strWHERE = " (";
@@ -144,15 +172,17 @@ class UserIncoming extends User {
         // Получаем данные из БД - ВСЕ объекты недвижимости, которые являются избранными для данного пользователя
         // Сортируем по стоимости аренды и не ограничиваем количество объявлений - все, добавленные в избранные
         // В итоге получим массив ($this->propertyLightArr), каждый элемент которого представляет собой также массив значений конкретного объявления по недвижимости
-        $res = DBconnect::get()->query("SELECT id, coordX, coordY FROM property WHERE" . $strWHERE . " ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting");
+        $res = DBconnect::get()->query("SELECT id, coordX, coordY FROM property WHERE" . $strWHERE . " ORDER BY " . $typeOfSortingString);
         if ((DBconnect::get()->errno)
             OR (($this->propertyLightArr = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
         ) {
             // Логируем ошибку
             //TODO: сделать логирование ошибки
             $this->propertyLightArr = array();
+            return FALSE;
         }
 
+        return TRUE;
     }
 
     // Метод записывает в параметр $this->propertyFullArr массив массивов, содержащий полные данные (в том числе с фото) по первым $amountFullProperties объектам недвижимости из массива $this->propertyLightArr

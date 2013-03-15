@@ -63,7 +63,7 @@
 
             echo "<li class='separator'></li>";
 
-            if (!$isLoggedIn) { // Пункт меню "Заявка на аренду" выдается только неавторизованным пользователям
+            if (!$isLoggedIn) { // Пункт меню "Регистрация" выдается только неавторизованным пользователям
 
                 if ($_SERVER['PHP_SELF'] == "/registration.php") {
                     echo ("<li class='selected choice' style='width: 113px;'><div>Регистрация</div>");

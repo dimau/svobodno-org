@@ -645,13 +645,15 @@ class View {
         // Стоимость
         $arrShortListReplace['costOfRenting'] = "";
         $arrShortListReplace['currency'] = "";
-        $arrShortListReplace['costOfRentingName'] = "";
+        $arrShortListReplace['costOfRentingName'] = "Плата:";
         $arrShortListReplace['utilities'] = "";
-        if (isset($oneProperty['costOfRenting']) && $oneProperty['costOfRenting'] != "" && $oneProperty['costOfRenting'] != "0.00" && isset($oneProperty['currency']) && $oneProperty['currency'] != "" && $oneProperty['currency'] != "0") {
+        if ($oneProperty['costOfRenting'] != "" && $oneProperty['costOfRenting'] != "0.00" && $oneProperty['currency'] != "" && $oneProperty['currency'] != "0") {
             $arrShortListReplace['costOfRenting'] = $oneProperty['costOfRenting'];
             $arrShortListReplace['currency'] = $oneProperty['currency'] . "/мес.";
-            $arrShortListReplace['costOfRentingName'] = "Плата:";
-            if (isset($oneProperty['utilities']) && $oneProperty['utilities'] == "да") $arrShortListReplace['utilities'] = " <span style='white-space: nowrap;'>+ ком.усл.</span>";
+            if ($oneProperty['utilities'] == "да") $arrShortListReplace['utilities'] = " <span style='white-space: nowrap;'>+ ком. усл.</span>";
+            if ($oneProperty['utilities'] == "нет") $arrShortListReplace['utilities'] = "<span style='white-space: nowrap;'> (ком. вкл.)</span>";
+        } else {
+            $arrShortListReplace['costOfRenting'] = "цена договорная";
         }
 
         // Комнаты
@@ -898,19 +900,17 @@ class View {
 
         // Уведомление прочитано или не прочитано
         $valuesArr['unread'] = "";
-        if (isset($sourceArr['isReaded']) && $sourceArr['isReaded'] == "не прочитано") $valuesArr['unread'] = "unread";
+        if ($sourceArr['isReaded'] == "не прочитано") $valuesArr['unread'] = "unread";
 
         // Идентификатор уведомления
-        $valuesArr['messageId'] = "";
-        if (isset($sourceArr['id'])) $valuesArr['messageId'] = $sourceArr['id'];
+        $valuesArr['messageId'] = $sourceArr['id'];
 
         // Команда прочитанности уведомления
         $valuesArr['isReadedTrue'] = "";
-        if (isset($sourceArr['isReaded']) && $sourceArr['isReaded'] == "не прочитано") $valuesArr['isReadedTrue'] = "прочитано";
+        if ($sourceArr['isReaded'] == "не прочитано") $valuesArr['isReadedTrue'] = "прочитано";
 
         // Идентификатор объекта
-        $valuesArr['propertyId'] = "";
-        if (isset($sourceArr['targetId'])) $valuesArr['propertyId'] = $sourceArr['targetId'];
+        $valuesArr['propertyId'] = $sourceArr['targetId'];
 
         // Тип
         $valuesArr['typeOfObject'] = "";
@@ -922,13 +922,15 @@ class View {
         // Стоимость
         $valuesArr['costOfRenting'] = "";
         $valuesArr['currency'] = "";
-        $valuesArr['costOfRentingName'] = "";
+        $valuesArr['costOfRentingName'] = "Плата:";
         $valuesArr['utilities'] = "";
         if ($sourceArr['costOfRenting'] != "" && $sourceArr['costOfRenting'] != "0.00" && $sourceArr['currency'] != "" && $sourceArr['currency'] != "0") {
             $valuesArr['costOfRenting'] = $sourceArr['costOfRenting'];
             $valuesArr['currency'] = $sourceArr['currency'] . "/мес.";
-            $valuesArr['costOfRentingName'] = "Плата:";
-            if (isset($sourceArr['utilities']) && $sourceArr['utilities'] == "да") $valuesArr['utilities'] = " <span style='white-space: nowrap;'>+ ком.усл.</span>";
+            if ($sourceArr['utilities'] == "да") $valuesArr['utilities'] = " <span style='white-space: nowrap;'>+ ком. усл.</span>";
+            if ($sourceArr['utilities'] == "нет") $valuesArr['utilities'] = "<span style='white-space: nowrap;'> (ком. вкл.)</span>";
+        } else {
+            $valuesArr['costOfRenting'] = "цена договорная";
         }
 
         // Комнаты

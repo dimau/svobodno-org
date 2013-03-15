@@ -29,6 +29,7 @@ class SearchRequest {
     private $regDate = "";
     private $needEmail = 1;
     private $needSMS = 0;
+    private $typeOfSorting = "costAscending";
 
     private $propertyLightArr; // Массив массивов. После выполнения метода searchProperties содержит минимальные данные по ВСЕМ объектам, соответствующим условиям поиска
     private $propertyFullArr; // Массив массивов. После выполнения метода searchProperties содержит полные данные, включая фотографии, по нескольким первым в выборке объектам (количество указывается в качестве первого параметра к методу searchProperties)
@@ -46,6 +47,10 @@ class SearchRequest {
 
     public function getNeedEmail() {
         return $this->needEmail;
+    }
+
+    public function getTypeOfSorting() {
+        return $this->typeOfSorting;
     }
 
     // Используется для установки id пользователя, которому принадлежит данный поисковый запрос
@@ -119,6 +124,7 @@ class SearchRequest {
         if (isset($res['regDate'])) $this->regDate = $res['regDate'];
         if (isset($res['needEmail'])) $this->needEmail = $res['needEmail'];
         if (isset($res['needSMS'])) $this->needSMS = $res['needSMS'];
+        if (isset($res['typeOfSorting'])) $this->typeOfSorting = $res['typeOfSorting'];
 
         return TRUE;
     }
@@ -130,6 +136,7 @@ class SearchRequest {
         if (isset($_GET['districtFast']) && $_GET['districtFast'] == "0") $this->district = array();
         if (isset($_GET['minCostFast']) && preg_match("/^\d{0,8}$/", $_GET['minCostFast'])) $this->minCost = htmlspecialchars($_GET['minCostFast'], ENT_QUOTES); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
         if (isset($_GET['maxCostFast']) && preg_match("/^\d{0,8}$/", $_GET['maxCostFast'])) $this->maxCost = htmlspecialchars($_GET['maxCostFast'], ENT_QUOTES); // Значение, введенное пользователем, затирает значение по умолчанию только если оно соответствует формату
+        if (isset($_GET['typeOfSortingFast'])) $this->typeOfSorting = htmlspecialchars($_GET['typeOfSortingFast'], ENT_QUOTES);
     }
 
     // Инициализировать параметры поискового запроса данными из POST запроса пользователя (форма поиска с подробными параметрами)
@@ -153,6 +160,7 @@ class SearchRequest {
         if (isset($_GET['children'])) $this->children = htmlspecialchars($_GET['children'], ENT_QUOTES);
         if (isset($_GET['animals'])) $this->animals = htmlspecialchars($_GET['animals'], ENT_QUOTES);
         if (isset($_GET['termOfLease'])) $this->termOfLease = htmlspecialchars($_GET['termOfLease'], ENT_QUOTES);
+        if (isset($_GET['typeOfSorting'])) $this->typeOfSorting = htmlspecialchars($_GET['typeOfSorting'], ENT_QUOTES);
     }
 
     // Записать в качестве параметров поискового запроса данные, полученные через POST запрос
@@ -183,6 +191,7 @@ class SearchRequest {
         if (isset($_POST['additionalDescriptionOfSearch'])) $this->additionalDescriptionOfSearch = htmlspecialchars($_POST['additionalDescriptionOfSearch'], ENT_QUOTES);
         if (isset($_POST['needEmail'])) $this->needEmail = intval(htmlspecialchars($_POST['needEmail'], ENT_QUOTES)); else $this->needEmail = 0;
         if (isset($_POST['needSMS'])) $this->needSMS = intval(htmlspecialchars($_POST['needSMS'], ENT_QUOTES)); else $this->needSMS = 0;
+        if (isset($_POST['typeOfSorting'])) $this->typeOfSorting = htmlspecialchars($_POST['typeOfSorting'], ENT_QUOTES);
     }
 
     /**
@@ -260,14 +269,22 @@ class SearchRequest {
         $this->regDate = "";
         $this->needEmail = 1;
         $this->needSMS = 0;
+        $this->typeOfSorting = "costAscending";
 
         return array();
     }
 
-    // Вычисляет массивы: 1. C краткими данными (id, coordX, coordY) о ВСЕХ объектах недвижимости, соответствующих параметрам поискового запроса
-    // 2. Кроме того по первым $amountFullProperties объектам недвижимости вычисляет полные данные, даже с фотографиями.
-    // Объекты недвижимости отсортированы в обоих массивах по увеличению стоимости аренды с учетом коммунальных платежей
+    /**
+     * Вычисляет массивы:
+     * 1. C краткими данными (id, coordX, coordY) о ВСЕХ объектах недвижимости, соответствующих параметрам поискового запроса
+     * 2. Кроме того по первым $amountFullProperties объектам недвижимости вычисляет полные данные, даже с фотографиями.
+     * @param $amountFullProperties количество объявлений, по которым нужно получить полные данные
+     * @return bool TRUE в случае успешного завершения выполнения алгоритма и FALSE в противном случае
+     */
     public function searchProperties($amountFullProperties) {
+
+        // Валидация входных данных
+        if (!isset($amountFullProperties)) return FALSE;
 
         // Получим минимальные данные (id, coordX, coordY) по всем объектам недвижимости, подходящим под параметры поискового запроса
         $this->findPropertyLightArr();
@@ -295,10 +312,29 @@ class SearchRequest {
         // Если был удален хотя бы 1 элемент, переиндексируем массив
         if ($markForSort) $this->propertyLightArr = array_values($this->propertyLightArr);
 
+        return TRUE;
     }
 
-    // Метод записывает в параметр $this->propertyLightArr массив массивов, содержащий минимальные данные по всем объектам недвижимости, соответствующим данным условиям поиска
+    /**
+     * Метод записывает в параметр $this->propertyLightArr массив массивов, содержащий минимальные данные по всем объектам недвижимости, соответствующим данным условиям поиска
+     * @return bool TRUE в случае успешного завершения выполнения алгоритма и FALSE в противном случае
+     */
     private function findPropertyLightArr() {
+
+        // Выбираем вариант сортировки
+        switch ($this->typeOfSorting) {
+            case "costAscending":
+                $typeOfSortingString = "realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting ASC";
+                break;
+            case "costDescending":
+                $typeOfSortingString = "realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting DESC";
+                break;
+            case "publicationDateDescending":
+                $typeOfSortingString = "reg_date DESC";
+                break;
+            default:
+                return FALSE;
+        }
 
         // Инициализируем массив, в который будем собирать условия поиска.
         $searchLimits = array();
@@ -406,15 +442,17 @@ class SearchRequest {
         // Получаем данные из БД - ВСЕ объекты недвижимости, соответствующие поисковому запросу
         // Сортируем по стоимости аренды и не ограничиваем количество объявлений - все, подходящие под условия пользователя
         // В итоге получим массив ($propertyLightArr), каждый элемент которого представляет собой еще один массив значений конкретного объявления по недвижимости
-        $res = DBconnect::get()->query("SELECT id, coordX, coordY FROM property WHERE" . $strWHERE . " ORDER BY realCostOfRenting + costInSummer * realCostOfRenting / costOfRenting");
+        $res = DBconnect::get()->query("SELECT id, coordX, coordY FROM property WHERE" . $strWHERE . " ORDER BY " . $typeOfSortingString);
         if ((DBconnect::get()->errno)
             OR (($this->propertyLightArr = $res->fetch_all(MYSQLI_ASSOC)) === FALSE)
         ) {
             // Логируем ошибку
             //TODO: сделать логирование ошибки
             $this->propertyLightArr = array();
+            return FALSE;
         }
 
+        return TRUE;
     }
 
     // Метод записывает в параметр $this->propertyFullArr массив массивов, содержащий полные данные (в том числе с фото) по первым $amountFullProperties объектам недвижимости из массива $this->propertyLightArr
@@ -476,6 +514,7 @@ class SearchRequest {
         $result['regDate'] = $this->regDate;
         $result['needEmail'] = $this->needEmail;
         $result['needSMS'] = $this->needSMS;
+        $result['typeOfSorting'] = $this->typeOfSorting;
 
         return $result;
     }

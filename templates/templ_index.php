@@ -51,12 +51,23 @@
         <div id="carousel">
             <div class="carousel-feature">
                 <a href="#"><img class="carousel-image" alt="Image Caption"
+                                 src="uploaded_files/7/big/70bcdb9e7b9648f145d097ed72c33a28.jpeg"></a>
+
+                <div class="carousel-caption">
+                    <p>
+                        Телефоны собственников жилья БЕСПЛАТНО<br>
+                        Всем зарегистрированным пользователям
+                    </p>
+                </div>
+            </div>
+            <div class="carousel-feature">
+                <a href="#"><img class="carousel-image" alt="Image Caption"
                                  src="uploaded_files/8/big/8191e133c5de9ac88f6e2044f9fa1492.jpeg"></a>
 
                 <div class="carousel-caption">
                     <p>
                         Экономьте свое время<br>
-                        У нас только реальные квартиры и комнаты!
+                        Мы отбираем только реальные квартиры и комнаты!
                     </p>
                 </div>
             </div>
@@ -89,17 +100,7 @@
                 <div class="carousel-caption">
                     <p>
                         Вы не пропустите подходящий вариант<br>
-                        Мы сообщим о нем по sms или e-mail
-                    </p>
-                </div>
-            </div>
-            <div class="carousel-feature">
-                <a href="#"><img class="carousel-image" alt="Image Caption"
-                                 src="uploaded_files/7/big/70bcdb9e7b9648f145d097ed72c33a28.jpeg"></a>
-
-                <div class="carousel-caption">
-                    <p>
-                        И все это по самой низкой цене в городе!
+                        Мы сообщим о нем по e-mail
                     </p>
                 </div>
             </div>
@@ -159,7 +160,7 @@
                             Автоматический подбор вариантов недвижимости
                         </li>
                         <li>
-                            Sms + email оповещение о новых подходящих под условия поиска объектах
+                            Email оповещение о новых подходящих под условия поиска объектах
                         </li>
                         <li>
                             Избранные объявления (добавление/удаление/просмотр)

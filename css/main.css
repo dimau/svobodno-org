@@ -125,7 +125,6 @@ ul.listDescriptionSmall {
     list-style: none;
     text-align: left;
     line-height: 1.6em;
-    font-size: 13px;
 }
 
 ul.listDescriptionSmall .headOfString {
@@ -808,7 +807,7 @@ td, th {
 .tabContent {}
 
 /* =============================================================================
-   ДИАЛОГОВОЕ ОКНО НА ОТДЕЛЬНОЙ СТРАНИЦЕ
+   ДИАЛОГОВОЕ ОКНО НА ОТДЕЛЬНОЙ СТРАНИЦЕ И МОДАЛЬНОЕ ОКНО
    ========================================================================== */
 
 .miniBlock {
@@ -864,6 +863,18 @@ td, th {
 
 .buttonRegistration {
     float: left;
+}
+
+/* Блок с кнопками оплаты премиум доступа */
+.paymentButtonsBlock {
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* Одинаковый отступ для содержимого любого модального окна */
+.modalWindow {
+    padding: 20px !important;
+    text-align: left;
 }
 
 /* =============================================================================
@@ -1052,17 +1063,26 @@ td, th {
     cursor: default !important;
 }
 
-/* Выбор варианта отображения результатов поиска - список, список + карта, карта */
-.choiceViewSearchResult {
-    margin: 16px 0px 6px 8px;
+/* Выбор варианта отображения результатов поиска - список, список + карта, карта и сортировки */
+.controlPanelSearchResult {
+    margin: 16px 8px 10px 8px;
     font-size: 14px;
+}
+
+.choiceViewSearchResult {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.choiceTypeOfSorting {
+    float: right;
 }
 
 /* Непосредственно блок с результатами поиска в выбранном представлении */
 #resultOnSearchPage {
     width: 100%;
     height: 100%;
-    margin: 10px auto;
+    margin: 0 auto 8px auto;
     position: relative;
 }
 
@@ -1398,7 +1418,8 @@ td, th {
 /* Стили для вкладки Новости личного кабинета */
 
 div.unread > div.newsHeader {
-    background-color: #FF9340;
+    background-color: #e1465a;
+    color: white;
 }
 
 /* =======================================================================

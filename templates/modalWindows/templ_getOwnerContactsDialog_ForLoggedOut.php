@@ -1,6 +1,6 @@
-<div id="getOwnerContactsDialog" title="Получить контакты собственника">
+<div id="getOwnerContactsDialog" class="modalWindow" title="Получить контакты собственника">
 
-    <div style="text-align: left; margin: 10px 0 10px 0;">
+    <div>
         Для получения контактов собственника необходимо
     </div>
 

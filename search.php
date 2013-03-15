@@ -47,7 +47,8 @@ if (isset($_GET['fastSearchButton'])) {
     $searchRequest->writeParamsFastFromGET();
 }
 
-if (isset($_GET['extendedSearchButton'])) {
+// При выборе типа сортировки, параметр extendedSearchButton не отправляется, поэтому ориентируемся по наличию typeOfSorting
+if (isset($_GET['extendedSearchButton']) || isset($_GET['typeOfSorting'])) {
     $searchRequest->writeParamsExtendedFromGET();
 }
 
@@ -55,7 +56,7 @@ if (isset($_GET['extendedSearchButton'])) {
  * Если пользователь залогинен и указал в личном кабинете параметры поиска, но еще не нажимал кнопки Поиск на этой странице
  **************************************************************************************************************/
 
-if (!isset($_GET['fastSearchButton']) && !isset($_GET['extendedSearchButton']) && $userIncoming->login()) {
+if (!isset($_GET['fastSearchButton']) && !isset($_GET['extendedSearchButton']) && !isset($_GET['typeOfSorting']) && $userIncoming->login()) {
     $searchRequest->setUserId($userIncoming->getId());
     $searchRequest->writeFromDB();
 }
