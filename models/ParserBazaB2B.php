@@ -5,8 +5,6 @@
 
 class ParserBazaB2B extends ParserBasic {
 
-    protected $c_id; // Дополнительный идентификатор объявления на сайте bazab2b
-
     /**
      * КОНСТРУКТОР
      */
@@ -91,7 +89,7 @@ class ParserBazaB2B extends ParserBasic {
     /**
      * Достает следующее краткое описание объявления из текущего списка.
      * При первом использовании достает самое первое краткое описание объявления из текущего списка.
-     * Сохраняет полученный DOM-объект в $advertShortDescriptionDOM, а также сохраняет идентификаторы загруженного объявления в $id и $c_id
+     * Сохраняет полученный DOM-объект в $advertShortDescriptionDOM, а также сохраняет идентификатор загруженного объявления в $id
      * @return bool TRUE в случае успешной загрузки и FALSE в противном случае
      */
     public function getNextAdvertShortDescription() {
@@ -99,7 +97,6 @@ class ParserBazaB2B extends ParserBasic {
         // Очищаем данные о предыдущем объявлении
         $this->advertShortDescriptionDOM = NULL;
         $this->id = NULL;
-        $this->c_id = NULL;
         $this->phoneNumber = NULL;
         $this->advertFullDescriptionDOM = NULL;
 
@@ -114,10 +111,7 @@ class ParserBazaB2B extends ParserBasic {
 
         // Сохраняем идентификаторы соответствующего объявления на сайте bazab2b в параметры объекта
         $href = $this->advertShortDescriptionDOM->find('.modal', 0)->href;
-        preg_match('/^\?c_id=([0-9]*)&.*$/', $href, $val);
-        $this->c_id = intval($val[1]);
-        preg_match('/&id=([0-9]*)$/', $href, $val);
-        $this->id = intval($val[1]);
+        $this->id = $href;
 
         return TRUE;
     }
@@ -132,7 +126,7 @@ class ParserBazaB2B extends ParserBasic {
         if (isset($this->advertFullDescriptionDOM)) $this->advertFullDescriptionDOM->clear();
 
         // Вычисляем URL запрашиваемой страницы
-        $url = "http://bazab2b.ru/?c_id=" . $this->c_id . "&&id=" . $this->id . "&modal=1";
+        $url = "http://bazab2b.ru/" . $this->id . "&modal=1";
 
         // Не передаем POST параметры, так как авторизация производится только при первоначальной загрузке списка объявлений, затем достаточно передавать только куки
         $post = "";
@@ -301,7 +295,7 @@ class ParserBazaB2B extends ParserBasic {
             $paramName = $oneParam->find("td", 0)->plaintext;
             if ($paramName == "Источник") {
                 $value = $oneParam->find("td a font b", 0)->plaintext;
-                if ($value == "" && $oneParam->find("td", 1)->plaintext == "Добавлено на наш сайт") $value = "http://bazab2b.ru/?c_id=" . $this->c_id . "&&id=" . $this->id . "&modal=1"; // Для объявлений добавленных напрямую в базуБ2Б
+                if ($value == "" && $oneParam->find("td", 1)->plaintext == "Добавлено на наш сайт") $value = "http://bazab2b.ru/" . $this->id . "&modal=1"; // Для объявлений добавленных напрямую в базуБ2Б
                 $params['sourceOfAdvert'] = $value;
             }
         }
@@ -313,25 +307,6 @@ class ParserBazaB2B extends ParserBasic {
         }
 
         return $params;
-    }
-
-    /**
-     * Функция проверяет, обрабатывалось ли данное объявление ранее
-     * @return bool возвращает TRUE, если текущее объявление уже обрабатывалось, FALSE в случае, если не обрабатывалось
-     */
-    public function isAdvertAlreadyHandled() {
-
-        /* Опознавательные идентификаторы всех обработанных за последнее время объявлений сохраняются в БД по мере обработки каждого объявления
-           Сравнение идентификаторов текущего объявления с сохраненными позволяет гарантированно убедиться в том, что данное объявление еще не сохранялось в мою БД */
-
-        // Проверяем по массиву $this->handledAdverts - было ли данное объявление уже обработано или нет
-        foreach ($this->handledAdverts as $key => $value) {
-            if ($key == $this->id && $value == $this->c_id) {
-                return TRUE;
-            }
-        }
-
-        return FALSE;
     }
 
     /**
@@ -359,7 +334,7 @@ class ParserBazaB2B extends ParserBasic {
                 $date = new DateTime(date("Y") . "-" . $publicationMonth . "-" . $publicationDate, new DateTimeZone('Asia/Yekaterinburg'));
             } else {
                 // Если не удалось получить ни время, ни дату публикации
-                Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->isTooLateDate():1 Не удалось получить ни время, ни дату публикации объекта с сайта bazaB2B по адресу: " . "http://bazab2b.ru/?c_id=" . $this->c_id . "&&id=" . $this->id . "&modal=1");
+                Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->isTooLateDate():1 Не удалось получить ни время, ни дату публикации объекта с сайта bazaB2B по адресу: " . "http://bazab2b.ru/" . $this->id . "&modal=1");
                 return TRUE;
             }
         }
@@ -373,36 +348,6 @@ class ParserBazaB2B extends ParserBasic {
             return FALSE;
         }
 
-    }
-
-    /**
-     * Функция запоминает в БД, что данное объявление успешно обработано, что позволит избежать его повторной обработки
-     * @return bool возвращает TRUE в случае успеха и FALSE в противном случае
-     */
-    public function setAdvertIsHandled() {
-
-        // Проверяем - объявление сегодняшнее? Если да, то дату устанавливаем также сегодняшнюю
-        $publicationTime = $this->advertShortDescriptionDOM->find('td', 0)->find('font', 0);
-        if (isset($publicationTime) && $publicationTime->plaintext != "") {
-            $date = new DateTime(NULL, new DateTimeZone('Asia/Yekaterinburg')); // Получаеми текущую дату
-            $date = $date->format("d.m.Y");
-        } else {
-            // Если объявление не сегодняшнее, то вычисляем дату его публикации
-            $value = $this->advertShortDescriptionDOM->find('td', 0)->find('center', 0);
-            if (isset($value) && $value = explode(".", $value->plaintext)) {
-                $publicationDate = intval($value['0']);
-                $publicationMonth = intval($value['1']);
-                $date = new DateTime(date("Y") . "-" . $publicationMonth . "-" . $publicationDate, new DateTimeZone('Asia/Yekaterinburg'));
-                $date = $date->format("d.m.Y");
-            } else {
-                // Если не удалось получить ни время, ни дату публикации, то дальнейшие действия бесполезны
-                Logger::getLogger(GlobFunc::$loggerName)->log("ParserBazaB2B.php->setAdvertIsHandled():1 Не удалось получить ни время, ни дату публикации объекта с сайта bazaB2B по адресу: " . "http://bazab2b.ru/?c_id=" . $this->c_id . "&&id=" . $this->id . "&modal=1");
-                return FALSE;
-            }
-        }
-
-        // Сохраняем идентификаторы объявления в БД и сразу выдаем результат
-        return DBconnect::insertHandledAdvertFromBazab2b($this->c_id, $this->id, $date);
     }
 
     /**

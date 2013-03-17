@@ -120,12 +120,12 @@ class View {
                 $arrForReplace['actionFavorites'] = "removeFromFavorites";
                 $arrForReplace['aloneStar'] = "";
                 $arrForReplace['imgFavorites'] = "img/gold_star.png";
-                $arrForReplace['textFavorites'] = "<a>убрать из избранного</a>";
+                $arrForReplace['textFavorites'] = " <a>убрать из избранного</a>";
             } else {
                 $arrForReplace['actionFavorites'] = "addToFavorites";
                 $arrForReplace['aloneStar'] = "";
                 $arrForReplace['imgFavorites'] = "img/blue_star.png";
-                $arrForReplace['textFavorites'] = "<a>добавить в избранное</a>";
+                $arrForReplace['textFavorites'] = " <a>добавить в избранное</a>";
             }
         } else {
             if (in_array($propertyId, $favoritePropertiesId)) {

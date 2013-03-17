@@ -378,10 +378,12 @@ require $websiteRoot . "/templates/templ_header.php";
         </li>
         <?php if ($isLoggedIn):?>
         <li class="instruction" id="lostRelevance">
-            <a href=""> не актуально</a>
+            <img src="img/lostRelevance.png">
+            <a> не актуально</a>
         </li>
         <li class="instruction" id="errorInDescription">
-            <a href=""> ошибка в описании</a>
+            <img src="img/errorInDescription.png">
+            <a> ошибка в описании</a>
         </li>
         <?php endif; ?>
         <!-- TODO: добавить функциональность!

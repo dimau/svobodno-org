@@ -574,8 +574,7 @@ if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TR
  ***************************************************************************/
 
 DBconnect::get()->query("CREATE TABLE bazab2b (
-  id VARCHAR(10) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'id идентификатор объявления на сайте bazab2b',
-  c_id VARCHAR(10) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'c_id идентификатор объявления на сайте bazab2b',
+  id VARCHAR(30) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'id идентификатор объявления на сайте bazab2b',
   date DATE COMMENT 'Дата публикации объявления'
 )");
 

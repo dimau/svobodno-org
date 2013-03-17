@@ -95,15 +95,12 @@
             <div class="alterHref">
                 <?php
                 if ($url_initial != "" && $url_initial != "http://svobodno.org/index.php" && $url_initial != "http://localhost/index.php" && $url_initial != "http://svobodno.org/" && $url_initial != "http://localhost/") {
-                    echo "<a href='" . $url_initial . "'>Вернуться на страницу</a>, с которой Вы перешли к регистрации";
+                    echo "<a href='" . $url_initial . "'>Вернуться на страницу</a>, с которой Вы перешли к регистрации,";
                 } else {
-                    echo "Воспользоваться <a href='search.php'>Поиском недвижимости</a>";
+                    echo "Воспользоваться <a href='search.php'>Поиском недвижимости</a>,";
                 }
                 ?>
-            </div>
-
-            <div class="alterHref">
-                Либо посетить <a href="personal.php">Личный кабинет</a>
+                либо посетить <a href="personal.php">Личный кабинет</a>
             </div>
 
         </div>

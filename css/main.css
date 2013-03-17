@@ -1027,13 +1027,6 @@ td, th {
     cursor: pointer;
 }
 
-.addToFavorites img, .removeFromFavorites img {
-    width: 1.3em;
-    height: 1em;
-    margin-top: -0.1em;
-    padding-right: 0.3em;
-}
-
 .addToFavorites.aloneStar img, .removeFromFavorites.aloneStar img {
     width: 1em;
     height: 1em;
