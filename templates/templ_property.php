@@ -154,7 +154,7 @@ require $websiteRoot . "/templates/templ_header.php";
                             $(".ownerContactsName").html("Телефонный номер:");
                         }
                         if (data.contactTelephonNumber != "") $(".ownerContactsTelephon").html(data.contactTelephonNumber);
-                        if (data.sourceOfAdvert != "") $(".ownerContactsSourceOfAdvert a.ownerContactsSourceOfAdvertHref").html("Источник объявления").attr("href", data.sourceOfAdvert);
+                        if (data.sourceOfAdvert != "" && data.sourceOfAdvert.substr(0,18) != "http://bazab2b.ru/") $(".ownerContactsSourceOfAdvert a.ownerContactsSourceOfAdvertHref").html("Источник объявления").attr("href", data.sourceOfAdvert);
                         // Прячем кнопку запроса контактов собственника, показываем полученные данные
                         $(".ownerContacts").css("display", "");
                         $(".getOwnerContactsButton").css("display", "none");

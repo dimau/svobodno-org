@@ -766,9 +766,16 @@ class DBconnect {
         }
 
         // Преобразование результата к нужному виду
-        $resultArr = array();
-        foreach ($res as $value) {
-            $resultArr[] = $value['id'];
+        if ($mode == "bazab2b") {
+            $resultArr = array();
+            foreach ($res as $value) {
+                $resultArr[$value['id']] = $value['c_id'];
+            }
+        } else {
+            $resultArr = array();
+            foreach ($res as $value) {
+                $resultArr[] = $value['id'];
+            }
         }
 
         return $resultArr;
@@ -1136,6 +1143,37 @@ class DBconnect {
             OR ($stmt->close() === FALSE)
         ) {
             Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO " . $table . " (id, date) VALUES (" . $id . "," . $date . ")'. id логгера: DBconnect::insertHandledAdvert():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
+            return FALSE;
+        }
+
+        return TRUE;
+    }
+
+    /**
+     * Сохраняет идентификаторы успешно обработанного объявления с сайта bazab2b (специализированный метод в отличие от общего insertHandledAdvert)
+     * @param int $c_id тоже какой-то идентификатор объявления
+     * @param int $id идентификатор объявления
+     * @param string $date дата публикации объявления в формате PHP: 27.01.1987
+     * @return bool Возвращает TRUE в случае успеха и FALSE в случае неудачи
+     */
+    public static function insertHandledAdvertFromBazab2b($c_id, $id, $date) {
+
+        // Проверка входящих параметров
+        if (!isset($c_id) || !is_int($c_id) || !isset($id) || !is_int($id) || !isset($date) || !is_string($date)) return FALSE;
+
+        // Преобразование даты в формат БД
+        $date = GlobFunc::dateFromViewToDB($date);
+
+        // Сохраняем информацию в БД
+        $stmt = DBconnect::get()->stmt_init();
+        if (($stmt->prepare("INSERT INTO bazab2b (id, c_id, date) VALUES (?,?,?)") === FALSE)
+            OR ($stmt->bind_param("iis", $id, $c_id, $date) === FALSE)
+            OR ($stmt->execute() === FALSE)
+            OR (($res = $stmt->affected_rows) === -1)
+            OR ($res === 0)
+            OR ($stmt->close() === FALSE)
+        ) {
+            Logger::getLogger(GlobFunc::$loggerName)->log("Ошибка обращения к БД. Запрос: 'INSERT INTO bazab2b (id, c_id, date) VALUES (" . $id . "," . $c_id . "," . $date . ")'. id логгера: DBconnect::insertHandledAdvertFromBazab2b():1. Выдаваемая ошибка: " . $stmt->errno . " " . $stmt->error . ". ID пользователя: не определено");
             return FALSE;
         }
 

@@ -46,6 +46,7 @@ messagesNewTenant,
 districts,
 currencies,
 archiveAdverts,
+bazab2b,
 e1,
 66ru,
 avito,
@@ -572,6 +573,15 @@ if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TR
  * СПИСОК ИДЕНТИФИКАТОРОВ ОБРАБОТАННЫХ ОБЪЯВЛЕНИЙ
  ***************************************************************************/
 
+DBconnect::get()->query("CREATE TABLE bazab2b (
+  id VARCHAR(10) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'id идентификатор объявления на сайте bazab2b',
+  c_id VARCHAR(10) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'c_id идентификатор объявления на сайте bazab2b',
+  date DATE COMMENT 'Дата публикации объявления'
+)");
+
+echo "bazab2b: ";
+if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TRUE);
+
 DBconnect::get()->query("CREATE TABLE e1 (
   id VARCHAR(15) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'id идентификатор объявления на сайте e1',
   date DATE COMMENT 'Дата публикации объявления'
@@ -620,6 +630,9 @@ if (DBconnect::get()->errno) returnResultMySql(FALSE); else returnResultMySql(TR
 
 // Записываем в таблицу первоначальные параметры
 DBconnect::get()->query("INSERT INTO lastSuccessfulHandledAdvertsId (id, mode, indexNumber) VALUES
+    ('0', 'bazab2b', 0),
+    ('0', 'bazab2b', 1),
+    ('0', 'bazab2b', 2),
     ('0', 'e1Kv1k', 0),
     ('0', 'e1Kv1k', 1),
     ('0', 'e1Kv1k', 2),
