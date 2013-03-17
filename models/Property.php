@@ -1280,7 +1280,7 @@ class Property {
         }
 
         // Получаем идентификаторы и параметры рассылки всех пользователей-арендаторов, чьим поисковым запросам соответствует данный объект недвижимости
-        $res = DBconnect::get()->query("SELECT searchRequests.userId AS userId, searchRequests.needEmail AS needEmail, searchRequests.needSMS AS needSMS, users.name AS name, users.email AS email, users.telephon AS telephon FROM searchRequests, users WHERE" . $strWHERE . " AND searchRequests.userId = users.id");
+        $res = DBconnect::get()->query("SELECT searchRequests.userId AS userId, searchRequests.needEmail AS needEmail, searchRequests.needSMS AS needSMS, users.name AS name, users.email AS email, users.telephon AS telephon, users.reviewFull AS reviewFull FROM searchRequests, users WHERE" . $strWHERE . " AND searchRequests.userId = users.id");
         if ((DBconnect::get()->errno)
             OR (($res = $res->fetch_all(MYSQLI_ASSOC)) == FALSE)
         ) {

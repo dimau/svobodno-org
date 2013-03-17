@@ -272,6 +272,9 @@ class View {
         $arrBalloonReplace['district'] = "";
         if ($oneProperty['district'] != "0") $arrBalloonReplace['district'] = $oneProperty['district'];
 
+        // Дата публикации
+        $arrBalloonReplace['reg_date'] = date('d.m', $oneProperty['reg_date']);
+
         // Адрес
         $arrBalloonReplace['address'] = $oneProperty['address'];
 
@@ -357,7 +360,7 @@ class View {
 
         // Производим заполнение шаблона баллуна
         // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне баллуна
-        $arrBalloonTemplVar = array('{coordX}', '{coordY}', '{propertyId}', '{typeOfObject}', '{district}', '{address}', '{costOfRenting}', '{currency}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{areaValuesMeasure}', '{floorName}', '{floor}', '{hasPhotos}', '{favorites}');
+        $arrBalloonTemplVar = array('{coordX}', '{coordY}', '{propertyId}', '{typeOfObject}', '{district}', '{reg_date}', '{address}', '{costOfRenting}', '{currency}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{areaValuesMeasure}', '{floorName}', '{floor}', '{hasPhotos}', '{favorites}');
         // Копируем html-текст шаблона баллуна
         $currentAdvertBalloonList = str_replace($arrBalloonTemplVar, $arrBalloonReplace, $templ);
 
@@ -400,6 +403,9 @@ class View {
         // Район
         $arrShortListReplace['district'] = "";
         if ($oneProperty['district'] != "0") $arrShortListReplace['district'] = $oneProperty['district'];
+
+        // Дата публикации
+        $arrShortListReplace['reg_date'] = date('d.m', $oneProperty['reg_date']);
 
         // Адрес
         $arrShortListReplace['address'] = $oneProperty['address'];
@@ -478,7 +484,7 @@ class View {
 
         // Производим заполнение шаблона строки (блока) shortList таблицы по данному объекту недвижимости
         // Инициализируем массив с строками, которые будут использоваться для подстановки в шаблоне
-        $arrShortListTemplVar = array('{propertyId}', '{number}', '{favorites}', '{hasPhotos}', '{typeOfObject}', '{district}', '{address}', '{costOfRenting}', '{currency}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{areaValuesMeasure}', '{floorName}', '{floor}');
+        $arrShortListTemplVar = array('{propertyId}', '{number}', '{favorites}', '{hasPhotos}', '{typeOfObject}', '{district}', '{reg_date}', '{address}', '{costOfRenting}', '{currency}', '{utilities}', '{amountOfRoomsName}', '{amountOfRooms}', '{adjacentRooms}', '{areaValues}', '{areaValuesMeasure}', '{floorName}', '{floor}');
         // Копируем html-текст шаблона блока (строки таблицы)
         $currentAdvertShortList = str_replace($arrShortListTemplVar, $arrShortListReplace, $tmpl_shortAdvert);
 

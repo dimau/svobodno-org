@@ -153,9 +153,13 @@
             </tr>
             <tr>
                 <td class="objectDescriptionItemLabel">Оповещение по e-mail:</td>
-                <td class="objectDescriptionBody"><span><?php
-                    if (isset($userSearchRequest['needEmail']) && $userSearchRequest['needEmail'] == 1) echo "включено"; else echo "отключено";
-                    ?></span></td>
+                <td class="objectDescriptionBody">
+                    <span>
+                        <?php
+                        if ($userSearchRequest['needEmail'] == 1 && $userCharacteristic['reviewFull'] >= time()) echo "включено"; else echo "отключено";
+                        ?>
+                    </span>
+                </td>
             </tr>
             </tbody>
         </table>

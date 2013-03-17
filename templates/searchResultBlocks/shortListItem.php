@@ -27,7 +27,7 @@
                     <a href='property.php?propertyId={propertyId}' target='_blank'>{address}</a>
                 </div>
                 <div>
-                    <span class="unimportantText">{typeOfObject} / {district}</span>
+                    <span class="unimportantText">{typeOfObject} / {district} / <span title="Дата публикации объявления">{reg_date}</span></span>
                 </div>
             </div>
         <div class="secondaryOptionsBlock">

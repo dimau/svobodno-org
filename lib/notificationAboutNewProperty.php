@@ -45,7 +45,7 @@ if (!$property->sendMessagesAboutNewProperty($listOfTargetUsers)) {
 // Формируем и рассылаем email по тем пользователям, которые подписаны на такую рассылку
 $listOfTargetUsersForEmail = array();
 foreach ($listOfTargetUsers as $value) {
-    if ($value['needEmail'] == 1) $listOfTargetUsersForEmail[] = $value;
+    if ($value['email'] != "" && $value['needEmail'] == 1 && $value['reviewFull'] >= time()) $listOfTargetUsersForEmail[] = $value;
 }
 $property->sendEmailAboutNewProperty($listOfTargetUsersForEmail);
 

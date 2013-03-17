@@ -293,7 +293,7 @@ require $websiteRoot . "/templates/templ_header.php";
             </div>
             <div>
                 <span class="unimportantText"><?php if ($propertyCharacteristic['typeOfObject'] != "0") echo GlobFunc::getFirstCharUpper($propertyCharacteristic['typeOfObject']); ?>
-                    / <?php if ($propertyCharacteristic['district'] != "0") echo $propertyCharacteristic['district']; ?></span>
+                    / <?php if ($propertyCharacteristic['district'] != "0") echo $propertyCharacteristic['district']; ?> / <span title="Дата публикации объявления"><?php echo date('d.m', $propertyCharacteristic['reg_date']); ?></span></span>
             </div>
         </div>
         <div class="secondaryOptionsBlock">

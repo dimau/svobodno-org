@@ -20,17 +20,6 @@
                     <option value="комната" <?php if ($userSearchRequest['typeOfObject'] == "комната") echo "selected";?>>
                         комната
                     </option>
-                    <option value="дом" <?php if ($userSearchRequest['typeOfObject'] == "дом") echo "selected";?>>дом,
-                        коттедж
-                    </option>
-                    <option value="таунхаус" <?php if ($userSearchRequest['typeOfObject'] == "таунхаус") echo "selected";?>>
-                        таунхаус
-                    </option>
-                    <option value="дача" <?php if ($userSearchRequest['typeOfObject'] == "дача") echo "selected";?>>дача
-                    </option>
-                    <option value="гараж" <?php if ($userSearchRequest['typeOfObject'] == "гараж") echo "selected";?>>
-                        гараж
-                    </option>
                 </select>
             </td>
         </tr>
@@ -421,17 +410,28 @@
 
 <?php if ($mode == "registration" || $mode == "personal"): ?>
 <div class="edited right" style="margin: 0; padding: 0; border: none; text-align: right;">
-    <label><input type="checkbox" value="1"
-                  name="needEmail" <?php if ($userSearchRequest['needEmail'] == 1) echo "checked";?>> Оповещать меня по
-        e-mail о подходящих объявлениях</label>
+    <?php if ($userCharacteristic['reviewFull'] >= time()): ?>
+    <label>
+        <input type="checkbox" value="1" name="needEmail"
+            <?php if ($userSearchRequest['needEmail'] == 1) echo "checked";?>>
+            Оповещать меня по e-mail о подходящих объявлениях
+    </label>
+    <?php else: ?>
+    <label style="color: silver;" title="Управлять e-mail оповещением можно только на премиум доступе">
+        <input type="checkbox" value="1" name="needEmail" disabled="disabled">
+        Оповещать меня по e-mail о подходящих объявлениях
+    </label>
+    <?php endif; ?>
 </div>
     <?php endif; ?>
 
 <?php if (($mode == "registration" || $mode == "personal") && $isAdmin['searchUser']): ?>
 <div class="edited right" style="margin: 0; padding: 0; border: none; text-align: right;">
-    <label><input type="checkbox" value="0"
-                  name="needSMS" <?php if ($userSearchRequest['needSMS'] == 1) echo "checked";?>> Оповещать меня по sms
-        о подходящих объявлениях</label>
+    <label>
+        <input type="checkbox" value="0" name="needSMS"
+            <?php if ($userSearchRequest['needSMS'] == 1) echo "checked";?>>
+            Оповещать меня по sms о подходящих объявлениях
+    </label>
 </div>
     <?php endif; ?>
 
