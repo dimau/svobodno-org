@@ -10,10 +10,10 @@
     <ul class='setOfInstructions'>
         {instructionPublish}
         <li>
-            <a href='editadvert.php?propertyId={propertyId}'>редактировать</a>
+            <a href='editadvert.php?propertyId={propertyId}'>Редактировать</a>
         </li>
         <li>
-            <a href='property.php?propertyId={propertyId}'>подробнее</a>
+            <a href='property.php?propertyId={propertyId}'>Подробнее</a>
         </li>
     </ul>
     <ul class='listDescriptionSmall'>

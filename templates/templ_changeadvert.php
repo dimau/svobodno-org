@@ -1792,7 +1792,7 @@ require $websiteRoot . "/templates/templ_header.php";
 </div>
 <!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2013 г. Мы будем рады ответить на Ваши вопросы, отзывы, предложения по телефону: 8-922-160-95-14, или e-mail: support@svobodno.org
+    2013 г. Мы будем рады ответить на Ваши вопросы, отзывы, предложения по телефону: 8-922-179-59-07, или e-mail: support@svobodno.org
 </div>
 <!-- /end.footer -->
 

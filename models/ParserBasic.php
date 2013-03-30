@@ -160,7 +160,7 @@ class ParserBasic {
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30); // Максимальное время ожидания ответа от сервера в секундах
         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17'); // Установим значение поля User-agent для маскировки под обычного пользователя
         if ($proxy) {
-            curl_setopt($ch, CURLOPT_PROXY, '84.47.172.129:3128'); // адрес прокси-сервера для анонимности
+            curl_setopt($ch, CURLOPT_PROXY, '188.64.128.1:3128'); // адрес прокси-сервера для анонимности
             //curl_setopt($ch, CURLOPT_PROXYUSERPWD,'user:pass'); // если необходимо предоставить имя пользователя и пароль для прокси
         }
         if ($cookieFileName != "") {

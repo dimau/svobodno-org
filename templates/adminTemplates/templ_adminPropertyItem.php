@@ -15,14 +15,14 @@
 
         <ul class="setOfInstructions">
             <li>
-                <a href='editadvert.php?propertyId=<?php echo $propertyCharacteristic['id'];?>'>редактировать</a>
+                <a href='editadvert.php?propertyId=<?php echo $propertyCharacteristic['id'];?>'>Редактировать</a>
             </li>
             <li>
-                <a href='property.php?propertyId=<?php echo $propertyCharacteristic['id'];?>'>подробнее</a>
+                <a href='property.php?propertyId=<?php echo $propertyCharacteristic['id'];?>'>Подробнее</a>
             </li>
             <?php if (isset($propertyCharacteristic['status']) && $propertyCharacteristic['status'] == "опубликовано"): ?>
             <li class="unpublishAdvert">
-                <a>снять с публикации</a>
+                <a>Снять с публикации</a>
             </li>
             <?php endif; ?>
         </ul>

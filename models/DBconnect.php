@@ -751,6 +751,9 @@ class DBconnect {
             case "slandoKomEkat":
                 $tableName = "slando";
                 break;
+            case "bazab2b":
+                $tableName = "bazab2b";
+                break;
         }
 
         $stmt = DBconnect::get()->stmt_init();

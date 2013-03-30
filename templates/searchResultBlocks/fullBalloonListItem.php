@@ -38,7 +38,7 @@
                 {favorites}
             </div>
             {hasPhotos}
-            <a href='property.php?propertyId={propertyId}' target='_blank'>подробнее</a>
+            <a href='property.php?propertyId={propertyId}' target='_blank'>Подробнее</a>
         </div>
     </div>
 </div>

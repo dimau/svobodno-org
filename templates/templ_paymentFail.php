@@ -63,7 +63,7 @@
             </div>
             <div class="paymentButtonsBlock">
                 <?php
-                //require $websiteRoot . "/templates/templ_paymentButtons.php";
+                require $websiteRoot . "/templates/templ_paymentButtons.php";
                 ?>
             </div>
         </div>
@@ -76,7 +76,7 @@
 </div>
 <!-- /end.pageWithoutFooter -->
 <div class="footer">
-    2013 г. Мы будем рады ответить на Ваши вопросы, отзывы, предложения по телефону: 8-922-160-95-14, или e-mail:
+    2013 г. Мы будем рады ответить на Ваши вопросы, отзывы, предложения по телефону: 8-922-179-59-07, или e-mail:
     support@svobodno.org
 </div>
 <!-- /end.footer -->
