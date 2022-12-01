@@ -1,1 +1,1 @@
-Project has name HC
+Codebase for Svobodno.org - social network for landlords and tenants
